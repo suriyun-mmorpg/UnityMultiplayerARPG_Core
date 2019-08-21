@@ -15,20 +15,14 @@ namespace MultiplayerARPG
             ref bool isLeftHand,
             out AnimActionType animActionType,
             out int skillOrWeaponTypeDataId,
-            out int animationIndex,
             out CharacterItem weapon,
-            out float triggerDuration,
-            out float totalDuration,
             out DamageInfo damageInfo,
             out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Initialize data
             animActionType = AnimActionType.None;
             skillOrWeaponTypeDataId = 0;
-            animationIndex = 0;
             weapon = this.GetAvailableWeapon(ref isLeftHand);
-            triggerDuration = 0f;
-            totalDuration = 0f;
             damageInfo = null;
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare skill data
@@ -46,20 +40,13 @@ namespace MultiplayerARPG
                 skillOrWeaponTypeDataId = weaponType.DataId;
                 // Assign animation action type
                 animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
-                // Random animation
-                if (!isLeftHand)
-                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDuration, out totalDuration);
-                else
-                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDuration, out totalDuration);
             }
             else if (useSkillActivateAnimationType == SkillActivateAnimationType.UseActivateAnimation)
             {
                 // Assign data id
                 skillOrWeaponTypeDataId = skill.DataId;
                 // Assign animation action type
-                animActionType = AnimActionType.Skill;
-                // Random animation
-                CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
+                animActionType = !isLeftHand ? AnimActionType.SkillRightHand : AnimActionType.AttackLeftHand;
             }
             // If it is attack skill
             if (skill.skillAttackType != SkillAttackType.None)
@@ -128,32 +115,36 @@ namespace MultiplayerARPG
             if (!skill.CanUse(this, level))
                 return;
 
-            // Prepare requires data
+            // Prepare requires data and get skill data
             AnimActionType animActionType;
             int skillOrWeaponTypeDataId;
-            int animationIndex;
             CharacterItem weapon;
-            float triggerDuration;
-            float totalDuration;
             DamageInfo damageInfo;
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
-
             GetUsingSkillData(
                 skill,
                 level,
                 ref isLeftHand,
                 out animActionType,
                 out skillOrWeaponTypeDataId,
-                out animationIndex,
                 out weapon,
-                out triggerDuration,
-                out totalDuration,
                 out damageInfo,
                 out allDamageAmounts);
 
             // Validate ammo
             if (skill.skillAttackType != SkillAttackType.None && !ValidateAmmo(weapon))
                 return;
+
+            // Prepare requires data and get animation data
+            int animationIndex;
+            float triggerDuration;
+            float totalDuration;
+            GetRandomAnimationData(
+                animActionType,
+                skillOrWeaponTypeDataId,
+                out animationIndex,
+                out triggerDuration,
+                out totalDuration);
 
             // Call on cast skill to extend skill functionality while casting skills
             // Quit function when on cast skill will override default cast skill functionality
@@ -190,9 +181,6 @@ namespace MultiplayerARPG
             float castDuration = skill.GetCastDuration(level);
             if (castDuration > 0f)
             {
-                // Play casting effects on clients
-                RequestPlayEffect(skill.castEffects.Id);
-
                 // Tell clients that character is casting
                 RequestSkillCasting(skill.DataId, castDuration);
 
@@ -243,9 +231,18 @@ namespace MultiplayerARPG
         {
             // Set doing action state at clients and server
             isAttackingOrUsingSkill = true;
-            // Play casting animation
-            if (CharacterModel != null)
-                yield return CharacterModel.PlaySkillCastClip(dataId, duration);
+
+            // SFX and Special effects will plays on clients only
+            if (IsClient)
+            {
+                // Play special effect
+                if (GameInstance.Skills.ContainsKey(dataId))
+                    Model.InstantiateEffect(GameInstance.Skills[dataId].castEffects.effects);
+
+                // Play casting animation
+                if (CharacterModel != null)
+                    yield return CharacterModel.PlaySkillCastClip(dataId, duration);
+            }
         }
 
         /// <summary>
@@ -291,7 +288,7 @@ namespace MultiplayerARPG
                             damageInfo,
                             allDamageAmounts,
                             debuff,
-                            skill.hitEffects.Id,
+                            skill,
                             hasAimPosition,
                             aimPosition,
                             Vector3.zero);

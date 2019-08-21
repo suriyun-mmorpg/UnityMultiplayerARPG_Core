@@ -341,10 +341,13 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
+
             if (onSetup != null)
                 onSetup.Invoke();
+
             SetupNetElements();
-            RegisterNetFunction<PackedUInt>(NetFuncPlayEffect);
+
+            // Register network functions
             RegisterNetFunction<PackedUInt>(NetFuncEnterVehicle);
             RegisterNetFunction<PackedUInt, byte>(NetFuncEnterVehicleToSeat);
             RegisterNetFunction(NetFuncExitVehicle);
@@ -389,18 +392,6 @@ namespace MultiplayerARPG
         public virtual void InitialRequiredComponents() { }
 
         #region Net Functions
-        /// <summary>
-        /// This will be called at every clients to play any effect
-        /// </summary>
-        /// <param name="effectId"></param>
-        protected void NetFuncPlayEffect(PackedUInt effectId)
-        {
-            GameEffectCollection gameEffectCollection;
-            if (Model == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
-                return;
-            Model.InstantiateEffect(gameEffectCollection.effects);
-        }
-
         protected void NetFuncEnterVehicle(PackedUInt objectId)
         {
             LiteNetLibIdentity identity;
@@ -432,13 +423,6 @@ namespace MultiplayerARPG
         #endregion
 
         #region Net Function Requests
-        public void RequestPlayEffect(uint effectId)
-        {
-            if (effectId <= 0)
-                return;
-            CallNetFunction(NetFuncPlayEffect, FunctionReceivers.All, new PackedUInt(effectId));
-        }
-
         public void RequestEnterVehicle(uint objectId)
         {
             CallNetFunction(NetFuncEnterVehicle, FunctionReceivers.Server, new PackedUInt(objectId));

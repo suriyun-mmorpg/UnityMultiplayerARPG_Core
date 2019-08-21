@@ -6,7 +6,8 @@
         Generic,
         AttackRightHand,
         AttackLeftHand,
-        Skill,
+        SkillRightHand,
+        SkillLeftHand,
         ReloadRightHand,
         ReloadLeftHand,
     }

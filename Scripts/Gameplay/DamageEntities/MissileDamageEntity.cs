@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldBool isExploded = new SyncFieldBool();
         [SerializeField]
-        protected SyncFieldPackedUInt lockingTargetId;
+        protected SyncFieldPackedUInt lockingTargetId = new SyncFieldPackedUInt();
 
         protected IDamageableEntity lockingTarget;
         public IDamageableEntity LockingTarget
@@ -33,9 +33,8 @@ namespace MultiplayerARPG
             }
             set
             {
-                if (!IsServer)
-                    return;
-                lockingTargetId.Value = value != null ? value.ObjectId : 0;
+                if (IsServer)
+                    lockingTargetId.Value = value != null ? value.ObjectId : 0;
                 lockingTarget = value;
             }
         }
@@ -75,10 +74,14 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            missileSpeed.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            missileSpeed.deliveryMethod = DeliveryMethod.Sequenced;
             missileSpeed.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            isExploded.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isExploded.deliveryMethod = DeliveryMethod.Sequenced;
             isExploded.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            lockingTargetId.deliveryMethod = DeliveryMethod.Sequenced;
+            lockingTargetId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            skillId.deliveryMethod = DeliveryMethod.Sequenced;
+            skillId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
         public override void OnSetup()
@@ -94,6 +97,10 @@ namespace MultiplayerARPG
                 if (onExploded != null)
                     onExploded.Invoke();
             }
+            // Explode when distance > 0
+            if (explodeDistance <= 0f)
+                return;
+            ExplodeApplyDamage();
         }
 
         public void SetupDamage(
@@ -101,12 +108,12 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
-            uint hitEffectsId,
+            Skill skill,
             float missileDistance,
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            SetupDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            SetupDamage(attacker, weapon, allDamageAmounts, debuff, skill);
             this.missileDistance = missileDistance;
             this.missileSpeed.Value = missileSpeed;
 
@@ -119,6 +126,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            Skill = skill;
             LockingTarget = lockingTarget;
             launchTime = Time.unscaledTime;
             missileDuration = missileDistance / missileSpeed;
@@ -215,7 +223,8 @@ namespace MultiplayerARPG
                     // If this is not going to explode, just apply damage to target
                     ApplyDamageTo(target);
                 }
-                NetworkDestroy(destroyDelay);
+                if (IsServer)
+                    NetworkDestroy(destroyDelay);
                 destroying = true;
                 return;
             }
@@ -231,7 +240,8 @@ namespace MultiplayerARPG
                     // Explode immediately when hit something
                     Explode();
                 }
-                NetworkDestroy(destroyDelay);
+                if (IsServer)
+                    NetworkDestroy(destroyDelay);
                 destroying = true;
                 return;
             }
@@ -240,10 +250,7 @@ namespace MultiplayerARPG
         private bool FindTargetEntity(GameObject other, out IDamageableEntity target)
         {
             target = null;
-
-            if (!IsServer)
-                return false;
-
+            
             if (attacker == null || attacker.gameObject == other)
                 return false;
 
@@ -273,10 +280,12 @@ namespace MultiplayerARPG
         {
             if (isExploded.Value || !IsServer)
                 return;
+
             isExploded.Value = true;
-            // Explode when distance > 0
-            if (explodeDistance <= 0f)
-                return;
+        }
+
+        private void ExplodeApplyDamage()
+        {
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);

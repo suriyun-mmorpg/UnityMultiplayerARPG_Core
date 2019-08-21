@@ -588,7 +588,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
@@ -599,12 +599,12 @@ namespace MultiplayerARPG
                 return;
             }
 
-            ReceiveDamageFunction(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            ReceiveDamageFunction(attacker, weapon, allDamageAmounts, debuff);
         }
 
-        internal void ReceiveDamageFunction(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        internal void ReceiveDamageFunction(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
         {
-            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // Notify enemy spotted when received damage from enemy
@@ -626,27 +626,16 @@ namespace MultiplayerARPG
             float calculatingTotalDamage = 0f;
             if (allDamageAmounts.Count > 0)
             {
-                DamageElement damageElement;
                 MinMaxFloat damageAmount;
                 float tempReceivingDamage;
-                foreach (KeyValuePair<DamageElement, MinMaxFloat> allDamageAmount in allDamageAmounts)
+                foreach (DamageElement damageElement in allDamageAmounts.Keys)
                 {
-                    damageElement = allDamageAmount.Key;
-                    damageAmount = allDamageAmount.Value;
-                    // Set hit effect by damage element
-                    if (hitEffectsId == 0 && damageElement != gameInstance.DefaultDamageElement)
-                        hitEffectsId = damageElement.hitEffects.Id;
+                    damageAmount = allDamageAmounts[damageElement];
                     tempReceivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
                     if (tempReceivingDamage > 0f)
                         calculatingTotalDamage += tempReceivingDamage;
                 }
             }
-
-            // Play hit effect
-            if (hitEffectsId == 0)
-                hitEffectsId = gameInstance.DefaultHitEffects.Id;
-            if (hitEffectsId > 0)
-                RequestPlayEffect(hitEffectsId);
 
             // Calculate chance to critical
             float criticalChance = gameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
@@ -811,20 +800,30 @@ namespace MultiplayerARPG
             return GetAttackFov(isLeftHand);
         }
 
+        /// <summary>
+        /// This function can be called at both client and server
+        /// For server it will instantiates damage entities if needed
+        /// For client it will instantiates special effects
+        /// </summary>
+        /// <param name="isLeftHand"></param>
+        /// <param name="weapon"></param>
+        /// <param name="damageInfo"></param>
+        /// <param name="allDamageAmounts"></param>
+        /// <param name="debuff"></param>
+        /// <param name="hasAimPosition"></param>
+        /// <param name="aimPosition"></param>
+        /// <param name="stagger"></param>
         public virtual void LaunchDamageEntity(
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
-            uint hitEffectsId,
+            Skill skill,
             bool hasAimPosition,
             Vector3 aimPosition,
             Vector3 stagger)
         {
-            if (!IsServer)
-                return;
-
             IDamageableEntity tempDamageableEntity = null;
             Vector3 damagePosition;
             Vector3 damageDirection;
@@ -860,7 +859,8 @@ namespace MultiplayerARPG
                             IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                         {
                             // Pass all receive damage condition, then apply damages
-                            tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                            if (IsServer)
+                                tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff);
                         }
                     }
                     else
@@ -880,14 +880,17 @@ namespace MultiplayerARPG
                                 IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                             {
                                 // Pass all receive damage condition, then apply damages
-                                tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                                if (IsServer)
+                                    tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff);
+                                if (IsClient)
+                                    tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
                             }
                         }
                     }
                     break;
                 case DamageType.Missile:
                     // Spawn missile damage entity, it will move to target then apply damage when hit
-                    if (damageInfo.missileDamageEntity != null)
+                    if (damageInfo.missileDamageEntity != null && IsServer)
                     {
                         GameObject spawnObj = Instantiate(damageInfo.missileDamageEntity.gameObject, damagePosition, damageRotation);
                         MissileDamageEntity missileDamageEntity = spawnObj.GetComponent<MissileDamageEntity>();
@@ -896,7 +899,7 @@ namespace MultiplayerARPG
                             if (!TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
-                        missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
+                        missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, skill, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
                         Manager.Assets.NetworkSpawn(spawnObj);
                     }
                     break;
@@ -918,7 +921,10 @@ namespace MultiplayerARPG
                             (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this))
                         {
                             // Pass all receive damage condition, then apply damages
-                            tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                            if (IsServer)
+                                tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff);
+                            if (IsClient)
+                                tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
                         }
                     }
                     break;
@@ -931,7 +937,7 @@ namespace MultiplayerARPG
         {
             return animActionType == AnimActionType.AttackRightHand || 
                 animActionType == AnimActionType.AttackLeftHand || 
-                animActionType == AnimActionType.Skill ||
+                animActionType == AnimActionType.SkillRightHand ||
                 animActionType == AnimActionType.ReloadRightHand ||
                 animActionType == AnimActionType.ReloadLeftHand;
         }

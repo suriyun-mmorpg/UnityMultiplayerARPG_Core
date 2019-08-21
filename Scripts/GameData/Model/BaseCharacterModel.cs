@@ -452,11 +452,11 @@ namespace MultiplayerARPG
             return null;
         }
 
-        public void PlayWeaponLaunchEffect(bool isLeftHand)
+        public void PlayWeaponLaunchEffect(AnimActionType animActionType)
         {
-            if (!isLeftHand && rightHandEquipmentEntity != null)
+            if ((animActionType == AnimActionType.AttackRightHand || animActionType == AnimActionType.SkillRightHand) && rightHandEquipmentEntity != null)
                 rightHandEquipmentEntity.PlayWeaponLaunchEffect();
-            if (isLeftHand && leftHandEquipmentEntity != null)
+            if ((animActionType == AnimActionType.AttackLeftHand || animActionType == AnimActionType.SkillLeftHand) && leftHandEquipmentEntity != null)
                 leftHandEquipmentEntity.PlayWeaponLaunchEffect();
         }
 
@@ -495,6 +495,8 @@ namespace MultiplayerARPG
         public abstract void StopSkillCastAnimation();
         public abstract bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
         public abstract bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
+        public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration);
+        public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration);
         public abstract bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration);
         public abstract bool GetRightHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);
         public abstract bool GetLeftHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);

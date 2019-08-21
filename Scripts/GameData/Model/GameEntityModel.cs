@@ -90,7 +90,7 @@ namespace MultiplayerARPG
         public List<GameEffect> InstantiateEffect(GameEffect[] effects)
         {
             if (effects == null || effects.Length == 0)
-                return new List<GameEffect>();
+                return null;
             List<GameEffect> tempAddingEffects = new List<GameEffect>();
             foreach (GameEffect effect in effects)
             {

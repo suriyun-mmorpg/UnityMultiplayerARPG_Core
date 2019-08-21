@@ -57,7 +57,8 @@ namespace MultiplayerARPG
                 case AnimActionType.AttackLeftHand:
                     tempActionAnimation = GetLeftHandAttackAnimations(dataId)[index];
                     break;
-                case AnimActionType.Skill:
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
                     tempActionAnimation = GetSkillActivateAnimation(dataId);
                     break;
                 case AnimActionType.ReloadRightHand:
@@ -130,15 +131,8 @@ namespace MultiplayerARPG
             out float triggerDuration,
             out float totalDuration)
         {
-            ActionAnimation[] tempActionAnimations = GetRightHandAttackAnimations(dataId);
-            animationIndex = 0;
-            triggerDuration = 0f;
-            totalDuration = 0f;
-            if (tempActionAnimations.Length == 0) return false;
-            animationIndex = Random.Range(0, tempActionAnimations.Length);
-            triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
-            totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
-            return true;
+            animationIndex = Random.Range(0, GetRightHandAttackAnimations(dataId).Length);
+            return GetRightHandAttackAnimation(dataId, animationIndex, out triggerDuration, out totalDuration);
         }
 
         public override bool GetRandomLeftHandAttackAnimation(
@@ -147,12 +141,35 @@ namespace MultiplayerARPG
             out float triggerDuration,
             out float totalDuration)
         {
-            ActionAnimation[] tempActionAnimations = GetLeftHandAttackAnimations(dataId);
-            animationIndex = 0;
+            animationIndex = Random.Range(0, GetLeftHandAttackAnimations(dataId).Length);
+            return GetLeftHandAttackAnimation(dataId, animationIndex, out triggerDuration, out totalDuration);
+        }
+
+        public override bool GetRightHandAttackAnimation(
+            int dataId,
+            int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            ActionAnimation[] tempActionAnimations = GetRightHandAttackAnimations(dataId);
             triggerDuration = 0f;
             totalDuration = 0f;
-            if (tempActionAnimations.Length == 0) return false;
-            animationIndex = Random.Range(0, tempActionAnimations.Length);
+            if (tempActionAnimations.Length == 0 || animationIndex >= tempActionAnimations.Length) return false;
+            triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
+            totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
+            return true;
+        }
+
+        public override bool GetLeftHandAttackAnimation(
+            int dataId,
+            int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            ActionAnimation[] tempActionAnimations = GetLeftHandAttackAnimations(dataId);
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (tempActionAnimations.Length == 0 || animationIndex >= tempActionAnimations.Length) return false;
             triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
             totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
             return true;
@@ -207,7 +224,7 @@ namespace MultiplayerARPG
         {
             return skillAnimations;
         }
-        
+
 #if UNITY_EDITOR
         [ContextMenu("Copy Weapon Animations")]
         public void CopyWeaponAnimations()

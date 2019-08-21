@@ -10,8 +10,7 @@ namespace MultiplayerARPG
         IAttackerEntity attacker,
         CharacterItem weapon,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-        CharacterBuff debuff,
-        uint hitEffectsId);
+        CharacterBuff debuff);
     public delegate void ReceivedDamage(
         IAttackerEntity attacker,
         CombatAmountType combatAmountType,

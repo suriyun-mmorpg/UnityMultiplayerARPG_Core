@@ -13,20 +13,14 @@ namespace MultiplayerARPG
             ref bool isLeftHand,
             out AnimActionType animActionType,
             out int dataId,
-            out int animationIndex,
             out CharacterItem weapon,
-            out float triggerDuration,
-            out float totalDuration,
             out DamageInfo damageInfo,
             out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Initialize data
             animActionType = AnimActionType.None;
             dataId = 0;
-            animationIndex = 0;
             weapon = this.GetAvailableWeapon(ref isLeftHand);
-            triggerDuration = 0f;
-            totalDuration = 0f;
             damageInfo = null;
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare weapon data
@@ -36,11 +30,6 @@ namespace MultiplayerARPG
             dataId = weaponType.DataId;
             // Assign animation action type
             animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
-            // Random animation
-            if (!isLeftHand)
-                CharacterModel.GetRandomRightHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
-            else
-                CharacterModel.GetRandomLeftHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
             // Assign damage data
             damageInfo = weaponType.damageInfo;
             // Calculate all damages
@@ -50,6 +39,32 @@ namespace MultiplayerARPG
             allDamageAmounts = GameDataHelpers.CombineDamages(
                 allDamageAmounts,
                 CacheIncreaseDamages);
+        }
+
+        public void GetRandomAnimationData(
+            AnimActionType animActionType,
+            int skillOrWeaponTypeDataId,
+            out int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            // Random animation
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDuration, out totalDuration);
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDuration, out totalDuration);
+                    break;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
+                    break;
+            }
         }
 
         public bool ValidateAmmo(CharacterItem weapon)
@@ -204,26 +219,30 @@ namespace MultiplayerARPG
             if (!CanAttack())
                 return;
 
-            // Prepare requires data
+            // Prepare requires data and get weapon data
             AnimActionType animActionType;
             int weaponTypeDataId;
-            int animationIndex;
             CharacterItem weapon;
-            float triggerDuration;
-            float totalDuration;
             DamageInfo damageInfo;
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
-
             GetAttackingData(
                 ref isLeftHand,
                 out animActionType,
                 out weaponTypeDataId,
-                out animationIndex,
                 out weapon,
-                out triggerDuration,
-                out totalDuration,
                 out damageInfo,
                 out allDamageAmounts);
+
+            // Prepare requires data and get animation data
+            int animationIndex;
+            float triggerDuration;
+            float totalDuration;
+            GetRandomAnimationData(
+                animActionType,
+                weaponTypeDataId,
+                out animationIndex,
+                out triggerDuration,
+                out totalDuration);
 
             // Validate ammo
             if (!ValidateAmmo(weapon))
@@ -287,10 +306,9 @@ namespace MultiplayerARPG
             Vector3 fireStagger = Vector3.zero;
             if (weapon != null && weapon.GetWeaponItem() != null)
             {
-                Item weaponItem = weapon.GetWeaponItem();
                 // For monsters, their weapon can be null so have to avoid null exception
-                fireSpread = weaponItem.fireSpread;
-                fireStagger = weaponItem.fireStagger;
+                fireSpread = weapon.GetWeaponItem().fireSpread;
+                fireStagger = weapon.GetWeaponItem().fireStagger;
             }
 
             Vector3 stagger;
@@ -303,20 +321,13 @@ namespace MultiplayerARPG
                     damageInfo,
                     allDamageAmounts,
                     CharacterBuff.Empty,
-                    0,
+                    null,
                     hasAimPosition,
                     aimPosition,
                     stagger);
             }
-            RequestPlayWeaponLaunchEffect(isLeftHand);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             isAttackingOrUsingSkill = false;
-        }
-
-        protected virtual void NetFuncPlayWeaponLaunchEffect(bool isLeftHand)
-        {
-            if (CharacterModel != null)
-                CharacterModel.PlayWeaponLaunchEffect(isLeftHand);
         }
     }
 }

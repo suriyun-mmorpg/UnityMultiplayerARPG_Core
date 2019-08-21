@@ -264,12 +264,12 @@ namespace MultiplayerARPG
             return characterEntity is BasePlayerCharacterEntity;
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
-            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // If character is not dead, try to attack
@@ -293,10 +293,7 @@ namespace MultiplayerARPG
             ref bool isLeftHand,
             out AnimActionType animActionType,
             out int dataId,
-            out int animationIndex,
             out CharacterItem weapon,
-            out float triggerDuration,
-            out float totalDuration,
             out DamageInfo damageInfo,
             out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
@@ -309,10 +306,7 @@ namespace MultiplayerARPG
 
             // Monster will not have weapon data
             weapon = null;
-
-            // Random attack animation
-            CharacterModel.GetRandomRightHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
-
+            
             // Assign damage data
             damageInfo = monsterCharacter.damageInfo;
 

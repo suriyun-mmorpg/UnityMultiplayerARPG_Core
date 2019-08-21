@@ -174,7 +174,6 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, MountEntity> MountEntities = new Dictionary<int, MountEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
-        public static readonly Dictionary<uint, GameEffectCollection> GameEffectCollections = new Dictionary<uint, GameEffectCollection>();
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, MapInfo> MapInfos = new Dictionary<string, MapInfo>();
@@ -329,8 +328,6 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (defaultHitEffects == null)
-                    defaultHitEffects = new GameEffectCollection();
                 return defaultHitEffects;
             }
         }
@@ -378,12 +375,9 @@ namespace MultiplayerARPG
             MonsterCharacterEntities.Clear();
             WarpPortalEntities.Clear();
             NpcEntities.Clear();
-            GameEffectCollections.Clear();
             MapWarpPortals.Clear();
             MapNpcs.Clear();
             MapInfos.Clear();
-            
-            GameEffectCollection.ResetId();
 
             this.InvokeInstanceDevExtMethods("Awake");
         }
@@ -663,19 +657,15 @@ namespace MultiplayerARPG
         {
             if (skills == null)
                 return;
-            List<GameEffectCollection> effects = new List<GameEffectCollection>();
             List<DamageInfo> damageInfos = new List<DamageInfo>();
             foreach (Skill skill in skills)
             {
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
                 Skills[skill.DataId] = skill;
-                effects.Add(skill.castEffects);
-                effects.Add(skill.hitEffects);
                 if (skill.damageInfo != null)
                     damageInfos.Add(skill.damageInfo);
             }
-            AddGameEffectCollections(effects);
             AddDamageInfos(damageInfos);
         }
 
@@ -803,20 +793,6 @@ namespace MultiplayerARPG
                     damageInfos.Add(weaponType.damageInfo);
             }
             AddDamageInfos(damageInfos);
-        }
-
-        public static void AddGameEffectCollections(IEnumerable<GameEffectCollection> gameEffectCollections)
-        {
-            if (gameEffectCollections == null)
-                return;
-            foreach (GameEffectCollection gameEffectCollection in gameEffectCollections)
-            {
-                if (!gameEffectCollection.Initialize())
-                    continue;
-                if (gameEffectCollection == null || GameEffectCollections.ContainsKey(gameEffectCollection.Id))
-                    continue;
-                GameEffectCollections[gameEffectCollection.Id] = gameEffectCollection;
-            }
         }
 
         public static void AddMapWarpPortals(IEnumerable<WarpPortals> mapWarpPortals)

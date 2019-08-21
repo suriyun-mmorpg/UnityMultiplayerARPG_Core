@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -59,49 +57,70 @@ namespace MultiplayerARPG
         private IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int skillOrWeaponTypeDataId, int index)
         {
             this.animActionType = animActionType;
+            // Set doing action state at clients and server
+            isAttackingOrUsingSkill = true;
+            // Calculate move speed rate while doing action at clients and server
+            moveSpeedRateWhileAttackOrUseSkill = 1f;
+            // Prepare data
             float playSpeedMultiplier = 1f;
+            float triggerDuration = 0f;
+            float totalDuration = 0f;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
                     playSpeedMultiplier = CacheAtkSpeed;
-                    // Set doing action state at clients and server
-                    isAttackingOrUsingSkill = true;
                     // Calculate move speed rate while doing action at clients and server
-                    moveSpeedRateWhileAttackOrUseSkill = 1f;
                     if (EquipWeapons != null && EquipWeapons.rightHand != null && EquipWeapons.rightHand.GetWeaponItem() != null)
                         moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.rightHand.GetWeaponItem().moveSpeedRateWhileAttacking;
                     else
                         moveSpeedRateWhileAttackOrUseSkill = gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                    // Get durations
+                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, index, out triggerDuration, out totalDuration);
                     break;
                 case AnimActionType.AttackLeftHand:
                     playSpeedMultiplier = CacheAtkSpeed;
-                    // Set doing action state at clients and server
-                    isAttackingOrUsingSkill = true;
                     // Calculate move speed rate while doing action at clients and server
-                    moveSpeedRateWhileAttackOrUseSkill = 1f;
                     if (EquipWeapons != null && EquipWeapons.leftHand != null && EquipWeapons.leftHand.GetWeaponItem() != null)
                         moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.leftHand.GetWeaponItem().moveSpeedRateWhileAttacking;
                     else
                         moveSpeedRateWhileAttackOrUseSkill = gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                    // Get durations
+                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, index, out triggerDuration, out totalDuration);
                     break;
-                case AnimActionType.Skill:
-                    // Set doing action state at clients and server
-                    isAttackingOrUsingSkill = true;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
                     // Calculate move speed rate while doing action at clients and server
-                    moveSpeedRateWhileAttackOrUseSkill = 1f;
                     if (GameInstance.Skills.ContainsKey(skillOrWeaponTypeDataId))
                         moveSpeedRateWhileAttackOrUseSkill = GameInstance.Skills[skillOrWeaponTypeDataId].moveSpeedRateWhileUsingSkill;
+                    // Get durations
+                    if (CharacterModel != null)
+                        CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
                     break;
                 case AnimActionType.ReloadLeftHand:
+                    // Get durations
+                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
+                    break;
                 case AnimActionType.ReloadRightHand:
-                    // Set doing action state at clients and server
-                    isAttackingOrUsingSkill = true;
-                    // Calculate move speed rate while doing action at clients and server
-                    moveSpeedRateWhileAttackOrUseSkill = 1f;
+                    // Get durations
+                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
                     break;
             }
-            if (CharacterModel != null)
-                yield return CharacterModel.PlayActionAnimation(animActionType, skillOrWeaponTypeDataId, index, playSpeedMultiplier);
+            // Animations will plays on clients only
+            if (IsClient)
+            {
+                // Play animation
+                CharacterModel.PlayActionAnimation(animActionType, skillOrWeaponTypeDataId, index, playSpeedMultiplier);
+            }
+            // Play special effects after trigger duration
+            yield return new WaitForSecondsRealtime(triggerDuration * playSpeedMultiplier);
+            // Special effects will plays on clients only
+            if (IsClient)
+            {
+                PlayActionSpecialEffect(animActionType, skillOrWeaponTypeDataId);
+                CharacterModel.PlayWeaponLaunchEffect(animActionType);
+            }
+            // Wait until animation ends to stop actions
+            yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) * playSpeedMultiplier);
             // Set doing action state at clients and server
             this.animActionType = AnimActionType.None;
             isAttackingOrUsingSkill = false;

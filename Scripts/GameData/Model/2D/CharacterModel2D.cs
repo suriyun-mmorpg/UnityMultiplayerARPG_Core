@@ -206,7 +206,8 @@ namespace MultiplayerARPG
                     else
                         animation2D = weaponAnimations2D.leftHandAttackAnimation;
                     break;
-                case AnimActionType.Skill:
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
                     if (!GetAnims().CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
                         animation2D = defaultSkillActivateAnimation2D;
                     else
@@ -294,11 +295,22 @@ namespace MultiplayerARPG
 
         public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
         {
+            animationIndex = 0;
+            return GetRightHandAttackAnimation(dataId, animationIndex, out triggerDuration, out totalDuration);
+        }
+
+        public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        {
+            animationIndex = 0;
+            return GetLeftHandAttackAnimation(dataId, animationIndex, out triggerDuration, out totalDuration);
+        }
+
+        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration)
+        {
             ActionAnimation2D animation2D = defaultAttackAnimation2D;
             WeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
-                animation2D = weaponAnims.rightHandReloadAnimation;
-            animationIndex = 0;
+                animation2D = weaponAnims.rightHandAttackAnimation;
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -309,13 +321,12 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration)
         {
             ActionAnimation2D animation2D = defaultAttackAnimation2D;
             WeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.leftHandAttackAnimation;
-            animationIndex = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;

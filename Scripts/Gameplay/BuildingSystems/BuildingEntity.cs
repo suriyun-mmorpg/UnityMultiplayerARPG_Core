@@ -182,12 +182,12 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
         {
             if (!IsServer || IsDead())
                 return;
 
-            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff);
             float calculatingTotalDamage = 0f;
             if (allDamageAmounts.Count > 0)
             {

@@ -35,16 +35,6 @@ namespace MultiplayerARPG
             GameInstance.AddMountEntities(mountEntities);
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddFactions(factions);
-            // Add hit effects
-            List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();
-            if (gameInstance.DefaultDamageElement.hitEffects != null)
-                weaponHitEffects.Add(gameInstance.DefaultDamageElement.hitEffects);
-            foreach (DamageElement damageElement in damageElements)
-            {
-                if (damageElement.hitEffects != null)
-                    weaponHitEffects.Add(damageElement.hitEffects);
-            }
-            GameInstance.AddGameEffectCollections(weaponHitEffects);
             // Tell game instance that data loaded
             gameInstance.LoadedGameData();
         }

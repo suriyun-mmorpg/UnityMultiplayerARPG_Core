@@ -216,32 +216,36 @@ namespace MultiplayerARPG
             Skill skill = item.skillLevel.skill;
             short level = item.skillLevel.level;
 
-            // Prepare requires data
+            // Prepare requires data and get skill data
             AnimActionType animActionType;
             int skillOrWeaponTypeDataId;
-            int animationIndex;
             CharacterItem weapon;
-            float triggerDuration;
-            float totalDuration;
             DamageInfo damageInfo;
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
-
             GetUsingSkillData(
                 skill,
                 level,
                 ref isLeftHand,
                 out animActionType,
                 out skillOrWeaponTypeDataId,
-                out animationIndex,
                 out weapon,
-                out triggerDuration,
-                out totalDuration,
                 out damageInfo,
                 out allDamageAmounts);
 
             // Validate ammo
             if (skill.skillAttackType != SkillAttackType.None && !ValidateAmmo(weapon))
                 return;
+
+            // Prepare requires data and get animation data
+            int animationIndex;
+            float triggerDuration;
+            float totalDuration;
+            GetRandomAnimationData(
+                animActionType,
+                skillOrWeaponTypeDataId,
+                out animationIndex,
+                out triggerDuration,
+                out totalDuration);
 
             // Call on cast skill to extend skill functionality while casting skills
             // Quit function when on cast skill will override default cast skill functionality

@@ -13,24 +13,29 @@ namespace MultiplayerARPG
         public int CurrentHp { get { return characterEntity.CurrentHp; } set { characterEntity.CurrentHp = value; } }
         public BaseGameEntity Entity { get { return characterEntity; } }
 
-        public bool CanReceiveDamageFrom(IAttackerEntity attacker)
-        {
-            return characterEntity.CanReceiveDamageFrom(attacker);
-        }
-
         public bool IsDead()
         {
             return characterEntity.IsDead();
         }
 
-        public void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
         {
             List<DamageElement> keys = new List<DamageElement>(allDamageAmounts.Keys);
             foreach (DamageElement key in keys)
             {
                 allDamageAmounts[key] = allDamageAmounts[key] * damageRate;
             }
-            characterEntity.ReceiveDamageFunction(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            characterEntity.ReceiveDamageFunction(attacker, weapon, allDamageAmounts, debuff);
+        }
+
+        public bool CanReceiveDamageFrom(IAttackerEntity attacker)
+        {
+            return characterEntity.CanReceiveDamageFrom(attacker);
+        }
+
+        public void PlayHitEffects(IEnumerable<DamageElement> allDamageElements, Skill skill)
+        {
+            characterEntity.PlayHitEffects(allDamageElements, skill);
         }
     }
 }

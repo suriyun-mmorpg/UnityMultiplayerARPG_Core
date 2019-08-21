@@ -92,18 +92,14 @@ namespace MultiplayerARPG
                 onHarvestableDestroy.Invoke();
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
         {
             if (!IsServer || IsDead() || weapon == null)
                 return;
 
-            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
-            // Play hit effect
-            if (hitEffectsId == 0)
-                hitEffectsId = gameInstance.DefaultHitEffects.Id;
-            if (hitEffectsId > 0)
-                RequestPlayEffect(hitEffectsId);
+
             // Apply damages
             int totalDamage = 0;
             Item weaponItem = weapon.GetWeaponItem();
