@@ -133,7 +133,7 @@ namespace MultiplayerARPG
             }
             set { movement = value; }
         }
-        
+
         public Transform MovementTransform
         {
             get
@@ -399,7 +399,7 @@ namespace MultiplayerARPG
             {
                 IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
                 byte seatIndex;
-                if (vehicleEntity != null && 
+                if (vehicleEntity != null &&
                     vehicleEntity.GetAvailableSeat(out seatIndex))
                     EnterVehicle(vehicleEntity, seatIndex);
             }
