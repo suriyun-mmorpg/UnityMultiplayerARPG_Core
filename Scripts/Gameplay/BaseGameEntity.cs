@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             set { movementState.Value = (byte)value; }
         }
         [SerializeField]
-        protected SyncFieldVector2 currentDirection = new SyncFieldVector2();
+        protected SyncFieldDirectionVector2 currentDirection = new SyncFieldDirectionVector2();
         public Vector2 CurrentDirection
         {
             get { return currentDirection.Value; }
