@@ -118,6 +118,7 @@ namespace MultiplayerARPG
         protected void SetupEquipWeapons(EquipWeapons equipWeapons)
         {
             currentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
+            UpdateCrosshair(currentCrosshairSetting, -currentCrosshairSetting.shrinkPerFrame);
 
             rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
             leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
