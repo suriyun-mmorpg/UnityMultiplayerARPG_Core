@@ -371,21 +371,5 @@ namespace MultiplayerARPG
         {
             Server.SendSocialMembers(connectionId, MsgTypes.UpdateFriends, members);
         }
-
-        public void SendNotifyOnlineCharacterToClient(long connectionId, string characterId)
-        {
-            StringMessage msg = new StringMessage();
-            msg.value = characterId;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, msg);
-        }
-
-        public void SendNotifyOnlineCharactersToClient(long connectionId)
-        {
-            foreach (string characterId in lastCharacterOnlineTimes.Keys)
-            {
-                if (IsCharacterOnline(characterId))
-                    SendNotifyOnlineCharacterToClient(connectionId, characterId);
-            }
-        }
     }
 }

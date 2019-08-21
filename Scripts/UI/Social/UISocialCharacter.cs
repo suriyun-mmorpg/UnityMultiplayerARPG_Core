@@ -73,6 +73,8 @@ namespace MultiplayerARPG
                 if (obj != null)
                     obj.SetActive(!BaseGameNetworkManager.IsCharacterOnline(Data.socialCharacter.id));
             }
+
+            BaseGameNetworkManager.RequestOnlineCharacter(Data.socialCharacter.id);
         }
 
         private bool MigrateUIGageValue()
