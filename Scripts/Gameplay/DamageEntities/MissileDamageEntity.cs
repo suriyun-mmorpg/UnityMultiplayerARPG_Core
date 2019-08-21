@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using LiteNetLibManager;
-using LiteNetLib;
 
 namespace MultiplayerARPG
 {
@@ -15,29 +13,9 @@ namespace MultiplayerARPG
         public float explodeDistance;
 
         protected float missileDistance;
-        [SerializeField]
-        protected SyncFieldFloat missileSpeed = new SyncFieldFloat();
-        [SerializeField]
-        protected SyncFieldBool isExploded = new SyncFieldBool();
-        [SerializeField]
-        protected SyncFieldPackedUInt lockingTargetId = new SyncFieldPackedUInt();
-
+        protected float missileSpeed;
+        protected bool isExploded;
         protected IDamageableEntity lockingTarget;
-        public IDamageableEntity LockingTarget
-        {
-            get
-            {
-                if (lockingTarget == null && lockingTargetId.Value > 0)
-                    TryGetEntityByObjectId(lockingTargetId.Value, out lockingTarget);
-                return lockingTarget;
-            }
-            set
-            {
-                if (IsServer)
-                    lockingTargetId.Value = value != null ? value.ObjectId : 0;
-                lockingTarget = value;
-            }
-        }
 
         private Rigidbody cacheRigidbody;
         public Rigidbody CacheRigidbody
@@ -63,44 +41,10 @@ namespace MultiplayerARPG
 
         private float launchTime;
         private float missileDuration;
-        private bool destroying;
 
-        protected override void EntityAwake()
+        private void Awake()
         {
-            base.EntityAwake();
             gameObject.layer = 2;   // Ignore raycast
-        }
-
-        protected override void SetupNetElements()
-        {
-            base.SetupNetElements();
-            missileSpeed.deliveryMethod = DeliveryMethod.Sequenced;
-            missileSpeed.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            isExploded.deliveryMethod = DeliveryMethod.Sequenced;
-            isExploded.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            lockingTargetId.deliveryMethod = DeliveryMethod.Sequenced;
-            lockingTargetId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            skillId.deliveryMethod = DeliveryMethod.Sequenced;
-            skillId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-        }
-
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            SetupNetElements();
-        }
-
-        private void OnIsExplodedChanged(bool isExploded)
-        {
-            if (isExploded)
-            {
-                if (onExploded != null)
-                    onExploded.Invoke();
-            }
-            // Explode when distance > 0
-            if (explodeDistance <= 0f)
-                return;
-            ExplodeApplyDamage();
         }
 
         public void SetupDamage(
@@ -115,42 +59,35 @@ namespace MultiplayerARPG
         {
             SetupDamage(attacker, weapon, allDamageAmounts, debuff, skill);
             this.missileDistance = missileDistance;
-            this.missileSpeed.Value = missileSpeed;
+            this.missileSpeed = missileSpeed;
 
             if (missileDistance <= 0 && missileSpeed <= 0)
             {
                 // Explode immediately when distance and speed is 0
                 Explode();
-                NetworkDestroy(destroyDelay);
-                destroying = true;
+                Destroy(gameObject);
                 return;
             }
 
-            Skill = skill;
-            LockingTarget = lockingTarget;
+            this.skill = skill;
+            this.lockingTarget = lockingTarget;
             launchTime = Time.unscaledTime;
             missileDuration = missileDistance / missileSpeed;
         }
 
-        protected override void EntityUpdate()
+        private void Update()
         {
-            if (destroying)
-                return;
-
-            base.EntityUpdate();
             if (Time.unscaledTime - launchTime > missileDuration)
             {
                 Explode();
-                NetworkDestroy(destroyDelay);
-                destroying = true;
+                Destroy(gameObject);
             }
         }
 
-        protected override void EntityFixedUpdate()
+        private void FixedUpdate()
         {
-            base.EntityFixedUpdate();
             // Don't move if exploded
-            if (isExploded.Value)
+            if (isExploded)
             {
                 if (gameInstance.DimensionType == DimensionType.Dimension2D)
                 {
@@ -166,10 +103,10 @@ namespace MultiplayerARPG
             }
 
             // Turn to locking target position
-            if (LockingTarget != null)
+            if (lockingTarget != null)
             {
                 // Lookat target then do anything when it's in range
-                Vector3 lookAtDirection = (LockingTarget.transform.position - CacheTransform.position).normalized;
+                Vector3 lookAtDirection = (lockingTarget.transform.position - CacheTransform.position).normalized;
                 // slerp to the desired rotation over time
                 if (lookAtDirection.magnitude > 0)
                 {
@@ -183,13 +120,19 @@ namespace MultiplayerARPG
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 if (CacheRigidbody2D != null)
-                    CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed.Value;
+                    CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed;
             }
             else
             {
                 if (CacheRigidbody != null)
-                    CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
+                    CacheRigidbody.velocity = CacheTransform.forward * missileSpeed;
             }
+        }
+
+        private void OnDestroy()
+        {
+            if (onDestroy != null)
+                onDestroy.Invoke();
         }
 
         private void OnTriggerEnter(Collider other)
@@ -204,9 +147,6 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
-            if (destroying)
-                return;
-
             if (attacker == null || attacker.gameObject == other)
                 return;
 
@@ -223,9 +163,7 @@ namespace MultiplayerARPG
                     // If this is not going to explode, just apply damage to target
                     ApplyDamageTo(target);
                 }
-                if (IsServer)
-                    NetworkDestroy(destroyDelay);
-                destroying = true;
+                Destroy(gameObject);
                 return;
             }
 
@@ -240,9 +178,7 @@ namespace MultiplayerARPG
                     // Explode immediately when hit something
                     Explode();
                 }
-                if (IsServer)
-                    NetworkDestroy(destroyDelay);
-                destroying = true;
+                Destroy(gameObject);
                 return;
             }
         }
@@ -259,7 +195,7 @@ namespace MultiplayerARPG
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
-            if (LockingTarget != null && LockingTarget != target)
+            if (lockingTarget != null && lockingTarget != target)
                 return false;
 
             return true;
@@ -278,10 +214,19 @@ namespace MultiplayerARPG
 
         private void Explode()
         {
-            if (isExploded.Value || !IsServer)
+            if (isExploded || !IsServer)
                 return;
 
-            isExploded.Value = true;
+            isExploded = true;
+
+            // Explode when distance > 0
+            if (explodeDistance <= 0f)
+                return;
+
+            if (onExploded != null)
+                onExploded.Invoke();
+
+            ExplodeApplyDamage();
         }
 
         private void ExplodeApplyDamage()
@@ -301,16 +246,6 @@ namespace MultiplayerARPG
                 {
                     FindAndApplyDamage(collider.gameObject);
                 }
-            }
-        }
-
-        public override void OnNetworkDestroy(byte reasons)
-        {
-            base.OnNetworkDestroy(reasons);
-            if (reasons == LiteNetLibGameManager.DestroyObjectReasons.RequestedToDestroy)
-            {
-                if (onDestroy != null)
-                    onDestroy.Invoke();
             }
         }
     }

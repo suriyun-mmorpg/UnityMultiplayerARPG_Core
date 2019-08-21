@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                 return;
 
             ItemDropEntity itemDropEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out itemDropEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out itemDropEntity))
                 return;
 
             if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > gameInstance.pickUpItemDistance + 5f)

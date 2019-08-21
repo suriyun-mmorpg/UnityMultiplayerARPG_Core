@@ -861,6 +861,8 @@ namespace MultiplayerARPG
                             // Pass all receive damage condition, then apply damages
                             if (IsServer)
                                 tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff);
+                            if (IsClient)
+                                tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
                         }
                     }
                     else
@@ -890,7 +892,7 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Missile:
                     // Spawn missile damage entity, it will move to target then apply damage when hit
-                    if (damageInfo.missileDamageEntity != null && IsServer)
+                    if (damageInfo.missileDamageEntity != null)
                     {
                         GameObject spawnObj = Instantiate(damageInfo.missileDamageEntity.gameObject, damagePosition, damageRotation);
                         MissileDamageEntity missileDamageEntity = spawnObj.GetComponent<MissileDamageEntity>();
@@ -900,7 +902,6 @@ namespace MultiplayerARPG
                                 tempDamageableEntity = null;
                         }
                         missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, skill, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
-                        Manager.Assets.NetworkSpawn(spawnObj);
                     }
                     break;
                 case DamageType.Raycast:

@@ -737,9 +737,9 @@ namespace MultiplayerARPG
                 return;
             foreach (BaseDamageEntity damageEntity in damageEntities)
             {
-                if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.Identity.HashAssetId))
+                if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.DataId))
                     continue;
-                DamageEntities[damageEntity.Identity.HashAssetId] = damageEntity;
+                DamageEntities[damageEntity.DataId] = damageEntity;
             }
         }
 

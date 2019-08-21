@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             if (objectId == 0)
                 SetTargetEntity(null);
             BaseGameEntity tempEntity;
-            if (!TryGetEntityByObjectId(objectId, out tempEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out tempEntity))
                 return;
             SetTargetEntity(tempEntity);
         }
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
                 return;
 
             NpcEntity npcEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out npcEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out npcEntity))
                 return;
 
             if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
@@ -559,7 +559,7 @@ namespace MultiplayerARPG
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;
             BuildingEntity parentBuildingEntity;
-            if (TryGetEntityByObjectId(parentObjectId, out parentBuildingEntity))
+            if (this.TryGetEntityByObjectId(parentObjectId, out parentBuildingEntity))
                 buildingSaveData.ParentId = parentBuildingEntity.Id;
             buildingSaveData.DataId = buildingEntity.DataId;
             buildingSaveData.CurrentHp = buildingEntity.maxHp;
@@ -577,7 +577,7 @@ namespace MultiplayerARPG
                 return;
 
             BuildingEntity buildingEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
                 return;
 
             // TODO: For now only creator can destroy building
@@ -591,7 +591,7 @@ namespace MultiplayerARPG
                 return;
 
             BuildingEntity buildingEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
                 return;
 
             // TODO: For now only creator can open storage
@@ -710,7 +710,7 @@ namespace MultiplayerARPG
         protected void NetFuncSendDealingRequest(PackedUInt objectId)
         {
             BasePlayerCharacterEntity targetCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out targetCharacterEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return;
@@ -734,7 +734,7 @@ namespace MultiplayerARPG
         protected void NetFuncReceiveDealingRequest(PackedUInt objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowDealingRequestDialog != null)
                 onShowDealingRequestDialog.Invoke(playerCharacterEntity);
@@ -775,7 +775,7 @@ namespace MultiplayerARPG
         protected void NetFuncAcceptedDealingRequest(PackedUInt objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowDealingDialog != null)
                 onShowDealingDialog.Invoke(playerCharacterEntity);
@@ -926,7 +926,7 @@ namespace MultiplayerARPG
         protected void NetFuncReceivePartyInvitation(PackedUInt objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowPartyInvitationDialog != null)
                 onShowPartyInvitationDialog.Invoke(playerCharacterEntity);
@@ -997,7 +997,7 @@ namespace MultiplayerARPG
         protected void NetFuncReceiveGuildInvitation(PackedUInt objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowGuildInvitationDialog != null)
                 onShowGuildInvitationDialog.Invoke(playerCharacterEntity);
@@ -1075,7 +1075,7 @@ namespace MultiplayerARPG
                 return;
 
             StorageEntity storageEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out storageEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out storageEntity))
                 return;
 
             if (Vector3.Distance(CacheTransform.position, storageEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
@@ -1098,7 +1098,7 @@ namespace MultiplayerARPG
                 return;
 
             DoorEntity doorEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out doorEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out doorEntity))
                 return;
 
             if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
@@ -1113,7 +1113,7 @@ namespace MultiplayerARPG
                 return;
 
             WorkbenchEntity workbenchEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out workbenchEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out workbenchEntity))
                 return;
 
             if (Vector3.Distance(CacheTransform.position, workbenchEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)

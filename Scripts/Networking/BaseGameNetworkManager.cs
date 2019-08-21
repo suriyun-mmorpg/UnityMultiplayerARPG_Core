@@ -694,10 +694,6 @@ namespace MultiplayerARPG
             {
                 spawnablePrefabs.Add(entry.Identity);
             }
-            foreach (BaseDamageEntity entry in GameInstance.DamageEntities.Values)
-            {
-                spawnablePrefabs.Add(entry.Identity);
-            }
             foreach (BuildingEntity entry in GameInstance.BuildingEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);

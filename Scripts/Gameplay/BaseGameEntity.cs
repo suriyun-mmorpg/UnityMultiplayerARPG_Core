@@ -446,20 +446,6 @@ namespace MultiplayerARPG
                 onNetworkDestroy.Invoke(reasons);
         }
 
-        public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : class
-        {
-            result = null;
-            LiteNetLibIdentity identity;
-            if (!Manager.Assets.TryGetSpawnedObject(objectId, out identity))
-                return false;
-
-            result = identity.GetComponent<T>();
-            if (result == null)
-                return false;
-
-            return true;
-        }
-
         public virtual float GetMoveSpeed()
         {
             return 0;
