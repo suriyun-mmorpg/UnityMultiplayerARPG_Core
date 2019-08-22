@@ -87,7 +87,7 @@ namespace MultiplayerARPG
         private static void RefineItem(IPlayerCharacterData character, CharacterItem refiningItem, System.Action<CharacterItem> onRefine, System.Action onDestroy, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.CannotRefine;
-            if (!refiningItem.NotEmptySlot())
+            if (refiningItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
                 return;

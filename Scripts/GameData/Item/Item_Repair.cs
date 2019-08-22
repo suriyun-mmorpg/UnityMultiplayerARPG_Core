@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         private static void RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.CannotRepair;
-            if (!repairingItem.NotEmptySlot())
+            if (repairingItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
                 return;

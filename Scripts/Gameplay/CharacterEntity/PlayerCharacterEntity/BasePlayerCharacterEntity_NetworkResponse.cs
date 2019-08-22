@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
             CharacterItem fromItem = NonEquipItems[fromIndex];
             CharacterItem toItem = NonEquipItems[toIndex];
-            if (!fromItem.NotEmptySlot() || !toItem.NotEmptySlot())
+            if (fromItem.IsEmptySlot() || toItem.IsEmptySlot())
                 return;
 
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
@@ -548,7 +548,7 @@ namespace MultiplayerARPG
 
             BuildingEntity buildingEntity;
             CharacterItem nonEquipItem = NonEquipItems[itemIndex];
-            if (!nonEquipItem.NotEmptySlot() ||
+            if (nonEquipItem.IsEmptySlot() ||
                 nonEquipItem.GetBuildingItem() == null ||
                 nonEquipItem.GetBuildingItem().buildingEntity == null ||
                 !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().buildingEntity.DataId, out buildingEntity) ||
@@ -617,7 +617,7 @@ namespace MultiplayerARPG
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
-            if (!nonEquipItem.NotEmptySlot() || amount > nonEquipItem.amount)
+            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
             Item item = nonEquipItem.GetItem();

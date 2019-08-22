@@ -128,7 +128,7 @@ namespace MultiplayerARPG
             }
 
             CharacterItem itemDropData = itemDropEntity.dropData;
-            if (!itemDropData.NotEmptySlot())
+            if (itemDropData.IsEmptySlot())
             {
                 // Destroy item drop entity without item add because this is not valid
                 itemDropEntity.MarkAsPickedUp();
@@ -154,7 +154,7 @@ namespace MultiplayerARPG
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
-            if (!nonEquipItem.NotEmptySlot() || amount > nonEquipItem.amount)
+            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
             if (this.DecreaseItemsByIndex(index, amount))

@@ -87,7 +87,7 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            if (!ui.Data.characterItem.NotEmptySlot())
+            if (ui.Data.characterItem.IsEmptySlot())
             {
                 CacheCharacterItemSelectionManager.DeselectSelectedUI();
                 return;

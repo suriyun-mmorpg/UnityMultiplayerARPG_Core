@@ -46,7 +46,7 @@ namespace MultiplayerARPG
         private static void EnhanceSocketItem(IPlayerCharacterData character, CharacterItem enhancingItem, int enhancerId, System.Action<CharacterItem> onEnhanceSocket, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.CannotEnhanceSocket;
-            if (!enhancingItem.NotEmptySlot())
+            if (enhancingItem.IsEmptySlot())
             {
                 // Cannot enhance socket because character item is empty
                 return;
