@@ -88,8 +88,7 @@ public static partial class CharacterDataExtension
         float result = 0f;
         foreach (CharacterItem item in itemList)
         {
-            if (!item.NotEmptySlot())
-                continue;
+            if (item.IsEmptySlot()) continue;
             result += item.GetItem().weight;
         }
         return result;
@@ -132,26 +131,21 @@ public static partial class CharacterDataExtension
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
         {
-            if (equipItem.IsEmpty()) continue;
+            if (equipItem.IsEmptySlot()) continue;
             result = GameDataHelpers.CombineAttributes(result, equipItem.GetIncreaseAttributes());
             result = GameDataHelpers.CombineAttributes(result, equipItem.GetSocketsIncreaseAttributes());
         }
-        // Weapons
-        EquipWeapons equipWeapons = data.EquipWeapons;
-        if (equipWeapons != null)
+        // Right hand equipment
+        if (data.EquipWeapons.NotEmptyRightHandSlot())
         {
-            // Right hand equipment
-            if (!equipWeapons.rightHand.IsEmpty())
-            {
-                result = GameDataHelpers.CombineAttributes(result, equipWeapons.rightHand.GetIncreaseAttributes());
-                result = GameDataHelpers.CombineAttributes(result, equipWeapons.rightHand.GetSocketsIncreaseAttributes());
-            }
-            // Left hand equipment
-            if (!equipWeapons.leftHand.IsEmpty())
-            {
-                result = GameDataHelpers.CombineAttributes(result, equipWeapons.leftHand.GetIncreaseAttributes());
-                result = GameDataHelpers.CombineAttributes(result, equipWeapons.leftHand.GetSocketsIncreaseAttributes());
-            }
+            result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.rightHand.GetIncreaseAttributes());
+            result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.rightHand.GetSocketsIncreaseAttributes());
+        }
+        // Left hand equipment
+        if (data.EquipWeapons.NotEmptyLeftHandSlot())
+        {
+            result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.leftHand.GetIncreaseAttributes());
+            result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.leftHand.GetSocketsIncreaseAttributes());
         }
         return result;
     }
@@ -221,26 +215,21 @@ public static partial class CharacterDataExtension
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
         {
-            if (equipItem.IsEmpty()) continue;
+            if (equipItem.IsEmptySlot()) continue;
             result = GameDataHelpers.CombineSkills(result, equipItem.GetIncreaseSkills());
             result = GameDataHelpers.CombineSkills(result, equipItem.GetSocketsIncreaseSkills());
         }
-        // Weapons
-        EquipWeapons equipWeapons = data.EquipWeapons;
-        if (equipWeapons != null)
+        // Right hand equipment
+        if (data.EquipWeapons.NotEmptyRightHandSlot())
         {
-            // Right hand equipment
-            if (!equipWeapons.rightHand.IsEmpty())
-            {
-                result = GameDataHelpers.CombineSkills(result, equipWeapons.rightHand.GetIncreaseSkills());
-                result = GameDataHelpers.CombineSkills(result, equipWeapons.rightHand.GetSocketsIncreaseSkills());
-            }
-            // Left hand equipment
-            if (!equipWeapons.leftHand.IsEmpty())
-            {
-                result = GameDataHelpers.CombineSkills(result, equipWeapons.leftHand.GetIncreaseSkills());
-                result = GameDataHelpers.CombineSkills(result, equipWeapons.leftHand.GetSocketsIncreaseSkills());
-            }
+            result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.rightHand.GetIncreaseSkills());
+            result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.rightHand.GetSocketsIncreaseSkills());
+        }
+        // Left hand equipment
+        if (data.EquipWeapons.NotEmptyLeftHandSlot())
+        {
+            result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.leftHand.GetIncreaseSkills());
+            result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.leftHand.GetSocketsIncreaseSkills());
         }
         return result;
     }
@@ -273,26 +262,21 @@ public static partial class CharacterDataExtension
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
         {
-            if (equipItem.IsEmpty()) continue;
+            if (equipItem.IsEmptySlot()) continue;
             result = GameDataHelpers.CombineResistances(result, equipItem.GetIncreaseResistances());
             result = GameDataHelpers.CombineResistances(result, equipItem.GetSocketsIncreaseResistances());
         }
-        // Weapons
-        EquipWeapons equipWeapons = data.EquipWeapons;
-        if (equipWeapons != null)
+        // Right hand equipment
+        if (data.EquipWeapons.NotEmptyRightHandSlot())
         {
-            // Right hand equipment
-            if (!equipWeapons.rightHand.IsEmpty())
-            {
-                result = GameDataHelpers.CombineResistances(result, equipWeapons.rightHand.GetIncreaseResistances());
-                result = GameDataHelpers.CombineResistances(result, equipWeapons.rightHand.GetSocketsIncreaseResistances());
-            }
-            // Left hand equipment
-            if (!equipWeapons.leftHand.IsEmpty())
-            {
-                result = GameDataHelpers.CombineResistances(result, equipWeapons.leftHand.GetIncreaseResistances());
-                result = GameDataHelpers.CombineResistances(result, equipWeapons.leftHand.GetSocketsIncreaseResistances());
-            }
+            result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.rightHand.GetIncreaseResistances());
+            result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.rightHand.GetSocketsIncreaseResistances());
+        }
+        // Left hand equipment
+        if (data.EquipWeapons.NotEmptyLeftHandSlot())
+        {
+            result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.leftHand.GetIncreaseResistances());
+            result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.leftHand.GetSocketsIncreaseResistances());
         }
         return result;
     }
@@ -338,26 +322,21 @@ public static partial class CharacterDataExtension
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
         {
-            if (equipItem.IsEmpty()) continue;
+            if (equipItem.IsEmptySlot()) continue;
             result = GameDataHelpers.CombineDamages(result, equipItem.GetIncreaseDamages());
             result = GameDataHelpers.CombineDamages(result, equipItem.GetSocketsIncreaseDamages());
         }
-        // Weapons
-        EquipWeapons equipWeapons = data.EquipWeapons;
-        if (equipWeapons != null)
+        // Right hand equipment
+        if (data.EquipWeapons.NotEmptyRightHandSlot())
         {
-            // Right hand equipment
-            if (!equipWeapons.rightHand.IsEmpty())
-            {
-                result = GameDataHelpers.CombineDamages(result, equipWeapons.rightHand.GetIncreaseDamages());
-                result = GameDataHelpers.CombineDamages(result, equipWeapons.rightHand.GetSocketsIncreaseDamages());
-            }
-            // Left hand equipment
-            if (!equipWeapons.leftHand.IsEmpty())
-            {
-                result = GameDataHelpers.CombineDamages(result, equipWeapons.leftHand.GetIncreaseDamages());
-                result = GameDataHelpers.CombineDamages(result, equipWeapons.leftHand.GetSocketsIncreaseDamages());
-            }
+            result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.rightHand.GetIncreaseDamages());
+            result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.rightHand.GetSocketsIncreaseDamages());
+        }
+        // Left hand equipment
+        if (data.EquipWeapons.NotEmptyLeftHandSlot())
+        {
+            result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.leftHand.GetIncreaseDamages());
+            result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.leftHand.GetSocketsIncreaseDamages());
         }
         return result;
     }
@@ -416,32 +395,27 @@ public static partial class CharacterDataExtension
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
         {
-            if (equipItem.IsEmpty()) continue;
+            if (equipItem.IsEmptySlot()) continue;
             result += equipItem.GetIncreaseStats();
             result += equipItem.GetSocketsIncreaseStats();
             result += GameDataHelpers.GetStatsFromAttributes(equipItem.GetIncreaseAttributes());
             result += GameDataHelpers.GetStatsFromAttributes(equipItem.GetSocketsIncreaseAttributes());
         }
-        // Weapons
-        EquipWeapons equipWeapons = data.EquipWeapons;
-        if (equipWeapons != null)
+        // Right hand equipment
+        if (!data.EquipWeapons.NotEmptyRightHandSlot())
         {
-            // Right hand equipment
-            if (!equipWeapons.rightHand.IsEmpty())
-            {
-                result += equipWeapons.rightHand.GetIncreaseStats();
-                result += equipWeapons.rightHand.GetSocketsIncreaseStats();
-                result += GameDataHelpers.GetStatsFromAttributes(equipWeapons.rightHand.GetIncreaseAttributes());
-                result += GameDataHelpers.GetStatsFromAttributes(equipWeapons.rightHand.GetSocketsIncreaseAttributes());
-            }
-            // Left hand equipment
-            if (!equipWeapons.leftHand.IsEmpty())
-            {
-                result += equipWeapons.leftHand.GetIncreaseStats();
-                result += equipWeapons.leftHand.GetSocketsIncreaseStats();
-                result += GameDataHelpers.GetStatsFromAttributes(equipWeapons.leftHand.GetIncreaseAttributes());
-                result += GameDataHelpers.GetStatsFromAttributes(equipWeapons.leftHand.GetSocketsIncreaseAttributes());
-            }
+            result += data.EquipWeapons.rightHand.GetIncreaseStats();
+            result += data.EquipWeapons.rightHand.GetSocketsIncreaseStats();
+            result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.rightHand.GetIncreaseAttributes());
+            result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.rightHand.GetSocketsIncreaseAttributes());
+        }
+        // Left hand equipment
+        if (!data.EquipWeapons.NotEmptyLeftHandSlot())
+        {
+            result += data.EquipWeapons.leftHand.GetIncreaseStats();
+            result += data.EquipWeapons.leftHand.GetSocketsIncreaseStats();
+            result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.leftHand.GetIncreaseAttributes());
+            result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.leftHand.GetSocketsIncreaseAttributes());
         }
         return result;
     }
@@ -500,7 +474,7 @@ public static partial class CharacterDataExtension
         // Remove empty slots if it's over limit
         for (i = itemList.Count - 1; itemList.Count > slotLimit && i >= 0; --i)
         {
-            if (!itemList[i].NotEmptySlot())
+            if (itemList[i].IsEmptySlot())
                 itemList.RemoveAt(i);
         }
     }
@@ -539,7 +513,7 @@ public static partial class CharacterDataExtension
         for (int i = 0; i < itemList.Count; ++i)
         {
             tempItem = itemList[i];
-            if (!tempItem.NotEmptySlot())
+            if (tempItem.IsEmptySlot())
             {
                 // If current entry is not valid, assume that it is empty slot, so reduce amount of adding item here
                 if (amount <= maxStack)
@@ -595,8 +569,7 @@ public static partial class CharacterDataExtension
     public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem addingItem)
     {
         // If item not valid
-        if (!addingItem.NotEmptySlot())
-            return false;
+        if (addingItem.IsEmptySlot()) return false;
 
         Item itemData = addingItem.GetItem();
         short amount = addingItem.amount;
@@ -609,7 +582,7 @@ public static partial class CharacterDataExtension
         for (int i = 0; i < itemList.Count; ++i)
         {
             tempNonEquipItem = itemList[i];
-            if (!tempNonEquipItem.NotEmptySlot())
+            if (tempNonEquipItem.IsEmptySlot())
             {
                 // If current entry is not valid, add it to empty list, going to replacing it later
                 emptySlots[i] = tempNonEquipItem;
@@ -788,7 +761,7 @@ public static partial class CharacterDataExtension
         if (index < 0 || index >= itemList.Count)
             return false;
         CharacterItem nonEquipItem = itemList[index];
-        if (!nonEquipItem.NotEmptySlot() || amount > nonEquipItem.amount)
+        if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
             return false;
         if (nonEquipItem.amount - amount == 0)
             itemList.RemoveAt(index);
@@ -847,28 +820,26 @@ public static partial class CharacterDataExtension
 
     public static CharacterItem GetAvailableWeapon(this ICharacterData data, ref bool isLeftHand)
     {
-        CharacterItem rightHand = data.EquipWeapons.rightHand;
-        Item rightWeaponItem = rightHand.GetWeaponItem();
-        CharacterItem leftHand = data.EquipWeapons.leftHand;
-        Item leftWeaponItem = leftHand.GetWeaponItem();
+        Item rightWeaponItem = data.EquipWeapons.GetRightHandWeaponItem();
+        Item leftWeaponItem = data.EquipWeapons.GetLeftHandWeaponItem();
         if (!isLeftHand)
         {
             if (rightWeaponItem != null)
-                return rightHand;
+                return data.EquipWeapons.rightHand;
             if (rightWeaponItem == null && leftWeaponItem != null)
             {
                 isLeftHand = true;
-                return leftHand;
+                return data.EquipWeapons.leftHand;
             }
         }
         else
         {
             if (leftWeaponItem != null)
-                return leftHand;
+                return data.EquipWeapons.leftHand;
             if (leftWeaponItem == null && rightWeaponItem != null)
             {
                 isLeftHand = false;
-                return rightHand;
+                return data.EquipWeapons.rightHand;
             }
         }
         isLeftHand = false;
@@ -1073,7 +1044,7 @@ public static partial class CharacterDataExtension
         for (int i = 0; i < list.Count; ++i)
         {
             tempItem = list[i];
-            if (!tempItem.NotEmptySlot())
+            if (tempItem.IsEmptySlot())
             {
                 index = i;
                 break;
@@ -1199,36 +1170,38 @@ public static partial class CharacterDataExtension
         bonusSkills.Clear();
         // Equipment Set
         equipmentSets.Clear();
+
+        Item tempEquipmentItem;
         // Armor equipment set
         foreach (CharacterItem equipItem in data.EquipItems)
         {
-            if (equipItem.NotEmptySlot() && equipItem.GetItem().equipmentSet != null)
+            tempEquipmentItem = equipItem.GetEquipmentItem();
+            if (tempEquipmentItem != null && tempEquipmentItem.equipmentSet != null)
             {
-                if (equipmentSets.ContainsKey(equipItem.GetItem().equipmentSet))
-                    ++equipmentSets[equipItem.GetItem().equipmentSet];
+                if (equipmentSets.ContainsKey(tempEquipmentItem.equipmentSet))
+                    ++equipmentSets[tempEquipmentItem.equipmentSet];
                 else
-                    equipmentSets.Add(equipItem.GetItem().equipmentSet, 0);
+                    equipmentSets.Add(tempEquipmentItem.equipmentSet, 0);
             }
         }
         // Weapon equipment set
-        if (data.EquipWeapons != null)
+        tempEquipmentItem = data.EquipWeapons.GetRightHandEquipmentItem();
+        // Right hand equipment set
+        if (tempEquipmentItem != null && tempEquipmentItem.equipmentSet != null)
         {
-            // Right hand equipment set
-            if (data.EquipWeapons.rightHand.NotEmptySlot() && data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
-            {
-                if (equipmentSets.ContainsKey(data.EquipWeapons.rightHand.GetItem().equipmentSet))
-                    ++equipmentSets[data.EquipWeapons.rightHand.GetItem().equipmentSet];
-                else
-                    equipmentSets.Add(data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
-            }
-            // Left hand equipment set
-            if (data.EquipWeapons.leftHand.NotEmptySlot() && data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
-            {
-                if (equipmentSets.ContainsKey(data.EquipWeapons.leftHand.GetItem().equipmentSet))
-                    ++equipmentSets[data.EquipWeapons.leftHand.GetItem().equipmentSet];
-                else
-                    equipmentSets.Add(data.EquipWeapons.leftHand.GetItem().equipmentSet, 0);
-            }
+            if (equipmentSets.ContainsKey(tempEquipmentItem.equipmentSet))
+                ++equipmentSets[tempEquipmentItem.equipmentSet];
+            else
+                equipmentSets.Add(tempEquipmentItem.equipmentSet, 0);
+        }
+        tempEquipmentItem = data.EquipWeapons.GetLeftHandEquipmentItem();
+        // Left hand equipment set
+        if (tempEquipmentItem != null && tempEquipmentItem.equipmentSet != null)
+        {
+            if (equipmentSets.ContainsKey(tempEquipmentItem.equipmentSet))
+                ++equipmentSets[tempEquipmentItem.equipmentSet];
+            else
+                equipmentSets.Add(tempEquipmentItem.equipmentSet, 0);
         }
         // Apply set items
         Dictionary<Attribute, short> tempIncreaseAttributes;
