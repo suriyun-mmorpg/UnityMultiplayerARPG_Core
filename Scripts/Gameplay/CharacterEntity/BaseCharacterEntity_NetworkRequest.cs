@@ -123,7 +123,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayAttackWithoutAimPosition, FunctionReceivers.Server, isLeftHand, animationIndex);
+            CallNetFunction(NetFuncPlayAttackWithoutAimPosition, FunctionReceivers.All, isLeftHand, animationIndex);
             return true;
         }
 
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayAttackWithAimPosition, FunctionReceivers.Server, isLeftHand, animationIndex, aimPosition);
+            CallNetFunction(NetFuncPlayAttackWithAimPosition, FunctionReceivers.All, isLeftHand, animationIndex, aimPosition);
             return true;
         }
 
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlaySkillWithoutAimPosition, FunctionReceivers.Server, isLeftHand, animationIndex, skillDataId, skillLevel);
+            CallNetFunction(NetFuncPlaySkillWithoutAimPosition, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel);
             return true;
         }
 
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlaySkillWithAimPosition, FunctionReceivers.Server, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+            CallNetFunction(NetFuncPlaySkillWithAimPosition, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
             return true;
         }
 
@@ -155,7 +155,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayReload, FunctionReceivers.Server, isLeftHand);
+            CallNetFunction(NetFuncPlayReload, FunctionReceivers.All, isLeftHand);
             return true;
         }
 
