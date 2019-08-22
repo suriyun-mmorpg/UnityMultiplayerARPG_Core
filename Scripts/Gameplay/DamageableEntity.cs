@@ -93,7 +93,7 @@ namespace MultiplayerARPG
         public virtual void PlayHitEffects(IEnumerable<DamageElement> allDamageElements, Skill skill)
         {
             GameEffect[] effects = gameInstance.DefaultHitEffects.effects;
-            if (skill != null && (skill.hitEffects.effects == null || skill.hitEffects.effects.Length == 0))
+            if (skill != null && skill.hitEffects.effects != null && skill.hitEffects.effects.Length > 0)
             {
                 // Set hit effects from skill's hit effects
                 effects = skill.hitEffects.effects;
@@ -109,7 +109,8 @@ namespace MultiplayerARPG
                     break;
                 }
             }
-            Model.InstantiateEffect(effects);
+            if (Model != null)
+                Model.InstantiateEffect(effects);
         }
     }
 }
