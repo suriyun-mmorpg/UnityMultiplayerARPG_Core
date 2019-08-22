@@ -16,28 +16,18 @@ namespace MultiplayerARPG
         CombatAmountType combatAmountType,
         int damage);
     public delegate void AttackRoutineDelegate(
-        AnimActionType animActionType,
-        int weaponTypeDataId,
-        int animationIndex,
-        float triggerDuration,
-        float totalDuration,
-        bool isLeftHand,
-        CharacterItem weapon,
-        DamageInfo damageInfo,
-        Dictionary<DamageElement, MinMaxFloat> allDamageAmounts);
-    public delegate void UseSkillRoutineDelegate(
-        Skill skill,
-        short level,
-        AnimActionType animActionType,
-        int skillOrWeaponTypeDataId,
-        int animationIndex,
-        float triggerDuration,
-        float totalDuration,
         bool isLeftHand,
         CharacterItem weapon,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-        bool hasAimPosition,
+        Vector3 aimPosition);
+    public delegate void UseSkillRoutineDelegate(
+        Skill skill,
+        short level,
+        bool isLeftHand,
+        CharacterItem weapon,
+        DamageInfo damageInfo,
+        Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
         Vector3 aimPosition);
     public delegate void ApplyBuffDelegate(
         int dataId,

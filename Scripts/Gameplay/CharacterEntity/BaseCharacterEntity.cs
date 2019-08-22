@@ -67,6 +67,9 @@ namespace MultiplayerARPG
         protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
+        protected CharacterItem reloadingWeapon;
+        protected Item reloadingWeaponItem;
+        protected short reloadingAmmoAmount;
         public bool isAttackingOrUsingSkill { get; protected set; }
         public bool isCastingSkillCanBeInterrupted { get; protected set; }
         public bool isCastingSkillInterrupted { get; protected set; }
@@ -351,70 +354,49 @@ namespace MultiplayerARPG
                 Killed(attacker);
         }
 
-        public void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        public void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
-                GetDamagePositionAndRotation2D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out direction, out rotation);
+                GetDamagePositionAndRotation2D(damageType, isLeftHand, aimPosition, stagger, out position, out direction, out rotation);
             else
-                GetDamagePositionAndRotation3D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out direction, out rotation);
+                GetDamagePositionAndRotation3D(damageType, isLeftHand, aimPosition, stagger, out position, out direction, out rotation);
         }
 
-        protected void GetDamagePositionAndRotation2D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        protected void GetDamagePositionAndRotation2D(DamageType damageType, bool isLeftHand, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
-            position = CacheTransform.position;
-            switch (damageType)
-            {
-                case DamageType.Melee:
-                    position = MeleeDamageTransform.position;
-                    break;
-                case DamageType.Missile:
-                case DamageType.Raycast:
-                    position = MissileDamageTransform.position;
-                    break;
-            }
+            Transform transform = GetDamageTransform(damageType, isLeftHand);
+            position = transform.position;
             direction = CurrentDirection;
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(direction.y, direction.x) * (180 / Mathf.PI)) + 90);
         }
 
-        protected void GetDamagePositionAndRotation3D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        protected void GetDamagePositionAndRotation3D(DamageType damageType, bool isLeftHand, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
-            position = CacheTransform.position;
+            Transform aimTransform = GetDamageTransform(damageType, isLeftHand);
+            position = aimTransform.position;
+            Quaternion forwardRotation = Quaternion.LookRotation(aimPosition - position);
+            Vector3 forwardStagger = forwardRotation * stagger;
+            direction = aimPosition + forwardStagger - position;
+            rotation = Quaternion.LookRotation(direction);
+        }
+
+        public Transform GetDamageTransform(DamageType damageType, bool isLeftHand)
+        {
+            Transform transform = null;
             switch (damageType)
             {
                 case DamageType.Melee:
-                    position = MeleeDamageTransform.position;
+                    transform = MeleeDamageTransform;
                     break;
                 case DamageType.Missile:
                 case DamageType.Raycast:
-                    Transform tempMissileDamageTransform = null;
-                    if ((tempMissileDamageTransform = CharacterModel.GetRightHandMissileDamageTransform()) != null && !isLeftHand)
-                    {
-                        // Use position from right hand weapon missile damage transform
-                        position = tempMissileDamageTransform.position;
-                    }
-                    else if ((tempMissileDamageTransform = CharacterModel.GetLeftHandMissileDamageTransform()) != null && isLeftHand)
-                    {
-                        // Use position from left hand weapon missile damage transform
-                        position = tempMissileDamageTransform.position;
-                    }
-                    else
-                    {
-                        // Use position from default missile damage transform
-                        position = MissileDamageTransform.position;
-                    }
+                    transform = !isLeftHand ? CharacterModel.GetRightHandMissileDamageTransform() : CharacterModel.GetLeftHandMissileDamageTransform();
+                    // Use position from default missile damage transform
+                    if (transform == null)
+                        transform = MissileDamageTransform;
                     break;
             }
-            Quaternion forwardRotation = Quaternion.LookRotation(CacheTransform.forward);
-            Vector3 forwardStagger = forwardRotation * stagger;
-            direction = CacheTransform.forward + forwardStagger;
-            rotation = Quaternion.LookRotation(direction);
-            if (hasAimPosition)
-            {
-                forwardRotation = Quaternion.LookRotation(aimPosition - position);
-                forwardStagger = forwardRotation * stagger;
-                direction = aimPosition + forwardStagger - position;
-                rotation = Quaternion.LookRotation(direction);
-            }
+            return transform;
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
@@ -820,7 +802,6 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
             Skill skill,
-            bool hasAimPosition,
             Vector3 aimPosition,
             Vector3 stagger)
         {
@@ -828,7 +809,7 @@ namespace MultiplayerARPG
             Vector3 damagePosition;
             Vector3 damageDirection;
             Quaternion damageRotation;
-            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
+            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
 #if UNITY_EDITOR
             debugDamagePosition = damagePosition;
             debugDamageRotation = damageRotation;

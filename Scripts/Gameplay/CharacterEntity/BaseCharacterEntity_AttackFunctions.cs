@@ -12,33 +12,30 @@ namespace MultiplayerARPG
         public virtual void GetAttackingData(
             ref bool isLeftHand,
             out AnimActionType animActionType,
-            out int dataId,
-            out CharacterItem weapon,
-            out DamageInfo damageInfo,
-            out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+            out int animationDataId,
+            out CharacterItem weapon)
         {
             // Initialize data
             animActionType = AnimActionType.None;
-            dataId = 0;
+            animationDataId = 0;
             weapon = this.GetAvailableWeapon(ref isLeftHand);
-            damageInfo = null;
-            allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare weapon data
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
             // Assign data id
-            dataId = weaponType.DataId;
+            animationDataId = weaponType.DataId;
             // Assign animation action type
             animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
-            // Assign damage data
-            damageInfo = weaponType.damageInfo;
+        }
+
+        public virtual void GetWeaponDamages(CharacterItem weapon, out DamageInfo damageInfo, out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        {
+            Item weaponItem = weapon.GetWeaponItem();
+            damageInfo = weaponItem.WeaponType.damageInfo;
             // Calculate all damages
-            allDamageAmounts = GameDataHelpers.CombineDamages(
-                allDamageAmounts,
-                weaponItem.GetDamageAmount(weapon.level, weapon.GetEquipmentBonusRate(), this));
-            allDamageAmounts = GameDataHelpers.CombineDamages(
-                allDamageAmounts,
-                CacheIncreaseDamages);
+            allDamageAmounts = GameDataHelpers.CombineDamages(null, weaponItem.GetDamageAmount(weapon.level, weapon.GetEquipmentBonusRate(), this));
+            // Sum damage with buffs
+            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, CacheIncreaseDamages);
         }
 
         public void GetRandomAnimationData(
@@ -65,6 +62,61 @@ namespace MultiplayerARPG
                     CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
                     break;
             }
+        }
+
+        public void GetAnimationData(
+            AnimActionType animActionType,
+            int skillOrWeaponTypeDataId,
+            int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            // Random animation
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out triggerDuration, out totalDuration);
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out triggerDuration, out totalDuration);
+                    break;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
+                    break;
+            }
+        }
+
+        public float GetAnimSpeedRate(AnimActionType animActionType)
+        {
+            if (animActionType == AnimActionType.AttackRightHand ||
+                animActionType == AnimActionType.AttackLeftHand)
+                return CacheAtkSpeed;
+            return 1f;
+        }
+
+        public float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, Skill skill)
+        {
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    if (EquipWeapons.GetRightHandWeaponItem() != null)
+                        return EquipWeapons.GetRightHandWeaponItem().moveSpeedRateWhileAttacking;
+                    return gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                case AnimActionType.AttackLeftHand:
+                    if (EquipWeapons.GetLeftHandWeaponItem() != null)
+                        return EquipWeapons.GetLeftHandWeaponItem().moveSpeedRateWhileAttacking;
+                    return gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    // Calculate move speed rate while doing action at clients and server
+                    if (skill != null)
+                        return moveSpeedRateWhileAttackOrUseSkill = skill.moveSpeedRateWhileUsingSkill;
+                    break;
+            }
+            return 1f;
         }
 
         public bool ValidateAmmo(CharacterItem weapon)
@@ -136,78 +188,75 @@ namespace MultiplayerARPG
         {
             if (!CanAttack())
                 return;
-
-            CharacterItem weapon;
-
+            
             if (isLeftHand)
-                weapon = EquipWeapons.leftHand;
+                reloadingWeapon = EquipWeapons.leftHand;
             else
-                weapon = EquipWeapons.rightHand;
+                reloadingWeapon = EquipWeapons.rightHand;
 
-            if (weapon.IsEmpty())
+            if (reloadingWeapon.IsEmptySlot())
                 return;
 
-            Item weaponItem = weapon.GetWeaponItem();
+            reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
+            if (reloadingWeaponItem == null ||
+                reloadingWeaponItem.WeaponType == null ||
+                reloadingWeaponItem.WeaponType.requireAmmoType == null ||
+                reloadingWeaponItem.ammoCapacity <= 0 ||
+                reloadingWeapon.ammo >= reloadingWeaponItem.ammoCapacity)
+                return;
 
-            if (weaponItem != null &&
-                weaponItem.WeaponType != null &&
-                weaponItem.WeaponType.requireAmmoType != null &&
-                weaponItem.ammoCapacity > 0 &&
-                weapon.ammo < weaponItem.ammoCapacity)
-            {
-                // Prepare reload data
-                AnimActionType animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;
-                int weaponTypeDataId = weaponItem.WeaponType.DataId;
-                float triggerDuration = 0f;
-                float totalDuration = 0f;
-                if (!isLeftHand)
-                    CharacterModel.GetRightHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
-                else
-                    CharacterModel.GetLeftHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
+            // Prepare reload data
+            reloadingAmmoAmount = (short)(reloadingWeaponItem.ammoCapacity - reloadingWeapon.ammo);
+            int inventoryAmount = this.CountAmmos(reloadingWeaponItem.WeaponType.requireAmmoType);
+            if (inventoryAmount < reloadingAmmoAmount)
+                reloadingAmmoAmount = (short)inventoryAmount;
 
-                int reloadingAmount = weaponItem.ammoCapacity - weapon.ammo;
-                int inventoryAmount = this.CountAmmos(weaponItem.WeaponType.requireAmmoType);
-                if (inventoryAmount < reloadingAmount)
-                    reloadingAmount = inventoryAmount;
+            if (reloadingAmmoAmount <= 0)
+                return;
 
-                if (reloadingAmount > 0)
-                {
-                    // Start reload routine
-                    isAttackingOrUsingSkill = true;
-                    StartCoroutine(ReloadRoutine(animActionType, weaponTypeDataId, triggerDuration, totalDuration, isLeftHand, weapon, (short)reloadingAmount));
-                }
-            }
+            // Start reload routine
+            isAttackingOrUsingSkill = true;
+
+            // Play animations
+            RequestPlayReloadAnimation(isLeftHand);
         }
-        
-        protected IEnumerator ReloadRoutine(
-            AnimActionType animActionType,
-            int weaponTypeDataId,
-            float triggerDuration,
-            float totalDuration,
-            bool isLeftHand,
-            CharacterItem weapon,
-            short reloadingAmount)
-        {
-            // Play animation on clients
-            RequestPlayActionAnimation(animActionType, weaponTypeDataId, 0);
+    
 
+        protected IEnumerator ReloadRoutine(bool isLeftHand)
+        {
+            animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;
+            int weaponTypeDataId = reloadingWeaponItem.WeaponType.DataId;
+            float triggerDuration = 0f;
+            float totalDuration = 0f;
+            if (!isLeftHand)
+                CharacterModel.GetRightHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
+            else
+                CharacterModel.GetLeftHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
+
+            // Animations will plays on clients only
+            if (IsClient)
+            {
+                // Play animation
+                CharacterModel.PlayActionAnimation(animActionType, weaponTypeDataId, 0);
+            }
+
+            // Wait until triggger before reload ammo
             yield return new WaitForSecondsRealtime(triggerDuration);
 
             // Prepare data
             EquipWeapons equipWeapons = EquipWeapons;
-            Item weaponItem = weapon.GetWeaponItem();
             Dictionary<CharacterItem, short> decreaseItems;
-            if (this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, reloadingAmount, out decreaseItems))
+            if (IsServer && this.DecreaseAmmos(reloadingWeaponItem.WeaponType.requireAmmoType, reloadingAmmoAmount, out decreaseItems))
             {
-                weapon.ammo += reloadingAmount;
+                reloadingWeapon.ammo += reloadingAmmoAmount;
                 if (isLeftHand)
-                    equipWeapons.leftHand = weapon;
+                    equipWeapons.leftHand = reloadingWeapon;
                 else
-                    equipWeapons.rightHand = weapon;
+                    equipWeapons.rightHand = reloadingWeapon;
                 EquipWeapons = equipWeapons;
             }
-
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
+            animActionType = AnimActionType.None;
             isAttackingOrUsingSkill = false;
         }
 
@@ -221,17 +270,13 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get weapon data
             AnimActionType animActionType;
-            int weaponTypeDataId;
+            int animationDataId;
             CharacterItem weapon;
-            DamageInfo damageInfo;
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
             GetAttackingData(
                 ref isLeftHand,
                 out animActionType,
-                out weaponTypeDataId,
-                out weapon,
-                out damageInfo,
-                out allDamageAmounts);
+                out animationDataId,
+                out weapon);
 
             // Prepare requires data and get animation data
             int animationIndex;
@@ -239,7 +284,7 @@ namespace MultiplayerARPG
             float totalDuration;
             GetRandomAnimationData(
                 animActionType,
-                weaponTypeDataId,
+                animationDataId,
                 out animationIndex,
                 out triggerDuration,
                 out totalDuration);
@@ -248,58 +293,129 @@ namespace MultiplayerARPG
             if (!ValidateAmmo(weapon))
                 return;
 
-            // Call on attack to extend attack functionality while attacking
-            bool overrideDefaultAttack = false;
-            foreach (CharacterSkill characterSkill in Skills)
-            {
-                if (characterSkill.level > 0)
-                {
-                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
-                        overrideDefaultAttack = true;
-                }
-            }
-
-            // Quit function when on attack will override default attack functionality
-            if (overrideDefaultAttack)
-                return;
-
-            // Start attack routine
-            isAttackingOrUsingSkill = true;
-            StartCoroutine(AttackRoutine(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
-        }
-
-        protected IEnumerator AttackRoutine(
-            AnimActionType animActionType,
-            int weaponTypeDataId,
-            int animationIndex,
-            float triggerDuration,
-            float totalDuration,
-            bool isLeftHand,
-            CharacterItem weapon,
-            DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-            bool hasAimPosition,
-            Vector3 aimPosition)
-        {
-            if (onAttackRoutine != null)
-                onAttackRoutine.Invoke(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts);
-
-            // Play animation on clients
-            RequestPlayActionAnimation(animActionType, weaponTypeDataId, (byte)animationIndex);
-
-            yield return new WaitForSecondsRealtime(triggerDuration);
-
-            // Reduce ammo amount
-            Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-            ReduceAmmo(weapon, isLeftHand, out increaseDamages);
-            if (increaseDamages != null)
-                allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, increaseDamages);
-
             // If no aim position set with attack function get aim position which set from client-controller if existed
             if (!hasAimPosition && HasAimPosition)
             {
                 hasAimPosition = true;
                 aimPosition = AimPosition;
+            }
+
+            // Start attack routine
+            isAttackingOrUsingSkill = true;
+
+            // Play animations
+            if (hasAimPosition)
+                RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex, aimPosition);
+            else
+                RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex);
+        }
+
+        protected IEnumerator AttackRoutine(bool isLeftHand, byte animationIndex, bool hasAimPosition, Vector3 aimPosition)
+        {
+            // Prepare requires data and get weapon data
+            int animationDataId;
+            CharacterItem weapon;
+            GetAttackingData(
+                ref isLeftHand,
+                out animActionType,
+                out animationDataId,
+                out weapon);
+
+            // Prepare requires data and get animation data
+            float triggerDuration;
+            float totalDuration;
+            GetAnimationData(
+                animActionType,
+                animationDataId,
+                animationIndex,
+                out triggerDuration,
+                out totalDuration);
+
+            // Prepare requires data and get damages data
+            DamageInfo damageInfo;
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
+            GetWeaponDamages(
+                weapon,
+                out damageInfo,
+                out allDamageAmounts);
+
+            // Set doing action state at clients and server
+            isAttackingOrUsingSkill = true;
+
+            // Calculate move speed rate while doing action at clients and server
+            moveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, null);
+
+            // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
+            float playSpeedMultiplier = GetAnimSpeedRate(animActionType);
+
+            // Animations will plays on clients only
+            if (IsClient)
+            {
+                // Play animation
+                CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
+            }
+
+            // Play special effects after trigger duration
+            yield return new WaitForSecondsRealtime(triggerDuration * playSpeedMultiplier);
+
+            // Special effects will plays on clients only
+            if (IsClient)
+            {
+                // Play weapon launch special effects
+                CharacterModel.PlayWeaponLaunchEffect(animActionType);
+            }
+
+            if (!hasAimPosition)
+            {
+                // No aim position set, set aim position to forward direction
+                Transform damageTransform = GetDamageTransform(damageInfo.damageType, isLeftHand);
+                aimPosition = damageTransform.position + damageTransform.forward;
+            }
+
+            // Call on attack to extend attack functionality while attacking
+            bool overrideDefaultAttack = false;
+            foreach (CharacterSkill characterSkill in Skills)
+            {
+                if (characterSkill.level <= 0)
+                    continue;
+                if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, damageInfo, allDamageAmounts, aimPosition))
+                    overrideDefaultAttack = true;
+            }
+
+            // Skip attack function when applied skills (buffs) will override default attack functionality
+            if (!overrideDefaultAttack)
+            {
+                // Trigger attack event
+                if (onAttackRoutine != null)
+                    onAttackRoutine.Invoke(isLeftHand, weapon, damageInfo, allDamageAmounts, aimPosition);
+
+                // Apply attack damages
+                ApplyAttack(
+                    isLeftHand,
+                    weapon,
+                    damageInfo,
+                    allDamageAmounts,
+                    hasAimPosition,
+                    aimPosition);
+            }
+
+            // Wait until animation ends to stop actions
+            yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) * playSpeedMultiplier);
+
+            // Set doing action state to none at clients and server
+            animActionType = AnimActionType.None;
+            isAttackingOrUsingSkill = false;
+        }
+
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
+        {
+            // Increase damage with ammo damage
+            if (IsServer)
+            {
+                Dictionary<DamageElement, MinMaxFloat> increaseDamages;
+                ReduceAmmo(weapon, isLeftHand, out increaseDamages);
+                if (increaseDamages != null)
+                    allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, increaseDamages);
             }
 
             byte fireSpread = 0;
@@ -322,12 +438,9 @@ namespace MultiplayerARPG
                     allDamageAmounts,
                     CharacterBuff.Empty,
                     null,
-                    hasAimPosition,
                     aimPosition,
                     stagger);
             }
-            yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
-            isAttackingOrUsingSkill = false;
         }
     }
 }

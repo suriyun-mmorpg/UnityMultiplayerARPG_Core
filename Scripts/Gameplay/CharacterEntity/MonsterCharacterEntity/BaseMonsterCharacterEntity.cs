@@ -292,31 +292,115 @@ namespace MultiplayerARPG
         public override void GetAttackingData(
             ref bool isLeftHand,
             out AnimActionType animActionType,
-            out int dataId,
-            out CharacterItem weapon,
+            out int animationDataId,
+            out CharacterItem weapon)
+        {
+            // Monster animation always main-hand (right-hand) animation
+            isLeftHand = false;
+            // Monster animation always main-hand (right-hand) animation
+            animActionType = AnimActionType.AttackRightHand;
+            // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
+            animationDataId = 0;
+            // Monster will not have weapon data
+            weapon = null;
+        }
+
+        public override void GetWeaponDamages(
+            CharacterItem weapon,
             out DamageInfo damageInfo,
             out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
-            // Initialize data
-            isLeftHand = false;
-            animActionType = AnimActionType.AttackRightHand;
-
-            // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
-            dataId = 0;
-
-            // Monster will not have weapon data
-            weapon = null;
-            
             // Assign damage data
             damageInfo = monsterCharacter.damageInfo;
+            // Assign damage amounts
+            allDamageAmounts = GameDataHelpers.CombineDamages(null, GameDataHelpers.MakeDamage(monsterCharacter.damageAmount, Level, 1f, 1f));
+            // Sum damage with buffs
+            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, CacheIncreaseDamages);
+        }
 
+        public override void GetUsingSkillData(
+            Skill skill, 
+            ref bool isLeftHand, 
+            out AnimActionType animActionType, 
+            out int animationDataId, 
+            out CharacterItem weapon)
+        {
+            // Monster animation always main-hand (right-hand) animation
+            isLeftHand = false;
+            // Monster animation always main-hand (right-hand) animation
+            animActionType = AnimActionType.AttackRightHand;
+            // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
+            animationDataId = 0;
+            // Monster will not have weapon data
+            weapon = null;
+            // Prepare skill data
+            if (skill == null)
+                return;
+            // Get activate animation type which defined at character model
+            SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
+            // Prepare animation
+            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.skillAttackType != SkillAttackType.None)
+            {
+                // Assign data id
+                animationDataId = 0;
+                // Assign animation action type
+                animActionType = AnimActionType.AttackRightHand;
+            }
+            else if (useSkillActivateAnimationType == SkillActivateAnimationType.UseActivateAnimation)
+            {
+                // Assign data id
+                animationDataId = skill.DataId;
+                // Assign animation action type
+                animActionType = AnimActionType.SkillRightHand;
+            }
+        }
+
+        public override void GetSkillDamages(
+            CharacterItem weapon, 
+            Skill skill, 
+            short skillLevel, 
+            out DamageInfo damageInfo, 
+            out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        {
+            // Assign damage data
+            damageInfo = monsterCharacter.damageInfo;
             // Assign damage amounts
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            DamageElement damageElement = monsterCharacter.damageAmount.damageElement;
-            MinMaxFloat damageAmount = monsterCharacter.damageAmount.amount.GetAmount(Level);
-            if (damageElement == null)
-                damageElement = gameInstance.DefaultDamageElement;
-            allDamageAmounts.Add(damageElement, damageAmount);
+            // If it is attack skill
+            if (skill.skillAttackType != SkillAttackType.None)
+            {
+                switch (skill.skillAttackType)
+                {
+                    case SkillAttackType.Normal:
+                        // Assign damage data
+                        damageInfo = skill.damageInfo;
+                        // Sum damage with skill damage because this skill damages based on itself
+                        allDamageAmounts = GameDataHelpers.CombineDamages(
+                            allDamageAmounts,
+                            skill.GetAdditionalDamageAmounts(skillLevel));
+                        // Sum damage with additional damage amounts
+                        allDamageAmounts = GameDataHelpers.CombineDamages(
+                            allDamageAmounts,
+                            skill.GetDamageAmount(skillLevel, this));
+                        break;
+                    case SkillAttackType.BasedOnWeapon:
+                        allDamageAmounts = GameDataHelpers.MakeDamageWithInflictions(
+                            monsterCharacter.damageAmount,
+                            Level, // Monster Level
+                            1f, // Equipment Bonus Rate
+                            1f, // Effectiveness
+                            skill.GetWeaponDamageInflictions(skillLevel));
+                        // Sum damage with additional damage amounts
+                        allDamageAmounts = GameDataHelpers.CombineDamages(
+                            allDamageAmounts,
+                            skill.GetAdditionalDamageAmounts(skillLevel));
+                        break;
+                }
+                // Sum damage with buffs
+                allDamageAmounts = GameDataHelpers.CombineDamages(
+                    allDamageAmounts,
+                    CacheIncreaseDamages);
+            }
         }
 
         public override float GetAttackDistance(bool isLeftHand)

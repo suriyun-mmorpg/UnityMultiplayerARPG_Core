@@ -42,88 +42,67 @@ namespace MultiplayerARPG
             NetFuncUseSkill(dataId, isLeftHand, true, aimPosition);
         }
 
-        /// <summary>
-        /// This will be called at every clients to play any action animation
-        /// </summary>
-        /// <param name="actionId"></param>
-        /// <param name="animActionType"></param>
-        protected virtual void NetFuncPlayActionAnimation(byte byteAnimActionType, int dataId, byte index)
+        protected void NetFuncPlayAttackWithoutAimPosition(bool isLeftHand, byte animationIndex)
         {
-            if (IsDead())
-                return;
-            StartCoroutine(PlayActionAnimationRoutine((AnimActionType)byteAnimActionType, dataId, index));
+            StartCoroutine(AttackRoutine(
+                isLeftHand,
+                animationIndex,
+                false,
+                Vector3.zero));
         }
 
-        private IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int skillOrWeaponTypeDataId, int index)
+        protected void NetFuncPlayAttackWithAimPosition(bool isLeftHand, byte animationIndex, Vector3 aimPosition)
         {
-            this.animActionType = animActionType;
-            // Set doing action state at clients and server
-            isAttackingOrUsingSkill = true;
-            // Calculate move speed rate while doing action at clients and server
-            moveSpeedRateWhileAttackOrUseSkill = 1f;
-            // Prepare data
-            float playSpeedMultiplier = 1f;
-            float triggerDuration = 0f;
-            float totalDuration = 0f;
-            switch (animActionType)
+            StartCoroutine(AttackRoutine(
+                isLeftHand,
+                animationIndex,
+                true,
+                aimPosition));
+        }
+
+        protected void NetFuncPlaySkillWithoutAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
+        {
+            Skill skill;
+            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel >= 1)
             {
-                case AnimActionType.AttackRightHand:
-                    playSpeedMultiplier = CacheAtkSpeed;
-                    // Calculate move speed rate while doing action at clients and server
-                    if (EquipWeapons != null && EquipWeapons.rightHand != null && EquipWeapons.rightHand.GetWeaponItem() != null)
-                        moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.rightHand.GetWeaponItem().moveSpeedRateWhileAttacking;
-                    else
-                        moveSpeedRateWhileAttackOrUseSkill = gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
-                    // Get durations
-                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, index, out triggerDuration, out totalDuration);
-                    break;
-                case AnimActionType.AttackLeftHand:
-                    playSpeedMultiplier = CacheAtkSpeed;
-                    // Calculate move speed rate while doing action at clients and server
-                    if (EquipWeapons != null && EquipWeapons.leftHand != null && EquipWeapons.leftHand.GetWeaponItem() != null)
-                        moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.leftHand.GetWeaponItem().moveSpeedRateWhileAttacking;
-                    else
-                        moveSpeedRateWhileAttackOrUseSkill = gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
-                    // Get durations
-                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, index, out triggerDuration, out totalDuration);
-                    break;
-                case AnimActionType.SkillRightHand:
-                case AnimActionType.SkillLeftHand:
-                    // Calculate move speed rate while doing action at clients and server
-                    if (GameInstance.Skills.ContainsKey(skillOrWeaponTypeDataId))
-                        moveSpeedRateWhileAttackOrUseSkill = GameInstance.Skills[skillOrWeaponTypeDataId].moveSpeedRateWhileUsingSkill;
-                    // Get durations
-                    if (CharacterModel != null)
-                        CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
-                    break;
-                case AnimActionType.ReloadLeftHand:
-                    // Get durations
-                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
-                    break;
-                case AnimActionType.ReloadRightHand:
-                    // Get durations
-                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
-                    break;
+                StartCoroutine(UseSkillRoutine(
+                    isLeftHand,
+                    animationIndex,
+                    skill,
+                    skillLevel,
+                    false,
+                    Vector3.zero));
             }
-            // Animations will plays on clients only
-            if (IsClient)
+            else
             {
-                // Play animation
-                CharacterModel.PlayActionAnimation(animActionType, skillOrWeaponTypeDataId, index, playSpeedMultiplier);
+                animActionType = AnimActionType.None;
+                isAttackingOrUsingSkill = false;
             }
-            // Play special effects after trigger duration
-            yield return new WaitForSecondsRealtime(triggerDuration * playSpeedMultiplier);
-            // Special effects will plays on clients only
-            if (IsClient)
+        }
+
+        protected void NetFuncPlaySkillWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
+        {
+            Skill skill;
+            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel >= 1)
             {
-                PlayActionSpecialEffect(animActionType, skillOrWeaponTypeDataId);
-                CharacterModel.PlayWeaponLaunchEffect(animActionType);
+                StartCoroutine(UseSkillRoutine(
+                    isLeftHand,
+                    animationIndex,
+                    skill,
+                    skillLevel,
+                    true,
+                    aimPosition));
             }
-            // Wait until animation ends to stop actions
-            yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) * playSpeedMultiplier);
-            // Set doing action state at clients and server
-            this.animActionType = AnimActionType.None;
-            isAttackingOrUsingSkill = false;
+            else
+            {
+                animActionType = AnimActionType.None;
+                isAttackingOrUsingSkill = false;
+            }
+        }
+
+        protected void NetFuncPlayReload(bool isLeftHand)
+        {
+            StartCoroutine(ReloadRoutine(isLeftHand));
         }
 
         /// <summary>

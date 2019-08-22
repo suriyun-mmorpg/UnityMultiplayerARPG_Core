@@ -67,8 +67,11 @@ namespace MultiplayerARPG
             RegisterNetFunction<bool, Vector3>(NetFuncAttackWithAimPosition);
             RegisterNetFunction<int, bool>(NetFuncUseSkillWithoutAimPosition);
             RegisterNetFunction<int, bool, Vector3>(NetFuncUseSkillWithAimPosition);
-            RegisterNetFunction<byte, int, byte>(NetFuncPlayActionAnimation);
-            RegisterNetFunction<int, float>(NetFuncSkillCasting);
+            RegisterNetFunction<bool, byte>(NetFuncPlayAttackWithoutAimPosition);
+            RegisterNetFunction<bool, byte, Vector3>(NetFuncPlayAttackWithAimPosition);
+            RegisterNetFunction<bool, byte, int, short>(NetFuncPlaySkillWithoutAimPosition);
+            RegisterNetFunction<bool, byte, int, short, Vector3>(NetFuncPlaySkillWithAimPosition);
+            RegisterNetFunction<bool>(NetFuncPlayReload);
             RegisterNetFunction(NetFuncSkillCastingInterrupted);
             RegisterNetFunction<PackedUInt>(NetFuncPickupItem);
             RegisterNetFunction<short, short>(NetFuncDropItem);

@@ -218,19 +218,14 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get skill data
             AnimActionType animActionType;
-            int skillOrWeaponTypeDataId;
+            int animatonDataId;
             CharacterItem weapon;
-            DamageInfo damageInfo;
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
             GetUsingSkillData(
                 skill,
-                level,
                 ref isLeftHand,
                 out animActionType,
-                out skillOrWeaponTypeDataId,
-                out weapon,
-                out damageInfo,
-                out allDamageAmounts);
+                out animatonDataId,
+                out weapon);
 
             // Validate ammo
             if (skill.skillAttackType != SkillAttackType.None && !ValidateAmmo(weapon))
@@ -242,19 +237,26 @@ namespace MultiplayerARPG
             float totalDuration;
             GetRandomAnimationData(
                 animActionType,
-                skillOrWeaponTypeDataId,
+                animatonDataId,
                 out animationIndex,
                 out triggerDuration,
                 out totalDuration);
 
-            // Call on cast skill to extend skill functionality while casting skills
-            // Quit function when on cast skill will override default cast skill functionality
-            if (skill.OnCastSkill(this, level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
-                return;
+            // TODO: some skill type will not able to change aim position by controller
+            if (!hasAimPosition && HasAimPosition)
+            {
+                hasAimPosition = true;
+                aimPosition = AimPosition;
+            }
 
             // Start use skill routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(UseSkillRoutine(skill, level, animActionType, skillOrWeaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
+
+            // Play animations
+            if (hasAimPosition)
+                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, level, aimPosition);
+            else
+                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, level);
         }
     }
 }

@@ -11,43 +11,45 @@ namespace MultiplayerARPG
 
         public virtual void GetUsingSkillData(
             Skill skill,
-            short level,
             ref bool isLeftHand,
             out AnimActionType animActionType,
-            out int skillOrWeaponTypeDataId,
-            out CharacterItem weapon,
-            out DamageInfo damageInfo,
-            out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+            out int animationDataId,
+            out CharacterItem weapon)
         {
             // Initialize data
             animActionType = AnimActionType.None;
-            skillOrWeaponTypeDataId = 0;
+            animationDataId = 0;
             weapon = this.GetAvailableWeapon(ref isLeftHand);
-            damageInfo = null;
-            allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare skill data
             if (skill == null)
                 return;
             // Prepare weapon data
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
+            // Get activate animation type which defined at character model
             SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
             // Prepare animation
             if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.skillAttackType != SkillAttackType.None)
             {
-                // If there is no cast animations
                 // Assign data id
-                skillOrWeaponTypeDataId = weaponType.DataId;
+                animationDataId = weaponType.DataId;
                 // Assign animation action type
                 animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
             }
             else if (useSkillActivateAnimationType == SkillActivateAnimationType.UseActivateAnimation)
             {
                 // Assign data id
-                skillOrWeaponTypeDataId = skill.DataId;
+                animationDataId = skill.DataId;
                 // Assign animation action type
                 animActionType = !isLeftHand ? AnimActionType.SkillRightHand : AnimActionType.AttackLeftHand;
             }
+        }
+
+        public virtual void GetSkillDamages(CharacterItem weapon, Skill skill, short level, out DamageInfo damageInfo, out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        {
+            Item weaponItem = weapon.GetWeaponItem();
+            damageInfo = weaponItem.WeaponType.damageInfo;
+            allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // If it is attack skill
             if (skill.skillAttackType != SkillAttackType.None)
             {
@@ -56,28 +58,31 @@ namespace MultiplayerARPG
                     case SkillAttackType.Normal:
                         // Assign damage data
                         damageInfo = skill.damageInfo;
-                        // Calculate all damages
-                        allDamageAmounts = weaponItem.GetDamageAmountWithInflictions(weapon.level, weapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(level));
+                        // Sum damage with skill damage because this skill damages based on itself
+                        allDamageAmounts = GameDataHelpers.CombineDamages(
+                            allDamageAmounts,
+                            skill.GetAdditionalDamageAmounts(level));
                         // Sum damage with additional damage amounts
                         allDamageAmounts = GameDataHelpers.CombineDamages(
                             allDamageAmounts,
                             skill.GetDamageAmount(level, this));
-                        // Sum damage with skill damage
-                        allDamageAmounts = GameDataHelpers.CombineDamages(
-                            allDamageAmounts,
-                            skill.GetAdditionalDamageAmounts(level));
                         break;
                     case SkillAttackType.BasedOnWeapon:
                         // Assign damage data
-                        damageInfo = weaponType.damageInfo;
+                        damageInfo = weaponItem.WeaponType.damageInfo;
                         // Calculate all damages
-                        allDamageAmounts = weaponItem.GetDamageAmountWithInflictions(weapon.level, weapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(level));
+                        allDamageAmounts = weaponItem.GetDamageAmountWithInflictions(
+                            weapon.level,
+                            weapon.GetEquipmentBonusRate(),
+                            this,
+                            skill.GetWeaponDamageInflictions(level));
                         // Sum damage with additional damage amounts
                         allDamageAmounts = GameDataHelpers.CombineDamages(
                             allDamageAmounts,
                             skill.GetAdditionalDamageAmounts(level));
                         break;
                 }
+                // Sum damage with buffs
                 allDamageAmounts = GameDataHelpers.CombineDamages(
                     allDamageAmounts,
                     CacheIncreaseDamages);
@@ -106,30 +111,25 @@ namespace MultiplayerARPG
                 return;
 
             Skill skill;
-            short level;
+            short skillLevel;
             if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
-                !CacheSkills.TryGetValue(skill, out level))
+                !CacheSkills.TryGetValue(skill, out skillLevel))
                 return;
 
             // Validate mp amount, skill level, 
-            if (!skill.CanUse(this, level))
+            if (!skill.CanUse(this, skillLevel))
                 return;
 
             // Prepare requires data and get skill data
             AnimActionType animActionType;
-            int skillOrWeaponTypeDataId;
+            int animatonDataId;
             CharacterItem weapon;
-            DamageInfo damageInfo;
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
             GetUsingSkillData(
                 skill,
-                level,
                 ref isLeftHand,
                 out animActionType,
-                out skillOrWeaponTypeDataId,
-                out weapon,
-                out damageInfo,
-                out allDamageAmounts);
+                out animatonDataId,
+                out weapon);
 
             // Validate ammo
             if (skill.skillAttackType != SkillAttackType.None && !ValidateAmmo(weapon))
@@ -141,108 +141,26 @@ namespace MultiplayerARPG
             float totalDuration;
             GetRandomAnimationData(
                 animActionType,
-                skillOrWeaponTypeDataId,
+                animatonDataId,
                 out animationIndex,
                 out triggerDuration,
                 out totalDuration);
 
-            // Call on cast skill to extend skill functionality while casting skills
-            // Quit function when on cast skill will override default cast skill functionality
-            if (skill.OnCastSkill(this, level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
-                return;
-
+            // TODO: some skill type will not able to change aim position by controller
+            if (!hasAimPosition && HasAimPosition)
+            {
+                hasAimPosition = true;
+                aimPosition = AimPosition;
+            }
+            
             // Start use skill routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(UseSkillRoutine(skill, level, animActionType, skillOrWeaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
-        }
 
-        protected IEnumerator UseSkillRoutine(
-            Skill skill,
-            short level,
-            AnimActionType animActionType,
-            int skillOrWeaponTypeDataId,
-            int animationIndex,
-            float triggerDuration,
-            float totalDuration,
-            bool isLeftHand,
-            CharacterItem weapon,
-            DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-            bool hasAimPosition,
-            Vector3 aimPosition)
-        {
-            if (onUseSkillRoutine != null)
-                onUseSkillRoutine.Invoke(skill, level, animActionType, skillOrWeaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
-
-            // Set doing action data
-            isCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
-            isCastingSkillInterrupted = false;
-
-            float castDuration = skill.GetCastDuration(level);
-            if (castDuration > 0f)
-            {
-                // Tell clients that character is casting
-                RequestSkillCasting(skill.DataId, castDuration);
-
-                yield return new WaitForSecondsRealtime(castDuration);
-            }
-
-            // If skill casting not interrupted, continue doing action
-            if (!isCastingSkillInterrupted || !isCastingSkillCanBeInterrupted)
-            {
-                // Play animation on clients
-                RequestPlayActionAnimation(animActionType, skillOrWeaponTypeDataId, (byte)animationIndex);
-
-                // Update skill usage states
-                CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, skill.DataId);
-                newSkillUsage.Use(this, level);
-                skillUsages.Add(newSkillUsage);
-
-                yield return new WaitForSecondsRealtime(triggerDuration);
-
-                // Reduce ammo amount
-                if (skill.skillAttackType != SkillAttackType.None)
-                {
-                    Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                    ReduceAmmo(weapon, isLeftHand, out increaseDamages);
-                    if (increaseDamages != null)
-                        allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, increaseDamages);
-                }
-
-                ApplySkill(skill, level, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
-                yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
-            }
-            isAttackingOrUsingSkill = false;
-        }
-
-        /// <summary>
-        /// This will be called at clients to play skill casting state with duration
-        /// </summary>
-        /// <param name="duration"></param>
-        protected virtual void NetFuncSkillCasting(int dataId, float duration)
-        {
-            if (IsDead())
-                return;
-            castingSkillDuration = castingSkillCountDown = duration;
-            StartCoroutine(SkillCastingRoutine(dataId, duration));
-        }
-
-        protected IEnumerator SkillCastingRoutine(int dataId, float duration)
-        {
-            // Set doing action state at clients and server
-            isAttackingOrUsingSkill = true;
-
-            // SFX and Special effects will plays on clients only
-            if (IsClient)
-            {
-                // Play special effect
-                if (GameInstance.Skills.ContainsKey(dataId))
-                    Model.InstantiateEffect(GameInstance.Skills[dataId].castEffects.effects);
-
-                // Play casting animation
-                if (CharacterModel != null)
-                    yield return CharacterModel.PlaySkillCastClip(dataId, duration);
-            }
+            // Play animations
+            if (hasAimPosition)
+                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition);
+            else
+                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel);
         }
 
         /// <summary>
@@ -259,41 +177,163 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void ApplySkill(Skill skill, short level, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
+        protected IEnumerator UseSkillRoutine(bool isLeftHand, byte animationIndex, Skill skill, short skillLevel, bool hasAimPosition, Vector3 aimPosition)
         {
-            // Quit function when on apply skill will override default apply skill functionality
-            if (skill.OnApplySkill(this, level, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
+            // Update skill usage states at server only
+            if (IsServer)
+            {
+                CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, skill.DataId);
+                newSkillUsage.Use(this, skillLevel);
+                skillUsages.Add(newSkillUsage);
+            }
+
+            // Prepare requires data and get skill data
+            int animationDataId;
+            CharacterItem weapon;
+            GetUsingSkillData(
+                skill,
+                ref isLeftHand,
+                out animActionType,
+                out animationDataId,
+                out weapon);
+
+            // Prepare requires data and get animation data
+            float triggerDuration;
+            float totalDuration;
+            GetAnimationData(
+                animActionType,
+                animationDataId,
+                animationIndex,
+                out triggerDuration,
+                out totalDuration);
+
+            // Prepare requires data and get damages data
+            DamageInfo damageInfo;
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
+            GetSkillDamages(
+                weapon,
+                skill,
+                level,
+                out damageInfo,
+                out allDamageAmounts);
+
+            // Set doing action state at clients and server
+            isAttackingOrUsingSkill = true;
+
+            // Calculate move speed rate while doing action at clients and server
+            moveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, null);
+
+            // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
+            float playSpeedMultiplier = GetAnimSpeedRate(animActionType);
+            
+            // Set doing action data
+            isCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
+            isCastingSkillInterrupted = false;
+            // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
+            castingSkillDuration = castingSkillCountDown = skill.GetCastDuration(level);
+            if (castingSkillDuration > 0f)
+            {
+                // Tell clients that character is casting
+                // Play special effect
+                if (IsClient)
+                    Model.InstantiateEffect(skill.castEffects.effects);
+                // Play casting animation
+                if (IsClient)
+                    CharacterModel.PlaySkillCastClip(skill.DataId, castingSkillDuration);
+                // Wait until end of cast duration
+                yield return new WaitForSeconds(castingSkillDuration);
+            }
+
+            // Continue skill activating action or not?
+            if (!isCastingSkillInterrupted || !isCastingSkillCanBeInterrupted)
+            {
+                // Animations will plays on clients only
+                if (IsClient)
+                    CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
+
+                // Play special effects after trigger duration
+                yield return new WaitForSecondsRealtime(triggerDuration * playSpeedMultiplier);
+
+                // Special effects will plays on clients only
+                if (IsClient)
+                    CharacterModel.PlayWeaponLaunchEffect(animActionType);
+
+                if (!hasAimPosition)
+                {
+                    // No aim position set, set aim position to forward direction
+                    Transform damageTransform = GetDamageTransform(damageInfo.damageType, isLeftHand);
+                    aimPosition = damageTransform.position + damageTransform.forward;
+                }
+
+                // Skip use skill function when using skill will override default skill functionality
+                if (!skill.OnApplySkill(this, skillLevel, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
+                {
+                    // Trigger skill event
+                    if (onUseSkillRoutine != null)
+                        onUseSkillRoutine.Invoke(skill, skillLevel, isLeftHand, weapon, damageInfo, allDamageAmounts, aimPosition);
+
+                    // Apply skill buffs, summons and attack damages
+                    ApplySkill(
+                        skill,
+                        skillLevel,
+                        isLeftHand,
+                        weapon,
+                        damageInfo,
+                        allDamageAmounts,
+                        hasAimPosition,
+                        aimPosition);
+                }
+
+                // Wait until animation ends to stop actions
+                yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) * playSpeedMultiplier);
+            }
+
+            // Set doing action state to none at clients and server
+            animActionType = AnimActionType.None;
+            isAttackingOrUsingSkill = false;
+        }
+
+        protected virtual void ApplySkill(Skill skill, short skillLevel, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
+        {
+            // Apply skills only when it's active skill
+            if (skill.skillType != SkillType.Active)
                 return;
 
-            switch (skill.skillType)
+            // Apply buff, summons at server only
+            if (IsServer)
             {
-                case SkillType.Active:
-                    ApplySkillBuff(skill, level);
-                    ApplySkillSummon(skill, level);
-                    ApplySkillMount(skill, level);
-                    if (skill.skillAttackType != SkillAttackType.None)
-                    {
-                        CharacterBuff debuff = CharacterBuff.Empty;
-                        if (skill.isDebuff)
-                            debuff = CharacterBuff.Create(BuffType.SkillDebuff, skill.DataId, level);
-                        // TODO: some skill type will not able to change aim position by controller
-                        if (!hasAimPosition && HasAimPosition)
-                        {
-                            hasAimPosition = true;
-                            aimPosition = AimPosition;
-                        }
-                        LaunchDamageEntity(
-                            isLeftHand,
-                            weapon,
-                            damageInfo,
-                            allDamageAmounts,
-                            debuff,
-                            skill,
-                            hasAimPosition,
-                            aimPosition,
-                            Vector3.zero);
-                    }
-                    break;
+                ApplySkillBuff(skill, skillLevel);
+                ApplySkillSummon(skill, skillLevel);
+                ApplySkillMount(skill, skillLevel);
+            }
+
+            // Apply attack skill
+            if (skill.skillAttackType != SkillAttackType.None)
+            {
+                if (IsServer)
+                {
+                    // Increase damage with ammo damage
+                    Dictionary<DamageElement, MinMaxFloat> increaseDamages;
+                    ReduceAmmo(weapon, isLeftHand, out increaseDamages);
+                    if (increaseDamages != null)
+                        allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, increaseDamages);
+                }
+
+                // Apply debuff
+                CharacterBuff debuff = CharacterBuff.Empty;
+                if (skill.isDebuff)
+                    debuff = CharacterBuff.Create(BuffType.SkillDebuff, skill.DataId, skillLevel);
+
+                // Launch damage entity to apply damage to other characters
+                LaunchDamageEntity(
+                    isLeftHand,
+                    weapon,
+                    damageInfo,
+                    allDamageAmounts,
+                    debuff,
+                    skill,
+                    aimPosition,
+                    Vector3.zero);
             }
         }
     }

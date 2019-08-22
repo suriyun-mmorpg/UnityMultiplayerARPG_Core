@@ -119,19 +119,43 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestPlayActionAnimation(AnimActionType animActionType, int dataId, byte animationIndex)
+        public bool RequestPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayActionAnimation, FunctionReceivers.All, (byte)animActionType, dataId, animationIndex);
+            CallNetFunction(NetFuncPlayAttackWithoutAimPosition, FunctionReceivers.Server, isLeftHand, animationIndex);
             return true;
         }
 
-        public bool RequestSkillCasting(int dataId, float duration)
+        public bool RequestPlayAttackAnimation(bool isLeftHand, byte animationIndex, Vector3 aimPosition)
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncSkillCasting, FunctionReceivers.All, dataId, duration);
+            CallNetFunction(NetFuncPlayAttackWithAimPosition, FunctionReceivers.Server, isLeftHand, animationIndex, aimPosition);
+            return true;
+        }
+
+        public bool RequestPlaySkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
+        {
+            if (IsDead())
+                return false;
+            CallNetFunction(NetFuncPlaySkillWithoutAimPosition, FunctionReceivers.Server, isLeftHand, animationIndex, skillDataId, skillLevel);
+            return true;
+        }
+
+        public bool RequestPlaySkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
+        {
+            if (IsDead())
+                return false;
+            CallNetFunction(NetFuncPlaySkillWithAimPosition, FunctionReceivers.Server, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+            return true;
+        }
+
+        public bool RequestPlayReloadAnimation(bool isLeftHand)
+        {
+            if (IsDead())
+                return false;
+            CallNetFunction(NetFuncPlayReload, FunctionReceivers.Server, isLeftHand);
             return true;
         }
 

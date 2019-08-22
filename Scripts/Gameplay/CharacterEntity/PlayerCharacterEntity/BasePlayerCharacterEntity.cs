@@ -71,16 +71,14 @@ namespace MultiplayerARPG
         protected override void ApplySkill(Skill skill, short level, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
         {
             base.ApplySkill(skill, level, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
-            
-            switch (skill.skillType)
+
+            if (skill.skillType == SkillType.CraftItem)
             {
-                case SkillType.CraftItem:
-                    GameMessage.Type gameMessageType;
-                    if (!skill.itemCraft.CanCraft(this, out gameMessageType))
-                        gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
-                    else
-                        skill.itemCraft.CraftItem(this);
-                    break;
+                GameMessage.Type gameMessageType;
+                if (!skill.itemCraft.CanCraft(this, out gameMessageType))
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                else
+                    skill.itemCraft.CraftItem(this);
             }
         }
 
