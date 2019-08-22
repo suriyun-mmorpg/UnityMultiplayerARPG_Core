@@ -32,6 +32,11 @@ public static class CharacterRelatesDataExtension
         return !data.IsEmpty() && data.GetItem() != null && data.amount > 0;
     }
 
+    public static bool IsEmptySlot(this CharacterItem data)
+    {
+        return !data.NotEmptySlot();
+    }
+
     public static bool IsEmpty(this CharacterQuest data)
     {
         return data == null || data.Equals(CharacterQuest.Empty);
@@ -50,5 +55,60 @@ public static class CharacterRelatesDataExtension
     public static bool IsEmpty(this CharacterSummon data)
     {
         return data == null || data.Equals(CharacterSummon.Empty);
+    }
+    
+    public static Item GetRightHandWeaponItem(this EquipWeapons equipWeapons)
+    {
+        if (equipWeapons.IsEmptyRightHandSlot())
+            return null;
+        return equipWeapons.rightHand.GetWeaponItem();
+    }
+
+    public static Item GetRightHandEquipmentItem(this EquipWeapons equipWeapons)
+    {
+        if (equipWeapons.IsEmptyRightHandSlot())
+            return null;
+        return equipWeapons.rightHand.GetEquipmentItem();
+    }
+
+    public static Item GetLeftHandWeaponItem(this EquipWeapons equipWeapons)
+    {
+        if (equipWeapons.IsEmptyLeftHandSlot())
+            return null;
+        return equipWeapons.leftHand.GetWeaponItem();
+    }
+
+    public static Item GetLeftHandShieldItem(this EquipWeapons equipWeapons)
+    {
+        if (equipWeapons.IsEmptyLeftHandSlot())
+            return null;
+        return equipWeapons.leftHand.GetShieldItem();
+    }
+
+    public static Item GetLeftHandEquipmentItem(this EquipWeapons equipWeapons)
+    {
+        if (equipWeapons.IsEmptyLeftHandSlot())
+            return null;
+        return equipWeapons.leftHand.GetEquipmentItem();
+    }
+
+    public static bool NotEmptyRightHandSlot(this EquipWeapons equipWeapons)
+    {
+        return equipWeapons != null && equipWeapons.rightHand.NotEmptySlot();
+    }
+
+    public static bool NotEmptyLeftHandSlot(this EquipWeapons equipWeapons)
+    {
+        return equipWeapons != null && equipWeapons.leftHand.NotEmptySlot();
+    }
+
+    public static bool IsEmptyRightHandSlot(this EquipWeapons equipWeapons)
+    {
+        return !equipWeapons.NotEmptyRightHandSlot();
+    }
+
+    public static bool IsEmptyLeftHandSlot(this EquipWeapons equipWeapons)
+    {
+        return !equipWeapons.NotEmptyLeftHandSlot();
     }
 }
