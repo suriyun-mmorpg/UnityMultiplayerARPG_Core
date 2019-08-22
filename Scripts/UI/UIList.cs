@@ -8,9 +8,21 @@ public class UIList : MonoBehaviour
     public Transform uiContainer;
     public IEnumerable list;
     protected readonly List<GameObject> uis = new List<GameObject>();
+    protected bool detectedPrefab;
+
+    private void DetectPrefab()
+    {
+        if (detectedPrefab)
+            return;
+
+        detectedPrefab = true;
+        uiContainer.RemoveChildren();
+    }
 
     public void Generate<T>(IEnumerable<T> list, System.Action<int, T, GameObject> onGenerateEntry)
     {
+        DetectPrefab();
+
         this.list = list;
         int i = 0;
         foreach (T entry in list)
@@ -47,6 +59,8 @@ public class UIList : MonoBehaviour
 
     public void HideAll()
     {
+        DetectPrefab();
+
         for (int i = 0; i < uis.Count; ++i)
         {
             GameObject ui = uis[i];
