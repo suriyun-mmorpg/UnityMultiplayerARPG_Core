@@ -1132,7 +1132,90 @@ namespace MultiplayerARPG
                 (findForNeutral && characterEntity.IsNeutral(this));
         }
         #endregion
-        
+
+        #region Animation helpers
+        public void GetRandomAnimationData(
+            AnimActionType animActionType,
+            int skillOrWeaponTypeDataId,
+            out int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            // Random animation
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDuration, out totalDuration);
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDuration, out totalDuration);
+                    break;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
+                    break;
+            }
+        }
+
+        public void GetAnimationData(
+            AnimActionType animActionType,
+            int skillOrWeaponTypeDataId,
+            int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            // Random animation
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out triggerDuration, out totalDuration);
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out triggerDuration, out totalDuration);
+                    break;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDuration, out totalDuration);
+                    break;
+            }
+        }
+
+        public float GetAnimSpeedRate(AnimActionType animActionType)
+        {
+            if (animActionType == AnimActionType.AttackRightHand ||
+                animActionType == AnimActionType.AttackLeftHand)
+                return CacheAtkSpeed;
+            return 1f;
+        }
+
+        public float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, Skill skill)
+        {
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    if (EquipWeapons.GetRightHandWeaponItem() != null)
+                        return EquipWeapons.GetRightHandWeaponItem().moveSpeedRateWhileAttacking;
+                    return gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                case AnimActionType.AttackLeftHand:
+                    if (EquipWeapons.GetLeftHandWeaponItem() != null)
+                        return EquipWeapons.GetLeftHandWeaponItem().moveSpeedRateWhileAttacking;
+                    return gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    // Calculate move speed rate while doing action at clients and server
+                    if (skill != null)
+                        return moveSpeedRateWhileAttackOrUseSkill = skill.moveSpeedRateWhileUsingSkill;
+                    break;
+            }
+            return 1f;
+        }
+        #endregion
+
         private void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
             // Warn that this character received damage to nearby characters
