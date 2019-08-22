@@ -15,10 +15,9 @@ namespace MultiplayerARPG
         {
             if (sourceDictionary == null)
                 sourceDictionary = new Dictionary<DamageElement, MinMaxFloat>();
-            GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
-                damageElement = gameInstance.DefaultDamageElement;
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
             MinMaxFloat value = newEntry.Value;
             if (!sourceDictionary.ContainsKey(damageElement))
                 sourceDictionary[damageElement] = value;
@@ -37,10 +36,9 @@ namespace MultiplayerARPG
         {
             if (sourceDictionary == null)
                 sourceDictionary = new Dictionary<DamageElement, float>();
-            GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
-                damageElement = gameInstance.DefaultDamageElement;
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
             float value = newEntry.Value;
             if (!sourceDictionary.ContainsKey(damageElement))
                 sourceDictionary[damageElement] = value;
@@ -270,10 +268,9 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamage(DamageAmount source, float rate, float effectiveness)
         {
-            GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
-                damageElement = gameInstance.DefaultDamageElement;
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
             return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, (source.amount * rate) + effectiveness);
         }
 
@@ -287,10 +284,9 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamage(DamageIncremental source, short level, float rate, float effectiveness)
         {
-            GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
-                damageElement = gameInstance.DefaultDamageElement;
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
             return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, (source.amount.GetAmount(level) * rate) + effectiveness);
         }
 
@@ -306,22 +302,20 @@ namespace MultiplayerARPG
         public static Dictionary<DamageElement, MinMaxFloat> MakeDamageWithInflictions(DamageIncremental source, short level, float rate, float effectiveness, Dictionary<DamageElement, float> damageInflictions)
         {
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
-            GameInstance gameInstance = GameInstance.Singleton;
             MinMaxFloat baseDamage = (source.amount.GetAmount(level) * rate) + effectiveness;
             if (damageInflictions != null && damageInflictions.Count > 0)
             {
-                foreach (DamageElement damageElement in damageInflictions.Keys)
+                foreach (DamageElement element in damageInflictions.Keys)
                 {
-                    if (damageElement == null) continue;
-                    result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage * damageInflictions[damageElement]));
+                    if (element == null) continue;
+                    result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(element, baseDamage * damageInflictions[element]));
                 }
             }
             else
             {
-                DamageElement damageElement = source.damageElement;
-                if (damageElement == null)
-                    damageElement = gameInstance.DefaultDamageElement;
-                result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage));
+                if (source.damageElement == null)
+                    source.damageElement = GameInstance.Singleton.DefaultDamageElement;
+                result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(source.damageElement, baseDamage));
             }
             return result;
         }
@@ -333,10 +327,9 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static KeyValuePair<DamageElement, float> MakeDamageInfliction(DamageInflictionAmount source)
         {
-            GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
-                damageElement = gameInstance.DefaultDamageElement;
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
             return new KeyValuePair<DamageElement, float>(damageElement, source.rate);
         }
 
@@ -348,10 +341,9 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static KeyValuePair<DamageElement, float> MakeDamageInfliction(DamageInflictionIncremental source, short level)
         {
-            GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
-                damageElement = gameInstance.DefaultDamageElement;
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
             return new KeyValuePair<DamageElement, float>(damageElement, source.rate.GetAmount(level));
         }
 
