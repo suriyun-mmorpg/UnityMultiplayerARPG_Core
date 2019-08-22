@@ -99,28 +99,32 @@ namespace MultiplayerARPG
 
         public AnimationClip GetSkillCastClip(int dataId)
         {
-            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheSkillAnimations[dataId].castClip != null)
                 return GetAnims().CacheSkillAnimations[dataId].castClip;
             return defaultAnimations.skillCastClip;
         }
 
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheSkillAnimations[dataId].activateAnimation.clip != null)
                 return GetAnims().CacheSkillAnimations[dataId].activateAnimation;
             return defaultAnimations.skillActivateAnimation;
         }
 
         public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId))
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].rightHandReloadAnimation.clip != null)
                 return GetAnims().CacheWeaponAnimations[dataId].rightHandReloadAnimation;
             return defaultAnimations.rightHandReloadAnimation;
         }
 
         public ActionAnimation GetLeftHandReloadAnimation(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId))
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].leftHandReloadAnimation.clip != null)
                 return GetAnims().CacheWeaponAnimations[dataId].leftHandReloadAnimation;
             return defaultAnimations.leftHandReloadAnimation;
         }
