@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatPercentage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
         public string formatPercentageAmount = "N0";
 
-        private float percentage;
+        private float rate;
 
         public void Update(int current, int max)
         {
@@ -36,7 +36,7 @@ namespace MultiplayerARPG
 
         public void Update(float current, float max)
         {
-            percentage = max == 0 ? 1 : current / max;
+            rate = max == 0 ? 1 : current / max;
 
             if (textValue != null)
             {
@@ -51,16 +51,16 @@ namespace MultiplayerARPG
                 {
                     textValue.text = string.Format(
                         LanguageManager.GetText(formatPercentage),
-                        percentage.ToString(formatPercentageAmount));
+                        (rate * 100f).ToString(formatPercentageAmount));
                 }
             }
 
             if (imageGage != null)
-                imageGage.fillAmount = percentage;
+                imageGage.fillAmount = rate;
         }
 
         // TODO: This is temporary use for migrate from old version
-        public static bool Migrate(ref UIGageValue target,ref TextWrapper oldText, ref Image oldGage)
+        public static bool Migrate(ref UIGageValue target, ref TextWrapper oldText, ref Image oldGage)
         {
             if (oldText == null && oldGage == null)
                 return false;
