@@ -264,6 +264,8 @@ namespace MultiplayerARPG
                 uiEnhanceSocketItem.OnUpdateCharacterItems();
             if (onUpdateNonEquipItems != null)
                 onUpdateNonEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
+            if (uiAmmoAmount != null)
+                uiAmmoAmount.UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
         /// <summary>
