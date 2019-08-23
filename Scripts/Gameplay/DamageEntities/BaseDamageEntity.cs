@@ -50,7 +50,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SetupDamage(
+        public virtual void Setup(
             IAttackerEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,

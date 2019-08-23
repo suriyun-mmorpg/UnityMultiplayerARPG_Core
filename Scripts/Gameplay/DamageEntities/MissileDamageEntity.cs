@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             gameObject.layer = 2;   // Ignore raycast
         }
 
-        public void SetupDamage(
+        public void Setup(
             IAttackerEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            SetupDamage(attacker, weapon, allDamageAmounts, debuff, skill);
+            Setup(attacker, weapon, allDamageAmounts, debuff, skill);
             this.missileDistance = missileDistance;
             this.missileSpeed = missileSpeed;
 

@@ -28,10 +28,13 @@ namespace MultiplayerARPG
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "Raycast" })]
         public float missileDistance = 5f;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile" })]
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "Raycast" })]
         public float missileSpeed = 5f;
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile" })]
         public MissileDamageEntity missileDamageEntity;
+
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
+        public ProjectileEffect projectileEffect;
 
         public float GetDistance()
         {
