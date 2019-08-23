@@ -617,12 +617,13 @@ namespace MultiplayerARPG
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
                 animator.Play(0, actionStateLayer, 0f);
-                // Waits by current transition + clip duration before end animation
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-                animator.SetBool(ANIM_DO_ACTION, false);
-                // Waits by current transition + extra duration before end playing animation state
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
             }
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            if (tempActionAnimation.clip != null)
+                animator.SetBool(ANIM_DO_ACTION, false);
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
         }
 
         private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
@@ -640,14 +641,13 @@ namespace MultiplayerARPG
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             isPlayingActionAnimation = true;
             if (tempActionAnimation.clip != null)
-            {
                 CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
-                // Waits by current transition + clip duration before end animation
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            if (tempActionAnimation.clip != null)
                 CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
-                // Waits by current transition + extra duration before end playing animation state
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
-            }
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
             isPlayingActionAnimation = false;
         }
 

@@ -245,12 +245,13 @@ namespace MultiplayerARPG
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
                 animator.Play(0, actionStateLayer, 0f);
-                // Waits by current transition + clip duration before end animation
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-                animator.SetBool(ANIM_DO_ACTION, false);
-                // Waits by current transition + extra duration before end playing animation state
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
             }
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            if (tempActionAnimation.clip != null)
+                animator.SetBool(ANIM_DO_ACTION, false);
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
         }
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)

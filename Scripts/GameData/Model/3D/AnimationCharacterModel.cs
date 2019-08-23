@@ -188,14 +188,13 @@ namespace MultiplayerARPG
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             isPlayingActionAnimation = true;
             if (tempActionAnimation.clip != null)
-            {
                 CrossFadeLegacyAnimation(CLIP_ACTION, actionClipFadeLength, WrapMode.Once);
-                // Waits by current transition + clip duration before end animation
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            if (tempActionAnimation.clip != null)
                 CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
-                // Waits by current transition + extra duration before end playing animation state
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
-            }
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
             isPlayingActionAnimation = false;
         }
 
