@@ -6,9 +6,15 @@ namespace MultiplayerARPG
 {
     public class GameEffect : MonoBehaviour
     {
+        public enum DestroyMode
+        {
+            DestroyGameObject,
+            DeactivateGameObject,
+        }
         public string effectSocket;
         public bool isLoop;
         public float lifeTime;
+        public DestroyMode destroyMode;
         public Transform followingTarget;
 
         private Transform cacheTransform;
@@ -26,6 +32,7 @@ namespace MultiplayerARPG
         private float volume;
         private ParticleSystem[] particles;
         private AudioSource[] audioSources;
+        private float destroyTime;
 
         private void Awake()
         {
@@ -33,8 +40,60 @@ namespace MultiplayerARPG
             audioSources = GetComponentsInChildren<AudioSource>();
         }
 
-        private void Start()
+        private void OnEnable()
         {
+            Play();
+        }
+
+        private void Update()
+        {
+            if (followingTarget != null)
+            {
+                CacheTransform.position = followingTarget.position;
+                CacheTransform.rotation = followingTarget.rotation;
+            }
+
+            if (destroyTime >= 0 && destroyTime - Time.time <= 0)
+            {
+                if (destroyMode == DestroyMode.DestroyGameObject)
+                    Destroy(gameObject);
+                else
+                    gameObject.SetActive(false);
+            }
+        }
+
+        public void DestroyEffect()
+        {
+            foreach (ParticleSystem particle in particles)
+            {
+                if (particle == null)
+                    continue;
+                ParticleSystem.MainModule mainEmitter = particle.main;
+                mainEmitter.loop = false;
+            }
+            foreach (AudioSource audioSource in audioSources)
+            {
+                if (audioSource == null)
+                    continue;
+                audioSource.loop = false;
+            }
+            destroyTime = Time.time + lifeTime;
+        }
+
+        public GameEffect InstantiateTo(Transform parent)
+        {
+            GameEffect newEffect = Instantiate(this, parent);
+            newEffect.transform.localPosition = Vector3.zero;
+            newEffect.transform.localEulerAngles = Vector3.zero;
+            newEffect.transform.localScale = Vector3.one;
+            return newEffect;
+        }
+
+        public void Play()
+        {
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
+            destroyTime = isLoop ? -1 : Time.time + lifeTime;
             volume = AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level;
             if (randomSoundEffects.Length > 0)
             {
@@ -55,44 +114,6 @@ namespace MultiplayerARPG
                 audioSource.volume = volume;
                 audioSource.Play();
             }
-            if (!isLoop)
-                Destroy(gameObject, lifeTime);
-        }
-
-        private void Update()
-        {
-            if (followingTarget != null)
-            {
-                CacheTransform.position = followingTarget.position;
-                CacheTransform.rotation = followingTarget.rotation;
-            }
-        }
-
-        public void DestroyEffect()
-        {
-            foreach (ParticleSystem particle in particles)
-            {
-                if (particle == null)
-                    continue;
-                ParticleSystem.MainModule mainEmitter = particle.main;
-                mainEmitter.loop = false;
-            }
-            foreach (AudioSource audioSource in audioSources)
-            {
-                if (audioSource == null)
-                    continue;
-                audioSource.loop = false;
-            }
-            Destroy(gameObject, lifeTime);
-        }
-
-        public GameEffect InstantiateTo(Transform parent)
-        {
-            GameEffect newEffect = Instantiate(this, parent);
-            newEffect.transform.localPosition = Vector3.zero;
-            newEffect.transform.localEulerAngles = Vector3.zero;
-            newEffect.transform.localScale = Vector3.one;
-            return newEffect;
         }
     }
 }
