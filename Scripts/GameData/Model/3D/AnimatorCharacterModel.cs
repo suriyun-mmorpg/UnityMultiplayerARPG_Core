@@ -232,19 +232,25 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
-            yield return 0;
+            if (tempActionAnimation.clip != null)
+            {
+                CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
+                yield return 0;
+            }
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-            animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
-            animator.SetBool(ANIM_DO_ACTION, true);
-            animator.Play(0, actionStateLayer, 0f);
-            // Waits by current transition + clip duration before end animation
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-            animator.SetBool(ANIM_DO_ACTION, false);
-            // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            if (tempActionAnimation.clip != null)
+            {
+                animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
+                animator.SetBool(ANIM_DO_ACTION, true);
+                animator.Play(0, actionStateLayer, 0f);
+                // Waits by current transition + clip duration before end animation
+                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+                animator.SetBool(ANIM_DO_ACTION, false);
+                // Waits by current transition + extra duration before end playing animation state
+                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            }
         }
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)

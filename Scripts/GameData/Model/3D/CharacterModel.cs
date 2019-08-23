@@ -126,7 +126,7 @@ namespace MultiplayerARPG
         // Private state validater
         private bool isSetupComponent;
         private bool isPlayingActionAnimation;
-        
+
         private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
         {
@@ -604,38 +604,50 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
-            yield return 0;
+            if (tempActionAnimation.clip != null)
+            {
+                CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
+                yield return 0;
+            }
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-            animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
-            animator.SetBool(ANIM_DO_ACTION, true);
-            animator.Play(0, actionStateLayer, 0f);
-            // Waits by current transition + clip duration before end animation
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-            animator.SetBool(ANIM_DO_ACTION, false);
-            // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            if (tempActionAnimation.clip != null)
+            {
+                animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
+                animator.SetBool(ANIM_DO_ACTION, true);
+                animator.Play(0, actionStateLayer, 0f);
+                // Waits by current transition + clip duration before end animation
+                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+                animator.SetBool(ANIM_DO_ACTION, false);
+                // Waits by current transition + extra duration before end playing animation state
+                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            }
         }
 
         private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_ACTION);
-            legacyAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
+            if (tempActionAnimation.clip != null)
+            {
+                if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
+                    legacyAnimation.RemoveClip(LEGACY_CLIP_ACTION);
+                legacyAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
+            }
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             isPlayingActionAnimation = true;
-            CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
-            // Waits by current transition + clip duration before end animation
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-            CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
-            // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            if (tempActionAnimation.clip != null)
+            {
+                CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
+                // Waits by current transition + clip duration before end animation
+                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                // Waits by current transition + extra duration before end playing animation state
+                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            }
             isPlayingActionAnimation = false;
         }
 
@@ -739,28 +751,32 @@ namespace MultiplayerARPG
 
         public AnimationClip GetSkillCastClip(int dataId)
         {
-            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheSkillAnimations[dataId].castClip != null)
                 return GetAnims().CacheSkillAnimations[dataId].castClip;
             return defaultSkillCastClip;
         }
 
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheSkillAnimations[dataId].activateAnimation.clip != null)
                 return GetAnims().CacheSkillAnimations[dataId].activateAnimation;
             return defaultSkillActivateAnimation;
         }
 
         public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId))
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                 GetAnims().CacheWeaponAnimations[dataId].rightHandReloadAnimation.clip != null)
                 return GetAnims().CacheWeaponAnimations[dataId].rightHandReloadAnimation;
             return defaultReloadAnimation;
         }
 
         public ActionAnimation GetLeftHandReloadAnimation(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId))
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].leftHandReloadAnimation.clip != null)
                 return GetAnims().CacheWeaponAnimations[dataId].leftHandReloadAnimation;
             return defaultReloadAnimation;
         }
