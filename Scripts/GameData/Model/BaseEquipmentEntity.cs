@@ -20,7 +20,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public ParticleSystem[] weaponLaunchEffects;
+        public GameEffect[] weaponLaunchEffects;
         public AudioClip[] weaponLaunchSoundEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
