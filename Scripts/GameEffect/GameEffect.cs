@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         }
 
         public AudioClip[] randomSoundEffects;
+        private float volume;
         private ParticleSystem[] particles;
         private AudioSource[] audioSources;
 
@@ -34,11 +35,12 @@ namespace MultiplayerARPG
 
         private void Start()
         {
+            volume = AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level;
             if (randomSoundEffects.Length > 0)
             {
                 AudioClip soundEffect = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
                 if (soundEffect != null)
-                    AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+                    AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, volume);
             }
             foreach (ParticleSystem particle in particles)
             {
@@ -50,6 +52,7 @@ namespace MultiplayerARPG
             {
                 if (audioSource == null)
                     continue;
+                audioSource.volume = volume;
                 audioSource.Play();
             }
             if (!isLoop)
