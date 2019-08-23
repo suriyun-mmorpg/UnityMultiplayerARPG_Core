@@ -187,21 +187,14 @@ namespace MultiplayerARPG
         {
             this.equipWeapons = equipWeapons;
 
-            Item rightHandWeapon = null;
-            Item leftHandWeapon = null;
-            Item leftHandShield = null;
-            if (equipWeapons != null)
-            {
-                rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
-                leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
-                leftHandShield = equipWeapons.leftHand.GetShieldItem();
-            }
+            Item rightHandWeapon = equipWeapons.GetRightHandEquipmentItem();
+            Item leftHandWeapon = equipWeapons.GetLeftHandEquipmentItem();
 
             // Clear equipped item models
             tempAddingKeys.Clear();
             if (rightHandWeapon != null)
                 tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-            if (leftHandWeapon != null || leftHandShield != null)
+            if (leftHandWeapon != null)
                 tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
             tempCachedKeys.Clear();
@@ -214,12 +207,12 @@ namespace MultiplayerARPG
                     DestroyCacheModel(key);
             }
 
-            if (rightHandWeapon != null)
+            if (rightHandWeapon != null && rightHandWeapon.IsWeapon())
                 InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels, equipWeapons.rightHand.level, out rightHandEquipmentEntity);
-            if (leftHandWeapon != null)
+            if (leftHandWeapon != null && leftHandWeapon.IsWeapon())
                 InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.subEquipmentModels, equipWeapons.leftHand.level, out leftHandEquipmentEntity);
-            if (leftHandShield != null)
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandShield.equipmentModels, equipWeapons.leftHand.level, out leftHandEquipmentEntity);
+            if (leftHandWeapon != null && leftHandWeapon.IsShield())
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.equipmentModels, equipWeapons.leftHand.level, out leftHandEquipmentEntity);
         }
 
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
