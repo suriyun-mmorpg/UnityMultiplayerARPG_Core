@@ -67,8 +67,6 @@ namespace MultiplayerARPG
         protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
-        protected CharacterItem reloadingWeapon;
-        protected Item reloadingWeaponItem;
         protected short reloadingAmmoAmount;
         public bool isAttackingOrUsingSkill { get; protected set; }
         public bool isCastingSkillCanBeInterrupted { get; protected set; }
@@ -873,16 +871,16 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Missile:
                     // Spawn missile damage entity, it will move to target then apply damage when hit
+                    // Instantiates on both client and server (damage applies at server)
                     if (damageInfo.missileDamageEntity != null)
                     {
-                        GameObject spawnObj = Instantiate(damageInfo.missileDamageEntity.gameObject, damagePosition, damageRotation);
-                        MissileDamageEntity missileDamageEntity = spawnObj.GetComponent<MissileDamageEntity>();
+                        MissileDamageEntity missileDamageEntity = Instantiate(damageInfo.missileDamageEntity, damagePosition, damageRotation);
                         if (damageInfo.hitOnlySelectedTarget)
                         {
                             if (!TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
-                        missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, skill, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
+                        missileDamageEntity.Setup(this, weapon, allDamageAmounts, debuff, skill, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
                     }
                     break;
                 case DamageType.Raycast:
@@ -908,6 +906,12 @@ namespace MultiplayerARPG
                             if (IsClient)
                                 tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
                         }
+                    }
+                    // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
+                    if (IsClient && damageInfo.projectileEffect != null)
+                    {
+                        Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
+                            .Setup(damageInfo.missileDistance, damageInfo.missileSpeed);
                     }
                     break;
             }

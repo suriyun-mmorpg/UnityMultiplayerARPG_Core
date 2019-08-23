@@ -108,15 +108,12 @@ namespace MultiplayerARPG
             if (!CanAttack())
                 return;
             
-            if (isLeftHand)
-                reloadingWeapon = EquipWeapons.leftHand;
-            else
-                reloadingWeapon = EquipWeapons.rightHand;
+            CharacterItem reloadingWeapon = isLeftHand ? EquipWeapons.leftHand : EquipWeapons.rightHand;
 
             if (reloadingWeapon.IsEmptySlot())
                 return;
 
-            reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
+            Item reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
             if (reloadingWeaponItem == null ||
                 reloadingWeaponItem.WeaponType == null ||
                 reloadingWeaponItem.WeaponType.requireAmmoType == null ||
@@ -144,19 +141,28 @@ namespace MultiplayerARPG
         protected IEnumerator ReloadRoutine(bool isLeftHand)
         {
             animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;
-            int weaponTypeDataId = reloadingWeaponItem.WeaponType.DataId;
+            CharacterItem reloadingWeapon = isLeftHand ? EquipWeapons.leftHand : EquipWeapons.rightHand;
+            Item reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
+
+            // Prepare requires data and get animation data
             float triggerDuration = 0f;
             float totalDuration = 0f;
             if (!isLeftHand)
-                CharacterModel.GetRightHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
+                CharacterModel.GetRightHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDuration, out totalDuration);
             else
-                CharacterModel.GetLeftHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
+                CharacterModel.GetLeftHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDuration, out totalDuration);
+
+            // Set doing action state at clients and server
+            isAttackingOrUsingSkill = true;
+
+            // Calculate move speed rate while doing action at clients and server
+            moveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, null);
 
             // Animations will plays on clients only
             if (IsClient)
             {
                 // Play animation
-                CharacterModel.PlayActionAnimation(animActionType, weaponTypeDataId, 0);
+                CharacterModel.PlayActionAnimation(animActionType, reloadingWeaponItem.WeaponType.DataId, 0);
             }
 
             // Wait until triggger before reload ammo
