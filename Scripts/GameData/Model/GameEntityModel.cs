@@ -92,17 +92,18 @@ namespace MultiplayerARPG
             if (effects == null || effects.Length == 0)
                 return null;
             List<GameEffect> tempAddingEffects = new List<GameEffect>();
+            EffectContainer tempContainer;
             foreach (GameEffect effect in effects)
             {
                 if (effect == null)
                     continue;
                 if (string.IsNullOrEmpty(effect.effectSocket))
                     continue;
-                EffectContainer container;
-                if (!CacheEffectContainers.TryGetValue(effect.effectSocket, out container))
+                if (!CacheEffectContainers.TryGetValue(effect.effectSocket, out tempContainer))
                     continue;
+                // Setup transform and activate effect
                 tempGameEffect = effect.InstantiateTo(null);
-                tempGameEffect.followingTarget = container.transform;
+                tempGameEffect.followingTarget = tempContainer.transform;
                 tempGameEffect.CacheTransform.position = tempGameEffect.followingTarget.position;
                 tempGameEffect.CacheTransform.rotation = tempGameEffect.followingTarget.rotation;
                 tempGameEffect.gameObject.SetActive(true);
