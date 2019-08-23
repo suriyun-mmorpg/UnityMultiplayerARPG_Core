@@ -884,6 +884,12 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Raycast:
+                    // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
+                    if (IsClient && damageInfo.projectileEffect != null)
+                    {
+                        Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
+                            .Setup(damageInfo.missileDistance, damageInfo.missileSpeed);
+                    }
                     // Just raycast to any characters to apply damage
                     int tempRaycastSize = RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, damageInfo.missileDistance, ~0);
                     if (tempRaycastSize == 0)
@@ -906,12 +912,6 @@ namespace MultiplayerARPG
                             if (IsClient)
                                 tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
                         }
-                    }
-                    // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                    if (IsClient && damageInfo.projectileEffect != null)
-                    {
-                        Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
-                            .Setup(damageInfo.missileDistance, damageInfo.missileSpeed);
                     }
                     break;
             }
