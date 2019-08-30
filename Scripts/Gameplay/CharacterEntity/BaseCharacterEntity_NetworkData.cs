@@ -26,6 +26,10 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
         [SerializeField]
+        protected SyncFieldEquipWeapons equipWeapons2 = new SyncFieldEquipWeapons();
+        [SerializeField]
+        protected SyncFieldByte equipWeaponSet = new SyncFieldByte();
+        [SerializeField]
         protected SyncFieldBool isHidding = new SyncFieldBool();
         [Header("Sync Lists")]
         [SerializeField]
@@ -54,6 +58,8 @@ namespace MultiplayerARPG
         public System.Action<int> onCurrentFoodChange;
         public System.Action<int> onCurrentWaterChange;
         public System.Action<EquipWeapons> onEquipWeaponsChange;
+        public System.Action<EquipWeapons> onEquipWeapons2Change;
+        public System.Action<byte> onEquipWeaponSetChange;
         public System.Action<bool> onIsHiddingChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
@@ -78,6 +84,8 @@ namespace MultiplayerARPG
         public int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
         public int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
         public EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
+        public EquipWeapons EquipWeapons2 { get { return equipWeapons2.Value; } set { equipWeapons2.Value = value; } }
+        public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
         public bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
 
         public IList<CharacterAttribute> Attributes
@@ -257,10 +265,36 @@ namespace MultiplayerARPG
         protected virtual void OnEquipWeaponsChange(bool isInitial, EquipWeapons equipWeapons)
         {
             if (CharacterModel != null)
-                CharacterModel.SetEquipWeapons(equipWeapons);
+                CharacterModel.SetEquipWeapons(EquipWeapons, EquipWeapons2, EquipWeaponSet);
 
             if (onEquipWeaponsChange != null)
                 onEquipWeaponsChange.Invoke(equipWeapons);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when equip weapons changes
+        /// </summary>
+        /// <param name="equipWeapons2"></param>
+        protected virtual void OnEquipWeapons2Change(bool isInitial, EquipWeapons equipWeapons2)
+        {
+            if (CharacterModel != null)
+                CharacterModel.SetEquipWeapons(EquipWeapons, EquipWeapons2, EquipWeaponSet);
+
+            if (onEquipWeapons2Change != null)
+                onEquipWeapons2Change.Invoke(equipWeapons2);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when equip weapon set changes
+        /// </summary>
+        /// <param name="equipWeaponSet"></param>
+        protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
+        {
+            if (CharacterModel != null)
+                CharacterModel.SetEquipWeapons(EquipWeapons, EquipWeapons2, EquipWeaponSet);
+
+            if (onEquipWeaponSetChange != null)
+                onEquipWeaponSetChange.Invoke(equipWeaponSet);
         }
 
         /// <summary>

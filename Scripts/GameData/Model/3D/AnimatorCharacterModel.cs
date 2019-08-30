@@ -158,11 +158,19 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_DEAD] = defaultAnimations.deadClip;
         }
 
-        public override void SetEquipWeapons(EquipWeapons equipWeapons)
+        public override void SetEquipWeapons(EquipWeapons equipWeapons, EquipWeapons equipWeapons2, byte equipWeaponSet)
         {
-            base.SetEquipWeapons(equipWeapons);
+            base.SetEquipWeapons(equipWeapons, equipWeapons2, equipWeaponSet);
             SetupComponent();
-            SetClipBasedOnWeapon(equipWeapons);
+            switch (equipWeaponSet)
+            {
+                case 1:
+                    SetClipBasedOnWeapon(equipWeapons2);
+                    break;
+                default:
+                    SetClipBasedOnWeapon(equipWeapons);
+                    break;
+            }
         }
 
         protected void SetClipBasedOnWeapon(EquipWeapons equipWeapons)

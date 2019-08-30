@@ -43,6 +43,8 @@ public static partial class PlayerCharacterDataExtension
         to.GuildRole = from.GuildRole;
         to.SharedGuildExp = from.SharedGuildExp;
         to.EquipWeapons = from.EquipWeapons;
+        to.EquipWeapons2 = from.EquipWeapons2;
+        to.EquipWeaponSet = from.EquipWeaponSet;
         to.CurrentMapName = from.CurrentMapName;
         to.CurrentPosition = from.CurrentPosition;
         to.RespawnMapName = from.RespawnMapName;
@@ -432,7 +434,12 @@ public static partial class PlayerCharacterDataExtension
         {
             entry.Serialize(writer);
         }
+        // Equip weapons - Set 1
         characterData.EquipWeapons.Serialize(writer);
+        // Equip weapons - Set 2
+        characterData.EquipWeapons2.Serialize(writer);
+        // Equip weapon set
+        writer.Put(characterData.EquipWeaponSet);
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SerializeCharacterData", characterData, writer);
     }
 
@@ -529,9 +536,17 @@ public static partial class PlayerCharacterDataExtension
             entry.Deserialize(reader);
             tempCharacterData.Quests.Add(entry);
         }
-        EquipWeapons equipWeapons = new EquipWeapons();
+        EquipWeapons equipWeapons;
+        // Equip weapons - Set 1
+        equipWeapons = new EquipWeapons();
         equipWeapons.Deserialize(reader);
         tempCharacterData.EquipWeapons = equipWeapons;
+        // Equip weapons - Set 2
+        equipWeapons = new EquipWeapons();
+        equipWeapons.Deserialize(reader);
+        tempCharacterData.EquipWeapons2 = equipWeapons;
+        // Equip weapon set
+        tempCharacterData.EquipWeaponSet = reader.GetByte();
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", tempCharacterData, reader);
 
         tempCharacterData.CloneTo(characterData);

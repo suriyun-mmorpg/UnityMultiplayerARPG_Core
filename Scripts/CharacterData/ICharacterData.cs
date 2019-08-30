@@ -17,6 +17,8 @@ public partial interface ICharacterData
     int CurrentFood { get; set; }
     int CurrentWater { get; set; }
     EquipWeapons EquipWeapons { get; set; }
+    EquipWeapons EquipWeapons2 { get; set; }
+    byte EquipWeaponSet { get; set; }
     // Listing
     IList<CharacterAttribute> Attributes { get; set; }
     IList<CharacterSkill> Skills { get; set; }

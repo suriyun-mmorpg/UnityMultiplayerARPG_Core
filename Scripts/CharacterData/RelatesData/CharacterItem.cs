@@ -11,6 +11,7 @@ public class CharacterItem : INetSerializableWithElement
     public int dataId;
     public short level;
     public short amount;
+    public byte equipSlotIndex;
     public float durability;
     public int exp;
     public float lockRemainsDuration;
@@ -494,6 +495,7 @@ public class CharacterItem : INetSerializableWithElement
         writer.Put(dataId);
         writer.Put(level);
         writer.Put(amount);
+        writer.Put(equipSlotIndex);
         if (isOwnerClient)
         {
             writer.Put(lockRemainsDuration);
@@ -535,6 +537,7 @@ public class CharacterItem : INetSerializableWithElement
         dataId = reader.GetInt();
         level = reader.GetShort();
         amount = reader.GetShort();
+        equipSlotIndex = reader.GetByte();
         if (isOwnerClient)
         {
             lockRemainsDuration = reader.GetFloat();

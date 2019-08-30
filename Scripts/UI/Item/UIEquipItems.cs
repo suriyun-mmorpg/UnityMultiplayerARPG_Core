@@ -8,9 +8,11 @@ namespace MultiplayerARPG
         public UICharacterItem uiItemDialog;
         public UICharacterItem rightHandSlot;
         public UICharacterItem leftHandSlot;
+        public UICharacterItem rightHandSlot2;
+        public UICharacterItem leftHandSlot2;
         public UICharacterItemPair[] otherEquipSlots;
 
-        private Dictionary<string, UICharacterItem> cacheEquipItemSlots = null;
+        private Dictionary<string, UICharacterItem> cacheEquipItemSlots;
         public Dictionary<string, UICharacterItem> CacheEquipItemSlots
         {
             get
@@ -19,38 +21,25 @@ namespace MultiplayerARPG
                 {
                     cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
                     CacheItemSelectionManager.Clear();
-                    if (rightHandSlot != null)
-                    {
-                        string equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-                        rightHandSlot.Setup(GetEmptyUIData(InventoryType.EquipWeaponRight), character, -1);
-                        UICharacterItemDragHandler dragHandler = rightHandSlot.GetComponentInChildren<UICharacterItemDragHandler>();
-                        if (dragHandler != null)
-                            dragHandler.SetupForEquipItems(rightHandSlot);
-                        cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
-                        CacheItemSelectionManager.Add(rightHandSlot);
-                    }
-                    if (leftHandSlot != null)
-                    {
-                        string equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-                        leftHandSlot.Setup(GetEmptyUIData(InventoryType.EquipWeaponLeft), character, -1);
-                        UICharacterItemDragHandler dragHandler = leftHandSlot.GetComponentInChildren<UICharacterItemDragHandler>();
-                        if (dragHandler != null)
-                            dragHandler.SetupForEquipItems(leftHandSlot);
-                        cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
-                        CacheItemSelectionManager.Add(leftHandSlot);
-                    }
+                    // Equip weapons
+                    CacheEquipWeaponSlots(rightHandSlot, leftHandSlot, 0);
+                    CacheEquipWeaponSlots(rightHandSlot2, leftHandSlot2, 1);
+                    // Armor equipments
+                    byte tempEquipSlotIndex;
+                    string tempEquipPosition;
                     foreach (UICharacterItemPair otherEquipSlot in otherEquipSlots)
                     {
-                        if (!string.IsNullOrEmpty(otherEquipSlot.armorType.Id) &&
+                        tempEquipSlotIndex = otherEquipSlot.equipSlotIndex;
+                        tempEquipPosition = GetEquipPosition(otherEquipSlot.armorType.Id, tempEquipSlotIndex);
+                        if (!string.IsNullOrEmpty(tempEquipPosition) &&
                             otherEquipSlot.ui != null &&
-                            !cacheEquipItemSlots.ContainsKey(otherEquipSlot.armorType.Id))
+                            !cacheEquipItemSlots.ContainsKey(tempEquipPosition))
                         {
-                            string equipPosition = otherEquipSlot.armorType.Id;
-                            otherEquipSlot.ui.Setup(GetEmptyUIData(InventoryType.EquipItems), character, -1);
+                            otherEquipSlot.ui.Setup(GetEmptyUIData(InventoryType.EquipItems, tempEquipSlotIndex), character, -1);
                             UICharacterItemDragHandler dragHandler = otherEquipSlot.ui.GetComponentInChildren<UICharacterItemDragHandler>();
                             if (dragHandler != null)
                                 dragHandler.SetupForEquipItems(otherEquipSlot.ui);
-                            cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
+                            cacheEquipItemSlots.Add(tempEquipPosition, otherEquipSlot.ui);
                             CacheItemSelectionManager.Add(otherEquipSlot.ui);
                         }
                     }
@@ -126,52 +115,88 @@ namespace MultiplayerARPG
         {
             this.character = character;
             // Clear slots data
-            foreach (UICharacterItem slot in CacheEquipItemSlots.Values)
+            UICharacterItem equipSlot;
+            foreach (string equipPosition in CacheEquipItemSlots.Keys)
             {
-                slot.Setup(GetEmptyUIData(slot.InventoryType), character, -1);
-                slot.Show();
+                equipSlot = CacheEquipItemSlots[equipPosition];
+                equipSlot.Setup(GetEmptyUIData(equipSlot.InventoryType, GetEquipSlotIndexFromEquipPosition(equipPosition)), character, -1);
+                equipSlot.Show();
             }
 
             if (character == null)
                 return;
 
-            string tempPosition;
+            CharacterItem tempEquipItem;
+            Item tempArmorItem;
             UICharacterItem tempSlot;
             IList<CharacterItem> equipItems = character.EquipItems;
             for (int i = 0; i < equipItems.Count; ++i)
             {
-                CharacterItem equipItem = equipItems[i];
-                Item armorItem = equipItem.GetArmorItem();
-                if (armorItem == null)
+                tempEquipItem = equipItems[i];
+                tempArmorItem = tempEquipItem.GetArmorItem();
+                if (tempArmorItem == null)
                     continue;
-
-                tempPosition = armorItem.EquipPosition;
-                if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
-                    tempSlot.Setup(new CharacterItemTuple(equipItem, equipItem.level, InventoryType.EquipItems), character, i);
+                
+                if (CacheEquipItemSlots.TryGetValue(GetEquipPosition(tempArmorItem.EquipPosition, tempEquipItem.equipSlotIndex), out tempSlot))
+                    tempSlot.Setup(new CharacterItemTuple(tempEquipItem, tempEquipItem.level, InventoryType.EquipItems), character, i);
             }
 
-            EquipWeapons equipWeapons = character.EquipWeapons;
-            CharacterItem rightHand = equipWeapons.rightHand;
-            CharacterItem leftHand = equipWeapons.leftHand;
-            Item rightHandEquipment = rightHand.GetEquipmentItem();
-            Item leftHandEquipment = leftHand.GetEquipmentItem();
-            tempPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
+            SetEquipWeapons(character.EquipWeapons, 0);
+            SetEquipWeapons(character.EquipWeapons2, 1);
+        }
+
+        private void CacheEquipWeaponSlots(UICharacterItem rightHandSlot, UICharacterItem leftHandSlot, byte equipSlotIndex)
+        {
+            CacheEquipWeaponSlot(rightHandSlot, false, equipSlotIndex);
+            CacheEquipWeaponSlot(leftHandSlot, true, equipSlotIndex);
+        }
+
+        private void CacheEquipWeaponSlot(UICharacterItem slot, bool isLeftHand, byte equipSlotIndex)
+        {
+            if (slot == null)
+                return;
+            slot.Setup(GetEmptyUIData(isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight, equipSlotIndex), character, -1);
+            UICharacterItemDragHandler dragHandler = slot.GetComponentInChildren<UICharacterItemDragHandler>();
+            if (dragHandler != null)
+                dragHandler.SetupForEquipItems(slot);
+            cacheEquipItemSlots.Add(GetEquipPosition(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipSlotIndex), slot);
+            CacheItemSelectionManager.Add(slot);
+        }
+
+        private void SetEquipWeapons(EquipWeapons equipWeapons, byte equipSlotIndex)
+        {
+            SetEquipWeapon(equipWeapons.rightHand, false, equipSlotIndex);
+            SetEquipWeapon(equipWeapons.leftHand, true, equipSlotIndex);
+        }
+
+        private void SetEquipWeapon(CharacterItem equipWeapon, bool isLeftHand, byte equipSlotIndex)
+        {
+            string tempPosition = GetEquipPosition(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipSlotIndex);
+            UICharacterItem tempSlot;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
-                if (rightHandEquipment != null)
-                    tempSlot.Setup(new CharacterItemTuple(rightHand, rightHand.level, InventoryType.EquipWeaponRight), character, 0);
-            }
-            tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-            if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
-            {
-                if (leftHandEquipment != null)
-                    tempSlot.Setup(new CharacterItemTuple(leftHand, leftHand.level, InventoryType.EquipWeaponLeft), character, 0);
+                if (equipWeapon.GetEquipmentItem() != null)
+                    tempSlot.Setup(new CharacterItemTuple(equipWeapon, equipWeapon.level, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), character, 0);
             }
         }
 
-        private CharacterItemTuple GetEmptyUIData(InventoryType inventoryType)
+        private CharacterItemTuple GetEmptyUIData(InventoryType inventoryType, byte equipSlotIndex)
         {
-            return new CharacterItemTuple(CharacterItem.Empty, 1, inventoryType);
+            return new CharacterItemTuple(new CharacterItem()
+            {
+                equipSlotIndex = equipSlotIndex
+            }, 1, inventoryType);
+        }
+
+        private string GetEquipPosition(string equipPositionId, byte equipSlotIndex)
+        {
+            return equipPositionId + ":" + equipSlotIndex;
+        }
+
+        private byte GetEquipSlotIndexFromEquipPosition(string equipPosition)
+        {
+            string[] splitEquipPosition = equipPosition.Split(':');
+            return byte.Parse(splitEquipPosition[splitEquipPosition.Length - 1]);
         }
     }
 }

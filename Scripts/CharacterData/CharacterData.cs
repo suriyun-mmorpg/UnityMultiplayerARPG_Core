@@ -19,6 +19,8 @@ public partial class CharacterData : ICharacterData
     private int currentFood;
     private int currentWater;
     private EquipWeapons equipWeapons;
+    private EquipWeapons equipWeapons2;
+    private byte equipWeaponSet;
 
     private ObservableCollection<CharacterAttribute> attributes;
     private ObservableCollection<CharacterSkill> skills;
@@ -83,6 +85,26 @@ public partial class CharacterData : ICharacterData
         set
         {
             equipWeapons = value;
+            shouldMakeCache = true;
+        }
+    }
+
+    public EquipWeapons EquipWeapons2
+    {
+        get { return equipWeapons2; }
+        set
+        {
+            equipWeapons2 = value;
+            shouldMakeCache = true;
+        }
+    }
+
+    public byte EquipWeaponSet
+    {
+        get { return equipWeaponSet; }
+        set
+        {
+            equipWeaponSet = value;
             shouldMakeCache = true;
         }
     }

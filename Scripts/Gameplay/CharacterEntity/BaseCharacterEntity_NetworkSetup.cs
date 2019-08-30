@@ -27,6 +27,10 @@ namespace MultiplayerARPG
             currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             equipWeapons.deliveryMethod = DeliveryMethod.ReliableOrdered;
             equipWeapons.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            equipWeapons2.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            equipWeapons2.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            equipWeaponSet.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isHidding.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isHidding.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
@@ -51,6 +55,8 @@ namespace MultiplayerARPG
             currentFood.onChange += OnCurrentFoodChange;
             currentWater.onChange += OnCurrentWaterChange;
             equipWeapons.onChange += OnEquipWeaponsChange;
+            equipWeapons2.onChange += OnEquipWeapons2Change;
+            equipWeaponSet.onChange += OnEquipWeaponSetChange;
             isHidding.onChange += OnIsHiddingChange;
             // On list changes events
             attributes.onOperation += OnAttributesOperation;
