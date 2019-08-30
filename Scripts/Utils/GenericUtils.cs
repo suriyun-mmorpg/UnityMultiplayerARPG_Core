@@ -70,6 +70,8 @@ public static class GenericUtils
 
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
     {
+        if (gameObject == null)
+            return;
         Transform[] childrenTransforms = gameObject.GetComponentsInChildren<Transform>(includeInactive);
         foreach (Transform childTransform in childrenTransforms)
         {
@@ -79,6 +81,8 @@ public static class GenericUtils
 
     public static T GetOrAddComponent<T>(this GameObject gameObject) where T : Component
     {
+        if (gameObject == null)
+            return null;
         T result = gameObject.GetComponent<T>();
         if (result == null)
             result = gameObject.AddComponent<T>();
@@ -87,6 +91,8 @@ public static class GenericUtils
 
     public static void RemoveChildren(this Transform transform)
     {
+        if (transform == null)
+            return;
         for (int i = transform.childCount - 1; i >= 0; --i)
         {
             Transform lastChild = transform.GetChild(i);
@@ -96,6 +102,8 @@ public static class GenericUtils
 
     public static void SetChildrenActive(this Transform transform, bool isActive)
     {
+        if (transform == null)
+            return;
         for (int i = 0; i < transform.childCount; ++i)
         {
             transform.GetChild(i).gameObject.SetActive(isActive);
@@ -104,6 +112,8 @@ public static class GenericUtils
 
     public static void RemoveObjectsByComponentInChildren<T>(this GameObject gameObject, bool includeInactive) where T : Component
     {
+        if (gameObject == null)
+            return;
         T[] components = gameObject.GetComponentsInChildren<T>(includeInactive);
         foreach (T component in components)
         {
@@ -113,6 +123,8 @@ public static class GenericUtils
 
     public static void RemoveObjectsByComponentInParent<T>(this GameObject gameObject, bool includeInactive) where T : Component
     {
+        if (gameObject == null)
+            return;
         T[] components = gameObject.GetComponentsInParent<T>(includeInactive);
         foreach (T component in components)
         {
@@ -122,6 +134,8 @@ public static class GenericUtils
 
     public static void RemoveComponents<T>(this GameObject gameObject) where T : Component
     {
+        if (gameObject == null)
+            return;
         T[] components = gameObject.GetComponents<T>();
         foreach (T component in components)
         {
@@ -131,6 +145,8 @@ public static class GenericUtils
 
     public static void RemoveComponentsInChildren<T>(this GameObject gameObject, bool includeInactive) where T : Component
     {
+        if (gameObject == null)
+            return;
         T[] components = gameObject.GetComponentsInChildren<T>(includeInactive);
         foreach (T component in components)
         {
@@ -140,6 +156,8 @@ public static class GenericUtils
 
     public static void RemoveComponentsInParent<T>(this GameObject gameObject, bool includeInactive) where T : Component
     {
+        if (gameObject == null)
+            return;
         T[] components = gameObject.GetComponentsInParent<T>(includeInactive);
         foreach (T component in components)
         {
