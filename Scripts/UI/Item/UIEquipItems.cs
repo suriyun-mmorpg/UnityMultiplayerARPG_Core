@@ -1,4 +1,8 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -6,11 +10,12 @@ namespace MultiplayerARPG
     {
         public ICharacterData character { get; protected set; }
         public UICharacterItem uiItemDialog;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public UICharacterItem rightHandSlot;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public UICharacterItem leftHandSlot;
-        public UICharacterItem rightHandSlot2;
-        public UICharacterItem leftHandSlot2;
-        public UICharacterItemPair[] otherEquipSlots;
+        public UIEquipWeaponsPair[] equipWeaponSlots;
+        public UIEquipItemPair[] otherEquipSlots;
 
         private Dictionary<string, UICharacterItem> cacheEquipItemSlots;
         public Dictionary<string, UICharacterItem> CacheEquipItemSlots
@@ -21,13 +26,16 @@ namespace MultiplayerARPG
                 {
                     cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
                     CacheItemSelectionManager.Clear();
-                    // Equip weapons
-                    CacheEquipWeaponSlots(rightHandSlot, leftHandSlot, 0);
-                    CacheEquipWeaponSlots(rightHandSlot2, leftHandSlot2, 1);
+                    // Weapons
+                    MigrateUIWeaponSlots();
+                    foreach (UIEquipWeaponsPair currentEquipWeaponSlots in equipWeaponSlots)
+                    {
+                        CacheEquipWeaponSlots(currentEquipWeaponSlots.rightHandSlot, currentEquipWeaponSlots.leftHandSlot, currentEquipWeaponSlots.equipWeaponSetIndex);
+                    }
                     // Armor equipments
                     byte tempEquipSlotIndex;
                     string tempEquipPosition;
-                    foreach (UICharacterItemPair otherEquipSlot in otherEquipSlots)
+                    foreach (UIEquipItemPair otherEquipSlot in otherEquipSlots)
                     {
                         tempEquipSlotIndex = otherEquipSlot.equipSlotIndex;
                         tempEquipPosition = GetEquipPosition(otherEquipSlot.armorType.Id, tempEquipSlotIndex);
@@ -60,6 +68,33 @@ namespace MultiplayerARPG
                 cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheItemSelectionManager;
             }
+        }
+
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (MigrateUIWeaponSlots())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateUIWeaponSlots()
+        {
+            bool hasChanges = false;
+            if (equipWeaponSlots == null || equipWeaponSlots.Length == 0)
+            {
+                equipWeaponSlots = new UIEquipWeaponsPair[]
+                {
+                    new UIEquipWeaponsPair()
+                    {
+                        equipWeaponSetIndex = 0,
+                        rightHandSlot = rightHandSlot,
+                        leftHandSlot = leftHandSlot,
+                    },
+                };
+                hasChanges = true;
+            }
+            return hasChanges;
         }
 
         public override void Show()
@@ -129,10 +164,10 @@ namespace MultiplayerARPG
             CharacterItem tempEquipItem;
             Item tempArmorItem;
             UICharacterItem tempSlot;
-            IList<CharacterItem> equipItems = character.EquipItems;
-            for (int i = 0; i < equipItems.Count; ++i)
+            int i;
+            for (i = 0; i < character.EquipItems.Count; ++i)
             {
-                tempEquipItem = equipItems[i];
+                tempEquipItem = character.EquipItems[i];
                 tempArmorItem = tempEquipItem.GetArmorItem();
                 if (tempArmorItem == null)
                     continue;
@@ -141,8 +176,10 @@ namespace MultiplayerARPG
                     tempSlot.Setup(new CharacterItemTuple(tempEquipItem, tempEquipItem.level, InventoryType.EquipItems), character, i);
             }
 
-            SetEquipWeapons(character.EquipWeapons, 0);
-            SetEquipWeapons(character.EquipWeapons2, 1);
+            for (i = 0; i < character.SelectableWeaponSets.Count; ++i)
+            {
+                SetEquipWeapons(character.SelectableWeaponSets[i], (byte)i);
+            };
         }
 
         private void CacheEquipWeaponSlots(UICharacterItem rightHandSlot, UICharacterItem leftHandSlot, byte equipSlotIndex)

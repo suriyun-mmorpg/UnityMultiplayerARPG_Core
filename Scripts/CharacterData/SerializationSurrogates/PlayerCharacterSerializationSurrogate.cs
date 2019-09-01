@@ -22,6 +22,8 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         info.AddValue("currentFood", data.CurrentFood);
         info.AddValue("currentWater", data.CurrentWater);
         info.AddValue("equipWeapons", data.EquipWeapons);
+        info.AddValue("equipWeaponSet", data.EquipWeaponSet);
+        info.AddListValue("selectableWeaponSets", data.SelectableWeaponSets);
         info.AddListValue("attributes", data.Attributes);
         info.AddListValue("skills", data.Skills);
         info.AddListValue("skillUsages", data.SkillUsages);
@@ -53,7 +55,6 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         data.Id = info.GetString("id");
         data.DataId = info.GetInt32("dataId");
         data.EntityId = info.GetInt32("entityId");
-        data.FactionId = info.GetInt32("factionId");
         data.CharacterName = info.GetString("characterName");
         data.Level = info.GetInt16("level");
         data.Exp = info.GetInt32("exp");
@@ -79,6 +80,19 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         {
             data.UserGold = info.GetInt32("userGold");
             data.UserCash = info.GetInt32("userCash");
+        }
+        catch { }
+        // TODO: Backward compatible, this will be removed in future version
+        try
+        {
+            data.FactionId = info.GetInt32("factionId");
+        }
+        catch { }
+        // TODO: Backward compatible, this will be removed in future version
+        try
+        {
+            data.EquipWeaponSet = info.GetByte("equipWeaponSet");
+            data.SelectableWeaponSets = info.GetListValue<EquipWeapons>("selectableWeaponSets");
         }
         catch { }
         data.CurrentMapName = info.GetString("currentMapName");

@@ -52,19 +52,11 @@ namespace MultiplayerARPG
             CrossFadeLegacyAnimation(CLIP_IDLE, 0f, WrapMode.Loop);
         }
 
-        public override void SetEquipWeapons(EquipWeapons equipWeapons, EquipWeapons equipWeapons2, byte equipWeaponSet)
+        public override void SetEquipWeapons(EquipWeapons equipWeapons)
         {
-            base.SetEquipWeapons(equipWeapons, equipWeapons2, equipWeaponSet);
+            base.SetEquipWeapons(equipWeapons);
             SetupComponent();
-            switch (equipWeaponSet)
-            {
-                case 1:
-                    SetClipBasedOnWeapon(equipWeapons2);
-                    break;
-                default:
-                    SetClipBasedOnWeapon(equipWeapons);
-                    break;
-            }
+            SetClipBasedOnWeapon(equipWeapons);
         }
 
         protected void SetClipBasedOnWeapon(EquipWeapons equipWeapons)

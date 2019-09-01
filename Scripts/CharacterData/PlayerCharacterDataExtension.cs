@@ -42,14 +42,13 @@ public static partial class PlayerCharacterDataExtension
         to.GuildId = from.GuildId;
         to.GuildRole = from.GuildRole;
         to.SharedGuildExp = from.SharedGuildExp;
-        to.EquipWeapons = from.EquipWeapons;
-        to.EquipWeapons2 = from.EquipWeapons2;
         to.EquipWeaponSet = from.EquipWeaponSet;
         to.CurrentMapName = from.CurrentMapName;
         to.CurrentPosition = from.CurrentPosition;
         to.RespawnMapName = from.RespawnMapName;
         to.RespawnPosition = from.RespawnPosition;
         to.LastUpdate = from.LastUpdate;
+        to.SelectableWeaponSets = new List<EquipWeapons>(from.SelectableWeaponSets);
         to.Attributes = new List<CharacterAttribute>(from.Attributes);
         to.Buffs = new List<CharacterBuff>(from.Buffs);
         to.Hotkeys = new List<CharacterHotkey>(from.Hotkeys);
@@ -434,12 +433,14 @@ public static partial class PlayerCharacterDataExtension
         {
             entry.Serialize(writer);
         }
-        // Equip weapons - Set 1
-        characterData.EquipWeapons.Serialize(writer);
-        // Equip weapons - Set 2
-        characterData.EquipWeapons2.Serialize(writer);
         // Equip weapon set
         writer.Put(characterData.EquipWeaponSet);
+        // Selectable weapon sets
+        writer.Put((byte)characterData.SelectableWeaponSets.Count);
+        foreach (EquipWeapons entry in characterData.SelectableWeaponSets)
+        {
+            entry.Serialize(writer);
+        }
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SerializeCharacterData", characterData, writer);
     }
 
@@ -536,17 +537,16 @@ public static partial class PlayerCharacterDataExtension
             entry.Deserialize(reader);
             tempCharacterData.Quests.Add(entry);
         }
-        EquipWeapons equipWeapons;
-        // Equip weapons - Set 1
-        equipWeapons = new EquipWeapons();
-        equipWeapons.Deserialize(reader);
-        tempCharacterData.EquipWeapons = equipWeapons;
-        // Equip weapons - Set 2
-        equipWeapons = new EquipWeapons();
-        equipWeapons.Deserialize(reader);
-        tempCharacterData.EquipWeapons2 = equipWeapons;
         // Equip weapon set
         tempCharacterData.EquipWeaponSet = reader.GetByte();
+        // Selectable weapon sets
+        count = reader.GetByte();
+        for (int i = 0; i < count; ++i)
+        {
+            EquipWeapons entry = new EquipWeapons();
+            entry.Deserialize(reader);
+            tempCharacterData.SelectableWeaponSets.Add(entry);
+        }
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", tempCharacterData, reader);
 
         tempCharacterData.CloneTo(characterData);

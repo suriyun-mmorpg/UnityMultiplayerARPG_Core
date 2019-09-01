@@ -122,7 +122,8 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateStorageItems();
             }
             characterEntity.onIdChange += OnIdChange;
-            characterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
+            characterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            characterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
             characterEntity.onAttributesOperation += OnAttributesOperation;
             characterEntity.onSkillsOperation += OnSkillsOperation;
             characterEntity.onSummonsOperation += OnSummonsOperation;
@@ -149,7 +150,8 @@ namespace MultiplayerARPG
                 return;
 
             characterEntity.onIdChange -= OnIdChange;
-            characterEntity.onEquipWeaponsChange -= OnEquipWeaponsChange;
+            characterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            characterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
             characterEntity.onAttributesOperation -= OnAttributesOperation;
             characterEntity.onSkillsOperation -= OnSkillsOperation;
             characterEntity.onSummonsOperation -= OnSummonsOperation;
@@ -207,7 +209,17 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnEquipWeaponsChange(EquipWeapons equipWeapons)
+        protected void OnEquipWeaponSetChange(byte equipWeaponSet)
+        {
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            {
+                CacheUISceneGameplay.UpdateCharacter();
+                CacheUISceneGameplay.UpdateEquipItems();
+                CacheUISceneGameplay.UpdateEquipWeapons();
+            }
+        }
+
+        protected void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             {

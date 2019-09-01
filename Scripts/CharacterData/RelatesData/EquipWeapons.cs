@@ -60,3 +60,9 @@ public class SyncFieldEquipWeapons : LiteNetLibSyncField<EquipWeapons>
         return true;
     }
 }
+
+
+[System.Serializable]
+public class SyncListEquipWeapons : LiteNetLibSyncList<EquipWeapons>
+{
+}

@@ -25,15 +25,12 @@ namespace MultiplayerARPG
             currentFood.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentWater.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            equipWeapons.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            equipWeapons.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            equipWeapons2.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            equipWeapons2.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             equipWeaponSet.deliveryMethod = DeliveryMethod.ReliableOrdered;
             equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isHidding.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isHidding.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
+            selectableWeaponSets.forOwnerOnly = false;
             attributes.forOwnerOnly = false;
             skills.forOwnerOnly = true;
             skillUsages.forOwnerOnly = true;
@@ -54,11 +51,10 @@ namespace MultiplayerARPG
             currentMp.onChange += OnCurrentMpChange;
             currentFood.onChange += OnCurrentFoodChange;
             currentWater.onChange += OnCurrentWaterChange;
-            equipWeapons.onChange += OnEquipWeaponsChange;
-            equipWeapons2.onChange += OnEquipWeapons2Change;
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
             isHidding.onChange += OnIsHiddingChange;
             // On list changes events
+            selectableWeaponSets.onOperation += OnSelectableWeaponSetsOperation;
             attributes.onOperation += OnAttributesOperation;
             skills.onOperation += OnSkillsOperation;
             skillUsages.onOperation += OnSkillUsagesOperation;
@@ -102,9 +98,10 @@ namespace MultiplayerARPG
             currentMp.onChange -= OnCurrentMpChange;
             currentFood.onChange -= OnCurrentFoodChange;
             currentWater.onChange -= OnCurrentWaterChange;
-            equipWeapons.onChange -= OnEquipWeaponsChange;
+            equipWeaponSet.onChange -= OnEquipWeaponSetChange;
             isHidding.onChange -= OnIsHiddingChange;
             // On list changes events
+            selectableWeaponSets.onOperation -= OnSelectableWeaponSetsOperation;
             attributes.onOperation -= OnAttributesOperation;
             skills.onOperation -= OnSkillsOperation;
             skillUsages.onOperation -= OnSkillUsagesOperation;

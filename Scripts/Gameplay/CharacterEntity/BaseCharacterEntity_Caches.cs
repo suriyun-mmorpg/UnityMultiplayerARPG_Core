@@ -15,6 +15,7 @@ namespace MultiplayerARPG
             get
             {
                 return isRecaching ||
+                    selectableWeaponSetsRecachingState.isRecaching ||
                     attributesRecachingState.isRecaching ||
                     skillsRecachingState.isRecaching ||
                     buffsRecachingState.isRecaching ||
@@ -24,6 +25,7 @@ namespace MultiplayerARPG
             }
         }
         protected bool isRecaching;
+        protected SyncListRecachingState selectableWeaponSetsRecachingState;
         protected SyncListRecachingState attributesRecachingState;
         protected SyncListRecachingState skillsRecachingState;
         protected SyncListRecachingState buffsRecachingState;
@@ -133,6 +135,13 @@ namespace MultiplayerARPG
                     CacheDisallowUseSkill &&
                     CacheDisallowUseItem)
                     break;
+            }
+
+            if (selectableWeaponSetsRecachingState.isRecaching)
+            {
+                if (onSelectableWeaponSetsOperation != null)
+                    onSelectableWeaponSetsOperation.Invoke(selectableWeaponSetsRecachingState.operation, selectableWeaponSetsRecachingState.index);
+                selectableWeaponSetsRecachingState = SyncListRecachingState.Empty;
             }
 
             if (attributesRecachingState.isRecaching)

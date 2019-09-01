@@ -18,9 +18,8 @@ public partial class CharacterData : ICharacterData
     private int currentStamina;
     private int currentFood;
     private int currentWater;
-    private EquipWeapons equipWeapons;
-    private EquipWeapons equipWeapons2;
     private byte equipWeaponSet;
+    private ObservableCollection<EquipWeapons> selectableEquipWeapons;
 
     private ObservableCollection<CharacterAttribute> attributes;
     private ObservableCollection<CharacterSkill> skills;
@@ -79,22 +78,20 @@ public partial class CharacterData : ICharacterData
     public int CurrentStamina { get { return currentStamina; } set { currentStamina = value; } }
     public int CurrentFood { get { return currentFood; } set { currentFood = value; } }
     public int CurrentWater { get { return currentWater; } set { currentWater = value; } }
+    
     public EquipWeapons EquipWeapons
     {
-        get { return equipWeapons; }
-        set
+        get
         {
-            equipWeapons = value;
-            shouldMakeCache = true;
+            while (SelectableWeaponSets.Count <= EquipWeaponSet)
+                SelectableWeaponSets.Add(new EquipWeapons());
+            return SelectableWeaponSets[EquipWeaponSet];
         }
-    }
-
-    public EquipWeapons EquipWeapons2
-    {
-        get { return equipWeapons2; }
         set
         {
-            equipWeapons2 = value;
+            while (SelectableWeaponSets.Count <= EquipWeaponSet)
+                SelectableWeaponSets.Add(new EquipWeapons());
+            SelectableWeaponSets[EquipWeaponSet] = value;
             shouldMakeCache = true;
         }
     }
@@ -105,6 +102,31 @@ public partial class CharacterData : ICharacterData
         set
         {
             equipWeaponSet = value;
+            shouldMakeCache = true;
+        }
+    }
+
+    public IList<EquipWeapons> SelectableWeaponSets
+    {
+        get
+        {
+            if (selectableEquipWeapons == null)
+            {
+                selectableEquipWeapons = new ObservableCollection<EquipWeapons>();
+                selectableEquipWeapons.CollectionChanged += List_CollectionChanged;
+            }
+            return selectableEquipWeapons;
+        }
+        set
+        {
+            if (selectableEquipWeapons == null)
+            {
+                selectableEquipWeapons = new ObservableCollection<EquipWeapons>();
+                selectableEquipWeapons.CollectionChanged += List_CollectionChanged;
+            }
+            selectableEquipWeapons.Clear();
+            foreach (EquipWeapons entry in value)
+                selectableEquipWeapons.Add(entry);
             shouldMakeCache = true;
         }
     }

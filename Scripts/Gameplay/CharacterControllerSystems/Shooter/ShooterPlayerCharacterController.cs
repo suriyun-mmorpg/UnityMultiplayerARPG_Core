@@ -102,7 +102,8 @@ namespace MultiplayerARPG
 
             SetupEquipWeapons(characterEntity.EquipWeapons);
 
-            characterEntity.onEquipWeaponsChange += SetupEquipWeapons;
+            characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
+            characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -112,7 +113,18 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            characterEntity.onEquipWeaponsChange -= SetupEquipWeapons;
+            characterEntity.onEquipWeaponSetChange -= SetupEquipWeapons;
+            characterEntity.onSelectableWeaponSetsOperation -= SetupEquipWeapons;
+        }
+
+        protected void SetupEquipWeapons(byte equipWeaponSet)
+        {
+            SetupEquipWeapons(PlayerCharacterEntity.EquipWeapons);
+        }
+
+        protected void SetupEquipWeapons(LiteNetLibManager.LiteNetLibSyncList.Operation operation, int index)
+        {
+            SetupEquipWeapons(PlayerCharacterEntity.EquipWeapons);
         }
 
         protected void SetupEquipWeapons(EquipWeapons equipWeapons)

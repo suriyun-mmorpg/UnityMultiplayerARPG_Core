@@ -69,8 +69,6 @@ namespace MultiplayerARPG
 
         // Protected fields
         public EquipWeapons equipWeapons { get; protected set; }
-        public EquipWeapons equipWeapons2 { get; protected set; }
-        public byte equipWeaponSet { get; protected set; }
         public IList<CharacterItem> equipItems { get; protected set; }
         public IList<CharacterBuff> buffs { get; protected set; }
         public bool isDead { get; protected set; }
@@ -108,7 +106,7 @@ namespace MultiplayerARPG
             {
                 previousModel.DestroyCacheModels();
                 previousModel.DestroyCacheEffects();
-                SetEquipWeapons(previousModel.equipWeapons, previousModel.equipWeapons2, previousModel.equipWeaponSet);
+                SetEquipWeapons(previousModel.equipWeapons);
                 SetEquipItems(previousModel.equipItems);
                 SetBuffs(previousModel.buffs);
                 SetIsDead(previousModel.isDead);
@@ -191,7 +189,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SetEquipWeapons(EquipWeapons equipWeapons, EquipWeapons equipWeapons2, byte equipWeaponSet)
+        public virtual void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             this.equipWeapons = equipWeapons;
 

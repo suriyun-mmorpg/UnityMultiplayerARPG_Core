@@ -24,14 +24,12 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt currentWater = new SyncFieldInt();
         [SerializeField]
-        protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
-        [SerializeField]
-        protected SyncFieldEquipWeapons equipWeapons2 = new SyncFieldEquipWeapons();
+        protected SyncFieldBool isHidding = new SyncFieldBool();
         [SerializeField]
         protected SyncFieldByte equipWeaponSet = new SyncFieldByte();
-        [SerializeField]
-        protected SyncFieldBool isHidding = new SyncFieldBool();
         [Header("Sync Lists")]
+        [SerializeField]
+        protected SyncListEquipWeapons selectableWeaponSets = new SyncListEquipWeapons();
         [SerializeField]
         protected SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
         [SerializeField]
@@ -57,11 +55,10 @@ namespace MultiplayerARPG
         public System.Action<int> onCurrentMpChange;
         public System.Action<int> onCurrentFoodChange;
         public System.Action<int> onCurrentWaterChange;
-        public System.Action<EquipWeapons> onEquipWeaponsChange;
-        public System.Action<EquipWeapons> onEquipWeapons2Change;
         public System.Action<byte> onEquipWeaponSetChange;
         public System.Action<bool> onIsHiddingChange;
         // List
+        public System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
@@ -83,10 +80,34 @@ namespace MultiplayerARPG
         public int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
         public int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
         public int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
-        public EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
-        public EquipWeapons EquipWeapons2 { get { return equipWeapons2.Value; } set { equipWeapons2.Value = value; } }
+        public EquipWeapons EquipWeapons
+        {
+            get
+            {
+                while (SelectableWeaponSets.Count <= EquipWeaponSet)
+                    SelectableWeaponSets.Add(new EquipWeapons());
+                return SelectableWeaponSets[EquipWeaponSet];
+            }
+            set
+            {
+                while (SelectableWeaponSets.Count <= EquipWeaponSet)
+                    SelectableWeaponSets.Add(new EquipWeapons());
+                SelectableWeaponSets[EquipWeaponSet] = value;
+            }
+        }
         public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
         public bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
+
+        public IList<EquipWeapons> SelectableWeaponSets
+        {
+            get { return selectableWeaponSets; }
+            set
+            {
+                selectableWeaponSets.Clear();
+                foreach (EquipWeapons entry in value)
+                    selectableWeaponSets.Add(entry);
+            }
+        }
 
         public IList<CharacterAttribute> Attributes
         {
@@ -259,39 +280,13 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when equip weapons changes
-        /// </summary>
-        /// <param name="equipWeapons"></param>
-        protected virtual void OnEquipWeaponsChange(bool isInitial, EquipWeapons equipWeapons)
-        {
-            if (CharacterModel != null)
-                CharacterModel.SetEquipWeapons(EquipWeapons, EquipWeapons2, EquipWeaponSet);
-
-            if (onEquipWeaponsChange != null)
-                onEquipWeaponsChange.Invoke(equipWeapons);
-        }
-
-        /// <summary>
-        /// Override this to do stuffs when equip weapons changes
-        /// </summary>
-        /// <param name="equipWeapons2"></param>
-        protected virtual void OnEquipWeapons2Change(bool isInitial, EquipWeapons equipWeapons2)
-        {
-            if (CharacterModel != null)
-                CharacterModel.SetEquipWeapons(EquipWeapons, EquipWeapons2, EquipWeaponSet);
-
-            if (onEquipWeapons2Change != null)
-                onEquipWeapons2Change.Invoke(equipWeapons2);
-        }
-
-        /// <summary>
         /// Override this to do stuffs when equip weapon set changes
         /// </summary>
         /// <param name="equipWeaponSet"></param>
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             if (CharacterModel != null)
-                CharacterModel.SetEquipWeapons(EquipWeapons, EquipWeapons2, EquipWeaponSet);
+                CharacterModel.SetEquipWeapons(EquipWeapons);
 
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
@@ -320,6 +315,24 @@ namespace MultiplayerARPG
         #endregion
 
         #region Net functions operation callback
+        /// <summary>
+        /// Override this to do stuffs when equip weapons changes
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="index"></param>
+        protected virtual void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            selectableWeaponSetsRecachingState = new SyncListRecachingState()
+            {
+                isRecaching = true,
+                operation = operation,
+                index = index
+            };
+
+            if (CharacterModel != null)
+                CharacterModel.SetEquipWeapons(EquipWeapons);
+        }
+
         /// <summary>
         /// Override this to do stuffs when attributes changes
         /// </summary>
