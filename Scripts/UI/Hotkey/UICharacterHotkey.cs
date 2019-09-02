@@ -89,10 +89,16 @@ namespace MultiplayerARPG
             if (uiCharacterItem != null)
             {
                 // Prepare item data
-                int itemIndex = -1;
-                CharacterItem characterItem;
                 InventoryType inventoryType;
-                owningCharacter.IsEquipped(Data.relateId, out itemIndex, out characterItem, out inventoryType);
+                int itemIndex;
+                byte equipWeaponSet;
+                CharacterItem characterItem;
+                owningCharacter.IsEquipped(
+                    Data.relateId,
+                    out inventoryType,
+                    out itemIndex,
+                    out equipWeaponSet,
+                    out characterItem);
 
                 bool isFound = false;
                 switch (inventoryType)

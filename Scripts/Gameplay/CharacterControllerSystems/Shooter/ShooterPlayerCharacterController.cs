@@ -769,12 +769,18 @@ namespace MultiplayerARPG
 
         protected void UseItem(string id)
         {
-            int itemIndex = -1;
-            CharacterItem characterItem;
             InventoryType inventoryType;
-            if (PlayerCharacterEntity.IsEquipped(id, out itemIndex, out characterItem, out inventoryType))
+            int itemIndex;
+            byte equipWeaponSet;
+            CharacterItem characterItem;
+            if (PlayerCharacterEntity.IsEquipped(
+                id,
+                out inventoryType,
+                out itemIndex,
+                out equipWeaponSet,
+                out characterItem))
             {
-                PlayerCharacterEntity.RequestUnEquipItem((byte)inventoryType, (short)itemIndex);
+                PlayerCharacterEntity.RequestUnEquipItem(inventoryType, (short)itemIndex, equipWeaponSet);
                 return;
             }
 

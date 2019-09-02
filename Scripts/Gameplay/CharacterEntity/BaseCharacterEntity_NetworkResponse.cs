@@ -208,11 +208,13 @@ namespace MultiplayerARPG
             {
                 if (isLeftHand)
                 {
+                    equippingItem.equipSlotIndex = equipWeaponSet;
                     tempEquipWeapons.leftHand = equippingItem;
                     SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
                 }
                 else
                 {
+                    equippingItem.equipSlotIndex = equipWeaponSet;
                     tempEquipWeapons.rightHand = equippingItem;
                     SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
                 }
@@ -226,9 +228,8 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to equip armor
         /// </summary>
         /// <param name="nonEquipIndex"></param>
-        /// <param name="unEquippingIndex"></param>
         /// <param name="equipSlotIndex"></param>
-        protected virtual void NetFuncEquipItem(short nonEquipIndex, short unEquippingIndex, byte equipSlotIndex)
+        protected virtual void NetFuncEquipArmor(short nonEquipIndex, byte equipSlotIndex)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= nonEquipItems.Count)
@@ -236,8 +237,9 @@ namespace MultiplayerARPG
 
             CharacterItem equippingItem = nonEquipItems[nonEquipIndex];
 
+            short unEquippingIndex = -1;
             GameMessage.Type gameMessageType;
-            if (!CanEquipItem(equippingItem, ref unEquippingIndex, equipSlotIndex, out gameMessageType))
+            if (!CanEquipItem(equippingItem, equipSlotIndex, out gameMessageType, out unEquippingIndex))
             {
                 gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                 return;
@@ -252,6 +254,7 @@ namespace MultiplayerARPG
                 // Can equip the item when there is no equipped item or able to unequip the equipped item
                 equippingItem.equipSlotIndex = equipSlotIndex;
                 equipItems.Add(equippingItem);
+                // Update equip item indexes
                 equipItemIndexes.Add(equippingItem.GetArmorItem().EquipPosition, equipItems.Count - 1);
                 // Update inventory
                 nonEquipItems.RemoveAt(nonEquipIndex);
@@ -299,7 +302,7 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to unequip equipments
         /// </summary>
         /// <param name="index"></param>
-        protected virtual void NetFuncUnEquipItem(short index)
+        protected virtual void NetFuncUnEquipArmor(short index)
         {
             UnEquipItem(index);
         }

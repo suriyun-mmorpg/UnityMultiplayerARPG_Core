@@ -978,11 +978,18 @@ public static partial class CharacterDataExtension
         return index;
     }
 
-    public static bool IsEquipped(this ICharacterData data, string id, out int itemIndex, out CharacterItem characterItem, out InventoryType inventoryType)
+    public static bool IsEquipped(
+        this ICharacterData data,
+        string id,
+        out InventoryType inventoryType,
+        out int itemIndex,
+        out byte equipWeaponSet,
+        out CharacterItem characterItem)
     {
-        itemIndex = -1;
-        characterItem = CharacterItem.Empty;
         inventoryType = InventoryType.NonEquipItems;
+        itemIndex = -1;
+        equipWeaponSet = 0;
+        characterItem = CharacterItem.Empty;
 
         itemIndex = data.IndexOfEquipItem(id);
         if (itemIndex >= 0)
@@ -992,20 +999,27 @@ public static partial class CharacterDataExtension
             return true;
         }
 
-        if (!string.IsNullOrEmpty(data.EquipWeapons.rightHand.id) && 
-            data.EquipWeapons.rightHand.id.Equals(id))
+        EquipWeapons tempEquipWeapons;
+        for (byte i = 0; i < data.SelectableWeaponSets.Count; ++i)
         {
-            characterItem = data.EquipWeapons.rightHand;
-            inventoryType = InventoryType.EquipWeaponRight;
-            return true;
-        }
+            tempEquipWeapons = data.SelectableWeaponSets[i];
+            if (!string.IsNullOrEmpty(tempEquipWeapons.rightHand.id) &&
+                tempEquipWeapons.rightHand.id.Equals(id))
+            {
+                equipWeaponSet = i;
+                characterItem = tempEquipWeapons.rightHand;
+                inventoryType = InventoryType.EquipWeaponRight;
+                return true;
+            }
 
-        if (!string.IsNullOrEmpty(data.EquipWeapons.leftHand.id) &&
-            data.EquipWeapons.leftHand.id.Equals(id))
-        {
-            characterItem = data.EquipWeapons.leftHand;
-            inventoryType = InventoryType.EquipWeaponLeft;
-            return true;
+            if (!string.IsNullOrEmpty(tempEquipWeapons.leftHand.id) &&
+                tempEquipWeapons.leftHand.id.Equals(id))
+            {
+                equipWeaponSet = i;
+                characterItem = tempEquipWeapons.leftHand;
+                inventoryType = InventoryType.EquipWeaponLeft;
+                return true;
+            }
         }
 
         itemIndex = data.IndexOfNonEquipItem(id);

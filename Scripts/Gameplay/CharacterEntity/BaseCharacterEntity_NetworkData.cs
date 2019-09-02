@@ -87,6 +87,11 @@ namespace MultiplayerARPG
                 this.FillWeaponSetsIfNeeded(EquipWeaponSet);
                 return SelectableWeaponSets[EquipWeaponSet];
             }
+            set
+            {
+                this.FillWeaponSetsIfNeeded(EquipWeaponSet);
+                SelectableWeaponSets[EquipWeaponSet] = value;
+            }
         }
         public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
         public bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }

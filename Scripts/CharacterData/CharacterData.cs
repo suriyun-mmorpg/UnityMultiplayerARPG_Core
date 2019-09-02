@@ -86,6 +86,11 @@ public partial class CharacterData : ICharacterData
             this.FillWeaponSetsIfNeeded(EquipWeaponSet);
             return SelectableWeaponSets[EquipWeaponSet];
         }
+        set
+        {
+            this.FillWeaponSetsIfNeeded(EquipWeaponSet);
+            SelectableWeaponSets[EquipWeaponSet] = value;
+        }
     }
 
     public byte EquipWeaponSet

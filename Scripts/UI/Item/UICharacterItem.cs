@@ -114,8 +114,18 @@ namespace MultiplayerARPG
         private bool isEnhanceSocketItemDialogAppeared;
         private bool isStorageDialogAppeared;
         private bool isDealingStateEntered;
+        private float lockRemainsDuration;
 
-        protected float lockRemainsDuration;
+        public bool IsSetupAsEquipSlot { get; private set; }
+        public string EquipPosition { get; private set; }
+        public byte EquipSlotIndex { get; private set; }
+
+        public void SetupAsEquipSlot(string equipPosition, byte equipSlotIndex)
+        {
+            IsSetupAsEquipSlot = true;
+            EquipPosition = equipPosition;
+            EquipSlotIndex = equipSlotIndex;
+        }
 
         private void OnDisable()
         {
@@ -806,7 +816,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            OwningCharacter.RequestUnEquipItem((byte)InventoryType, (short)IndexOfData);
+            OwningCharacter.RequestUnEquipItem(InventoryType, (short)IndexOfData, CharacterItem.equipSlotIndex);
         }
 
         #region Drop Item Functions

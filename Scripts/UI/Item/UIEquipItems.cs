@@ -44,6 +44,7 @@ namespace MultiplayerARPG
                             !cacheEquipItemSlots.ContainsKey(tempEquipPosition))
                         {
                             otherEquipSlot.ui.Setup(GetEmptyUIData(InventoryType.EquipItems, tempEquipSlotIndex), character, -1);
+                            otherEquipSlot.ui.SetupAsEquipSlot(otherEquipSlot.armorType.Id, tempEquipSlotIndex);
                             UICharacterItemDragHandler dragHandler = otherEquipSlot.ui.GetComponentInChildren<UICharacterItemDragHandler>();
                             if (dragHandler != null)
                                 dragHandler.SetupForEquipItems(otherEquipSlot.ui);
@@ -193,6 +194,7 @@ namespace MultiplayerARPG
             if (slot == null)
                 return;
             slot.Setup(GetEmptyUIData(isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight, equipSlotIndex), character, -1);
+            slot.SetupAsEquipSlot(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipSlotIndex);
             UICharacterItemDragHandler dragHandler = slot.GetComponentInChildren<UICharacterItemDragHandler>();
             if (dragHandler != null)
                 dragHandler.SetupForEquipItems(slot);
@@ -219,10 +221,7 @@ namespace MultiplayerARPG
 
         private CharacterItemTuple GetEmptyUIData(InventoryType inventoryType, byte equipSlotIndex)
         {
-            return new CharacterItemTuple(new CharacterItem()
-            {
-                equipSlotIndex = equipSlotIndex
-            }, 1, inventoryType);
+            return new CharacterItemTuple(CharacterItem.Empty, 1, inventoryType);
         }
 
         private string GetEquipPosition(string equipPositionId, byte equipSlotIndex)

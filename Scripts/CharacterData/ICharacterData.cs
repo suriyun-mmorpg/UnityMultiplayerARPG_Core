@@ -18,7 +18,7 @@ public partial interface ICharacterData
     int CurrentWater { get; set; }
     byte EquipWeaponSet { get; set; }
     IList<EquipWeapons> SelectableWeaponSets { get; set; }
-    EquipWeapons EquipWeapons { get; }
+    EquipWeapons EquipWeapons { get; set; }
     // Listing
     IList<CharacterAttribute> Attributes { get; set; }
     IList<CharacterSkill> Skills { get; set; }

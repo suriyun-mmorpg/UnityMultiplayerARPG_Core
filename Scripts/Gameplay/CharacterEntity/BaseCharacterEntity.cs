@@ -549,9 +549,10 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool CanEquipItem(CharacterItem equippingItem, ref short unEquippingIndex, byte equipSlotIndex, out GameMessage.Type gameMessageType)
+        public bool CanEquipItem(CharacterItem equippingItem, byte equipSlotIndex, out GameMessage.Type gameMessageType, out short unEquippingIndex)
         {
             gameMessageType = GameMessage.Type.None;
+            unEquippingIndex = -1;
 
             if (equippingItem.GetArmorItem() == null)
             {
@@ -569,12 +570,7 @@ namespace MultiplayerARPG
             Item equippingArmorItem = equippingItem.GetArmorItem();
             if (equippingArmorItem != null)
             {
-                if (unEquippingIndex >= 0)
-                {
-
-                }
-                else
-                    unEquippingIndex = (short)this.IndexOfEquipItemByEquipPosition(equippingArmorItem.EquipPosition, equipSlotIndex);
+                unEquippingIndex = (short)this.IndexOfEquipItemByEquipPosition(equippingArmorItem.EquipPosition, equipSlotIndex);
                 return true;
             }
             gameMessageType = GameMessage.Type.CannotEquip;

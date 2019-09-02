@@ -348,21 +348,6 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void RequestEquipItem(short itemIndex)
-        {
-            PlayerCharacterEntity.RequestEquipItem(itemIndex);
-        }
-
-        public void RequestUnEquipItem(InventoryType inventoryType, short itemIndex)
-        {
-            PlayerCharacterEntity.RequestUnEquipItem((byte)inventoryType, itemIndex);
-        }
-
-        public void RequestUseItem(short itemIndex)
-        {
-            PlayerCharacterEntity.RequestUseItem(itemIndex);
-        }
-
         protected void ClearQueueUsingSkill()
         {
             queueUsingSkill = null;

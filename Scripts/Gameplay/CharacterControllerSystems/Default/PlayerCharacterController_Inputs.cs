@@ -783,12 +783,18 @@ namespace MultiplayerARPG
 
         protected void UseItem(string id)
         {
-            int itemIndex = -1;
-            CharacterItem characterItem;
             InventoryType inventoryType;
-            if (PlayerCharacterEntity.IsEquipped(id, out itemIndex, out characterItem, out inventoryType))
+            int itemIndex;
+            byte equipWeaponSet;
+            CharacterItem characterItem;
+            if (PlayerCharacterEntity.IsEquipped(
+                id,
+                out inventoryType,
+                out itemIndex,
+                out equipWeaponSet,
+                out characterItem))
             {
-                RequestUnEquipItem(inventoryType, (short)itemIndex);
+                PlayerCharacterEntity.RequestUnEquipItem(inventoryType, (short)itemIndex, equipWeaponSet);
                 return;
             }
 
@@ -801,7 +807,7 @@ namespace MultiplayerARPG
 
             if (item.IsEquipment())
             {
-                RequestEquipItem((short)itemIndex);
+                PlayerCharacterEntity.RequestEquipItem((short)itemIndex);
             }
             else if (item.IsUsable())
             {
@@ -811,7 +817,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    RequestUseItem((short)itemIndex);
+                    PlayerCharacterEntity.RequestUseItem((short)itemIndex);
                 }
             }
             else if (item.IsBuilding())

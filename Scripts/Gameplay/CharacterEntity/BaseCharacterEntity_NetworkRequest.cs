@@ -184,11 +184,12 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestEquipItem(short nonEquipIndex, byte equipSlotIndex)
+        public bool RequestEquipItem(short nonEquipIndex)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return false;
+
             CharacterItem characterItem = NonEquipItems[nonEquipIndex];
             Item armorItem = characterItem.GetArmorItem();
             Item weaponItem = characterItem.GetWeaponItem();
@@ -199,34 +200,79 @@ namespace MultiplayerARPG
                 {
                     Item rightWeapon = EquipWeapons.rightHand.GetWeaponItem();
                     if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
-                        return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponLeft, 0);
+                        return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
                     else
-                        return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponRight, 0);
+                        return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, false);
                 }
                 else
-                    return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponRight, 0);
+                    return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, false);
             }
             else if (shieldItem != null)
-                return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponLeft, 0);
+                return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
             else if (armorItem != null)
-                return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipItems, (short)this.IndexOfEquipItemByEquipPosition(armorItem.EquipPosition, equipSlotIndex));
+                return RequestEquipArmor(nonEquipIndex, 0);
             return false;
         }
 
-        public bool RequestEquipItem(short nonEquipIndex, byte byteInventoryType, short oldEquipIndex)
+        public bool RequestEquipItem(short nonEquipIndex, InventoryType inventoryType, byte equipSlotIndex)
+        {
+            switch (inventoryType)
+            {
+                case InventoryType.EquipItems:
+                    return RequestEquipArmor(nonEquipIndex, equipSlotIndex);
+                case InventoryType.EquipWeaponRight:
+                    return RequestEquipWeapon(nonEquipIndex, equipSlotIndex, false);
+                case InventoryType.EquipWeaponLeft:
+                    return RequestEquipWeapon(nonEquipIndex, equipSlotIndex, true);
+            }
+            return false;
+        }
+
+        private bool RequestEquipWeapon(short nonEquipIndex, byte equipWeaponSet, bool isLeftHand)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            CallNetFunction(NetFuncEquipItem, FunctionReceivers.Server, nonEquipIndex, byteInventoryType, oldEquipIndex);
+            CallNetFunction(NetFuncEquipWeapon, FunctionReceivers.Server, nonEquipIndex, equipWeaponSet, isLeftHand);
             return true;
         }
 
-        public bool RequestUnEquipItem(byte byteInventoryType, short index)
+        private bool RequestEquipArmor(short nonEquipIndex, byte equipSlotIndex)
+        {
+            if (!CanDoActions() ||
+                nonEquipIndex >= NonEquipItems.Count)
+                return false;
+            CallNetFunction(NetFuncEquipArmor, FunctionReceivers.Server, nonEquipIndex, equipSlotIndex);
+            return true;
+        }
+
+        public bool RequestUnEquipItem(InventoryType inventoryType, short equipItemIndex, byte equipWeaponSet)
+        {
+            switch (inventoryType)
+            {
+                case InventoryType.EquipItems:
+                    return RequestUnEquipArmor(equipItemIndex);
+                case InventoryType.EquipWeaponRight:
+                    return RequestUnEquipWeapon(equipWeaponSet, false);
+                case InventoryType.EquipWeaponLeft:
+                    return RequestUnEquipWeapon(equipWeaponSet, true);
+            }
+            return false;
+        }
+
+        private bool RequestUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
         {
             if (!CanDoActions())
                 return false;
-            CallNetFunction(NetFuncUnEquipItem, FunctionReceivers.Server, byteInventoryType, index);
+            CallNetFunction(NetFuncUnEquipWeapon, FunctionReceivers.Server, equipWeaponSet, isLeftHand);
+            return true;
+        }
+
+        private bool RequestUnEquipArmor(short equipItemIndex)
+        {
+            if (!CanDoActions())
+                return false;
+            CallNetFunction(NetFuncUnEquipArmor, FunctionReceivers.Server, equipItemIndex);
             return true;
         }
 
