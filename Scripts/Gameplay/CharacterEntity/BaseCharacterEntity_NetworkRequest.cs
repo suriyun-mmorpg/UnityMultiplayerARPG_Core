@@ -184,7 +184,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestEquipItem(short nonEquipIndex)
+        public bool RequestEquipItem(short nonEquipIndex, byte equipSlotIndex)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -209,7 +209,7 @@ namespace MultiplayerARPG
             else if (shieldItem != null)
                 return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponLeft, 0);
             else if (armorItem != null)
-                return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipItems, (short)this.IndexOfEquipItemByEquipPosition(armorItem.EquipPosition));
+                return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipItems, (short)this.IndexOfEquipItemByEquipPosition(armorItem.EquipPosition, equipSlotIndex));
             return false;
         }
 

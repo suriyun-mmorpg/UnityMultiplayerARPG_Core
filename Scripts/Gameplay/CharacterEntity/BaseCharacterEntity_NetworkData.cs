@@ -84,15 +84,8 @@ namespace MultiplayerARPG
         {
             get
             {
-                while (SelectableWeaponSets.Count <= EquipWeaponSet)
-                    SelectableWeaponSets.Add(new EquipWeapons());
+                this.FillWeaponSetsIfNeeded(EquipWeaponSet);
                 return SelectableWeaponSets[EquipWeaponSet];
-            }
-            set
-            {
-                while (SelectableWeaponSets.Count <= EquipWeaponSet)
-                    SelectableWeaponSets.Add(new EquipWeapons());
-                SelectableWeaponSets[EquipWeaponSet] = value;
             }
         }
         public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }

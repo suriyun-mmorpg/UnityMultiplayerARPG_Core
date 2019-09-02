@@ -167,11 +167,12 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// This will be called at server to order character to equip equipments
+        /// This will be called at server to order character to equip weapon or shield
         /// </summary>
         /// <param name="nonEquipIndex"></param>
-        /// <param name="equipPosition"></param>
-        protected virtual void NetFuncEquipItem(short nonEquipIndex, byte byteInventoryType, short oldEquipIndex)
+        /// <param name="equipWeaponSet"></param>
+        /// <param name="isLeftHand"></param>
+        protected virtual void NetFuncEquipWeapon(short nonEquipIndex, byte equipWeaponSet, bool isLeftHand)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= nonEquipItems.Count)
@@ -182,74 +183,142 @@ namespace MultiplayerARPG
             GameMessage.Type gameMessageType;
             bool shouldUnequipRightHand;
             bool shouldUnequipLeftHand;
-            if (!CanEquipItem(equippingItem, (InventoryType)byteInventoryType, oldEquipIndex, out gameMessageType, out shouldUnequipRightHand, out shouldUnequipLeftHand))
+            if (!CanEquipWeapon(equippingItem, equipWeaponSet, isLeftHand, out gameMessageType, out shouldUnequipRightHand, out shouldUnequipLeftHand))
             {
                 gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                 return;
             }
-            // Unequip equipped item that already equipped
+
+            bool ableToEquipWeapon = true;
             if (shouldUnequipRightHand)
-                NetFuncUnEquipItem((byte)InventoryType.EquipWeaponRight, 0);
-            if (shouldUnequipLeftHand)
-                NetFuncUnEquipItem((byte)InventoryType.EquipWeaponLeft, 0);
-            // Equipping items
-            EquipWeapons tempEquipWeapons = EquipWeapons;
-            switch ((InventoryType)byteInventoryType)
             {
-                case InventoryType.EquipWeaponRight:
-                    tempEquipWeapons.rightHand = equippingItem;
-                    EquipWeapons = tempEquipWeapons;
-                    break;
-                case InventoryType.EquipWeaponLeft:
-                    tempEquipWeapons.leftHand = equippingItem;
-                    EquipWeapons = tempEquipWeapons;
-                    break;
-                case InventoryType.EquipItems:
-                    if (oldEquipIndex < 0)
-                        oldEquipIndex = (short)this.IndexOfEquipItemByEquipPosition(equippingItem.GetArmorItem().EquipPosition);
-                    if (oldEquipIndex >= 0)
-                        NetFuncUnEquipItem((byte)InventoryType.EquipItems, oldEquipIndex);
-                    equipItems.Add(equippingItem);
-                    equipItemIndexes.Add(equippingItem.GetArmorItem().EquipPosition, equipItems.Count - 1);
-                    break;
+                if (!UnEquipWeapon(equipWeaponSet, false))
+                    ableToEquipWeapon = false;
             }
-            nonEquipItems.RemoveAt(nonEquipIndex);
-            this.FillEmptySlots();
+            if (shouldUnequipLeftHand)
+            {
+                if (!UnEquipWeapon(equipWeaponSet, true))
+                    ableToEquipWeapon = false;
+            }
+
+            // Equipping items
+            this.FillWeaponSetsIfNeeded(equipWeaponSet);
+            EquipWeapons tempEquipWeapons = SelectableWeaponSets[equipWeaponSet];
+            if (ableToEquipWeapon)
+            {
+                if (isLeftHand)
+                {
+                    tempEquipWeapons.leftHand = equippingItem;
+                    SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
+                }
+                else
+                {
+                    tempEquipWeapons.rightHand = equippingItem;
+                    SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
+                }
+                // Update inventory
+                nonEquipItems.RemoveAt(nonEquipIndex);
+                this.FillEmptySlots();
+            }
         }
 
         /// <summary>
-        /// This will be called at server to order character to unequip equipments
+        /// This will be called at server to order character to equip armor
         /// </summary>
-        /// <param name="fromEquipPosition"></param>
-        protected virtual void NetFuncUnEquipItem(byte byteInventoryType, short index)
+        /// <param name="nonEquipIndex"></param>
+        /// <param name="unEquippingIndex"></param>
+        /// <param name="equipSlotIndex"></param>
+        protected virtual void NetFuncEquipItem(short nonEquipIndex, short unEquippingIndex, byte equipSlotIndex)
         {
-            if (!CanDoActions())
+            if (!CanDoActions() ||
+                nonEquipIndex >= nonEquipItems.Count)
                 return;
 
-            EquipWeapons tempEquipWeapons = EquipWeapons;
-            CharacterItem unEquipItem = CharacterItem.Empty;
-            switch ((InventoryType)byteInventoryType)
+            CharacterItem equippingItem = nonEquipItems[nonEquipIndex];
+
+            GameMessage.Type gameMessageType;
+            if (!CanEquipItem(equippingItem, ref unEquippingIndex, equipSlotIndex, out gameMessageType))
             {
-                case InventoryType.EquipWeaponRight:
-                    unEquipItem = tempEquipWeapons.rightHand;
-                    tempEquipWeapons.rightHand = CharacterItem.Empty;
-                    EquipWeapons = tempEquipWeapons;
-                    break;
-                case InventoryType.EquipWeaponLeft:
-                    unEquipItem = tempEquipWeapons.leftHand;
-                    tempEquipWeapons.leftHand = CharacterItem.Empty;
-                    EquipWeapons = tempEquipWeapons;
-                    break;
-                case InventoryType.EquipItems:
-                    unEquipItem = equipItems[index];
-                    equipItems.RemoveAt(index);
-                    UpdateEquipItemIndexes();
-                    break;
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                return;
+            }
+
+            bool ableToEquipWeapon = true;
+            if (unEquippingIndex >= 0 && !UnEquipItem(unEquippingIndex))
+                ableToEquipWeapon = false;
+
+            if (ableToEquipWeapon)
+            {
+                // Can equip the item when there is no equipped item or able to unequip the equipped item
+                equippingItem.equipSlotIndex = equipSlotIndex;
+                equipItems.Add(equippingItem);
+                equipItemIndexes.Add(equippingItem.GetArmorItem().EquipPosition, equipItems.Count - 1);
+                // Update inventory
+                nonEquipItems.RemoveAt(nonEquipIndex);
+                this.FillEmptySlots();
+            }
+        }
+
+        protected virtual void NetFuncUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
+        {
+            UnEquipWeapon(equipWeaponSet, isLeftHand);
+        }
+
+        protected bool UnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
+        {
+            if (!CanDoActions())
+                return false;
+
+            this.FillWeaponSetsIfNeeded(equipWeaponSet);
+            EquipWeapons tempEquipWeapons = SelectableWeaponSets[equipWeaponSet];
+            CharacterItem unEquipItem = CharacterItem.Empty;
+
+            if (isLeftHand)
+            {
+                // Unequip left-hand weapon
+                unEquipItem = tempEquipWeapons.leftHand;
+                tempEquipWeapons.leftHand = CharacterItem.Empty;
+                SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
+            }
+            else
+            {
+                // Unequip right-hand weapon
+                unEquipItem = tempEquipWeapons.rightHand;
+                tempEquipWeapons.rightHand = CharacterItem.Empty;
+                SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
             }
 
             if (unEquipItem.NotEmptySlot())
                 this.AddOrInsertNonEquipItems(unEquipItem);
             this.FillEmptySlots();
+
+            return true;
+        }
+
+        /// <summary>
+        /// This will be called at server to order character to unequip equipments
+        /// </summary>
+        /// <param name="index"></param>
+        protected virtual void NetFuncUnEquipItem(short index)
+        {
+            UnEquipItem(index);
+        }
+
+        protected bool UnEquipItem(short index)
+        {
+            if (!CanDoActions() || index >= equipItems.Count)
+                return false;
+
+            EquipWeapons tempEquipWeapons = EquipWeapons;
+            CharacterItem unEquipItem = equipItems[index];
+            equipItems.RemoveAt(index);
+            UpdateEquipItemIndexes();
+
+            if (unEquipItem.NotEmptySlot())
+                this.AddOrInsertNonEquipItems(unEquipItem);
+            this.FillEmptySlots();
+
+            return true;
         }
 
         protected virtual void NetFuncOnDead()

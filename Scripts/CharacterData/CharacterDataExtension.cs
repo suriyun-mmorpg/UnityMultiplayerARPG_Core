@@ -483,6 +483,12 @@ public static partial class CharacterDataExtension
     {
         data.NonEquipItems.FillEmptySlots(GameInstance.Singleton.IsLimitInventorySlot, (short)(data.CacheStats.slotLimit + GameInstance.Singleton.baseSlotLimit));
     }
+
+    public static void FillWeaponSetsIfNeeded(this ICharacterData data, byte equipWeaponSet)
+    {
+        while (data.SelectableWeaponSets.Count <= equipWeaponSet)
+            data.SelectableWeaponSets.Add(new EquipWeapons());
+    }
     #endregion
 
     #region Increasing Items Will Overwhelming
@@ -948,7 +954,7 @@ public static partial class CharacterDataExtension
         return index;
     }
 
-    public static int IndexOfEquipItemByEquipPosition(this ICharacterData data, string equipPosition)
+    public static int IndexOfEquipItemByEquipPosition(this ICharacterData data, string equipPosition, byte equipSlotIndex)
     {
         if (string.IsNullOrEmpty(equipPosition))
             return -1;
@@ -962,7 +968,8 @@ public static partial class CharacterDataExtension
             if (tempItem.GetEquipmentItem() == null)
                 continue;
 
-            if (equipPosition.Equals(tempItem.GetEquipmentItem().EquipPosition))
+            if (tempItem.equipSlotIndex == equipSlotIndex &&
+                equipPosition.Equals(tempItem.GetEquipmentItem().EquipPosition))
             {
                 index = i;
                 break;

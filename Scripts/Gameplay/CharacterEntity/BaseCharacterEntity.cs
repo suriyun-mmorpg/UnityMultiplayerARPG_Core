@@ -445,14 +445,13 @@ namespace MultiplayerARPG
         #endregion
 
         #region Inventory Helpers
-        public bool CanEquipItem(CharacterItem equippingItem, InventoryType inventoryType, int oldEquipIndex, out GameMessage.Type gameMessageType, out bool shouldUnequipRightHand, out bool shouldUnequipLeftHand)
+        public bool CanEquipWeapon(CharacterItem equippingItem, byte equipWeaponSet, bool isLeftHand, out GameMessage.Type gameMessageType, out bool shouldUnequipRightHand, out bool shouldUnequipLeftHand)
         {
             gameMessageType = GameMessage.Type.None;
             shouldUnequipRightHand = false;
             shouldUnequipLeftHand = false;
-
-            Item equipmentItem = equippingItem.GetEquipmentItem();
-            if (equipmentItem == null)
+            
+            if (equippingItem.GetWeaponItem() == null && equippingItem.GetShieldItem() == null)
             {
                 gameMessageType = GameMessage.Type.CannotEquip;
                 return false;
@@ -463,26 +462,27 @@ namespace MultiplayerARPG
                 gameMessageType = GameMessage.Type.LevelOrAttributeNotEnough;
                 return false;
             }
-            
-            EquipWeapons tempEquipWeapons = EquipWeapons;
-            Item rightHandWeapon = tempEquipWeapons.rightHand.GetWeaponItem();
-            Item leftHandWeapon = tempEquipWeapons.leftHand.GetWeaponItem();
-            Item leftHandShield = tempEquipWeapons.leftHand.GetShieldItem();
+
+            this.FillWeaponSetsIfNeeded(equipWeaponSet);
+            EquipWeapons tempEquipWeapons = SelectableWeaponSets[equipWeaponSet];
 
             WeaponItemEquipType rightHandEquipType;
-            bool hasRightHandItem = rightHandWeapon.TryGetWeaponItemEquipType(out rightHandEquipType);
+            bool hasRightHandItem =
+                tempEquipWeapons.GetRightHandWeaponItem().TryGetWeaponItemEquipType(out rightHandEquipType);
             WeaponItemEquipType leftHandEquipType;
-            bool hasLeftHandItem = leftHandShield != null || leftHandWeapon.TryGetWeaponItemEquipType(out leftHandEquipType);
+            bool hasLeftHandItem =
+                tempEquipWeapons.GetLeftHandWeaponItem().TryGetWeaponItemEquipType(out leftHandEquipType) ||
+                tempEquipWeapons.GetLeftHandShieldItem() != null;
 
             // Equipping item is weapon
-            Item weaponItem = equippingItem.GetWeaponItem();
-            if (weaponItem != null)
+            Item equippingWeaponItem = equippingItem.GetWeaponItem();
+            if (equippingWeaponItem != null)
             {
-                switch (weaponItem.EquipType)
+                switch (equippingWeaponItem.EquipType)
                 {
                     case WeaponItemEquipType.OneHand:
                         // If weapon is one hand its equip position must be right hand
-                        if (inventoryType != InventoryType.EquipWeaponRight)
+                        if (isLeftHand)
                         {
                             gameMessageType = GameMessage.Type.InvalidEquipPositionRightHand;
                             return false;
@@ -496,22 +496,16 @@ namespace MultiplayerARPG
                         break;
                     case WeaponItemEquipType.OneHandCanDual:
                         // If weapon is one hand can dual its equip position must be right or left hand
-                        if (inventoryType != InventoryType.EquipWeaponRight &&
-                            inventoryType != InventoryType.EquipWeaponLeft)
-                        {
-                            gameMessageType = GameMessage.Type.InvalidEquipPositionRightHandOrLeftHand;
-                            return false;
-                        }
-                        if (inventoryType == InventoryType.EquipWeaponRight && hasRightHandItem)
+                        if (!isLeftHand && hasRightHandItem)
                         {
                             shouldUnequipRightHand = true;
                         }
-                        if (inventoryType == InventoryType.EquipWeaponLeft && hasLeftHandItem)
+                        if (isLeftHand && hasLeftHandItem)
                         {
                             shouldUnequipLeftHand = true;
                         }
                         // Unequip item if right hand weapon is one hand or two hand when equipping at left hand
-                        if (inventoryType == InventoryType.EquipWeaponLeft && hasRightHandItem)
+                        if (isLeftHand && hasRightHandItem)
                         {
                             if (rightHandEquipType == WeaponItemEquipType.OneHand ||
                                 rightHandEquipType == WeaponItemEquipType.TwoHand)
@@ -520,7 +514,7 @@ namespace MultiplayerARPG
                         break;
                     case WeaponItemEquipType.TwoHand:
                         // If weapon is one hand its equip position must be right hand
-                        if (inventoryType != InventoryType.EquipWeaponRight)
+                        if (isLeftHand)
                         {
                             gameMessageType = GameMessage.Type.InvalidEquipPositionRightHand;
                             return false;
@@ -534,11 +528,13 @@ namespace MultiplayerARPG
                 }
                 return true;
             }
+
             // Equipping item is shield
-            Item shieldItem = equippingItem.GetShieldItem();
-            if (shieldItem != null)
+            Item equippingShieldItem = equippingItem.GetShieldItem();
+            if (equippingShieldItem != null)
             {
-                if (inventoryType != InventoryType.EquipWeaponLeft)
+                // If it is shield, its equip position must be left hand
+                if (!isLeftHand)
                 {
                     gameMessageType = GameMessage.Type.InvalidEquipPositionLeftHand;
                     return false;
@@ -549,22 +545,39 @@ namespace MultiplayerARPG
                     shouldUnequipLeftHand = true;
                 return true;
             }
-            // Equipping item is armor
-            Item armorItem = equippingItem.GetArmorItem();
-            if (armorItem != null)
+            gameMessageType = GameMessage.Type.CannotEquip;
+            return false;
+        }
+
+        public bool CanEquipItem(CharacterItem equippingItem, ref short unEquippingIndex, byte equipSlotIndex, out GameMessage.Type gameMessageType)
+        {
+            gameMessageType = GameMessage.Type.None;
+
+            if (equippingItem.GetArmorItem() == null)
             {
-                if (inventoryType != InventoryType.EquipItems)
+                gameMessageType = GameMessage.Type.CannotEquip;
+                return false;
+            }
+
+            if (!equippingItem.CanEquip(this))
+            {
+                gameMessageType = GameMessage.Type.LevelOrAttributeNotEnough;
+                return false;
+            }
+
+            // Equipping item is armor
+            Item equippingArmorItem = equippingItem.GetArmorItem();
+            if (equippingArmorItem != null)
+            {
+                if (unEquippingIndex >= 0)
                 {
-                    gameMessageType = GameMessage.Type.InvalidEquipPositionArmor;
-                    return false;
+
                 }
-                if (oldEquipIndex >= 0 && !armorItem.EquipPosition.Equals(EquipItems[oldEquipIndex].GetArmorItem().EquipPosition))
-                {
-                    gameMessageType = GameMessage.Type.InvalidEquipPositionArmor;
-                    return false;
-                }
+                else
+                    unEquippingIndex = (short)this.IndexOfEquipItemByEquipPosition(equippingArmorItem.EquipPosition, equipSlotIndex);
                 return true;
             }
+            gameMessageType = GameMessage.Type.CannotEquip;
             return false;
         }
 

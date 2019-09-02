@@ -83,16 +83,8 @@ public partial class CharacterData : ICharacterData
     {
         get
         {
-            while (SelectableWeaponSets.Count <= EquipWeaponSet)
-                SelectableWeaponSets.Add(new EquipWeapons());
+            this.FillWeaponSetsIfNeeded(EquipWeaponSet);
             return SelectableWeaponSets[EquipWeaponSet];
-        }
-        set
-        {
-            while (SelectableWeaponSets.Count <= EquipWeaponSet)
-                SelectableWeaponSets.Add(new EquipWeapons());
-            SelectableWeaponSets[EquipWeaponSet] = value;
-            shouldMakeCache = true;
         }
     }
 
