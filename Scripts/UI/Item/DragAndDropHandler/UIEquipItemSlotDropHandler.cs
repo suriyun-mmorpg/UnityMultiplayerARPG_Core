@@ -88,7 +88,7 @@ namespace MultiplayerARPG
                     break;
                 case InventoryType.EquipWeaponRight:
                 case InventoryType.EquipWeaponLeft:
-                    if (weaponItem == null ||
+                    if (weaponItem == null &&
                         shieldItem == null)
                     {
                         // Check if it's correct equip position or not
