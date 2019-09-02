@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterAttribute : UIDataForCharacter<CharacterAttributeTuple>
+    public partial class UICharacterAttribute : UIDataForCharacter<UICharacterAttributeData>
     {
         public CharacterAttribute CharacterAttribute { get { return Data.characterAttribute; } }
         public short Amount { get { return Data.targetAmount; } }

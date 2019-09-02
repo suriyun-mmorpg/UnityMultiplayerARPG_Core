@@ -29,7 +29,7 @@
             SocialCharacterData[] members = group.GetMembers();
             MemberList.Generate(members, (index, foundCharacter, ui) =>
             {
-                SocialCharacterEntityTuple foundCharacterEntity = new SocialCharacterEntityTuple();
+                UISocialCharacterData foundCharacterEntity = new UISocialCharacterData();
                 foundCharacterEntity.socialCharacter = foundCharacter;
 
                 UISocialCharacter uiFoundCharacter = ui.GetComponent<UISocialCharacter>();

@@ -13,7 +13,7 @@ namespace MultiplayerARPG
 
         public byte GuildRole { get; private set; }
 
-        public void Setup(SocialCharacterEntityTuple data, byte guildRole, GuildRoleData guildRoleData)
+        public void Setup(UISocialCharacterData data, byte guildRole, GuildRoleData guildRoleData)
         {
             Data = data;
             GuildRole = guildRole;

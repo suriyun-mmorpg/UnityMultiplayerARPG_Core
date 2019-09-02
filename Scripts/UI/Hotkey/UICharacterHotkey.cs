@@ -78,7 +78,7 @@ namespace MultiplayerARPG
                     // Found skill, so create new skill entry if it's not existed in learn skill list
                     int skillIndex = owningCharacter.IndexOfSkill(BaseGameData.MakeDataId(Data.relateId));
                     CharacterSkill characterSkill = skillIndex >= 0 ? owningCharacter.Skills[skillIndex] : CharacterSkill.Create(skill, skillLevel);
-                    uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, skillLevel), owningCharacter, skillIndex);
+                    uiCharacterSkill.Setup(new UICharacterSkillData(characterSkill, skillLevel), owningCharacter, skillIndex);
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Show only existed items
-                    uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), owningCharacter, itemIndex);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), owningCharacter, itemIndex);
                     uiCharacterItem.Show();
                     UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                     if (dragHandler != null)

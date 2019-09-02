@@ -84,7 +84,7 @@ namespace MultiplayerARPG
                     UIQuestTask uiQuestTask = ui.GetComponent<UIQuestTask>();
                     bool isComplete = false;
                     int progress = Data.GetProgress(Character, index, out isComplete);
-                    uiQuestTask.Data = new QuestTaskProgressTuple(task, progress);
+                    uiQuestTask.Data = new UIQuestTaskData(task, progress);
                     uiQuestTask.Show();
                 });
             }
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
                     CharacterItem characterItem = CharacterItem.Create(rewardItem.item);
                     characterItem.amount = rewardItem.amount;
                     UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                    uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), OwningCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), OwningCharacter, -1);
                     uiCharacterItem.Show();
                 });
             }

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class UIDamageElementInfliction : UISelectionEntry<DamageElementInflictionTuple>
+    public partial class UIDamageElementInfliction : UISelectionEntry<UIDamageElementInflictionData>
     {
         [Header("String Formats")]
         [Tooltip("Format => {1} = {Infliction * 100}")]

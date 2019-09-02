@@ -140,7 +140,7 @@ namespace MultiplayerARPG
             CacheItemList.Generate(filteredItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), this.character, filterIndexes[index]);
+                uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), this.character, filterIndexes[index]);
                 uiCharacterItem.Show();
                 UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)

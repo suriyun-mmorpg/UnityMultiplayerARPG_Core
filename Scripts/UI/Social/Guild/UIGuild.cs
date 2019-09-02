@@ -303,7 +303,7 @@ namespace MultiplayerARPG
             guild.GetSortedMembers(out members, out memberRoles);
             MemberList.Generate(members, (index, guildMember, ui) =>
             {
-                SocialCharacterEntityTuple guildMemberEntity = new SocialCharacterEntityTuple();
+                UISocialCharacterData guildMemberEntity = new UISocialCharacterData();
                 guildMemberEntity.socialCharacter = guildMember;
 
                 UIGuildCharacter uiGuildMember = ui.GetComponent<UIGuildCharacter>();
@@ -336,7 +336,7 @@ namespace MultiplayerARPG
             SkillList.Generate(GameInstance.GuildSkills.Values, (index, guildSkill, ui) =>
             {
                 UIGuildSkill uiGuildSkill = ui.GetComponent<UIGuildSkill>();
-                uiGuildSkill.Data = new GuildSkillTuple(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
+                uiGuildSkill.Data = new UIGuildSkillData(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
                 uiGuildSkill.Show();
                 SkillSelectionManager.Add(uiGuildSkill);
                 if (selectedIdx == index)

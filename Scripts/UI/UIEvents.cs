@@ -38,7 +38,7 @@ namespace MultiplayerARPG
 
     #region Events for UI Character Item
     [System.Serializable]
-    public class CharacterItemEvent : UnityEvent<CharacterItemTuple> { }
+    public class CharacterItemEvent : UnityEvent<UICharacterItemData> { }
 
     [System.Serializable]
     public class UICharacterItemEvent : UnityEvent<UICharacterItem> { }
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
 
     #region Events for UI Character Skill
     [System.Serializable]
-    public class CharacterSkillEvent : UnityEvent<CharacterSkillTuple> { }
+    public class CharacterSkillEvent : UnityEvent<UICharacterSkillData> { }
 
     [System.Serializable]
     public class UICharacterSkillEvent : UnityEvent<UICharacterSkill> { }
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
     #region Events for UI Social Character
     [System.Serializable]
-    public class SocialCharacterEvent : UnityEvent<SocialCharacterEntityTuple> { }
+    public class SocialCharacterEvent : UnityEvent<UISocialCharacterData> { }
 
     [System.Serializable]
     public class UISocialCharacterEvent : UnityEvent<UISocialCharacter> { }
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
 
     #region Events for UI Guild Skill
     [System.Serializable]
-    public class GuildSkillEvent : UnityEvent<GuildSkillTuple> { }
+    public class GuildSkillEvent : UnityEvent<UIGuildSkillData> { }
 
     [System.Serializable]
     public class UIGuildSkillEvent : UnityEvent<UIGuildSkill> { }

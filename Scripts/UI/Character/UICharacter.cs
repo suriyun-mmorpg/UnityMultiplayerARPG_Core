@@ -398,7 +398,7 @@ namespace MultiplayerARPG
                     {
                         if (cacheAttributes.ContainsKey(tempAttribute))
                             tempAmount = cacheAttributes[tempAttribute];
-                        cacheUICharacterAttribute.Setup(new CharacterAttributeTuple(tempCharacterAttribute, tempAmount), Data, indexOfData);
+                        cacheUICharacterAttribute.Setup(new UICharacterAttributeData(tempCharacterAttribute, tempAmount), Data, indexOfData);
                         cacheUICharacterAttribute.Show();
                     }
                 }

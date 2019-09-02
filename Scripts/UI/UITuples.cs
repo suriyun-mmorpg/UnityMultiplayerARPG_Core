@@ -2,34 +2,34 @@
 
 namespace MultiplayerARPG
 {
-    public struct CharacterAttributeTuple
+    public struct UICharacterAttributeData
     {
         public CharacterAttribute characterAttribute;
         public short targetAmount;
-        public CharacterAttributeTuple(CharacterAttribute characterAttribute, short targetAmount)
+        public UICharacterAttributeData(CharacterAttribute characterAttribute, short targetAmount)
         {
             this.characterAttribute = characterAttribute;
             this.targetAmount = targetAmount;
         }
     }
 
-    public struct CharacterSkillTuple
+    public struct UICharacterSkillData
     {
         public CharacterSkill characterSkill;
         public short targetLevel;
-        public CharacterSkillTuple(CharacterSkill characterSkill, short targetLevel)
+        public UICharacterSkillData(CharacterSkill characterSkill, short targetLevel)
         {
             this.characterSkill = characterSkill;
             this.targetLevel = targetLevel;
         }
     }
 
-    public struct CharacterItemTuple
+    public struct UICharacterItemData
     {
         public CharacterItem characterItem;
         public short targetLevel;
         public InventoryType inventoryType;
-        public CharacterItemTuple(CharacterItem characterItem, short targetLevel, InventoryType inventoryType)
+        public UICharacterItemData(CharacterItem characterItem, short targetLevel, InventoryType inventoryType)
         {
             this.characterItem = characterItem;
             this.targetLevel = targetLevel;
@@ -37,95 +37,95 @@ namespace MultiplayerARPG
         }
     }
 
-    public struct CharacterItemByIndexTuple
+    public struct UICharacterItemByIndexData
     {
         public InventoryType inventoryType;
         public int indexOfData;
-        public CharacterItemByIndexTuple(InventoryType inventoryType, int indexOfData)
+        public UICharacterItemByIndexData(InventoryType inventoryType, int indexOfData)
         {
             this.inventoryType = inventoryType;
             this.indexOfData = indexOfData;
         }
     }
 
-    public struct BuffTuple
+    public struct UIBuffData
     {
         public Buff buff;
         public short targetLevel;
-        public BuffTuple(Buff buff, short targetLevel)
+        public UIBuffData(Buff buff, short targetLevel)
         {
             this.buff = buff;
             this.targetLevel = targetLevel;
         }
     }
 
-    public struct GuildSkillTuple
+    public struct UIGuildSkillData
     {
         public GuildSkill guildSkill;
         public short targetLevel;
-        public GuildSkillTuple(GuildSkill guildSkill, short targetLevel)
+        public UIGuildSkillData(GuildSkill guildSkill, short targetLevel)
         {
             this.guildSkill = guildSkill;
             this.targetLevel = targetLevel;
         }
     }
 
-    public struct DamageElementAmountTuple
+    public struct UIDamageElementAmountData
     {
         public DamageElement damageElement;
         public MinMaxFloat amount;
-        public DamageElementAmountTuple(DamageElement damageElement, MinMaxFloat amount)
+        public UIDamageElementAmountData(DamageElement damageElement, MinMaxFloat amount)
         {
             this.damageElement = damageElement;
             this.amount = amount;
         }
     }
 
-    public struct DamageElementInflictionTuple
+    public struct UIDamageElementInflictionData
     {
         public DamageElement damageElement;
         public float infliction;
-        public DamageElementInflictionTuple(DamageElement damageElement, float infliction)
+        public UIDamageElementInflictionData(DamageElement damageElement, float infliction)
         {
             this.damageElement = damageElement;
             this.infliction = infliction;
         }
     }
 
-    public struct QuestTaskProgressTuple
+    public struct UIQuestTaskData
     {
         public QuestTask questTask;
         public int progress;
-        public QuestTaskProgressTuple(QuestTask questTask, int progress)
+        public UIQuestTaskData(QuestTask questTask, int progress)
         {
             this.questTask = questTask;
             this.progress = progress;
         }
     }
 
-    public struct EquipmentSetWithEquippedCountTuple
+    public struct UIEquipmentSetData
     {
         public EquipmentSet equipmentSet;
         public int equippedCount;
-        public EquipmentSetWithEquippedCountTuple(EquipmentSet equipmentSet, int equippedCount)
+        public UIEquipmentSetData(EquipmentSet equipmentSet, int equippedCount)
         {
             this.equipmentSet = equipmentSet;
             this.equippedCount = equippedCount;
         }
     }
 
-    public struct EnhancedSocketsWithMaxSocketTuple
+    public struct UIEquipmentSocketsData
     {
         public List<int> sockets;
         public int maxSocket;
-        public EnhancedSocketsWithMaxSocketTuple(List<int> sockets, int maxSocket)
+        public UIEquipmentSocketsData(List<int> sockets, int maxSocket)
         {
             this.sockets = sockets;
             this.maxSocket = maxSocket;
         }
     }
 
-    public struct SocialCharacterEntityTuple
+    public struct UISocialCharacterData
     {
         public SocialCharacterData socialCharacter;
         public BasePlayerCharacterEntity characterEntity;

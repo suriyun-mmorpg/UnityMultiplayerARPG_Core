@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             party.GetSortedMembers(out members);
             MemberList.Generate(members, (index, partyMember, ui) =>
             {
-                SocialCharacterEntityTuple partyMemberEntity = new SocialCharacterEntityTuple();
+                UISocialCharacterData partyMemberEntity = new UISocialCharacterData();
                 partyMemberEntity.socialCharacter = partyMember;
 
                 UISocialCharacter uiPartyMember = ui.GetComponent<UISocialCharacter>();

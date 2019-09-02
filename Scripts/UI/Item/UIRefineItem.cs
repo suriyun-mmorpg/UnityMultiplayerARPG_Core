@@ -64,7 +64,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new CharacterItemTuple(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
         public override void Hide()
         {
             base.Hide();
-            Data = new CharacterItemByIndexTuple(InventoryType.NonEquipItems, -1);
+            Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
         }
 
         public void OnClickRefine()

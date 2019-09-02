@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class UIQuestTask : UISelectionEntry<QuestTaskProgressTuple>
+    public partial class UIQuestTask : UISelectionEntry<UIQuestTaskData>
     {
         public QuestTask QuestTask { get { return Data.questTask; } }
         public int Progress { get { return Data.progress; } }

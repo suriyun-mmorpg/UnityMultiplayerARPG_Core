@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public class UIGuildSkillSelectionManager : UISelectionManager<GuildSkillTuple, UIGuildSkill, GuildSkillEvent, UIGuildSkillEvent>
+    public class UIGuildSkillSelectionManager : UISelectionManager<UIGuildSkillData, UIGuildSkill, GuildSkillEvent, UIGuildSkillEvent>
     {
     }
 }

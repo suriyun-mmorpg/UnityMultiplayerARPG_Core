@@ -28,7 +28,7 @@ namespace MultiplayerARPG
                     uiCharacterItem.Hide();
                 else
                 {
-                    uiCharacterItem.Setup(new CharacterItemTuple(CharacterItem.Create(Data.item), 1, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(Data.item), 1, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, -1);
                     uiCharacterItem.Show();
                 }
             }

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterItem : UIDataForCharacter<CharacterItemTuple>
+    public partial class UICharacterItem : UIDataForCharacter<UICharacterItemData>
     {
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public short Level { get { return Data.targetLevel; } }
@@ -523,7 +523,7 @@ namespace MultiplayerARPG
                     uiEquipmentSet.Show();
                     int equippedCount = 0;
                     Character.CacheEquipmentSets.TryGetValue(EquipmentItem.equipmentSet, out equippedCount);
-                    uiEquipmentSet.Data = new EquipmentSetWithEquippedCountTuple(EquipmentItem.equipmentSet, equippedCount);
+                    uiEquipmentSet.Data = new UIEquipmentSetData(EquipmentItem.equipmentSet, equippedCount);
                 }
             }
 
@@ -534,7 +534,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiEquipmentSockets.Show();
-                    uiEquipmentSockets.Data = new EnhancedSocketsWithMaxSocketTuple(CharacterItem.Sockets, EquipmentItem.maxSocket);
+                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.maxSocket);
                 }
             }
 
@@ -546,7 +546,7 @@ namespace MultiplayerARPG
                 {
                     uiDamageAmounts.Show();
                     KeyValuePair<DamageElement, MinMaxFloat> keyValuePair = WeaponItem.GetDamageAmount(Level, CharacterItem.GetEquipmentBonusRate(), null);
-                    uiDamageAmounts.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
+                    uiDamageAmounts.Data = new UIDamageElementAmountData(keyValuePair.Key, keyValuePair.Value);
                 }
             }
 
@@ -597,7 +597,7 @@ namespace MultiplayerARPG
                     uiNextLevelItem.Hide();
                 else
                 {
-                    uiNextLevelItem.Setup(new CharacterItemTuple(CharacterItem, (short)(Level + 1), InventoryType), Character, IndexOfData);
+                    uiNextLevelItem.Setup(new UICharacterItemData(CharacterItem, (short)(Level + 1), InventoryType), Character, IndexOfData);
                     uiNextLevelItem.Show();
                 }
             }
@@ -975,7 +975,7 @@ namespace MultiplayerARPG
             if (uiGameplay.uiRefineItem != null &&
                 CharacterItem.GetEquipmentItem() != null)
             {
-                uiGameplay.uiRefineItem.Data = new CharacterItemByIndexTuple(InventoryType, IndexOfData);
+                uiGameplay.uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
                 uiGameplay.uiRefineItem.Show();
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
@@ -994,7 +994,7 @@ namespace MultiplayerARPG
             if (uiGameplay.uiEnhanceSocketItem != null &&
                 CharacterItem.GetEquipmentItem() != null)
             {
-                uiGameplay.uiEnhanceSocketItem.Data = new CharacterItemByIndexTuple(InventoryType, IndexOfData);
+                uiGameplay.uiEnhanceSocketItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
                 uiGameplay.uiEnhanceSocketItem.Show();
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();

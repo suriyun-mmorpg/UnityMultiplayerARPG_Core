@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public class UICharacterItemSelectionManager : UISelectionManager<CharacterItemTuple, UICharacterItem, CharacterItemEvent, UICharacterItemEvent>
+    public class UICharacterItemSelectionManager : UISelectionManager<UICharacterItemData, UICharacterItem, CharacterItemEvent, UICharacterItemEvent>
     {
     }
 }

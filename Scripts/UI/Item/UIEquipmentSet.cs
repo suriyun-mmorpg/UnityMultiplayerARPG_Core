@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class UIEquipmentSet : UIBaseEquipmentBonus<EquipmentSetWithEquippedCountTuple>
+    public partial class UIEquipmentSet : UIBaseEquipmentBonus<UIEquipmentSetData>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Set Title}, {1} = {List Of Effect}")]

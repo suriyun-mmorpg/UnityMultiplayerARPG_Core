@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UISkillRequirement : UISelectionEntry<CharacterSkillTuple>
+    public partial class UISkillRequirement : UISelectionEntry<UICharacterSkillData>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Level}")]

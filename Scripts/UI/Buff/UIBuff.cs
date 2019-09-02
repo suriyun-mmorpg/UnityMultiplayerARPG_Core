@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class UIBuff : UISelectionEntry<BuffTuple>
+    public partial class UIBuff : UISelectionEntry<UIBuffData>
     {
         public Buff Buff { get { return Data.buff; } }
         public short Level { get { return Data.targetLevel; } }

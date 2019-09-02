@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class UIDamageElementAmount : UISelectionEntry<DamageElementAmountTuple>
+    public partial class UIDamageElementAmount : UISelectionEntry<UIDamageElementAmountData>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Min Damage}, {2} = {Max Damage}")]

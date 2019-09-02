@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterSkill : UIDataForCharacter<CharacterSkillTuple>
+    public partial class UICharacterSkill : UIDataForCharacter<UICharacterSkillData>
     {
         public CharacterSkill CharacterSkill { get { return Data.characterSkill; } }
         public short Level { get { return Data.targetLevel; } }
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRequirement.Show();
-                    uiRequirement.Data = new CharacterSkillTuple(CharacterSkill, Level);
+                    uiRequirement.Data = new UICharacterSkillData(CharacterSkill, Level);
                 }
             }
 
@@ -249,7 +249,7 @@ namespace MultiplayerARPG
                 {
                     uiDamageAmount.Show();
                     KeyValuePair<DamageElement, MinMaxFloat> keyValuePair = Skill.GetDamageAmount(Level, null);
-                    uiDamageAmount.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
+                    uiDamageAmount.Data = new UIDamageElementAmountData(keyValuePair.Key, keyValuePair.Value);
                 }
             }
 
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new BuffTuple(Skill.buff, Level);
+                    uiSkillBuff.Data = new UIBuffData(Skill.buff, Level);
                 }
             }
 
@@ -295,7 +295,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiSkillDebuff.Show();
-                    uiSkillDebuff.Data = new BuffTuple(Skill.debuff, Level);
+                    uiSkillDebuff.Data = new UIBuffData(Skill.debuff, Level);
                 }
             }
 
@@ -314,7 +314,7 @@ namespace MultiplayerARPG
                     uiNextLevelSkill.Hide();
                 else
                 {
-                    uiNextLevelSkill.Setup(new CharacterSkillTuple(CharacterSkill, (short)(Level + 1)), Character, IndexOfData);
+                    uiNextLevelSkill.Setup(new UICharacterSkillData(CharacterSkill, (short)(Level + 1)), Character, IndexOfData);
                     uiNextLevelSkill.Show();
                 }
             }

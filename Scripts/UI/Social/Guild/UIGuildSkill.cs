@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIGuildSkill : UISelectionEntry<GuildSkillTuple>
+    public class UIGuildSkill : UISelectionEntry<UIGuildSkillData>
     {
         public GuildSkill GuildSkill { get { return Data.guildSkill; } }
         public short Level { get { return Data.targetLevel; } }
@@ -244,7 +244,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new BuffTuple(GuildSkill.buff, Level);
+                    uiSkillBuff.Data = new UIBuffData(GuildSkill.buff, Level);
                 }
             }
 
@@ -254,7 +254,7 @@ namespace MultiplayerARPG
                     uiNextLevelSkill.Hide();
                 else
                 {
-                    uiNextLevelSkill.Data = new GuildSkillTuple(GuildSkill, (short)(Level + 1));
+                    uiNextLevelSkill.Data = new UIGuildSkillData(GuildSkill, (short)(Level + 1));
                     uiNextLevelSkill.Show();
                 }
             }

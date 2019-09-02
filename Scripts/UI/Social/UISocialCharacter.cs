@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class UISocialCharacter : UISelectionEntry<SocialCharacterEntityTuple>
+    public class UISocialCharacter : UISelectionEntry<UISocialCharacterData>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-	public abstract class BaseUICharacterItemByIndex : UISelectionEntry<CharacterItemByIndexTuple>
+	public abstract class BaseUICharacterItemByIndex : UISelectionEntry<UICharacterItemByIndexData>
 	{
         public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
 		public InventoryType InventoryType { get { return Data.inventoryType; } }
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                     uiCharacterItem.Hide();
                 else
                 {
-                    uiCharacterItem.Setup(new CharacterItemTuple(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }

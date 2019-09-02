@@ -111,7 +111,7 @@ namespace MultiplayerARPG
                 {
                     Buff buff = Data.GetBuff();
                     uiBuff.Show();
-                    uiBuff.Data = new BuffTuple(buff, Data.level);
+                    uiBuff.Data = new UIBuffData(buff, Data.level);
                 }
             }
         }
