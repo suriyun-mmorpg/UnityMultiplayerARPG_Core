@@ -87,6 +87,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<PackedUInt>(NetFuncUnSummon);
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeNonEquipItems);
             RegisterNetFunction<bool>(NetFuncReload);
+            RegisterNetFunction<byte>(NetFuncSwitchEquipWeaponSet);
         }
 
         protected override void EntityOnDestroy()

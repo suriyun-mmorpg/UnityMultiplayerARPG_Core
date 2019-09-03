@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void NetFuncReload(bool isLeftHand)
+        protected void NetFuncReload(bool isLeftHand)
         {
             if (!CanAttack())
                 return;
@@ -137,7 +137,6 @@ namespace MultiplayerARPG
             RequestPlayReloadAnimation(isLeftHand);
         }
     
-
         protected IEnumerator ReloadRoutine(bool isLeftHand)
         {
             animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;

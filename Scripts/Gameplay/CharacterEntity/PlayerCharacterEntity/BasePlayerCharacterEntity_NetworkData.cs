@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= gameInstance.coCharacterActionDuration)
+                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= gameInstance.dealingRequestDuration)
                     dealingCharacter = null;
                 return dealingCharacter;
             }

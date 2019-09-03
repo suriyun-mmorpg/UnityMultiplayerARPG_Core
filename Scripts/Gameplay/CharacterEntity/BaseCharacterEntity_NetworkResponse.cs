@@ -431,5 +431,14 @@ namespace MultiplayerARPG
             nonEquipItems[index2] = nonEquipItem1;
             nonEquipItems[index1] = nonEquipItem2;
         }
+
+        protected void NetFuncSwitchEquipWeaponSet(byte equipWeaponSet)
+        {
+            if (equipWeaponSet >= gameInstance.maxEquipWeaponSet)
+                equipWeaponSet = gameInstance.maxEquipWeaponSet;
+
+            this.FillWeaponSetsIfNeeded(equipWeaponSet);
+            EquipWeaponSet = equipWeaponSet;
+        }
     }
 }

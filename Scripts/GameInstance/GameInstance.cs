@@ -93,12 +93,12 @@ namespace MultiplayerARPG
         public UnityLayer buildingLayer;
         public UnityLayer harvestableLayer;
         public UnityLayer[] nonTargetingLayers;
-        [Tooltip("This is duration for Item Entities to appears befor destroyed")]
+        [Tooltip("If dropped items does not picked up within this duration, it will be destroyed from the server")]
         public float itemAppearDuration = 60f;
-        [Tooltip("This is duration for Item Entities to allow only player who kill monster to pick up item")]
+        [Tooltip("If dropped items does not picked up by killer within this duration, anyone can pick up the items")]
         public float itemLootLockDuration = 5f;
-        [Tooltip("This is duration for players to decides to do any action by another players")]
-        public float coCharacterActionDuration = 5f;
+        [Tooltip("If dealing request does not accepted within this duration, the request will be cancelled")]
+        public float dealingRequestDuration = 5f;
         [Tooltip("This is a distance that allows a player to pick up an item")]
         public float pickUpItemDistance = 1f;
         [Tooltip("This is a distance that random drop item around a player")]
@@ -109,6 +109,9 @@ namespace MultiplayerARPG
         public float buildDistance = 10f;
         [Tooltip("This is a distance that other players will receives local chat")]
         public float localChatDistance = 10f;
+        [Tooltip("Maximum number of equip weapon set")]
+        [Range(1, 16)]
+        public byte maxEquipWeaponSet = 2;
 
         [Header("Gameplay Configs - Inventory and Storage")]
         public InventorySystem inventorySystem;

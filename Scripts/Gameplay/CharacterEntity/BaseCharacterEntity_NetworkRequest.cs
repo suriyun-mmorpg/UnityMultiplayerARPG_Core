@@ -311,5 +311,11 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncReload, FunctionReceivers.Server, isLeftHand);
             return true;
         }
+
+        public bool RequestSwitchEquipWeaponSet(byte equipWeaponSet)
+        {
+            CallNetFunction(NetFuncSwitchEquipWeaponSet, FunctionReceivers.Server, equipWeaponSet);
+            return true;
+        }
     }
 }
