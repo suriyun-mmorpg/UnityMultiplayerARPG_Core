@@ -434,6 +434,9 @@ namespace MultiplayerARPG
 
         protected void NetFuncSwitchEquipWeaponSet(byte equipWeaponSet)
         {
+            if (!CanDoActions())
+                return;
+
             if (equipWeaponSet >= gameInstance.maxEquipWeaponSet)
                 equipWeaponSet = gameInstance.maxEquipWeaponSet;
 
