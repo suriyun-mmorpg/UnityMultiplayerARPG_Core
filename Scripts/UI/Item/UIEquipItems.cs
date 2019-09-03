@@ -156,7 +156,6 @@ namespace MultiplayerARPG
             {
                 equipSlot = CacheEquipItemSlots[equipPosition];
                 equipSlot.Setup(CreateEmptyUIData(equipSlot.InventoryType), character, -1);
-                equipSlot.Show();
             }
 
             if (character == null)
