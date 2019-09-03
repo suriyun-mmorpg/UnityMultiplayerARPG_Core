@@ -268,33 +268,33 @@ namespace MultiplayerARPG
 
         public void OnClickSetDealingGold()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_OFFER_GOLD.ToString()), LanguageManager.GetText(UILocaleKeys.UI_OFFER_GOLD_DESCRIPTION.ToString()), OnDealingGoldConfirmed, 0, owningCharacter.Gold, owningCharacter.DealingGold);
+            UISceneGlobal.Singleton.ShowInputDialog(
+                LanguageManager.GetText(UILocaleKeys.UI_OFFER_GOLD.ToString()), 
+                LanguageManager.GetText(UILocaleKeys.UI_OFFER_GOLD_DESCRIPTION.ToString()), 
+                OnDealingGoldConfirmed, 
+                0, // Min amount is 0
+                BasePlayerCharacterController.OwningCharacter.Gold, // Max amount is number of gold
+                BasePlayerCharacterController.OwningCharacter.DealingGold);
         }
 
         private void OnDealingGoldConfirmed(int amount)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null)
-                owningCharacter.RequestSetDealingGold(amount);
+            BasePlayerCharacterController.OwningCharacter.RequestSetDealingGold(amount);
         }
 
         public void OnClickLock()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestLockDealing();
+            BasePlayerCharacterController.OwningCharacter.RequestLockDealing();
         }
 
         public void OnClickConfirm()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestConfirmDealing();
+            BasePlayerCharacterController.OwningCharacter.RequestConfirmDealing();
         }
 
         public void OnClickCancel()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestCancelDealing();
+            BasePlayerCharacterController.OwningCharacter.RequestCancelDealing();
         }
     }
 }

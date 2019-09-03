@@ -262,21 +262,16 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null || BaseGameNetworkManager.ClientGuild == null)
+            if (BaseGameNetworkManager.ClientGuild == null)
                 return;
-
-            if (owningCharacter != null)
-                owningCharacter.RequestAddGuildSkill(GuildSkill.DataId);
+            BasePlayerCharacterController.OwningCharacter.RequestAddGuildSkill(GuildSkill.DataId);
         }
 
         public void OnClickUse()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null || BaseGameNetworkManager.ClientGuild == null)
+            if (BaseGameNetworkManager.ClientGuild == null)
                 return;
-
-            owningCharacter.RequestUseGuildSkill(GuildSkill.DataId);
+            BasePlayerCharacterController.OwningCharacter.RequestUseGuildSkill(GuildSkill.DataId);
         }
     }
 }

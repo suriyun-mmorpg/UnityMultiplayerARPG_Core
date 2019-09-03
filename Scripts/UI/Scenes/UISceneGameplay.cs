@@ -460,9 +460,7 @@ namespace MultiplayerARPG
 
         public void OnClickRespawn()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null)
-                owningCharacter.RequestRespawn();
+            BasePlayerCharacterController.OwningCharacter.RequestRespawn();
         }
 
         public void OnClickExit()
