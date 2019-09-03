@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -8,16 +9,60 @@ namespace MultiplayerARPG
     {
         [Tooltip("Index of this array is equip weapons set")]
         public ActivatingGameObjects[] activatingGameObjects;
-        
-        private void Update()
+
+        private byte dirtyEquipWeaponSet;
+        private bool updatingActivatingGameObjects;
+
+        private void Awake()
         {
-            for (byte i = 0; i < activatingGameObjects.Length; ++i)
+            for (int i = 0; i < activatingGameObjects.Length; ++i)
             {
-                for (byte j = 0; j < activatingGameObjects[i].gameObjects.Length; ++j)
+                if (activatingGameObjects[i].toggle == null)
+                    continue;
+                int j = i;
+                activatingGameObjects[i].toggle.onValueChanged.AddListener((isOn) =>
                 {
-                    activatingGameObjects[i].gameObjects[j].SetActive(BasePlayerCharacterController.OwningCharacter.EquipWeaponSet == i);
+                    if (updatingActivatingGameObjects)
+                        return;
+
+                    if (isOn)
+                    {
+                        OnClickSwitchEquipWeaponSet(activatingGameObjects[j].equipWeaponSet);
+                    }
+                });
+            }
+        }
+
+        private void Start()
+        {
+            updatingActivatingGameObjects = false;
+            dirtyEquipWeaponSet = BasePlayerCharacterController.OwningCharacter.EquipWeaponSet;
+            UpdateActivatingGameObjects();
+        }
+
+        private void LateUpdate()
+        {
+            if (dirtyEquipWeaponSet != BasePlayerCharacterController.OwningCharacter.EquipWeaponSet)
+            {
+                dirtyEquipWeaponSet = BasePlayerCharacterController.OwningCharacter.EquipWeaponSet;
+                UpdateActivatingGameObjects();
+            }
+        }
+
+        private void UpdateActivatingGameObjects()
+        {
+            updatingActivatingGameObjects = true;
+            for (int i = 0; i < activatingGameObjects.Length; ++i)
+            {
+                if (activatingGameObjects[i].toggle != null)
+                    activatingGameObjects[i].toggle.isOn = activatingGameObjects[i].equipWeaponSet == BasePlayerCharacterController.OwningCharacter.EquipWeaponSet;
+
+                for (int j = 0; j < activatingGameObjects[i].gameObjects.Length; ++j)
+                {
+                    activatingGameObjects[i].gameObjects[j].SetActive(activatingGameObjects[i].equipWeaponSet == BasePlayerCharacterController.OwningCharacter.EquipWeaponSet);
                 }
             }
+            updatingActivatingGameObjects = false;
         }
 
         public void OnClickSwitchEquipWeaponSet(byte equipWeaponSet)
@@ -28,6 +73,9 @@ namespace MultiplayerARPG
         [System.Serializable]
         public struct ActivatingGameObjects
         {
+            [Range(0, 15)]
+            public byte equipWeaponSet;
+            public Toggle toggle;
             public GameObject[] gameObjects;
         }
     }

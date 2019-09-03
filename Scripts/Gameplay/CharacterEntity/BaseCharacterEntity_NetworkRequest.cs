@@ -338,7 +338,7 @@ namespace MultiplayerARPG
 
         public bool RequestSwitchEquipWeaponSet(byte equipWeaponSet)
         {
-            if (!CanDoActions())
+            if (!CanDoActions() || EquipWeaponSet == equipWeaponSet)
                 return false;
             CallNetFunction(NetFuncSwitchEquipWeaponSet, FunctionReceivers.Server, equipWeaponSet);
             return true;

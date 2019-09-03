@@ -208,13 +208,11 @@ namespace MultiplayerARPG
             {
                 if (isLeftHand)
                 {
-                    equippingItem.equipSlotIndex = equipWeaponSet;
                     tempEquipWeapons.leftHand = equippingItem;
                     SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
                 }
                 else
                 {
-                    equippingItem.equipSlotIndex = equipWeaponSet;
                     tempEquipWeapons.rightHand = equippingItem;
                     SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
                 }
@@ -438,7 +436,7 @@ namespace MultiplayerARPG
                 return;
 
             if (equipWeaponSet >= gameInstance.maxEquipWeaponSet)
-                equipWeaponSet = gameInstance.maxEquipWeaponSet;
+                equipWeaponSet = (byte)(gameInstance.maxEquipWeaponSet - 1);
 
             this.FillWeaponSetsIfNeeded(equipWeaponSet);
             EquipWeaponSet = equipWeaponSet;
