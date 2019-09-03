@@ -18,27 +18,25 @@ namespace MultiplayerARPG
 
         public void OnDrop(PointerEventData eventData)
         {
-            if (RectTransformUtility.RectangleContainsScreenPoint(DropRect, Input.mousePosition))
+            // Validate drop position
+            if (!RectTransformUtility.RectangleContainsScreenPoint(DropRect, Input.mousePosition))
+                return;
+            // Validate dragging UI
+            UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
+            if (dragHandler == null || dragHandler.isDropped)
+                return;
+            // Set UI drop state
+            dragHandler.isDropped = true;
+            // If dragged item UI
+            UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
+            if (draggedItemUI != null)
             {
-                UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
-                if (dragHandler != null && !dragHandler.isDropped)
+                switch (draggedItemUI.sourceLocation)
                 {
-                    dragHandler.isDropped = true;
-                    // Get owing character
-                    BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-                    if (owningCharacter == null)
-                        return;
-                    UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
-                    if (draggedItemUI != null)
-                    {
-                        switch (draggedItemUI.sourceLocation)
-                        {
-                            case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
-                            case UICharacterItemDragHandler.SourceLocation.EquipItems:
-                                draggedItemUI.uiCharacterItem.OnClickSell();
-                                break;
-                        }
-                    }
+                    case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
+                    case UICharacterItemDragHandler.SourceLocation.EquipItems:
+                        draggedItemUI.uiCharacterItem.OnClickSell();
+                        break;
                 }
             }
         }
