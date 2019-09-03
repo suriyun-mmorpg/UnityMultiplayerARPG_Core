@@ -190,15 +190,16 @@ namespace MultiplayerARPG
                 nonEquipIndex >= NonEquipItems.Count)
                 return false;
 
-            CharacterItem characterItem = NonEquipItems[nonEquipIndex];
-            Item armorItem = characterItem.GetArmorItem();
-            Item weaponItem = characterItem.GetWeaponItem();
-            Item shieldItem = characterItem.GetShieldItem();
-            if (weaponItem != null)
+            CharacterItem equippingItem = NonEquipItems[nonEquipIndex];
+            Item equippingArmorItem = equippingItem.GetArmorItem();
+            Item equippingWeaponItem = equippingItem.GetWeaponItem();
+            Item equippingShieldItem = equippingItem.GetShieldItem();
+            if (equippingWeaponItem != null)
             {
-                if (weaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
+                if (equippingWeaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
                 {
-                    Item rightWeapon = EquipWeapons.rightHand.GetWeaponItem();
+                    Item rightWeapon = EquipWeapons.GetRightHandWeaponItem();
+                    // Equip at left-hand if able to do it
                     if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
                         return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
                     else
@@ -207,10 +208,33 @@ namespace MultiplayerARPG
                 else
                     return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, false);
             }
-            else if (shieldItem != null)
+            else if (equippingShieldItem != null)
+            {
+                // Shield can equip at left-hand only
                 return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
-            else if (armorItem != null)
-                return RequestEquipArmor(nonEquipIndex, 0);
+            }
+            else if (equippingArmorItem != null)
+            {
+                // Find equip slot index
+                // Example: if there is 2 ring slots
+                // If first ring slot is empty, equip to first ring slot
+                // The if first ring slot is not empty, equip to second ring slot
+                // Do not equip to third ring slot because it's not allowed to do that
+                byte highestEquipSlotIndex = 0;
+                CharacterItem equippedItem;
+                for (short i = 0; i < EquipItems.Count; ++i)
+                {
+                    equippedItem = EquipItems[i];
+                    if (equippedItem.GetArmorItem() != null &&
+                        equippedItem.GetArmorItem().ArmorType == equippingArmorItem.ArmorType &&
+                        highestEquipSlotIndex <= equippedItem.equipSlotIndex)
+                        highestEquipSlotIndex = equippedItem.equipSlotIndex;
+                }
+                highestEquipSlotIndex++;
+                if (highestEquipSlotIndex >= equippingArmorItem.ArmorType.equippableSlots)
+                    highestEquipSlotIndex = (byte)(equippingArmorItem.ArmorType.equippableSlots - 1);
+                return RequestEquipArmor(nonEquipIndex, highestEquipSlotIndex);
+            }
             return false;
         }
 
