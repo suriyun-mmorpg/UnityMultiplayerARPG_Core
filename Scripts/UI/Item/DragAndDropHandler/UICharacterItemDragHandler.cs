@@ -81,9 +81,6 @@ namespace MultiplayerARPG
             base.OnEndDrag(eventData);
             if (isDropped || !CanDrag)
                 return;
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null)
-                return;
             if (sourceLocation == SourceLocation.NonEquipItems && !EventSystem.current.IsPointerOverGameObject())
                 uiCharacterItem.OnClickDrop();
             if (sourceLocation == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
@@ -91,7 +88,7 @@ namespace MultiplayerARPG
             if (sourceLocation == SourceLocation.StorageItems)
                 uiCharacterItem.OnClickMoveFromStorage();
             if (sourceLocation == SourceLocation.Hotkey)
-                owningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.None, string.Empty);
+                BasePlayerCharacterController.OwningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.None, string.Empty);
         }
     }
 }
