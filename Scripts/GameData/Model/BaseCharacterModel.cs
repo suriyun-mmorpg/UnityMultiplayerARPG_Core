@@ -163,9 +163,11 @@ namespace MultiplayerARPG
 
         private void DestroyCacheModel(string equipPosition)
         {
+            if (string.IsNullOrEmpty(equipPosition))
+                return;
+
             Dictionary<string, GameObject> oldModels;
-            if (!string.IsNullOrEmpty(equipPosition) &&
-                cacheModels.TryGetValue(equipPosition, out oldModels) &&
+            if (cacheModels.TryGetValue(equipPosition, out oldModels) &&
                 oldModels != null)
             {
                 EquipmentContainer tempContainer;
@@ -178,6 +180,8 @@ namespace MultiplayerARPG
                 }
                 cacheModels.Remove(equipPosition);
             }
+            if (itemIds.ContainsKey(equipPosition))
+                itemIds.Remove(equipPosition);
         }
 
         private void DestroyCacheModels()
@@ -205,12 +209,13 @@ namespace MultiplayerARPG
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheModels.Keys);
-            foreach (string position in tempCachedKeys)
+            foreach (string equipPosition in tempCachedKeys)
             {
-                if (!tempAddingKeys.Contains(position) &&
-                    (position.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) ||
-                    position.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND)))
-                    DestroyCacheModel(position);
+                // Destroy cache model by the position which not existed in new equipment position (unequipped items)
+                if (!tempAddingKeys.Contains(equipPosition) &&
+                    (equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) ||
+                    equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND)))
+                    DestroyCacheModel(equipPosition);
             }
 
             if (rightHandWeapon != null && rightHandWeapon.IsWeapon())
@@ -224,13 +229,14 @@ namespace MultiplayerARPG
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
         {
             this.equipItems = equipItems;
+            Item armorItem;
             // Clear equipped item models
             tempAddingKeys.Clear();
             if (equipItems != null)
             {
                 foreach (CharacterItem equipItem in equipItems)
                 {
-                    Item armorItem = equipItem.GetArmorItem();
+                    armorItem = equipItem.GetArmorItem();
                     if (armorItem != null)
                         tempAddingKeys.Add(armorItem.EquipPosition);
                 }
@@ -238,22 +244,23 @@ namespace MultiplayerARPG
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheModels.Keys);
-            foreach (string key in tempCachedKeys)
+            foreach (string equipPosition in tempCachedKeys)
             {
-                if (!tempAddingKeys.Contains(key) &&
-                    !key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
-                    !key.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
-                    DestroyCacheModel(key);
+                // Destroy cache model by the position which not existed in new equipment position (unequipped items)
+                if (!tempAddingKeys.Contains(equipPosition) &&
+                    !equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
+                    !equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
+                    DestroyCacheModel(equipPosition);
             }
 
             if (equipItems != null)
             {
+                BaseEquipmentEntity tempEquipmentEntity;
                 foreach (CharacterItem equipItem in equipItems)
                 {
-                    Item armorItem = equipItem.GetArmorItem();
+                    armorItem = equipItem.GetArmorItem();
                     if (armorItem == null)
                         continue;
-                    BaseEquipmentEntity tempEquipmentEntity;
                     if (tempAddingKeys.Contains(armorItem.EquipPosition))
                         InstantiateEquipModel(armorItem.EquipPosition, armorItem.DataId, equipItem.level, armorItem.equipmentModels, out tempEquipmentEntity);
                 }
