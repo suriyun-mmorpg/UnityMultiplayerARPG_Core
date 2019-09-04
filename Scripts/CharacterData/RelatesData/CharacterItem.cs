@@ -447,6 +447,7 @@ public class CharacterItem : INetSerializableWithElement
         cloneItem.dataId = dataId;
         cloneItem.level = level;
         cloneItem.amount = amount;
+        cloneItem.equipSlotIndex = equipSlotIndex;
         cloneItem.sockets = sockets;
         cloneItem.durability = durability;
         cloneItem.exp = exp;
