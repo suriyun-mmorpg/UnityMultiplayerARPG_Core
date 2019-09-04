@@ -347,7 +347,7 @@ namespace MultiplayerARPG
             if (!CanDoActions() || EquipWeaponSet == equipWeaponSet)
                 return false;
             if (equipWeaponSet >= gameInstance.maxEquipWeaponSet)
-                equipWeaponSet = gameInstance.maxEquipWeaponSet;
+                equipWeaponSet = 0;
             CallNetFunction(NetFuncSwitchEquipWeaponSet, FunctionReceivers.Server, equipWeaponSet);
             return true;
         }
