@@ -12,6 +12,7 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         info.AddValue("dataId", data.dataId);
         info.AddValue("level", data.level);
         info.AddValue("amount", data.amount);
+        info.AddValue("equipSlotIndex", data.equipSlotIndex);
         info.AddValue("durability", data.durability);
         info.AddValue("exp", data.exp);
         info.AddValue("lockRemainsDuration", data.lockRemainsDuration);
@@ -47,6 +48,11 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         try
         {
             data.sockets = (List<int>)info.GetValue("sockets", typeof(List<int>));
+        }
+        catch { }
+        try
+        {
+            data.equipSlotIndex = info.GetByte("equipSlotIndex");
         }
         catch { }
         if (string.IsNullOrEmpty(data.id))
