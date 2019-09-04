@@ -673,12 +673,21 @@ namespace MultiplayerARPG
         protected void UpdateEquipItemIndexes()
         {
             equipItemIndexes.Clear();
+            CharacterItem tempEquipItem;
+            Item tempArmor;
+            string tempEquipPosition;
             for (int i = 0; i < equipItems.Count; ++i)
             {
-                CharacterItem entry = equipItems[i];
-                Item armorItem = entry.GetArmorItem();
-                if (entry.NotEmptySlot() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
-                    equipItemIndexes.Add(armorItem.EquipPosition, i);
+                tempEquipItem = equipItems[i];
+                tempArmor = tempEquipItem.GetArmorItem();
+                if (tempEquipItem.IsEmptySlot() || tempArmor == null)
+                    continue;
+
+                tempEquipPosition = GetEquipPosition(tempArmor.EquipPosition, tempEquipItem.equipSlotIndex);
+                if (equipItemIndexes.ContainsKey(tempEquipPosition))
+                    continue;
+
+                equipItemIndexes[tempEquipPosition] = i;
             }
         }
         #endregion
@@ -987,6 +996,13 @@ namespace MultiplayerARPG
             if (CacheDisallowUseItem)
                 return false;
             return true;
+        }
+        #endregion
+
+        #region Data helpers
+        private string GetEquipPosition(string equipPositionId, byte equipSlotIndex)
+        {
+            return equipPositionId + ":" + equipSlotIndex;
         }
         #endregion
 

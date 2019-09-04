@@ -158,15 +158,22 @@ namespace MultiplayerARPG
             {
                 equipItemIndexes.Clear();
                 equipItems.Clear();
+                CharacterItem tempEquipItem;
+                Item tempArmor;
+                string tempEquipPosition;
                 for (int i = 0; i < value.Count; ++i)
                 {
-                    CharacterItem entry = value[i];
-                    Item armorItem = entry.GetArmorItem();
-                    if (entry.NotEmptySlot() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
-                    {
-                        equipItemIndexes.Add(armorItem.EquipPosition, i);
-                        equipItems.Add(entry);
-                    }
+                    tempEquipItem = value[i];
+                    tempArmor = tempEquipItem.GetArmorItem();
+                    if (tempEquipItem.IsEmptySlot() || tempArmor == null)
+                        continue;
+
+                    tempEquipPosition = GetEquipPosition(tempArmor.EquipPosition, tempEquipItem.equipSlotIndex);
+                    if (equipItemIndexes.ContainsKey(tempEquipPosition))
+                        continue;
+
+                    equipItemIndexes[tempEquipPosition] = i;
+                    equipItems.Add(tempEquipItem);
                 }
             }
         }

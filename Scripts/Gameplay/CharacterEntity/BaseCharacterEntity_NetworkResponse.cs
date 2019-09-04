@@ -253,7 +253,7 @@ namespace MultiplayerARPG
                 equippingItem.equipSlotIndex = equipSlotIndex;
                 equipItems.Add(equippingItem);
                 // Update equip item indexes
-                equipItemIndexes.Add(equippingItem.GetArmorItem().EquipPosition, equipItems.Count - 1);
+                equipItemIndexes[GetEquipPosition(equippingItem.GetArmorItem().EquipPosition, equipSlotIndex)] = equipItems.Count - 1;
                 // Update inventory
                 nonEquipItems.RemoveAt(nonEquipIndex);
                 this.FillEmptySlots();

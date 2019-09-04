@@ -220,20 +220,26 @@ namespace MultiplayerARPG
                 // If first ring slot is empty, equip to first ring slot
                 // The if first ring slot is not empty, equip to second ring slot
                 // Do not equip to third ring slot because it's not allowed to do that
-                byte highestEquipSlotIndex = 0;
+                byte equippingSlotIndex = (byte)(equippingArmorItem.ArmorType.equippableSlots - 1);
+                bool[] equippedSlots = new bool[equippingArmorItem.ArmorType.equippableSlots];
                 CharacterItem equippedItem;
                 for (short i = 0; i < EquipItems.Count; ++i)
                 {
                     equippedItem = EquipItems[i];
-                    if (equippedItem.GetArmorItem() != null &&
-                        equippedItem.GetArmorItem().ArmorType == equippingArmorItem.ArmorType &&
-                        highestEquipSlotIndex <= equippedItem.equipSlotIndex)
-                        highestEquipSlotIndex = equippedItem.equipSlotIndex;
+                    // If equipped item is same armor type, find which slot it is equipped
+                    if (equippedItem.GetItem().ArmorType == equippingArmorItem.ArmorType)
+                        equippedSlots[equippedItem.equipSlotIndex] = true;
                 }
-                highestEquipSlotIndex++;
-                if (highestEquipSlotIndex >= equippingArmorItem.ArmorType.equippableSlots)
-                    highestEquipSlotIndex = (byte)(equippingArmorItem.ArmorType.equippableSlots - 1);
-                return RequestEquipArmor(nonEquipIndex, highestEquipSlotIndex);
+                // Find free slot
+                for (byte i = 0; i < equippedSlots.Length; ++i)
+                {
+                    if (!equippedSlots[i])
+                    {
+                        equippingSlotIndex = i;
+                        break;
+                    }
+                }
+                return RequestEquipArmor(nonEquipIndex, equippingSlotIndex);
             }
             return false;
         }
