@@ -24,9 +24,7 @@ namespace MultiplayerARPG
         public override void LoadData(GameInstance gameInstance)
         {
             GameInstance.AddAttributes(attributes);
-            GameInstance.AddItems(new Item[] { gameInstance.DefaultWeaponItem });
             GameInstance.AddItems(items);
-            GameInstance.AddWeaponTypes(new WeaponType[] { gameInstance.DefaultWeaponType });
             GameInstance.AddNpcDialogs(npcDialogs);
             GameInstance.AddQuests(quests);
             GameInstance.AddGuildSkills(guildSkills);

@@ -394,6 +394,10 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("LoadedGameData");
 
+            // Add required default game data
+            AddItems(new Item[] { DefaultWeaponItem });
+            AddWeaponTypes(new WeaponType[] { DefaultWeaponType });
+
             if (warpPortalDatabase != null)
                 AddMapWarpPortals(warpPortalDatabase.maps);
 
