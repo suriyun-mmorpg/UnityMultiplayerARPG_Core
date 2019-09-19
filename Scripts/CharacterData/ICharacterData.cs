@@ -27,20 +27,4 @@ public partial interface ICharacterData
     IList<CharacterItem> EquipItems { get; set; }
     IList<CharacterItem> NonEquipItems { get; set; }
     IList<CharacterSummon> Summons { get; set; }
-    // Caching
-    CharacterStats CacheStats { get; }
-    Dictionary<Attribute, short> CacheAttributes { get; }
-    Dictionary<Skill, short> CacheSkills { get; }
-    Dictionary<DamageElement, float> CacheResistances { get; }
-    Dictionary<DamageElement, float> CacheArmors { get; }
-    Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get; }
-    Dictionary<EquipmentSet, int> CacheEquipmentSets { get; }
-    int CacheMaxHp { get; }
-    int CacheMaxMp { get; }
-    int CacheMaxStamina { get; }
-    int CacheMaxFood { get; }
-    int CacheMaxWater { get; }
-    float CacheTotalItemWeight { get; }
-    float CacheAtkSpeed { get; }
-    float CacheMoveSpeed { get; }
 }

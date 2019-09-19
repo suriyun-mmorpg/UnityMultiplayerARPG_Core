@@ -34,9 +34,9 @@ namespace MultiplayerARPG
             tempMemberData.dataId = playerCharacterEntity.DataId;
             tempMemberData.level = playerCharacterEntity.Level;
             tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
-            tempMemberData.maxHp = playerCharacterEntity.CacheMaxHp;
+            tempMemberData.maxHp = playerCharacterEntity.MaxHp;
             tempMemberData.currentMp = playerCharacterEntity.CurrentMp;
-            tempMemberData.maxMp = playerCharacterEntity.CacheMaxMp;
+            tempMemberData.maxMp = playerCharacterEntity.MaxMp;
             return tempMemberData;
         }
 

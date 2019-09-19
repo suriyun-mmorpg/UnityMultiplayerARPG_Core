@@ -29,8 +29,6 @@ public partial class CharacterData : ICharacterData
     private ObservableCollection<CharacterItem> nonEquipItems;
     private ObservableCollection<CharacterSummon> summons;
 
-    private bool shouldMakeCache = false;
-
     public string Id { get { return id; } set { id = value; } }
     public int DataId
     {
@@ -38,7 +36,7 @@ public partial class CharacterData : ICharacterData
         set
         {
             dataId = value;
-            shouldMakeCache = true;
+            this.MarkToMakeCaches();
         }
     }
     public int EntityId
@@ -47,7 +45,7 @@ public partial class CharacterData : ICharacterData
         set
         {
             entityId = value;
-            shouldMakeCache = true;
+            this.MarkToMakeCaches();
         }
     }
     public string CharacterName
@@ -65,7 +63,7 @@ public partial class CharacterData : ICharacterData
         set
         {
             level = value;
-            shouldMakeCache = true;
+            this.MarkToMakeCaches();
         }
     }
     public short DisplayLevel
@@ -99,7 +97,7 @@ public partial class CharacterData : ICharacterData
         set
         {
             equipWeaponSet = value;
-            shouldMakeCache = true;
+            this.MarkToMakeCaches();
         }
     }
 
@@ -124,7 +122,6 @@ public partial class CharacterData : ICharacterData
             selectableEquipWeapons.Clear();
             foreach (EquipWeapons entry in value)
                 selectableEquipWeapons.Add(entry);
-            shouldMakeCache = true;
         }
     }
 
@@ -149,7 +146,6 @@ public partial class CharacterData : ICharacterData
             attributes.Clear();
             foreach (CharacterAttribute entry in value)
                 attributes.Add(entry);
-            shouldMakeCache = true;
         }
     }
 
@@ -174,7 +170,6 @@ public partial class CharacterData : ICharacterData
             skills.Clear();
             foreach (CharacterSkill entry in value)
                 skills.Add(entry);
-            shouldMakeCache = true;
         }
     }
 
@@ -217,7 +212,6 @@ public partial class CharacterData : ICharacterData
             buffs.Clear();
             foreach (CharacterBuff entry in value)
                 buffs.Add(entry);
-            shouldMakeCache = true;
         }
     }
 
@@ -242,7 +236,6 @@ public partial class CharacterData : ICharacterData
             equipItems.Clear();
             foreach (CharacterItem entry in value)
                 equipItems.Add(entry);
-            shouldMakeCache = true;
         }
     }
 
@@ -267,7 +260,6 @@ public partial class CharacterData : ICharacterData
             nonEquipItems.Clear();
             foreach (CharacterItem entry in value)
                 nonEquipItems.Add(entry);
-            shouldMakeCache = true;
         }
     }
 
@@ -292,199 +284,10 @@ public partial class CharacterData : ICharacterData
             summons.Clear();
             foreach (CharacterSummon entry in value)
                 summons.Add(entry);
-            shouldMakeCache = true;
         }
     }
-
-    private CharacterStats cacheStats;
-    public CharacterStats CacheStats
-    {
-        get
-        {
-            MakeCaches();
-            return cacheStats;
-        }
-    }
-
-    private Dictionary<Attribute, short> cacheAttributes;
-    public Dictionary<Attribute, short> CacheAttributes
-    {
-        get
-        {
-            MakeCaches();
-            return cacheAttributes;
-        }
-    }
-
-    private Dictionary<Skill, short> cacheSkills;
-    public Dictionary<Skill, short> CacheSkills
-    {
-        get
-        {
-            MakeCaches();
-            return cacheSkills;
-        }
-    }
-
-    private Dictionary<DamageElement, float> cacheResistances;
-    public Dictionary<DamageElement, float> CacheResistances
-    {
-        get
-        {
-            MakeCaches();
-            return cacheResistances;
-        }
-    }
-
-    private Dictionary<DamageElement, float> cacheArmors;
-    public Dictionary<DamageElement, float> CacheArmors
-    {
-        get
-        {
-            MakeCaches();
-            return cacheArmors;
-        }
-    }
-
-    private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
-    public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages
-    {
-        get
-        {
-            MakeCaches();
-            return cacheIncreaseDamages;
-        }
-    }
-
-    private Dictionary<EquipmentSet, int> cacheEquipmentSets;
-    public Dictionary<EquipmentSet, int> CacheEquipmentSets
-    {
-        get
-        {
-            MakeCaches();
-            return cacheEquipmentSets;
-        }
-    }
-
-    private int cacheMaxHp;
-    public int CacheMaxHp
-    {
-        get
-        {
-            MakeCaches();
-            return cacheMaxHp;
-        }
-    }
-
-    private int cacheMaxMp;
-    public int CacheMaxMp
-    {
-        get
-        {
-            MakeCaches();
-            return cacheMaxMp;
-        }
-    }
-
-    private int cacheMaxStamina;
-    public int CacheMaxStamina
-    {
-        get
-        {
-            MakeCaches();
-            return cacheMaxStamina;
-        }
-    }
-
-    private int cacheMaxFood;
-    public int CacheMaxFood
-    {
-        get
-        {
-            MakeCaches();
-            return cacheMaxFood;
-        }
-    }
-
-    private int cacheMaxWater;
-    public int CacheMaxWater
-    {
-        get
-        {
-            MakeCaches();
-            return cacheMaxWater;
-        }
-    }
-
-    private float cacheTotalItemWeight;
-    public float CacheTotalItemWeight
-    {
-        get
-        {
-            MakeCaches();
-            return cacheTotalItemWeight;
-        }
-    }
-
-    private float cacheAtkSpeed;
-    public float CacheAtkSpeed
-    {
-        get
-        {
-            MakeCaches();
-            return cacheAtkSpeed;
-        }
-    }
-
-    private float cacheMoveSpeed;
-    public float CacheMoveSpeed
-    {
-        get
-        {
-            MakeCaches();
-            return cacheMoveSpeed;
-        }
-    }
-
     private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        shouldMakeCache = true;
-    }
-
-    private void MakeCaches()
-    {
-        if (!shouldMakeCache)
-            return;
-
-        if (cacheAttributes == null)
-            cacheAttributes = new Dictionary<Attribute, short>();
-        if (cacheResistances == null)
-            cacheResistances = new Dictionary<DamageElement, float>();
-        if (cacheArmors == null)
-            cacheArmors = new Dictionary<DamageElement, float>();
-        if (cacheIncreaseDamages == null)
-            cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-        if (cacheSkills == null)
-            cacheSkills = new Dictionary<Skill, short>();
-        if (cacheEquipmentSets == null)
-            cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
-
-        this.GetAllStats(
-            out cacheStats,
-            cacheAttributes,
-            cacheResistances,
-            cacheArmors,
-            cacheIncreaseDamages,
-            cacheSkills,
-            cacheEquipmentSets,
-            out cacheMaxHp,
-            out cacheMaxMp,
-            out cacheMaxStamina,
-            out cacheMaxFood,
-            out cacheMaxWater,
-            out cacheTotalItemWeight,
-            out cacheAtkSpeed,
-            out cacheMoveSpeed);
-        shouldMakeCache = false;
+        this.MarkToMakeCaches();
     }
 }

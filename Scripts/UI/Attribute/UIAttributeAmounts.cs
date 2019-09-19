@@ -85,7 +85,7 @@ namespace MultiplayerARPG
                         tempAllText += "\n";
                     // Get attribute amount from character
                     if (owningCharacter != null)
-                        owningCharacter.CacheAttributes.TryGetValue(tempAttribute, out tempCurrentAmount);
+                        owningCharacter.GetCaches().Attributes.TryGetValue(tempAttribute, out tempCurrentAmount);
                     // Use difference format by option 
                     if (showAsRequirement)
                     {

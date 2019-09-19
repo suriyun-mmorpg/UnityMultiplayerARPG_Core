@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             List<int> filterItemsIndexes = new List<int>();
             
             CharacterSkill tempCharacterSkill;
-            foreach (KeyValuePair<Skill, short> characterSkill in owningCharacter.CacheSkills)
+            foreach (KeyValuePair<Skill, short> characterSkill in owningCharacter.GetCaches().Skills)
             {
                 tempCharacterSkill = CharacterSkill.Create(characterSkill.Key, characterSkill.Value);
                 if (uiCharacterHotkey.CanAssignCharacterSkill(tempCharacterSkill))

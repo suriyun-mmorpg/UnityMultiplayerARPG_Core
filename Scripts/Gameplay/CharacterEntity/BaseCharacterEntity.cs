@@ -82,8 +82,12 @@ namespace MultiplayerARPG
         protected bool tempEnableMovement;
         #endregion
 
-        public override sealed int MaxHp { get { return CacheMaxHp; } }
-        public override sealed float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
+        public override sealed int MaxHp { get { return this.GetCaches().MaxHp; } }
+        public int MaxMp { get { return this.GetCaches().MaxMp; } }
+        public int MaxStamina { get { return this.GetCaches().MaxStamina; } }
+        public int MaxFood { get { return this.GetCaches().MaxFood; } }
+        public int MaxWater { get { return this.GetCaches().MaxWater; } }
+        public override sealed float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / this.GetCaches().BaseMoveSpeed; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
         public bool HasAimPosition { get; protected set; }
@@ -293,28 +297,28 @@ namespace MultiplayerARPG
             // Validate Hp
             if (CurrentHp < 0)
                 CurrentHp = 0;
-            if (CurrentHp > CacheMaxHp)
-                CurrentHp = CacheMaxHp;
+            if (CurrentHp > this.GetCaches().MaxHp)
+                CurrentHp = this.GetCaches().MaxHp;
             // Validate Mp
             if (CurrentMp < 0)
                 CurrentMp = 0;
-            if (CurrentMp > CacheMaxMp)
-                CurrentMp = CacheMaxMp;
+            if (CurrentMp > this.GetCaches().MaxMp)
+                CurrentMp = this.GetCaches().MaxMp;
             // Validate Stamina
             if (CurrentStamina < 0)
                 CurrentStamina = 0;
-            if (CurrentStamina > CacheMaxStamina)
-                CurrentStamina = CacheMaxStamina;
+            if (CurrentStamina > this.GetCaches().MaxStamina)
+                CurrentStamina = this.GetCaches().MaxStamina;
             // Validate Food
             if (CurrentFood < 0)
                 CurrentFood = 0;
-            if (CurrentFood > CacheMaxFood)
-                CurrentFood = CacheMaxFood;
+            if (CurrentFood > this.GetCaches().MaxFood)
+                CurrentFood = this.GetCaches().MaxFood;
             // Validate Water
             if (CurrentWater < 0)
                 CurrentWater = 0;
-            if (CurrentWater > CacheMaxWater)
-                CurrentWater = CacheMaxWater;
+            if (CurrentWater > this.GetCaches().MaxWater)
+                CurrentWater = this.GetCaches().MaxWater;
 
             if (IsDead())
                 Killed(attacker);
@@ -386,11 +390,11 @@ namespace MultiplayerARPG
         {
             if (!IsServer || !IsDead())
                 return;
-            CurrentHp = CacheMaxHp;
-            CurrentMp = CacheMaxMp;
-            CurrentStamina = CacheMaxStamina;
-            CurrentFood = CacheMaxFood;
-            CurrentWater = CacheMaxWater;
+            CurrentHp = this.GetCaches().MaxHp;
+            CurrentMp = this.GetCaches().MaxMp;
+            CurrentStamina = this.GetCaches().MaxStamina;
+            CurrentFood = this.GetCaches().MaxFood;
+            CurrentWater = this.GetCaches().MaxWater;
             respawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
             // Send OnRespawn to owner player only
             RequestOnRespawn();
@@ -928,7 +932,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return false;
-            if (CacheDisallowMove)
+            if (this.GetCaches().DisallowMove)
                 return false;
             return true;
         }
@@ -937,7 +941,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            if (CacheDisallowAttack)
+            if (this.GetCaches().DisallowAttack)
                 return false;
             if (PassengingVehicleEntity != null &&
                 !PassengingVehicleSeat.canAttack)
@@ -949,7 +953,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            if (CacheDisallowUseSkill)
+            if (this.GetCaches().DisallowUseSkill)
                 return false;
             if (PassengingVehicleEntity != null &&
                 !PassengingVehicleSeat.canUseSkill)
@@ -961,7 +965,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return false;
-            if (CacheDisallowUseItem)
+            if (this.GetCaches().DisallowUseItem)
                 return false;
             return true;
         }
@@ -1186,7 +1190,7 @@ namespace MultiplayerARPG
         {
             if (animActionType == AnimActionType.AttackRightHand ||
                 animActionType == AnimActionType.AttackLeftHand)
-                return CacheAtkSpeed;
+                return this.GetCaches().AtkSpeed;
             return 1f;
         }
 

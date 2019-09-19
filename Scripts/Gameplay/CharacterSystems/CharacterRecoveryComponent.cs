@@ -49,7 +49,7 @@ namespace MultiplayerARPG
             {
                 // Hp
                 recoveryData.recoveryingHp += recoveryData.updatingTime * gameplayRule.GetRecoveryHpPerSeconds(characterEntity);
-                if (characterEntity.CurrentHp < characterEntity.CacheMaxHp)
+                if (characterEntity.CurrentHp < characterEntity.MaxHp)
                 {
                     if (recoveryData.recoveryingHp >= 1)
                     {
@@ -79,7 +79,7 @@ namespace MultiplayerARPG
 
                 // Mp
                 recoveryData.recoveryingMp += recoveryData.updatingTime * gameplayRule.GetRecoveryMpPerSeconds(characterEntity);
-                if (characterEntity.CurrentMp < characterEntity.CacheMaxMp)
+                if (characterEntity.CurrentMp < characterEntity.MaxMp)
                 {
                     if (recoveryData.recoveryingMp >= 1)
                     {
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
 
                 // Stamina
                 recoveryData.recoveryingStamina += recoveryData.updatingTime * gameplayRule.GetRecoveryStaminaPerSeconds(characterEntity);
-                if (characterEntity.CurrentStamina < characterEntity.CacheMaxStamina)
+                if (characterEntity.CurrentStamina < characterEntity.MaxStamina)
                 {
                     if (recoveryData.recoveryingStamina >= 1)
                     {
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
                     recoveryData.decreasingStamina = 0;
 
                 // Food
-                if (characterEntity.CurrentFood < characterEntity.CacheMaxFood)
+                if (characterEntity.CurrentFood < characterEntity.MaxFood)
                 {
                     if (recoveryData.recoveryingFood >= 1)
                     {
@@ -167,7 +167,7 @@ namespace MultiplayerARPG
                     recoveryData.decreasingFood = 0;
 
                 // Water
-                if (characterEntity.CurrentWater < characterEntity.CacheMaxWater)
+                if (characterEntity.CurrentWater < characterEntity.MaxWater)
                 {
                     if (recoveryData.recoveryingWater >= 1)
                     {

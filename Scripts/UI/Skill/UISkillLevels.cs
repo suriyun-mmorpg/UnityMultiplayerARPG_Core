@@ -85,7 +85,7 @@ namespace MultiplayerARPG
                         tempAllText += "\n";
                     // Get skill level from character
                     if (owningCharacter != null)
-                        owningCharacter.CacheSkills.TryGetValue(tempSkill, out tempCurrentLevel);
+                        owningCharacter.GetCaches().Skills.TryGetValue(tempSkill, out tempCurrentLevel);
                     // Use difference format by option 
                     if (showAsRequirement)
                     {

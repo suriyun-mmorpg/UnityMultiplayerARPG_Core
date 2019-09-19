@@ -64,16 +64,16 @@ namespace MultiplayerARPG
                 return false;
 
             Skill skill;
-            short level;
+            short skillLevel;
             if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
-                !CacheSkills.TryGetValue(skill, out level))
+                !this.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return false;
 
             float currentTime = Time.unscaledTime;
             if (!requestUseSkillErrorTime.ContainsKey(dataId))
                 requestUseSkillErrorTime[dataId] = currentTime;
 
-            if (CurrentMp < skill.GetConsumeMp(level))
+            if (CurrentMp < skill.GetConsumeMp(skillLevel))
             {
                 if (!IsOwnerClient)
                     return false;

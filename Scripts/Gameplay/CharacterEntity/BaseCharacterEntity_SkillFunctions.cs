@@ -85,7 +85,7 @@ namespace MultiplayerARPG
                 // Sum damage with buffs
                 allDamageAmounts = GameDataHelpers.CombineDamages(
                     allDamageAmounts,
-                    CacheIncreaseDamages);
+                    this.GetCaches().IncreaseDamages);
             }
         }
 
@@ -113,7 +113,7 @@ namespace MultiplayerARPG
             Skill skill;
             short skillLevel;
             if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
-                !CacheSkills.TryGetValue(skill, out skillLevel))
+                !this.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return;
 
             // Validate mp amount, skill level, 

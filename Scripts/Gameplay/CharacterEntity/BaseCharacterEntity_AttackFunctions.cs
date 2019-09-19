@@ -36,7 +36,7 @@ namespace MultiplayerARPG
             // Calculate all damages
             allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, weapon.GetDamageAmount(this));
             // Sum damage with buffs
-            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, CacheIncreaseDamages);
+            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, this.GetCaches().IncreaseDamages);
         }
 
         public bool ValidateAmmo(CharacterItem weapon)

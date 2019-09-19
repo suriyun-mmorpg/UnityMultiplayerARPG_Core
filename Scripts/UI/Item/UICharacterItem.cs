@@ -573,7 +573,7 @@ namespace MultiplayerARPG
                 {
                     uiEquipmentSet.Show();
                     int equippedCount = 0;
-                    Character.CacheEquipmentSets.TryGetValue(EquipmentItem.equipmentSet, out equippedCount);
+                    Character.GetCaches().EquipmentSets.TryGetValue(EquipmentItem.equipmentSet, out equippedCount);
                     uiEquipmentSet.Data = new UIEquipmentSetData(EquipmentItem.equipmentSet, equippedCount);
                 }
             }

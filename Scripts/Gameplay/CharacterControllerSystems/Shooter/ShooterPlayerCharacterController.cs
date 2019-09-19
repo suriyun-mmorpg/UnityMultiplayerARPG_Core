@@ -767,7 +767,7 @@ namespace MultiplayerARPG
         {
             Skill skill = null;
             if (GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) &&
-                skill != null && PlayerCharacterEntity.CacheSkills.ContainsKey(skill))
+                skill != null && PlayerCharacterEntity.GetCaches().Skills.ContainsKey(skill))
             {
                 PlayerCharacterEntity.StopMove();
                 queueSkill = skill;

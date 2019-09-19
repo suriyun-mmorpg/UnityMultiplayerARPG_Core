@@ -50,9 +50,9 @@ namespace MultiplayerARPG
         public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             // Attacker stats
-            CharacterStats attackerStats = attacker.CacheStats;
+            CharacterStats attackerStats = attacker.GetCaches().Stats;
             // Damage receiver stats
-            CharacterStats dmgReceiverStats = damageReceiver.CacheStats;
+            CharacterStats dmgReceiverStats = damageReceiver.GetCaches().Stats;
             // Calculate chance to hit
             float attackerAcc = attackerStats.accuracy;
             float dmgReceiverEva = dmgReceiverStats.evasion;
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
 
         public override float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
-            float criRate = attacker.CacheStats.criRate;
+            float criRate = attacker.GetCaches().Stats.criRate;
             // Minimum critical chance is 5%
             if (criRate < 0.05f)
                 criRate = 0.05f;
@@ -89,12 +89,12 @@ namespace MultiplayerARPG
 
         public override float GetCriticalDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage)
         {
-            return damage * attacker.CacheStats.criDmgRate;
+            return damage * attacker.GetCaches().Stats.criDmgRate;
         }
 
         public override float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
-            float blockRate = damageReceiver.CacheStats.blockRate;
+            float blockRate = damageReceiver.GetCaches().Stats.blockRate;
             // Minimum block chance is 5%
             if (blockRate < 0.05f)
                 blockRate = 0.05f;
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
 
         public override float GetBlockDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage)
         {
-            float blockDmgRate = damageReceiver.CacheStats.blockDmgRate;
+            float blockDmgRate = damageReceiver.GetCaches().Stats.blockDmgRate;
             // Minimum block damage is 5%
             if (blockDmgRate < 0.05f)
                 blockDmgRate = 0.05f;
@@ -122,13 +122,13 @@ namespace MultiplayerARPG
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             // Reduce damage by resistance
             float resistanceAmount = 0f;
-            damageReceiver.CacheResistances.TryGetValue(damageElement, out resistanceAmount);
+            damageReceiver.GetCaches().Resistances.TryGetValue(damageElement, out resistanceAmount);
             if (resistanceAmount > damageElement.maxResistanceAmount)
                 resistanceAmount = damageElement.maxResistanceAmount;
             damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
             // Reduce damage by armor
             float armorAmount = 0f;
-            damageReceiver.CacheArmors.TryGetValue(damageElement, out resistanceAmount);
+            damageReceiver.GetCaches().Armors.TryGetValue(damageElement, out resistanceAmount);
             damageAmount *= 100f / (100f + armorAmount);
             return damageAmount;
         }
@@ -137,14 +137,14 @@ namespace MultiplayerARPG
         {
             if (IsHungry(character))
                 return 0;
-            return character.CacheMaxHp * hpRecoveryRatePerSeconds;
+            return character.GetCaches().MaxHp * hpRecoveryRatePerSeconds;
         }
 
         public override float GetRecoveryMpPerSeconds(BaseCharacterEntity character)
         {
             if (IsThirsty(character))
                 return 0;
-            return character.CacheMaxMp * mpRecoveryRatePerSeconds;
+            return character.GetCaches().MaxMp * mpRecoveryRatePerSeconds;
         }
 
         public override float GetRecoveryStaminaPerSeconds(BaseCharacterEntity character)
@@ -158,9 +158,9 @@ namespace MultiplayerARPG
                 return 0f;
             float result = 0f;
             if (IsHungry(character))
-                result += character.CacheMaxHp * hpDecreaseRatePerSecondsWhenHungry;
+                result += character.GetCaches().MaxHp * hpDecreaseRatePerSecondsWhenHungry;
             if (IsThirsty(character))
-                result += character.CacheMaxHp * hpDecreaseRatePerSecondsWhenThirsty;
+                result += character.GetCaches().MaxHp * hpDecreaseRatePerSecondsWhenThirsty;
             return result;
         }
 
@@ -170,9 +170,9 @@ namespace MultiplayerARPG
                 return 0f;
             float result = 0f;
             if (IsHungry(character))
-                result += character.CacheMaxMp * mpDecreaseRatePerSecondsWhenHungry;
+                result += character.GetCaches().MaxMp * mpDecreaseRatePerSecondsWhenHungry;
             if (IsThirsty(character))
-                result += character.CacheMaxMp * mpDecreaseRatePerSecondsWhenThirsty;
+                result += character.GetCaches().MaxMp * mpDecreaseRatePerSecondsWhenThirsty;
             return result;
         }
 
@@ -206,7 +206,7 @@ namespace MultiplayerARPG
 
         public override float GetMoveSpeed(BaseCharacterEntity character)
         {
-            float moveSpeed = character.CacheMoveSpeed;
+            float moveSpeed = character.GetCaches().MoveSpeed;
             if (character is BaseMonsterCharacterEntity &&
                 (character as BaseMonsterCharacterEntity).isWandering)
                 moveSpeed = (character as BaseMonsterCharacterEntity).monsterCharacter.wanderMoveSpeed;

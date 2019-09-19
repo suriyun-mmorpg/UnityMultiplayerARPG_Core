@@ -261,7 +261,7 @@ namespace MultiplayerARPG
             // Assign damage amounts
             allDamageAmounts = GameDataHelpers.CombineDamages(null, GameDataHelpers.MakeDamage(monsterCharacter.damageAmount, Level, 1f, 1f));
             // Sum damage with buffs
-            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, CacheIncreaseDamages);
+            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, this.GetCaches().IncreaseDamages);
         }
 
         public override void GetUsingSkillData(
@@ -345,7 +345,7 @@ namespace MultiplayerARPG
                 // Sum damage with buffs
                 allDamageAmounts = GameDataHelpers.CombineDamages(
                     allDamageAmounts,
-                    CacheIncreaseDamages);
+                    this.GetCaches().IncreaseDamages);
             }
         }
 
@@ -415,7 +415,7 @@ namespace MultiplayerARPG
                     shareGuildExpRate = 0f;
 
                     ReceivedDamageRecord receivedDamageRecord = receivedDamageRecords[enemy];
-                    float rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)CacheMaxHp;
+                    float rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)this.GetCaches().MaxHp;
                     if (rewardRate > 1f)
                         rewardRate = 1f;
 

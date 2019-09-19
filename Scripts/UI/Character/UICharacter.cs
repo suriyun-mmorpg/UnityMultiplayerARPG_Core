@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentHp = Data.CurrentHp;
-                maxHp = Data.CacheMaxHp;
+                maxHp = Data.GetCaches().MaxHp;
             }
             if (uiGageHp != null)
                 uiGageHp.Update(currentHp, maxHp);
@@ -121,7 +121,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentMp = Data.CurrentMp;
-                maxMp = Data.CacheMaxMp;
+                maxMp = Data.GetCaches().MaxMp;
             }
             if (uiGageMp != null)
                 uiGageMp.Update(currentMp, maxMp);
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentStamina = Data.CurrentStamina;
-                maxStamina = Data.CacheMaxStamina;
+                maxStamina = Data.GetCaches().MaxStamina;
             }
             if (uiGageStamina != null)
                 uiGageStamina.Update(currentStamina, maxStamina);
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentFood = Data.CurrentFood;
-                maxFood = Data.CacheMaxFood;
+                maxFood = Data.GetCaches().MaxFood;
             }
             if (uiGageFood != null)
                 uiGageFood.Update(currentFood, maxFood);
@@ -154,7 +154,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentWater = Data.CurrentWater;
-                maxWater = Data.CacheMaxWater;
+                maxWater = Data.GetCaches().MaxWater;
             }
             if (uiGageWater != null)
                 uiGageWater.Update(currentWater, maxWater);
