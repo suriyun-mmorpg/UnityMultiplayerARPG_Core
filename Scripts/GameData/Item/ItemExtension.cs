@@ -66,6 +66,15 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public static Dictionary<DamageElement, float> GetIncreaseArmors(this Item equipmentItem, short level, float rate)
+        {
+            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+            if (equipmentItem != null &&
+                equipmentItem.IsEquipment())
+                result = GameDataHelpers.CombineArmors(equipmentItem.increaseArmors, result, level, rate);
+            return result;
+        }
+
         public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Item equipmentItem, short level, float rate)
         {
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
@@ -82,6 +91,16 @@ namespace MultiplayerARPG
                 equipmentItem.IsEquipment())
                 result = GameDataHelpers.CombineSkills(equipmentItem.increaseSkillLevels, result);
             return result;
+        }
+        #endregion
+
+        #region Armor/Shield Extension
+        public static KeyValuePair<DamageElement, float> GetArmorAmount(this Item defendItem, short level, float rate)
+        {
+            if (defendItem == null ||
+                !defendItem.IsDefendEquipment())
+                return new KeyValuePair<DamageElement, float>();
+            return GameDataHelpers.MakeArmor(defendItem.armorAmount, level, rate);
         }
         #endregion
 

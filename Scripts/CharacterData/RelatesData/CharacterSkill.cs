@@ -38,6 +38,8 @@ public class CharacterSkill : INetSerializableWithElement
     [System.NonSerialized]
     private Dictionary<DamageElement, float> cachePassiveBuffIncreaseResistances;
     [System.NonSerialized]
+    private Dictionary<DamageElement, float> cachePassiveBuffIncreaseArmors;
+    [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cachePassiveBuffIncreaseDamages;
 
     [System.NonSerialized]
@@ -65,6 +67,7 @@ public class CharacterSkill : INetSerializableWithElement
             cachePassiveBuffIncreaseStats = new CharacterStats();
             cachePassiveBuffIncreaseAttributes = null;
             cachePassiveBuffIncreaseResistances = null;
+            cachePassiveBuffIncreaseArmors = null;
             cachePassiveBuffIncreaseDamages = null;
             if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill))
             {
@@ -80,6 +83,7 @@ public class CharacterSkill : INetSerializableWithElement
                     cachePassiveBuffIncreaseStats = cachePassiveBuff.GetIncreaseStats(level);
                     cachePassiveBuffIncreaseAttributes = cachePassiveBuff.GetIncreaseAttributes(level);
                     cachePassiveBuffIncreaseResistances = cachePassiveBuff.GetIncreaseResistances(level);
+                    cachePassiveBuffIncreaseArmors = cachePassiveBuff.GetIncreaseArmors(level);
                     cachePassiveBuffIncreaseDamages = cachePassiveBuff.GetIncreaseDamages(level);
                 }
             }
@@ -154,6 +158,12 @@ public class CharacterSkill : INetSerializableWithElement
     {
         MakeCache();
         return cachePassiveBuffIncreaseResistances;
+    }
+
+    public Dictionary<DamageElement, float> GetPassiveBuffIncreaseArmors()
+    {
+        MakeCache();
+        return cachePassiveBuffIncreaseArmors;
     }
 
     public Dictionary<DamageElement, MinMaxFloat> GetPassiveBuffIncreaseDamages()

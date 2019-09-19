@@ -92,6 +92,28 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Combine armor amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> CombineArmors(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
+        {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<DamageElement, float>();
+            DamageElement damageElement = newEntry.Key;
+            if (damageElement != null)
+            {
+                float value = newEntry.Value;
+                if (!sourceDictionary.ContainsKey(damageElement))
+                    sourceDictionary[damageElement] = value;
+                else
+                    sourceDictionary[damageElement] += value;
+            }
+            return sourceDictionary;
+        }
+
+        /// <summary>
         /// Combine skill levels dictionary
         /// </summary>
         /// <param name="sourceDictionary"></param>
@@ -212,6 +234,26 @@ namespace MultiplayerARPG
                 foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
                 {
                     CombineResistances(sourceDictionary, entry);
+                }
+            }
+            return sourceDictionary;
+        }
+
+        /// <summary>
+        /// Combine defend amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="combineDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> CombineArmors(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
+        {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<DamageElement, float>();
+            if (combineDictionary != null)
+            {
+                foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
+                {
+                    CombineArmors(sourceDictionary, entry);
                 }
             }
             return sourceDictionary;
@@ -395,6 +437,33 @@ namespace MultiplayerARPG
         /// <param name="rate"></param>
         /// <returns></returns>
         public static KeyValuePair<DamageElement, float> MakeResistance(ResistanceIncremental source, short level, float rate)
+        {
+            if (source.damageElement == null)
+                return new KeyValuePair<DamageElement, float>();
+            return new KeyValuePair<DamageElement, float>(source.damageElement, source.amount.GetAmount(level) * rate);
+        }
+
+        /// <summary>
+        /// Make armor - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<DamageElement, float> MakeArmor(ArmorAmount source, float rate)
+        {
+            if (source.damageElement == null)
+                return new KeyValuePair<DamageElement, float>();
+            return new KeyValuePair<DamageElement, float>(source.damageElement, source.amount * rate);
+        }
+
+        /// <summary>
+        /// Make armor - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<DamageElement, float> MakeArmor(ArmorIncremental source, short level, float rate)
         {
             if (source.damageElement == null)
                 return new KeyValuePair<DamageElement, float>();
@@ -623,6 +692,54 @@ namespace MultiplayerARPG
                 {
                     pair = MakeResistance(sourceIncremental, level, rate);
                     targetDictionary = CombineResistances(targetDictionary, pair);
+                }
+            }
+            return targetDictionary;
+        }
+
+
+        /// <summary>
+        /// Combine armor amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> CombineArmors(ArmorAmount[] sourceAmounts, Dictionary<DamageElement, float> targetDictionary, float rate)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, float>();
+            if (sourceAmounts != null)
+            {
+                KeyValuePair<DamageElement, float> pair;
+                foreach (ArmorAmount sourceAmount in sourceAmounts)
+                {
+                    pair = MakeArmor(sourceAmount, rate);
+                    targetDictionary = CombineArmors(targetDictionary, pair);
+                }
+            }
+            return targetDictionary;
+        }
+
+        /// <summary>
+        /// Combine armor amounts dictionary
+        /// </summary>
+        /// <param name="sourceIncrementals"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> CombineArmors(ArmorIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level, float rate)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, float>();
+            if (sourceIncrementals != null)
+            {
+                KeyValuePair<DamageElement, float> pair;
+                foreach (ArmorIncremental sourceIncremental in sourceIncrementals)
+                {
+                    pair = MakeArmor(sourceIncremental, level, rate);
+                    targetDictionary = CombineArmors(targetDictionary, pair);
                 }
             }
             return targetDictionary;

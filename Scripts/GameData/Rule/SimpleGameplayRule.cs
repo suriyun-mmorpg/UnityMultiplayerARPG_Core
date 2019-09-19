@@ -118,14 +118,19 @@ namespace MultiplayerARPG
 
         public override float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, DamageElement damageElement)
         {
-            if (damageElement == null || damageElement == GameInstance.Singleton.DefaultDamageElement)
-                return damageAmount -= damageReceiver.CacheStats.armor; // If armor is minus value, damage will be increased
-            Dictionary<DamageElement, float> resistances = damageReceiver.CacheResistances;
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            // Reduce damage by resistance
             float resistanceAmount = 0f;
-            resistances.TryGetValue(damageElement, out resistanceAmount);
+            damageReceiver.CacheResistances.TryGetValue(damageElement, out resistanceAmount);
             if (resistanceAmount > damageElement.maxResistanceAmount)
                 resistanceAmount = damageElement.maxResistanceAmount;
-            return damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
+            damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
+            // Reduce damage by armor
+            float armorAmount = 0f;
+            damageReceiver.CacheArmors.TryGetValue(damageElement, out resistanceAmount);
+            damageAmount *= 100f / (100f + armorAmount);
+            return damageAmount;
         }
 
         public override float GetRecoveryHpPerSeconds(BaseCharacterEntity character)

@@ -37,6 +37,7 @@ namespace MultiplayerARPG
         protected Dictionary<Attribute, short> cacheAttributes;
         protected Dictionary<Skill, short> cacheSkills;
         protected Dictionary<DamageElement, float> cacheResistances;
+        protected Dictionary<DamageElement, float> cacheArmors;
         protected Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
         protected Dictionary<EquipmentSet, int> cacheEquipmentSets;
         protected int cacheMaxHp;
@@ -51,6 +52,7 @@ namespace MultiplayerARPG
         public Dictionary<Attribute, short> CacheAttributes { get { return cacheAttributes; } }
         public Dictionary<Skill, short> CacheSkills { get { return cacheSkills; } }
         public Dictionary<DamageElement, float> CacheResistances { get { return cacheResistances; } }
+        public Dictionary<DamageElement, float> CacheArmors { get { return cacheArmors; } }
         public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get { return cacheIncreaseDamages; } }
         public Dictionary<EquipmentSet, int> CacheEquipmentSets { get { return cacheEquipmentSets; } }
         public int CacheMaxHp { get { return cacheMaxHp; } }
@@ -88,6 +90,8 @@ namespace MultiplayerARPG
                 cacheAttributes = new Dictionary<Attribute, short>();
             if (cacheResistances == null)
                 cacheResistances = new Dictionary<DamageElement, float>();
+            if (cacheArmors == null)
+                cacheArmors = new Dictionary<DamageElement, float>();
             if (cacheIncreaseDamages == null)
                 cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
             if (cacheSkills == null)
@@ -99,6 +103,7 @@ namespace MultiplayerARPG
                 out cacheStats,
                 cacheAttributes,
                 cacheResistances,
+                cacheArmors,
                 cacheIncreaseDamages,
                 cacheSkills,
                 cacheEquipmentSets,

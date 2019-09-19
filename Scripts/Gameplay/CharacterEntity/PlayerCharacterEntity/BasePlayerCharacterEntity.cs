@@ -25,7 +25,6 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.tag = gameInstance.playerTag;
-            MigrateDatabase();
         }
 
         protected override void EntityUpdate()
@@ -37,35 +36,6 @@ namespace MultiplayerARPG
                 SetTargetEntity(null);
                 return;
             }
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-#if UNITY_EDITOR
-            if (database != null && !(database is PlayerCharacter))
-            {
-                Debug.LogError("[BasePlayerCharacterEntity] " + name + " Database must be `PlayerCharacter`");
-                database = null;
-                EditorUtility.SetDirty(this);
-            }
-            if (MigrateDatabase())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateDatabase()
-        {
-            bool hasChanges = false;
-            if (database != null && database is PlayerCharacter)
-            {
-                List<PlayerCharacter> list = playerCharacters == null ? new List<PlayerCharacter>() : new List<PlayerCharacter>(playerCharacters);
-                list.Add(database as PlayerCharacter);
-                playerCharacters = list.ToArray();
-                database = null;
-                hasChanges = true;
-            }
-            return hasChanges;
         }
 
         protected override void ApplySkill(Skill skill, short level, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)

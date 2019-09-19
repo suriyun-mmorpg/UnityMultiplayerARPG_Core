@@ -15,10 +15,6 @@ namespace MultiplayerARPG
         [Header("Character Entity - UI Elements")]
         public TextWrapper uiTextLevel;
         // Mp
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextMp;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageMpGage;
         public UIGageValue uiGageMp;
         // Skill cast
         public GameObject uiSkillCastContainer;
@@ -30,12 +26,6 @@ namespace MultiplayerARPG
         protected int maxMp;
         protected float castingSkillCountDown;
         protected float castingSkillDuration;
-
-        protected override bool MigrateUIGageValue()
-        {
-            return UIGageValue.Migrate(ref uiGageHp, ref uiTextHp, ref imageHpGage) ||
-                UIGageValue.Migrate(ref uiGageMp, ref uiTextMp, ref imageMpGage);
-        }
 
         protected override void Update()
         {

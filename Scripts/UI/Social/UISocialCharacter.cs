@@ -19,16 +19,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
         // HP
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextHp;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageHpGage;
         public UIGageValue uiGageHp;
         // MP
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextMp;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageMpGage;
         public UIGageValue uiGageMp;
 
         public UICharacterBuffs uiCharacterBuffs;
@@ -42,20 +34,6 @@ namespace MultiplayerARPG
         [Tooltip("These objects will be activated when this social member is not leader")]
         public GameObject[] memberIsNotLeaderObjects;
         public UICharacterClass uiCharacterClass;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            MigrateUIGageValue();
-        }
-
-        protected void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (MigrateUIGageValue())
-                EditorUtility.SetDirty(this);
-#endif
-        }
 
         protected override void Update()
         {
@@ -75,12 +53,6 @@ namespace MultiplayerARPG
             }
 
             BaseGameNetworkManager.RequestOnlineCharacter(Data.socialCharacter.id);
-        }
-
-        private bool MigrateUIGageValue()
-        {
-            return UIGageValue.Migrate(ref uiGageHp, ref uiTextHp, ref imageHpGage) ||
-                UIGageValue.Migrate(ref uiGageMp, ref uiTextMp, ref imageMpGage);
         }
 
         protected override void UpdateData()

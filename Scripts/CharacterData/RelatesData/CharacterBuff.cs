@@ -55,6 +55,8 @@ public class CharacterBuff : INetSerializableWithElement
     [System.NonSerialized]
     private Dictionary<DamageElement, float> cacheIncreaseResistances;
     [System.NonSerialized]
+    private Dictionary<DamageElement, float> cacheIncreaseArmors;
+    [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
     [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
@@ -87,6 +89,7 @@ public class CharacterBuff : INetSerializableWithElement
             cacheIncreaseStats = new CharacterStats();
             cacheIncreaseAttributes = null;
             cacheIncreaseResistances = null;
+            cacheIncreaseArmors = null;
             cacheIncreaseDamages = null;
             cacheDamageOverTimes = null;
             switch (type)
@@ -114,6 +117,7 @@ public class CharacterBuff : INetSerializableWithElement
             cacheIncreaseStats = cacheBuff.GetIncreaseStats(level);
             cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
             cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
+            cacheIncreaseArmors = cacheBuff.GetIncreaseArmors(level);
             cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
             cacheDamageOverTimes = cacheBuff.GetDamageOverTimes(level);
         }
@@ -195,6 +199,12 @@ public class CharacterBuff : INetSerializableWithElement
     {
         MakeCache();
         return cacheIncreaseResistances;
+    }
+
+    public Dictionary<DamageElement, float> GetIncreaseArmors()
+    {
+        MakeCache();
+        return cacheIncreaseArmors;
     }
 
     public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()

@@ -11,10 +11,6 @@ namespace MultiplayerARPG
     {
         [Header("Damageable Entity - UI Elements")]
         // HP
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextHp;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageHpGage;
         public UIGageValue uiGageHp;
 
         protected int currentHp;
@@ -23,25 +19,6 @@ namespace MultiplayerARPG
         [Header("Options")]
         [Tooltip("Visible when hit duration for non owning character")]
         public float visibleWhenHitDuration = 2f;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            MigrateUIGageValue();
-        }
-
-        protected void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (MigrateUIGageValue())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        protected virtual bool MigrateUIGageValue()
-        {
-            return UIGageValue.Migrate(ref uiGageHp, ref uiTextHp, ref imageHpGage);
-        }
 
         protected override void Update()
         {

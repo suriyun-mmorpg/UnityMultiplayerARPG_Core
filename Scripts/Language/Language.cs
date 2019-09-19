@@ -96,11 +96,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Format => {0} = {Amount}
         /// </summary>
-        UI_FORMAT_ARMOR,
-        /// <summary>
-        /// Format => {0} = {Amount}
-        /// </summary>
-        UI_FORMAT_ACCURACY,
+        UI_FORMAT_ACCURACY = 26,
         /// <summary>
         /// Format => {0} = {Amount}
         /// </summary>
@@ -523,6 +519,11 @@ namespace MultiplayerARPG
         UI_FRIEND_ADD_DESCRIPTION,
         UI_FRIEND_REMOVE,
         UI_FRIEND_REMOVE_DESCRIPTION,
+        // Format - Armor Amount
+        /// <summary>
+        /// Format => {0} = {Armor Title}, {1} = {Target Amount}
+        /// </summary>
+        UI_FORMAT_ARMOR_AMOUNT,
     }
 
     public static class DefaultLocale
@@ -612,7 +613,6 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_FORMAT_STAMINA.ToString(), "Stamina: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_FOOD.ToString(), "Food: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_WATER.ToString(), "Water: {0}");
-            Texts.Add(UILocaleKeys.UI_FORMAT_ARMOR.ToString(), "Armor: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_ACCURACY.ToString(), "Accuracy: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_EVASION.ToString(), "Evasion: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_CRITICAL_RATE.ToString(), "Cri. Rate: {0}%");
@@ -677,6 +677,8 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_FORMAT_ATTRIBUTE_AMOUNT.ToString(), "{0}: {1}");
             // Format - Resistance Amount
             Texts.Add(UILocaleKeys.UI_FORMAT_RESISTANCE_AMOUNT.ToString(), "{0}: {1}");
+            // Format - Armor Amount
+            Texts.Add(UILocaleKeys.UI_FORMAT_ARMOR_AMOUNT.ToString(), "{0}: {1}");
             // Format - Skill Level
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_SKILL.ToString(), "{0}: {1}/{2}");
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");

@@ -12,18 +12,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyAppliedEffect = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT);
         [Tooltip("Format => {0} = {Equip Amount}, {1} = {List Of Bonus}")]
         public UILocaleKeySetting formatKeyUnappliedEffect = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT);
-
-        // TODO: This is deprecated
-        [HideInInspector]
-        public TextWrapper uiTextAllEffects;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            if (uiTextAllBonus == null && uiTextAllEffects != null)
-                uiTextAllBonus = uiTextAllEffects;
-        }
-
+        
         protected override void UpdateData()
         {
             string allBonusText = string.Empty;

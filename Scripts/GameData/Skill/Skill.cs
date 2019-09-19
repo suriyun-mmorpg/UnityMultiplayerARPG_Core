@@ -113,6 +113,12 @@ namespace MultiplayerARPG
             }
         }
 
+        public override bool Validate()
+        {
+            return GameDataMigration.MigrateBuffArmor(buff, out buff) ||
+                GameDataMigration.MigrateBuffArmor(debuff, out debuff);
+        }
+
         /// <summary>
         /// Return TRUE if this will override default apply skill function
         /// </summary>

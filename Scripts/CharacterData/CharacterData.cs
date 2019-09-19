@@ -336,6 +336,16 @@ public partial class CharacterData : ICharacterData
         }
     }
 
+    private Dictionary<DamageElement, float> cacheArmors;
+    public Dictionary<DamageElement, float> CacheArmors
+    {
+        get
+        {
+            MakeCaches();
+            return cacheArmors;
+        }
+    }
+
     private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
     public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages
     {
@@ -450,6 +460,8 @@ public partial class CharacterData : ICharacterData
             cacheAttributes = new Dictionary<Attribute, short>();
         if (cacheResistances == null)
             cacheResistances = new Dictionary<DamageElement, float>();
+        if (cacheArmors == null)
+            cacheArmors = new Dictionary<DamageElement, float>();
         if (cacheIncreaseDamages == null)
             cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
         if (cacheSkills == null)
@@ -461,6 +473,7 @@ public partial class CharacterData : ICharacterData
             out cacheStats,
             cacheAttributes,
             cacheResistances,
+            cacheArmors,
             cacheIncreaseDamages,
             cacheSkills,
             cacheEquipmentSets,

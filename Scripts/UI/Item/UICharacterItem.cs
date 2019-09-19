@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -74,6 +77,9 @@ namespace MultiplayerARPG
         public UICharacterStats uiStats;
         public UIAttributeAmounts uiIncreaseAttributes;
         public UIResistanceAmounts uiIncreaseResistances;
+        public UIArmorAmounts uiIncreaseArmors;
+        public UIDamageElementAmounts uiIncreaseDamages;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public UIDamageElementAmounts uiIncreaseDamageAmounts;
         public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
@@ -119,6 +125,31 @@ namespace MultiplayerARPG
         public bool IsSetupAsEquipSlot { get; private set; }
         public string EquipPosition { get; private set; }
         public byte EquipSlotIndex { get; private set; }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            MigrateFields();
+        }
+
+        protected void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (MigrateFields())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateFields()
+        {
+            if (uiIncreaseDamageAmounts != null)
+            {
+                uiIncreaseDamages = uiIncreaseDamageAmounts;
+                uiIncreaseDamageAmounts = null;
+                return true;
+            }
+            return false;
+        }
 
         public void SetupAsEquipSlot(string equipPosition, byte equipSlotIndex)
         {
@@ -471,6 +502,26 @@ namespace MultiplayerARPG
                 }
             }
 
+            if (uiIncreaseArmors != null)
+            {
+                Dictionary<DamageElement, float> armors = null;
+                if (EquipmentItem != null)
+                    armors = EquipmentItem.GetIncreaseArmors(Level, CharacterItem.GetEquipmentBonusRate());
+                else if (SocketEnhancerItem != null)
+                    armors = GameDataHelpers.CombineArmors(SocketEnhancerItem.socketEnhanceEffect.armors, armors, 1f);
+
+                if (armors == null || armors.Count == 0)
+                {
+                    // Hide ui if armors is empty
+                    uiIncreaseArmors.Hide();
+                }
+                else
+                {
+                    uiIncreaseArmors.Show();
+                    uiIncreaseArmors.Data = armors;
+                }
+            }
+
             if (uiIncreaseDamageAmounts != null)
             {
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
@@ -545,7 +596,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiDamageAmounts.Show();
-                    KeyValuePair<DamageElement, MinMaxFloat> keyValuePair = WeaponItem.GetDamageAmount(Level, CharacterItem.GetEquipmentBonusRate(), null);
+                    KeyValuePair<DamageElement, MinMaxFloat> keyValuePair = CharacterItem.GetDamageAmount(null);
                     uiDamageAmounts.Data = new UIDamageElementAmountData(keyValuePair.Key, keyValuePair.Value);
                 }
             }

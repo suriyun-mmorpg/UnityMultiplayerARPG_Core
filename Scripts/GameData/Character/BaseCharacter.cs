@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         private AttributeIncremental[] attributes;
         [SerializeField]
         private ResistanceIncremental[] resistances;
+        [SerializeField]
+        private ArmorIncremental[] armors;
 
         public virtual CharacterStatsIncremental Stats
         {
@@ -29,7 +31,17 @@ namespace MultiplayerARPG
             get { return resistances; }
         }
 
+        public virtual ArmorIncremental[] Armors
+        {
+            get { return armors; }
+        }
+
         public abstract Dictionary<Skill, short> CacheSkillLevels { get; }
+
+        public override bool Validate()
+        {
+            return GameDataMigration.MigrateArmor(stats, armors, out stats, out armors);
+        }
 
         public CharacterStats GetCharacterStats(short level)
         {
@@ -44,6 +56,11 @@ namespace MultiplayerARPG
         public Dictionary<DamageElement, float> GetCharacterResistances(short level)
         {
             return GameDataHelpers.CombineResistances(Resistances, new Dictionary<DamageElement, float>(), level, 1f);
+        }
+
+        public Dictionary<DamageElement, float> GetCharacterArmors(short level)
+        {
+            return GameDataHelpers.CombineArmors(Armors, new Dictionary<DamageElement, float>(), level, 1f);
         }
     }
 }

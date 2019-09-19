@@ -32,6 +32,7 @@ namespace MultiplayerARPG
         public UICharacterStats uiBuffStats;
         public UIAttributeAmounts uiBuffAttributes;
         public UIResistanceAmounts uiBuffResistances;
+        public UIArmorAmounts uiBuffArmors;
         public UIDamageElementAmounts uiBuffDamages;
 
         protected override void UpdateData()
@@ -98,6 +99,9 @@ namespace MultiplayerARPG
 
             if (uiBuffResistances != null)
                 uiBuffResistances.Data = GameDataHelpers.CombineResistances(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);
+
+            if (uiBuffArmors != null)
+                uiBuffArmors.Data = GameDataHelpers.CombineArmors(Buff.increaseArmors, new Dictionary<DamageElement, float>(), Level, 1f);
 
             if (uiBuffDamages != null)
                 uiBuffDamages.Data = GameDataHelpers.CombineDamages(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);

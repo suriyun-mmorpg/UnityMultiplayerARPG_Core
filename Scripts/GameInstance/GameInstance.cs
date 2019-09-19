@@ -161,6 +161,7 @@ namespace MultiplayerARPG
 
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Item> Items = new Dictionary<int, Item>();
+        public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
         public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
@@ -439,7 +440,7 @@ namespace MultiplayerARPG
 
             return mapIds;
         }
-        
+
         /// <summary>
         /// All layers except `nonTargetingLayers`, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
         /// </summary>
@@ -545,6 +546,7 @@ namespace MultiplayerARPG
             {
                 if (attribute == null || Attributes.ContainsKey(attribute.DataId))
                     continue;
+                attribute.Validate();
                 Attributes[attribute.DataId] = attribute;
             }
         }
@@ -553,6 +555,7 @@ namespace MultiplayerARPG
         {
             if (items == null)
                 return;
+            List<ArmorType> armorTypes = new List<ArmorType>();
             List<WeaponType> weaponTypes = new List<WeaponType>();
             List<BuildingEntity> buildingEntities = new List<BuildingEntity>();
             List<SkillLevel> skillLevels = new List<SkillLevel>();
@@ -560,7 +563,14 @@ namespace MultiplayerARPG
             {
                 if (item == null || Items.ContainsKey(item.DataId))
                     continue;
+                item.Validate();
                 Items[item.DataId] = item;
+                // Validate equipment set
+                if (item.equipmentSet != null)
+                    item.equipmentSet.Validate();
+                // Add armor types
+                if (item.armorType != null)
+                    armorTypes.Add(item.armorType);
                 // Add weapon types
                 if (item.weaponType != null)
                     weaponTypes.Add(item.weaponType);
@@ -571,6 +581,7 @@ namespace MultiplayerARPG
                 skillLevels.AddRange(item.increaseSkillLevels);
                 skillLevels.Add(item.skillLevel);
             }
+            AddArmorTypes(armorTypes);
             AddWeaponTypes(weaponTypes);
             AddBuildingEntities(buildingEntities);
             AddSkillLevels(skillLevels);
@@ -586,10 +597,9 @@ namespace MultiplayerARPG
             {
                 if (character == null || Characters.ContainsKey(character.DataId))
                     continue;
-
+                character.Validate();
                 Characters[character.DataId] = character;
                 skills.AddRange(character.CacheSkillLevels.Keys);
-
                 if (character is PlayerCharacter)
                 {
                     PlayerCharacter playerCharacter = character as PlayerCharacter;
@@ -599,8 +609,7 @@ namespace MultiplayerARPG
                 {
                     MonsterCharacter monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
-                    if (monsterCharacter.damageInfo != null)
-                        damageInfos.Add(monsterCharacter.damageInfo);
+                    damageInfos.Add(monsterCharacter.damageInfo);
                 }
             }
             AddSkills(skills);
@@ -669,9 +678,9 @@ namespace MultiplayerARPG
             {
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
+                skill.Validate();
                 Skills[skill.DataId] = skill;
-                if (skill.damageInfo != null)
-                    damageInfos.Add(skill.damageInfo);
+                damageInfos.Add(skill.damageInfo);
             }
             AddDamageInfos(damageInfos);
         }
@@ -695,6 +704,7 @@ namespace MultiplayerARPG
                     }
                     AddNpcDialogs(menuDialogs);
                 }
+                npcDialog.Validate();
                 NpcDialogs[npcDialog.DataId] = npcDialog;
             }
         }
@@ -707,6 +717,7 @@ namespace MultiplayerARPG
             {
                 if (quest == null || Quests.ContainsKey(quest.DataId))
                     continue;
+                quest.Validate();
                 Quests[quest.DataId] = quest;
             }
         }
@@ -719,6 +730,7 @@ namespace MultiplayerARPG
             {
                 if (guildSkill == null || GuildSkills.ContainsKey(guildSkill.DataId))
                     continue;
+                guildSkill.Validate();
                 GuildSkills[guildSkill.DataId] = guildSkill;
             }
         }
@@ -730,8 +742,6 @@ namespace MultiplayerARPG
             List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
             foreach (DamageInfo damageInfo in damageInfos)
             {
-                if (damageInfo == null)
-                    continue;
                 if (damageInfo.missileDamageEntity != null)
                     damageEntities.Add(damageInfo.missileDamageEntity);
             }
@@ -786,6 +796,19 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddArmorTypes(IEnumerable<ArmorType> armorTypes)
+        {
+            if (armorTypes == null)
+                return;
+            foreach (ArmorType armorType in armorTypes)
+            {
+                if (armorType == null || ArmorTypes.ContainsKey(armorType.DataId))
+                    continue;
+                armorType.Validate();
+                ArmorTypes[armorType.DataId] = armorType;
+            }
+        }
+
         public static void AddWeaponTypes(IEnumerable<WeaponType> weaponTypes)
         {
             if (weaponTypes == null)
@@ -795,9 +818,9 @@ namespace MultiplayerARPG
             {
                 if (weaponType == null || WeaponTypes.ContainsKey(weaponType.DataId))
                     continue;
+                weaponType.Validate();
                 WeaponTypes[weaponType.DataId] = weaponType;
-                if (weaponType.damageInfo != null)
-                    damageInfos.Add(weaponType.damageInfo);
+                damageInfos.Add(weaponType.damageInfo);
             }
             AddDamageInfos(damageInfos);
         }
@@ -858,6 +881,7 @@ namespace MultiplayerARPG
             {
                 if (mapInfo == null || !mapInfo.IsSceneSet())
                     continue;
+                mapInfo.Validate();
                 MapInfos[mapInfo.Id] = mapInfo;
             }
         }
@@ -870,6 +894,7 @@ namespace MultiplayerARPG
             {
                 if (faction == null)
                     continue;
+                faction.Validate();
                 Factions[faction.DataId] = faction;
             }
         }

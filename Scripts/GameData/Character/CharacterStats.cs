@@ -3,13 +3,14 @@
 namespace MultiplayerARPG
 {
     [System.Serializable]
+#pragma warning disable CS0282 // There is no defined ordering between fields in multiple declarations of partial struct
     public partial struct CharacterStats
+#pragma warning restore CS0282 // There is no defined ordering between fields in multiple declarations of partial struct
     {
         public static readonly CharacterStats Empty = new CharacterStats();
         [Header("Default Stats")]
         public float hp;
         public float mp;
-        public float armor;
         public float accuracy;
         public float evasion;
         public float criRate;
@@ -23,12 +24,14 @@ namespace MultiplayerARPG
         public float stamina;
         public float food;
         public float water;
+        // TODO: This is deprecated, will be removed later
+        [Header("Deprecated")]
+        public float armor;
 
         public CharacterStats Add(CharacterStats b)
         {
             hp = hp + b.hp;
             mp = mp + b.mp;
-            armor = armor + b.armor;
             accuracy = accuracy + b.accuracy;
             evasion = evasion + b.evasion;
             criRate = criRate + b.criRate;
@@ -49,7 +52,6 @@ namespace MultiplayerARPG
         {
             hp = hp * multiplier;
             mp = mp * multiplier;
-            armor = armor * multiplier;
             accuracy = accuracy * multiplier;
             evasion = evasion * multiplier;
             criRate = criRate * multiplier;
@@ -80,7 +82,6 @@ namespace MultiplayerARPG
             CharacterStats data,
             string hpStatsFormat,
             string mpStatsFormat,
-            string armorStatsFormat,
             string accuracyStatsFormat,
             string evasionStatsFormat,
             string criRateStatsFormat,
@@ -137,19 +138,6 @@ namespace MultiplayerARPG
             }
             if (uiTextMp != null)
                 uiTextMp.text = statsStringPart;
-
-            // Armor
-            statsStringPart = string.Format(
-                LanguageManager.GetText(armorStatsFormat),
-                data.armor.ToString("N0"));
-            if (data.armor != 0)
-            {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
-            }
-            if (uiTextArmor != null)
-                uiTextArmor.text = statsStringPart;
 
             // Accuracy
             statsStringPart = string.Format(

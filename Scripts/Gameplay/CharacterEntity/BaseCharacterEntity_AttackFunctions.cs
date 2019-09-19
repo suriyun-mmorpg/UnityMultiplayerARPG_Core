@@ -32,8 +32,9 @@ namespace MultiplayerARPG
         {
             Item weaponItem = weapon.GetWeaponItem();
             damageInfo = weaponItem.WeaponType.damageInfo;
+            allDamageAmounts = null;
             // Calculate all damages
-            allDamageAmounts = GameDataHelpers.CombineDamages(null, weaponItem.GetDamageAmount(weapon.level, weapon.GetEquipmentBonusRate(), this));
+            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, weapon.GetDamageAmount(this));
             // Sum damage with buffs
             allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, CacheIncreaseDamages);
         }

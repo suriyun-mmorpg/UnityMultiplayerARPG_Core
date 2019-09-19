@@ -34,16 +34,6 @@ namespace MultiplayerARPG
         public bool isInSafeArea;
 
         #region Serialize data
-        [HideInInspector]
-        // TODO: This will be made as private variable later
-        public BaseCharacter database;
-        [HideInInspector]
-        // TODO: This will be removed later
-        public Transform uiElementTransform;
-        [HideInInspector]
-        // TODO: This will be removed later
-        public Transform miniMapElementContainer;
-
         [Header("Character Settings")]
         [Tooltip("When character attack with melee weapon, it will cast sphere from this transform to detect hit objects")]
         public Transform meleeDamageTransform;
@@ -163,7 +153,6 @@ namespace MultiplayerARPG
             gameObject.layer = gameInstance.characterLayer;
             animActionType = AnimActionType.None;
             isRecaching = true;
-            MigrateTransforms();
             HitBoxes = GetComponentsInChildren<CharacterHitBox>();
         }
 
@@ -171,9 +160,6 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (MigrateTransforms())
-                EditorUtility.SetDirty(this);
-
             if (model != ModelManager.ActiveModel)
             {
                 model = ModelManager.ActiveModel;
@@ -214,24 +200,6 @@ namespace MultiplayerARPG
             }
         }
 #endif
-
-        private bool MigrateTransforms()
-        {
-            bool hasChanges = false;
-            if (uiElementTransform != null)
-            {
-                characterUITransform = uiElementTransform;
-                uiElementTransform = null;
-                hasChanges = true;
-            }
-            if (miniMapElementContainer != null)
-            {
-                miniMapUITransform = miniMapElementContainer;
-                miniMapElementContainer = null;
-                hasChanges = true;
-            }
-            return hasChanges;
-        }
 
         protected override void EntityUpdate()
         {

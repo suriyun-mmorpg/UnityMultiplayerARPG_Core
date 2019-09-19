@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -12,7 +10,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class DamageInfo
+    public struct DamageInfo
     {
         public DamageType damageType;
 
@@ -21,15 +19,15 @@ namespace MultiplayerARPG
         public bool hitOnlySelectedTarget;
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee" })]
-        public float hitDistance = 1f;
+        public float hitDistance;
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee" })]
         [Range(10f, 360f)]
         public float hitFov;
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "Raycast" })]
-        public float missileDistance = 5f;
+        public float missileDistance;
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "Raycast" })]
-        public float missileSpeed = 5f;
+        public float missileSpeed;
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile" })]
         public MissileDamageEntity missileDamageEntity;
 

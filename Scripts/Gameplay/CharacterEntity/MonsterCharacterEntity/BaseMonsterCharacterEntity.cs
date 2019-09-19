@@ -76,8 +76,6 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.tag = gameInstance.monsterTag;
-            MigrateDatabase();
-            MigrateFields();
         }
 
         protected override void EntityStart()
@@ -105,58 +103,6 @@ namespace MultiplayerARPG
                     UnSummon();
                 }
             }
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-#if UNITY_EDITOR
-            if (database != null && !(database is MonsterCharacter))
-            {
-                Debug.LogError("[BaseMonsterCharacterEntity] " + name + " Database must be `MonsterCharacter`");
-                database = null;
-                EditorUtility.SetDirty(this);
-            }
-            if (MigrateDatabase() || MigrateFields())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateDatabase()
-        {
-            bool hasChanges = false;
-            if (database != null && database is MonsterCharacter)
-            {
-                monsterCharacter = database as MonsterCharacter;
-                database = null;
-                hasChanges = true;
-            }
-            return hasChanges;
-        }
-
-        private bool MigrateFields()
-        {
-            bool hasChanges = false;
-            if (monsterCharacter != null)
-            {
-                if (monsterCharacter.deadHideDelay > 0)
-                {
-                    destroyDelay = monsterCharacter.deadHideDelay;
-                    monsterCharacter.deadHideDelay = -1;
-                    hasChanges = true;
-                }
-                if (monsterCharacter.deadRespawnDelay > 0)
-                {
-                    destroyRespawnDelay = monsterCharacter.deadRespawnDelay;
-                    monsterCharacter.deadRespawnDelay = -1;
-                    hasChanges = true;
-                }
-#if UNITY_EDITOR
-                if (hasChanges)
-                    EditorUtility.SetDirty(monsterCharacter);
-#endif
-            }
-            return hasChanges;
         }
 
         protected void InitStats()

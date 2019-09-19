@@ -44,17 +44,9 @@ namespace MultiplayerARPG
         public ItemRefine itemRefine;
         [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
         public float lockDuration;
-        
+
         [Header("Equipment Configs")]
-        public EquipmentModel[] equipmentModels;
-        [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
-        public EquipmentModel[] subEquipmentModels;
         public EquipmentRequirement requirement;
-        public CharacterStatsIncremental increaseStats;
-        public AttributeIncremental[] increaseAttributes;
-        public ResistanceIncremental[] increaseResistances;
-        public DamageIncremental[] increaseDamages;
-        public SkillLevel[] increaseSkillLevels;
         public EquipmentSet equipmentSet;
         [Tooltip("Equipment durability, If this set to 0 it will not broken")]
         [Range(0f, 1000f)]
@@ -64,16 +56,17 @@ namespace MultiplayerARPG
         [Range(0, 6)]
         public byte maxSocket;
 
-        [Header("Armor Configs")]
+        [Header("Armor/Shield Configs")]
         public ArmorType armorType;
+        public ArmorIncremental armorAmount;
 
         [Header("Weapon Configs")]
         public WeaponType weaponType;
+        public DamageIncremental damageAmount;
+        public IncrementalMinMaxFloat harvestDamageAmount;
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while attacking with this weapon")]
         public float moveSpeedRateWhileAttacking = 0f;
-        public DamageIncremental damageAmount;
-        public IncrementalMinMaxFloat harvestDamageAmount;
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
         public short ammoCapacity;
         public BaseWeaponAbility weaponAbility;
@@ -85,10 +78,24 @@ namespace MultiplayerARPG
             minSpread = 10f,
             maxSpread = 50f
         };
+
+        [Header("Equipment Bonus Stats")]
+        public CharacterStatsIncremental increaseStats;
+        public AttributeIncremental[] increaseAttributes;
+        public ResistanceIncremental[] increaseResistances;
+        public ArmorIncremental[] increaseArmors;
+        public DamageIncremental[] increaseDamages;
+        public SkillLevel[] increaseSkillLevels;
+
         [Header("Fire Configs")]
         public FireType fireType;
         public Vector2 fireStagger;
         public byte fireSpread;
+
+        [Header("Equip Models")]
+        public EquipmentModel[] equipmentModels;
+        [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
+        public EquipmentModel[] subEquipmentModels;
 
         [Header("Buff Configs")]
         public Buff buff;
@@ -133,9 +140,8 @@ namespace MultiplayerARPG
                 return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + itemRefine.title + "</color>";
             }
         }
-
-#if UNITY_EDITOR
-        protected virtual void OnValidate()
+        
+        public override bool Validate()
         {
             bool hasChanges = false;
             // Equipment / Pet max stack always equals to 1
@@ -167,11 +173,12 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-            // Mark asset to be dirty when chagnes occured
-            if (hasChanges)
-                EditorUtility.SetDirty(this);
+            // Migrate character stats → armor (equipment)
+            GameDataMigration.MigrateArmor(increaseStats, increaseArmors, out increaseStats, out increaseArmors);
+            // Migrate character stats → armor (armor)
+            GameDataMigration.MigrateBuffArmor(buff, out buff);
+            return hasChanges;
         }
-#endif
 
         public bool IsEquipment()
         {
@@ -363,6 +370,7 @@ namespace MultiplayerARPG
         public CharacterStats stats;
         public AttributeAmount[] attributes;
         public ResistanceAmount[] resistances;
+        public ArmorAmount[] armors;
         public DamageAmount[] damages;
         public SkillLevel[] skills;
     }

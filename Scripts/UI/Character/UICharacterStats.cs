@@ -10,8 +10,6 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyMpStats = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_MP);
         [Tooltip("Format => {0} = {Amount}")]
-        public UILocaleKeySetting formatKeyArmorStats = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ARMOR);
-        [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyAccuracyStats = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ACCURACY);
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyEvasionStats = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EVASION);
@@ -60,7 +58,6 @@ namespace MultiplayerARPG
                 Data,
                 formatKeyHpStats,
                 formatKeyMpStats,
-                formatKeyArmorStats,
                 formatKeyAccuracyStats,
                 formatKeyEvasionStats,
                 formatKeyCriRateStats,

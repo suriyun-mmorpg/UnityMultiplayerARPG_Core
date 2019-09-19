@@ -47,8 +47,6 @@ namespace MultiplayerARPG
         public NpcDialog questDeclinedDialog;
         public NpcDialog questAbandonedDialog;
         public NpcDialog questCompletedDialog;
-        [HideInInspector]
-        public NpcDialog questCompletedDailog;
         // Shop
         public NpcSellItem[] sellItems;
         // Craft Item
@@ -68,18 +66,6 @@ namespace MultiplayerARPG
         public NpcDialog warpCancelDialog;
         // Teleport
         public NpcDialog storageCancelDialog;
-
-        private void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (questCompletedDailog != null)
-            {
-                questCompletedDialog = questCompletedDailog;
-                questCompletedDailog = null;
-                EditorUtility.SetDirty(this);
-            }
-#endif
-        }
     }
 
     public enum NpcDialogConditionType : byte

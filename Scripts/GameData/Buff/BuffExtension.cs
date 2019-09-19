@@ -52,6 +52,11 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineResistances(buff.increaseResistances, new Dictionary<DamageElement, float>(), level, 1f);
         }
 
+        public static Dictionary<DamageElement, float> GetIncreaseArmors(this Buff buff, short level)
+        {
+            return GameDataHelpers.CombineArmors(buff.increaseArmors, new Dictionary<DamageElement, float>(), level, 1f);
+        }
+
         public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Buff buff, short level)
         {
             return GameDataHelpers.CombineDamages(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);

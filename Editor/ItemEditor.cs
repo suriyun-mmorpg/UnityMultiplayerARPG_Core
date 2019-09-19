@@ -21,11 +21,13 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.requirement));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseAttributes));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseResistances));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseArmors));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseStats));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseSkillLevels));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.equipmentSet));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.armorType));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.armorAmount));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.maxDurability));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.destroyIfBroken));
             // Weapon
@@ -35,14 +37,15 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.requirement));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseAttributes));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseResistances));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseArmors));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseStats));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseSkillLevels));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.equipmentSet));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.weaponType));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.moveSpeedRateWhileAttacking));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.damageAmount));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.harvestDamageAmount));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.moveSpeedRateWhileAttacking));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.ammoCapacity));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.weaponAbility));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.crosshairSetting));
@@ -57,10 +60,12 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.requirement));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseAttributes));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseResistances));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseArmors));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseStats));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseSkillLevels));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.equipmentSet));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.armorAmount));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.maxDurability));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.destroyIfBroken));
             // Potion

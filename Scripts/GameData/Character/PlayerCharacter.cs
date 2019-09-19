@@ -48,9 +48,8 @@ namespace MultiplayerARPG
                 return cacheSkillLevels;
             }
         }
-
-#if UNITY_EDITOR
-        void OnValidate()
+        
+        public override bool Validate()
         {
             bool hasChanges = false;
             Item tempRightHandWeapon = null;
@@ -131,10 +130,7 @@ namespace MultiplayerARPG
                 else
                     equipedPositions.Add(armorItem.EquipPosition);
             }
-            // Mark asset to be dirty when chagnes occured
-            if (hasChanges)
-                EditorUtility.SetDirty(this);
+            return hasChanges;
         }
-#endif
     }
 }

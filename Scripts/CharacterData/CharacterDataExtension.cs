@@ -313,6 +313,82 @@ public static partial class CharacterDataExtension
         return result;
     }
 
+    public static Dictionary<DamageElement, float> GetCharacterArmors(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<DamageElement, float>();
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        BaseCharacter character = data.GetDatabase();
+        if (character != null)
+            result = GameDataHelpers.CombineArmors(result, character.GetCharacterArmors(data.Level));
+        return result;
+    }
+
+    public static Dictionary<DamageElement, float> GetEquipmentArmors(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<DamageElement, float>();
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        // Armors
+        IList<CharacterItem> equipItems = data.EquipItems;
+        foreach (CharacterItem equipItem in equipItems)
+        {
+            if (equipItem.IsEmptySlot() || equipItem.GetDefendItem() == null) continue;
+            result = GameDataHelpers.CombineArmors(result, equipItem.GetArmorAmount());
+            result = GameDataHelpers.CombineArmors(result, equipItem.GetIncreaseArmors());
+            result = GameDataHelpers.CombineArmors(result, equipItem.GetSocketsIncreaseArmors());
+        }
+        // Right hand equipment
+        if (data.EquipWeapons.NotEmptyRightHandSlot())
+        {
+            if (data.EquipWeapons.rightHand.GetDefendItem() != null)
+                result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.rightHand.GetArmorAmount());
+            result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.rightHand.GetIncreaseArmors());
+            result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.rightHand.GetSocketsIncreaseArmors());
+        }
+        // Left hand equipment
+        if (data.EquipWeapons.NotEmptyLeftHandSlot())
+        {
+            if (data.EquipWeapons.leftHand.GetDefendItem() != null)
+                result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.leftHand.GetArmorAmount());
+            result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.leftHand.GetIncreaseArmors());
+            result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.leftHand.GetSocketsIncreaseArmors());
+        }
+        return result;
+    }
+
+    public static Dictionary<DamageElement, float> GetBuffArmors(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<DamageElement, float>();
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        IList<CharacterBuff> buffs = data.Buffs;
+        foreach (CharacterBuff buff in buffs)
+        {
+            result = GameDataHelpers.CombineArmors(result, buff.GetIncreaseArmors());
+        }
+
+        // Passive skills
+        IList<CharacterSkill> skills = data.Skills;
+        foreach (CharacterSkill skill in skills)
+        {
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
+                continue;
+            result = GameDataHelpers.CombineArmors(result, skill.GetPassiveBuffIncreaseArmors());
+        }
+        return result;
+    }
+
+    public static Dictionary<DamageElement, float> GetArmors(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    {
+        Dictionary<DamageElement, float> result = data.GetCharacterArmors();
+        if (sumWithEquipments)
+            result = GameDataHelpers.CombineArmors(result, data.GetEquipmentArmors());
+        if (sumWithBuffs)
+            result = GameDataHelpers.CombineArmors(result, data.GetBuffArmors());
+        return result;
+    }
+
     public static Dictionary<DamageElement, MinMaxFloat> GetEquipmentIncreaseDamages(this ICharacterData data)
     {
         if (data == null)
@@ -1180,14 +1256,16 @@ public static partial class CharacterDataExtension
         out CharacterStats bonusStats,
         Dictionary<Attribute, short> bonusAttributes,
         Dictionary<DamageElement, float> bonusResistances,
-        Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages,
+        Dictionary<DamageElement, float> bonusArmors,
+        Dictionary<DamageElement, MinMaxFloat> bonusDamages,
         Dictionary<Skill, short> bonusSkills,
         Dictionary<EquipmentSet, int> equipmentSets)
     {
         bonusStats = new CharacterStats();
         bonusAttributes.Clear();
         bonusResistances.Clear();
-        bonusIncreaseDamages.Clear();
+        bonusArmors.Clear();
+        bonusDamages.Clear();
         bonusSkills.Clear();
         // Equipment Set
         equipmentSets.Clear();
@@ -1225,10 +1303,11 @@ public static partial class CharacterDataExtension
                 equipmentSets.Add(tempEquipmentItem.equipmentSet, 0);
         }
         // Apply set items
-        Dictionary<Attribute, short> tempIncreaseAttributes;
-        Dictionary<DamageElement, float> tempIncreaseResistances;
-        Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages;
-        Dictionary<Skill, short> tempIncreaseSkills;
+        Dictionary<Attribute, short> tempAttributes;
+        Dictionary<DamageElement, float> tempResistances;
+        Dictionary<DamageElement, float> tempArmors;
+        Dictionary<DamageElement, MinMaxFloat> tempDamages;
+        Dictionary<Skill, short> tempSkillLevels;
         CharacterStats tempIncreaseStats;
         foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in equipmentSets)
         {
@@ -1239,16 +1318,18 @@ public static partial class CharacterDataExtension
                 if (i < effects.Length)
                 {
                     // Make temp of data
-                    tempIncreaseAttributes = GameDataHelpers.CombineAttributes(effects[i].attributes, null, 1f);
-                    tempIncreaseResistances = GameDataHelpers.CombineResistances(effects[i].resistances, null, 1f);
-                    tempIncreaseDamages = GameDataHelpers.CombineDamages(effects[i].damages, null, 1f);
-                    tempIncreaseSkills = GameDataHelpers.CombineSkills(effects[i].skills, null);
-                    tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
+                    tempAttributes = GameDataHelpers.CombineAttributes(effects[i].attributes, null, 1f);
+                    tempResistances = GameDataHelpers.CombineResistances(effects[i].resistances, null, 1f);
+                    tempArmors = GameDataHelpers.CombineArmors(effects[i].armors, null, 1f);
+                    tempDamages = GameDataHelpers.CombineDamages(effects[i].damages, null, 1f);
+                    tempSkillLevels = GameDataHelpers.CombineSkills(effects[i].skills, null);
+                    tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempAttributes);
                     // Combine to result dictionaries
-                    bonusAttributes = GameDataHelpers.CombineAttributes(bonusAttributes, tempIncreaseAttributes);
-                    bonusResistances = GameDataHelpers.CombineResistances(bonusResistances, tempIncreaseResistances);
-                    bonusIncreaseDamages = GameDataHelpers.CombineDamages(bonusIncreaseDamages, tempIncreaseDamages);
-                    bonusSkills = GameDataHelpers.CombineSkills(bonusSkills, tempIncreaseSkills);
+                    bonusAttributes = GameDataHelpers.CombineAttributes(bonusAttributes, tempAttributes);
+                    bonusResistances = GameDataHelpers.CombineResistances(bonusResistances, tempResistances);
+                    bonusArmors = GameDataHelpers.CombineArmors(bonusArmors, tempArmors);
+                    bonusDamages = GameDataHelpers.CombineDamages(bonusDamages, tempDamages);
+                    bonusSkills = GameDataHelpers.CombineSkills(bonusSkills, tempSkillLevels);
                     bonusStats += tempIncreaseStats;
                 }
                 else
@@ -1261,6 +1342,7 @@ public static partial class CharacterDataExtension
         out CharacterStats resultStats,
         Dictionary<Attribute, short> resultAttributes,
         Dictionary<DamageElement, float> resultResistances,
+        Dictionary<DamageElement, float> resultArmors,
         Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,
         Dictionary<Skill, short> resultSkills,
         Dictionary<EquipmentSet, int> resultEquipmentSets,
@@ -1276,14 +1358,16 @@ public static partial class CharacterDataExtension
         resultStats = new CharacterStats();
         resultAttributes.Clear();
         resultResistances.Clear();
+        resultArmors.Clear();
         resultIncreaseDamages.Clear();
         resultSkills.Clear();
         resultEquipmentSets.Clear();
 
-        GetEquipmentSetBonus(data, out resultStats, resultAttributes, resultResistances, resultIncreaseDamages, resultSkills, resultEquipmentSets);
+        GetEquipmentSetBonus(data, out resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets);
         resultStats = resultStats + data.GetStats();
         resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes());
         resultResistances = GameDataHelpers.CombineResistances(resultResistances, data.GetResistances());
+        resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.GetArmors());
         resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages());
         resultSkills = GameDataHelpers.CombineSkills(resultSkills, data.GetSkills());
         // Sum with other stats

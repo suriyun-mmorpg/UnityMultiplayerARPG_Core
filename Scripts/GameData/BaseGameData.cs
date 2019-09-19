@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -85,6 +88,19 @@ namespace MultiplayerARPG
                 }
                 return cacheDescriptions;
             }
+        }
+
+#if UNITY_EDITOR
+        protected void OnValidate()
+        {
+            if (Validate())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        public virtual bool Validate()
+        {
+            return false;
         }
     }
 }

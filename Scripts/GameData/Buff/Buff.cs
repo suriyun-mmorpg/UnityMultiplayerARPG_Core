@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public CharacterStatsIncremental increaseStats;
         public AttributeIncremental[] increaseAttributes;
         public ResistanceIncremental[] increaseResistances;
+        public ArmorIncremental[] increaseArmors;
         public DamageIncremental[] increaseDamages;
         public DamageIncremental[] damageOverTimes;
         public bool disallowMove;

@@ -320,6 +320,20 @@ public class CharacterItem : INetSerializableWithElement
         return expTree[level - 1];
     }
 
+    public KeyValuePair<DamageElement, float> GetArmorAmount()
+    {
+        if (GetDefendItem() == null)
+            return new KeyValuePair<DamageElement, float>();
+        return GetDefendItem().GetArmorAmount(level, GetEquipmentBonusRate());
+    }
+
+    public KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(ICharacterData characterData)
+    {
+        if (GetWeaponItem() == null)
+            return new KeyValuePair<DamageElement, MinMaxFloat>();
+        return GetWeaponItem().GetDamageAmount(level, GetEquipmentBonusRate(), characterData);
+    }
+
     public Dictionary<Attribute, short> GetIncreaseAttributes()
     {
         if (GetEquipmentItem() == null)
@@ -334,6 +348,13 @@ public class CharacterItem : INetSerializableWithElement
         return GetEquipmentItem().GetIncreaseResistances(level, GetEquipmentBonusRate());
     }
 
+    public Dictionary<DamageElement, float> GetIncreaseArmors()
+    {
+        if (GetEquipmentItem() == null)
+            return null;
+        return GetEquipmentItem().GetIncreaseArmors(level, GetEquipmentBonusRate());
+    }
+    
     public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
     {
         if (GetEquipmentItem() == null)
@@ -384,6 +405,23 @@ public class CharacterItem : INetSerializableWithElement
             {
                 // Level for increase stats always 1
                 result = GameDataHelpers.CombineResistances(tempEnhancer.socketEnhanceEffect.resistances, result, 1f);
+            }
+        }
+        return result;
+    }
+    
+    public Dictionary<DamageElement, float> GetSocketsIncreaseArmors()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
+            {
+                // Level for increase stats always 1
+                result = GameDataHelpers.CombineArmors(tempEnhancer.socketEnhanceEffect.armors, result, 1f);
             }
         }
         return result;

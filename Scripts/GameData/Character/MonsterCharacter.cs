@@ -33,10 +33,6 @@ namespace MultiplayerARPG
         public float visualRange = 5f;
         [SerializeField]
         private MonsterSkill[] monsterSkills;
-        [HideInInspector]
-        public float deadHideDelay = 2f;
-        [HideInInspector]
-        public float deadRespawnDelay = 5f;
 
         [Header("Weapon/Attack Abilities")]
         public DamageInfo damageInfo;
@@ -58,6 +54,8 @@ namespace MultiplayerARPG
         private AttributeIncremental[] adjustAttributes;
         [System.NonSerialized]
         private ResistanceIncremental[] adjustResistances;
+        [System.NonSerialized]
+        private ArmorIncremental[] adjustArmors;
 
         [System.NonSerialized]
         private List<ItemDrop> cacheRandomItems;
@@ -163,6 +161,40 @@ namespace MultiplayerARPG
                         }
                     }
                     return adjustResistances;
+                }
+            }
+        }
+
+        public override sealed ArmorIncremental[] Armors
+        {
+            get
+            {
+                // Adjust base armors by default level
+                if (defaultLevel <= 1)
+                {
+                    return base.Armors;
+                }
+                else
+                {
+                    if (adjustArmors == null)
+                    {
+                        adjustArmors = new ArmorIncremental[base.Armors.Length];
+                        ArmorIncremental tempValue;
+                        for (int i = 0; i < base.Armors.Length; ++i)
+                        {
+                            tempValue = base.Armors[i];
+                            adjustArmors[i] = new ArmorIncremental()
+                            {
+                                damageElement = tempValue.damageElement,
+                                amount = new IncrementalFloat()
+                                {
+                                    baseAmount = (short)(tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1))),
+                                    amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
+                                }
+                            };
+                        }
+                    }
+                    return adjustArmors;
                 }
             }
         }

@@ -30,40 +30,16 @@ namespace MultiplayerARPG
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
         // EXP
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextExp;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageExpGage;
         public UIGageValue uiGageExp;
         // HP
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextHp;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageHpGage;
         public UIGageValue uiGageHp;
         // MP
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextMp;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageMpGage;
         public UIGageValue uiGageMp;
         // Stamina
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextStamina;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageStaminaGage;
         public UIGageValue uiGageStamina;
         // Food
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextFood;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageFoodGage;
         public UIGageValue uiGageFood;
         // Water
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextWater;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageWaterGage;
         public UIGageValue uiGageWater;
 
         public TextWrapper uiTextStatPoint;
@@ -76,13 +52,15 @@ namespace MultiplayerARPG
         public UICharacterStats uiCharacterStats;
         public UICharacterBuffs uiCharacterBuffs;
         public UIResistanceAmounts uiCharacterResistances;
+        public UIArmorAmounts uiCharacterArmors;
         public UICharacterAttributePair[] uiCharacterAttributes;
         public UICharacterClass uiCharacterClass;
 
         [Header("Options")]
         public bool showStatsWithBuffs;
-        public bool showResistanceWithBuffs;
         public bool showAttributeWithBuffs;
+        public bool showResistanceWithBuffs;
+        public bool showArmorWithBuffs;
         public bool showDamageWithBuffs;
 
         // Improve garbage collector
@@ -90,13 +68,15 @@ namespace MultiplayerARPG
         private CharacterStats cacheStats;
         private Dictionary<Attribute, short> cacheAttributes;
         private Dictionary<DamageElement, float> cacheResistances;
-        private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
+        private Dictionary<DamageElement, float> cacheArmors;
+        private Dictionary<DamageElement, MinMaxFloat> cacheDamages;
         private Dictionary<EquipmentSet, int> cacheEquipmentSets;
         // Cache bonus data
         private CharacterStats bonusStats;
         private Dictionary<Attribute, short> bonusAttributes;
         private Dictionary<DamageElement, float> bonusResistances;
-        private Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages;
+        private Dictionary<DamageElement, float> bonusArmors;
+        private Dictionary<DamageElement, MinMaxFloat> bonusDamages;
         private Dictionary<Skill, short> bonusSkills;
 
         private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes;
@@ -117,30 +97,6 @@ namespace MultiplayerARPG
                 }
                 return cacheUICharacterAttributes;
             }
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            MigrateUIGageValue();
-        }
-
-        protected void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (MigrateUIGageValue())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateUIGageValue()
-        {
-            return UIGageValue.Migrate(ref uiGageExp, ref uiTextExp, ref imageExpGage) ||
-                UIGageValue.Migrate(ref uiGageHp, ref uiTextHp, ref imageHpGage) ||
-                UIGageValue.Migrate(ref uiGageMp, ref uiTextMp, ref imageMpGage) ||
-                UIGageValue.Migrate(ref uiGageStamina, ref uiTextStamina, ref imageStaminaGage) ||
-                UIGageValue.Migrate(ref uiGageFood, ref uiTextFood, ref imageFoodGage) ||
-                UIGageValue.Migrate(ref uiGageWater, ref uiTextWater, ref imageWaterGage);
         }
 
         protected override void Update()
@@ -276,7 +232,8 @@ namespace MultiplayerARPG
             cacheStats = showStatsWithBuffs ? Data.GetStats() : Data.GetStats(true, false);
             cacheAttributes = showAttributeWithBuffs ? Data.GetAttributes() : Data.GetAttributes(true, false);
             cacheResistances = showResistanceWithBuffs ? Data.GetResistances() : Data.GetResistances(true, false);
-            cacheIncreaseDamages = showDamageWithBuffs ? Data.GetIncreaseDamages() : Data.GetIncreaseDamages(true, false);
+            cacheArmors = showArmorWithBuffs ? Data.GetArmors() : Data.GetArmors(true, false);
+            cacheDamages = showDamageWithBuffs ? Data.GetIncreaseDamages() : Data.GetIncreaseDamages(true, false);
             cacheWeightLimit = cacheStats.weightLimit;
             if (!showStatsWithBuffs)
             {
@@ -288,19 +245,22 @@ namespace MultiplayerARPG
                 bonusAttributes = new Dictionary<Attribute, short>();
             if (bonusResistances == null)
                 bonusResistances = new Dictionary<DamageElement, float>();
-            if (bonusIncreaseDamages == null)
-                bonusIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            if (bonusArmors == null)
+                bonusArmors = new Dictionary<DamageElement, float>();
+            if (bonusDamages == null)
+                bonusDamages = new Dictionary<DamageElement, MinMaxFloat>();
             if (bonusSkills == null)
                 bonusSkills = new Dictionary<Skill, short>();
             if (cacheEquipmentSets == null)
                 cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
 
-            Data.GetEquipmentSetBonus(out bonusStats, bonusAttributes, bonusResistances, bonusIncreaseDamages, bonusSkills, cacheEquipmentSets);
+            Data.GetEquipmentSetBonus(out bonusStats, bonusAttributes, bonusResistances, bonusArmors, bonusDamages, bonusSkills, cacheEquipmentSets);
             // Increase stats by equipment set bonus
             cacheStats += bonusStats;
             cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, bonusAttributes);
             cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, bonusResistances);
-            cacheIncreaseDamages = GameDataHelpers.CombineDamages(cacheIncreaseDamages, bonusIncreaseDamages);
+            cacheArmors = GameDataHelpers.CombineArmors(cacheArmors, bonusArmors);
+            cacheDamages = GameDataHelpers.CombineDamages(cacheDamages, bonusDamages);
             cacheWeightLimit += bonusStats.weightLimit;
 
             if (uiTextWeightLimit != null)
@@ -315,8 +275,8 @@ namespace MultiplayerARPG
             CharacterItem leftHandItem = Data.EquipWeapons.leftHand;
             Item rightHandWeapon = rightHandItem.GetWeaponItem();
             Item leftHandWeapon = leftHandItem.GetWeaponItem();
-            Dictionary<DamageElement, MinMaxFloat> rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamages(cacheIncreaseDamages, rightHandWeapon.GetDamageAmount(rightHandItem.level, rightHandItem.GetEquipmentBonusRate(), Data)) : null;
-            Dictionary<DamageElement, MinMaxFloat> leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamages(cacheIncreaseDamages, leftHandWeapon.GetDamageAmount(leftHandItem.level, leftHandItem.GetEquipmentBonusRate(), Data)) : null;
+            Dictionary<DamageElement, MinMaxFloat> rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamages(cacheDamages, rightHandItem.GetDamageAmount(Data)) : null;
+            Dictionary<DamageElement, MinMaxFloat> leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamages(cacheDamages, leftHandItem.GetDamageAmount(Data)) : null;
 
             if (uiTextWeaponDamages != null)
             {
@@ -381,6 +341,9 @@ namespace MultiplayerARPG
 
             if (uiCharacterResistances != null)
                 uiCharacterResistances.Data = cacheResistances;
+
+            if (uiCharacterArmors != null)
+                uiCharacterArmors.Data = cacheArmors;
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {
