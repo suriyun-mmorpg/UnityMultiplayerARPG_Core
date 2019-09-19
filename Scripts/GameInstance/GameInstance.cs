@@ -673,6 +673,7 @@ namespace MultiplayerARPG
         {
             if (skills == null)
                 return;
+            List<WeaponType> weaponTypes = new List<WeaponType>();
             List<DamageInfo> damageInfos = new List<DamageInfo>();
             foreach (Skill skill in skills)
             {
@@ -680,8 +681,10 @@ namespace MultiplayerARPG
                     continue;
                 skill.Validate();
                 Skills[skill.DataId] = skill;
+                weaponTypes.AddRange(skill.availableWeapons);
                 damageInfos.Add(skill.damageInfo);
             }
+            AddWeaponTypes(weaponTypes);
             AddDamageInfos(damageInfos);
         }
 
