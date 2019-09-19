@@ -51,7 +51,7 @@ namespace MultiplayerARPG
         
         public override bool Validate()
         {
-            bool hasChanges = false;
+            bool hasChanges = base.Validate();
             Item tempRightHandWeapon = null;
             Item tempLeftHandWeapon = null;
             Item tempLeftHandShield = null;

@@ -174,9 +174,11 @@ namespace MultiplayerARPG
                     break;
             }
             // Migrate character stats → armor (equipment)
-            GameDataMigration.MigrateArmor(increaseStats, increaseArmors, out increaseStats, out increaseArmors);
+            if (GameDataMigration.MigrateArmor(increaseStats, increaseArmors, out increaseStats, out increaseArmors))
+                hasChanges = true;
             // Migrate character stats → armor (armor)
-            GameDataMigration.MigrateBuffArmor(buff, out buff);
+            if (GameDataMigration.MigrateBuffArmor(buff, out buff))
+                hasChanges = true;
             return hasChanges;
         }
 
