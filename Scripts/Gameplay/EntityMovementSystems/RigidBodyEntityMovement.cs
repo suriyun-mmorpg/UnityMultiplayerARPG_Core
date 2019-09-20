@@ -150,13 +150,6 @@ namespace MultiplayerARPG
             entity.RegisterNetFunction<byte>(NetFuncSetMovementState);
         }
 
-        protected void NetFuncPointClickMovement(Vector3 position)
-        {
-            if (!CacheEntity.CanMove())
-                return;
-            SetMovePaths(position, true);
-        }
-
         protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput, byte movementState)
         {
             if (!CacheEntity.CanMove())
@@ -166,6 +159,14 @@ namespace MultiplayerARPG
             tempMovementState = (MovementState)movementState;
             if (!IsJumping)
                 IsJumping = IsGrounded && tempMovementState.HasFlag(MovementState.IsJump);
+        }
+
+        protected void NetFuncPointClickMovement(Vector3 position)
+        {
+            if (!CacheEntity.CanMove())
+                return;
+            tempMovementState = MovementState.Forward;
+            SetMovePaths(position, true);
         }
 
         protected void NetFuncUpdateYRotation(short yRotation)
@@ -253,6 +254,7 @@ namespace MultiplayerARPG
                     CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
+                    tempMovementState = MovementState.Forward;
                     SetMovePaths(position, true);
                     break;
             }
