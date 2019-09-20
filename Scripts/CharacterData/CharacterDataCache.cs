@@ -42,6 +42,16 @@ namespace MultiplayerARPG
         public bool DisallowUseSkill { get; private set; }
         public bool DisallowUseItem { get; private set; }
 
+        public CharacterDataCache()
+        {
+            attributes = new Dictionary<Attribute, short>();
+            resistances = new Dictionary<DamageElement, float>();
+            armors = new Dictionary<DamageElement, float>();
+            increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            skills = new Dictionary<Skill, short>();
+            equipmentSets = new Dictionary<EquipmentSet, int>();
+        }
+
         public CharacterDataCache MarkToMakeCaches()
         {
             IsRecaching = true;
@@ -55,19 +65,6 @@ namespace MultiplayerARPG
                 return this;
 
             IsRecaching = false;
-
-            if (attributes == null)
-                attributes = new Dictionary<Attribute, short>();
-            if (resistances == null)
-                resistances = new Dictionary<DamageElement, float>();
-            if (armors == null)
-                armors = new Dictionary<DamageElement, float>();
-            if (increaseDamages == null)
-                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            if (skills == null)
-                skills = new Dictionary<Skill, short>();
-            if (equipmentSets == null)
-                equipmentSets = new Dictionary<EquipmentSet, int>();
 
             characterData.GetAllStats(
                 out stats,
