@@ -33,16 +33,21 @@ namespace MultiplayerARPG
         private ParticleSystem[] particles;
         private AudioSource[] audioSources;
         private float destroyTime;
+        private bool isStarted;
 
-        private void Awake()
+        private void Start()
         {
-            particles = GetComponentsInChildren<ParticleSystem>();
-            audioSources = GetComponentsInChildren<AudioSource>();
+            if (!isStarted)
+            {
+                Play();
+                isStarted = true;
+            }
         }
 
         private void OnEnable()
         {
-            Play();
+            if (isStarted)
+                Play();
         }
 
         private void Update()
@@ -92,8 +97,19 @@ namespace MultiplayerARPG
         public void Play()
         {
             if (!gameObject.activeSelf)
+            {
                 gameObject.SetActive(true);
+                return;
+            }
+            // Prepare particles
+            if (particles == null)
+                particles = GetComponentsInChildren<ParticleSystem>();
+            // Prepare audio sources
+            if (audioSources == null)
+                audioSources = GetComponentsInChildren<AudioSource>();
+            // Prepare destroy time
             destroyTime = isLoop ? -1 : Time.time + lifeTime;
+            // Play random audio
             volume = AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level;
             if (randomSoundEffects.Length > 0)
             {
@@ -101,18 +117,26 @@ namespace MultiplayerARPG
                 if (soundEffect != null)
                     AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, volume);
             }
-            foreach (ParticleSystem particle in particles)
+            // Play particles
+            if (particles != null)
             {
-                if (particle == null)
-                    continue;
-                particle.Play();
+                foreach (ParticleSystem particle in particles)
+                {
+                    if (particle == null)
+                        continue;
+                    particle.Play();
+                }
             }
-            foreach (AudioSource audioSource in audioSources)
+            // Play audio sources
+            if (audioSources != null)
             {
-                if (audioSource == null)
-                    continue;
-                audioSource.volume = volume;
-                audioSource.Play();
+                foreach (AudioSource audioSource in audioSources)
+                {
+                    if (audioSource == null)
+                        continue;
+                    audioSource.volume = volume;
+                    audioSource.Play();
+                }
             }
         }
     }
