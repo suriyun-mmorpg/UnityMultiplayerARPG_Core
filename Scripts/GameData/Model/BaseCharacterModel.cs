@@ -287,10 +287,10 @@ namespace MultiplayerARPG
                 }
                 return;
             }
-            
+
+            DestroyCacheModel(equipPosition);
             itemIds[equipPosition] = itemDataId;
             equipmentEntities[equipPosition].Clear();
-            DestroyCacheModel(equipPosition);
 
             if (equipmentModels == null || equipmentModels.Length == 0)
                 return;
