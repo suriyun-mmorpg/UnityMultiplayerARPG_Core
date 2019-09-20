@@ -158,8 +158,8 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
-            if (attacker is BaseCharacterEntity)
-                gameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
+            if (attacker.Entity is BaseCharacterEntity)
+                gameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage);
         }
 
         private void OnDrawGizmos()
