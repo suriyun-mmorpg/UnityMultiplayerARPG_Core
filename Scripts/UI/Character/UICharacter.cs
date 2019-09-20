@@ -66,14 +66,14 @@ namespace MultiplayerARPG
         // Improve garbage collector
         private float cacheWeightLimit;
         private CharacterStats cacheStats;
-        private Dictionary<Attribute, short> cacheAttributes;
+        private Dictionary<Attribute, float> cacheAttributes;
         private Dictionary<DamageElement, float> cacheResistances;
         private Dictionary<DamageElement, float> cacheArmors;
         private Dictionary<DamageElement, MinMaxFloat> cacheDamages;
         private Dictionary<EquipmentSet, int> cacheEquipmentSets;
         // Cache bonus data
         private CharacterStats bonusStats;
-        private Dictionary<Attribute, short> bonusAttributes;
+        private Dictionary<Attribute, float> bonusAttributes;
         private Dictionary<DamageElement, float> bonusResistances;
         private Dictionary<DamageElement, float> bonusArmors;
         private Dictionary<DamageElement, MinMaxFloat> bonusDamages;
@@ -242,7 +242,7 @@ namespace MultiplayerARPG
             }
 
             if (bonusAttributes == null)
-                bonusAttributes = new Dictionary<Attribute, short>();
+                bonusAttributes = new Dictionary<Attribute, float>();
             if (bonusResistances == null)
                 bonusResistances = new Dictionary<DamageElement, float>();
             if (bonusArmors == null)
@@ -349,7 +349,7 @@ namespace MultiplayerARPG
             {
                 CharacterAttribute tempCharacterAttribute;
                 Attribute tempAttribute;
-                short tempAmount;
+                float tempAmount;
                 IList<CharacterAttribute> characterAttributes = Data.Attributes;
                 for (int indexOfData = 0; indexOfData < characterAttributes.Count; ++indexOfData)
                 {

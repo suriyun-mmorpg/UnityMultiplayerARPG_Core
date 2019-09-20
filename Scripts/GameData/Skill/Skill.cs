@@ -80,13 +80,13 @@ namespace MultiplayerARPG
         [Header("Craft")]
         public ItemCraft itemCraft;
 
-        private Dictionary<Attribute, short> cacheRequireAttributeAmounts;
-        public Dictionary<Attribute, short> CacheRequireAttributeAmounts
+        private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
+        public Dictionary<Attribute, float> CacheRequireAttributeAmounts
         {
             get
             {
                 if (cacheRequireAttributeAmounts == null)
-                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, short>(), 1f);
+                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
                 return cacheRequireAttributeAmounts;
             }
         }

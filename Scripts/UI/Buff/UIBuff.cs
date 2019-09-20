@@ -95,7 +95,7 @@ namespace MultiplayerARPG
                 uiBuffStats.Data = Buff.GetIncreaseStats(Level);
 
             if (uiBuffAttributes != null)
-                uiBuffAttributes.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributes, new Dictionary<Attribute, short>(), Level, 1f);
+                uiBuffAttributes.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributes, new Dictionary<Attribute, float>(), Level, 1f);
 
             if (uiBuffResistances != null)
                 uiBuffResistances.Data = GameDataHelpers.CombineResistances(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);

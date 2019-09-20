@@ -68,6 +68,26 @@ namespace MultiplayerARPG
             return this.InvokeInstanceDevExtMethodsLoopItself("Multiply", multiplier);
         }
 
+        public CharacterStats MultiplyStats(CharacterStats b)
+        {
+            hp = hp * b.hp;
+            mp = mp * b.mp;
+            accuracy = accuracy * b.accuracy;
+            evasion = evasion * b.evasion;
+            criRate = criRate * b.criRate;
+            criDmgRate = criDmgRate * b.criDmgRate;
+            blockRate = blockRate * b.blockRate;
+            blockDmgRate = blockDmgRate * b.blockDmgRate;
+            moveSpeed = moveSpeed * b.moveSpeed;
+            atkSpeed = atkSpeed * b.atkSpeed;
+            weightLimit = weightLimit * b.weightLimit;
+            slotLimit = slotLimit * b.slotLimit;
+            stamina = stamina * b.stamina;
+            food = food * b.food;
+            water = water * b.water;
+            return this.InvokeInstanceDevExtMethodsLoopItself("MultiplyStats", b);
+        }
+
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
         {
             return a.Add(b);
@@ -76,6 +96,11 @@ namespace MultiplayerARPG
         public static CharacterStats operator *(CharacterStats a, float multiplier)
         {
             return a.Multiply(multiplier);
+        }
+
+        public static CharacterStats operator *(CharacterStats a, CharacterStats b)
+        {
+            return a.MultiplyStats(b);
         }
 
         public static string GetText(

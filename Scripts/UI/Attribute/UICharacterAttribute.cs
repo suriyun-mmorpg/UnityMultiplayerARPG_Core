@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     public partial class UICharacterAttribute : UIDataForCharacter<UICharacterAttributeData>
     {
         public CharacterAttribute CharacterAttribute { get { return Data.characterAttribute; } }
-        public short Amount { get { return Data.targetAmount; } }
+        public float Amount { get { return Data.targetAmount; } }
         public Attribute Attribute { get { return CharacterAttribute != null ? CharacterAttribute.GetAttribute() : null; } }
         
         [Header("String Formats")]

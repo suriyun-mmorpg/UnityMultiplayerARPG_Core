@@ -81,7 +81,9 @@ namespace MultiplayerARPG
 
         [Header("Equipment Bonus Stats")]
         public CharacterStatsIncremental increaseStats;
+        public CharacterStatsIncremental increaseStatsRate;
         public AttributeIncremental[] increaseAttributes;
+        public AttributeIncremental[] increaseAttributesRate;
         public ResistanceIncremental[] increaseResistances;
         public ArmorIncremental[] increaseArmors;
         public DamageIncremental[] increaseDamages;
@@ -284,13 +286,13 @@ namespace MultiplayerARPG
 
         #region Cache Data
         [System.NonSerialized]
-        private Dictionary<Attribute, short> cacheRequireAttributeAmounts;
-        public Dictionary<Attribute, short> CacheRequireAttributeAmounts
+        private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
+        public Dictionary<Attribute, float> CacheRequireAttributeAmounts
         {
             get
             {
                 if (cacheRequireAttributeAmounts == null)
-                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, short>(), 1f);
+                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
                 return cacheRequireAttributeAmounts;
             }
         }
@@ -364,17 +366,6 @@ namespace MultiplayerARPG
         public PlayerCharacter character;
         public short level;
         public AttributeAmount[] attributeAmounts;
-    }
-
-    [System.Serializable]
-    public struct EquipmentBonus
-    {
-        public CharacterStats stats;
-        public AttributeAmount[] attributes;
-        public ResistanceAmount[] resistances;
-        public ArmorAmount[] armors;
-        public DamageAmount[] damages;
-        public SkillLevel[] skills;
     }
 
     [System.Serializable]

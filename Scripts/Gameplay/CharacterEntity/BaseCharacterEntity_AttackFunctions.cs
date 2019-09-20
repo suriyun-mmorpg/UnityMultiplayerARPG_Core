@@ -83,8 +83,8 @@ namespace MultiplayerARPG
                     Item ammoItem = ammoCharacterItem.GetItem();
                     if (ammoItem != null && firstEntry.Value > 0)
                     {
-                        // Ammo level always 1 and its bonus rate always 1
-                        increaseDamges = ammoItem.GetIncreaseDamages(1, 1f);
+                        // Ammo level always 1
+                        increaseDamges = ammoItem.GetIncreaseDamages(1);
                     }
                 }
             }

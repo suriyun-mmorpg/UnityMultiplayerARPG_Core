@@ -17,13 +17,13 @@ namespace MultiplayerARPG
     public struct AttributeAmount
     {
         public Attribute attribute;
-        public short amount;
+        public float amount;
     }
 
     [System.Serializable]
     public struct AttributeIncremental
     {
         public Attribute attribute;
-        public IncrementalShort amount;
+        public IncrementalFloat amount;
     }
 }

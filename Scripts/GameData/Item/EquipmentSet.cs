@@ -24,4 +24,17 @@ namespace MultiplayerARPG
             return hasChanges;
         }
     }
+
+    [System.Serializable]
+    public struct EquipmentBonus
+    {
+        public CharacterStats stats;
+        public CharacterStats statsRate;
+        public AttributeAmount[] attributes;
+        public AttributeAmount[] attributesRate;
+        public ResistanceAmount[] resistances;
+        public ArmorAmount[] armors;
+        public DamageAmount[] damages;
+        public SkillLevel[] skills;
+    }
 }

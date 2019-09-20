@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public static class AttributeExtension
     {
-        public static CharacterStats GetStats(this Attribute attribute, short level)
+        public static CharacterStats GetStats(this Attribute attribute, float level)
         {
             if (attribute == null)
                 return new CharacterStats();

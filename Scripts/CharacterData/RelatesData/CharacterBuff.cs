@@ -51,7 +51,11 @@ public class CharacterBuff : INetSerializableWithElement
     [System.NonSerialized]
     private CharacterStats cacheIncreaseStats;
     [System.NonSerialized]
-    private Dictionary<Attribute, short> cacheIncreaseAttributes;
+    private CharacterStats cacheIncreaseStatsRate;
+    [System.NonSerialized]
+    private Dictionary<Attribute, float> cacheIncreaseAttributes;
+    [System.NonSerialized]
+    private Dictionary<Attribute, float> cacheIncreaseAttributesRate;
     [System.NonSerialized]
     private Dictionary<DamageElement, float> cacheIncreaseResistances;
     [System.NonSerialized]
@@ -87,7 +91,9 @@ public class CharacterBuff : INetSerializableWithElement
             cacheRecoveryFood = 0;
             cacheRecoveryWater = 0;
             cacheIncreaseStats = new CharacterStats();
+            cacheIncreaseStatsRate = new CharacterStats();
             cacheIncreaseAttributes = null;
+            cacheIncreaseAttributesRate = null;
             cacheIncreaseResistances = null;
             cacheIncreaseArmors = null;
             cacheIncreaseDamages = null;
@@ -115,7 +121,9 @@ public class CharacterBuff : INetSerializableWithElement
             cacheRecoveryFood = cacheBuff.GetRecoveryFood(level);
             cacheRecoveryWater = cacheBuff.GetRecoveryWater(level);
             cacheIncreaseStats = cacheBuff.GetIncreaseStats(level);
+            cacheIncreaseStatsRate = cacheBuff.GetIncreaseStatsRate(level);
             cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
+            cacheIncreaseAttributesRate = cacheBuff.GetIncreaseAttributesRate(level);
             cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
             cacheIncreaseArmors = cacheBuff.GetIncreaseArmors(level);
             cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
@@ -189,10 +197,22 @@ public class CharacterBuff : INetSerializableWithElement
         return cacheIncreaseStats;
     }
 
-    public Dictionary<Attribute, short> GetIncreaseAttributes()
+    public CharacterStats GetIncreaseStatsRate()
+    {
+        MakeCache();
+        return cacheIncreaseStatsRate;
+    }
+
+    public Dictionary<Attribute, float> GetIncreaseAttributes()
     {
         MakeCache();
         return cacheIncreaseAttributes;
+    }
+
+    public Dictionary<Attribute, float> GetIncreaseAttributesRate()
+    {
+        MakeCache();
+        return cacheIncreaseAttributesRate;
     }
 
     public Dictionary<DamageElement, float> GetIncreaseResistances()

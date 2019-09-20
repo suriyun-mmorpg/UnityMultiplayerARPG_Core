@@ -8,8 +8,8 @@ namespace MultiplayerARPG
         public bool IsRecaching { get; private set; }
         private CharacterStats stats;
         public CharacterStats Stats { get { return stats; } }
-        private Dictionary<Attribute, short> attributes;
-        public Dictionary<Attribute, short> Attributes { get { return attributes; } }
+        private Dictionary<Attribute, float> attributes;
+        public Dictionary<Attribute, float> Attributes { get { return attributes; } }
         private Dictionary<Skill, short> skills;
         public Dictionary<Skill, short> Skills { get { return skills; } }
         private Dictionary<DamageElement, float> resistances;
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
 
         public CharacterDataCache()
         {
-            attributes = new Dictionary<Attribute, short>();
+            attributes = new Dictionary<Attribute, float>();
             resistances = new Dictionary<DamageElement, float>();
             armors = new Dictionary<DamageElement, float>();
             increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();

@@ -8,153 +8,161 @@ namespace MultiplayerARPG
         /// <summary>
         /// Combine damage amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> targetDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<DamageElement, MinMaxFloat>();
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             MinMaxFloat value = newEntry.Value;
-            if (!sourceDictionary.ContainsKey(damageElement))
-                sourceDictionary[damageElement] = value;
+            if (!targetDictionary.ContainsKey(damageElement))
+                targetDictionary[damageElement] = value;
             else
-                sourceDictionary[damageElement] += value;
-            return sourceDictionary;
+                targetDictionary[damageElement] += value;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine damage infliction amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
+        public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> targetDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<DamageElement, float>();
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, float>();
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             float value = newEntry.Value;
-            if (!sourceDictionary.ContainsKey(damageElement))
-                sourceDictionary[damageElement] = value;
+            if (!targetDictionary.ContainsKey(damageElement))
+                targetDictionary[damageElement] = value;
             else
-                sourceDictionary[damageElement] += value;
-            return sourceDictionary;
+                targetDictionary[damageElement] += value;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine attribute amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, short> CombineAttributes(Dictionary<Attribute, short> sourceDictionary, KeyValuePair<Attribute, short> newEntry)
+        public static Dictionary<Attribute, float> CombineAttributes(Dictionary<Attribute, float> targetDictionary, KeyValuePair<Attribute, float> newEntry)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<Attribute, short>();
-            Attribute attribute = newEntry.Key;
-            if (attribute != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Attribute, float>();
+            if (newEntry.Key != null)
             {
-                short value = newEntry.Value;
-                if (!sourceDictionary.ContainsKey(attribute))
-                    sourceDictionary[attribute] = value;
+                if (!targetDictionary.ContainsKey(newEntry.Key))
+                    targetDictionary[newEntry.Key] = newEntry.Value;
                 else
-                    sourceDictionary[attribute] += value;
+                    targetDictionary[newEntry.Key] += newEntry.Value;
             }
-            return sourceDictionary;
+            return targetDictionary;
+        }
+
+        /// <summary>
+        /// Multiply attribute amounts dictionary
+        /// </summary>
+        /// <param name="targetDictionary"></param>
+        /// <param name="multiplyEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<Attribute, float> MultiplyAttributes(Dictionary<Attribute, float> targetDictionary, KeyValuePair<Attribute, float> multiplyEntry)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Attribute, float>();
+            if (multiplyEntry.Key != null)
+            {
+                if (targetDictionary.ContainsKey(multiplyEntry.Key))
+                    targetDictionary[multiplyEntry.Key] *= multiplyEntry.Value;
+            }
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine resistance amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineResistances(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
+        public static Dictionary<DamageElement, float> CombineResistances(Dictionary<DamageElement, float> targetDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<DamageElement, float>();
-            DamageElement damageElement = newEntry.Key;
-            if (damageElement != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, float>();
+            if (newEntry.Key != null)
             {
-                float value = newEntry.Value;
-                if (!sourceDictionary.ContainsKey(damageElement))
-                    sourceDictionary[damageElement] = value;
+                if (!targetDictionary.ContainsKey(newEntry.Key))
+                    targetDictionary[newEntry.Key] = newEntry.Value;
                 else
-                    sourceDictionary[damageElement] += value;
+                    targetDictionary[newEntry.Key] += newEntry.Value;
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine armor amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineArmors(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
+        public static Dictionary<DamageElement, float> CombineArmors(Dictionary<DamageElement, float> targetDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<DamageElement, float>();
-            DamageElement damageElement = newEntry.Key;
-            if (damageElement != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, float>();
+            if (newEntry.Key != null)
             {
-                float value = newEntry.Value;
-                if (!sourceDictionary.ContainsKey(damageElement))
-                    sourceDictionary[damageElement] = value;
+                if (!targetDictionary.ContainsKey(newEntry.Key))
+                    targetDictionary[newEntry.Key] = newEntry.Value;
                 else
-                    sourceDictionary[damageElement] += value;
+                    targetDictionary[newEntry.Key] += newEntry.Value;
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine skill levels dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> sourceDictionary, KeyValuePair<Skill, short> newEntry)
+        public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> targetDictionary, KeyValuePair<Skill, short> newEntry)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<Skill, short>();
-            Skill skill = newEntry.Key;
-            if (skill != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Skill, short>();
+            if (newEntry.Key != null)
             {
-                short value = newEntry.Value;
-                if (!sourceDictionary.ContainsKey(skill))
-                    sourceDictionary[skill] = value;
+                if (!targetDictionary.ContainsKey(newEntry.Key))
+                    targetDictionary[newEntry.Key] = newEntry.Value;
                 else
-                    sourceDictionary[skill] += value;
+                    targetDictionary[newEntry.Key] += newEntry.Value;
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine item amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> sourceDictionary, KeyValuePair<Item, short> newEntry)
+        public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> targetDictionary, KeyValuePair<Item, short> newEntry)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<Item, short>();
-            Item item = newEntry.Key;
-            if (item != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Item, short>();
+            if (newEntry.Key != null)
             {
-                short value = newEntry.Value;
-                if (!sourceDictionary.ContainsKey(item))
-                    sourceDictionary[item] = value;
+                if (!targetDictionary.ContainsKey(newEntry.Key))
+                    targetDictionary[newEntry.Key] = newEntry.Value;
                 else
-                    sourceDictionary[item] += value;
+                    targetDictionary[newEntry.Key] += newEntry.Value;
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
         #endregion
 
@@ -162,141 +170,172 @@ namespace MultiplayerARPG
         /// <summary>
         /// Combine damage amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="combineDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> targetDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<DamageElement, MinMaxFloat>();
-            if (combineDictionary != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
+            if (combineDictionary != null && combineDictionary.Count > 0)
             {
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in combineDictionary)
                 {
-                    CombineDamages(sourceDictionary, entry);
+                    CombineDamages(targetDictionary, entry);
                 }
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine damage infliction amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="combineDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
+        public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> targetDictionary, Dictionary<DamageElement, float> combineDictionary)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<DamageElement, float>();
-            if (combineDictionary != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, float>();
+            if (combineDictionary != null && combineDictionary.Count > 0)
             {
                 foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
                 {
-                    CombineDamageInflictions(sourceDictionary, entry);
+                    CombineDamageInflictions(targetDictionary, entry);
                 }
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine attribute amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="combineDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, short> CombineAttributes(Dictionary<Attribute, short> sourceDictionary, Dictionary<Attribute, short> combineDictionary)
+        public static Dictionary<Attribute, float> CombineAttributes(Dictionary<Attribute, float> targetDictionary, Dictionary<Attribute, float> combineDictionary)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<Attribute, short>();
-            if (combineDictionary != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Attribute, float>();
+            if (combineDictionary != null && combineDictionary.Count > 0)
             {
-                foreach (KeyValuePair<Attribute, short> entry in combineDictionary)
+                foreach (KeyValuePair<Attribute, float> entry in combineDictionary)
                 {
-                    CombineAttributes(sourceDictionary, entry);
+                    CombineAttributes(targetDictionary, entry);
                 }
             }
-            return sourceDictionary;
+            return targetDictionary;
+        }
+
+        /// <summary>
+        /// Multiply attribute amounts dictionary
+        /// </summary>
+        /// <param name="targetDictionary"></param>
+        /// <param name="multiplyDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<Attribute, float> MultiplyAttributes(Dictionary<Attribute, float> targetDictionary, Dictionary<Attribute, float> multiplyDictionary)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Attribute, float>();
+            if (multiplyDictionary != null && multiplyDictionary.Count > 0)
+            {
+                // Remove attributes that are not multiplying
+                List<Attribute> availableAttributes = new List<Attribute>(targetDictionary.Keys);
+                foreach (Attribute attribute in availableAttributes)
+                {
+                    if (!multiplyDictionary.ContainsKey(attribute))
+                        targetDictionary.Remove(attribute);
+                }
+                foreach (KeyValuePair<Attribute, float> entry in multiplyDictionary)
+                {
+                    MultiplyAttributes(targetDictionary, entry);
+                }
+            }
+            else
+            {
+                targetDictionary.Clear();
+            }
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine resistance amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="combineDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineResistances(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
+        public static Dictionary<DamageElement, float> CombineResistances(Dictionary<DamageElement, float> targetDictionary, Dictionary<DamageElement, float> combineDictionary)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<DamageElement, float>();
-            if (combineDictionary != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, float>();
+            if (combineDictionary != null && combineDictionary.Count > 0)
             {
                 foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
                 {
-                    CombineResistances(sourceDictionary, entry);
+                    CombineResistances(targetDictionary, entry);
                 }
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine defend amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="combineDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineArmors(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
+        public static Dictionary<DamageElement, float> CombineArmors(Dictionary<DamageElement, float> targetDictionary, Dictionary<DamageElement, float> combineDictionary)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<DamageElement, float>();
-            if (combineDictionary != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, float>();
+            if (combineDictionary != null && combineDictionary.Count > 0)
             {
                 foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
                 {
-                    CombineArmors(sourceDictionary, entry);
+                    CombineArmors(targetDictionary, entry);
                 }
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine skill levels dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="combineDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> sourceDictionary, Dictionary<Skill, short> combineDictionary)
+        public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> targetDictionary, Dictionary<Skill, short> combineDictionary)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<Skill, short>();
-            if (combineDictionary != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Skill, short>();
+            if (combineDictionary != null && combineDictionary.Count > 0)
             {
                 foreach (KeyValuePair<Skill, short> entry in combineDictionary)
                 {
-                    CombineSkills(sourceDictionary, entry);
+                    CombineSkills(targetDictionary, entry);
                 }
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
 
         /// <summary>
         /// Combine item amounts dictionary
         /// </summary>
-        /// <param name="sourceDictionary"></param>
+        /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> sourceDictionary, Dictionary<Item, short> combineDictionary)
+        public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> targetDictionary, Dictionary<Item, short> combineDictionary)
         {
-            if (sourceDictionary == null)
-                sourceDictionary = new Dictionary<Item, short>();
-            if (combineDictionary != null)
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Item, short>();
+            if (combineDictionary != null && combineDictionary.Count > 0)
             {
                 foreach (KeyValuePair<Item, short> entry in combineDictionary)
                 {
-                    CombineItems(sourceDictionary, entry);
+                    CombineItems(targetDictionary, entry);
                 }
             }
-            return sourceDictionary;
+            return targetDictionary;
         }
         #endregion
 
@@ -395,11 +434,11 @@ namespace MultiplayerARPG
         /// <param name="source"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<Attribute, short> MakeAttribute(AttributeAmount source, float rate)
+        public static KeyValuePair<Attribute, float> MakeAttribute(AttributeAmount source, float rate)
         {
             if (source.attribute == null)
-                return new KeyValuePair<Attribute, short>();
-            return new KeyValuePair<Attribute, short>(source.attribute, (short)(source.amount * rate));
+                return new KeyValuePair<Attribute, float>();
+            return new KeyValuePair<Attribute, float>(source.attribute, source.amount * rate);
         }
 
         /// <summary>
@@ -409,11 +448,11 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<Attribute, short> MakeAttribute(AttributeIncremental source, short level, float rate)
+        public static KeyValuePair<Attribute, float> MakeAttribute(AttributeIncremental source, short level, float rate)
         {
             if (source.attribute == null)
-                return new KeyValuePair<Attribute, short>();
-            return new KeyValuePair<Attribute, short>(source.attribute, (short)(source.amount.GetAmount(level) * rate));
+                return new KeyValuePair<Attribute, float>();
+            return new KeyValuePair<Attribute, float>(source.attribute, source.amount.GetAmount(level) * rate);
         }
 
         /// <summary>
@@ -610,13 +649,13 @@ namespace MultiplayerARPG
         /// <param name="targetDictionary"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, short> CombineAttributes(AttributeAmount[] sourceAmounts, Dictionary<Attribute, short> targetDictionary, float rate)
+        public static Dictionary<Attribute, float> CombineAttributes(AttributeAmount[] sourceAmounts, Dictionary<Attribute, float> targetDictionary, float rate)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Attribute, short>();
+                targetDictionary = new Dictionary<Attribute, float>();
             if (sourceAmounts != null)
             {
-                KeyValuePair<Attribute, short> pair;
+                KeyValuePair<Attribute, float> pair;
                 foreach (AttributeAmount sourceAmount in sourceAmounts)
                 {
                     pair = MakeAttribute(sourceAmount, rate);
@@ -634,13 +673,13 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, short> CombineAttributes(AttributeIncremental[] sourceIncrementals, Dictionary<Attribute, short> targetDictionary, short level, float rate)
+        public static Dictionary<Attribute, float> CombineAttributes(AttributeIncremental[] sourceIncrementals, Dictionary<Attribute, float> targetDictionary, short level, float rate)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Attribute, short>();
+                targetDictionary = new Dictionary<Attribute, float>();
             if (sourceIncrementals != null)
             {
-                KeyValuePair<Attribute, short> pair;
+                KeyValuePair<Attribute, float> pair;
                 foreach (AttributeIncremental sourceIncremental in sourceIncrementals)
                 {
                     pair = MakeAttribute(sourceIncremental, level, rate);
@@ -818,7 +857,7 @@ namespace MultiplayerARPG
             float damageEffectiveness = 0f;
             if (effectivenessAttributes != null && character != null)
             {
-                Dictionary<Attribute, short> characterAttributes = character.GetAttributes();
+                Dictionary<Attribute, float> characterAttributes = character.GetAttributes();
                 foreach (Attribute attribute in characterAttributes.Keys)
                 {
                     if (attribute != null && effectivenessAttributes.ContainsKey(attribute))
@@ -828,7 +867,7 @@ namespace MultiplayerARPG
             return damageEffectiveness;
         }
 
-        public static CharacterStats GetStatsFromAttributes(Dictionary<Attribute, short> attributeAmounts)
+        public static CharacterStats GetStatsFromAttributes(Dictionary<Attribute, float> attributeAmounts)
         {
             CharacterStats stats = new CharacterStats();
             if (attributeAmounts != null)

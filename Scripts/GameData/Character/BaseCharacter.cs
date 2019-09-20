@@ -48,9 +48,9 @@ namespace MultiplayerARPG
             return Stats.GetCharacterStats(level);
         }
 
-        public Dictionary<Attribute, short> GetCharacterAttributes(short level)
+        public Dictionary<Attribute, float> GetCharacterAttributes(short level)
         {
-            return GameDataHelpers.CombineAttributes(Attributes, new Dictionary<Attribute, short>(), level, 1f);
+            return GameDataHelpers.CombineAttributes(Attributes, new Dictionary<Attribute, float>(), level, 1f);
         }
 
         public Dictionary<DamageElement, float> GetCharacterResistances(short level)

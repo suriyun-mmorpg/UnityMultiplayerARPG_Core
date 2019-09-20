@@ -334,32 +334,53 @@ public class CharacterItem : INetSerializableWithElement
         return GetWeaponItem().GetDamageAmount(level, GetEquipmentBonusRate(), characterData);
     }
 
-    public Dictionary<Attribute, short> GetIncreaseAttributes()
+    public CharacterStats GetIncreaseStats()
+    {
+        if (GetEquipmentItem() == null)
+            return CharacterStats.Empty;
+        return GetEquipmentItem().GetIncreaseStats(level);
+    }
+
+    public CharacterStats GetIncreaseStatsRate()
+    {
+        if (GetEquipmentItem() == null)
+            return CharacterStats.Empty;
+        return GetEquipmentItem().GetIncreaseStatsRate(level);
+    }
+
+    public Dictionary<Attribute, float> GetIncreaseAttributes()
     {
         if (GetEquipmentItem() == null)
             return null;
-        return GetEquipmentItem().GetIncreaseAttributes(level, GetEquipmentBonusRate());
+        return GetEquipmentItem().GetIncreaseAttributes(level);
+    }
+
+    public Dictionary<Attribute, float> GetIncreaseAttributesRate()
+    {
+        if (GetEquipmentItem() == null)
+            return null;
+        return GetEquipmentItem().GetIncreaseAttributesRate(level);
     }
 
     public Dictionary<DamageElement, float> GetIncreaseResistances()
     {
         if (GetEquipmentItem() == null)
             return null;
-        return GetEquipmentItem().GetIncreaseResistances(level, GetEquipmentBonusRate());
+        return GetEquipmentItem().GetIncreaseResistances(level);
     }
 
     public Dictionary<DamageElement, float> GetIncreaseArmors()
     {
         if (GetEquipmentItem() == null)
             return null;
-        return GetEquipmentItem().GetIncreaseArmors(level, GetEquipmentBonusRate());
+        return GetEquipmentItem().GetIncreaseArmors(level);
     }
-    
+
     public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
     {
         if (GetEquipmentItem() == null)
             return null;
-        return GetEquipmentItem().GetIncreaseDamages(level, GetEquipmentBonusRate());
+        return GetEquipmentItem().GetIncreaseDamages(level);
     }
 
     public Dictionary<Skill, short> GetIncreaseSkills()
@@ -369,26 +390,58 @@ public class CharacterItem : INetSerializableWithElement
         return GetEquipmentItem().GetIncreaseSkills();
     }
 
-    public CharacterStats GetIncreaseStats()
-    {
-        if (GetEquipmentItem() == null)
-            return CharacterStats.Empty;
-        return GetEquipmentItem().GetIncreaseStats(level, GetEquipmentBonusRate());
-    }
-
-    public Dictionary<Attribute, short> GetSocketsIncreaseAttributes()
+    public CharacterStats GetSocketsIncreaseStats()
     {
         if (GetEquipmentItem() == null || Sockets.Count == 0)
-            return null;
-        Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
+            return CharacterStats.Empty;
+        CharacterStats result = new CharacterStats();
         Item tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-            {
-                // Level for increase stats always 1
+                result += tempEnhancer.socketEnhanceEffect.stats;
+        }
+        return result;
+    }
+
+    public CharacterStats GetSocketsIncreaseStatsRate()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return CharacterStats.Empty;
+        CharacterStats result = new CharacterStats();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
+                result += tempEnhancer.socketEnhanceEffect.statsRate;
+        }
+        return result;
+    }
+
+    public Dictionary<Attribute, float> GetSocketsIncreaseAttributes()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
                 result = GameDataHelpers.CombineAttributes(tempEnhancer.socketEnhanceEffect.attributes, result, 1f);
-            }
+        }
+        return result;
+    }
+
+    public Dictionary<Attribute, float> GetSocketsIncreaseAttributesRate()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
+                result = GameDataHelpers.CombineAttributes(tempEnhancer.socketEnhanceEffect.attributesRate, result, 1f);
         }
         return result;
     }
@@ -402,14 +455,11 @@ public class CharacterItem : INetSerializableWithElement
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-            {
-                // Level for increase stats always 1
                 result = GameDataHelpers.CombineResistances(tempEnhancer.socketEnhanceEffect.resistances, result, 1f);
-            }
         }
         return result;
     }
-    
+
     public Dictionary<DamageElement, float> GetSocketsIncreaseArmors()
     {
         if (GetEquipmentItem() == null || Sockets.Count == 0)
@@ -419,10 +469,7 @@ public class CharacterItem : INetSerializableWithElement
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-            {
-                // Level for increase stats always 1
                 result = GameDataHelpers.CombineArmors(tempEnhancer.socketEnhanceEffect.armors, result, 1f);
-            }
         }
         return result;
     }
@@ -436,10 +483,7 @@ public class CharacterItem : INetSerializableWithElement
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-            {
-                // Level for increase stats always 1
                 result = GameDataHelpers.CombineDamages(tempEnhancer.socketEnhanceEffect.damages, result, 1f);
-            }
         }
         return result;
     }
@@ -453,27 +497,7 @@ public class CharacterItem : INetSerializableWithElement
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-            {
-                // Level for increase stats always 1
                 result = GameDataHelpers.CombineSkills(tempEnhancer.socketEnhanceEffect.skills, result);
-            }
-        }
-        return result;
-    }
-
-    public CharacterStats GetSocketsIncreaseStats()
-    {
-        if (GetEquipmentItem() == null || Sockets.Count == 0)
-            return CharacterStats.Empty;
-        CharacterStats result = new CharacterStats();
-        Item tempEnhancer;
-        foreach (int socketId in Sockets)
-        {
-            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-            {
-                // Level for increase stats always 1
-                result += tempEnhancer.socketEnhanceEffect.stats;
-            }
         }
         return result;
     }
@@ -543,7 +567,7 @@ public class CharacterItem : INetSerializableWithElement
             {
                 writer.Put(durability);
                 writer.Put(exp);
-                
+
                 if (GetWeaponItem() != null)
                 {
                     // Only weapons have an ammo

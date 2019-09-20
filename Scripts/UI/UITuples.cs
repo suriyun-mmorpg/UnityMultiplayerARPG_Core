@@ -5,8 +5,8 @@ namespace MultiplayerARPG
     public struct UICharacterAttributeData
     {
         public CharacterAttribute characterAttribute;
-        public short targetAmount;
-        public UICharacterAttributeData(CharacterAttribute characterAttribute, short targetAmount)
+        public float targetAmount;
+        public UICharacterAttributeData(CharacterAttribute characterAttribute, float targetAmount)
         {
             this.characterAttribute = characterAttribute;
             this.targetAmount = targetAmount;

@@ -94,16 +94,14 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, short> GetCharacterAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, float> GetCharacterAttributes(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Attribute, short>();
-        Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
+            return new Dictionary<Attribute, float>();
+        Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
         // Attributes from character database
-        BaseCharacter character = data.GetDatabase();
-        if (character != null)
-            result = GameDataHelpers.CombineAttributes(result,
-                character.GetCharacterAttributes(data.Level));
+        if (data.GetDatabase() != null)
+            result = GameDataHelpers.CombineAttributes(result, data.GetDatabase().GetCharacterAttributes(data.Level));
 
         // Added attributes
         IList<CharacterAttribute> characterAttributes = data.Attributes;
@@ -122,59 +120,76 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, short> GetEquipmentAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, float> GetEquipmentAttributes(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Attribute, short>();
-        Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
-        // Armors
+            return new Dictionary<Attribute, float>();
+        Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
+        // Prepare base attributes, it will be multiplied with increase attributes rate
+        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
+        // Increase attributes from armors
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
         {
             if (equipItem.IsEmptySlot()) continue;
             result = GameDataHelpers.CombineAttributes(result, equipItem.GetIncreaseAttributes());
             result = GameDataHelpers.CombineAttributes(result, equipItem.GetSocketsIncreaseAttributes());
+            // Increase by rate
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetIncreaseAttributesRate()));
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetSocketsIncreaseAttributesRate()));
         }
-        // Right hand equipment
+        // Increase attributes from right hand equipment
         if (data.EquipWeapons.NotEmptyRightHandSlot())
         {
             result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.rightHand.GetIncreaseAttributes());
             result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.rightHand.GetSocketsIncreaseAttributes());
+            // Increase by rate
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetIncreaseAttributesRate()));
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetSocketsIncreaseAttributesRate()));
         }
-        // Left hand equipment
+        // Increase attributes from left hand equipment
         if (data.EquipWeapons.NotEmptyLeftHandSlot())
         {
             result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.leftHand.GetIncreaseAttributes());
             result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.leftHand.GetSocketsIncreaseAttributes());
+            // Increase by rate
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetIncreaseAttributesRate()));
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetSocketsIncreaseAttributesRate()));
         }
         return result;
     }
 
-    public static Dictionary<Attribute, short> GetBuffAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, float> GetBuffAttributes(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Attribute, short>();
-        Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
+            return new Dictionary<Attribute, float>();
+        Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
+        // Prepare base attributes, it will be multiplied with increase attributes rate
+        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
+        // Increase stats from buffs
         IList<CharacterBuff> buffs = data.Buffs;
         foreach (CharacterBuff buff in buffs)
         {
             result = GameDataHelpers.CombineAttributes(result, buff.GetIncreaseAttributes());
+            // Increase with rates
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
         }
-
-        // Passive skills
+        // Increase attributes from passive skills
         IList<CharacterSkill> skills = data.Skills;
         foreach (CharacterSkill skill in skills)
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
             result = GameDataHelpers.CombineAttributes(result, skill.GetPassiveBuffIncreaseAttributes());
+            // Increase with rates
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.GetPassiveBuffIncreaseAttributesRate()));
         }
         return result;
     }
 
-    public static Dictionary<Attribute, short> GetAttributes(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    public static Dictionary<Attribute, float> GetAttributes(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
-        Dictionary<Attribute, short> result = data.GetCharacterAttributes();
+        Dictionary<Attribute, float> result = data.GetCharacterAttributes();
         if (sumWithEquipments)
             result = GameDataHelpers.CombineAttributes(result, data.GetEquipmentAttributes());
         if (sumWithBuffs)
@@ -247,9 +262,8 @@ public static partial class CharacterDataExtension
         if (data == null)
             return new Dictionary<DamageElement, float>();
         Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-        BaseCharacter character = data.GetDatabase();
-        if (character != null)
-            result = GameDataHelpers.CombineResistances(result, character.GetCharacterResistances(data.Level));
+        if (data.GetDatabase() != null)
+            result = GameDataHelpers.CombineResistances(result, data.GetDatabase().GetCharacterResistances(data.Level));
         return result;
     }
 
@@ -318,9 +332,8 @@ public static partial class CharacterDataExtension
         if (data == null)
             return new Dictionary<DamageElement, float>();
         Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-        BaseCharacter character = data.GetDatabase();
-        if (character != null)
-            result = GameDataHelpers.CombineArmors(result, character.GetCharacterArmors(data.Level));
+        if (data.GetDatabase() != null)
+            result = GameDataHelpers.CombineArmors(result, data.GetDatabase().GetCharacterArmors(data.Level));
         return result;
     }
 
@@ -453,12 +466,10 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new CharacterStats();
-        short level = data.Level;
-        BaseCharacter character = data.GetDatabase();
         CharacterStats result = new CharacterStats();
-        if (character != null)
-            result += character.GetCharacterStats(level);
-        result += GameDataHelpers.GetStatsFromAttributes(GetAttributes(data));
+        if (data.GetDatabase() != null)
+            result += data.GetDatabase().GetCharacterStats(data.Level);
+        result += GameDataHelpers.GetStatsFromAttributes(data.GetCharacterAttributes());
         return result;
     }
 
@@ -467,7 +478,13 @@ public static partial class CharacterDataExtension
         if (data == null)
             return new CharacterStats();
         CharacterStats result = new CharacterStats();
-        // Armors
+        // Prepare base stats, it will be multiplied with increase stats rate
+        CharacterStats baseStats = new CharacterStats();
+        if (data.GetDatabase() != null)
+            baseStats += data.GetDatabase().GetCharacterStats(data.Level);
+        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
+        baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
+        // Increase stats from armors
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
         {
@@ -476,22 +493,37 @@ public static partial class CharacterDataExtension
             result += equipItem.GetSocketsIncreaseStats();
             result += GameDataHelpers.GetStatsFromAttributes(equipItem.GetIncreaseAttributes());
             result += GameDataHelpers.GetStatsFromAttributes(equipItem.GetSocketsIncreaseAttributes());
+            // Increase with rates
+            result += baseStats * equipItem.GetIncreaseStatsRate();
+            result += baseStats * equipItem.GetSocketsIncreaseStatsRate();
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetIncreaseAttributesRate()));
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetSocketsIncreaseAttributesRate()));
         }
-        // Right hand equipment
+        // Increase stats from right hand equipment
         if (!data.EquipWeapons.NotEmptyRightHandSlot())
         {
             result += data.EquipWeapons.rightHand.GetIncreaseStats();
             result += data.EquipWeapons.rightHand.GetSocketsIncreaseStats();
             result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.rightHand.GetIncreaseAttributes());
             result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.rightHand.GetSocketsIncreaseAttributes());
+            // Increase with rates
+            result += baseStats * data.EquipWeapons.rightHand.GetIncreaseStatsRate();
+            result += baseStats * data.EquipWeapons.rightHand.GetSocketsIncreaseStatsRate();
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetIncreaseAttributesRate()));
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetSocketsIncreaseAttributesRate()));
         }
-        // Left hand equipment
+        // Increase stats from left hand equipment
         if (!data.EquipWeapons.NotEmptyLeftHandSlot())
         {
             result += data.EquipWeapons.leftHand.GetIncreaseStats();
             result += data.EquipWeapons.leftHand.GetSocketsIncreaseStats();
             result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.leftHand.GetIncreaseAttributes());
             result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.leftHand.GetSocketsIncreaseAttributes());
+            // Increase with rates
+            result += baseStats * data.EquipWeapons.leftHand.GetIncreaseStatsRate();
+            result += baseStats * data.EquipWeapons.leftHand.GetSocketsIncreaseStatsRate();
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetIncreaseAttributesRate()));
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetSocketsIncreaseAttributesRate()));
         }
         return result;
     }
@@ -501,14 +533,23 @@ public static partial class CharacterDataExtension
         if (data == null)
             return new CharacterStats();
         CharacterStats result = new CharacterStats();
+        // Prepare base stats, it will be multiplied with increase stats rate
+        CharacterStats baseStats = new CharacterStats();
+        if (data.GetDatabase() != null)
+            baseStats += data.GetDatabase().GetCharacterStats(data.Level);
+        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
+        baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
+        // Increase stats from buffs
         IList<CharacterBuff> buffs = data.Buffs;
         foreach (CharacterBuff buff in buffs)
         {
             result += buff.GetIncreaseStats();
             result += GameDataHelpers.GetStatsFromAttributes(buff.GetIncreaseAttributes());
+            // Increase with rates
+            result += baseStats * buff.GetIncreaseStatsRate();
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
         }
-
-        // Passive skills
+        // Increase stats from passive skills
         IList<CharacterSkill> skills = data.Skills;
         foreach (CharacterSkill skill in skills)
         {
@@ -516,6 +557,9 @@ public static partial class CharacterDataExtension
                 continue;
             result += skill.GetPassiveBuffIncreaseStats();
             result += GameDataHelpers.GetStatsFromAttributes(skill.GetPassiveBuffIncreaseAttributes());
+            // Increase with rates
+            result += baseStats * skill.GetPassiveBuffIncreaseStatsRate();
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.GetPassiveBuffIncreaseAttributesRate()));
         }
         return result;
     }
@@ -1261,7 +1305,7 @@ public static partial class CharacterDataExtension
 
     public static void GetEquipmentSetBonus(this ICharacterData data,
         out CharacterStats bonusStats,
-        Dictionary<Attribute, short> bonusAttributes,
+        Dictionary<Attribute, float> bonusAttributes,
         Dictionary<DamageElement, float> bonusResistances,
         Dictionary<DamageElement, float> bonusArmors,
         Dictionary<DamageElement, MinMaxFloat> bonusDamages,
@@ -1309,8 +1353,15 @@ public static partial class CharacterDataExtension
             else
                 equipmentSets.Add(tempEquipmentItem.equipmentSet, 0);
         }
+        // Prepare base stats, it will be multiplied with increase stats rate
+        CharacterStats baseStats = new CharacterStats();
+        if (data.GetDatabase() != null)
+            baseStats += data.GetDatabase().GetCharacterStats(data.Level);
+        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
+        baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
         // Apply set items
-        Dictionary<Attribute, short> tempAttributes;
+        Dictionary<Attribute, float> tempAttributes;
+        Dictionary<Attribute, float> tempAttributesRate;
         Dictionary<DamageElement, float> tempResistances;
         Dictionary<DamageElement, float> tempArmors;
         Dictionary<DamageElement, MinMaxFloat> tempDamages;
@@ -1326,11 +1377,23 @@ public static partial class CharacterDataExtension
                 {
                     // Make temp of data
                     tempAttributes = GameDataHelpers.CombineAttributes(effects[i].attributes, null, 1f);
+                    tempAttributesRate = GameDataHelpers.CombineAttributes(effects[i].attributesRate, null, 1f);
                     tempResistances = GameDataHelpers.CombineResistances(effects[i].resistances, null, 1f);
                     tempArmors = GameDataHelpers.CombineArmors(effects[i].armors, null, 1f);
                     tempDamages = GameDataHelpers.CombineDamages(effects[i].damages, null, 1f);
                     tempSkillLevels = GameDataHelpers.CombineSkills(effects[i].skills, null);
                     tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempAttributes);
+                    // Increase with rates
+                    tempIncreaseStats += baseStats * effects[i].statsRate;
+                    tempIncreaseStats += GameDataHelpers.GetStatsFromAttributes(
+                        GameDataHelpers.MultiplyAttributes(
+                            new Dictionary<Attribute, float>(baseAttributes),
+                            tempAttributesRate));
+                    tempAttributes = GameDataHelpers.CombineAttributes(
+                        tempAttributes, 
+                        GameDataHelpers.MultiplyAttributes(
+                            new Dictionary<Attribute, float>(baseAttributes),
+                            tempAttributesRate));
                     // Combine to result dictionaries
                     bonusAttributes = GameDataHelpers.CombineAttributes(bonusAttributes, tempAttributes);
                     bonusResistances = GameDataHelpers.CombineResistances(bonusResistances, tempResistances);
@@ -1347,7 +1410,7 @@ public static partial class CharacterDataExtension
 
     public static void GetAllStats(this ICharacterData data,
         out CharacterStats resultStats,
-        Dictionary<Attribute, short> resultAttributes,
+        Dictionary<Attribute, float> resultAttributes,
         Dictionary<DamageElement, float> resultResistances,
         Dictionary<DamageElement, float> resultArmors,
         Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,

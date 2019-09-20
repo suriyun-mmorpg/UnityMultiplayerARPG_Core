@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, short>>
+    public partial class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, float>>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Attribute Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
@@ -67,12 +67,12 @@ namespace MultiplayerARPG
             {
                 string tempAllText = string.Empty;
                 Attribute tempAttribute;
-                short tempCurrentAmount;
-                short tempTargetAmount;
+                float tempCurrentAmount;
+                float tempTargetAmount;
                 string tempFormat;
                 string tempAmountText;
                 TextWrapper tempTextWrapper;
-                foreach (KeyValuePair<Attribute, short> dataEntry in Data)
+                foreach (KeyValuePair<Attribute, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;

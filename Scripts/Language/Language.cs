@@ -676,9 +676,9 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");
             Texts.Add(UILocaleKeys.UI_FORMAT_ATTRIBUTE_AMOUNT.ToString(), "{0}: {1}");
             // Format - Resistance Amount
-            Texts.Add(UILocaleKeys.UI_FORMAT_RESISTANCE_AMOUNT.ToString(), "{0}: {1}");
+            Texts.Add(UILocaleKeys.UI_FORMAT_RESISTANCE_AMOUNT.ToString(), "{0} Resistance: {1}%");
             // Format - Armor Amount
-            Texts.Add(UILocaleKeys.UI_FORMAT_ARMOR_AMOUNT.ToString(), "{0}: {1}");
+            Texts.Add(UILocaleKeys.UI_FORMAT_ARMOR_AMOUNT.ToString(), "{0} Armor: {1}");
             // Format - Skill Level
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_SKILL.ToString(), "{0}: {1}/{2}");
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");

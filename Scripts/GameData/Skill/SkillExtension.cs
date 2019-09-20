@@ -47,9 +47,9 @@ namespace MultiplayerARPG
                 return false;
 
             // Check is it pass attribute requirement or not
-            Dictionary<Attribute, short> attributeAmountsDict = character.GetAttributes(false, false);
-            Dictionary<Attribute, short> requireAttributeAmounts = skill.CacheRequireAttributeAmounts;
-            foreach (KeyValuePair<Attribute, short> requireAttributeAmount in requireAttributeAmounts)
+            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(false, false);
+            Dictionary<Attribute, float> requireAttributeAmounts = skill.CacheRequireAttributeAmounts;
+            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
             {
                 if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
                     attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)

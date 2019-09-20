@@ -118,9 +118,9 @@ namespace MultiplayerARPG
                             adjustAttributes[i] = new AttributeIncremental()
                             {
                                 attribute = tempValue.attribute,
-                                amount = new IncrementalShort()
+                                amount = new IncrementalFloat()
                                 {
-                                    baseAmount = (short)(tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1))),
+                                    baseAmount = tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
                                     amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
                                 }
                             };

@@ -13,9 +13,9 @@ namespace MultiplayerARPG
                 return false;
 
             // Check is it pass attribute requirement or not
-            Dictionary<Attribute, short> attributeAmountsDict = character.GetAttributes(true, false);
-            Dictionary<Attribute, short> requireAttributeAmounts = equipmentItem.CacheRequireAttributeAmounts;
-            foreach (KeyValuePair<Attribute, short> requireAttributeAmount in requireAttributeAmounts)
+            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(true, false);
+            Dictionary<Attribute, float> requireAttributeAmounts = equipmentItem.CacheRequireAttributeAmounts;
+            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
             {
                 if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
                     attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
@@ -40,47 +40,64 @@ namespace MultiplayerARPG
             return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
         }
 
-        public static CharacterStats GetIncreaseStats(this Item equipmentItem, short level, float rate)
+        public static CharacterStats GetIncreaseStats(this Item equipmentItem, short level)
         {
             if (equipmentItem == null ||
                 !equipmentItem.IsEquipment())
                 return new CharacterStats();
-            return equipmentItem.increaseStats.GetCharacterStats(level) * rate;
+            return equipmentItem.increaseStats.GetCharacterStats(level);
         }
 
-        public static Dictionary<Attribute, short> GetIncreaseAttributes(this Item equipmentItem, short level, float rate)
+        public static CharacterStats GetIncreaseStatsRate(this Item equipmentItem, short level)
         {
-            Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
+            if (equipmentItem == null ||
+                !equipmentItem.IsEquipment())
+                return new CharacterStats();
+            return equipmentItem.increaseStatsRate.GetCharacterStats(level);
+        }
+
+        public static Dictionary<Attribute, float> GetIncreaseAttributes(this Item equipmentItem, short level)
+        {
+            Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineAttributes(equipmentItem.increaseAttributes, result, level, rate);
+                result = GameDataHelpers.CombineAttributes(equipmentItem.increaseAttributes, result, level, 1f);
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseResistances(this Item equipmentItem, short level, float rate)
+        public static Dictionary<Attribute, float> GetIncreaseAttributesRate(this Item equipmentItem, short level)
+        {
+            Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
+            if (equipmentItem != null &&
+                equipmentItem.IsEquipment())
+                result = GameDataHelpers.CombineAttributes(equipmentItem.increaseAttributesRate, result, level, 1f);
+            return result;
+        }
+
+        public static Dictionary<DamageElement, float> GetIncreaseResistances(this Item equipmentItem, short level)
         {
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineResistances(equipmentItem.increaseResistances, result, level, rate);
+                result = GameDataHelpers.CombineResistances(equipmentItem.increaseResistances, result, level, 1f);
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseArmors(this Item equipmentItem, short level, float rate)
+        public static Dictionary<DamageElement, float> GetIncreaseArmors(this Item equipmentItem, short level)
         {
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineArmors(equipmentItem.increaseArmors, result, level, rate);
+                result = GameDataHelpers.CombineArmors(equipmentItem.increaseArmors, result, level, 1f);
             return result;
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Item equipmentItem, short level, float rate)
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Item equipmentItem, short level)
         {
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineDamages(equipmentItem.increaseDamages, result, level, rate);
+                result = GameDataHelpers.CombineDamages(equipmentItem.increaseDamages, result, level, 1f);
             return result;
         }
 

@@ -15,7 +15,9 @@ namespace MultiplayerARPG
         public IncrementalInt recoveryFood;
         public IncrementalInt recoveryWater;
         public CharacterStatsIncremental increaseStats;
+        public CharacterStatsIncremental increaseStatsRate;
         public AttributeIncremental[] increaseAttributes;
+        public AttributeIncremental[] increaseAttributesRate;
         public ResistanceIncremental[] increaseResistances;
         public ArmorIncremental[] increaseArmors;
         public DamageIncremental[] increaseDamages;
