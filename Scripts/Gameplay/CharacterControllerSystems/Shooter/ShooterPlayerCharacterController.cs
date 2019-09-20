@@ -143,7 +143,8 @@ namespace MultiplayerARPG
                     if (weaponAbility != null)
                         weaponAbility.ForceDeactivated();
                     weaponAbility = rightHandWeapon.weaponAbility;
-                    weaponAbility.Setup(this);
+                    if (weaponAbility != null)
+                        weaponAbility.Setup(this);
                     weaponAbilityState = WeaponAbilityState.Deactivated;
                 }
             }
