@@ -28,7 +28,20 @@ namespace MultiplayerARPG
             public LiteNetLibSyncList.Operation operation;
             public int index;
         }
-        
+
+        protected struct RaycastHitComparer : IComparer<RaycastHit>, IComparer<RaycastHit2D>
+        {
+            public int Compare(RaycastHit x, RaycastHit y)
+            {
+                return x.distance.CompareTo(y.distance);
+            }
+
+            public int Compare(RaycastHit2D x, RaycastHit2D y)
+            {
+                return x.distance.CompareTo(y.distance);
+            }
+        }
+
         [HideInInspector, System.NonSerialized]
         // This will be TRUE when this character enter to safe area
         public bool isInSafeArea;
@@ -373,8 +386,8 @@ namespace MultiplayerARPG
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
             InterruptCastingSkill();
-            if (attacker is BaseCharacterEntity)
-                gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
+            if (attacker.Entity is BaseCharacterEntity)
+                gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage);
         }
 
         public virtual void Killed(BaseCharacterEntity lastAttacker)
@@ -818,13 +831,14 @@ namespace MultiplayerARPG
                             {
                                 tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                                 tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                                if (tempDamageableEntity != null && (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this))
+                                if (tempDamageableEntity != null &&
+                                    (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this))
                                     break;
                             }
                         }
                         // Target receive damage
                         if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
-                            (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
+                            (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this) &&
                             IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                         {
                             // Pass all receive damage condition, then apply damages
@@ -847,7 +861,7 @@ namespace MultiplayerARPG
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
                             // Target receive damage
                             if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
-                                (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
+                                (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this) &&
                                 IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                             {
                                 // Pass all receive damage condition, then apply damages
@@ -874,33 +888,53 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Raycast:
-                    // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                    if (IsClient && damageInfo.projectileEffect != null)
-                    {
-                        Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
-                            .Setup(damageInfo.missileDistance, damageInfo.missileSpeed);
-                    }
                     // Just raycast to any characters to apply damage
-                    int tempRaycastSize = RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, damageInfo.missileDistance, ~0);
+                    int tempRaycastSize = RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, damageInfo.missileDistance, Physics.DefaultRaycastLayers);
                     if (tempRaycastSize == 0)
+                    {
+                        // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
+                        if (IsClient && damageInfo.projectileEffect != null)
+                        {
+                            Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
+                                .Setup(damageInfo.missileDistance, damageInfo.missileSpeed);
+                        }
                         return;
-                    // Find characters that receiving damages
+                    }
+                    // Sort index
                     Vector3 point;
                     Vector3 normal;
+                    float distance;
                     Transform tempHitTransform;
+                    // Find characters that receiving damages
                     for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
                     {
-                        tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal);
+                        tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance);
                         tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
+                        // Hit walls or harvestable entity, skip
+                        if (tempDamageableEntity == null || !(tempDamageableEntity.Entity is BaseCharacterEntity))
+                        {
+                            // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
+                            if (IsClient && damageInfo.projectileEffect != null)
+                            {
+                                Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
+                                    .Setup(distance, damageInfo.missileSpeed);
+                            }
+                            return;
+                        }
                         // Target receive damage
-                        if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
-                            (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this))
+                        if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() && tempDamageableEntity.Entity != this)
                         {
                             // Pass all receive damage condition, then apply damages
                             if (IsServer)
                                 tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff);
                             if (IsClient)
                                 tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
+                            // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
+                            if (IsClient && damageInfo.projectileEffect != null)
+                            {
+                                Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
+                                    .Setup(distance, damageInfo.missileSpeed);
+                            }
                         }
                     }
                     break;
@@ -981,22 +1015,30 @@ namespace MultiplayerARPG
         #region Find objects helpers
         public int RaycastObjects_ForAttackFunctions(Vector3 origin, Vector3 direction, float distance, int layerMask)
         {
+            int count = 0;
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
-                return Physics2D.RaycastNonAlloc(origin, direction, raycasts2D_ForAttackFunctions, distance, layerMask);
-            Debug.DrawRay(origin, direction, Color.red, 10);
-            return Physics.RaycastNonAlloc(origin, direction, raycasts_ForAttackFunctions, distance, layerMask);
+            {
+                count = Physics2D.RaycastNonAlloc(origin, direction, raycasts2D_ForAttackFunctions, distance, layerMask);
+                System.Array.Sort(raycasts2D_ForAttackFunctions, 0, count, new RaycastHitComparer());
+                return count;
+            }
+            count = Physics.RaycastNonAlloc(origin, direction, raycasts_ForAttackFunctions, distance, layerMask);
+            System.Array.Sort(raycasts_ForAttackFunctions, 0, count, new RaycastHitComparer());
+            return count;
         }
 
-        public Transform GetRaycastObject_ForAttackFunctions(int index, out Vector3 point, out Vector3 normal)
+        public Transform GetRaycastObject_ForAttackFunctions(int index, out Vector3 point, out Vector3 normal, out float distance)
         {
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 point = raycasts2D_ForAttackFunctions[index].point;
                 normal = raycasts2D_ForAttackFunctions[index].normal;
+                distance = raycasts2D_ForAttackFunctions[index].distance;
                 return raycasts2D_ForAttackFunctions[index].transform;
             }
             point = raycasts_ForAttackFunctions[index].point;
             normal = raycasts_ForAttackFunctions[index].normal;
+            distance = raycasts_ForAttackFunctions[index].distance;
             return raycasts_ForAttackFunctions[index].transform;
         }
 
