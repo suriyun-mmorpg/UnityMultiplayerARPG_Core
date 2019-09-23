@@ -260,7 +260,7 @@ namespace MultiplayerARPG
             // Slot
             statsStringPart = string.Format(
                 LanguageManager.GetText(slotLimitStatsFormat),
-                data.slotLimit.ToString("N2"));
+                data.slotLimit.ToString("N0"));
             if (data.slotLimit != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -326,6 +326,241 @@ namespace MultiplayerARPG
             statsStringPart = string.Format(
                 LanguageManager.GetText(waterStatsFormat),
                 data.water.ToString("N0"));
+            if (data.water != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextWater != null)
+                uiTextWater.text = statsStringPart;
+
+            return statsString;
+        }
+
+        public static string GetRateText(
+            CharacterStats data,
+            string hpRateStatsFormat,
+            string mpRateStatsFormat,
+            string accuracyRateStatsFormat,
+            string evasionRateStatsFormat,
+            string criRateStatsFormat,
+            string criDmgRateStatsFormat,
+            string blockRateStatsFormat,
+            string blockDmgRateStatsFormat,
+            string moveSpeedRateStatsFormat,
+            string atkSpeedRateStatsFormat,
+            string weightLimitRateStatsFormat,
+            string slotLimitRateStatsFormat,
+            string staminaRateStatsFormat,
+            string foodRateStatsFormat,
+            string waterRateStatsFormat,
+            TextWrapper uiTextHp = null,
+            TextWrapper uiTextMp = null,
+            TextWrapper uiTextArmor = null,
+            TextWrapper uiTextAccuracy = null,
+            TextWrapper uiTextEvasion = null,
+            TextWrapper uiTextCriRate = null,
+            TextWrapper uiTextCriDmgRate = null,
+            TextWrapper uiTextBlockRate = null,
+            TextWrapper uiTextBlockDmgRate = null,
+            TextWrapper uiTextMoveSpeed = null,
+            TextWrapper uiTextAtkSpeed = null,
+            TextWrapper uiTextWeightLimit = null,
+            TextWrapper uiTextSlotLimit = null,
+            TextWrapper uiTextStamina = null,
+            TextWrapper uiTextFood = null,
+            TextWrapper uiTextWater = null)
+        {
+            string statsString = string.Empty;
+            string statsStringPart = string.Empty;
+
+            // Hp
+            statsStringPart = string.Format(
+                LanguageManager.GetText(hpRateStatsFormat),
+                (data.hp * 100).ToString("N2"));
+            if (data.hp != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextHp != null)
+                uiTextHp.text = statsStringPart;
+
+            // Mp
+            statsStringPart = string.Format(
+                LanguageManager.GetText(mpRateStatsFormat),
+                (data.mp * 100).ToString("N2"));
+            if (data.mp != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextMp != null)
+                uiTextMp.text = statsStringPart;
+
+            // Accuracy
+            statsStringPart = string.Format(
+                LanguageManager.GetText(accuracyRateStatsFormat),
+                (data.accuracy * 100).ToString("N2"));
+            if (data.accuracy != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextAccuracy != null)
+                uiTextAccuracy.text = statsStringPart;
+
+            // Evasion
+            statsStringPart = string.Format(
+                LanguageManager.GetText(evasionRateStatsFormat),
+                (data.evasion * 100).ToString("N2"));
+            if (data.evasion != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextEvasion != null)
+                uiTextEvasion.text = statsStringPart;
+
+            // Cri Rate
+            statsStringPart = string.Format(
+                LanguageManager.GetText(criRateStatsFormat),
+                (data.criRate * 100).ToString("N2"));
+            if (data.criRate != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextCriRate != null)
+                uiTextCriRate.text = statsStringPart;
+
+            // Cri Dmg Rate
+            statsStringPart = string.Format(
+                LanguageManager.GetText(criDmgRateStatsFormat),
+                (data.criDmgRate * 100).ToString("N2"));
+            if (data.criDmgRate != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextCriDmgRate != null)
+                uiTextCriDmgRate.text = statsStringPart;
+
+            // Block Rate
+            statsStringPart = string.Format(
+                LanguageManager.GetText(blockRateStatsFormat),
+                (data.blockRate * 100).ToString("N2"));
+            if (data.blockRate != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextBlockRate != null)
+                uiTextBlockRate.text = statsStringPart;
+
+            // Block Dmg Rate
+            statsStringPart = string.Format(
+                LanguageManager.GetText(blockDmgRateStatsFormat),
+                (data.blockDmgRate * 100).ToString("N2"));
+            if (data.blockDmgRate != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextBlockDmgRate != null)
+                uiTextBlockDmgRate.text = statsStringPart;
+
+            // Weight
+            statsStringPart = string.Format(
+                LanguageManager.GetText(weightLimitRateStatsFormat),
+                (data.weightLimit * 100).ToString("N2"));
+            if (data.weightLimit != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextWeightLimit != null)
+                uiTextWeightLimit.text = statsStringPart;
+
+            // Slot
+            statsStringPart = string.Format(
+                LanguageManager.GetText(slotLimitRateStatsFormat),
+                (data.slotLimit * 100).ToString("N2"));
+            if (data.slotLimit != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextSlotLimit != null)
+                uiTextSlotLimit.text = statsStringPart;
+
+            // Move Speed
+            statsStringPart = string.Format(
+                LanguageManager.GetText(moveSpeedRateStatsFormat),
+                (data.moveSpeed * 100).ToString("N2"));
+            if (data.moveSpeed != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextMoveSpeed != null)
+                uiTextMoveSpeed.text = statsStringPart;
+
+            // Attack Speed
+            statsStringPart = string.Format(
+                LanguageManager.GetText(atkSpeedRateStatsFormat),
+                (data.atkSpeed * 100).ToString("N2"));
+            if (data.atkSpeed != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextAtkSpeed != null)
+                uiTextAtkSpeed.text = statsStringPart;
+
+            // Stamina
+            statsStringPart = string.Format(
+                LanguageManager.GetText(staminaRateStatsFormat),
+                (data.stamina * 100).ToString("N2"));
+            if (data.stamina != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextStamina != null)
+                uiTextStamina.text = statsStringPart;
+
+            // Food
+            statsStringPart = string.Format(
+                LanguageManager.GetText(foodRateStatsFormat),
+                (data.food * 100).ToString("N2"));
+            if (data.food != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextFood != null)
+                uiTextFood.text = statsStringPart;
+
+            // Water
+            statsStringPart = string.Format(
+                LanguageManager.GetText(waterRateStatsFormat),
+                (data.water * 100).ToString("N2"));
             if (data.water != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
