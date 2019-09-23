@@ -74,10 +74,10 @@ namespace MultiplayerARPG
             mp = mp * b.mp;
             accuracy = accuracy * b.accuracy;
             evasion = evasion * b.evasion;
-            criRate = criRate * b.criRate;
-            criDmgRate = criDmgRate * b.criDmgRate;
-            blockRate = blockRate * b.blockRate;
-            blockDmgRate = blockDmgRate * b.blockDmgRate;
+            criRate = criRate + b.criRate;
+            criDmgRate = criDmgRate + b.criDmgRate;
+            blockRate = blockRate + b.blockRate;
+            blockDmgRate = blockDmgRate + b.blockDmgRate;
             moveSpeed = moveSpeed * b.moveSpeed;
             atkSpeed = atkSpeed * b.atkSpeed;
             weightLimit = weightLimit * b.weightLimit;
@@ -116,6 +116,7 @@ namespace MultiplayerARPG
             string moveSpeedStatsFormat,
             string atkSpeedStatsFormat,
             string weightLimitStatsFormat,
+            string slotLimitStatsFormat,
             string staminaStatsFormat,
             string foodStatsFormat,
             string waterStatsFormat,
@@ -131,6 +132,7 @@ namespace MultiplayerARPG
             TextWrapper uiTextMoveSpeed = null,
             TextWrapper uiTextAtkSpeed = null,
             TextWrapper uiTextWeightLimit = null,
+            TextWrapper uiTextSlotLimit = null,
             TextWrapper uiTextStamina = null,
             TextWrapper uiTextFood = null,
             TextWrapper uiTextWater = null)
@@ -254,6 +256,19 @@ namespace MultiplayerARPG
             }
             if (uiTextWeightLimit != null)
                 uiTextWeightLimit.text = statsStringPart;
+
+            // Slot
+            statsStringPart = string.Format(
+                LanguageManager.GetText(slotLimitStatsFormat),
+                data.slotLimit.ToString("N2"));
+            if (data.slotLimit != 0)
+            {
+                if (!string.IsNullOrEmpty(statsString))
+                    statsString += "\n";
+                statsString += statsStringPart;
+            }
+            if (uiTextSlotLimit != null)
+                uiTextSlotLimit.text = statsStringPart;
 
             // Move Speed
             statsStringPart = string.Format(
