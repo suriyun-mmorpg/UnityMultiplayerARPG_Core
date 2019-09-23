@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_PARTY_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UILocaleKeys.UI_PARTY_CHANGE_LEADER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_CHANGE_LEADER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestChangePartyLeader(partyMember.id);
             });
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UILocaleKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestKickFromParty(partyMember.id);
             });
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
 
         public void OnClickLeaveParty()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_PARTY_LEAVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_PARTY_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestLeaveParty();
             });

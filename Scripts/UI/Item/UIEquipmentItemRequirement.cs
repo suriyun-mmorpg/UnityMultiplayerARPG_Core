@@ -6,9 +6,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Require Level}")]
-        public UILocaleKeySetting formatKeyRequireLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_LEVEL);
+        public UILocaleKeySetting formatKeyRequireLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL);
         [Tooltip("Format => {0} = {Require Class Title}")]
-        public UILocaleKeySetting formatKeyRequireClass = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_CLASS);
+        public UILocaleKeySetting formatKeyRequireClass = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_CLASS);
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiRequireAttributeAmounts.showAsRequirement = true;
+                    uiRequireAttributeAmounts.displayType = UIAttributeAmounts.DisplayType.Requirement;
                     uiRequireAttributeAmounts.Show();
                     uiRequireAttributeAmounts.Data = equipmentItem.CacheRequireAttributeAmounts;
                 }

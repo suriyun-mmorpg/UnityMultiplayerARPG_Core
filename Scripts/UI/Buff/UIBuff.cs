@@ -10,17 +10,17 @@ namespace MultiplayerARPG
         
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Buff Duration}")]
-        public UILocaleKeySetting formatKeyDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_DURATION);
+        public UILocaleKeySetting formatKeyDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_DURATION);
         [Tooltip("Format => {0} = {Buff Recovery Hp}")]
-        public UILocaleKeySetting formatKeyRecoveryHp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_HP);
+        public UILocaleKeySetting formatKeyRecoveryHp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_HP);
         [Tooltip("Format => {0} = {Buff Recovery Mp}")]
-        public UILocaleKeySetting formatKeyRecoveryMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_MP);
+        public UILocaleKeySetting formatKeyRecoveryMp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_MP);
         [Tooltip("Format => {0} = {Buff Recovery Stamina}")]
-        public UILocaleKeySetting formatKeyRecoveryStamina = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_STAMINA);
+        public UILocaleKeySetting formatKeyRecoveryStamina = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_STAMINA);
         [Tooltip("Format => {0} = {Buff Recovery Food}")]
-        public UILocaleKeySetting formatKeyRecoveryFood = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_FOOD);
+        public UILocaleKeySetting formatKeyRecoveryFood = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_FOOD);
         [Tooltip("Format => {0} = {Buff Recovery Water}")]
-        public UILocaleKeySetting formatKeyRecoveryWater = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_WATER);
+        public UILocaleKeySetting formatKeyRecoveryWater = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_WATER);
 
         [Header("UI Elements")]
         public TextWrapper uiTextDuration;
@@ -30,7 +30,9 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRecoveryFood;
         public TextWrapper uiTextRecoveryWater;
         public UICharacterStats uiBuffStats;
+        public UICharacterStats uiBuffStatsRate;
         public UIAttributeAmounts uiBuffAttributes;
+        public UIAttributeAmounts uiBuffAttributesRate;
         public UIResistanceAmounts uiBuffResistances;
         public UIArmorAmounts uiBuffArmors;
         public UIDamageElementAmounts uiBuffDamages;
@@ -92,10 +94,28 @@ namespace MultiplayerARPG
             }
 
             if (uiBuffStats != null)
+            {
+                uiBuffStats.displayType = UICharacterStats.DisplayType.Simple;
                 uiBuffStats.Data = Buff.GetIncreaseStats(Level);
+            }
+
+            if (uiBuffStatsRate != null)
+            {
+                uiBuffStatsRate.displayType = UICharacterStats.DisplayType.Rate;
+                uiBuffStatsRate.Data = Buff.GetIncreaseStatsRate(Level);
+            }
 
             if (uiBuffAttributes != null)
+            {
+                uiBuffAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
                 uiBuffAttributes.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributes, new Dictionary<Attribute, float>(), Level, 1f);
+            }
+
+            if (uiBuffAttributesRate != null)
+            {
+                uiBuffAttributesRate.displayType = UIAttributeAmounts.DisplayType.Simple;
+                uiBuffAttributesRate.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributesRate, new Dictionary<Attribute, float>(), Level, 1f);
+            }
 
             if (uiBuffResistances != null)
                 uiBuffResistances.Data = GameDataHelpers.CombineResistances(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);

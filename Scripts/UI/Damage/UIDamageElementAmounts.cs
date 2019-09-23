@@ -7,9 +7,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Min Damage}, {2} = {Max Damage}")]
-        public UILocaleKeySetting formatKeyDamage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL);
+        public UILocaleKeySetting formatKeyDamage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL);
         [Tooltip("Format => {0} = {Min Damage}, {1} = {Max Damage}")]
-        public UILocaleKeySetting formatKeySumDamage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_DAMAGE_AMOUNT);
+        public UILocaleKeySetting formatKeySumDamage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllDamages;

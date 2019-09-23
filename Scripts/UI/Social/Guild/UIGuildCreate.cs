@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
-        public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD);
+        public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
 
         [Header("UI Elements")]
         public InputFieldWrapper inputFieldGuildName;

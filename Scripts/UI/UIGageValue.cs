@@ -19,12 +19,12 @@ namespace MultiplayerARPG
         public Image imageGage;
 
         [Header("Min By Max Setting")]
-        public UILocaleKeySetting formatCurrentByMax = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE_MIN_BY_MAX);
+        public UILocaleKeySetting formatCurrentByMax = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_MIN_BY_MAX);
         public string formatCurrentAmount = "N0";
         public string formatMaxAmount = "N0";
 
         [Header("Percentage Setting")]
-        public UILocaleKeySetting formatPercentage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
+        public UILocaleKeySetting formatPercentage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
         public string formatPercentageAmount = "N0";
 
         private float rate;

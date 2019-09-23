@@ -9,13 +9,13 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
-        public UILocaleKeySetting formatKeyTaskKillMonster = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER);
+        public UILocaleKeySetting formatKeyTaskKillMonster = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER);
         [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
-        public UILocaleKeySetting formatKeyTaskKillMonsterComplete = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE);
+        public UILocaleKeySetting formatKeyTaskKillMonsterComplete = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE);
         [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
-        public UILocaleKeySetting formatKeyTaskCollectItem = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM);
+        public UILocaleKeySetting formatKeyTaskCollectItem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM);
         [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
-        public UILocaleKeySetting formatKeyTaskCollectItemComplete = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE);
+        public UILocaleKeySetting formatKeyTaskCollectItemComplete = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTaskDescription;

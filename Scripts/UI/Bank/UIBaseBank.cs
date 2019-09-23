@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Gold Amount}")]
-        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_GOLD);
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;
@@ -25,12 +25,12 @@ namespace MultiplayerARPG
 
         public void OnClickDeposit()
         {
-            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_BANK_DEPOSIT.ToString()), LanguageManager.GetText(UILocaleKeys.UI_BANK_DEPOSIT_DESCRIPTION.ToString()), OnDepositConfirm, 0, null, 0);
+            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_BANK_DEPOSIT.ToString()), LanguageManager.GetText(UITextKeys.UI_BANK_DEPOSIT_DESCRIPTION.ToString()), OnDepositConfirm, 0, null, 0);
         }
 
         public void OnClickWithdraw()
         {
-            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_BANK_WITHDRAW.ToString()), LanguageManager.GetText(UILocaleKeys.UI_BANK_WITHDRAW_DESCRIPTION.ToString()), OnWithdrawConfirm, 0, null, 0);
+            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_BANK_WITHDRAW.ToString()), LanguageManager.GetText(UITextKeys.UI_BANK_WITHDRAW_DESCRIPTION.ToString()), OnWithdrawConfirm, 0, null, 0);
         }
 
         public abstract void OnDepositConfirm(int amount);

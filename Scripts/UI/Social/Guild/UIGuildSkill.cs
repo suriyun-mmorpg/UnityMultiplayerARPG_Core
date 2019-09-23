@@ -11,17 +11,17 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Description}")]
-        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
-        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Duration}")]
-        public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
+        public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
         [Tooltip("Format => {0} = {Remains Duration}")]
-        public UILocaleKeySetting formatKeyCoolDownRemainsDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyCoolDownRemainsDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Skill Type Title}")]
-        public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_TYPE);
+        public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_TYPE);
 
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextDescription;
@@ -173,12 +173,12 @@ namespace MultiplayerARPG
                     case GuildSkillType.Active:
                         uiTextSkillType.text = string.Format(
                             LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
+                            LanguageManager.GetText(UITextKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
                         break;
                     case GuildSkillType.Passive:
                         uiTextSkillType.text = string.Format(
                             LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
+                            LanguageManager.GetText(UITextKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
                         break;
                 }
             }
@@ -187,7 +187,7 @@ namespace MultiplayerARPG
             {
                 int amount = GuildSkill.increaseMaxMember.GetAmount(Level);
                 uiTextIncreaseMaxMember.text = string.Format(
-                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_MAX_MEMBER.ToString()),
+                    LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_MAX_MEMBER.ToString()),
                     amount.ToString("N0"));
                 uiTextIncreaseMaxMember.gameObject.SetActive(amount != 0);
             }
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
             {
                 float amount = GuildSkill.increaseExpGainPercentage.GetAmount(Level);
                 uiTextIncreaseExpGainPercentage.text = string.Format(
-                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE.ToString()),
+                    LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
                 uiTextIncreaseExpGainPercentage.gameObject.SetActive(amount != 0);
             }
@@ -205,7 +205,7 @@ namespace MultiplayerARPG
             {
                 float amount = GuildSkill.increaseGoldGainPercentage.GetAmount(Level);
                 uiTextIncreaseGoldGainPercentage.text = string.Format(
-                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE.ToString()),
+                    LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
                 uiTextIncreaseGoldGainPercentage.gameObject.SetActive(amount != 0);
             }
@@ -214,7 +214,7 @@ namespace MultiplayerARPG
             {
                 float amount = GuildSkill.increaseShareExpGainPercentage.GetAmount(Level);
                 uiTextIncreaseShareExpGainPercentage.text = string.Format(
-                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE.ToString()),
+                    LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
                 uiTextIncreaseShareExpGainPercentage.gameObject.SetActive(amount != 0);
             }
@@ -223,7 +223,7 @@ namespace MultiplayerARPG
             {
                 float amount = GuildSkill.increaseShareGoldGainPercentage.GetAmount(Level);
                 uiTextIncreaseShareGoldGainPercentage.text = string.Format(
-                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE.ToString()),
+                    LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
                 uiTextIncreaseShareGoldGainPercentage.gameObject.SetActive(amount != 0);
             }
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
             {
                 float amount = GuildSkill.decreaseExpLostPercentage.GetAmount(Level);
                 uiTextDecreaseExpLostPercentage.text = string.Format(
-                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE.ToString()),
+                    LanguageManager.GetText(UIFormatKeys.UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
                 uiTextDecreaseExpLostPercentage.gameObject.SetActive(amount != 0);
             }

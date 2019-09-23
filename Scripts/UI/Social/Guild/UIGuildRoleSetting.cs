@@ -40,13 +40,13 @@ namespace MultiplayerARPG
             if (inputFieldRoleName == null ||
                 string.IsNullOrEmpty(inputFieldRoleName.text))
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY.ToString()));
                 return;
             }
             if (inputFieldShareExpPercentage == null || 
                 !byte.TryParse(inputFieldShareExpPercentage.text, out shareExpPercentage))
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString()));
                 return;
             }
             BasePlayerCharacterController.OwningCharacter.RequestSetGuildRole(

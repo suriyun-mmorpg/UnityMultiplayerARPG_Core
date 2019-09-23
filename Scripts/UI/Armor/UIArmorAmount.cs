@@ -2,11 +2,11 @@
 
 namespace MultiplayerARPG
 {
-    public partial class UIDamageElementAmount : UISelectionEntry<UIDamageElementAmountData>
+    public partial class UIArmorAmount : UISelectionEntry<UIArmorAmountData>
     {
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Min Damage}, {2} = {Max Damage}")]
-        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL);
+        [Tooltip("Format => {0} = {Armor Title}, {1} = {Amount}")]
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;
@@ -18,8 +18,7 @@ namespace MultiplayerARPG
                 uiTextAmount.text = string.Format(
                     LanguageManager.GetText(formatKeyAmount),
                     Data.damageElement.Title,
-                    Data.amount.min.ToString("N0"),
-                    Data.amount.max.ToString("N0"));
+                    Data.amount.ToString("N0"));
             }
         }
     }

@@ -10,15 +10,15 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Guild Name}")]
-        public UILocaleKeySetting formatKeyGuildName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Leader Name}")]
-        public UILocaleKeySetting formatKeyLeaderName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SOCIAL_LEADER);
+        public UILocaleKeySetting formatKeyLeaderName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_LEADER);
         [Tooltip("Format => {0} = {Level}")]
-        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Skill Point}")]
-        public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_POINTS);
+        public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_POINTS);
         [Tooltip("Format => {0} = {Message}")]
-        public UILocaleKeySetting formatKeyMessage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SOCIAL_LEADER);
+        public UILocaleKeySetting formatKeyMessage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_LEADER);
 
         [Header("UI Elements")]
         public UIGuildRole uiRoleDialog;
@@ -366,7 +366,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_GUILD_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UILocaleKeys.UI_GUILD_CHANGE_LEADER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestChangeGuildLeader(guildMember.id);
             });
@@ -415,7 +415,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UILocaleKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestKickFromGuild(guildMember.id);
             });
@@ -423,7 +423,7 @@ namespace MultiplayerARPG
 
         public void OnClickLeaveGuild()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_GUILD_LEAVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestLeaveGuild();
             });

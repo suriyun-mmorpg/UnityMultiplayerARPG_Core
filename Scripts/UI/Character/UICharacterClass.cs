@@ -9,9 +9,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Description}")]
-        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -46,10 +46,16 @@ namespace MultiplayerARPG
             }
 
             if (uiStats != null)
+            {
+                uiStats.displayType = UICharacterStats.DisplayType.Simple;
                 uiStats.Data = Data.GetCharacterStats(1);
+            }
 
             if (uiAttributes != null)
+            {
+                uiAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
                 uiAttributes.Data = Data.GetCharacterAttributes(1);
+            }
 
             if (uiResistances != null)
                 uiResistances.Data = Data.GetCharacterResistances(1);

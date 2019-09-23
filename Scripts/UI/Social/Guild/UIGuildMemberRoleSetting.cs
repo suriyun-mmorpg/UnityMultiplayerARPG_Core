@@ -7,9 +7,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]
-        public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
-        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
 
         [Header("UI Elements")]
         public TextWrapper uiTextName;
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
             if (dropdownRoles != null)
             {
                 List<DropdownWrapper.OptionData> options = new List<DropdownWrapper.OptionData>();
-                options.Add(new DropdownWrapper.OptionData(LanguageManager.GetText(UILocaleKeys.UI_LABEL_NONE.ToString())));
+                options.Add(new DropdownWrapper.OptionData(LanguageManager.GetText(UITextKeys.UI_LABEL_NONE.ToString())));
                 for (int i = 1; i < roles.Length; ++i)
                 {
                     options.Add(new DropdownWrapper.OptionData(roles[i].roleName));
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             byte role = (byte)(dropdownRoles != null ? dropdownRoles.value : 0);
             if (role == 0)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_INVALID_GUILD_ROLE.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_GUILD_ROLE.ToString()));
                 return;
             }
             BasePlayerCharacterController.OwningCharacter.RequestSetGuildMemberRole(characterId, (byte)dropdownRoles.value);

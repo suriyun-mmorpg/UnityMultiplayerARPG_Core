@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Sell Price}")]
-        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SELL_PRICE);
+        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
 
         [Header("UI Elements")]
         public UICharacterItem uiCharacterItem;
@@ -57,7 +57,15 @@ namespace MultiplayerARPG
                     owningCharacter.RequestBuyNpcItem((short)indexOfData, 1);
             }
             else
-                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_BUY_ITEM.ToString()), LanguageManager.GetText(UILocaleKeys.UI_BUY_ITEM_DESCRIPTION.ToString()), OnBuyAmountConfirmed, 1, item.maxStack, 1);
+            {
+                UISceneGlobal.Singleton.ShowInputDialog(
+                    LanguageManager.GetText(UITextKeys.UI_BUY_ITEM.ToString()),
+                    LanguageManager.GetText(UITextKeys.UI_BUY_ITEM_DESCRIPTION.ToString()),
+                    OnBuyAmountConfirmed,
+                    1,  /* Min Amount */
+                    item.maxStack,
+                    1   /* Start Amount*/);
+            }
         }
 
         private void OnBuyAmountConfirmed(int amount)

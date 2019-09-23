@@ -13,21 +13,21 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Description}")]
-        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
-        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {List Of Weapon Type}")]
-        public UILocaleKeySetting formatKeyAvailableWeapons = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_AVAILABLE_WEAPONS);
+        public UILocaleKeySetting formatKeyAvailableWeapons = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS);
         [Tooltip("Format => {0} = {Consume Mp Amount}")]
-        public UILocaleKeySetting formatKeyConsumeMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CONSUME_MP);
+        public UILocaleKeySetting formatKeyConsumeMp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CONSUME_MP);
         [Tooltip("Format => {0} = {Cooldown Duration}")]
-        public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
+        public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
         [Tooltip("Format => {0} = {Cooldown Remains Duration}")]
-        public UILocaleKeySetting formatKeyCoolDownRemainsDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyCoolDownRemainsDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Skill Type Title}")]
-        public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_TYPE);
+        public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_TYPE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -169,17 +169,17 @@ namespace MultiplayerARPG
                     case SkillType.Active:
                         uiTextSkillType.text = string.Format(
                             LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
+                            LanguageManager.GetText(UITextKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
                         break;
                     case SkillType.Passive:
                         uiTextSkillType.text = string.Format(
                             LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
+                            LanguageManager.GetText(UITextKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
                         break;
                     case SkillType.CraftItem:
                         uiTextSkillType.text = string.Format(
                             LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString()));
+                            LanguageManager.GetText(UITextKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString()));
                         break;
                 }
             }

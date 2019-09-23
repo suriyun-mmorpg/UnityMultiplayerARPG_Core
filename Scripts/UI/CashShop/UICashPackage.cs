@@ -9,13 +9,13 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Description}")]
-        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Sell Price}")]
-        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SELL_PRICE);
+        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
         [Tooltip("Format => {0} = {Cash Amount}")]
-        public UILocaleKeySetting formatKeyRewardCash = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REWARD_CASH);
+        public UILocaleKeySetting formatKeyRewardCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_CASH);
 
         [Header("UI Elements")]
         public UICashPackages uiCashPackages;

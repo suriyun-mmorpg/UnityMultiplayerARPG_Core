@@ -6,9 +6,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Role Name}")]
-        public UILocaleKeySetting formatKeyRoleName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyRoleName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Share Exp Percentage}")]
-        public UILocaleKeySetting formatKeyShareExpPercentage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SHARE_EXP_PERCENTAGE);
+        public UILocaleKeySetting formatKeyShareExpPercentage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SHARE_EXP_PERCENTAGE);
 
         [Header("UI Elements")]
         public TextWrapper textRoleName;
@@ -27,15 +27,15 @@ namespace MultiplayerARPG
             if (textCanInvite != null)
             {
                 textCanInvite.text = Data.canInvite ?
-                    LanguageManager.GetText(UILocaleKeys.UI_GUILD_ROLE_CAN_INVITE.ToString()) :
-                    LanguageManager.GetText(UILocaleKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString());
+                    LanguageManager.GetText(UITextKeys.UI_GUILD_ROLE_CAN_INVITE.ToString()) :
+                    LanguageManager.GetText(UITextKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString());
             }
 
             if (textCanKick != null)
             {
                 textCanKick.text = Data.canKick ?
-                    LanguageManager.GetText(UILocaleKeys.UI_GUILD_ROLE_CAN_KICK.ToString()) :
-                    LanguageManager.GetText(UILocaleKeys.UI_GUILD_ROLE_CANNOT_KICK.ToString());
+                    LanguageManager.GetText(UITextKeys.UI_GUILD_ROLE_CAN_KICK.ToString()) :
+                    LanguageManager.GetText(UITextKeys.UI_GUILD_ROLE_CANNOT_KICK.ToString());
             }
 
             if (textShareExpPercentage != null)

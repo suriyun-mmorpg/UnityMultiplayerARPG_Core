@@ -8,9 +8,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
-        public UILocaleKeySetting formatKeyWeightLimit = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_WEIGHT);
+        public UILocaleKeySetting formatKeyWeightLimit = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_WEIGHT);
         [Tooltip("Format => {0} = {Current Used Slots}, {1} = {Slot Limit}")]
-        public UILocaleKeySetting formatKeySlotLimit = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_SLOT);
+        public UILocaleKeySetting formatKeySlotLimit = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_SLOT);
 
         [Header("UI Elements")]
         public UICharacterItem uiItemDialog;
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             if (uiTextWeightLimit != null)
             {
                 if (weightLimit <= 0)
-                    uiTextWeightLimit.text = LanguageManager.GetText(UILocaleKeys.UI_LABEL_UNLIMIT_WEIGHT.ToString());
+                    uiTextWeightLimit.text = LanguageManager.GetText(UITextKeys.UI_LABEL_UNLIMIT_WEIGHT.ToString());
                 else
                     uiTextWeightLimit.text = string.Format(LanguageManager.GetText(formatKeyWeightLimit), totalWeight.ToString("N2"), weightLimit.ToString("N2"));
             }
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             if (uiTextSlotLimit != null)
             {
                 if (slotLimit <= 0)
-                    uiTextSlotLimit.text = LanguageManager.GetText(UILocaleKeys.UI_LABEL_UNLIMIT_SLOT.ToString());
+                    uiTextSlotLimit.text = LanguageManager.GetText(UITextKeys.UI_LABEL_UNLIMIT_SLOT.ToString());
                 else
                     uiTextSlotLimit.text = string.Format(LanguageManager.GetText(formatKeySlotLimit), usedSlots.ToString("N0"), slotLimit.ToString("N0"));
             }

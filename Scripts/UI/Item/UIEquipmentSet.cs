@@ -6,12 +6,11 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Set Title}, {1} = {List Of Effect}")]
-        [Multiline]
-        public UILocaleKeySetting formatKeySet = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET);
+        public UILocaleKeySetting formatKeySet = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EQUIPMENT_SET);
         [Tooltip("Format => {0} = {Equip Amount}, {1} = {List Of Bonus}")]
-        public UILocaleKeySetting formatKeyAppliedEffect = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT);
+        public UILocaleKeySetting formatKeyAppliedEffect = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT);
         [Tooltip("Format => {0} = {Equip Amount}, {1} = {List Of Bonus}")]
-        public UILocaleKeySetting formatKeyUnappliedEffect = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT);
+        public UILocaleKeySetting formatKeyUnappliedEffect = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT);
         
         protected override void UpdateData()
         {

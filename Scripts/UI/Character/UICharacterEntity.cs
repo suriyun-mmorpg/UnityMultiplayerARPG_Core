@@ -8,9 +8,9 @@ namespace MultiplayerARPG
     {
         [Header("Character Entity - String Formats")]
         [Tooltip("Format => {0} = {Level}")]
-        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Count Down Duration}")]
-        public UILocaleKeySetting formatKeySkillCastDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeySkillCastDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("Character Entity - UI Elements")]
         public TextWrapper uiTextLevel;

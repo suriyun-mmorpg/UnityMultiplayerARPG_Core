@@ -12,19 +12,19 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]
-        public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
-        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Stat Points}")]
-        public UILocaleKeySetting formatKeyStatPoint = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_STAT_POINTS);
+        public UILocaleKeySetting formatKeyStatPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STAT_POINTS);
         [Tooltip("Format => {0} = {Skill Points}")]
-        public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_POINTS);
+        public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_POINTS);
         [Tooltip("Format => {0} = {Gold Amount}")]
-        public UILocaleKeySetting formatKeyGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_GOLD);
+        public UILocaleKeySetting formatKeyGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
-        public UILocaleKeySetting formatKeyWeightLimitStats = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_WEIGHT);
+        public UILocaleKeySetting formatKeyWeightLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_WEIGHT);
         [Tooltip("Format => {0} = {Min Damage}, {1} = {Max Damage}")]
-        public UILocaleKeySetting formatKeyWeaponDamage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_DAMAGE_AMOUNT);
+        public UILocaleKeySetting formatKeyWeaponDamage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper uiTextName;
@@ -235,10 +235,17 @@ namespace MultiplayerARPG
             cacheArmors = showArmorWithBuffs ? Data.GetArmors() : Data.GetArmors(true, false);
             cacheDamages = showDamageWithBuffs ? Data.GetIncreaseDamages() : Data.GetIncreaseDamages(true, false);
             cacheWeightLimit = cacheStats.weightLimit;
+
             if (!showStatsWithBuffs)
             {
+                // Prepare base stats, it will be multiplied with increase stats rate
+                CharacterStats baseStats = new CharacterStats();
+                if (Data.GetDatabase() != null)
+                    baseStats += Data.GetDatabase().GetCharacterStats(Data.Level);
+                Dictionary<Attribute, float> baseAttributes = Data.GetCharacterAttributes();
+                baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
                 // Always increase weight limit by buff bonus because it should always show real weight limit in UIs
-                cacheWeightLimit += Data.GetBuffStats().weightLimit;
+                cacheWeightLimit += Data.GetBuffStats(baseStats, baseAttributes).weightLimit;
             }
 
             if (bonusAttributes == null)
@@ -337,7 +344,10 @@ namespace MultiplayerARPG
             }
 
             if (uiCharacterStats != null)
+            {
+                uiCharacterStats.displayType = UICharacterStats.DisplayType.Simple;
                 uiCharacterStats.Data = cacheStats;
+            }
 
             if (uiCharacterResistances != null)
                 uiCharacterResistances.Data = cacheResistances;

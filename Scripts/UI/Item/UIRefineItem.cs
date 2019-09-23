@@ -13,13 +13,13 @@ namespace MultiplayerARPG
         
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
-        public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD);
+        public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
-        public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
+        public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
         [Tooltip("Format => {0} = {Rate * 100}")]
-        public UILocaleKeySetting formatKeySuccessRate = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REFINE_SUCCESS_RATE);
+        public UILocaleKeySetting formatKeySuccessRate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REFINE_SUCCESS_RATE);
         [Tooltip("Format => {0} = {Refining Level}")]
-        public UILocaleKeySetting formatKeyRefiningLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REFINING_LEVEL);
+        public UILocaleKeySetting formatKeyRefiningLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REFINING_LEVEL);
 
         [Header("UI Elements for UI Refine Item")]
         // TODO: This is deprecated

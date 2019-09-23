@@ -17,6 +17,8 @@ namespace MultiplayerARPG
         public Item Item { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() : null; } }
         public Item EquipmentItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
         public Item ArmorItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
+        public Item ShieldItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
+        public Item DefendItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetDefendItem() : null; } }
         public Item WeaponItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
         public Item PotionItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPotionItem() : null; } }
         public Item AmmoItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
@@ -32,31 +34,31 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Description}")]
-        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Rarity Title}")]
-        public UILocaleKeySetting formatKeyRarityTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_RARITY);
+        public UILocaleKeySetting formatKeyRarityTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_RARITY);
         [Tooltip("Format => {0} = {Level}")]
-        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Refine Level}")]
-        public UILocaleKeySetting formatKeyRefineLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_REFINE_LEVEL);
+        public UILocaleKeySetting formatKeyRefineLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_REFINE_LEVEL);
         [Tooltip("Format => {0} = {Refine Level}")]
-        public UILocaleKeySetting formatKeyTitleWithRefineLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL);
+        public UILocaleKeySetting formatKeyTitleWithRefineLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL);
         [Tooltip("Format => {0} = {Sell Price}")]
-        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SELL_PRICE);
+        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
         [Tooltip("Format => {0} = {Amount}, {1} = {Max Stack}")]
-        public UILocaleKeySetting formatKeyStack = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_STACK);
+        public UILocaleKeySetting formatKeyStack = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_STACK);
         [Tooltip("Format => {0} = {Durability}, {1} = {Max Durability}")]
-        public UILocaleKeySetting formatKeyDurability = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_DURABILITY);
+        public UILocaleKeySetting formatKeyDurability = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_DURABILITY);
         [Tooltip("Format => {0} = {Weight}")]
-        public UILocaleKeySetting formatKeyWeight = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_WEIGHT);
+        public UILocaleKeySetting formatKeyWeight = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_WEIGHT);
         [Tooltip("Format => {0} = {Current Exp}, {1} = {Max Exp}")]
-        public UILocaleKeySetting formatKeyExp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_EXP);
+        public UILocaleKeySetting formatKeyExp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_EXP);
         [Tooltip("Format => {0} = {Lock Remains Duration}")]
-        public UILocaleKeySetting formatKeyLockRemainsDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyLockRemainsDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Item Type Title}")]
-        public UILocaleKeySetting formatKeyItemType = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_TYPE);
+        public UILocaleKeySetting formatKeyItemType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_TYPE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -74,8 +76,12 @@ namespace MultiplayerARPG
 
         [Header("Equipment - UI Elements")]
         public UIEquipmentItemRequirement uiRequirement;
+        public UICharacterStats uiIncreaseStats;
+        public UICharacterStats uiIncreaseStatsRate;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public UICharacterStats uiStats;
         public UIAttributeAmounts uiIncreaseAttributes;
+        public UIAttributeAmounts uiIncreaseAttributesRate;
         public UIResistanceAmounts uiIncreaseResistances;
         public UIArmorAmounts uiIncreaseArmors;
         public UIDamageElementAmounts uiIncreaseDamages;
@@ -85,7 +91,12 @@ namespace MultiplayerARPG
         public UIEquipmentSet uiEquipmentSet;
         public UIEquipmentSockets uiEquipmentSockets;
 
+        [Header("Armor/Shield - UI Elements")]
+        public UIArmorAmount uiArmorAmount;
+
         [Header("Weapon - UI Elements")]
+        public UIDamageElementAmount uiDamageAmount;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public UIDamageElementAmount uiDamageAmounts;
 
         [Header("Events")]
@@ -142,13 +153,26 @@ namespace MultiplayerARPG
 
         private bool MigrateFields()
         {
+            bool hasChanges = false;
+            if (uiStats != null)
+            {
+                uiIncreaseStats = uiStats;
+                uiStats = null;
+                hasChanges = true;
+            }
             if (uiIncreaseDamageAmounts != null)
             {
                 uiIncreaseDamages = uiIncreaseDamageAmounts;
                 uiIncreaseDamageAmounts = null;
-                return true;
+                hasChanges = true;
             }
-            return false;
+            if (uiDamageAmounts != null)
+            {
+                uiDamageAmount = uiDamageAmounts;
+                uiDamageAmounts = null;
+                hasChanges = true;
+            }
+            return hasChanges;
         }
 
         public void SetupAsEquipSlot(string equipPosition, byte equipSlotIndex)
@@ -299,7 +323,7 @@ namespace MultiplayerARPG
                         case ItemType.Junk:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_JUNK.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_JUNK.ToString()));
                             break;
                         case ItemType.Armor:
                             uiTextItemType.text = string.Format(
@@ -314,62 +338,62 @@ namespace MultiplayerARPG
                         case ItemType.Shield:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SHIELD.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SHIELD.ToString()));
                             break;
                         case ItemType.Potion:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_POTION.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_POTION.ToString()));
                             break;
                         case ItemType.Ammo:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_AMMO.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_AMMO.ToString()));
                             break;
                         case ItemType.Building:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_BUILDING.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_BUILDING.ToString()));
                             break;
                         case ItemType.Pet:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_PET.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_PET.ToString()));
                             break;
                         case ItemType.SocketEnhancer:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString()));
                             break;
                         case ItemType.Mount:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_MOUNT.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_MOUNT.ToString()));
                             break;
                         case ItemType.AttributeIncrease:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_ATTRIBUTE_INCREASE.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_ATTRIBUTE_INCREASE.ToString()));
                             break;
                         case ItemType.AttributeReset:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_ATTRIBUTE_RESET.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_ATTRIBUTE_RESET.ToString()));
                             break;
                         case ItemType.Skill:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SKILL.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SKILL.ToString()));
                             break;
                         case ItemType.SkillLearn:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString()));
                             break;
                         case ItemType.SkillReset:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString()));
+                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString()));
                             break;
                     }
                 }
@@ -442,23 +466,45 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiStats != null)
+            if (uiIncreaseStats != null)
             {
-                CharacterStats stats = CharacterStats.Empty;
+                CharacterStats stats = new CharacterStats();
                 if (EquipmentItem != null)
-                    stats = EquipmentItem.GetIncreaseStats(Level);
+                    stats += EquipmentItem.GetIncreaseStats(Level);
                 else if (SocketEnhancerItem != null)
-                    stats = SocketEnhancerItem.socketEnhanceEffect.stats;
+                    stats += SocketEnhancerItem.socketEnhanceEffect.stats;
 
                 if (stats.IsEmpty())
                 {
                     // Hide ui if stats is empty
-                    uiStats.Hide();
+                    uiIncreaseStats.Hide();
                 }
                 else
                 {
-                    uiStats.Show();
-                    uiStats.Data = stats;
+                    uiIncreaseStats.displayType = UICharacterStats.DisplayType.Simple;
+                    uiIncreaseStats.Show();
+                    uiIncreaseStats.Data = stats;
+                }
+            }
+
+            if (uiIncreaseStatsRate != null)
+            {
+                CharacterStats statsRate = new CharacterStats();
+                if (EquipmentItem != null)
+                    statsRate += EquipmentItem.GetIncreaseStatsRate(Level);
+                else if (SocketEnhancerItem != null)
+                    statsRate += SocketEnhancerItem.socketEnhanceEffect.statsRate;
+
+                if (statsRate.IsEmpty())
+                {
+                    // Hide ui if stats is empty
+                    uiIncreaseStatsRate.Hide();
+                }
+                else
+                {
+                    uiIncreaseStatsRate.displayType = UICharacterStats.DisplayType.Rate;
+                    uiIncreaseStatsRate.Show();
+                    uiIncreaseStatsRate.Data = statsRate;
                 }
             }
 
@@ -469,7 +515,7 @@ namespace MultiplayerARPG
                     attributes = EquipmentItem.GetIncreaseAttributes(Level);
                 else if (SocketEnhancerItem != null)
                     attributes = GameDataHelpers.CombineAttributes(SocketEnhancerItem.socketEnhanceEffect.attributes, attributes, 1f);
-                
+
                 if (attributes == null || attributes.Count == 0)
                 {
                     // Hide ui if attributes is empty
@@ -477,8 +523,30 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiIncreaseAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
                     uiIncreaseAttributes.Show();
                     uiIncreaseAttributes.Data = attributes;
+                }
+            }
+
+            if (uiIncreaseAttributesRate != null)
+            {
+                Dictionary<Attribute, float> attributesRate = null;
+                if (EquipmentItem != null)
+                    attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level);
+                else if (SocketEnhancerItem != null)
+                    attributesRate = GameDataHelpers.CombineAttributes(SocketEnhancerItem.socketEnhanceEffect.attributesRate, attributesRate, 1f);
+
+                if (attributesRate == null || attributesRate.Count == 0)
+                {
+                    // Hide ui if attributes is empty
+                    uiIncreaseAttributesRate.Hide();
+                }
+                else
+                {
+                    uiIncreaseAttributesRate.displayType = UIAttributeAmounts.DisplayType.Rate;
+                    uiIncreaseAttributesRate.Show();
+                    uiIncreaseAttributesRate.Data = attributesRate;
                 }
             }
 
@@ -589,15 +657,27 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiDamageAmounts != null)
+            if (uiArmorAmount != null)
             {
-                if (WeaponItem == null)
-                    uiDamageAmounts.Hide();
+                if (DefendItem == null)
+                    uiArmorAmount.Hide();
                 else
                 {
-                    uiDamageAmounts.Show();
-                    KeyValuePair<DamageElement, MinMaxFloat> keyValuePair = CharacterItem.GetDamageAmount(null);
-                    uiDamageAmounts.Data = new UIDamageElementAmountData(keyValuePair.Key, keyValuePair.Value);
+                    uiArmorAmount.Show();
+                    KeyValuePair<DamageElement, float> kvPair = CharacterItem.GetArmorAmount();
+                    uiArmorAmount.Data = new UIArmorAmountData(kvPair.Key, kvPair.Value);
+                }
+            }
+
+            if (uiDamageAmount != null)
+            {
+                if (WeaponItem == null)
+                    uiDamageAmount.Hide();
+                else
+                {
+                    uiDamageAmount.Show();
+                    KeyValuePair<DamageElement, MinMaxFloat> kvPair = CharacterItem.GetDamageAmount(null);
+                    uiDamageAmount.Data = new UIDamageElementAmountData(kvPair.Key, kvPair.Value);
                 }
             }
 
@@ -785,7 +865,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            bool isAnyStorageVisible = 
+            bool isAnyStorageVisible =
                 (uiGameplay.uiPlayerStorageItems != null && uiGameplay.uiPlayerStorageItems.IsVisible()) ||
                 (uiGameplay.uiGuildStorageItems != null && uiGameplay.uiGuildStorageItems.IsVisible()) ||
                 (uiGameplay.uiBuildingStorageItems != null && uiGameplay.uiBuildingStorageItems.IsVisible());
@@ -884,7 +964,7 @@ namespace MultiplayerARPG
                 OwningCharacter.RequestDropItem((short)IndexOfData, 1);
             }
             else
-                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_DROP_ITEM.ToString()), LanguageManager.GetText(UILocaleKeys.UI_DROP_ITEM_DESCRIPTION.ToString()), OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DROP_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString()), OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
         }
 
         private void OnDropAmountConfirmed(int amount)
@@ -909,7 +989,7 @@ namespace MultiplayerARPG
                 OwningCharacter.RequestSellItem((short)IndexOfData, 1);
             }
             else
-                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_SELL_ITEM.ToString()), LanguageManager.GetText(UILocaleKeys.UI_SELL_ITEM_DESCRIPTION.ToString()), OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_SELL_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_SELL_ITEM_DESCRIPTION.ToString()), OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
         }
 
         private void OnSellItemAmountConfirmed(int amount)
@@ -934,7 +1014,7 @@ namespace MultiplayerARPG
                 OwningCharacter.RequestSetDealingItem((short)IndexOfData, 1);
             }
             else
-                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_OFFER_ITEM.ToString()), LanguageManager.GetText(UILocaleKeys.UI_OFFER_ITEM_DESCRIPTION.ToString()), OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_OFFER_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_OFFER_ITEM_DESCRIPTION.ToString()), OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
         }
 
         private void OnSetDealingItemAmountConfirmed(int amount)
@@ -965,7 +1045,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_MOVE_ITEM_TO_STORAGE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString()), (amount) =>
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_TO_STORAGE.ToString()), LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString()), (amount) =>
                 {
                     OnClickMoveToStorage(amount, storageIndex);
                 }, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1000,7 +1080,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString()), (amount) =>
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString()), LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString()), (amount) =>
                 {
                     OnClickMoveFromStorage(amount, nonEquipIndex);
                 }, 1, CharacterItem.amount, CharacterItem.amount);

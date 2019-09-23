@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Armor Title}, {1} = {Amount}")]
-        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ARMOR_AMOUNT);
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;

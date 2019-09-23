@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Role Name}")]
-        public UILocaleKeySetting formatKeyGuildRole = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatKeyGuildRole = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         
         [Header("UI Elements")]
         public TextWrapper uiGuildRole;

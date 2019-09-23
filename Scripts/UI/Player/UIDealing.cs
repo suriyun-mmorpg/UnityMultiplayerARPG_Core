@@ -9,9 +9,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Gold Amount}")]
-        public UILocaleKeySetting formatKeyDealingGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_GOLD);
+        public UILocaleKeySetting formatKeyDealingGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Gold Amount}")]
-        public UILocaleKeySetting formatKeyAnotherDealingGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_GOLD);
+        public UILocaleKeySetting formatKeyAnotherDealingGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
 
         [Header("UI Elements")]
         public UICharacterItem uiDealingItemPrefab;
@@ -269,8 +269,8 @@ namespace MultiplayerARPG
         public void OnClickSetDealingGold()
         {
             UISceneGlobal.Singleton.ShowInputDialog(
-                LanguageManager.GetText(UILocaleKeys.UI_OFFER_GOLD.ToString()), 
-                LanguageManager.GetText(UILocaleKeys.UI_OFFER_GOLD_DESCRIPTION.ToString()), 
+                LanguageManager.GetText(UITextKeys.UI_OFFER_GOLD.ToString()), 
+                LanguageManager.GetText(UITextKeys.UI_OFFER_GOLD_DESCRIPTION.ToString()), 
                 OnDealingGoldConfirmed, 
                 0, // Min amount is 0
                 BasePlayerCharacterController.OwningCharacter.Gold, // Max amount is number of gold

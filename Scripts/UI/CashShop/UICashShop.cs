@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Cash Amount}")]
-        public UILocaleKeySetting formatKeyCash = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CASH);
+        public UILocaleKeySetting formatKeyCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
 
         [Header("UI Elements")]
         public UICashShopItem uiCashShopItemDialog;
@@ -107,10 +107,10 @@ namespace MultiplayerARPG
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString()));
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     if (uiTextCash != null)
@@ -156,22 +156,22 @@ namespace MultiplayerARPG
                     switch (castedMessage.error)
                     {
                         case ResponseCashShopBuyMessage.Error.UserNotFound:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_USER_NOT_FOUND.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());
                             break;
                         case ResponseCashShopBuyMessage.Error.ItemNotFound:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_ITEM_NOT_FOUND.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_ITEM_NOT_FOUND.ToString());
                             break;
                         case ResponseCashShopBuyMessage.Error.NotEnoughCash:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UILocaleKeys.UI_SUCCESS_CASH_SHOP_BUY.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_SUCCESS_CASH_SHOP_BUY.ToString()));
                     RefreshCashShopInfo();
                     break;
             }
