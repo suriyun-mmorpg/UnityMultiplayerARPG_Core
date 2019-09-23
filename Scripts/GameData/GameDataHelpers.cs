@@ -394,9 +394,10 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (source.damageElement == null)
-                    source.damageElement = GameInstance.Singleton.DefaultDamageElement;
-                result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(source.damageElement, baseDamage));
+                DamageElement damageElement = source.damageElement;
+                if (damageElement == null)
+                    damageElement = GameInstance.Singleton.DefaultDamageElement;
+                result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage));
             }
             return result;
         }
@@ -463,9 +464,10 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static KeyValuePair<DamageElement, float> MakeResistance(ResistanceAmount source, float rate)
         {
-            if (source.damageElement == null)
-                return new KeyValuePair<DamageElement, float>();
-            return new KeyValuePair<DamageElement, float>(source.damageElement, source.amount * rate);
+            DamageElement damageElement = source.damageElement;
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            return new KeyValuePair<DamageElement, float>(damageElement, source.amount * rate);
         }
 
         /// <summary>
@@ -477,9 +479,10 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static KeyValuePair<DamageElement, float> MakeResistance(ResistanceIncremental source, short level, float rate)
         {
-            if (source.damageElement == null)
-                return new KeyValuePair<DamageElement, float>();
-            return new KeyValuePair<DamageElement, float>(source.damageElement, source.amount.GetAmount(level) * rate);
+            DamageElement damageElement = source.damageElement;
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            return new KeyValuePair<DamageElement, float>(damageElement, source.amount.GetAmount(level) * rate);
         }
 
         /// <summary>
@@ -490,9 +493,10 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static KeyValuePair<DamageElement, float> MakeArmor(ArmorAmount source, float rate)
         {
-            if (source.damageElement == null)
-                return new KeyValuePair<DamageElement, float>();
-            return new KeyValuePair<DamageElement, float>(source.damageElement, source.amount * rate);
+            DamageElement damageElement = source.damageElement;
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            return new KeyValuePair<DamageElement, float>(damageElement, source.amount * rate);
         }
 
         /// <summary>
@@ -504,9 +508,10 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static KeyValuePair<DamageElement, float> MakeArmor(ArmorIncremental source, short level, float rate)
         {
-            if (source.damageElement == null)
-                return new KeyValuePair<DamageElement, float>();
-            return new KeyValuePair<DamageElement, float>(source.damageElement, source.amount.GetAmount(level) * rate);
+            DamageElement damageElement = source.damageElement;
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            return new KeyValuePair<DamageElement, float>(damageElement, source.amount.GetAmount(level) * rate);
         }
 
         /// <summary>
