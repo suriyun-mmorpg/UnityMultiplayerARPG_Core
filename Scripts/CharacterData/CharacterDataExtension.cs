@@ -120,13 +120,11 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, float> GetEquipmentAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, float> GetEquipmentAttributes(this ICharacterData data, Dictionary<Attribute, float> baseAttributes)
     {
         if (data == null)
             return new Dictionary<Attribute, float>();
         Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
-        // Prepare base attributes, it will be multiplied with increase attributes rate
-        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
         // Increase attributes from armors
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
@@ -159,13 +157,11 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, float> GetBuffAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, float> GetBuffAttributes(this ICharacterData data, Dictionary<Attribute, float> baseAttributes)
     {
         if (data == null)
             return new Dictionary<Attribute, float>();
         Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
-        // Prepare base attributes, it will be multiplied with increase attributes rate
-        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
         // Increase stats from buffs
         IList<CharacterBuff> buffs = data.Buffs;
         foreach (CharacterBuff buff in buffs)
@@ -190,10 +186,14 @@ public static partial class CharacterDataExtension
     public static Dictionary<Attribute, float> GetAttributes(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
         Dictionary<Attribute, float> result = data.GetCharacterAttributes();
-        if (sumWithEquipments)
-            result = GameDataHelpers.CombineAttributes(result, data.GetEquipmentAttributes());
-        if (sumWithBuffs)
-            result = GameDataHelpers.CombineAttributes(result, data.GetBuffAttributes());
+        if (sumWithEquipments || sumWithBuffs)
+        {
+            Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
+            if (sumWithEquipments)
+                result = GameDataHelpers.CombineAttributes(result, data.GetEquipmentAttributes(baseAttributes));
+            if (sumWithBuffs)
+                result = GameDataHelpers.CombineAttributes(result, data.GetBuffAttributes(baseAttributes));
+        }
         return result;
     }
 
@@ -473,17 +473,11 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static CharacterStats GetEquipmentStats(this ICharacterData data)
+    public static CharacterStats GetEquipmentStats(this ICharacterData data, CharacterStats baseStats, Dictionary<Attribute, float> baseAttributes)
     {
         if (data == null)
             return new CharacterStats();
         CharacterStats result = new CharacterStats();
-        // Prepare base stats, it will be multiplied with increase stats rate
-        CharacterStats baseStats = new CharacterStats();
-        if (data.GetDatabase() != null)
-            baseStats += data.GetDatabase().GetCharacterStats(data.Level);
-        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
-        baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
         // Increase stats from armors
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
@@ -528,17 +522,11 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static CharacterStats GetBuffStats(this ICharacterData data)
+    public static CharacterStats GetBuffStats(this ICharacterData data, CharacterStats baseStats, Dictionary<Attribute, float> baseAttributes)
     {
         if (data == null)
             return new CharacterStats();
         CharacterStats result = new CharacterStats();
-        // Prepare base stats, it will be multiplied with increase stats rate
-        CharacterStats baseStats = new CharacterStats();
-        if (data.GetDatabase() != null)
-            baseStats += data.GetDatabase().GetCharacterStats(data.Level);
-        Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
-        baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
         // Increase stats from buffs
         IList<CharacterBuff> buffs = data.Buffs;
         foreach (CharacterBuff buff in buffs)
@@ -567,10 +555,20 @@ public static partial class CharacterDataExtension
     public static CharacterStats GetStats(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
         CharacterStats result = data.GetCharacterStats();
-        if (sumWithEquipments)
-            result += data.GetEquipmentStats();
-        if (sumWithBuffs)
-            result += data.GetBuffStats();
+        if (sumWithEquipments || sumWithBuffs)
+        {
+            // Prepare base stats, it will be multiplied with increase stats rate
+            CharacterStats baseStats = new CharacterStats();
+            if (data.GetDatabase() != null)
+                baseStats += data.GetDatabase().GetCharacterStats(data.Level);
+            Dictionary<Attribute, float> baseAttributes = data.GetCharacterAttributes();
+            baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
+            // Sum stats with equipments and buffs
+            if (sumWithEquipments)
+                result += data.GetEquipmentStats(baseStats, baseAttributes);
+            if (sumWithBuffs)
+                result += data.GetBuffStats(baseStats, baseAttributes);
+        }
         return result;
     }
     #endregion
