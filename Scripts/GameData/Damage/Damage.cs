@@ -7,6 +7,7 @@ namespace MultiplayerARPG
         Melee,
         Missile,
         Raycast,
+        Custom,
     }
 
     [System.Serializable]
@@ -15,7 +16,7 @@ namespace MultiplayerARPG
         public DamageType damageType;
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee", "Missile" })]
-        [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 found target")]
+        [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 random target")]
         public bool hitOnlySelectedTarget;
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee" })]
@@ -33,6 +34,10 @@ namespace MultiplayerARPG
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
         public ProjectileEffect projectileEffect;
+        // TODO: Add impact effect
+
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Custom" })]
+        public BaseCustomDamageType customDamageType;
 
         public float GetDistance()
         {
@@ -45,6 +50,9 @@ namespace MultiplayerARPG
                 case DamageType.Missile:
                 case DamageType.Raycast:
                     distance = missileDistance;
+                    break;
+                case DamageType.Custom:
+                    distance = customDamageType.GetDistance();
                     break;
             }
             return distance;
@@ -62,6 +70,9 @@ namespace MultiplayerARPG
                 case DamageType.Raycast:
                     fov = 10f;
                     break;
+                case DamageType.Custom:
+                    fov = customDamageType.GetFov();
+                    break;
             }
             return fov;
         }
@@ -70,7 +81,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct DamageAmount
     {
-        [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]
+        [Tooltip("If `damageElement` is empty it will use default damage element from game instance")]
         public DamageElement damageElement;
         public MinMaxFloat amount;
     }
@@ -78,7 +89,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct DamageIncremental
     {
-        [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]
+        [Tooltip("If `damageElement` is empty it will use default damage element from game instance")]
         public DamageElement damageElement;
         public IncrementalMinMaxFloat amount;
     }
