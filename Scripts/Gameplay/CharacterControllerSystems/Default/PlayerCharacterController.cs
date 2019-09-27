@@ -184,9 +184,18 @@ namespace MultiplayerARPG
                     destination = null;
             }
 
-            UpdateInput();
-            UpdateFollowTarget();
-            UpdateLookAtTarget();
+            if (controllingCustomDamageType != null)
+            {
+                // Update by custom damage type
+                controllingCustomDamageType.UpdateCustomControls();
+            }
+            else
+            {
+                // Default update functions
+                UpdateInput();
+                UpdateFollowTarget();
+                UpdateLookAtTarget();
+            }
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
@@ -244,7 +253,7 @@ namespace MultiplayerARPG
             {
                 if (!GameInstance.Skills.TryGetValue(queueUsingSkill.Value.dataId, out skill) || skill == null)
                 {
-                    queueUsingSkill = null;
+                    ClearQueueUsingSkill();
                 }
             }
 
@@ -252,7 +261,7 @@ namespace MultiplayerARPG
             {
                 if (!GameInstance.Skills.TryGetValue(queueUsingSkillItem.Value.skillDataId, out skill) || skill == null)
                 {
-                    queueUsingSkillItem = null;
+                    ClearQueueUsingSkillItem();
                 }
             }
 
@@ -323,7 +332,7 @@ namespace MultiplayerARPG
                 UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
                 if (queueUsingSkillValue.aimPosition.HasValue)
                     aimPosition = queueUsingSkillValue.aimPosition.Value;
-                queueUsingSkill = null;
+                ClearQueueUsingSkill();
                 if (aimPosition.HasValue)
                     return PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand, aimPosition.Value);
                 else
@@ -339,7 +348,7 @@ namespace MultiplayerARPG
                 UsingSkillItemData queueUsingSkillItemValue = queueUsingSkillItem.Value;
                 if (queueUsingSkillItemValue.aimPosition.HasValue)
                     aimPosition = queueUsingSkillItemValue.aimPosition.Value;
-                queueUsingSkillItem = null;
+                ClearQueueUsingSkillItem();
                 if (aimPosition.HasValue)
                     return PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkillItemValue.itemIndex, isLeftHand, aimPosition.Value);
                 else
@@ -348,9 +357,23 @@ namespace MultiplayerARPG
             return false;
         }
 
-        protected void ClearQueueUsingSkill()
+        public void SetQueueUsingSkill(Vector3? aimPosition, int skillDataId)
+        {
+            queueUsingSkill = new UsingSkillData(aimPosition, skillDataId);
+        }
+
+        public void SetQueueUsingSkillItem(Vector3? aimPosition, short itemIndex, int skillDataId)
+        {
+            queueUsingSkillItem = new UsingSkillItemData(aimPosition, itemIndex, skillDataId);
+        }
+
+        public void ClearQueueUsingSkill()
         {
             queueUsingSkill = null;
+        }
+
+        public void ClearQueueUsingSkillItem()
+        {
             queueUsingSkillItem = null;
         }
     }

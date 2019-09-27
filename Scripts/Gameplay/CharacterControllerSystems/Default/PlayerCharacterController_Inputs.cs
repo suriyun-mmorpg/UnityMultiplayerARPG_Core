@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public partial class PlayerCharacterController
     {
-        protected virtual void UpdateInput()
+        public virtual void UpdateInput()
         {
             if (GenericUtils.IsFocusInputField())
                 return;
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.RequestReload(true);
         }
 
-        protected virtual void UpdatePointClickInput()
+        public virtual void UpdatePointClickInput()
         {
             // If it's building something, not allow point click movement
             if (CurrentBuildingEntity != null)
@@ -295,7 +295,7 @@ namespace MultiplayerARPG
             SelectedEntity = null;
         }
 
-        protected virtual void UpdateWASDInput()
+        public virtual void UpdateWASDInput()
         {
             if (controllerMode != PlayerCharacterControllerMode.WASD &&
                 controllerMode != PlayerCharacterControllerMode.Both)
@@ -422,7 +422,9 @@ namespace MultiplayerARPG
                 }
             }
             else
-                queueUsingSkill = null;
+            {
+                ClearQueueUsingSkill();
+            }
 
             return true;
         }
@@ -473,12 +475,14 @@ namespace MultiplayerARPG
                 }
             }
             else
-                queueUsingSkillItem = null;
+            {
+                ClearQueueUsingSkillItem();
+            }
 
             return true;
         }
 
-        protected void UpdateBuilding()
+        public void UpdateBuilding()
         {
             // Current building UI
             UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
@@ -510,7 +514,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateFollowTarget()
+        public void UpdateFollowTarget()
         {
             // Temp variables
             if (TryGetAttackingCharacter(out targetEnemy))
@@ -522,13 +526,13 @@ namespace MultiplayerARPG
                     ClearTarget();
                     return;
                 }
-                
+
                 // Find attack distance and fov, from weapon or skill
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 if (!GetAttackDataOrUseNonAttackSkill(isLeftHandAttacking, out attackDistance, out attackFov))
                     return;
-                
+
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
@@ -698,7 +702,7 @@ namespace MultiplayerARPG
             targetLookDirection = (targetPosition - MovementTransform.position).normalized;
         }
 
-        protected void UpdateLookAtTarget()
+        public void UpdateLookAtTarget()
         {
             if (destination != null)
                 targetLookDirection = (destination.Value - MovementTransform.position).normalized;
@@ -735,25 +739,33 @@ namespace MultiplayerARPG
         protected void UseSkill(string id)
         {
             Skill skill = null;
+            short skillLevel;
+
+            // Avoid empty data
             if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) ||
-                skill == null || !PlayerCharacterEntity.GetCaches().Skills.ContainsKey(skill))
+                skill == null || !PlayerCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
+                return;
+            
+            // Start controlling custom damage type
+            if (StartControllingCustomDamageType(skill, skillLevel))
                 return;
 
             BaseCharacterEntity attackingCharacter;
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                queueUsingSkill = new UsingSkillData(null, skill.DataId);
+                SetQueueUsingSkill(null, skill.DataId);
             }
             else
             {
                 // If not attacking any character, use skill immediately
                 if (skill.IsAttack())
                 {
+                    // Default damage type attacks
                     if (IsLockTarget())
                     {
                         // If attacking any character, will use skill later
-                        queueUsingSkill = new UsingSkillData(null, skill.DataId);
+                        SetQueueUsingSkill(null, skill.DataId);
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
                             // Attacking selected target
@@ -840,11 +852,21 @@ namespace MultiplayerARPG
         protected void UseSkillItem(Item item, short itemIndex)
         {
             Skill skill = item.skillLevel.skill;
+            short skillLevel = item.skillLevel.level;
+
+            // Avoid empty data
+            if (skill == null)
+                return;
+
+            // Start controlling custom damage type
+            if (StartControllingCustomDamageType(skill, skillLevel))
+                return;
+
             BaseCharacterEntity attackingCharacter;
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                queueUsingSkillItem = new UsingSkillItemData(null, itemIndex, skill.DataId);
+                SetQueueUsingSkillItem(null, itemIndex, skill.DataId);
             }
             else
             {
@@ -854,7 +876,7 @@ namespace MultiplayerARPG
                     if (IsLockTarget())
                     {
                         // If attacking any character, will use skill later
-                        queueUsingSkillItem = new UsingSkillItemData(null, itemIndex, skill.DataId);
+                        SetQueueUsingSkillItem(null, itemIndex, skill.DataId);
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
                             // Attacking selected target

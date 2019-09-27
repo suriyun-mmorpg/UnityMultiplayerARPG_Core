@@ -7,7 +7,9 @@ namespace MultiplayerARPG
     public abstract class BaseCustomDamageType : ScriptableObject
     {
         public abstract bool UseCustomControls();
-        public abstract void UpdateCustomControls(BasePlayerCharacterController controller);
+        public abstract void StartCustomControls(BasePlayerCharacterController controller, Skill causingSkill, short skillLevel);
+        public abstract void UpdateCustomControls();
+        public abstract void StopCustomControls();
         public abstract float GetDistance();
         public abstract float GetFov();
         public abstract void LaunchDamageEntity(
