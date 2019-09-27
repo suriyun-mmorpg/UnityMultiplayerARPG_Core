@@ -210,12 +210,12 @@ namespace MultiplayerARPG
             return characterEntity is BasePlayerCharacterEntity;
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
-            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff);
+            base.ReceiveDamage(attacker, weapon, damageAmounts, debuff);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // If character is not dead, try to attack
@@ -254,14 +254,14 @@ namespace MultiplayerARPG
         public override void GetWeaponDamages(
             CharacterItem weapon,
             out DamageInfo damageInfo,
-            out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+            out Dictionary<DamageElement, MinMaxFloat> damageAmounts)
         {
             // Assign damage data
             damageInfo = monsterCharacter.damageInfo;
             // Assign damage amounts
-            allDamageAmounts = GameDataHelpers.CombineDamages(null, GameDataHelpers.MakeDamage(monsterCharacter.damageAmount, Level, 1f, 1f));
+            damageAmounts = GameDataHelpers.CombineDamages(null, GameDataHelpers.MakeDamage(monsterCharacter.damageAmount, Level, 1f, 1f));
             // Sum damage with buffs
-            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, this.GetCaches().IncreaseDamages);
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetCaches().IncreaseDamages);
         }
 
         public override void GetUsingSkillData(
@@ -285,7 +285,7 @@ namespace MultiplayerARPG
             // Get activate animation type which defined at character model
             SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
             // Prepare animation
-            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.skillAttackType != SkillAttackType.None)
+            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.skillDamageType != SkillDamageType.None)
             {
                 // Assign data id
                 animationDataId = 0;
@@ -306,45 +306,45 @@ namespace MultiplayerARPG
             Skill skill, 
             short skillLevel, 
             out DamageInfo damageInfo, 
-            out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+            out Dictionary<DamageElement, MinMaxFloat> damageAmounts)
         {
             // Assign damage data
             damageInfo = monsterCharacter.damageInfo;
             // Assign damage amounts
-            allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+            damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // If it is attack skill
-            if (skill.skillAttackType != SkillAttackType.None)
+            if (skill.skillDamageType != SkillDamageType.None)
             {
-                switch (skill.skillAttackType)
+                switch (skill.skillDamageType)
                 {
-                    case SkillAttackType.Normal:
+                    case SkillDamageType.Normal:
                         // Assign damage data
                         damageInfo = skill.damageInfo;
                         // Sum damage with skill damage because this skill damages based on itself
-                        allDamageAmounts = GameDataHelpers.CombineDamages(
-                            allDamageAmounts,
+                        damageAmounts = GameDataHelpers.CombineDamages(
+                            damageAmounts,
                             skill.GetAdditionalDamageAmounts(skillLevel));
                         // Sum damage with additional damage amounts
-                        allDamageAmounts = GameDataHelpers.CombineDamages(
-                            allDamageAmounts,
+                        damageAmounts = GameDataHelpers.CombineDamages(
+                            damageAmounts,
                             skill.GetDamageAmount(skillLevel, this));
                         break;
-                    case SkillAttackType.BasedOnWeapon:
-                        allDamageAmounts = GameDataHelpers.MakeDamageWithInflictions(
+                    case SkillDamageType.BasedOnWeapon:
+                        damageAmounts = GameDataHelpers.MakeDamageWithInflictions(
                             monsterCharacter.damageAmount,
                             Level, // Monster Level
                             1f, // Equipment Bonus Rate
                             1f, // Effectiveness
                             skill.GetWeaponDamageInflictions(skillLevel));
                         // Sum damage with additional damage amounts
-                        allDamageAmounts = GameDataHelpers.CombineDamages(
-                            allDamageAmounts,
+                        damageAmounts = GameDataHelpers.CombineDamages(
+                            damageAmounts,
                             skill.GetAdditionalDamageAmounts(skillLevel));
                         break;
                 }
                 // Sum damage with buffs
-                allDamageAmounts = GameDataHelpers.CombineDamages(
-                    allDamageAmounts,
+                damageAmounts = GameDataHelpers.CombineDamages(
+                    damageAmounts,
                     this.GetCaches().IncreaseDamages);
             }
         }

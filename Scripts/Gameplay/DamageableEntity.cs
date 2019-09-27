@@ -70,12 +70,12 @@ namespace MultiplayerARPG
             return CurrentHp <= 0;
         }
 
-        public virtual void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
+        public virtual void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
         {
             if (!IsServer || IsDead())
                 return;
             if (onReceiveDamage != null)
-                onReceiveDamage.Invoke(attacker, weapon, allDamageAmounts, debuff);
+                onReceiveDamage.Invoke(attacker, weapon, damageAmounts, debuff);
         }
 
         public virtual void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual void PlayHitEffects(IEnumerable<DamageElement> allDamageElements, Skill skill)
+        public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, Skill skill)
         {
             GameEffect[] effects = gameInstance.DefaultHitEffects.effects;
             if (skill != null && skill.hitEffects.effects != null && skill.hitEffects.effects.Length > 0)
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                foreach (DamageElement element in allDamageElements)
+                foreach (DamageElement element in damageElements)
                 {
                     if (element.hitEffects.effects == null ||
                         element.hitEffects.effects.Length == 0)

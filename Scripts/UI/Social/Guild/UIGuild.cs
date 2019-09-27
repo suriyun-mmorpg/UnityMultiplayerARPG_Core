@@ -30,11 +30,6 @@ namespace MultiplayerARPG
         public TextWrapper textGuildName;
         public TextWrapper textLeaderName;
         public TextWrapper textLevel;
-        // EXP
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public TextWrapper uiTextExp;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public Image imageExpGage;
         public UIGageValue uiGageExp;
 
         public TextWrapper textSkillPoint;
@@ -104,25 +99,6 @@ namespace MultiplayerARPG
                 skillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return skillSelectionManager;
             }
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            MigrateUIGageValue();
-        }
-
-        protected void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (MigrateUIGageValue())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateUIGageValue()
-        {
-            return UIGageValue.Migrate(ref uiGageExp, ref uiTextExp, ref imageExpGage);
         }
 
         protected override void UpdateUIs()

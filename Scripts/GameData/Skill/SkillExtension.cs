@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         {
             if (skill == null)
                 return false;
-            return skill.skillAttackType != SkillAttackType.None;
+            return skill.skillDamageType != SkillDamageType.None;
         }
 
         public static bool IsBuff(this Skill skill)
@@ -176,7 +176,7 @@ namespace MultiplayerARPG
         #region Attack
         public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Skill skill, short level, ICharacterData character)
         {
-            if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.Normal)
+            if (!skill.IsAttack() || skill.skillDamageType != SkillDamageType.Normal)
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
             return GameDataHelpers.MakeDamage(skill.damageAmount, level, 1f, skill.GetEffectivenessDamage(character));
         }

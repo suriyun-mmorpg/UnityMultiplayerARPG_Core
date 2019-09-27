@@ -6,8 +6,8 @@ namespace MultiplayerARPG
     {
         int CurrentHp { get; set; }
         bool IsDead();
-        void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff);
+        void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff);
         bool CanReceiveDamageFrom(IAttackerEntity attacker);
-        void PlayHitEffects(IEnumerable<DamageElement> allDamageElements, Skill skill);
+        void PlayHitEffects(IEnumerable<DamageElement> damageElements, Skill skill);
     }
 }

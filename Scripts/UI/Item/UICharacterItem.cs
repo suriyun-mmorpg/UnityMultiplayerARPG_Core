@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -76,17 +77,15 @@ namespace MultiplayerARPG
 
         [Header("Equipment - UI Elements")]
         public UIEquipmentItemRequirement uiRequirement;
+        [FormerlySerializedAs("uiStats")]
         public UICharacterStats uiIncreaseStats;
         public UICharacterStats uiIncreaseStatsRate;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public UICharacterStats uiStats;
         public UIAttributeAmounts uiIncreaseAttributes;
         public UIAttributeAmounts uiIncreaseAttributesRate;
         public UIResistanceAmounts uiIncreaseResistances;
         public UIArmorAmounts uiIncreaseArmors;
+        [FormerlySerializedAs("uiIncreaseDamageAmounts")]
         public UIDamageElementAmounts uiIncreaseDamages;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public UIDamageElementAmounts uiIncreaseDamageAmounts;
         public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
         public UIEquipmentSockets uiEquipmentSockets;
@@ -95,9 +94,8 @@ namespace MultiplayerARPG
         public UIArmorAmount uiArmorAmount;
 
         [Header("Weapon - UI Elements")]
+        [FormerlySerializedAs("uiDamageAmounts")]
         public UIDamageElementAmount uiDamageAmount;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public UIDamageElementAmount uiDamageAmounts;
 
         [Header("Events")]
         public UnityEvent onSetLevelZeroData;
@@ -136,44 +134,6 @@ namespace MultiplayerARPG
         public bool IsSetupAsEquipSlot { get; private set; }
         public string EquipPosition { get; private set; }
         public byte EquipSlotIndex { get; private set; }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            MigrateFields();
-        }
-
-        protected void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (MigrateFields())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateFields()
-        {
-            bool hasChanges = false;
-            if (uiStats != null)
-            {
-                uiIncreaseStats = uiStats;
-                uiStats = null;
-                hasChanges = true;
-            }
-            if (uiIncreaseDamageAmounts != null)
-            {
-                uiIncreaseDamages = uiIncreaseDamageAmounts;
-                uiIncreaseDamageAmounts = null;
-                hasChanges = true;
-            }
-            if (uiDamageAmounts != null)
-            {
-                uiDamageAmount = uiDamageAmounts;
-                uiDamageAmounts = null;
-                hasChanges = true;
-            }
-            return hasChanges;
-        }
 
         public void SetupAsEquipSlot(string equipPosition, byte equipSlotIndex)
         {
@@ -590,7 +550,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiIncreaseDamageAmounts != null)
+            if (uiIncreaseDamages != null)
             {
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
                 if (EquipmentItem != null)
@@ -601,12 +561,12 @@ namespace MultiplayerARPG
                 if (damageAmounts == null || damageAmounts.Count == 0)
                 {
                     // Hide ui if damage amounts is empty
-                    uiIncreaseDamageAmounts.Hide();
+                    uiIncreaseDamages.Hide();
                 }
                 else
                 {
-                    uiIncreaseDamageAmounts.Show();
-                    uiIncreaseDamageAmounts.Data = damageAmounts;
+                    uiIncreaseDamages.Show();
+                    uiIncreaseDamages.Data = damageAmounts;
                 }
             }
 

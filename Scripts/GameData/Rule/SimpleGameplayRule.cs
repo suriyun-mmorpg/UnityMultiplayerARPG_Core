@@ -576,5 +576,10 @@ namespace MultiplayerARPG
             result.gold = quest.rewardGold;
             return result;
         }
+
+        public override float GetRecoveryUpdateDuration()
+        {
+            return 1f;
+        }
     }
 }

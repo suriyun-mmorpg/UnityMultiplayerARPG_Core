@@ -85,9 +85,9 @@ namespace MultiplayerARPG
             return buildingEntity.IsDead();
         }
 
-        public void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
+        public void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
         {
-            buildingEntity.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff);
+            buildingEntity.ReceiveDamage(attacker, weapon, damageAmounts, debuff);
         }
 
         public bool CanReceiveDamageFrom(IAttackerEntity attacker)
@@ -95,9 +95,9 @@ namespace MultiplayerARPG
             return buildingEntity.CanReceiveDamageFrom(attacker);
         }
 
-        public void PlayHitEffects(IEnumerable<DamageElement> allDamageElements, Skill skill)
+        public void PlayHitEffects(IEnumerable<DamageElement> damageElements, Skill skill)
         {
-            buildingEntity.PlayHitEffects(allDamageElements, skill);
+            buildingEntity.PlayHitEffects(damageElements, skill);
         }
     }
 }

@@ -35,14 +35,23 @@ namespace MultiplayerARPG
         public WeaponAnimations[] weaponAnimations;
         public SkillAnimations[] skillAnimations;
 
-        public override void AddingNewModel(GameObject newModel)
+        public override void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer)
         {
-            base.AddingNewModel(newModel);
+            base.AddingNewModel(newModel, equipmentContainer);
             SkinnedMeshRenderer skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
             if (skinnedMesh != null && skinnedMeshRenderer != null)
             {
                 skinnedMesh.bones = skinnedMeshRenderer.bones;
                 skinnedMesh.rootBone = skinnedMeshRenderer.rootBone;
+                if (equipmentContainer.defaultModel != null)
+                {
+                    SkinnedMeshRenderer defaultSkinnedMesh = equipmentContainer.defaultModel.GetComponentInChildren<SkinnedMeshRenderer>();
+                    if (defaultSkinnedMesh != null)
+                    {
+                        skinnedMesh.bones = defaultSkinnedMesh.bones;
+                        skinnedMesh.rootBone = defaultSkinnedMesh.rootBone;
+                    }
+                }
             }
         }
 

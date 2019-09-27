@@ -505,6 +505,10 @@ namespace MultiplayerARPG
             // Set passenger to vehicle
             vehicle.SetPassenger(seatIndex, this);
 
+            // Character when enter vehicle should stop movement, and set movement state to is grounded
+            Movement.StopMove();
+            MovementState = MovementState.IsGrounded;
+
             // Set mount info
             PassengingVehicle passengingVehicle = new PassengingVehicle()
             {

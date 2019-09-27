@@ -240,7 +240,7 @@ namespace MultiplayerARPG
             }
 
             bool isAttack = Skill != null && Skill.IsAttack();
-            bool isOverrideWeaponDamage = isAttack && Skill.skillAttackType == SkillAttackType.Normal;
+            bool isOverrideWeaponDamage = isAttack && Skill.skillDamageType == SkillDamageType.Normal;
             if (uiDamageAmount != null)
             {
                 if (!isOverrideWeaponDamage)

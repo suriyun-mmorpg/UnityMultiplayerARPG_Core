@@ -50,14 +50,14 @@ namespace MultiplayerARPG
         public void Setup(
             IAttackerEntity attacker,
             CharacterItem weapon,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             CharacterBuff debuff,
             Skill skill,
             float missileDistance,
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            Setup(attacker, weapon, allDamageAmounts, debuff, skill);
+            Setup(attacker, weapon, damageAmounts, debuff, skill);
             this.missileDistance = missileDistance;
             this.missileSpeed = missileSpeed;
 

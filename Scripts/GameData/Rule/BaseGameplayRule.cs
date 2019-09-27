@@ -43,5 +43,6 @@ namespace MultiplayerARPG
         public abstract void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
         public abstract Reward MakeMonsterReward(MonsterCharacter monster);
         public abstract Reward MakeQuestReward(Quest quest);
+        public abstract float GetRecoveryUpdateDuration();
     }
 }

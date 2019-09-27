@@ -28,15 +28,15 @@ namespace MultiplayerARPG
             animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
         }
 
-        public virtual void GetWeaponDamages(CharacterItem weapon, out DamageInfo damageInfo, out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        public virtual void GetWeaponDamages(CharacterItem weapon, out DamageInfo damageInfo, out Dictionary<DamageElement, MinMaxFloat> damageAmounts)
         {
             Item weaponItem = weapon.GetWeaponItem();
             damageInfo = weaponItem.WeaponType.damageInfo;
-            allDamageAmounts = null;
+            damageAmounts = null;
             // Calculate all damages
-            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, weapon.GetDamageAmount(this));
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, weapon.GetDamageAmount(this));
             // Sum damage with buffs
-            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, this.GetCaches().IncreaseDamages);
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetCaches().IncreaseDamages);
         }
 
         public bool ValidateAmmo(CharacterItem weapon)
@@ -258,11 +258,11 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get damages data
             DamageInfo damageInfo;
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts;
             GetWeaponDamages(
                 weapon,
                 out damageInfo,
-                out allDamageAmounts);
+                out damageAmounts);
 
             // Set doing action state at clients and server
             isAttackingOrUsingSkill = true;
@@ -303,7 +303,7 @@ namespace MultiplayerARPG
             {
                 if (characterSkill.level <= 0)
                     continue;
-                if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, damageInfo, allDamageAmounts, aimPosition))
+                if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, damageInfo, damageAmounts, aimPosition))
                     overrideDefaultAttack = true;
             }
 
@@ -312,14 +312,14 @@ namespace MultiplayerARPG
             {
                 // Trigger attack event
                 if (onAttackRoutine != null)
-                    onAttackRoutine.Invoke(isLeftHand, weapon, damageInfo, allDamageAmounts, aimPosition);
+                    onAttackRoutine.Invoke(isLeftHand, weapon, damageInfo, damageAmounts, aimPosition);
 
                 // Apply attack damages
                 ApplyAttack(
                     isLeftHand,
                     weapon,
                     damageInfo,
-                    allDamageAmounts,
+                    damageAmounts,
                     hasAimPosition,
                     aimPosition);
             }
@@ -332,7 +332,7 @@ namespace MultiplayerARPG
             isAttackingOrUsingSkill = false;
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, bool hasAimPosition, Vector3 aimPosition)
         {
             // Increase damage with ammo damage
             if (IsServer)
@@ -340,7 +340,7 @@ namespace MultiplayerARPG
                 Dictionary<DamageElement, MinMaxFloat> increaseDamages;
                 ReduceAmmo(weapon, isLeftHand, out increaseDamages);
                 if (increaseDamages != null)
-                    allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, increaseDamages);
+                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
             }
 
             byte fireSpread = 0;
@@ -360,7 +360,7 @@ namespace MultiplayerARPG
                     isLeftHand,
                     weapon,
                     damageInfo,
-                    allDamageAmounts,
+                    damageAmounts,
                     CharacterBuff.Empty,
                     null,
                     aimPosition,

@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                 out weapon);
 
             // Validate ammo
-            if (skill.skillAttackType != SkillAttackType.None && !ValidateAmmo(weapon))
+            if (skill.skillDamageType != SkillDamageType.None && !ValidateAmmo(weapon))
                 return;
 
             // Prepare requires data and get animation data

@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             }
 
             CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
-            if (skill.skillAttackType != SkillAttackType.None && !ValidateAmmo(weapon))
+            if (skill.skillDamageType != SkillDamageType.None && !ValidateAmmo(weapon))
             {
                 if (!IsOwnerClient)
                     return false;

@@ -322,7 +322,7 @@ namespace MultiplayerARPG
                     if (equipmentEntity == null)
                         equipmentEntity = tempEquipmentEntity;
                 }
-                AddingNewModel(tempEquipmentObject);
+                AddingNewModel(tempEquipmentObject, tempContainer);
                 tempCreatingModels.Add(tempEquipmentModel.equipSocket, tempEquipmentObject);
             }
             CreateCacheModel(equipPosition, tempCreatingModels);
@@ -487,7 +487,7 @@ namespace MultiplayerARPG
                 leftHandEquipmentEntity.PlayWeaponLaunchEffect();
         }
 
-        public virtual void AddingNewModel(GameObject newModel) { }
+        public virtual void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer) { }
 
         public void SetIsDead(bool isDead)
         {

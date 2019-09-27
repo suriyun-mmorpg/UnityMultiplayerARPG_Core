@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public class CharacterRecoveryComponent : BaseCharacterComponent
     {
-        public const float RECOVERY_UPDATE_DURATION = 0.5f;
+        public float recoveryUpdateDuration = 1f;
 
         #region Recovery System Data
         [HideInInspector, System.NonSerialized]
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
 
             recoveryData.updatingTime += deltaTime;
             int tempAmount;
-            if (recoveryData.updatingTime >= RECOVERY_UPDATE_DURATION)
+            if (recoveryData.updatingTime >= gameplayRule.GetRecoveryUpdateDuration())
             {
                 // Hp
                 recoveryData.recoveryingHp += recoveryData.updatingTime * gameplayRule.GetRecoveryHpPerSeconds(characterEntity);

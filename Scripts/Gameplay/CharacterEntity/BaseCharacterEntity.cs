@@ -562,7 +562,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
@@ -573,12 +573,12 @@ namespace MultiplayerARPG
                 return;
             }
 
-            ReceiveDamageFunction(attacker, weapon, allDamageAmounts, debuff);
+            ReceiveDamageFunction(attacker, weapon, damageAmounts, debuff);
         }
 
-        internal void ReceiveDamageFunction(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
+        internal void ReceiveDamageFunction(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
         {
-            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff);
+            base.ReceiveDamage(attacker, weapon, damageAmounts, debuff);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // Notify enemy spotted when received damage from enemy
@@ -598,13 +598,13 @@ namespace MultiplayerARPG
 
             // Calculate damages
             float calculatingTotalDamage = 0f;
-            if (allDamageAmounts.Count > 0)
+            if (damageAmounts.Count > 0)
             {
                 MinMaxFloat damageAmount;
                 float tempReceivingDamage;
-                foreach (DamageElement damageElement in allDamageAmounts.Keys)
+                foreach (DamageElement damageElement in damageAmounts.Keys)
                 {
-                    damageAmount = allDamageAmounts[damageElement];
+                    damageAmount = damageAmounts[damageElement];
                     tempReceivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
                     if (tempReceivingDamage > 0f)
                         calculatingTotalDamage += tempReceivingDamage;
@@ -769,7 +769,7 @@ namespace MultiplayerARPG
         {
             if (skill == null || !skill.IsAttack())
                 return 0f;
-            if (skill.skillAttackType == SkillAttackType.Normal)
+            if (skill.skillDamageType == SkillDamageType.Normal)
                 return skill.damageInfo.GetDistance();
             return GetAttackDistance(isLeftHand);
         }
@@ -778,7 +778,7 @@ namespace MultiplayerARPG
         {
             if (skill == null || !skill.IsAttack())
                 return 0f;
-            if (skill.skillAttackType == SkillAttackType.Normal)
+            if (skill.skillDamageType == SkillDamageType.Normal)
                 return skill.damageInfo.GetFov();
             return GetAttackFov(isLeftHand);
         }
@@ -791,7 +791,7 @@ namespace MultiplayerARPG
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
         /// <param name="damageInfo"></param>
-        /// <param name="allDamageAmounts"></param>
+        /// <param name="damageAmounts"></param>
         /// <param name="debuff"></param>
         /// <param name="hasAimPosition"></param>
         /// <param name="aimPosition"></param>
@@ -800,7 +800,7 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             CharacterBuff debuff,
             Skill skill,
             Vector3 aimPosition,
@@ -843,9 +843,9 @@ namespace MultiplayerARPG
                         {
                             // Pass all receive damage condition, then apply damages
                             if (IsServer)
-                                tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff);
+                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, debuff);
                             if (IsClient)
-                                tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
+                                tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                         }
                     }
                     else
@@ -866,9 +866,9 @@ namespace MultiplayerARPG
                             {
                                 // Pass all receive damage condition, then apply damages
                                 if (IsServer)
-                                    tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff);
+                                    tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, debuff);
                                 if (IsClient)
-                                    tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
+                                    tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                             }
                         }
                     }
@@ -884,7 +884,7 @@ namespace MultiplayerARPG
                             if (!TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
-                        missileDamageEntity.Setup(this, weapon, allDamageAmounts, debuff, skill, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
+                        missileDamageEntity.Setup(this, weapon, damageAmounts, debuff, skill, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
                     }
                     break;
                 case DamageType.Raycast:
@@ -926,9 +926,9 @@ namespace MultiplayerARPG
                         {
                             // Pass all receive damage condition, then apply damages
                             if (IsServer)
-                                tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff);
+                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, debuff);
                             if (IsClient)
-                                tempDamageableEntity.PlayHitEffects(allDamageAmounts.Keys, skill);
+                                tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                             // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
                             if (IsClient && damageInfo.projectileEffect != null)
                             {
@@ -937,6 +937,9 @@ namespace MultiplayerARPG
                             }
                         }
                     }
+                    break;
+                case DamageType.Custom:
+                    damageInfo.customDamageType.LaunchDamageEntity(isLeftHand, weapon, damageAmounts, debuff, skill, aimPosition, stagger);
                     break;
             }
         }

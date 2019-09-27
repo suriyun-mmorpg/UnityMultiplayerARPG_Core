@@ -18,14 +18,14 @@ namespace MultiplayerARPG
             return characterEntity.IsDead();
         }
 
-        public void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff)
+        public void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
         {
-            List<DamageElement> keys = new List<DamageElement>(allDamageAmounts.Keys);
+            List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
             foreach (DamageElement key in keys)
             {
-                allDamageAmounts[key] = allDamageAmounts[key] * damageRate;
+                damageAmounts[key] = damageAmounts[key] * damageRate;
             }
-            characterEntity.ReceiveDamageFunction(attacker, weapon, allDamageAmounts, debuff);
+            characterEntity.ReceiveDamageFunction(attacker, weapon, damageAmounts, debuff);
         }
 
         public bool CanReceiveDamageFrom(IAttackerEntity attacker)
@@ -33,9 +33,9 @@ namespace MultiplayerARPG
             return characterEntity.CanReceiveDamageFrom(attacker);
         }
 
-        public void PlayHitEffects(IEnumerable<DamageElement> allDamageElements, Skill skill)
+        public void PlayHitEffects(IEnumerable<DamageElement> damageElements, Skill skill)
         {
-            characterEntity.PlayHitEffects(allDamageElements, skill);
+            characterEntity.PlayHitEffects(damageElements, skill);
         }
     }
 }

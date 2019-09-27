@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     public delegate void ReceiveDamageDelegate(
         IAttackerEntity attacker,
         CharacterItem weapon,
-        Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+        Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         CharacterBuff debuff);
     public delegate void ReceivedDamage(
         IAttackerEntity attacker,
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         bool isLeftHand,
         CharacterItem weapon,
         DamageInfo damageInfo,
-        Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+        Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         Vector3 aimPosition);
     public delegate void UseSkillRoutineDelegate(
         Skill skill,
@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         bool isLeftHand,
         CharacterItem weapon,
         DamageInfo damageInfo,
-        Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+        Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         Vector3 aimPosition);
     public delegate void ApplyBuffDelegate(
         int dataId,

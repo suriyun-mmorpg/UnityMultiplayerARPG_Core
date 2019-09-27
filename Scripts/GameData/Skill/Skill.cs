@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -11,7 +12,7 @@ namespace MultiplayerARPG
         CraftItem,
     }
 
-    public enum SkillAttackType
+    public enum SkillDamageType
     {
         None,
         Normal,
@@ -56,7 +57,8 @@ namespace MultiplayerARPG
         public SkillRequirement requirement;
 
         [Header("Attack")]
-        public SkillAttackType skillAttackType;
+        [FormerlySerializedAs("skillAttackType")]
+        public SkillDamageType skillDamageType;
         public GameEffectCollection hitEffects;
         public DamageInfo damageInfo;
         public DamageEffectivenessAttribute[] effectivenessAttributes;
@@ -127,7 +129,7 @@ namespace MultiplayerARPG
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
         /// <param name="damageInfo"></param>
-        /// <param name="allDamageAmounts"></param>
+        /// <param name="damageAmounts"></param>
         /// <param name="hasAimPosition"></param>
         /// <param name="aimPosition"></param>
         /// <returns></returns>
@@ -137,7 +139,7 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             bool hasAimPosition,
             Vector3 aimPosition)
         {
@@ -152,7 +154,7 @@ namespace MultiplayerARPG
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
         /// <param name="damageInfo"></param>
-        /// <param name="allDamageAmounts"></param>
+        /// <param name="damageAmounts"></param>
         /// <param name="aimPosition"></param>
         /// <returns></returns>
         public virtual bool OnAttack(
@@ -161,7 +163,7 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             Vector3 aimPosition)
         {
             return false;

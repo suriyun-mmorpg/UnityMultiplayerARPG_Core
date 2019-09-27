@@ -117,6 +117,9 @@ namespace MultiplayerARPG
                 ++counter;
             }
 
+            CacheSkillList.DetectPrefab();
+            CacheItemList.DetectPrefab();
+
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
             {
                 UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
@@ -156,7 +159,6 @@ namespace MultiplayerARPG
 
         public void OnClickUnAssign()
         {
-
             BasePlayerCharacterController.OwningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.None, string.Empty);
             Hide();
         }

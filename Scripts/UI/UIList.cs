@@ -10,11 +10,10 @@ public class UIList : MonoBehaviour
     protected readonly List<GameObject> uis = new List<GameObject>();
     protected bool detectedPrefab;
 
-    private void DetectPrefab()
+    public void DetectPrefab()
     {
         if (detectedPrefab)
             return;
-
         detectedPrefab = true;
         uiContainer.RemoveChildren();
     }
