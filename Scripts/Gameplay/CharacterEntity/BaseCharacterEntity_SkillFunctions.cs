@@ -332,6 +332,7 @@ namespace MultiplayerARPG
                     damageAmounts,
                     debuff,
                     skill,
+                    skillLevel,
                     aimPosition,
                     Vector3.zero);
             }

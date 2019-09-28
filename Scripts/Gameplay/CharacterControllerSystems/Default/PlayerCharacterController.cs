@@ -184,10 +184,10 @@ namespace MultiplayerARPG
                     destination = null;
             }
 
-            if (controllingCustomDamageType != null)
+            if (aimingDamageType != null)
             {
                 // Update by custom damage type
-                controllingCustomDamageType.UpdateCustomControls();
+                aimingDamageType.UpdateAimControls();
             }
             else
             {

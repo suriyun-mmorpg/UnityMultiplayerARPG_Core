@@ -48,7 +48,7 @@ namespace MultiplayerARPG
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
         public UISceneGameplay CacheUISceneGameplay { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
-        protected BaseCustomDamageType controllingCustomDamageType;
+        protected BaseCustomDamageType aimingDamageType;
         protected int buildingItemIndex;
         public BaseGameEntity SelectedEntity { get; protected set; }
         public BuildingEntity CurrentBuildingEntity { get; protected set; }
@@ -393,25 +393,25 @@ namespace MultiplayerARPG
 
         public void ClearControllingCustomDamageType()
         {
-            if (controllingCustomDamageType != null)
-                controllingCustomDamageType = null;
+            if (aimingDamageType != null)
+                aimingDamageType = null;
         }
 
         public bool StartControllingCustomDamageType(Skill skill, short skillLevel)
         {
             if (skill == null || !skill.IsAttack() ||
                 skill.damageInfo.damageType != DamageType.Custom ||
-                !skill.damageInfo.customDamageType.UseCustomControls())
+                !skill.damageInfo.customDamageType.UseCustomAimControls())
                 return false;
             // Stop previous controlling custom damage type
-            if (controllingCustomDamageType != null)
-                controllingCustomDamageType.StopCustomControls();
+            if (aimingDamageType != null)
+                aimingDamageType.StopAimControls();
             // Set current custom damage type
-            controllingCustomDamageType = skill.damageInfo.customDamageType;
+            aimingDamageType = skill.damageInfo.customDamageType;
             // Start controlling custom damage type
-            if (controllingCustomDamageType != null)
+            if (aimingDamageType != null)
             {
-                controllingCustomDamageType.StartCustomControls(this, skill, skillLevel);
+                aimingDamageType.StartAimControls(this, skill, skillLevel);
                 return true;
             }
             return false;

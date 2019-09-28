@@ -803,6 +803,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             CharacterBuff debuff,
             Skill skill,
+            short skillLevel,
             Vector3 aimPosition,
             Vector3 stagger)
         {
@@ -939,7 +940,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Custom:
-                    damageInfo.customDamageType.LaunchDamageEntity(isLeftHand, weapon, damageAmounts, debuff, skill, aimPosition, stagger);
+                    damageInfo.customDamageType.LaunchDamageEntity(isLeftHand, weapon, damageAmounts, debuff, skill, skillLevel, aimPosition, stagger);
                     break;
             }
         }

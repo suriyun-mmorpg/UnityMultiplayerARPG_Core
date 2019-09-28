@@ -363,6 +363,7 @@ namespace MultiplayerARPG
                     damageAmounts,
                     CharacterBuff.Empty,
                     null,
+                    0,
                     aimPosition,
                     stagger);
             }
