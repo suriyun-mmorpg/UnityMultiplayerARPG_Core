@@ -6,13 +6,12 @@ namespace MultiplayerARPG
 {
     public abstract class BaseCustomDamageType : ScriptableObject
     {
-        public abstract bool UseCustomAimControls();
-        public abstract void StartAimControls(BasePlayerCharacterController controller, Skill causingSkill, short skillLevel);
-        public abstract void UpdateAimControls();
-        public abstract void StopAimControls();
+        public abstract bool HasCustomAimControls();
+        public abstract Vector3? UpdateAimControls(Skill causingSkill, short causingSkillLevel);
         public abstract float GetDistance();
         public abstract float GetFov();
         public abstract void LaunchDamageEntity(
+            BaseCharacterEntity baseCharacterEntity,
             bool isLeftHand,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,

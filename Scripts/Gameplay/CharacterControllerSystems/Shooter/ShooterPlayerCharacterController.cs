@@ -742,7 +742,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UseHotkey(int hotkeyIndex)
+        public override void UseHotkey(int hotkeyIndex, Vector3? aimPosition)
         {
             if (hotkeyIndex < 0 || hotkeyIndex >= PlayerCharacterEntity.Hotkeys.Count)
                 return;

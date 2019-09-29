@@ -390,6 +390,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public abstract void UseHotkey(int hotkeyIndex);
+        public abstract void UseHotkey(int hotkeyIndex, Vector3? aimPosition);
     }
 }

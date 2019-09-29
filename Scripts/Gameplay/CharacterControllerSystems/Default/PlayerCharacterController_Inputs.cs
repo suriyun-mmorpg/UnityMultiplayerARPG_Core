@@ -714,7 +714,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UseHotkey(int hotkeyIndex)
+        public override void UseHotkey(int hotkeyIndex, Vector3? aimPosition)
         {
             if (hotkeyIndex < 0 || hotkeyIndex >= PlayerCharacterEntity.Hotkeys.Count)
                 return;
@@ -728,15 +728,15 @@ namespace MultiplayerARPG
             switch (hotkey.type)
             {
                 case HotkeyType.Skill:
-                    UseSkill(hotkey.relateId);
+                    UseSkill(hotkey.relateId, aimPosition);
                     break;
                 case HotkeyType.Item:
-                    UseItem(hotkey.relateId);
+                    UseItem(hotkey.relateId, aimPosition);
                     break;
             }
         }
 
-        protected void UseSkill(string id)
+        protected void UseSkill(string id, Vector3? aimPosition)
         {
             Skill skill = null;
 
@@ -748,7 +748,7 @@ namespace MultiplayerARPG
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                SetQueueUsingSkill(null, skill.DataId);
+                SetQueueUsingSkill(aimPosition, skill.DataId);
             }
             else
             {
@@ -759,7 +759,7 @@ namespace MultiplayerARPG
                     if (IsLockTarget())
                     {
                         // If attacking any character, will use skill later
-                        SetQueueUsingSkill(null, skill.DataId);
+                        SetQueueUsingSkill(aimPosition, skill.DataId);
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
                             // Attacking selected target
@@ -792,7 +792,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UseItem(string id)
+        protected void UseItem(string id, Vector3? aimPosition)
         {
             InventoryType inventoryType;
             int itemIndex;
@@ -824,7 +824,7 @@ namespace MultiplayerARPG
             {
                 if (item.IsSkill())
                 {
-                    UseSkillItem(item, (short)itemIndex);
+                    UseSkillItem(item, (short)itemIndex, aimPosition);
                 }
                 else
                 {
@@ -843,7 +843,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UseSkillItem(Item item, short itemIndex)
+        protected void UseSkillItem(Item item, short itemIndex, Vector3? aimPosition)
         {
             Skill skill = item.skillLevel.skill;
 
@@ -855,7 +855,7 @@ namespace MultiplayerARPG
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                SetQueueUsingSkillItem(null, itemIndex, skill.DataId);
+                SetQueueUsingSkillItem(aimPosition, itemIndex, skill.DataId);
             }
             else
             {
@@ -865,7 +865,7 @@ namespace MultiplayerARPG
                     if (IsLockTarget())
                     {
                         // If attacking any character, will use skill later
-                        SetQueueUsingSkillItem(null, itemIndex, skill.DataId);
+                        SetQueueUsingSkillItem(aimPosition, itemIndex, skill.DataId);
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
                             // Attacking selected target

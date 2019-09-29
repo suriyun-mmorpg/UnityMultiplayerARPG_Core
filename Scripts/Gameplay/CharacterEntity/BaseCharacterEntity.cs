@@ -940,7 +940,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Custom:
-                    damageInfo.customDamageType.LaunchDamageEntity(isLeftHand, weapon, damageAmounts, debuff, skill, skillLevel, aimPosition, stagger);
+                    damageInfo.customDamageType.LaunchDamageEntity(this, isLeftHand, weapon, damageAmounts, debuff, skill, skillLevel, aimPosition, stagger);
                     break;
             }
         }
@@ -1256,7 +1256,7 @@ namespace MultiplayerARPG
                 case AnimActionType.SkillLeftHand:
                     // Calculate move speed rate while doing action at clients and server
                     if (skill != null)
-                        return moveSpeedRateWhileAttackOrUseSkill = skill.moveSpeedRateWhileUsingSkill;
+                        return skill.moveSpeedRateWhileUsingSkill;
                     break;
             }
             return 1f;
