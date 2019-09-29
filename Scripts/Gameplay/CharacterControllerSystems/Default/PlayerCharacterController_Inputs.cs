@@ -739,15 +739,9 @@ namespace MultiplayerARPG
         protected void UseSkill(string id)
         {
             Skill skill = null;
-            short skillLevel;
 
             // Avoid empty data
-            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) ||
-                skill == null || !PlayerCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
-                return;
-            
-            // Start controlling custom damage type
-            if (StartControllingCustomDamageType(skill, skillLevel))
+            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null)
                 return;
 
             BaseCharacterEntity attackingCharacter;
@@ -852,14 +846,9 @@ namespace MultiplayerARPG
         protected void UseSkillItem(Item item, short itemIndex)
         {
             Skill skill = item.skillLevel.skill;
-            short skillLevel = item.skillLevel.level;
 
             // Avoid empty data
             if (skill == null)
-                return;
-
-            // Start controlling custom damage type
-            if (StartControllingCustomDamageType(skill, skillLevel))
                 return;
 
             BaseCharacterEntity attackingCharacter;

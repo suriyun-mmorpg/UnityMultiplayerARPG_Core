@@ -184,18 +184,9 @@ namespace MultiplayerARPG
                     destination = null;
             }
 
-            if (aimingDamageType != null)
-            {
-                // Update by custom damage type
-                aimingDamageType.UpdateAimControls();
-            }
-            else
-            {
-                // Default update functions
-                UpdateInput();
-                UpdateFollowTarget();
-                UpdateLookAtTarget();
-            }
+            UpdateInput();
+            UpdateFollowTarget();
+            UpdateLookAtTarget();
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
