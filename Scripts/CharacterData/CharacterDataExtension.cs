@@ -554,7 +554,8 @@ public static partial class CharacterDataExtension
 
     public static CharacterStats GetStats(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
-        CharacterStats result = data.GetCharacterStats();
+        CharacterStats result = new CharacterStats();
+        result += data.GetCharacterStats();
         if (sumWithEquipments || sumWithBuffs)
         {
             // Prepare base stats, it will be multiplied with increase stats rate
