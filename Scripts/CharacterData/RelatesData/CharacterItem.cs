@@ -579,12 +579,12 @@ public class CharacterItem : INetSerializableWithElement
             {
                 writer.Put(durability);
                 writer.Put(exp);
+            }
 
-                if (GetWeaponItem() != null)
-                {
-                    // Only weapons have an ammo
-                    writer.Put(ammo);
-                }
+            if (GetWeaponItem() != null)
+            {
+                // Only weapons have an ammo
+                writer.Put(ammo);
             }
 
             byte socketCount = (byte)Sockets.Count;
@@ -632,12 +632,12 @@ public class CharacterItem : INetSerializableWithElement
             {
                 durability = reader.GetFloat();
                 exp = reader.GetInt();
+            }
 
-                if (GetWeaponItem() != null)
-                {
-                    // Only weapons have an ammo
-                    ammo = reader.GetShort();
-                }
+            if (GetWeaponItem() != null)
+            {
+                // Only weapons have an ammo
+                ammo = reader.GetShort();
             }
 
             byte socketCount = reader.GetByte();
