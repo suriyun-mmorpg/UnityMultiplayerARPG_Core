@@ -175,7 +175,7 @@ namespace MultiplayerARPG
             isAttackingOrUsingSkill = true;
 
             // Calculate move speed rate while doing action at clients and server
-            moveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, null);
+            moveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, skill);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             float playSpeedMultiplier = GetAnimSpeedRate(animActionType);
