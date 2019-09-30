@@ -199,7 +199,7 @@ public static partial class CharacterDataExtension
 
     public static Dictionary<BaseSkill, short> GetCharacterSkills(this ICharacterData data)
     {
-        if (data == null || data.GetDatabase() ==  null)
+        if (data == null || data.GetDatabase() == null)
             return new Dictionary<BaseSkill, short>();
         // Make dictionary of skills which set in `PlayerCharacter` or `MonsterCharacter`
         Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>(data.GetDatabase().CacheSkillLevels);
@@ -687,12 +687,12 @@ public static partial class CharacterDataExtension
     public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
     {
         return data.NonEquipItems.IncreasingItemsWillOverwhelming(
-            dataId, 
-            amount, 
-            true, 
-            (short)data.GetCaches().Stats.weightLimit, 
-            data.GetCaches().TotalItemWeight, 
-            GameInstance.Singleton.IsLimitInventorySlot, 
+            dataId,
+            amount,
+            true,
+            (short)data.GetCaches().Stats.weightLimit,
+            data.GetCaches().TotalItemWeight,
+            GameInstance.Singleton.IsLimitInventorySlot,
             (short)(data.GetCaches().Stats.slotLimit + GameInstance.Singleton.baseSlotLimit));
     }
     #endregion
@@ -795,7 +795,7 @@ public static partial class CharacterDataExtension
 
     public static bool IncreaseItems(this ICharacterData data, CharacterItem addingItem)
     {
-        if  (data.NonEquipItems.IncreaseItems(addingItem))
+        if (data.NonEquipItems.IncreaseItems(addingItem))
         {
             data.FillEmptySlots();
             return true;
@@ -1389,7 +1389,7 @@ public static partial class CharacterDataExtension
                             new Dictionary<Attribute, float>(baseAttributes),
                             tempAttributesRate));
                     tempAttributes = GameDataHelpers.CombineAttributes(
-                        tempAttributes, 
+                        tempAttributes,
                         GameDataHelpers.MultiplyAttributes(
                             new Dictionary<Attribute, float>(baseAttributes),
                             tempAttributesRate));
