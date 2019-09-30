@@ -32,7 +32,7 @@ public class EquipWeapons : INetSerializableWithElement
         rightHand.Element = Element;
         leftHand.Element = Element;
     }
-    
+
     public void Serialize(NetDataWriter writer)
     {
         Validate();
@@ -40,6 +40,15 @@ public class EquipWeapons : INetSerializableWithElement
         rightHand.Serialize(writer);
         // Left hand
         leftHand.Serialize(writer);
+    }
+
+    public void Serialize(NetDataWriter writer, bool isOwnerClient)
+    {
+        Validate();
+        // Right hand
+        rightHand.Serialize(writer, isOwnerClient);
+        // Left hand
+        leftHand.Serialize(writer, isOwnerClient);
     }
 
     public void Deserialize(NetDataReader reader)

@@ -416,12 +416,12 @@ public static partial class PlayerCharacterDataExtension
         writer.Put((byte)characterData.EquipItems.Count);
         foreach (CharacterItem entry in characterData.EquipItems)
         {
-            entry.Serialize(writer);
+            entry.Serialize(writer, true); // Force serialize for owner client to send all data
         }
         writer.Put((short)characterData.NonEquipItems.Count);
         foreach (CharacterItem entry in characterData.NonEquipItems)
         {
-            entry.Serialize(writer);
+            entry.Serialize(writer, true); // Force serialize for owner client to send all data
         }
         writer.Put((byte)characterData.Hotkeys.Count);
         foreach (CharacterHotkey entry in characterData.Hotkeys)
@@ -439,7 +439,7 @@ public static partial class PlayerCharacterDataExtension
         writer.Put((byte)characterData.SelectableWeaponSets.Count);
         foreach (EquipWeapons entry in characterData.SelectableWeaponSets)
         {
-            entry.Serialize(writer);
+            entry.Serialize(writer, true); // Force serialize for owner client to send all data
         }
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SerializeCharacterData", characterData, writer);
     }

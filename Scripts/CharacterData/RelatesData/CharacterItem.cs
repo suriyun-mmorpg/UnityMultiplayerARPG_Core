@@ -551,19 +551,31 @@ public class CharacterItem : INetSerializableWithElement
 
     public void Serialize(NetDataWriter writer)
     {
-        bool isOwnerClient = Element == null || Element.SendingConnectionId == Element.ConnectionId;
+        Serialize(writer, Element == null || Element.SendingConnectionId == Element.ConnectionId);
+    }
+
+    public void Serialize(NetDataWriter writer, bool isOwnerClient)
+    {
         writer.Put(isOwnerClient);
         if (isOwnerClient)
+        {
             writer.Put(id);
+        }
+
         writer.Put(dataId);
         writer.Put(level);
         writer.Put(amount);
         writer.Put(equipSlotIndex);
+
         if (isOwnerClient)
         {
             writer.Put(lockRemainsDuration);
-            // Put only needed data
-            if (GetEquipmentItem() != null)
+        }
+
+        // Put only needed data
+        if (GetEquipmentItem() != null)
+        {
+            if (isOwnerClient)
             {
                 writer.Put(durability);
                 writer.Put(exp);
@@ -573,19 +585,22 @@ public class CharacterItem : INetSerializableWithElement
                     // Only weapons have an ammo
                     writer.Put(ammo);
                 }
-
-                byte socketCount = (byte)Sockets.Count;
-                writer.Put(socketCount);
-                if (socketCount > 0)
-                {
-                    foreach (int socketDataId in Sockets)
-                    {
-                        writer.Put(socketDataId);
-                    }
-                }
             }
 
-            if (GetPetItem() != null)
+            byte socketCount = (byte)Sockets.Count;
+            writer.Put(socketCount);
+            if (socketCount > 0)
+            {
+                foreach (int socketDataId in Sockets)
+                {
+                    writer.Put(socketDataId);
+                }
+            }
+        }
+
+        if (GetPetItem() != null)
+        {
+            if (isOwnerClient)
             {
                 writer.Put(exp);
             }
@@ -596,16 +611,24 @@ public class CharacterItem : INetSerializableWithElement
     {
         bool isOwnerClient = reader.GetBool();
         if (isOwnerClient)
+        {
             id = reader.GetString();
+        }
+
         dataId = reader.GetInt();
         level = reader.GetShort();
         amount = reader.GetShort();
         equipSlotIndex = reader.GetByte();
+
         if (isOwnerClient)
         {
             lockRemainsDuration = reader.GetFloat();
-            // Read only needed data
-            if (GetEquipmentItem() != null)
+        }
+
+        // Read only needed data
+        if (GetEquipmentItem() != null)
+        {
+            if (isOwnerClient)
             {
                 durability = reader.GetFloat();
                 exp = reader.GetInt();
@@ -615,16 +638,19 @@ public class CharacterItem : INetSerializableWithElement
                     // Only weapons have an ammo
                     ammo = reader.GetShort();
                 }
-
-                int socketCount = reader.GetByte();
-                Sockets.Clear();
-                for (int i = 0; i < socketCount; ++i)
-                {
-                    Sockets.Add(reader.GetInt());
-                }
             }
 
-            if (GetPetItem() != null)
+            byte socketCount = reader.GetByte();
+            Sockets.Clear();
+            for (byte i = 0; i < socketCount; ++i)
+            {
+                Sockets.Add(reader.GetInt());
+            }
+        }
+
+        if (GetPetItem() != null)
+        {
+            if (isOwnerClient)
             {
                 exp = reader.GetInt();
             }
