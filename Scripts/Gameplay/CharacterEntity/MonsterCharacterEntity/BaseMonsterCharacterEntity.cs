@@ -368,6 +368,9 @@ namespace MultiplayerARPG
                 float tempHighRewardRate = 0f;
                 foreach (BaseCharacterEntity enemy in receivedDamageRecords.Keys)
                 {
+                    if (enemy == null)
+                        continue;
+
                     givenRewardExp = false;
                     givenRewardCurrency = false;
                     shareGuildExpRate = 0f;
@@ -517,16 +520,16 @@ namespace MultiplayerARPG
                 return;
 
             if (spawnArea != null)
-                spawnArea.Spawn(destroyDelay + destroyRespawnDelay);
+                spawnArea.Spawn(DestroyDelay + DestroyRespawnDelay);
             else
                 Manager.StartCoroutine(RespawnRoutine());
 
-            NetworkDestroy(destroyDelay);
+            NetworkDestroy(DestroyDelay);
         }
 
         private IEnumerator RespawnRoutine()
         {
-            yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
+            yield return new WaitForSecondsRealtime(DestroyDelay + DestroyRespawnDelay);
             InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
