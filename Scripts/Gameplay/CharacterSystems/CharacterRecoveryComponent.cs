@@ -6,8 +6,6 @@ namespace MultiplayerARPG
 {
     public class CharacterRecoveryComponent : BaseCharacterComponent
     {
-        public float recoveryUpdateDuration = 1f;
-
         #region Recovery System Data
         [HideInInspector, System.NonSerialized]
         public float recoveryingHp;
