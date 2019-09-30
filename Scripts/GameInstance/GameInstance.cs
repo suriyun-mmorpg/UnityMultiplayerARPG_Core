@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
@@ -63,7 +63,10 @@ namespace MultiplayerARPG
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
         [SerializeField]
         private Item defaultWeaponItem;
-        [Tooltip("Default hit effect, will be used when attacks to enemies")]
+        [Tooltip("Default damage element, will be used when attacks to enemies or receives damages from enemies")]
+        [SerializeField]
+        private DamageElement defaultDamageElement;
+        [Tooltip("Default hit effect, will be used when attacks to enemies or receives damages from enemies")]
         [SerializeField]
         private GameEffectCollection defaultHitEffects;
         [SerializeField]
@@ -234,22 +237,6 @@ namespace MultiplayerARPG
             }
         }
 
-        private DamageElement cacheDefaultDamageElement;
-        public DamageElement DefaultDamageElement
-        {
-            get
-            {
-                if (cacheDefaultDamageElement == null)
-                {
-                    cacheDefaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
-                    cacheDefaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
-                    cacheDefaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
-                    cacheDefaultDamageElement.hitEffects = DefaultHitEffects;
-                }
-                return cacheDefaultDamageElement;
-            }
-        }
-
         public int[] ExpTree
         {
             get
@@ -328,12 +315,24 @@ namespace MultiplayerARPG
             }
         }
 
-        public GameEffectCollection DefaultHitEffects
+        public DamageElement DefaultDamageElement
         {
             get
             {
-                return defaultHitEffects;
+                if (defaultDamageElement == null)
+                {
+                    defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
+                    defaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
+                    defaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
+                    defaultDamageElement.hitEffects = DefaultHitEffects;
+                }
+                return defaultDamageElement;
             }
+        }
+
+        public GameEffectCollection DefaultHitEffects
+        {
+            get { return defaultHitEffects; }
         }
 
         public SocialSystemSetting SocialSystemSetting
