@@ -42,6 +42,9 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
+            if (BasePlayerCharacterController.OwningCharacter == null)
+                return;
+
             if (dirtyEquipWeaponSet != BasePlayerCharacterController.OwningCharacter.EquipWeaponSet)
             {
                 dirtyEquipWeaponSet = BasePlayerCharacterController.OwningCharacter.EquipWeaponSet;
