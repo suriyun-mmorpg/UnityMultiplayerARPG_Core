@@ -74,10 +74,10 @@ namespace MultiplayerARPG
             mp = mp * b.mp;
             accuracy = accuracy * b.accuracy;
             evasion = evasion * b.evasion;
-            criRate = criRate + b.criRate;
-            criDmgRate = criDmgRate + b.criDmgRate;
-            blockRate = blockRate + b.blockRate;
-            blockDmgRate = blockDmgRate + b.blockDmgRate;
+            criRate = criRate * b.criRate;
+            criDmgRate = criDmgRate * b.criDmgRate;
+            blockRate = blockRate * b.blockRate;
+            blockDmgRate = blockDmgRate * b.blockDmgRate;
             moveSpeed = moveSpeed * b.moveSpeed;
             atkSpeed = atkSpeed * b.atkSpeed;
             weightLimit = weightLimit * b.weightLimit;
@@ -582,7 +582,10 @@ namespace MultiplayerARPG
 
         public CharacterStats GetCharacterStats(short level)
         {
-            return baseStats + (statsIncreaseEachLevel * (level - 1));
+            CharacterStats result = new CharacterStats();
+            result += baseStats;
+            result += (statsIncreaseEachLevel * (level - 1));
+            return result;
         }
     }
 }

@@ -50,6 +50,14 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyEvasionRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EVASION_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyCriRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CRITICAL_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyCriDmgRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyBlockRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BLOCK_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyBlockDmgRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BLOCK_DAMAGE_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyMoveSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MOVE_SPEED_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyAtkSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ATTACK_SPEED_RATE);
@@ -97,10 +105,10 @@ namespace MultiplayerARPG
                         formatKeyMpRateStats,
                         formatKeyAccuracyRateStats,
                         formatKeyEvasionRateStats,
-                        formatKeyCriRateStats,
-                        formatKeyCriDmgRateStats,
-                        formatKeyBlockRateStats,
-                        formatKeyBlockDmgRateStats,
+                        formatKeyCriRateRateStats,
+                        formatKeyCriDmgRateRateStats,
+                        formatKeyBlockRateRateStats,
+                        formatKeyBlockDmgRateRateStats,
                         formatKeyMoveSpeedRateStats,
                         formatKeyAtkSpeedRateStats,
                         formatKeyWeightLimitRateStats,

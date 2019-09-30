@@ -564,6 +564,22 @@ namespace MultiplayerARPG
         /// <summary>
         /// Format => {0} = {Amount * 100}
         /// </summary>
+        UI_FORMAT_CRITICAL_RATE_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_BLOCK_RATE_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_BLOCK_DAMAGE_RATE_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
         UI_FORMAT_MOVE_SPEED_RATE,
         /// <summary>
         /// Format => {0} = {Amount * 100}
@@ -884,6 +900,10 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_WATER_RATE.ToString(), "Water: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_ACCURACY_RATE.ToString(), "Accuracy: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_EVASION_RATE.ToString(), "Evasion: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CRITICAL_RATE_RATE.ToString(), "% of Cri. Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE.ToString(), "% of Cri. Damage: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_BLOCK_RATE_RATE.ToString(), "% of Block Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_BLOCK_DAMAGE_RATE_RATE.ToString(), "% of Block Damage: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_MOVE_SPEED_RATE.ToString(), "Move Speed: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_ATTACK_SPEED_RATE.ToString(), "Attack Speed: {0}%");
             // Format - Attribute Amount Rate
