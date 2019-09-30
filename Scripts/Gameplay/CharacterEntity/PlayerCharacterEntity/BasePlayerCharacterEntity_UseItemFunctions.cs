@@ -168,7 +168,7 @@ namespace MultiplayerARPG
 
             int dataId = item.skillLevel.skill.DataId;
 
-            Skill skillData;
+            BaseSkill skillData;
             if (!GameInstance.Skills.TryGetValue(dataId, out skillData))
                 return;
 
@@ -213,7 +213,7 @@ namespace MultiplayerARPG
             if (!CanUseItem() || !CanUseSkill() || item == null || item.skillLevel.skill == null || !this.DecreaseItemsByIndex(itemIndex, 1))
                 return;
 
-            Skill skill = item.skillLevel.skill;
+            BaseSkill skill = item.skillLevel.skill;
             short level = item.skillLevel.level;
 
             // Prepare requires data and get skill data
@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                 out weapon);
 
             // Validate ammo
-            if (skill.skillDamageType != SkillDamageType.None && !ValidateAmmo(weapon))
+            if (skill.IsAttack() && !ValidateAmmo(weapon))
                 return;
 
             // Prepare requires data and get animation data

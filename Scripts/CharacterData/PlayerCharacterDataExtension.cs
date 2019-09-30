@@ -105,7 +105,7 @@ public static partial class PlayerCharacterDataExtension
         for (int i = characterSkills.Count - 1; i >= 0; --i)
         {
             CharacterSkill characterSkill = characterSkills[i];
-            Skill skill = characterSkill.GetSkill();
+            BaseSkill skill = characterSkill.GetSkill();
             // If skill is invalid or this character database does not have skill
             if (characterSkill.GetSkill() == null ||
                 !database.CacheSkillLevels.ContainsKey(skill) ||
@@ -119,7 +119,7 @@ public static partial class PlayerCharacterDataExtension
         }
         character.SkillPoint += returningSkillPoint;
         // Add character's skills
-        foreach (Skill skill in database.CacheSkillLevels.Keys)
+        foreach (BaseSkill skill in database.CacheSkillLevels.Keys)
         {
             // This skill is valid, so not have to add it
             if (validSkillIds.Contains(skill.DataId))
@@ -186,8 +186,8 @@ public static partial class PlayerCharacterDataExtension
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
-        Dictionary<Skill, short> skillLevels = playerCharacter.CacheSkillLevels;
-        foreach (Skill skill in playerCharacter.CacheSkillLevels.Keys)
+        Dictionary<BaseSkill, short> skillLevels = playerCharacter.CacheSkillLevels;
+        foreach (BaseSkill skill in playerCharacter.CacheSkillLevels.Keys)
         {
             CharacterSkill characterSkill = new CharacterSkill();
             characterSkill.dataId = skill.DataId;

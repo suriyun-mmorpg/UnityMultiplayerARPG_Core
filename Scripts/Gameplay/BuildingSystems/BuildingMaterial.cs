@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             return buildingEntity.CanReceiveDamageFrom(attacker);
         }
 
-        public void PlayHitEffects(IEnumerable<DamageElement> damageElements, Skill skill)
+        public void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
         {
             buildingEntity.PlayHitEffects(damageElements, skill);
         }

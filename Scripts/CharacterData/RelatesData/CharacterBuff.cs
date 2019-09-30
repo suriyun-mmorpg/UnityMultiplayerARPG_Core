@@ -29,7 +29,7 @@ public class CharacterBuff : INetSerializableWithElement
     private short dirtyLevel;
 
     [System.NonSerialized]
-    private Skill cacheSkill;
+    private BaseSkill cacheSkill;
     [System.NonSerialized]
     private Item cacheItem;
     [System.NonSerialized]
@@ -103,7 +103,7 @@ public class CharacterBuff : INetSerializableWithElement
                 case BuffType.SkillBuff:
                 case BuffType.SkillDebuff:
                     if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill) && cacheSkill != null)
-                        cacheBuff = type == BuffType.SkillBuff ? cacheSkill.buff : cacheSkill.debuff;
+                        cacheBuff = type == BuffType.SkillBuff ? cacheSkill.GetBuff() : cacheSkill.GetDebuff();
                     break;
                 case BuffType.PotionBuff:
                     if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
@@ -131,7 +131,7 @@ public class CharacterBuff : INetSerializableWithElement
         }
     }
 
-    public Skill GetSkill()
+    public BaseSkill GetSkill()
     {
         MakeCache();
         return cacheSkill;

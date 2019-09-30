@@ -19,7 +19,7 @@ public class CharacterSkillUsage : INetSerializableWithElement
     [System.NonSerialized]
     private int dirtyDataId;
     [System.NonSerialized]
-    private Skill cacheSkill;
+    private BaseSkill cacheSkill;
     [System.NonSerialized]
     private GuildSkill cacheGuildSkill;
 
@@ -50,7 +50,7 @@ public class CharacterSkillUsage : INetSerializableWithElement
         }
     }
 
-    public Skill GetSkill()
+    public BaseSkill GetSkill()
     {
         MakeCache();
         return cacheSkill;

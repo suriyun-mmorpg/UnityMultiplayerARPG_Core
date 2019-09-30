@@ -16,11 +16,13 @@ namespace MultiplayerARPG
         public struct UsingSkillData
         {
             public Vector3? aimPosition;
-            public int dataId;
-            public UsingSkillData(Vector3? aimPosition, int dataId)
+            public BaseSkill skill;
+            public short level;
+            public UsingSkillData(Vector3? aimPosition, BaseSkill skill, short level)
             {
                 this.aimPosition = aimPosition;
-                this.dataId = dataId;
+                this.skill = skill;
+                this.level = level;
             }
         }
 
@@ -28,12 +30,14 @@ namespace MultiplayerARPG
         {
             public Vector3? aimPosition;
             public short itemIndex;
-            public int skillDataId;
-            public UsingSkillItemData(Vector3? aimPosition, short itemIndex, int skillDataId)
+            public BaseSkill skill;
+            public short level;
+            public UsingSkillItemData(Vector3? aimPosition, short itemIndex, BaseSkill skill, short level)
             {
                 this.aimPosition = aimPosition;
                 this.itemIndex = itemIndex;
-                this.skillDataId = skillDataId;
+                this.skill = skill;
+                this.level = level;
             }
         }
 
@@ -54,8 +58,8 @@ namespace MultiplayerARPG
         public bool buildRotationSnap;
 
         protected Vector3? destination;
-        protected UsingSkillData? queueUsingSkill;
-        protected UsingSkillItemData? queueUsingSkillItem;
+        protected UsingSkillData queueUsingSkill;
+        protected UsingSkillItemData queueUsingSkillItem;
         protected Vector3 mouseDownPosition;
         protected float mouseDownTime;
         protected bool isMouseDragOrHoldOrOverUI;
@@ -165,6 +169,7 @@ namespace MultiplayerARPG
             if (PlayerCharacterEntity.IsDead())
             {
                 ClearQueueUsingSkill();
+                ClearQueueUsingSkillItem();
                 destination = null;
                 if (CacheUISceneGameplay != null)
                     CacheUISceneGameplay.SetTargetEntity(null);
@@ -238,19 +243,24 @@ namespace MultiplayerARPG
             attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHand);
             attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHand);
 
-            Skill skill = null;
+            BaseSkill skill = null;
+            short skillLevel = 0;
 
-            if (queueUsingSkill.HasValue)
+            if (queueUsingSkill.skill != null)
             {
-                if (!GameInstance.Skills.TryGetValue(queueUsingSkill.Value.dataId, out skill) || skill == null)
+                skill = queueUsingSkill.skill;
+                skillLevel = queueUsingSkill.level;
+                if (queueUsingSkill.level <= 0)
                 {
                     ClearQueueUsingSkill();
                 }
             }
 
-            if (queueUsingSkillItem.HasValue)
+            if (queueUsingSkillItem.skill != null)
             {
-                if (!GameInstance.Skills.TryGetValue(queueUsingSkillItem.Value.skillDataId, out skill) || skill == null)
+                skill = queueUsingSkillItem.skill;
+                skillLevel = queueUsingSkillItem.level;
+                if (queueUsingSkillItem.level <= 0)
                 {
                     ClearQueueUsingSkillItem();
                 }
@@ -258,24 +268,23 @@ namespace MultiplayerARPG
 
             if (skill == null)
             {
-                // No skill, use weapon attack data
+                // No using skill, just attack
                 return true;
             }
 
             if (skill.IsAttack())
             {
-                attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHand);
-                attackFov = PlayerCharacterEntity.GetSkillAttackFov(skill, isLeftHand);
+                attackDistance = skill.GetAttackDistance(PlayerCharacterEntity, isLeftHand, skillLevel);
+                attackFov = skill.GetAttackFov(PlayerCharacterEntity, isLeftHand, skillLevel);
             }
             else
             {
                 // Stop movement to use non attack skill
                 PlayerCharacterEntity.StopMove();
                 // Use skill
-                if (queueUsingSkill.HasValue)
+                if (queueUsingSkill.skill != null)
                     RequestUsePendingSkill(false, null);
-                // Use skill item
-                if (queueUsingSkillItem.HasValue)
+                else if (queueUsingSkillItem.skill != null)
                     RequestUsePendingSkillItem(false, null);
                 return false;
             }
@@ -318,54 +327,54 @@ namespace MultiplayerARPG
 
         public bool RequestUsePendingSkill(bool isLeftHand, Vector3? aimPosition)
         {
-            if (queueUsingSkill.HasValue && PlayerCharacterEntity.CanUseSkill())
+            if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseSkill())
             {
-                UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
-                if (queueUsingSkillValue.aimPosition.HasValue)
-                    aimPosition = queueUsingSkillValue.aimPosition.Value;
+                BaseSkill skill = queueUsingSkill.skill;
+                if (queueUsingSkill.aimPosition.HasValue)
+                    aimPosition = queueUsingSkill.aimPosition.Value;
                 ClearQueueUsingSkill();
                 if (aimPosition.HasValue)
-                    return PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand, aimPosition.Value);
+                    return PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHand, aimPosition.Value);
                 else
-                    return PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand);
+                    return PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHand);
             }
             return false;
         }
 
         public bool RequestUsePendingSkillItem(bool isLeftHand, Vector3? aimPosition)
         {
-            if (queueUsingSkillItem.HasValue && PlayerCharacterEntity.CanUseItem() && PlayerCharacterEntity.CanUseSkill())
+            if (queueUsingSkillItem.skill != null && PlayerCharacterEntity.CanUseItem() && PlayerCharacterEntity.CanUseSkill())
             {
-                UsingSkillItemData queueUsingSkillItemValue = queueUsingSkillItem.Value;
-                if (queueUsingSkillItemValue.aimPosition.HasValue)
-                    aimPosition = queueUsingSkillItemValue.aimPosition.Value;
+                short itemIndex = queueUsingSkillItem.itemIndex;
+                if (queueUsingSkillItem.aimPosition.HasValue)
+                    aimPosition = queueUsingSkillItem.aimPosition.Value;
                 ClearQueueUsingSkillItem();
                 if (aimPosition.HasValue)
-                    return PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkillItemValue.itemIndex, isLeftHand, aimPosition.Value);
+                    return PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHand, aimPosition.Value);
                 else
-                    return PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkillItemValue.itemIndex, isLeftHand);
+                    return PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHand);
             }
             return false;
         }
 
-        public void SetQueueUsingSkill(Vector3? aimPosition, int skillDataId)
+        public void SetQueueUsingSkill(Vector3? aimPosition, BaseSkill skill, short level)
         {
-            queueUsingSkill = new UsingSkillData(aimPosition, skillDataId);
+            queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
         }
 
-        public void SetQueueUsingSkillItem(Vector3? aimPosition, short itemIndex, int skillDataId)
+        public void SetQueueUsingSkillItem(Vector3? aimPosition, short itemIndex, BaseSkill skill, short level)
         {
-            queueUsingSkillItem = new UsingSkillItemData(aimPosition, itemIndex, skillDataId);
+            queueUsingSkillItem = new UsingSkillItemData(aimPosition, itemIndex, skill, level);
         }
 
         public void ClearQueueUsingSkill()
         {
-            queueUsingSkill = null;
+            queueUsingSkill = default(UsingSkillData);
         }
 
         public void ClearQueueUsingSkillItem()
         {
-            queueUsingSkillItem = null;
+            queueUsingSkillItem = default(UsingSkillItemData);
         }
     }
 }

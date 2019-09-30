@@ -102,20 +102,20 @@ namespace MultiplayerARPG
             if (database != null)
             {
                 CharacterSkill tempCharacterSkill;
-                Skill tempSkill;
+                BaseSkill tempSkill;
                 int tempIndexOfSkill;
                 // Combine skills from database (skill that can level up) with increased skill and equipment skill
-                Dictionary<Skill, short> skillLevels = character.GetSkills();
+                Dictionary<BaseSkill, short> skillLevels = character.GetSkills();
                 // Filter skills to show by specific skill types / categories
-                Dictionary<Skill, short> filteredSkillLevels = new Dictionary<Skill, short>();
-                foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
+                Dictionary<BaseSkill, short> filteredSkillLevels = new Dictionary<BaseSkill, short>();
+                foreach (KeyValuePair<BaseSkill, short> skillLevel in skillLevels)
                 {
                     if (string.IsNullOrEmpty(skillLevel.Key.category) ||
                         filterCategories == null || filterCategories.Count == 0 ||
                         filterCategories.Contains(skillLevel.Key.category))
                     {
                         if (filterSkillTypes == null || filterSkillTypes.Count == 0 ||
-                            filterSkillTypes.Contains(skillLevel.Key.skillType))
+                            filterSkillTypes.Contains(skillLevel.Key.GetSkillType()))
                             filteredSkillLevels.Add(skillLevel.Key, skillLevel.Value);
                     }
                 }

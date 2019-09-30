@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
         
-        private Skill hotkeySkill;
+        private BaseSkill hotkeySkill;
         private short hotkeySkillLevel;
 
         public void Setup(UICharacterHotkeys uiCharacterHotkeys, CharacterHotkey data, int indexOfData)
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             if (uiCharacterSkill != null)
             {
                 // All skills included equipment skills
-                Dictionary<Skill, short> skills = OwningCharacter.GetSkills();
+                Dictionary<BaseSkill, short> skills = OwningCharacter.GetSkills();
 
                 if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.relateId), out hotkeySkill) ||
                     hotkeySkill == null || !skills.TryGetValue(hotkeySkill, out hotkeySkillLevel))
@@ -141,15 +141,13 @@ namespace MultiplayerARPG
 
         public Vector3? UpdateAimAxes(Vector3 axes)
         {
-            Vector3? aimPosition = null;
-            if (hotkeySkill != null && hotkeySkillLevel > 0 && hotkeySkill.IsAttack() &&
-                hotkeySkill.damageInfo.damageType == DamageType.Custom &&
-                hotkeySkill.damageInfo.customDamageType != null &&
-                hotkeySkill.damageInfo.customDamageType.HasCustomAimControls())
+            if (hotkeySkill != null && hotkeySkillLevel > 0 &&
+                hotkeySkill.GetSkillType() == SkillType.Active &&
+                hotkeySkill.HasCustomAimControls())
             {
-                hotkeySkill.damageInfo.customDamageType.UpdateAimControls(hotkeySkill, hotkeySkillLevel);
+                return hotkeySkill.UpdateAimControls(hotkeySkillLevel);
             }
-            return aimPosition;
+            return null;
         }
 
         public void OnClickAssign()
@@ -187,9 +185,9 @@ namespace MultiplayerARPG
         {
             if (characterSkill == null)
                 return false;
-            Skill skill = characterSkill.GetSkill();
+            BaseSkill skill = characterSkill.GetSkill();
             if (skill != null && characterSkill.level > 0 &&
-                (skill.skillType == SkillType.Active || skill.skillType == SkillType.CraftItem))
+                (skill.GetSkillType() == SkillType.Active || skill.GetSkillType() == SkillType.CraftItem))
                 return true;
             return false;
         }

@@ -200,15 +200,21 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<Skill, short> cacheSkillLevels;
-        public override Dictionary<Skill, short> CacheSkillLevels
+        private Dictionary<BaseSkill, short> cacheSkillLevels;
+        public override Dictionary<BaseSkill, short> CacheSkillLevels
         {
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(monsterSkills, new Dictionary<Skill, short>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(monsterSkills, new Dictionary<BaseSkill, short>());
                 return cacheSkillLevels;
             }
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddDamageInfos(new DamageInfo[] { damageInfo });
         }
 
         public int RandomExp()
@@ -245,7 +251,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool RandomSkill(BaseMonsterCharacterEntity entity, out Skill skill, out short level)
+        public bool RandomSkill(BaseMonsterCharacterEntity entity, out BaseSkill skill, out short level)
         {
             skill = null;
             level = 1;

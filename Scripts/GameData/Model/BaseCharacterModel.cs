@@ -420,7 +420,7 @@ namespace MultiplayerARPG
         }
 
         public bool GetSkillActivateAnimation(
-            Skill skill,
+            BaseSkill skill,
             out float triggerDuration,
             out float totalDuration)
         {
@@ -443,7 +443,7 @@ namespace MultiplayerARPG
             return GetLeftHandReloadAnimation(weaponType.DataId, out triggerDuration, out totalDuration);
         }
 
-        public SkillActivateAnimationType UseSkillActivateAnimationType(Skill skill)
+        public SkillActivateAnimationType UseSkillActivateAnimationType(BaseSkill skill)
         {
             return UseSkillActivateAnimationType(skill.DataId);
         }

@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> damageAmounts;
         protected CharacterBuff debuff;
-        protected Skill skill;
+        protected BaseSkill skill;
 
         public GameInstance gameInstance
         {
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             CharacterBuff debuff,
-            Skill skill)
+            BaseSkill skill)
         {
             this.attacker = attacker;
             this.weapon = weapon;

@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     {
         public CharacterSkill CharacterSkill { get { return Data.characterSkill; } }
         public short Level { get { return Data.targetLevel; } }
-        public Skill Skill { get { return CharacterSkill != null ? CharacterSkill.GetSkill() : null; } }
+        public BaseSkill Skill { get { return CharacterSkill != null ? CharacterSkill.GetSkill() : null; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -164,7 +164,7 @@ namespace MultiplayerARPG
 
             if (uiTextSkillType != null)
             {
-                switch (Skill.skillType)
+                switch (Skill.GetSkillType())
                 {
                     case SkillType.Active:
                         uiTextSkillType.text = string.Format(
@@ -230,32 +230,31 @@ namespace MultiplayerARPG
 
             if (uiCraftItem != null)
             {
-                if (Skill == null || Skill.skillType != SkillType.CraftItem)
+                if (Skill == null || Skill.GetSkillType() != SkillType.CraftItem)
                     uiCraftItem.Hide();
                 else
                 {
-                    uiCraftItem.SetupForCharacter(Skill.itemCraft);
+                    uiCraftItem.SetupForCharacter(Skill.GetItemCraft());
                     uiCraftItem.Show();
                 }
             }
 
             bool isAttack = Skill != null && Skill.IsAttack();
-            bool isOverrideWeaponDamage = isAttack && Skill.skillDamageType == SkillDamageType.Normal;
             if (uiDamageAmount != null)
             {
-                if (!isOverrideWeaponDamage)
+                KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount = Skill.GetBaseAttackDamageAmount(Character, false, Level);
+                if (!isAttack)
                     uiDamageAmount.Hide();
                 else
                 {
                     uiDamageAmount.Show();
-                    KeyValuePair<DamageElement, MinMaxFloat> keyValuePair = Skill.GetDamageAmount(Level, null);
-                    uiDamageAmount.Data = new UIDamageElementAmountData(keyValuePair.Key, keyValuePair.Value);
+                    uiDamageAmount.Data = new UIDamageElementAmountData(baseAttackDamageAmount.Key, baseAttackDamageAmount.Value);
                 }
             }
 
             if (uiDamageInflictions != null)
             {
-                Dictionary<DamageElement, float> damageInflictionRates = Skill.GetWeaponDamageInflictions(Level);
+                Dictionary<DamageElement, float> damageInflictionRates = Skill.GetAttackWeaponDamageInflictions(Character, Level);
                 if (!isAttack || damageInflictionRates == null || damageInflictionRates.Count == 0)
                     uiDamageInflictions.Hide();
                 else
@@ -267,7 +266,7 @@ namespace MultiplayerARPG
 
             if (uiAdditionalDamageAmounts != null)
             {
-                Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts = Skill.GetAdditionalDamageAmounts(Level);
+                Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts = Skill.GetAttackAdditionalDamageAmounts(Character, Level);
                 if (!isAttack || additionalDamageAmounts == null || additionalDamageAmounts.Count == 0)
                     uiAdditionalDamageAmounts.Hide();
                 else
@@ -284,7 +283,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new UIBuffData(Skill.buff, Level);
+                    uiSkillBuff.Data = new UIBuffData(Skill.GetBuff(), Level);
                 }
             }
 
@@ -295,7 +294,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiSkillDebuff.Show();
-                    uiSkillDebuff.Data = new UIBuffData(Skill.debuff, Level);
+                    uiSkillDebuff.Data = new UIBuffData(Skill.GetDebuff(), Level);
                 }
             }
 

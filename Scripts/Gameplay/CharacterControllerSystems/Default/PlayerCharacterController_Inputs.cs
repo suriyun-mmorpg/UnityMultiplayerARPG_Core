@@ -260,6 +260,7 @@ namespace MultiplayerARPG
                     // Close NPC dialog, when target changes
                     HideNpcDialogs();
                     ClearQueueUsingSkill();
+                    ClearQueueUsingSkillItem();
 
                     // Move to target, will hide destination when target is object
                     if (targetEntity != null)
@@ -309,6 +310,7 @@ namespace MultiplayerARPG
             {
                 HideNpcDialogs();
                 ClearQueueUsingSkill();
+                ClearQueueUsingSkillItem();
                 FindAndSetBuildingAreaFromCharacterDirection();
             }
 
@@ -378,16 +380,14 @@ namespace MultiplayerARPG
 
         protected bool UpdateWASDPendingSkill()
         {
-            if (!queueUsingSkill.HasValue)
+            if (queueUsingSkill.skill == null)
                 return false;
-
-            UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
+            
             destination = null;
             PlayerCharacterEntity.StopMove();
-            Skill skill = null;
-            if (GameInstance.Skills.TryGetValue(queueUsingSkillValue.dataId, out skill) && skill != null)
+            if (queueUsingSkill.level > 0)
             {
-                if (skill.IsAttack())
+                if (queueUsingSkill.skill.IsAttack())
                 {
                     BaseCharacterEntity targetEntity;
                     if (TryGetSelectedTargetAsAttackingCharacter(out targetEntity))
@@ -395,7 +395,7 @@ namespace MultiplayerARPG
 
                     if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                     {
-                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
+                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(queueUsingSkill.skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, queueUsingSkill.level) + lockAttackTargetDistance, false, true, false);
                         if (nearestTarget != null)
                         {
                             // Set target, then use skill later when moved nearby target
@@ -431,16 +431,14 @@ namespace MultiplayerARPG
 
         protected bool UpdateWASDPendingSkillItem()
         {
-            if (!queueUsingSkillItem.HasValue)
+            if (queueUsingSkillItem.skill == null)
                 return false;
-
-            UsingSkillItemData queueUsingSkillItemValue = queueUsingSkillItem.Value;
+            
             destination = null;
             PlayerCharacterEntity.StopMove();
-            Skill skill = null;
-            if (GameInstance.Skills.TryGetValue(queueUsingSkillItemValue.skillDataId, out skill) && skill != null)
+            if (queueUsingSkillItem.level > 0)
             {
-                if (skill.IsAttack())
+                if (queueUsingSkillItem.skill.IsAttack())
                 {
                     BaseCharacterEntity targetEntity;
                     if (TryGetSelectedTargetAsAttackingCharacter(out targetEntity))
@@ -448,7 +446,7 @@ namespace MultiplayerARPG
 
                     if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                     {
-                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
+                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(queueUsingSkillItem.skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, queueUsingSkillItem.level) + lockAttackTargetDistance, false, true, false);
                         if (nearestTarget != null)
                         {
                             // Set target, then use skill later when moved nearby target
@@ -522,6 +520,7 @@ namespace MultiplayerARPG
                 if (targetEnemy.IsDead())
                 {
                     ClearQueueUsingSkill();
+                    ClearQueueUsingSkillItem();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
@@ -545,13 +544,13 @@ namespace MultiplayerARPG
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
-                        if (queueUsingSkill.HasValue &&
+                        if (queueUsingSkill.skill != null &&
                             RequestUsePendingSkill(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
                         {
                             // Change attacking hand after attack requested
                             isLeftHandAttacking = !isLeftHandAttacking;
                         }
-                        else if (queueUsingSkillItem.HasValue &&
+                        else if (queueUsingSkillItem.skill != null &&
                             RequestUsePendingSkillItem(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
                         {
                             // Change attacking hand after attack requested
@@ -572,6 +571,7 @@ namespace MultiplayerARPG
                 if (targetPlayer.IsDead())
                 {
                     ClearQueueUsingSkill();
+                    ClearQueueUsingSkillItem();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
@@ -590,6 +590,7 @@ namespace MultiplayerARPG
                 if (targetMonster.IsDead())
                 {
                     ClearQueueUsingSkill();
+                    ClearQueueUsingSkillItem();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
@@ -664,6 +665,7 @@ namespace MultiplayerARPG
                 if (targetHarvestable.IsDead())
                 {
                     ClearQueueUsingSkill();
+                    ClearQueueUsingSkillItem();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
@@ -723,6 +725,7 @@ namespace MultiplayerARPG
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
             ClearQueueUsingSkill();
+            ClearQueueUsingSkillItem();
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
             switch (hotkey.type)
@@ -738,17 +741,19 @@ namespace MultiplayerARPG
 
         protected void UseSkill(string id, Vector3? aimPosition)
         {
-            Skill skill = null;
+            BaseSkill skill = null;
+            short skillLevel = 0;
 
             // Avoid empty data
-            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null)
+            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null ||
+                !PlayerCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return;
 
             BaseCharacterEntity attackingCharacter;
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                SetQueueUsingSkill(aimPosition, skill.DataId);
+                SetQueueUsingSkill(aimPosition, skill, skillLevel);
             }
             else
             {
@@ -759,7 +764,7 @@ namespace MultiplayerARPG
                     if (IsLockTarget())
                     {
                         // If attacking any character, will use skill later
-                        SetQueueUsingSkill(aimPosition, skill.DataId);
+                        SetQueueUsingSkill(aimPosition, skill, skillLevel);
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
                             // Attacking selected target
@@ -768,7 +773,7 @@ namespace MultiplayerARPG
                         else
                         {
                             // Attacking nearest target
-                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
+                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, skillLevel) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                         }
@@ -845,7 +850,8 @@ namespace MultiplayerARPG
 
         protected void UseSkillItem(Item item, short itemIndex, Vector3? aimPosition)
         {
-            Skill skill = item.skillLevel.skill;
+            BaseSkill skill = item.skillLevel.skill;
+            short skillLevel = item.skillLevel.level;
 
             // Avoid empty data
             if (skill == null)
@@ -855,7 +861,7 @@ namespace MultiplayerARPG
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                SetQueueUsingSkillItem(aimPosition, itemIndex, skill.DataId);
+                SetQueueUsingSkillItem(aimPosition, itemIndex, skill, skillLevel);
             }
             else
             {
@@ -865,7 +871,7 @@ namespace MultiplayerARPG
                     if (IsLockTarget())
                     {
                         // If attacking any character, will use skill later
-                        SetQueueUsingSkillItem(aimPosition, itemIndex, skill.DataId);
+                        SetQueueUsingSkillItem(aimPosition, itemIndex, skill, skillLevel);
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
                             // Attacking selected target
@@ -874,7 +880,7 @@ namespace MultiplayerARPG
                         else
                         {
                             // Attacking nearest target
-                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
+                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, skillLevel) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                         }

@@ -90,13 +90,13 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, Skill skill)
+        public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
         {
             GameEffect[] effects = gameInstance.DefaultHitEffects.effects;
-            if (skill != null && skill.hitEffects.effects != null && skill.hitEffects.effects.Length > 0)
+            if (skill != null && skill.GetHitEffect().effects != null && skill.GetHitEffect().effects.Length > 0)
             {
                 // Set hit effects from skill's hit effects
-                effects = skill.hitEffects.effects;
+                effects = skill.GetHitEffect().effects;
             }
             else
             {

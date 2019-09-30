@@ -2,12 +2,11 @@
 
 namespace MultiplayerARPG
 {
-    public enum DamageType
+    public enum DamageType : byte
     {
         Melee,
         Missile,
         Raycast,
-        Custom,
     }
 
     [System.Serializable]
@@ -36,9 +35,6 @@ namespace MultiplayerARPG
         public ProjectileEffect projectileEffect;
         // TODO: Add impact effect
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Custom" })]
-        public BaseCustomDamageType customDamageType;
-
         public float GetDistance()
         {
             float distance = 0f;
@@ -50,9 +46,6 @@ namespace MultiplayerARPG
                 case DamageType.Missile:
                 case DamageType.Raycast:
                     distance = missileDistance;
-                    break;
-                case DamageType.Custom:
-                    distance = customDamageType.GetDistance();
                     break;
             }
             return distance;
@@ -69,9 +62,6 @@ namespace MultiplayerARPG
                 case DamageType.Missile:
                 case DamageType.Raycast:
                     fov = 10f;
-                    break;
-                case DamageType.Custom:
-                    fov = customDamageType.GetFov();
                     break;
             }
             return fov;

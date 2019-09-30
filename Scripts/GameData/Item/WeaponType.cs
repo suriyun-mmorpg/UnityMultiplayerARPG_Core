@@ -33,5 +33,11 @@ namespace MultiplayerARPG
                 return cacheEffectivenessAttributes;
             }
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddDamageInfos(new DamageInfo[] { damageInfo });
+        }
     }
 }

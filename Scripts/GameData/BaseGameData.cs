@@ -102,5 +102,10 @@ namespace MultiplayerARPG
         {
             return false;
         }
+
+        public virtual void PrepareRelatesData()
+        {
+
+        }
     }
 }

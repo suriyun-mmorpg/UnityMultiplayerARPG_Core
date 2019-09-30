@@ -66,6 +66,38 @@ namespace MultiplayerARPG
         public NpcDialog warpCancelDialog;
         // Teleport
         public NpcDialog storageCancelDialog;
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+
+            // Add dialogs from menus
+            List<NpcDialog> menuDialogs = new List<NpcDialog>();
+            if (menus != null && menus.Length > 0)
+            {
+                foreach (NpcDialogMenu menu in menus)
+                {
+                    if (menu.dialog != null)
+                        menuDialogs.Add(menu.dialog);
+                }
+            }
+            GameInstance.AddNpcDialogs(menuDialogs);
+            // Add items
+            List<Item> items = new List<Item>();
+            if (sellItems != null && sellItems.Length > 0)
+            {
+                foreach (NpcSellItem sellItem in sellItems)
+                {
+                    if (sellItem.item != null)
+                        items.Add(sellItem.item);
+                }
+            }
+            if (itemCraft.CraftingItem != null)
+                items.Add(itemCraft.CraftingItem);
+            GameInstance.AddItems(items);
+            // Add quest
+            GameInstance.AddQuests(new Quest[] { quest });
+        }
     }
 
     public enum NpcDialogConditionType : byte

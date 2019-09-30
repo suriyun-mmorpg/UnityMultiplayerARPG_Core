@@ -166,7 +166,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
         public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
-        public static readonly Dictionary<int, Skill> Skills = new Dictionary<int, Skill>();
+        public static readonly Dictionary<int, BaseSkill> Skills = new Dictionary<int, BaseSkill>();
         public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
@@ -547,6 +547,7 @@ namespace MultiplayerARPG
                 if (attribute == null || Attributes.ContainsKey(attribute.DataId))
                     continue;
                 attribute.Validate();
+                attribute.PrepareRelatesData();
                 Attributes[attribute.DataId] = attribute;
             }
         }
@@ -555,51 +556,33 @@ namespace MultiplayerARPG
         {
             if (items == null)
                 return;
-            List<ArmorType> armorTypes = new List<ArmorType>();
-            List<WeaponType> weaponTypes = new List<WeaponType>();
-            List<BuildingEntity> buildingEntities = new List<BuildingEntity>();
-            List<SkillLevel> skillLevels = new List<SkillLevel>();
             foreach (Item item in items)
             {
                 if (item == null || Items.ContainsKey(item.DataId))
                     continue;
                 item.Validate();
+                item.PrepareRelatesData();
                 Items[item.DataId] = item;
                 // Validate equipment set
                 if (item.equipmentSet != null)
+                {
                     item.equipmentSet.Validate();
-                // Add armor types
-                if (item.armorType != null)
-                    armorTypes.Add(item.armorType);
-                // Add weapon types
-                if (item.weaponType != null)
-                    weaponTypes.Add(item.weaponType);
-                // Add building entities
-                if (item.buildingEntity != null)
-                    buildingEntities.Add(item.buildingEntity);
-                // Add skills
-                skillLevels.AddRange(item.increaseSkillLevels);
-                skillLevels.Add(item.skillLevel);
+                    item.equipmentSet.PrepareRelatesData();
+                }
             }
-            AddArmorTypes(armorTypes);
-            AddWeaponTypes(weaponTypes);
-            AddBuildingEntities(buildingEntities);
-            AddSkillLevels(skillLevels);
         }
 
         public static void AddCharacters(IEnumerable<BaseCharacter> characters)
         {
             if (characters == null)
                 return;
-            List<Skill> skills = new List<Skill>();
-            List<DamageInfo> damageInfos = new List<DamageInfo>();
             foreach (BaseCharacter character in characters)
             {
                 if (character == null || Characters.ContainsKey(character.DataId))
                     continue;
                 character.Validate();
+                character.PrepareRelatesData();
                 Characters[character.DataId] = character;
-                skills.AddRange(character.CacheSkillLevels.Keys);
                 if (character is PlayerCharacter)
                 {
                     PlayerCharacter playerCharacter = character as PlayerCharacter;
@@ -609,11 +592,8 @@ namespace MultiplayerARPG
                 {
                     MonsterCharacter monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
-                    damageInfos.Add(monsterCharacter.damageInfo);
                 }
             }
-            AddSkills(skills);
-            AddDamageInfos(damageInfos);
         }
 
         public static void AddCharacterEntities(IEnumerable<BaseCharacterEntity> characterEntities)
@@ -637,7 +617,7 @@ namespace MultiplayerARPG
                 {
                     BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                     MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = monsterCharacterEntity;
-                    characters.Add(monsterCharacterEntity.monsterCharacter);
+                    characters.Add(monsterCharacterEntity.MonsterDatabase);
                 }
             }
             AddCharacters(characters);
@@ -659,7 +639,7 @@ namespace MultiplayerARPG
         {
             if (skillLevels == null)
                 return;
-            List<Skill> skills = new List<Skill>();
+            List<BaseSkill> skills = new List<BaseSkill>();
             foreach (SkillLevel skillLevel in skillLevels)
             {
                 if (skillLevel.skill == null)
@@ -669,23 +649,18 @@ namespace MultiplayerARPG
             AddSkills(skills);
         }
 
-        public static void AddSkills(IEnumerable<Skill> skills)
+        public static void AddSkills(IEnumerable<BaseSkill> skills)
         {
             if (skills == null)
                 return;
-            List<WeaponType> weaponTypes = new List<WeaponType>();
-            List<DamageInfo> damageInfos = new List<DamageInfo>();
-            foreach (Skill skill in skills)
+            foreach (BaseSkill skill in skills)
             {
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
                 skill.Validate();
+                skill.PrepareRelatesData();
                 Skills[skill.DataId] = skill;
-                weaponTypes.AddRange(skill.availableWeapons);
-                damageInfos.Add(skill.damageInfo);
             }
-            AddWeaponTypes(weaponTypes);
-            AddDamageInfos(damageInfos);
         }
 
         public static void AddNpcDialogs(IEnumerable<NpcDialog> npcDialogs)
@@ -696,18 +671,8 @@ namespace MultiplayerARPG
             {
                 if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.DataId))
                     continue;
-                if (npcDialog.menus != null && npcDialog.menus.Length > 0)
-                {
-                    // Add dialogs from menus
-                    List<NpcDialog> menuDialogs = new List<NpcDialog>();
-                    foreach (NpcDialogMenu menu in npcDialog.menus)
-                    {
-                        if (menu.dialog != null && !NpcDialogs.ContainsKey(menu.dialog.DataId))
-                            menuDialogs.Add(menu.dialog);
-                    }
-                    AddNpcDialogs(menuDialogs);
-                }
                 npcDialog.Validate();
+                npcDialog.PrepareRelatesData();
                 NpcDialogs[npcDialog.DataId] = npcDialog;
             }
         }
@@ -721,6 +686,7 @@ namespace MultiplayerARPG
                 if (quest == null || Quests.ContainsKey(quest.DataId))
                     continue;
                 quest.Validate();
+                quest.PrepareRelatesData();
                 Quests[quest.DataId] = quest;
             }
         }
@@ -734,6 +700,7 @@ namespace MultiplayerARPG
                 if (guildSkill == null || GuildSkills.ContainsKey(guildSkill.DataId))
                     continue;
                 guildSkill.Validate();
+                guildSkill.PrepareRelatesData();
                 GuildSkills[guildSkill.DataId] = guildSkill;
             }
         }
@@ -808,6 +775,7 @@ namespace MultiplayerARPG
                 if (armorType == null || ArmorTypes.ContainsKey(armorType.DataId))
                     continue;
                 armorType.Validate();
+                armorType.PrepareRelatesData();
                 ArmorTypes[armorType.DataId] = armorType;
             }
         }
@@ -816,16 +784,14 @@ namespace MultiplayerARPG
         {
             if (weaponTypes == null)
                 return;
-            List<DamageInfo> damageInfos = new List<DamageInfo>();
             foreach (WeaponType weaponType in weaponTypes)
             {
                 if (weaponType == null || WeaponTypes.ContainsKey(weaponType.DataId))
                     continue;
                 weaponType.Validate();
+                weaponType.PrepareRelatesData();
                 WeaponTypes[weaponType.DataId] = weaponType;
-                damageInfos.Add(weaponType.damageInfo);
             }
-            AddDamageInfos(damageInfos);
         }
 
         public static void AddMapWarpPortals(IEnumerable<WarpPortals> mapWarpPortals)
@@ -885,6 +851,7 @@ namespace MultiplayerARPG
                 if (mapInfo == null || !mapInfo.IsSceneSet())
                     continue;
                 mapInfo.Validate();
+                mapInfo.PrepareRelatesData();
                 MapInfos[mapInfo.Id] = mapInfo;
             }
         }
@@ -898,6 +865,7 @@ namespace MultiplayerARPG
                 if (faction == null)
                     continue;
                 faction.Validate();
+                faction.PrepareRelatesData();
                 Factions[faction.DataId] = faction;
             }
         }

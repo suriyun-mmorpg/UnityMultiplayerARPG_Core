@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public RectTransform hotkeyCancelArea;
         private UICharacterHotkey draggingHotkey;
         private Vector2 hotkeyAxes;
+        private Vector3? hotkeyAimPosition;
         private CanvasGroup hotkeyAimJoyStickGroup;
         private CanvasGroup hotkeyCancelAreaGroup;
         public bool hotkeyCancel { get; private set; }
@@ -166,6 +167,7 @@ namespace MultiplayerARPG
 
             hotkeyAxes = new Vector2(InputManager.GetAxis(HOTKEY_AXIS_X, false), InputManager.GetAxis(HOTKEY_AXIS_Y, false));
             hotkeyCancel = false;
+            hotkeyAimPosition = null;
 
             if (hotkeyCancelArea != null)
             {
@@ -183,7 +185,7 @@ namespace MultiplayerARPG
 
             if (hotkeyStartDragged && hotkeyAimJoyStick.IsDragging)
             {
-                draggingHotkey.UpdateAimAxes(hotkeyAxes);
+                hotkeyAimPosition = draggingHotkey.UpdateAimAxes(hotkeyAxes);
             }
 
             if (hotkeyStartDragged && !hotkeyAimJoyStick.IsDragging)
@@ -191,7 +193,7 @@ namespace MultiplayerARPG
                 if (!hotkeyCancel)
                 {
                     // Use hotkey
-                    draggingHotkey.OnClickUse();
+                    draggingHotkey.OnClickUse(hotkeyAimPosition);
                 }
                 draggingHotkey = null;
                 hotkeyStartDragged = false;

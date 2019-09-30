@@ -96,12 +96,12 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct SkillAnimations : ISkillAnims
     {
-        public Skill skill;
+        public BaseSkill skill;
         public AnimationClip castClip;
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional("activateAnimationType", "UseActivateAnimation")]
         public ActionAnimation activateAnimation;
-        public Skill Data { get { return skill; } }
+        public BaseSkill Data { get { return skill; } }
     }
 
     [System.Serializable]

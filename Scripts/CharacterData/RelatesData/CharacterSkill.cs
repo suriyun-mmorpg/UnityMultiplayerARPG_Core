@@ -16,7 +16,7 @@ public class CharacterSkill : INetSerializableWithElement
     private short dirtyLevel;
 
     [System.NonSerialized]
-    private Skill cacheSkill;
+    private BaseSkill cacheSkill;
     [System.NonSerialized]
     private Buff cachePassiveBuff;
     [System.NonSerialized]
@@ -77,9 +77,9 @@ public class CharacterSkill : INetSerializableWithElement
             cachePassiveBuffIncreaseDamages = null;
             if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill))
             {
-                if (cacheSkill.skillType == SkillType.Passive)
+                if (cacheSkill.GetSkillType() == SkillType.Passive)
                 {
-                    cachePassiveBuff = cacheSkill.buff;
+                    cachePassiveBuff = cacheSkill.GetBuff();
                     cachePassiveBuffDuration = cachePassiveBuff.GetDuration(level);
                     cachePassiveBuffRecoveryHp = cachePassiveBuff.GetRecoveryHp(level);
                     cachePassiveBuffRecoveryMp = cachePassiveBuff.GetRecoveryMp(level);
@@ -98,7 +98,7 @@ public class CharacterSkill : INetSerializableWithElement
         }
     }
 
-    public Skill GetSkill()
+    public BaseSkill GetSkill()
     {
         MakeCache();
         return cacheSkill;
@@ -192,7 +192,7 @@ public class CharacterSkill : INetSerializableWithElement
         return cachePassiveBuffIncreaseDamages;
     }
 
-    public static CharacterSkill Create(Skill skill, short level)
+    public static CharacterSkill Create(BaseSkill skill, short level)
     {
         CharacterSkill newSkill = new CharacterSkill();
         newSkill.dataId = skill.DataId;

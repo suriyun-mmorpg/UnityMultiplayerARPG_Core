@@ -101,9 +101,9 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<Skill, short> GetIncreaseSkills(this Item equipmentItem)
+        public static Dictionary<BaseSkill, short> GetIncreaseSkills(this Item equipmentItem)
         {
-            Dictionary<Skill, short> result = new Dictionary<Skill, short>();
+            Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
                 result = GameDataHelpers.CombineSkills(equipmentItem.increaseSkillLevels, result);
@@ -122,20 +122,12 @@ namespace MultiplayerARPG
         #endregion
 
         #region Weapon Extension
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Item weaponItem, short level, float rate, ICharacterData character)
+        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Item weaponItem, short itemLevel, float statsRate, ICharacterData character)
         {
             if (weaponItem == null ||
                 !weaponItem.IsWeapon())
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.MakeDamage(weaponItem.damageAmount, level, rate, weaponItem.GetEffectivenessDamage(character));
-        }
-
-        public static Dictionary<DamageElement, MinMaxFloat> GetDamageAmountWithInflictions(this Item weaponItem, short level, float rate, ICharacterData character, Dictionary<DamageElement, float> damageInflictionAmounts)
-        {
-            if (weaponItem == null ||
-                !weaponItem.IsWeapon())
-                return new Dictionary<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.MakeDamageWithInflictions(weaponItem.damageAmount, level, rate, weaponItem.GetEffectivenessDamage(character), damageInflictionAmounts);
+            return GameDataHelpers.MakeDamage(weaponItem.damageAmount, itemLevel, statsRate, weaponItem.GetEffectivenessDamage(character));
         }
 
         public static float GetEffectivenessDamage(this Item weaponItem, ICharacterData character)

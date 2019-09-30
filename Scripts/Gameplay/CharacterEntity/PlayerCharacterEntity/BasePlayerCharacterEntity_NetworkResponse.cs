@@ -115,7 +115,7 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            Skill skillData;
+            BaseSkill skillData;
             if (!GameInstance.Skills.TryGetValue(dataId, out skillData))
                 return;
 

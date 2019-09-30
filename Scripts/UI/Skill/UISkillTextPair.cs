@@ -3,7 +3,7 @@
     [System.Serializable]
     public struct UISkillTextPair
     {
-        public Skill skill;
+        public BaseSkill skill;
         public TextWrapper uiText;
     }
 }

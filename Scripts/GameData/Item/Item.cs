@@ -184,6 +184,26 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            // Add armor type
+            GameInstance.AddArmorTypes(new ArmorType[] { armorType });
+            // Add weapon type
+            GameInstance.AddWeaponTypes(new WeaponType[] { weaponType });
+            // Add building entity
+            GameInstance.AddBuildingEntities(new BuildingEntity[] { buildingEntity });
+            // Add pet entity
+            GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { petEntity });
+            // Add mount entity
+            GameInstance.AddMountEntities(new MountEntity[] { mountEntity });
+            // Add skills
+            List<SkillLevel> skillLevels = new List<SkillLevel>();
+            skillLevels.AddRange(increaseSkillLevels);
+            skillLevels.Add(skillLevel);
+            GameInstance.AddSkillLevels(skillLevels);
+        }
+
         public bool IsEquipment()
         {
             return IsArmor() || IsShield() || IsWeapon();

@@ -78,35 +78,6 @@ namespace MultiplayerARPG
                 onApplyBuff.Invoke(dataId, type, level);
         }
 
-        protected virtual void ApplySkillBuff(Skill skill, short level)
-        {
-            if (IsDead() || !IsServer || skill == null || level <= 0)
-                return;
-            List<BaseCharacterEntity> tempCharacters;
-            switch (skill.skillBuffType)
-            {
-                case SkillBuffType.BuffToUser:
-                    ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
-                    break;
-                case SkillBuffType.BuffToNearbyAllies:
-                    tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance.GetAmount(level), true, false, false);
-                    foreach (BaseCharacterEntity character in tempCharacters)
-                    {
-                        character.ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
-                    }
-                    ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
-                    break;
-                case SkillBuffType.BuffToNearbyCharacters:
-                    tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance.GetAmount(level), true, false, true);
-                    foreach (BaseCharacterEntity character in tempCharacters)
-                    {
-                        character.ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
-                    }
-                    ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
-                    break;
-            }
-        }
-
         protected virtual void ApplyGuildSkillBuff(GuildSkill guildSkill, short level)
         {
             if (IsDead() || !IsServer || guildSkill == null || level <= 0)

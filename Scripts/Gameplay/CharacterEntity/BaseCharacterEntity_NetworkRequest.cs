@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             if (!CanUseSkill())
                 return false;
 
-            Skill skill;
+            BaseSkill skill;
             short skillLevel;
             if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
                 !this.GetCaches().Skills.TryGetValue(skill, out skillLevel))
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
             }
 
             CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
-            if (skill.skillDamageType != SkillDamageType.None && !ValidateAmmo(weapon))
+            if (skill.IsAttack() && !ValidateAmmo(weapon))
             {
                 if (!IsOwnerClient)
                     return false;

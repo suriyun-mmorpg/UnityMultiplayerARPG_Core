@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class UISkillLevels : UISelectionEntry<Dictionary<Skill, short>>
+    public partial class UISkillLevels : UISelectionEntry<Dictionary<BaseSkill, short>>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}")]
@@ -18,15 +18,15 @@ namespace MultiplayerARPG
         public UISkillTextPair[] textLevels;
         public bool showAsRequirement;
 
-        private Dictionary<Skill, TextWrapper> cacheTextLevels;
-        public Dictionary<Skill, TextWrapper> CacheTextLevels
+        private Dictionary<BaseSkill, TextWrapper> cacheTextLevels;
+        public Dictionary<BaseSkill, TextWrapper> CacheTextLevels
         {
             get
             {
                 if (cacheTextLevels == null)
                 {
-                    cacheTextLevels = new Dictionary<Skill, TextWrapper>();
-                    Skill tempSkill;
+                    cacheTextLevels = new Dictionary<BaseSkill, TextWrapper>();
+                    BaseSkill tempSkill;
                     TextWrapper tempTextComponent;
                     foreach (UISkillTextPair textLevel in textLevels)
                     {
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 if (uiTextAllLevels != null)
                     uiTextAllLevels.gameObject.SetActive(false);
 
-                foreach (KeyValuePair<Skill, TextWrapper> entry in CacheTextLevels)
+                foreach (KeyValuePair<BaseSkill, TextWrapper> entry in CacheTextLevels)
                 {
                     entry.Value.text = string.Format(
                         LanguageManager.GetText(formatKeyLevel),
@@ -66,13 +66,13 @@ namespace MultiplayerARPG
             else
             {
                 string tempAllText = string.Empty;
-                Skill tempSkill;
+                BaseSkill tempSkill;
                 short tempCurrentLevel;
                 short tempTargetLevel;
                 string tempFormat;
                 string tempLevelText;
                 TextWrapper tempTextWrapper;
-                foreach (KeyValuePair<Skill, short> dataEntry in Data)
+                foreach (KeyValuePair<BaseSkill, short> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;

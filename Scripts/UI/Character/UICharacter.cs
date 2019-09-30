@@ -77,7 +77,7 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, float> bonusResistances;
         private Dictionary<DamageElement, float> bonusArmors;
         private Dictionary<DamageElement, MinMaxFloat> bonusDamages;
-        private Dictionary<Skill, short> bonusSkills;
+        private Dictionary<BaseSkill, short> bonusSkills;
 
         private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes;
         public Dictionary<Attribute, UICharacterAttribute> CacheUICharacterAttributes
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
             if (bonusDamages == null)
                 bonusDamages = new Dictionary<DamageElement, MinMaxFloat>();
             if (bonusSkills == null)
-                bonusSkills = new Dictionary<Skill, short>();
+                bonusSkills = new Dictionary<BaseSkill, short>();
             if (cacheEquipmentSets == null)
                 cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
 

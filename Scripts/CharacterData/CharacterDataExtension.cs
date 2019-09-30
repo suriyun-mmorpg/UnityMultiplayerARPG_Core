@@ -174,7 +174,7 @@ public static partial class CharacterDataExtension
         IList<CharacterSkill> skills = data.Skills;
         foreach (CharacterSkill skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
+            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
                 continue;
             result = GameDataHelpers.CombineAttributes(result, skill.GetPassiveBuffIncreaseAttributes());
             // Increase with rates
@@ -197,15 +197,15 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Skill, short> GetCharacterSkills(this ICharacterData data)
+    public static Dictionary<BaseSkill, short> GetCharacterSkills(this ICharacterData data)
     {
         if (data == null || data.GetDatabase() ==  null)
-            return new Dictionary<Skill, short>();
+            return new Dictionary<BaseSkill, short>();
         // Make dictionary of skills which set in `PlayerCharacter` or `MonsterCharacter`
-        Dictionary<Skill, short> result = new Dictionary<Skill, short>(data.GetDatabase().CacheSkillLevels);
+        Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>(data.GetDatabase().CacheSkillLevels);
         // Combine with skills that character learnt
         IList<CharacterSkill> skills = data.Skills;
-        Skill learntSkill;
+        BaseSkill learntSkill;
         short learntSkillLevel;
         foreach (CharacterSkill characterSkill in skills)
         {
@@ -221,11 +221,11 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Skill, short> GetEquipmentSkills(this ICharacterData data)
+    public static Dictionary<BaseSkill, short> GetEquipmentSkills(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Skill, short>();
-        Dictionary<Skill, short> result = new Dictionary<Skill, short>();
+            return new Dictionary<BaseSkill, short>();
+        Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>();
         // Armors
         IList<CharacterItem> equipItems = data.EquipItems;
         foreach (CharacterItem equipItem in equipItems)
@@ -249,9 +249,9 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Skill, short> GetSkills(this ICharacterData data, bool sumWithEquipments = true)
+    public static Dictionary<BaseSkill, short> GetSkills(this ICharacterData data, bool sumWithEquipments = true)
     {
-        Dictionary<Skill, short> result = data.GetCharacterSkills();
+        Dictionary<BaseSkill, short> result = data.GetCharacterSkills();
         if (sumWithEquipments)
             result = GameDataHelpers.CombineSkills(result, data.GetEquipmentSkills());
         return result;
@@ -310,7 +310,7 @@ public static partial class CharacterDataExtension
         IList<CharacterSkill> skills = data.Skills;
         foreach (CharacterSkill skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
+            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
                 continue;
             result = GameDataHelpers.CombineResistances(result, skill.GetPassiveBuffIncreaseResistances());
         }
@@ -385,7 +385,7 @@ public static partial class CharacterDataExtension
         IList<CharacterSkill> skills = data.Skills;
         foreach (CharacterSkill skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
+            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
                 continue;
             result = GameDataHelpers.CombineArmors(result, skill.GetPassiveBuffIncreaseArmors());
         }
@@ -445,7 +445,7 @@ public static partial class CharacterDataExtension
         IList<CharacterSkill> skills = data.Skills;
         foreach (CharacterSkill skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
+            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
                 continue;
             result = GameDataHelpers.CombineDamages(result, skill.GetPassiveBuffIncreaseDamages());
         }
@@ -541,7 +541,7 @@ public static partial class CharacterDataExtension
         IList<CharacterSkill> skills = data.Skills;
         foreach (CharacterSkill skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
+            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
                 continue;
             result += skill.GetPassiveBuffIncreaseStats();
             result += GameDataHelpers.GetStatsFromAttributes(skill.GetPassiveBuffIncreaseAttributes());
@@ -1307,7 +1307,7 @@ public static partial class CharacterDataExtension
         Dictionary<DamageElement, float> bonusResistances,
         Dictionary<DamageElement, float> bonusArmors,
         Dictionary<DamageElement, MinMaxFloat> bonusDamages,
-        Dictionary<Skill, short> bonusSkills,
+        Dictionary<BaseSkill, short> bonusSkills,
         Dictionary<EquipmentSet, int> equipmentSets)
     {
         bonusStats = new CharacterStats();
@@ -1363,7 +1363,7 @@ public static partial class CharacterDataExtension
         Dictionary<DamageElement, float> tempResistances;
         Dictionary<DamageElement, float> tempArmors;
         Dictionary<DamageElement, MinMaxFloat> tempDamages;
-        Dictionary<Skill, short> tempSkillLevels;
+        Dictionary<BaseSkill, short> tempSkillLevels;
         CharacterStats tempIncreaseStats;
         foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in equipmentSets)
         {
@@ -1412,7 +1412,7 @@ public static partial class CharacterDataExtension
         Dictionary<DamageElement, float> resultResistances,
         Dictionary<DamageElement, float> resultArmors,
         Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,
-        Dictionary<Skill, short> resultSkills,
+        Dictionary<BaseSkill, short> resultSkills,
         Dictionary<EquipmentSet, int> resultEquipmentSets,
         out int resultMaxHp,
         out int resultMaxMp,

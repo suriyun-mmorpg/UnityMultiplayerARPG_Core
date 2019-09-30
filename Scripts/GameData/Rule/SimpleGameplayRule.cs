@@ -210,7 +210,7 @@ namespace MultiplayerARPG
             float moveSpeed = character.GetCaches().MoveSpeed;
             if (character is BaseMonsterCharacterEntity &&
                 (character as BaseMonsterCharacterEntity).isWandering)
-                moveSpeed = (character as BaseMonsterCharacterEntity).monsterCharacter.wanderMoveSpeed;
+                moveSpeed = (character as BaseMonsterCharacterEntity).MonsterDatabase.wanderMoveSpeed;
             if (character.MovementState.HasFlag(MovementState.IsSprinting))
                 moveSpeed *= moveSpeedRateWhileSprint;
             if (character.isAttackingOrUsingSkill)
@@ -358,7 +358,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override float GetEquipmentBonusRate(CharacterItem characterItem)
+        public override float GetEquipmentStatsRate(CharacterItem characterItem)
         {
             if (characterItem.GetMaxDurability() <= 0)
                 return 1;

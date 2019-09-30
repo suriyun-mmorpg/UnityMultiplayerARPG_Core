@@ -20,7 +20,7 @@ namespace MultiplayerARPG
             List<Attribute> attributes = new List<Attribute>();
             List<DamageElement> damageElements = new List<DamageElement>();
             List<Item> items = new List<Item>();
-            List<Skill> skills = new List<Skill>();
+            List<BaseSkill> skills = new List<BaseSkill>();
             List<NpcDialog> npcDialogs = new List<NpcDialog>();
             List<Quest> quests = new List<Quest>();
             List<GuildSkill> guildSkills = new List<GuildSkill>();
@@ -38,8 +38,8 @@ namespace MultiplayerARPG
                     damageElements.Add(gameData as DamageElement);
                 if (gameData is Item)
                     items.Add(gameData as Item);
-                if (gameData is Skill)
-                    skills.Add(gameData as Skill);
+                if (gameData is BaseSkill)
+                    skills.Add(gameData as BaseSkill);
                 if (gameData is NpcDialog)
                     npcDialogs.Add(gameData as NpcDialog);
                 if (gameData is Quest)

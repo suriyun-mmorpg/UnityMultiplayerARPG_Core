@@ -18,15 +18,13 @@ namespace MultiplayerARPG
     public delegate void AttackRoutineDelegate(
         bool isLeftHand,
         CharacterItem weapon,
-        DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         Vector3 aimPosition);
     public delegate void UseSkillRoutineDelegate(
-        Skill skill,
+        BaseSkill skill,
         short level,
         bool isLeftHand,
         CharacterItem weapon,
-        DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         Vector3 aimPosition);
     public delegate void ApplyBuffDelegate(

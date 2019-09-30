@@ -14,9 +14,12 @@ namespace MultiplayerARPG
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
         [Header("Monster Character Settings")]
-        public MonsterCharacter monsterCharacter;
-        public float destroyDelay = 2f;
-        public float destroyRespawnDelay = 5f;
+        [SerializeField]
+        private MonsterCharacter monsterCharacter;
+        [SerializeField]
+        private float destroyDelay = 2f;
+        [SerializeField]
+        private float destroyRespawnDelay = 5f;
         [HideInInspector, System.NonSerialized]
         public bool isWandering;
 
@@ -69,6 +72,9 @@ namespace MultiplayerARPG
         public MonsterSpawnArea spawnArea { get; protected set; }
         public Vector3 spawnPosition { get; protected set; }
         public override int DataId { get { return monsterCharacter.DataId; } set { } }
+        public MonsterCharacter MonsterDatabase { get { return monsterCharacter; } }
+        public float DestroyDelay { get { return destroyDelay; } }
+        public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
         private readonly HashSet<uint> looters = new HashSet<uint>();
 
@@ -265,7 +271,7 @@ namespace MultiplayerARPG
         }
 
         public override void GetUsingSkillData(
-            Skill skill, 
+            BaseSkill skill, 
             ref bool isLeftHand, 
             out AnimActionType animActionType, 
             out int animationDataId, 
@@ -285,7 +291,7 @@ namespace MultiplayerARPG
             // Get activate animation type which defined at character model
             SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
             // Prepare animation
-            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.skillDamageType != SkillDamageType.None)
+            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack())
             {
                 // Assign data id
                 animationDataId = 0;
@@ -298,54 +304,6 @@ namespace MultiplayerARPG
                 animationDataId = skill.DataId;
                 // Assign animation action type
                 animActionType = AnimActionType.SkillRightHand;
-            }
-        }
-
-        public override void GetSkillDamages(
-            CharacterItem weapon, 
-            Skill skill, 
-            short skillLevel, 
-            out DamageInfo damageInfo, 
-            out Dictionary<DamageElement, MinMaxFloat> damageAmounts)
-        {
-            // Assign damage data
-            damageInfo = monsterCharacter.damageInfo;
-            // Assign damage amounts
-            damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            // If it is attack skill
-            if (skill.skillDamageType != SkillDamageType.None)
-            {
-                switch (skill.skillDamageType)
-                {
-                    case SkillDamageType.Normal:
-                        // Assign damage data
-                        damageInfo = skill.damageInfo;
-                        // Sum damage with skill damage because this skill damages based on itself
-                        damageAmounts = GameDataHelpers.CombineDamages(
-                            damageAmounts,
-                            skill.GetAdditionalDamageAmounts(skillLevel));
-                        // Sum damage with additional damage amounts
-                        damageAmounts = GameDataHelpers.CombineDamages(
-                            damageAmounts,
-                            skill.GetDamageAmount(skillLevel, this));
-                        break;
-                    case SkillDamageType.BasedOnWeapon:
-                        damageAmounts = GameDataHelpers.MakeDamageWithInflictions(
-                            monsterCharacter.damageAmount,
-                            Level, // Monster Level
-                            1f, // Equipment Bonus Rate
-                            1f, // Effectiveness
-                            skill.GetWeaponDamageInflictions(skillLevel));
-                        // Sum damage with additional damage amounts
-                        damageAmounts = GameDataHelpers.CombineDamages(
-                            damageAmounts,
-                            skill.GetAdditionalDamageAmounts(skillLevel));
-                        break;
-                }
-                // Sum damage with buffs
-                damageAmounts = GameDataHelpers.CombineDamages(
-                    damageAmounts,
-                    this.GetCaches().IncreaseDamages);
             }
         }
 

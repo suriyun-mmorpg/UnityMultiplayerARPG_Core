@@ -7,15 +7,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected virtual void ApplySkillMount(Skill skill, short level)
-        {
-            if (IsDead() || !IsServer || skill == null || level <= 0)
-                return;
-
-            Mount(skill.mount.mountEntity);
-        }
-
-        protected void Mount(MountEntity mountEntityPrefab)
+        public void Mount(MountEntity mountEntityPrefab)
         {
             if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - lastMountTime < MOUNT_DELAY)
                 return;

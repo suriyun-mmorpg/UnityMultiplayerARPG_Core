@@ -2,6 +2,6 @@
 {
     public interface ISkillAnims
     {
-        Skill Data { get; }
+        BaseSkill Data { get; }
     }
 }

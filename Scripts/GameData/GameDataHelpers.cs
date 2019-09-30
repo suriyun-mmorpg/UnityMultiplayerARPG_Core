@@ -131,10 +131,10 @@ namespace MultiplayerARPG
         /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> targetDictionary, KeyValuePair<Skill, short> newEntry)
+        public static Dictionary<BaseSkill, short> CombineSkills(Dictionary<BaseSkill, short> targetDictionary, KeyValuePair<BaseSkill, short> newEntry)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Skill, short>();
+                targetDictionary = new Dictionary<BaseSkill, short>();
             if (newEntry.Key != null)
             {
                 if (!targetDictionary.ContainsKey(newEntry.Key))
@@ -304,13 +304,13 @@ namespace MultiplayerARPG
         /// <param name="targetDictionary"></param>
         /// <param name="combineDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> targetDictionary, Dictionary<Skill, short> combineDictionary)
+        public static Dictionary<BaseSkill, short> CombineSkills(Dictionary<BaseSkill, short> targetDictionary, Dictionary<BaseSkill, short> combineDictionary)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Skill, short>();
+                targetDictionary = new Dictionary<BaseSkill, short>();
             if (combineDictionary != null && combineDictionary.Count > 0)
             {
-                foreach (KeyValuePair<Skill, short> entry in combineDictionary)
+                foreach (KeyValuePair<BaseSkill, short> entry in combineDictionary)
                 {
                     CombineSkills(targetDictionary, entry);
                 }
@@ -519,11 +519,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<Skill, short> MakeSkill(SkillLevel source)
+        public static KeyValuePair<BaseSkill, short> MakeSkill(SkillLevel source)
         {
             if (source.skill == null)
-                return new KeyValuePair<Skill, short>();
-            return new KeyValuePair<Skill, short>(source.skill, source.level);
+                return new KeyValuePair<BaseSkill, short>();
+            return new KeyValuePair<BaseSkill, short>(source.skill, source.level);
         }
 
         /// <summary>
@@ -531,11 +531,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<Skill, short> MakeSkill(MonsterSkill source)
+        public static KeyValuePair<BaseSkill, short> MakeSkill(MonsterSkill source)
         {
             if (source.skill == null)
-                return new KeyValuePair<Skill, short>();
-            return new KeyValuePair<Skill, short>(source.skill, source.level);
+                return new KeyValuePair<BaseSkill, short>();
+            return new KeyValuePair<BaseSkill, short>(source.skill, source.level);
         }
 
         /// <summary>
@@ -795,13 +795,13 @@ namespace MultiplayerARPG
         /// <param name="sourceLevels"></param>
         /// <param name="targetDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Skill, short> CombineSkills(SkillLevel[] sourceLevels, Dictionary<Skill, short> targetDictionary)
+        public static Dictionary<BaseSkill, short> CombineSkills(SkillLevel[] sourceLevels, Dictionary<BaseSkill, short> targetDictionary)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Skill, short>();
+                targetDictionary = new Dictionary<BaseSkill, short>();
             if (sourceLevels != null)
             {
-                KeyValuePair<Skill, short> pair;
+                KeyValuePair<BaseSkill, short> pair;
                 foreach (SkillLevel sourceLevel in sourceLevels)
                 {
                     pair = MakeSkill(sourceLevel);
@@ -817,13 +817,13 @@ namespace MultiplayerARPG
         /// <param name="sourceMonsterSkills"></param>
         /// <param name="targetDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Skill, short> CombineSkills(MonsterSkill[] sourceMonsterSkills, Dictionary<Skill, short> targetDictionary)
+        public static Dictionary<BaseSkill, short> CombineSkills(MonsterSkill[] sourceMonsterSkills, Dictionary<BaseSkill, short> targetDictionary)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Skill, short>();
+                targetDictionary = new Dictionary<BaseSkill, short>();
             if (sourceMonsterSkills != null)
             {
-                KeyValuePair<Skill, short> pair;
+                KeyValuePair<BaseSkill, short> pair;
                 foreach (MonsterSkill sourceMonsterSkill in sourceMonsterSkills)
                 {
                     pair = MakeSkill(sourceMonsterSkill);

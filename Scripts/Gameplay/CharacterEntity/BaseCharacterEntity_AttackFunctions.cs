@@ -303,7 +303,7 @@ namespace MultiplayerARPG
             {
                 if (characterSkill.level <= 0)
                     continue;
-                if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, damageInfo, damageAmounts, aimPosition))
+                if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, damageAmounts, aimPosition))
                     overrideDefaultAttack = true;
             }
 
@@ -312,7 +312,7 @@ namespace MultiplayerARPG
             {
                 // Trigger attack event
                 if (onAttackRoutine != null)
-                    onAttackRoutine.Invoke(isLeftHand, weapon, damageInfo, damageAmounts, aimPosition);
+                    onAttackRoutine.Invoke(isLeftHand, weapon, damageAmounts, aimPosition);
 
                 // Apply attack damages
                 ApplyAttack(

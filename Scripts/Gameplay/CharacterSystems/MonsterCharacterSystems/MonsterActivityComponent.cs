@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         public Vector3? wanderDestination { get; private set; }
         public Vector3 oldDestination { get; private set; }
 
-        protected Skill queueSkill;
+        protected BaseSkill queueSkill;
         protected short queueSkillLevel;
         
         public BaseMonsterCharacterEntity CacheMonsterCharacterEntity
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
         
         public MonsterCharacter MonsterDatabase
         {
-            get { return CacheMonsterCharacterEntity.monsterCharacter; }
+            get { return CacheMonsterCharacterEntity.MonsterDatabase; }
         }
 
         protected void Awake()

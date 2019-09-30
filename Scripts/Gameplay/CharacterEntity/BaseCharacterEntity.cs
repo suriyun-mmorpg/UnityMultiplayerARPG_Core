@@ -765,24 +765,6 @@ namespace MultiplayerARPG
             return gameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetFov();
         }
 
-        public virtual float GetSkillAttackDistance(Skill skill, bool isLeftHand)
-        {
-            if (skill == null || !skill.IsAttack())
-                return 0f;
-            if (skill.skillDamageType == SkillDamageType.Normal)
-                return skill.damageInfo.GetDistance();
-            return GetAttackDistance(isLeftHand);
-        }
-
-        public virtual float GetSkillAttackFov(Skill skill, bool isLeftHand)
-        {
-            if (skill == null || !skill.IsAttack())
-                return 0f;
-            if (skill.skillDamageType == SkillDamageType.Normal)
-                return skill.damageInfo.GetFov();
-            return GetAttackFov(isLeftHand);
-        }
-
         /// <summary>
         /// This function can be called at both client and server
         /// For server it will instantiates damage entities if needed
@@ -802,7 +784,7 @@ namespace MultiplayerARPG
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             CharacterBuff debuff,
-            Skill skill,
+            BaseSkill skill,
             short skillLevel,
             Vector3 aimPosition,
             Vector3 stagger)
@@ -938,9 +920,6 @@ namespace MultiplayerARPG
                             }
                         }
                     }
-                    break;
-                case DamageType.Custom:
-                    damageInfo.customDamageType.LaunchDamageEntity(this, isLeftHand, weapon, damageAmounts, debuff, skill, skillLevel, aimPosition, stagger);
                     break;
             }
         }
@@ -1240,7 +1219,7 @@ namespace MultiplayerARPG
             return 1f;
         }
 
-        public float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, Skill skill)
+        public float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, BaseSkill skill)
         {
             switch (animActionType)
             {

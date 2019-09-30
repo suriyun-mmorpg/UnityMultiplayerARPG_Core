@@ -572,7 +572,7 @@ namespace MultiplayerARPG
 
             if (uiIncreaseSkillLevels != null)
             {
-                Dictionary<Skill, short> skillLevels = null;
+                Dictionary<BaseSkill, short> skillLevels = null;
                 if (EquipmentItem != null)
                     skillLevels = EquipmentItem.GetIncreaseSkills();
                 else if (SocketEnhancerItem != null)

@@ -10,8 +10,8 @@ namespace MultiplayerARPG
         public CharacterStats Stats { get { return stats; } }
         private Dictionary<Attribute, float> attributes;
         public Dictionary<Attribute, float> Attributes { get { return attributes; } }
-        private Dictionary<Skill, short> skills;
-        public Dictionary<Skill, short> Skills { get { return skills; } }
+        private Dictionary<BaseSkill, short> skills;
+        public Dictionary<BaseSkill, short> Skills { get { return skills; } }
         private Dictionary<DamageElement, float> resistances;
         public Dictionary<DamageElement, float> Resistances { get { return resistances; } }
         private Dictionary<DamageElement, float> armors;
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             resistances = new Dictionary<DamageElement, float>();
             armors = new Dictionary<DamageElement, float>();
             increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            skills = new Dictionary<Skill, short>();
+            skills = new Dictionary<BaseSkill, short>();
             equipmentSets = new Dictionary<EquipmentSet, int>();
         }
 

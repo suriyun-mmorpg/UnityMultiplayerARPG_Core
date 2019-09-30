@@ -38,20 +38,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void ApplySkill(Skill skill, short level, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, bool hasAimPosition, Vector3 aimPosition)
-        {
-            base.ApplySkill(skill, level, isLeftHand, weapon, damageInfo, damageAmounts, hasAimPosition, aimPosition);
-
-            if (skill.skillType == SkillType.CraftItem)
-            {
-                GameMessage.Type gameMessageType;
-                if (!skill.itemCraft.CanCraft(this, out gameMessageType))
-                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
-                else
-                    skill.itemCraft.CraftItem(this);
-            }
-        }
-
         public override void Respawn()
         {
             if (!IsServer || !IsDead())

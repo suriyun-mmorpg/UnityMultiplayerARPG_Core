@@ -36,7 +36,7 @@ namespace MultiplayerARPG
             get { return armors; }
         }
 
-        public abstract Dictionary<Skill, short> CacheSkillLevels { get; }
+        public abstract Dictionary<BaseSkill, short> CacheSkillLevels { get; }
 
         public override bool Validate()
         {
@@ -61,6 +61,15 @@ namespace MultiplayerARPG
         public Dictionary<DamageElement, float> GetCharacterArmors(short level)
         {
             return GameDataHelpers.CombineArmors(Armors, new Dictionary<DamageElement, float>(), level, 1f);
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            // Add skills
+            List<BaseSkill> skills = new List<BaseSkill>();
+            skills.AddRange(CacheSkillLevels.Keys);
+            GameInstance.AddSkills(skills);
         }
     }
 }

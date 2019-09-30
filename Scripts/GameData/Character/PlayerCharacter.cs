@@ -38,13 +38,13 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<Skill, short> cacheSkillLevels;
-        public override Dictionary<Skill, short> CacheSkillLevels
+        private Dictionary<BaseSkill, short> cacheSkillLevels;
+        public override Dictionary<BaseSkill, short> CacheSkillLevels
         {
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(SkillLevels, new Dictionary<Skill, short>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(SkillLevels, new Dictionary<BaseSkill, short>());
                 return cacheSkillLevels;
             }
         }
@@ -131,6 +131,15 @@ namespace MultiplayerARPG
                     equipedPositions.Add(armorItem.EquipPosition);
             }
             return hasChanges;
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            List<Item> items = new List<Item>();
+            items.AddRange(armorItems);
+            items.Add(rightHandEquipItem);
+            items.Add(leftHandEquipItem);
         }
     }
 }

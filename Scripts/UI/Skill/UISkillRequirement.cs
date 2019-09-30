@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            Skill skill = Data.characterSkill.GetSkill();
+            BaseSkill skill = Data.characterSkill.GetSkill();
             short level = Data.targetLevel;
 
             if (uiTextRequireLevel != null)

@@ -6,42 +6,21 @@ namespace MultiplayerARPG
     public static class SkillExtension
     {
         #region Skill Extension
-        public static bool IsAttack(this Skill skill)
-        {
-            if (skill == null)
-                return false;
-            return skill.skillDamageType != SkillDamageType.None;
-        }
-
-        public static bool IsBuff(this Skill skill)
-        {
-            if (skill == null)
-                return false;
-            return skill.skillType == SkillType.Passive || skill.skillBuffType != SkillBuffType.None;
-        }
-
-        public static bool IsDebuff(this Skill skill)
-        {
-            if (skill == null)
-                return false;
-            return skill.IsAttack() && skill.isDebuff;
-        }
-
-        public static short GetRequireCharacterLevel(this Skill skill, short level)
+        public static short GetRequireCharacterLevel(this BaseSkill skill, short level)
         {
             if (skill == null)
                 return 0;
             return skill.requirement.characterLevel.GetAmount((short)(level + 1));
         }
 
-        public static int GetMaxLevel(this Skill skill)
+        public static int GetMaxLevel(this BaseSkill skill)
         {
             if (skill == null)
                 return 0;
             return skill.maxLevel;
         }
 
-        public static bool CanLevelUp(this Skill skill, IPlayerCharacterData character, short level, bool checkSkillPoint = true)
+        public static bool CanLevelUp(this BaseSkill skill, IPlayerCharacterData character, short level, bool checkSkillPoint = true)
         {
             if (skill == null || character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(skill))
                 return false;
@@ -56,15 +35,15 @@ namespace MultiplayerARPG
                     return false;
             }
             // Check is it pass skill level requirement or not
-            Dictionary<Skill, int> skillLevelsDict = new Dictionary<Skill, int>();
+            Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
             foreach (CharacterSkill skillLevel in character.Skills)
             {
                 if (skillLevel.GetSkill() == null)
                     continue;
                 skillLevelsDict[skillLevel.GetSkill()] = skillLevel.level;
             }
-            Dictionary<Skill, short> requireSkillLevels = skill.CacheRequireSkillLevels;
-            foreach (KeyValuePair<Skill, short> requireSkillLevel in requireSkillLevels)
+            Dictionary<BaseSkill, short> requireSkillLevels = skill.CacheRequireSkillLevels;
+            foreach (KeyValuePair<BaseSkill, short> requireSkillLevel in requireSkillLevels)
             {
                 if (!skillLevelsDict.ContainsKey(requireSkillLevel.Key) ||
                     skillLevelsDict[requireSkillLevel.Key] < requireSkillLevel.Value)
@@ -74,7 +53,7 @@ namespace MultiplayerARPG
             return (!checkSkillPoint || character.SkillPoint > 0) && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level);
         }
 
-        public static bool CanUse(this Skill skill, ICharacterData character, short level)
+        public static bool CanUse(this BaseSkill skill, ICharacterData character, short level)
         {
             if (skill == null || character == null)
                 return false;
@@ -83,7 +62,7 @@ namespace MultiplayerARPG
             if (character is IPlayerCharacterData)
             {
                 // Only player character will check for available weapons
-                switch (skill.skillType)
+                switch (skill.GetSkillType())
                 {
                     case SkillType.Active:
                         WeaponType[] availableWeapons = skill.availableWeapons;
@@ -113,7 +92,7 @@ namespace MultiplayerARPG
                         }
                         break;
                     case SkillType.CraftItem:
-                        if (!(character is BasePlayerCharacterEntity) || !skill.itemCraft.CanCraft(character as BasePlayerCharacterEntity))
+                        if (!(character is BasePlayerCharacterEntity) || !skill.GetItemCraft().CanCraft(character as BasePlayerCharacterEntity))
                             return false;
                         break;
                     default:
@@ -136,7 +115,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static short GetAdjustedLevel(this Skill skill, short level)
+        public static short GetAdjustedLevel(this BaseSkill skill, short level)
         {
             if (skill == null)
                 return 0;
@@ -145,7 +124,7 @@ namespace MultiplayerARPG
             return level;
         }
 
-        public static float GetCastDuration(this Skill skill, short level)
+        public static float GetCastDuration(this BaseSkill skill, short level)
         {
             if (skill == null)
                 return 0;
@@ -153,7 +132,7 @@ namespace MultiplayerARPG
             return skill.castDuration.GetAmount(level);
         }
 
-        public static int GetConsumeMp(this Skill skill, short level)
+        public static int GetConsumeMp(this BaseSkill skill, short level)
         {
             if (skill == null)
                 return 0;
@@ -161,7 +140,7 @@ namespace MultiplayerARPG
             return skill.consumeMp.GetAmount(level);
         }
 
-        public static float GetCoolDownDuration(this Skill skill, short level)
+        public static float GetCoolDownDuration(this BaseSkill skill, short level)
         {
             if (skill == null)
                 return 0f;
@@ -170,38 +149,6 @@ namespace MultiplayerARPG
             if (duration < 0f)
                 duration = 0f;
             return duration;
-        }
-        #endregion
-
-        #region Attack
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Skill skill, short level, ICharacterData character)
-        {
-            if (!skill.IsAttack() || skill.skillDamageType != SkillDamageType.Normal)
-                return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.MakeDamage(skill.damageAmount, level, 1f, skill.GetEffectivenessDamage(character));
-        }
-
-        public static float GetEffectivenessDamage(this Skill skill, ICharacterData character)
-        {
-            if (skill == null)
-                return 1f;
-            return GameDataHelpers.GetEffectivenessDamage(skill.CacheEffectivenessAttributes, character);
-        }
-
-        public static Dictionary<DamageElement, float> GetWeaponDamageInflictions(this Skill skill, short level)
-        {
-            if (!skill.IsAttack())
-                return new Dictionary<DamageElement, float>();
-            level = skill.GetAdjustedLevel(level);
-            return GameDataHelpers.CombineDamageInflictions(skill.weaponDamageInflictions, new Dictionary<DamageElement, float>(), level);
-        }
-
-        public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAmounts(this Skill skill, short level)
-        {
-            if (!skill.IsAttack())
-                return new Dictionary<DamageElement, MinMaxFloat>();
-            level = skill.GetAdjustedLevel(level);
-            return GameDataHelpers.CombineDamages(skill.additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
         #endregion
     }

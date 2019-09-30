@@ -300,9 +300,9 @@ public class CharacterItem : INetSerializableWithElement
         lockRemainsDuration -= deltaTime;
     }
 
-    public float GetEquipmentBonusRate()
+    public float GetEquipmentStatsRate()
     {
-        return GameInstance.Singleton.GameplayRule.GetEquipmentBonusRate(this);
+        return GameInstance.Singleton.GameplayRule.GetEquipmentStatsRate(this);
     }
 
     public bool CanEquip(ICharacterData character)
@@ -324,14 +324,14 @@ public class CharacterItem : INetSerializableWithElement
     {
         if (GetDefendItem() == null)
             return new KeyValuePair<DamageElement, float>();
-        return GetDefendItem().GetArmorAmount(level, GetEquipmentBonusRate());
+        return GetDefendItem().GetArmorAmount(level, GetEquipmentStatsRate());
     }
 
     public KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(ICharacterData characterData)
     {
         if (GetWeaponItem() == null)
             return new KeyValuePair<DamageElement, MinMaxFloat>();
-        return GetWeaponItem().GetDamageAmount(level, GetEquipmentBonusRate(), characterData);
+        return GetWeaponItem().GetDamageAmount(level, GetEquipmentStatsRate(), characterData);
     }
 
     public CharacterStats GetIncreaseStats()
@@ -383,7 +383,7 @@ public class CharacterItem : INetSerializableWithElement
         return GetEquipmentItem().GetIncreaseDamages(level);
     }
 
-    public Dictionary<Skill, short> GetIncreaseSkills()
+    public Dictionary<BaseSkill, short> GetIncreaseSkills()
     {
         if (GetEquipmentItem() == null)
             return null;
@@ -488,11 +488,11 @@ public class CharacterItem : INetSerializableWithElement
         return result;
     }
 
-    public Dictionary<Skill, short> GetSocketsIncreaseSkills()
+    public Dictionary<BaseSkill, short> GetSocketsIncreaseSkills()
     {
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return null;
-        Dictionary<Skill, short> result = new Dictionary<Skill, short>();
+        Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>();
         Item tempEnhancer;
         foreach (int socketId in Sockets)
         {

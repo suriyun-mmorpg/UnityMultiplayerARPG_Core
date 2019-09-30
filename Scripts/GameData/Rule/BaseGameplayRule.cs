@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         public abstract bool IsThirsty(BaseCharacterEntity character);
         public abstract bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType);
         public abstract void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType);
-        public abstract float GetEquipmentBonusRate(CharacterItem characterItem);
+        public abstract float GetEquipmentStatsRate(CharacterItem characterItem);
         public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage);
         public abstract void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage);
         public abstract bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount);
