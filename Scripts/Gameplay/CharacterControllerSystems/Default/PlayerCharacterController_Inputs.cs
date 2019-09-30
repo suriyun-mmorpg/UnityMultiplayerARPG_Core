@@ -337,7 +337,7 @@ namespace MultiplayerARPG
                     if (nearestTarget != null)
                     {
                         // Set target, then attack later when moved nearby target
-                        PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                        SetTarget(nearestTarget);
                     }
                     else
                     {
@@ -382,7 +382,7 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkill.skill == null)
                 return false;
-            
+
             destination = null;
             PlayerCharacterEntity.StopMove();
             if (queueUsingSkill.level > 0)
@@ -399,7 +399,7 @@ namespace MultiplayerARPG
                         if (nearestTarget != null)
                         {
                             // Set target, then use skill later when moved nearby target
-                            PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                            SetTarget(nearestTarget);
                         }
                         else
                         {
@@ -433,7 +433,7 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkillItem.skill == null)
                 return false;
-            
+
             destination = null;
             PlayerCharacterEntity.StopMove();
             if (queueUsingSkillItem.level > 0)
@@ -450,7 +450,7 @@ namespace MultiplayerARPG
                         if (nearestTarget != null)
                         {
                             // Set target, then use skill later when moved nearby target
-                            PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                            SetTarget(nearestTarget);
                         }
                         else
                         {
@@ -765,17 +765,12 @@ namespace MultiplayerARPG
                     {
                         // If attacking any character, will use skill later
                         SetQueueUsingSkill(aimPosition, skill, skillLevel);
-                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
-                        {
-                            // Attacking selected target
-                            PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
-                        }
-                        else
+                        if (SelectedEntity == null && !(SelectedEntity is BaseCharacterEntity))
                         {
                             // Attacking nearest target
                             BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, skillLevel) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
-                                PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                                SetTarget(nearestTarget);
                         }
                     }
                     else
@@ -872,17 +867,12 @@ namespace MultiplayerARPG
                     {
                         // If attacking any character, will use skill later
                         SetQueueUsingSkillItem(aimPosition, itemIndex, skill, skillLevel);
-                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
-                        {
-                            // Attacking selected target
-                            PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
-                        }
-                        else
+                        if (SelectedEntity == null || !(SelectedEntity is BaseCharacterEntity))
                         {
                             // Attacking nearest target
                             BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, skillLevel) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
-                                PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                                SetTarget(nearestTarget);
                         }
                     }
                     else
