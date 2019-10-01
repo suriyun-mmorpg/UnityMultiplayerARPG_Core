@@ -7,6 +7,7 @@ namespace MultiplayerARPG
 {
     public class MissileDamageEntity : BaseDamageEntity
     {
+        public float destroyDelay;
         public UnityEvent onExploded;
         public UnityEvent onDestroy;
         [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
@@ -41,6 +42,7 @@ namespace MultiplayerARPG
 
         private float launchTime;
         private float missileDuration;
+        private bool destroying;
 
         private void Awake()
         {
@@ -65,7 +67,8 @@ namespace MultiplayerARPG
             {
                 // Explode immediately when distance and speed is 0
                 Explode();
-                Destroy(gameObject);
+                Destroy(gameObject, destroyDelay);
+                destroying = true;
                 return;
             }
 
@@ -77,10 +80,14 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            if (destroying)
+                return;
+
             if (Time.unscaledTime - launchTime > missileDuration)
             {
                 Explode();
-                Destroy(gameObject);
+                Destroy(gameObject, destroyDelay);
+                destroying = true;
             }
         }
 
@@ -147,6 +154,9 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
+            if (destroying)
+                return;
+
             if (attacker == null || attacker.gameObject == other)
                 return;
 
@@ -163,7 +173,8 @@ namespace MultiplayerARPG
                     // If this is not going to explode, just apply damage to target
                     ApplyDamageTo(target);
                 }
-                Destroy(gameObject);
+                Destroy(gameObject, destroyDelay);
+                destroying = true;
                 return;
             }
 
@@ -178,7 +189,8 @@ namespace MultiplayerARPG
                     // Explode immediately when hit something
                     Explode();
                 }
-                Destroy(gameObject);
+                Destroy(gameObject, destroyDelay);
+                destroying = true;
                 return;
             }
         }
