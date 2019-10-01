@@ -89,7 +89,7 @@ public static partial class CharacterDataExtension
         foreach (CharacterItem item in itemList)
         {
             if (item.IsEmptySlot()) continue;
-            result += item.GetItem().weight;
+            result += item.GetItem().weight * item.amount;
         }
         return result;
     }
