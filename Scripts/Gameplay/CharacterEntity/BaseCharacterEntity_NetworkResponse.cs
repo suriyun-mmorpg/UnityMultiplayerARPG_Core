@@ -208,11 +208,13 @@ namespace MultiplayerARPG
             {
                 if (isLeftHand)
                 {
+                    equippingItem.equipSlotIndex = equipWeaponSet;
                     tempEquipWeapons.leftHand = equippingItem;
                     SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
                 }
                 else
                 {
+                    equippingItem.equipSlotIndex = equipWeaponSet;
                     tempEquipWeapons.rightHand = equippingItem;
                     SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
                 }

@@ -214,7 +214,10 @@ namespace MultiplayerARPG
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 if (equipWeapon.GetEquipmentItem() != null)
+                {
+                    equipWeapon.equipSlotIndex = equipWeaponSet;
                     tempSlot.Setup(new UICharacterItemData(equipWeapon, equipWeapon.level, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), character, 0);
+                }
             }
         }
 
