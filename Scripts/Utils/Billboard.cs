@@ -2,33 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Billboard : MonoBehaviour
+namespace UtilsComponents
 {
-    public Camera targetCamera;
-    public Camera CacheTargetCamera
+    public class Billboard : MonoBehaviour
     {
-        get
+        public Camera targetCamera;
+        public Camera CacheTargetCamera
         {
-            if (targetCamera == null)
-                targetCamera = Camera.main;
-            return targetCamera;
+            get
+            {
+                if (targetCamera == null)
+                    targetCamera = Camera.main;
+                return targetCamera;
+            }
         }
-    }
 
-    private Transform cacheTransform;
-    public Transform CacheTransform
-    {
-        get
+        private Transform cacheTransform;
+        public Transform CacheTransform
         {
-            if (cacheTransform == null)
-                cacheTransform = GetComponent<Transform>();
-            return cacheTransform;
+            get
+            {
+                if (cacheTransform == null)
+                    cacheTransform = GetComponent<Transform>();
+                return cacheTransform;
+            }
         }
-    }
 
-    void LateUpdate()
-    {
-        if (CacheTargetCamera != null)
-            CacheTransform.rotation = Quaternion.Euler(Quaternion.LookRotation(CacheTargetCamera.transform.forward, CacheTargetCamera.transform.up).eulerAngles);
+        void LateUpdate()
+        {
+            if (CacheTargetCamera != null)
+                CacheTransform.rotation = Quaternion.Euler(Quaternion.LookRotation(CacheTargetCamera.transform.forward, CacheTargetCamera.transform.up).eulerAngles);
+        }
     }
 }

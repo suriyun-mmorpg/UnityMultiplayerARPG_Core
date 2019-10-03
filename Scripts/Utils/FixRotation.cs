@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FixRotation : MonoBehaviour
+namespace UtilsComponents
 {
-    public Vector3 eulerAngles;
-    private void LateUpdate()
+    public class FixRotation : MonoBehaviour
     {
-        transform.eulerAngles = eulerAngles;
+        public Vector3 eulerAngles;
+        private void LateUpdate()
+        {
+            transform.eulerAngles = eulerAngles;
+        }
     }
 }

@@ -2,20 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CopyCamera : MonoBehaviour
+namespace UtilsComponents
 {
-    public Camera copyFromCamera;
-    public Camera copyToCamera;
-
-    void Update()
+    public class CopyCamera : MonoBehaviour
     {
-        if (copyFromCamera == null || copyToCamera == null)
-            return;
-        copyToCamera.orthographic = copyFromCamera.orthographic;
-        copyToCamera.orthographicSize = copyFromCamera.orthographicSize;
-        copyToCamera.nearClipPlane = copyFromCamera.nearClipPlane;
-        copyToCamera.farClipPlane = copyFromCamera.farClipPlane;
-        copyToCamera.fieldOfView = copyFromCamera.fieldOfView;
-        copyToCamera.rect = copyFromCamera.rect;
+        public Camera copyFromCamera;
+        public Camera copyToCamera;
+
+        void Update()
+        {
+            if (copyFromCamera == null || copyToCamera == null)
+                return;
+            copyToCamera.orthographic = copyFromCamera.orthographic;
+            copyToCamera.orthographicSize = copyFromCamera.orthographicSize;
+            copyToCamera.nearClipPlane = copyFromCamera.nearClipPlane;
+            copyToCamera.farClipPlane = copyFromCamera.farClipPlane;
+            copyToCamera.fieldOfView = copyFromCamera.fieldOfView;
+            copyToCamera.rect = copyFromCamera.rect;
+        }
     }
 }

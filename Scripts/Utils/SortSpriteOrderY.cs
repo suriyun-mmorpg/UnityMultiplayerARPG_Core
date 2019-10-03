@@ -2,21 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SortSpriteOrderY : MonoBehaviour
+namespace UtilsComponents
 {
-    private Renderer cacheRenderer;
-    public Renderer CacheRenderer
+    public class SortSpriteOrderY : MonoBehaviour
     {
-        get
+        private Renderer cacheRenderer;
+        public Renderer CacheRenderer
         {
-            if (cacheRenderer == null)
-                cacheRenderer = GetComponent<Renderer>();
-            return cacheRenderer;
+            get
+            {
+                if (cacheRenderer == null)
+                    cacheRenderer = GetComponent<Renderer>();
+                return cacheRenderer;
+            }
         }
-    }
 
-    void Update()
-    {
-        CacheRenderer.sortingOrder = -(int)(transform.position.y * 100);
+        void Update()
+        {
+            CacheRenderer.sortingOrder = -(int)(transform.position.y * 100);
+        }
     }
 }
