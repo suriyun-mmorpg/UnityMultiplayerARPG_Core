@@ -24,6 +24,17 @@ namespace MultiplayerARPG
         public AudioClip[] weaponLaunchSoundEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
+        
+        protected virtual void OnEnable()
+        {
+            if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
+            {
+                foreach (GameEffect weaponLaunchEffect in weaponLaunchEffects)
+                {
+                    weaponLaunchEffect.gameObject.SetActive(false);
+                }
+            }
+        }
 
         public void PlayWeaponLaunchEffect()
         {

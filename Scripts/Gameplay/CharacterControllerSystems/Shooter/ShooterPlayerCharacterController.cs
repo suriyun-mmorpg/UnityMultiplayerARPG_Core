@@ -32,8 +32,6 @@ namespace MultiplayerARPG
         public bool showConfirmConstructionUI;
         public RectTransform crosshairRect;
         public bool IsBlockController { get; protected set; }
-        public float DefaultGameplayCameraFOV { get; protected set; }
-        public Vector3 DefaultGameplayCameraOffset { get; protected set; }
 
         // Temp data
         BuildingMaterial tempBuildingMaterial;
@@ -84,12 +82,6 @@ namespace MultiplayerARPG
             base.Awake();
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
-
-            if (CacheGameplayCameraControls != null)
-            {
-                DefaultGameplayCameraFOV = CacheGameplayCameraControls.CacheCamera.fieldOfView;
-                DefaultGameplayCameraOffset = CacheGameplayCameraControls.targetOffset;
-            }
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -133,25 +125,25 @@ namespace MultiplayerARPG
             currentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
             UpdateCrosshair(currentCrosshairSetting, -currentCrosshairSetting.shrinkPerFrame);
 
-            rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
-            leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
+            rightHandWeapon = equipWeapons.GetRightHandWeaponItem();
+            leftHandWeapon = equipWeapons.GetLeftHandWeaponItem();
             // Weapon ability will be able to use when equip weapon at main-hand only
             if (rightHandWeapon != null && leftHandWeapon == null)
             {
                 if (rightHandWeapon.weaponAbility != weaponAbility)
                 {
                     if (weaponAbility != null)
-                        weaponAbility.ForceDeactivated();
+                        weaponAbility.Desetup();
                     weaponAbility = rightHandWeapon.weaponAbility;
                     if (weaponAbility != null)
-                        weaponAbility.Setup(this);
+                        weaponAbility.Setup(this, equipWeapons.rightHand);
                     weaponAbilityState = WeaponAbilityState.Deactivated;
                 }
             }
             else
             {
                 if (weaponAbility != null)
-                    weaponAbility.ForceDeactivated();
+                    weaponAbility.Desetup();
                 weaponAbility = null;
                 weaponAbilityState = WeaponAbilityState.Deactivated;
             }
@@ -188,10 +180,23 @@ namespace MultiplayerARPG
 
             IsBlockController = CacheUISceneGameplay.IsBlockController();
             // Lock cursor when not show UIs
-            Cursor.lockState = !IsBlockController ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = IsBlockController;
 
-            CacheGameplayCameraControls.updateRotation = !IsBlockController;
+            if (Application.isMobilePlatform || gameInstance.useMobileInEditor)
+            {
+                // Control camera by touch-screen
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                CacheGameplayCameraControls.updateRotationX = false;
+                CacheGameplayCameraControls.updateRotationY = false;
+                CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
+            }
+            else
+            {
+                // Control camera by mouse-move
+                Cursor.lockState = !IsBlockController ? CursorLockMode.Locked : CursorLockMode.None;
+                Cursor.visible = IsBlockController;
+                CacheGameplayCameraControls.updateRotation = !IsBlockController;
+            }
             // Clear selected entity
             SelectedEntity = null;
 
@@ -247,16 +252,16 @@ namespace MultiplayerARPG
                 if (CurrentBuildingEntity == null)
                 {
                     // Attack with right hand weapon
-                    tempPressAttackRight = InputManager.GetButton("Fire1");
+                    tempPressAttackRight = GetPrimaryAttackButton();
                     if (weaponAbility == null && leftHandWeapon != null)
                     {
                         // Attack with left hand weapon if left hand weapon not empty
-                        tempPressAttackLeft = InputManager.GetButton("Fire2");
+                        tempPressAttackLeft = GetSecondaryAttackButton();
                     }
                     else if (weaponAbility != null)
                     {
                         // Use weapon ability if it can
-                        tempPressWeaponAbility = InputManager.GetButtonDown("Fire2");
+                        tempPressWeaponAbility = GetSecondaryAttackButtonDown();
                     }
                     // Is left hand attack when not attacking with right hand
                     // So priority is right > left
@@ -438,8 +443,6 @@ namespace MultiplayerARPG
                     moveLookDirection = moveDirection;
                     break;
                 case Mode.Combat:
-                    moveDirection += forward * inputV;
-                    moveDirection += right * inputH;
                     if (inputV > 0.5f)
                         movementState |= MovementState.Forward;
                     else if (inputV < -0.5f)
@@ -452,6 +455,16 @@ namespace MultiplayerARPG
                     break;
             }
 
+            if (weaponAbility != null &&
+                weaponAbility.IsTurnToTargetWhileActivated() &&
+                (weaponAbilityState == WeaponAbilityState.Activated ||
+                weaponAbilityState == WeaponAbilityState.Activating))
+            {
+                // Force turn to look direction
+                moveLookDirection = moveDirection;
+                targetLookDirection = actionLookDirection;
+            }
+
             // normalize input if it exceeds 1 in combined length:
             if (moveDirection.sqrMagnitude > 1)
                 moveDirection.Normalize();
@@ -460,7 +473,7 @@ namespace MultiplayerARPG
             {
                 mustReleaseFireKey = false;
                 // Building
-                tempPressAttackRight = InputManager.GetButtonUp("Fire1");
+                tempPressAttackRight = GetPrimaryAttackButtonUp();
                 if (tempPressAttackRight)
                 {
                     if (showConfirmConstructionUI)
@@ -490,12 +503,12 @@ namespace MultiplayerARPG
                     tempPressAttackRight = false;
                     tempPressAttackLeft = false;
                     if (!isLeftHandAttacking &&
-                        (InputManager.GetButtonUp("Fire1") ||
-                        !InputManager.GetButton("Fire1")))
+                        (GetPrimaryAttackButtonUp() ||
+                        !GetPrimaryAttackButton()))
                         mustReleaseFireKey = false;
                     if (isLeftHandAttacking &&
-                        (InputManager.GetButtonUp("Fire2") ||
-                        !InputManager.GetButton("Fire2")))
+                        (GetSecondaryAttackButtonUp() ||
+                        !GetSecondaryAttackButton()))
                         mustReleaseFireKey = false;
                 }
                 // Not building so it is attacking
@@ -848,6 +861,7 @@ namespace MultiplayerARPG
                 weaponAbilityState == WeaponAbilityState.Activating)
                 return;
 
+            weaponAbility.OnPreActivate();
             weaponAbilityState = WeaponAbilityState.Activating;
         }
 
@@ -872,6 +886,7 @@ namespace MultiplayerARPG
                 weaponAbilityState == WeaponAbilityState.Deactivating)
                 return;
 
+            weaponAbility.OnPreDeactivate();
             weaponAbilityState = WeaponAbilityState.Deactivating;
         }
 
@@ -940,6 +955,36 @@ namespace MultiplayerARPG
             queueSkill.skill = null;
             queueSkillByItem.skill = null;
             queueSkillItemIndex = -1;
+        }
+
+        public bool GetPrimaryAttackButton()
+        {
+            return InputManager.GetButton("Fire1") || InputManager.GetButton("Attack");
+        }
+
+        public bool GetSecondaryAttackButton()
+        {
+            return InputManager.GetButton("Fire2");
+        }
+
+        public bool GetPrimaryAttackButtonUp()
+        {
+            return InputManager.GetButtonUp("Fire1") || InputManager.GetButtonUp("Attack");
+        }
+
+        public bool GetSecondaryAttackButtonUp()
+        {
+            return InputManager.GetButtonUp("Fire2");
+        }
+
+        public bool GetPrimaryAttackButtonDown()
+        {
+            return InputManager.GetButtonDown("Fire1") || InputManager.GetButtonDown("Attack");
+        }
+
+        public bool GetSecondaryAttackButtonDown()
+        {
+            return InputManager.GetButtonDown("Fire2");
         }
     }
 }
