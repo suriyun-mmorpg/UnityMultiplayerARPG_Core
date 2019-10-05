@@ -239,9 +239,14 @@ public static partial class PlayerCharacterDataExtension
             if (startItem.item == null || startItem.amount <= 0)
                 continue;
             short amount = startItem.amount;
-            if (amount > startItem.item.maxStack)
-                amount = startItem.item.maxStack;
-            character.AddOrInsertNonEquipItems(CharacterItem.Create(startItem.item, 1, amount));
+            while (amount > 0)
+            {
+                short addAmount = amount;
+                if (addAmount > startItem.item.maxStack)
+                    addAmount = startItem.item.maxStack;
+                character.AddOrInsertNonEquipItems(CharacterItem.Create(startItem.item, 1, addAmount));
+                amount -= addAmount;
+            }
         }
         // Position
         MapInfo startMap = playerCharacter.StartMap;
