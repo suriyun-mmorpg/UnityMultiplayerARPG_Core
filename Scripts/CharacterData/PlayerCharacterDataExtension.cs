@@ -231,9 +231,9 @@ public static partial class PlayerCharacterDataExtension
         character.CurrentStamina = (int)stats.stamina;
         character.CurrentFood = (int)stats.food;
         character.CurrentWater = (int)stats.water;
-        character.Gold = gameInstance.startGold;
+        character.Gold = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startGold : gameInstance.startGold;
         // Inventory
-        ItemAmount[] startItems = gameInstance.startItems;
+        ItemAmount[] startItems = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startItems : gameInstance.startItems;
         foreach (ItemAmount startItem in startItems)
         {
             if (startItem.item == null || startItem.amount <= 0)

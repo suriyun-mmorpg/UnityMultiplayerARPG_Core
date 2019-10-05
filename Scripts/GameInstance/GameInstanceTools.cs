@@ -41,6 +41,27 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(CacheGameInstance);
             }
         }
+
+        [ContextMenu("Copy To NewCharacterSetting")]
+        public void CopyToNewCharacterSetting()
+        {
+            if (CacheGameInstance.newCharacterSetting ==  null)
+            {
+                Debug.LogError("[GameInstanceTools] `newCharacterSetting` is null, cannot copy");
+                return;
+            }
+            CacheGameInstance.newCharacterSetting.startGold = CacheGameInstance.startGold;
+            CacheGameInstance.newCharacterSetting.startItems = CacheGameInstance.startItems;
+            EditorUtility.SetDirty(CacheGameInstance.newCharacterSetting);
+        }
+
+        [ContextMenu("Clear StartGold and StartItems")]
+        public void ClearStartGoldAndStartItems()
+        {
+            CacheGameInstance.startGold = 0;
+            CacheGameInstance.startItems = null;
+            EditorUtility.SetDirty(CacheGameInstance);
+        }
 #endif
     }
 }

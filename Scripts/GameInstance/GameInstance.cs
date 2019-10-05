@@ -149,6 +149,7 @@ namespace MultiplayerARPG
         public GameEffect levelUpEffect;
 
         [Header("New Character")]
+        public NewCharacterSetting newCharacterSetting;
         public int startGold = 0;
         public ItemAmount[] startItems;
 
