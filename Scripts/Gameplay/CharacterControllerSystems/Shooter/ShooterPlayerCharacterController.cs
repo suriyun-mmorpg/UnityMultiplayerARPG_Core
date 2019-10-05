@@ -233,8 +233,6 @@ namespace MultiplayerARPG
 
             // Find target character
             Ray ray = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
-            Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
             float distanceFromOrigin = Vector3.Distance(ray.origin, MovementTransform.position);
 
             // Prepare variables to find nearest raycasted hit point
@@ -263,9 +261,13 @@ namespace MultiplayerARPG
                         // Use weapon ability if it can
                         tempPressWeaponAbility = GetSecondaryAttackButtonDown();
                     }
-                    // Is left hand attack when not attacking with right hand
-                    // So priority is right > left
-                    isLeftHandAttacking = !tempPressAttackRight && tempPressAttackLeft;
+
+                    if ((tempPressAttackRight || tempPressAttackLeft) &&
+                        turningState == TurningState.None)
+                    {
+                        // So priority is right > left
+                        isLeftHandAttacking = !tempPressAttackRight && tempPressAttackLeft;
+                    }
 
                     // Calculate aim distance by skill or weapon
                     if (queueSkill.skill != null && queueSkill.skill.IsAttack())
@@ -328,6 +330,7 @@ namespace MultiplayerARPG
                     // If already found damageable entity don't find for npc / item
                     if (foundDamageableEntity)
                         continue;
+
                     // Find item drop entity
                     tempEntity = tempHitInfo.collider.GetComponent<ItemDropEntity>();
                     if (tempEntity != null && tempDistance <= gameInstance.pickUpItemDistance)
@@ -422,10 +425,18 @@ namespace MultiplayerARPG
                     CurrentBuildingEntity.transform.rotation = Quaternion.LookRotation(direction);
                 }
             }
+            // Set aim position before attack
+            SetAimPosition(aimPosition);
 
+        }
+
+        private void LateUpdate()
+        {
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = Vector3.zero;
+            Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
+            Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
             forward.y = 0f;
             right.y = 0f;
             forward.Normalize();
@@ -660,7 +671,6 @@ namespace MultiplayerARPG
                     ReloadAmmo();
                 }
             }
-            SetAimPosition(aimPosition);
 
             // Hide Npc UIs when move
             if (moveDirection.magnitude != 0f)
