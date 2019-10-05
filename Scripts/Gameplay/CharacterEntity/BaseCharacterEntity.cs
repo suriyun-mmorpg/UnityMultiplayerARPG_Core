@@ -701,32 +701,32 @@ namespace MultiplayerARPG
         #region Weapons / Damage
         public virtual CrosshairSetting GetCrosshairSetting()
         {
-            Item rightHandWeapon = EquipWeapons.rightHand.GetWeaponItem();
-            Item leftHandWeapon = EquipWeapons.leftHand.GetWeaponItem();
-            if (rightHandWeapon != null && leftHandWeapon != null)
+            Item rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
+            Item leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
+            if (rightWeaponItem != null && leftWeaponItem != null)
             {
                 // Create new crosshair setting based on weapons
                 return new CrosshairSetting()
                 {
-                    hidden = rightHandWeapon.crosshairSetting.hidden || leftHandWeapon.crosshairSetting.hidden,
-                    expandPerFrameWhileMoving = (rightHandWeapon.crosshairSetting.expandPerFrameWhileMoving + leftHandWeapon.crosshairSetting.expandPerFrameWhileMoving) / 2f,
-                    expandPerFrameWhileAttacking = (rightHandWeapon.crosshairSetting.expandPerFrameWhileAttacking + leftHandWeapon.crosshairSetting.expandPerFrameWhileAttacking) / 2f,
-                    shrinkPerFrame = (rightHandWeapon.crosshairSetting.shrinkPerFrame + leftHandWeapon.crosshairSetting.shrinkPerFrame) / 2f,
-                    minSpread = (rightHandWeapon.crosshairSetting.minSpread + leftHandWeapon.crosshairSetting.minSpread) / 2f,
-                    maxSpread = (rightHandWeapon.crosshairSetting.maxSpread + leftHandWeapon.crosshairSetting.maxSpread) / 2f
+                    hidden = rightWeaponItem.crosshairSetting.hidden || leftWeaponItem.crosshairSetting.hidden,
+                    expandPerFrameWhileMoving = (rightWeaponItem.crosshairSetting.expandPerFrameWhileMoving + leftWeaponItem.crosshairSetting.expandPerFrameWhileMoving) / 2f,
+                    expandPerFrameWhileAttacking = (rightWeaponItem.crosshairSetting.expandPerFrameWhileAttacking + leftWeaponItem.crosshairSetting.expandPerFrameWhileAttacking) / 2f,
+                    shrinkPerFrame = (rightWeaponItem.crosshairSetting.shrinkPerFrame + leftWeaponItem.crosshairSetting.shrinkPerFrame) / 2f,
+                    minSpread = (rightWeaponItem.crosshairSetting.minSpread + leftWeaponItem.crosshairSetting.minSpread) / 2f,
+                    maxSpread = (rightWeaponItem.crosshairSetting.maxSpread + leftWeaponItem.crosshairSetting.maxSpread) / 2f
                 };
             }
-            if (rightHandWeapon != null)
-                return rightHandWeapon.crosshairSetting;
-            if (leftHandWeapon != null)
-                return leftHandWeapon.crosshairSetting;
+            if (rightWeaponItem != null)
+                return rightWeaponItem.crosshairSetting;
+            if (leftWeaponItem != null)
+                return leftWeaponItem.crosshairSetting;
             return gameInstance.DefaultWeaponItem.crosshairSetting;
         }
 
         public virtual float GetAttackDistance(bool isLeftHand)
         {
-            Item rightWeaponItem = EquipWeapons.rightHand.GetWeaponItem();
-            Item leftWeaponItem = EquipWeapons.leftHand.GetWeaponItem();
+            Item rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
+            Item leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
             if (!isLeftHand)
             {
                 if (rightWeaponItem != null)
@@ -746,8 +746,8 @@ namespace MultiplayerARPG
 
         public virtual float GetAttackFov(bool isLeftHand)
         {
-            Item rightWeaponItem = EquipWeapons.rightHand.GetWeaponItem();
-            Item leftWeaponItem = EquipWeapons.leftHand.GetWeaponItem();
+            Item rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
+            Item leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
             if (!isLeftHand)
             {
                 if (rightWeaponItem != null)
