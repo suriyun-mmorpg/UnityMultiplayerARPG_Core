@@ -149,8 +149,11 @@ namespace MultiplayerARPG
         public GameEffect levelUpEffect;
 
         [Header("New Character")]
+        [Tooltip("If this is NULL, it will use `startGold` and `startItems`")]
         public NewCharacterSetting newCharacterSetting;
+        [Tooltip("Amount of gold that will be added to character when create new character")]
         public int startGold = 0;
+        [Tooltip("Items that will be added to character when create new character")]
         public ItemAmount[] startItems;
 
         [Header("Scene/Maps")]
@@ -344,6 +347,11 @@ namespace MultiplayerARPG
                     socialSystemSetting = ScriptableObject.CreateInstance<SocialSystemSetting>();
                 return socialSystemSetting;
             }
+        }
+
+        public bool HasNewCharacterSetting
+        {
+            get { return newCharacterSetting != null; }
         }
         #endregion
 
