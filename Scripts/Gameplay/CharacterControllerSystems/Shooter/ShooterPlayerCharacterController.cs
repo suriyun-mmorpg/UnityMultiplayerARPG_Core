@@ -428,10 +428,6 @@ namespace MultiplayerARPG
             // Set aim position before attack
             SetAimPosition(aimPosition);
 
-        }
-
-        private void LateUpdate()
-        {
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = Vector3.zero;
