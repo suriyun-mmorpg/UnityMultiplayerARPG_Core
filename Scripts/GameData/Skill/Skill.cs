@@ -26,7 +26,6 @@ namespace MultiplayerARPG
         public SkillType skillType;
 
         [Header("Attack")]
-        [FormerlySerializedAs("skillAttackType")]
         public SkillAttackType skillAttackType;
         public GameEffectCollection hitEffects;
         public DamageInfo damageInfo;
