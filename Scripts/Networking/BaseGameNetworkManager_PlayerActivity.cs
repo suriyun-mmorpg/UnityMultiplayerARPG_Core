@@ -179,10 +179,20 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanCreateGuild(BasePlayerCharacterEntity playerCharacterEntity)
+        public virtual bool CanCreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return false;
+            if (string.IsNullOrEmpty(guildName) || guildName.Length < gameInstance.SocialSystemSetting.MinGuildNameLength)
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooShortGuildName);
+                return false;
+            }
+            if (guildName.Length > gameInstance.SocialSystemSetting.MaxGuildNameLength)
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooLongGuildName);
+                return false;
+            }
             if (playerCharacterEntity.GuildId > 0)
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.JoinedAnotherGuild);
@@ -222,7 +232,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanSetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, out int guildId, out GuildData guild)
+        public virtual bool CanSetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage, out int guildId, out GuildData guild)
         {
             guildId = 0;
             guild = null;
@@ -239,10 +249,15 @@ namespace MultiplayerARPG
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotGuildLeader);
                 return false;
             }
+            if (guildMessage.Length > gameInstance.SocialSystemSetting.MaxGuildMessageLength)
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooLongGuildMessage);
+                return false;
+            }
             return true;
         }
 
-        public virtual bool CanSetGuildRole(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole, out int guildId, out GuildData guild)
+        public virtual bool CanSetGuildRole(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole, string roleName, out int guildId, out GuildData guild)
         {
             guildId = 0;
             guild = null;
@@ -262,6 +277,16 @@ namespace MultiplayerARPG
             if (!guild.IsRoleAvailable(guildRole))
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.GuildRoleNotAvailable);
+                return false;
+            }
+            if (string.IsNullOrEmpty(roleName) || roleName.Length < gameInstance.SocialSystemSetting.MinGuildRoleNameLength)
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooShortGuildRoleName);
+                return false;
+            }
+            if (roleName.Length > gameInstance.SocialSystemSetting.MaxGuildRoleNameLength)
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooLongGuildRoleName);
                 return false;
             }
             return true;
@@ -580,7 +605,7 @@ namespace MultiplayerARPG
 
         public virtual void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName, int guildId)
         {
-            if (!CanCreateGuild(playerCharacterEntity))
+            if (!CanCreateGuild(playerCharacterEntity, guildName))
                 return;
 
             gameInstance.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacterEntity);
@@ -614,7 +639,7 @@ namespace MultiplayerARPG
         {
             int guildId;
             GuildData guild;
-            if (!CanSetGuildMessage(playerCharacterEntity, out guildId, out guild))
+            if (!CanSetGuildMessage(playerCharacterEntity, guildMessage, out guildId, out guild))
                 return;
 
             guild.guildMessage = guildMessage;
@@ -626,7 +651,7 @@ namespace MultiplayerARPG
         {
             int guildId;
             GuildData guild;
-            if (!CanSetGuildRole(playerCharacterEntity, guildRole, out guildId, out guild))
+            if (!CanSetGuildRole(playerCharacterEntity, guildRole, roleName, out guildId, out guild))
                 return;
 
             guild.SetRole(guildRole, roleName, canInvite, canKick, shareExpPercentage);

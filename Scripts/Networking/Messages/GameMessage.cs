@@ -77,6 +77,14 @@ namespace MultiplayerARPG
             // Combatant
             NoAmmo,
             NotEnoughMp,
+            // Guild Name
+            TooShortGuildName,
+            TooLongGuildName,
+            // Guild Role Name
+            TooShortGuildRoleName,
+            TooLongGuildRoleName,
+            // Guild Message
+            TooLongGuildMessage,
         }
         public Type type;
 

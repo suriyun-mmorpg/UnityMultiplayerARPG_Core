@@ -25,6 +25,16 @@ namespace MultiplayerARPG
         [Header("Guild Configs")]
         [SerializeField]
         private int maxGuildMember = 50;
+        [SerializeField]
+        private int minGuildNameLength = 2;
+        [SerializeField]
+        private int maxGuildNameLength = 16;
+        [SerializeField]
+        private int minGuildRoleNameLength = 2;
+        [SerializeField]
+        private int maxGuildRoleNameLength = 16;
+        [SerializeField]
+        private int maxGuildMessageLength = 140;
         [Tooltip("Member roles from high to low priority")]
         [SerializeField]
         private GuildRoleData[] guildMemberRoles = new GuildRoleData[] {
@@ -51,6 +61,11 @@ namespace MultiplayerARPG
         public bool guildCalculateExp;
 
         public int MaxGuildMember { get { return maxGuildMember; } }
+        public int MinGuildNameLength { get { return minGuildNameLength; } }
+        public int MaxGuildNameLength { get { return maxGuildNameLength; } }
+        public int MinGuildRoleNameLength { get { return minGuildRoleNameLength; } }
+        public int MaxGuildRoleNameLength { get { return maxGuildRoleNameLength; } }
+        public int MaxGuildMessageLength { get { return maxGuildMessageLength; } }
         public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }
         public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
         private Dictionary<Item, short> cacheCreateGuildRequireItems;
