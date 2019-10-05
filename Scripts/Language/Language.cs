@@ -656,9 +656,18 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.NotEnoughGoldToDeposit.ToString(), "Not enough gold to deposit");
             Texts.Add(GameMessage.Type.NotEnoughGoldToWithdraw.ToString(), "Not enough gold to withdraw");
             Texts.Add(GameMessage.Type.CannotAccessStorage.ToString(), "Cannot access storage");
-            // Battle
+            // Combatant
             Texts.Add(GameMessage.Type.NoAmmo.ToString(), "No Ammo");
             Texts.Add(GameMessage.Type.NotEnoughMp.ToString(), "Have not enough Mp");
+            // Guild Name
+            Texts.Add(GameMessage.Type.TooShortGuildName.ToString(), "Guild name is too short");
+            Texts.Add(GameMessage.Type.TooLongGuildName.ToString(), "Guild name is too long");
+            Texts.Add(GameMessage.Type.ExistedGuildName.ToString(), "Guild name is already existed");
+            // Guild Role Name
+            Texts.Add(GameMessage.Type.TooShortGuildRoleName.ToString(), "Guild role name is too short");
+            Texts.Add(GameMessage.Type.TooLongGuildRoleName.ToString(), "Guild role name is too long");
+            // Guild Message
+            Texts.Add(GameMessage.Type.TooLongGuildMessage.ToString(), "Guild message is too long");
             // UI Generic Title
             Texts.Add(UITextKeys.UI_LABEL_DISCONNECTED.ToString(), "Disconnected");
             Texts.Add(UITextKeys.UI_LABEL_SUCCESS.ToString(), "Success");
