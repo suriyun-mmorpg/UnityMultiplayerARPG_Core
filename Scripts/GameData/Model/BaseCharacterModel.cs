@@ -197,14 +197,14 @@ namespace MultiplayerARPG
         {
             this.equipWeapons = equipWeapons;
 
-            Item rightHandWeapon = equipWeapons.GetRightHandEquipmentItem();
-            Item leftHandWeapon = equipWeapons.GetLeftHandEquipmentItem();
+            Item rightHandItem = equipWeapons.GetRightHandEquipmentItem();
+            Item leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
 
             // Clear equipped item models
             tempAddingKeys.Clear();
-            if (rightHandWeapon != null)
+            if (rightHandItem != null)
                 tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-            if (leftHandWeapon != null)
+            if (leftHandItem != null)
                 tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
             tempCachedKeys.Clear();
@@ -218,12 +218,12 @@ namespace MultiplayerARPG
                     DestroyCacheModel(equipPosition);
             }
 
-            if (rightHandWeapon != null && rightHandWeapon.IsWeapon())
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.DataId, equipWeapons.rightHand.level, rightHandWeapon.equipmentModels, out rightHandEquipmentEntity);
-            if (leftHandWeapon != null && leftHandWeapon.IsWeapon())
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.DataId, equipWeapons.leftHand.level, leftHandWeapon.subEquipmentModels, out leftHandEquipmentEntity);
-            if (leftHandWeapon != null && leftHandWeapon.IsShield())
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.DataId, equipWeapons.leftHand.level, leftHandWeapon.equipmentModels, out leftHandEquipmentEntity);
+            if (rightHandItem != null && rightHandItem.IsWeapon())
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandItem.DataId, equipWeapons.rightHand.level, rightHandItem.equipmentModels, out rightHandEquipmentEntity);
+            if (leftHandItem != null && leftHandItem.IsWeapon())
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, leftHandItem.subEquipmentModels, out leftHandEquipmentEntity);
+            if (leftHandItem != null && leftHandItem.IsShield())
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, leftHandItem.equipmentModels, out leftHandEquipmentEntity);
         }
 
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
@@ -280,10 +280,10 @@ namespace MultiplayerARPG
             {
                 for (i = 0; i < equipmentEntities[equipPosition].Count; ++i)
                 {
-                    if (equipmentEntity == null)
-                        equipmentEntity = tempEquipmentEntity;
                     tempEquipmentEntity = equipmentEntities[equipPosition][i];
                     tempEquipmentEntity.Level = itemLevel;
+                    if (equipmentEntity == null)
+                        equipmentEntity = tempEquipmentEntity;
                 }
                 return;
             }
