@@ -80,6 +80,7 @@ namespace MultiplayerARPG
             // Guild Name
             TooShortGuildName,
             TooLongGuildName,
+            ExistedGuildName,
             // Guild Role Name
             TooShortGuildRoleName,
             TooLongGuildRoleName,
