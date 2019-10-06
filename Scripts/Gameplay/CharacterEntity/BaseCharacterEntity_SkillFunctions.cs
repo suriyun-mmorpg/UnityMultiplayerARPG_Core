@@ -152,12 +152,7 @@ namespace MultiplayerARPG
                 out totalDuration);
 
             // Prepare requires data and get damages data
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts;
-            skill.GetAttackDamages(
-                this,
-                isLeftHand,
-                level,
-                out damageAmounts);
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, isLeftHand, level);
 
             // Set doing action state at clients and server
             isAttackingOrUsingSkill = true;

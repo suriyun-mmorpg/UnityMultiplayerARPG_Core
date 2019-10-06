@@ -864,7 +864,7 @@ namespace MultiplayerARPG
                             if (!TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
-                        missileDamageEntity.Setup(this, weapon, damageAmounts, debuff, skill, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
+                        missileDamageEntity.Setup(this, weapon, damageAmounts, debuff, skill, skillLevel, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
                     }
                     break;
                 case DamageType.Raycast:
@@ -1271,12 +1271,12 @@ namespace MultiplayerARPG
 
         public override sealed bool CanReceiveDamageFrom(IAttackerEntity attacker)
         {
-            if (attacker == null)
-                return false;
+            if (attacker == null || attacker.Entity == null)
+                return true;
 
-            BaseCharacterEntity characterEntity = attacker as BaseCharacterEntity;
+            BaseCharacterEntity characterEntity = attacker.Entity as BaseCharacterEntity;
             if (characterEntity == null)
-                return false;
+                return true;
 
             if (isInSafeArea || characterEntity.isInSafeArea)
             {
