@@ -276,7 +276,7 @@ namespace MultiplayerARPG
             return hitEffects;
         }
 
-        public override float GetAttackDistance(BaseCharacterEntity skillUser, bool isLeftHand, short skillLevel)
+        public override float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
             if (!IsAttack())
                 return 0f;
@@ -285,7 +285,7 @@ namespace MultiplayerARPG
             return skillUser.GetAttackDistance(isLeftHand);
         }
 
-        public override float GetAttackFov(BaseCharacterEntity skillUser, bool isLeftHand, short skillLevel)
+        public override float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
             if (!IsAttack())
                 return 0f;
@@ -294,7 +294,7 @@ namespace MultiplayerARPG
             return skillUser.GetAttackFov(isLeftHand);
         }
 
-        public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, bool isLeftHand, short skillLevel)
+        public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
             Dictionary<DamageElement, MinMaxFloat>  damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // If it is attack skill
@@ -310,7 +310,7 @@ namespace MultiplayerARPG
                         // Sum damage with additional damage amounts
                         damageAmounts = GameDataHelpers.CombineDamages(
                             damageAmounts,
-                            GetBaseAttackDamageAmount(skillUser, isLeftHand, skillLevel));
+                            GetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand));
                         break;
                     case SkillAttackType.BasedOnWeapon:
                         // Assign damage data
@@ -355,7 +355,7 @@ namespace MultiplayerARPG
             return damageAmounts;
         }
 
-        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, bool isLeftHand, short skillLevel)
+        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
             switch (skillAttackType)
             {

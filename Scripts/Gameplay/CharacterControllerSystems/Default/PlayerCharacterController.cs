@@ -274,8 +274,8 @@ namespace MultiplayerARPG
 
             if (skill.IsAttack())
             {
-                attackDistance = skill.GetAttackDistance(PlayerCharacterEntity, isLeftHand, skillLevel);
-                attackFov = skill.GetAttackFov(PlayerCharacterEntity, isLeftHand, skillLevel);
+                attackDistance = skill.GetAttackDistance(PlayerCharacterEntity, skillLevel, isLeftHand);
+                attackFov = skill.GetAttackFov(PlayerCharacterEntity, skillLevel, isLeftHand);
             }
             else
             {

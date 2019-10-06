@@ -273,14 +273,14 @@ namespace MultiplayerARPG
                     if (queueSkill.skill != null && queueSkill.skill.IsAttack())
                     {
                         // Increase aim distance by skill attack distance
-                        attackDistance = queueSkill.skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, queueSkill.level);
-                        attackFov = queueSkill.skill.GetAttackFov(PlayerCharacterEntity, isLeftHandAttacking, queueSkill.level);
+                        attackDistance = queueSkill.skill.GetAttackDistance(PlayerCharacterEntity, queueSkill.level, isLeftHandAttacking);
+                        attackFov = queueSkill.skill.GetAttackFov(PlayerCharacterEntity, queueSkill.level, isLeftHandAttacking);
                     }
                     else if (queueSkillByItem.skill != null && queueSkillByItem.skill.IsAttack())
                     {
                         // Increase aim distance by skill attack distance
-                        attackDistance = queueSkillByItem.skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, queueSkillByItem.level);
-                        attackFov = queueSkillByItem.skill.GetAttackFov(PlayerCharacterEntity, isLeftHandAttacking, queueSkillByItem.level);
+                        attackDistance = queueSkillByItem.skill.GetAttackDistance(PlayerCharacterEntity, queueSkillByItem.level, isLeftHandAttacking);
+                        attackFov = queueSkillByItem.skill.GetAttackFov(PlayerCharacterEntity, queueSkillByItem.level, isLeftHandAttacking);
                     }
                     else
                     {

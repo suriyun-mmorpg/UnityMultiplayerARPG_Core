@@ -395,7 +395,7 @@ namespace MultiplayerARPG
 
                     if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                     {
-                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(queueUsingSkill.skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, queueUsingSkill.level) + lockAttackTargetDistance, false, true, false);
+                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(queueUsingSkill.skill.GetAttackDistance(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
                         if (nearestTarget != null)
                         {
                             // Set target, then use skill later when moved nearby target
@@ -446,7 +446,7 @@ namespace MultiplayerARPG
 
                     if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                     {
-                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(queueUsingSkillItem.skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, queueUsingSkillItem.level) + lockAttackTargetDistance, false, true, false);
+                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(queueUsingSkillItem.skill.GetAttackDistance(PlayerCharacterEntity, queueUsingSkillItem.level, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
                         if (nearestTarget != null)
                         {
                             // Set target, then use skill later when moved nearby target
@@ -768,7 +768,7 @@ namespace MultiplayerARPG
                         if (SelectedEntity == null && !(SelectedEntity is BaseCharacterEntity))
                         {
                             // Attacking nearest target
-                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, skillLevel) + lockAttackTargetDistance, false, true, false);
+                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(skill.GetAttackDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
                                 SetTarget(nearestTarget);
                         }
@@ -870,7 +870,7 @@ namespace MultiplayerARPG
                         if (SelectedEntity == null || !(SelectedEntity is BaseCharacterEntity))
                         {
                             // Attacking nearest target
-                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(skill.GetAttackDistance(PlayerCharacterEntity, isLeftHandAttacking, skillLevel) + lockAttackTargetDistance, false, true, false);
+                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(skill.GetAttackDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
                                 SetTarget(nearestTarget);
                         }

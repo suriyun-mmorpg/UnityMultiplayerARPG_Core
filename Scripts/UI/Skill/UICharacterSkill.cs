@@ -242,7 +242,7 @@ namespace MultiplayerARPG
             bool isAttack = Skill != null && Skill.IsAttack();
             if (uiDamageAmount != null)
             {
-                KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount = Skill.GetBaseAttackDamageAmount(Character, false, Level);
+                KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount = Skill.GetBaseAttackDamageAmount(Character, Level, false);
                 if (!isAttack)
                     uiDamageAmount.Hide();
                 else

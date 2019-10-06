@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public float castRadius;
         public IncrementalFloat areaDuration;
         public IncrementalFloat applyDuration;
+        public AreaDamageEntity areaDamageEntity;
         public GameObject targetObjectPrefab;
         public GameEffectCollection hitEffects;
         public DamageIncremental damageAmount;
@@ -44,20 +45,27 @@ namespace MultiplayerARPG
 
         public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
         {
-            // TODO: Spawn area entity
+            // Apply debuff
+            CharacterBuff debuff = CharacterBuff.Empty;
+            if (isDebuff)
+                debuff = CharacterBuff.Create(BuffType.SkillDebuff, DataId, skillLevel);
+            // Spawn area entity
+            // TODO: validate aim position
+            AreaDamageEntity damageEntity = Instantiate(areaDamageEntity, aimPosition, skillUser.GetSummonRotation());
+            damageEntity.Setup(skillUser, weapon, GetAttackDamages(skillUser, skillLevel, isLeftHand), debuff, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
 
-        public override float GetAttackDistance(BaseCharacterEntity skillUser, bool isLeftHand, short skillLevel)
+        public override float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
             return castRadius;
         }
 
-        public override float GetAttackFov(BaseCharacterEntity skillUser, bool isLeftHand, short skillLevel)
+        public override float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
             return 360f;
         }
 
-        public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, bool isLeftHand, short skillLevel)
+        public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
 
@@ -68,7 +76,7 @@ namespace MultiplayerARPG
             // Sum damage with additional damage amounts
             damageAmounts = GameDataHelpers.CombineDamages(
                 damageAmounts,
-                GetBaseAttackDamageAmount(skillUser, isLeftHand, skillLevel));
+                GetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand));
 
             if (increaseDamageWithBuffs)
             {
@@ -81,7 +89,7 @@ namespace MultiplayerARPG
             return damageAmounts;
         }
 
-        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, bool isLeftHand, short skillLevel)
+        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
             return GameDataHelpers.MakeDamage(
                 damageAmount,
