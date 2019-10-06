@@ -71,7 +71,7 @@ namespace MultiplayerARPG
         public abstract GameEffectCollection GetHitEffect();
         public abstract float GetAttackDistance(BaseCharacterEntity skillUser, bool isLeftHand, short skillLevel);
         public abstract float GetAttackFov(BaseCharacterEntity skillUser, bool isLeftHand, short skillLevel);
-        public abstract void GetAttackDamages(ICharacterData skillUser, bool isLeftHand, short skillLevel, out Dictionary<DamageElement, MinMaxFloat> damageAmounts);
+        public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, bool isLeftHand, short skillLevel);
         public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, bool isLeftHand, short skillLevel);
         public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);

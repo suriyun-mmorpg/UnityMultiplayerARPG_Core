@@ -33,6 +33,7 @@ namespace MultiplayerARPG
         public DamageIncremental damageAmount;
         public DamageInflictionIncremental[] weaponDamageInflictions;
         public DamageIncremental[] additionalDamageAmounts;
+        public bool increaseDamageWithBuffs;
         public bool isDebuff;
         public Buff debuff;
 
@@ -293,9 +294,9 @@ namespace MultiplayerARPG
             return skillUser.GetAttackFov(isLeftHand);
         }
 
-        public override void GetAttackDamages(ICharacterData skillUser, bool isLeftHand, short skillLevel, out Dictionary<DamageElement, MinMaxFloat> damageAmounts)
+        public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, bool isLeftHand, short skillLevel)
         {
-            damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+            Dictionary<DamageElement, MinMaxFloat>  damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // If it is attack skill
             if (IsAttack())
             {
@@ -343,11 +344,15 @@ namespace MultiplayerARPG
                             GetAttackAdditionalDamageAmounts(skillUser, skillLevel));
                         break;
                 }
-                // Sum damage with buffs
-                damageAmounts = GameDataHelpers.CombineDamages(
-                    damageAmounts,
-                    skillUser.GetCaches().IncreaseDamages);
+                if (increaseDamageWithBuffs)
+                {
+                    // Sum damage with buffs
+                    damageAmounts = GameDataHelpers.CombineDamages(
+                        damageAmounts,
+                        skillUser.GetCaches().IncreaseDamages);
+                }
             }
+            return damageAmounts;
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, bool isLeftHand, short skillLevel)
@@ -413,7 +418,6 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddDamageInfos(new DamageInfo[] { damageInfo });
             GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { summon.monsterEntity });
             GameInstance.AddMountEntities(new MountEntity[] { mount.mountEntity });
             GameInstance.AddItems(new Item[] { itemCraft.CraftingItem });
