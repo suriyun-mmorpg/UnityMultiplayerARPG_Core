@@ -27,6 +27,8 @@ namespace MultiplayerARPG
             currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             equipWeaponSet.deliveryMethod = DeliveryMethod.ReliableOrdered;
             equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            pitch.deliveryMethod = DeliveryMethod.Sequenced;
+            pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             isHidding.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isHidding.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
@@ -52,6 +54,7 @@ namespace MultiplayerARPG
             currentFood.onChange += OnCurrentFoodChange;
             currentWater.onChange += OnCurrentWaterChange;
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
+            pitch.onChange += OnPitchChange;
             isHidding.onChange += OnIsHiddingChange;
             // On list changes events
             selectableWeaponSets.onOperation += OnSelectableWeaponSetsOperation;
@@ -63,16 +66,10 @@ namespace MultiplayerARPG
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summons.onOperation += OnSummonsOperation;
             // Register Network functions
-            RegisterNetFunction<Vector3>(NetFuncSetAimPosition);
-            RegisterNetFunction(NetFuncUnsetAimPosition);
-            RegisterNetFunction<bool>(NetFuncAttackWithoutAimPosition);
-            RegisterNetFunction<bool, Vector3>(NetFuncAttackWithAimPosition);
-            RegisterNetFunction<int, bool>(NetFuncUseSkillWithoutAimPosition);
-            RegisterNetFunction<int, bool, Vector3>(NetFuncUseSkillWithAimPosition);
-            RegisterNetFunction<bool, byte>(NetFuncPlayAttackWithoutAimPosition);
-            RegisterNetFunction<bool, byte, Vector3>(NetFuncPlayAttackWithAimPosition);
-            RegisterNetFunction<bool, byte, int, short>(NetFuncPlaySkillWithoutAimPosition);
-            RegisterNetFunction<bool, byte, int, short, Vector3>(NetFuncPlaySkillWithAimPosition);
+            RegisterNetFunction<bool, Vector3>(NetFuncAttack);
+            RegisterNetFunction<int, bool, Vector3>(NetFuncUseSkill);
+            RegisterNetFunction<bool, byte, Vector3>(NetFuncPlayAttack);
+            RegisterNetFunction<bool, byte, int, short, Vector3>(NetFuncPlayUseSkill);
             RegisterNetFunction<bool>(NetFuncPlayReload);
             RegisterNetFunction(NetFuncSkillCastingInterrupted);
             RegisterNetFunction<PackedUInt>(NetFuncPickupItem);

@@ -27,6 +27,8 @@ namespace MultiplayerARPG
         protected SyncFieldBool isHidding = new SyncFieldBool();
         [SerializeField]
         protected SyncFieldByte equipWeaponSet = new SyncFieldByte();
+        [SerializeField]
+        protected SyncFieldByte pitch = new SyncFieldByte();
         [Header("Sync Lists")]
         [SerializeField]
         protected SyncListEquipWeapons selectableWeaponSets = new SyncListEquipWeapons();
@@ -56,6 +58,7 @@ namespace MultiplayerARPG
         public System.Action<int> onCurrentFoodChange;
         public System.Action<int> onCurrentWaterChange;
         public System.Action<byte> onEquipWeaponSetChange;
+        public System.Action<byte> onPitchChange;
         public System.Action<bool> onIsHiddingChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
@@ -94,6 +97,7 @@ namespace MultiplayerARPG
             }
         }
         public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
+        public float Pitch { get { return pitch.Value * 100f; } set { pitch.Value = (byte)(value * 0.01f); } }
         public bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
 
         public IList<EquipWeapons> SelectableWeaponSets
@@ -295,6 +299,16 @@ namespace MultiplayerARPG
 
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when pitch changes
+        /// </summary>
+        /// <param name="pitch"></param>
+        protected virtual void OnPitchChange(bool isInitial, byte pitch)
+        {
+            if (onPitchChange != null)
+                onPitchChange.Invoke(pitch);
         }
 
         /// <summary>
