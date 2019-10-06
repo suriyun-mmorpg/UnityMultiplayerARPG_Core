@@ -177,7 +177,6 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
-        public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
         public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
@@ -380,7 +379,6 @@ namespace MultiplayerARPG
             NpcDialogs.Clear();
             Quests.Clear();
             GuildSkills.Clear();
-            DamageEntities.Clear();
             BuildingEntities.Clear();
             CharacterEntities.Clear();
             PlayerCharacterEntities.Clear();
@@ -712,32 +710,7 @@ namespace MultiplayerARPG
                 GuildSkills[guildSkill.DataId] = guildSkill;
             }
         }
-
-        public static void AddDamageInfos(IEnumerable<DamageInfo> damageInfos)
-        {
-            if (damageInfos == null)
-                return;
-            List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
-            foreach (DamageInfo damageInfo in damageInfos)
-            {
-                if (damageInfo.missileDamageEntity != null)
-                    damageEntities.Add(damageInfo.missileDamageEntity);
-            }
-            AddDamageEntities(damageEntities);
-        }
-
-        public static void AddDamageEntities(IEnumerable<BaseDamageEntity> damageEntities)
-        {
-            if (damageEntities == null)
-                return;
-            foreach (BaseDamageEntity damageEntity in damageEntities)
-            {
-                if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.DataId))
-                    continue;
-                DamageEntities[damageEntity.DataId] = damageEntity;
-            }
-        }
-
+        
         public static void AddBuildingEntities(IEnumerable<BuildingEntity> buildingEntities)
         {
             if (buildingEntities == null)

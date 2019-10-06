@@ -55,11 +55,12 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             CharacterBuff debuff,
             BaseSkill skill,
+            short skillLevel,
             float missileDistance,
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            Setup(attacker, weapon, damageAmounts, debuff, skill);
+            Setup(attacker, weapon, damageAmounts, debuff, skill, skillLevel);
             this.missileDistance = missileDistance;
             this.missileSpeed = missileSpeed;
 
@@ -157,7 +158,7 @@ namespace MultiplayerARPG
             if (destroying)
                 return;
 
-            if (attacker == null || attacker.gameObject == other)
+            if (attacker != null && attacker.Entity.gameObject == other)
                 return;
 
             IDamageableEntity target = null;
@@ -198,8 +199,8 @@ namespace MultiplayerARPG
         private bool FindTargetEntity(GameObject other, out IDamageableEntity target)
         {
             target = null;
-            
-            if (attacker == null || attacker.gameObject == other)
+
+            if (attacker != null && attacker.Entity.gameObject == other)
                 return false;
 
             target = other.GetComponent<IDamageableEntity>();

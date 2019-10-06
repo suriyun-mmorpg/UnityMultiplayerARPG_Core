@@ -211,12 +211,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void PrepareRelatesData()
-        {
-            base.PrepareRelatesData();
-            GameInstance.AddDamageInfos(new DamageInfo[] { damageInfo });
-        }
-
         public int RandomExp()
         {
             int min = randomExpMin;

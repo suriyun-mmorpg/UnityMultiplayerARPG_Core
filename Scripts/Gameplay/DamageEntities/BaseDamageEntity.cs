@@ -5,14 +5,12 @@ namespace MultiplayerARPG
 {
     public abstract class BaseDamageEntity : MonoBehaviour
     {
-        public string Id { get { return name; } }
-        public int DataId { get { return BaseGameData.MakeDataId(Id); } }
-
         protected IAttackerEntity attacker;
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> damageAmounts;
         protected CharacterBuff debuff;
         protected BaseSkill skill;
+        protected short skillLevel;
 
         public GameInstance gameInstance
         {
@@ -55,13 +53,15 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             CharacterBuff debuff,
-            BaseSkill skill)
+            BaseSkill skill,
+            short skillLevel)
         {
             this.attacker = attacker;
             this.weapon = weapon;
             this.damageAmounts = damageAmounts;
             this.debuff = debuff;
             this.skill = skill;
+            this.skillLevel = skillLevel;
         }
 
         public virtual void ApplyDamageTo(IDamageableEntity target)
