@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         BuffToNearbyCharacters,
     }
 
-    [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill", order = -4996)]
+    [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Skill", order = -4989)]
     public partial class Skill : BaseSkill
     {
         public SkillType skillType;
@@ -348,13 +348,6 @@ namespace MultiplayerARPG
                     damageAmounts,
                     skillUser.GetCaches().IncreaseDamages);
             }
-        }
-
-        public override Vector3 GetDefaultAimPosition(BaseCharacterEntity skillUser, bool isLeftHand)
-        {
-            // No aim position set, set aim position to forward direction
-            Transform damageTransform = skillUser.GetDamageTransform(GetDamageInfo(skillUser, isLeftHand).damageType, isLeftHand);
-            return damageTransform.position + damageTransform.forward;
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, bool isLeftHand, short skillLevel)

@@ -75,30 +75,8 @@ namespace MultiplayerARPG
         public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, bool isLeftHand, short skillLevel);
         public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
-        public abstract Vector3 GetDefaultAimPosition(BaseCharacterEntity skillUser, bool isLeftHand);
         public abstract bool HasCustomAimControls();
         public abstract Vector3? UpdateAimControls(short skillLevel);
-
-        /// <summary>
-        /// Return TRUE if skill will be applied
-        /// </summary>
-        /// <param name="skillUser"></param>
-        /// <param name="skillLevel"></param>
-        /// <param name="isLeftHand"></param>
-        /// <param name="weapon"></param>
-        /// <param name="damageAmounts"></param>
-        /// <param name="aimPosition"></param>
-        /// <returns></returns>
-        public virtual bool OnPreApplySkill(
-            BaseCharacterEntity skillUser,
-            short skillLevel,
-            bool isLeftHand,
-            CharacterItem weapon,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-            Vector3 aimPosition)
-        {
-            return false;
-        }
 
         /// <summary>
         /// Apply skill
