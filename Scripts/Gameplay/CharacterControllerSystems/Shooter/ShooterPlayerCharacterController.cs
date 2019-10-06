@@ -425,8 +425,7 @@ namespace MultiplayerARPG
                     CurrentBuildingEntity.transform.rotation = Quaternion.LookRotation(direction);
                 }
             }
-            // Set aim position before attack
-            SetAimPosition(aimPosition);
+            // TODO: Set pitch
 
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
@@ -587,7 +586,7 @@ namespace MultiplayerARPG
                         }
                         else if (tempPressAttackRight || tempPressAttackLeft)
                         {
-                            Attack(isLeftHandAttacking);
+                            Attack(isLeftHandAttacking, aimPosition);
                             isDoingAction = true;
                         }
                         else if (tempPressActivate)
@@ -599,11 +598,11 @@ namespace MultiplayerARPG
                     // If skill is not attack skill, use it immediately
                     if (queueSkill.skill != null && !queueSkill.skill.IsAttack())
                     {
-                        UseSkill(false);
+                        UseSkill(isLeftHandAttacking, aimPosition);
                     }
                     else if (queueSkillByItem.skill != null && queueSkillByItem.skill.IsAttack())
                     {
-                        UseSkillItem(false);
+                        UseSkillItem(isLeftHandAttacking, aimPosition);
                     }
                 }
                 else if (tempPressWeaponAbility)
@@ -735,7 +734,7 @@ namespace MultiplayerARPG
                     switch (turningState)
                     {
                         case TurningState.Attack:
-                            Attack(isLeftHandAttacking);
+                            Attack(isLeftHandAttacking, aimPosition);
                             break;
                         case TurningState.Activate:
                             Activate();
@@ -848,14 +847,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetAimPosition(Vector3 aimPosition)
+        public void Attack(bool isLeftHand, Vector3 aimPosition)
         {
-            PlayerCharacterEntity.RequestSetAimPosition(aimPosition);
-        }
-
-        public void Attack(bool isLeftHand)
-        {
-            PlayerCharacterEntity.RequestAttack(isLeftHand);
+            PlayerCharacterEntity.RequestAttack(isLeftHand, aimPosition);
         }
 
         public void ActivateWeaponAbility()
@@ -907,27 +901,11 @@ namespace MultiplayerARPG
                 ActivateBuilding(targetBuilding);
         }
 
-        public void UseSkill(bool isLeftHand)
-        {
-            if (queueSkill.skill == null)
-                return;
-            PlayerCharacterEntity.RequestUseSkill(queueSkill.skill.DataId, isLeftHand);
-            ClearQueueSkill();
-        }
-
         public void UseSkill(bool isLeftHand, Vector3 aimPosition)
         {
             if (queueSkill.skill == null)
                 return;
             PlayerCharacterEntity.RequestUseSkill(queueSkill.skill.DataId, isLeftHand, aimPosition);
-            ClearQueueSkill();
-        }
-
-        public void UseSkillItem(bool isLeftHand)
-        {
-            if (queueSkillItemIndex < 0)
-                return;
-            PlayerCharacterEntity.RequestUseSkillItem((short)queueSkillItemIndex, isLeftHand);
             ClearQueueSkill();
         }
 

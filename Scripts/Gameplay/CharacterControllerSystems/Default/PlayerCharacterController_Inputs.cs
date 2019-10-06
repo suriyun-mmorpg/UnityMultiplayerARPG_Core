@@ -342,7 +342,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // No nearby target, so attack immediately
-                        if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
+                        if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, GetDefaultAttackAimPosition()))
                             isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
@@ -359,7 +359,7 @@ namespace MultiplayerARPG
                         PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking));
                     SelectedEntity = nearestTarget;
                     // Not lock target, so not finding target and attack immediately
-                    if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
+                    if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, GetDefaultAttackAimPosition()))
                         isLeftHandAttacking = !isLeftHandAttacking;
                 }
             }
@@ -404,21 +404,21 @@ namespace MultiplayerARPG
                         else
                         {
                             // No nearby target, so use skill immediately
-                            if (RequestUsePendingSkill(isLeftHandAttacking, null))
+                            if (RequestUsePendingSkill(isLeftHandAttacking))
                                 isLeftHandAttacking = !isLeftHandAttacking;
                         }
                     }
                     else if (!wasdLockAttackTarget)
                     {
                         // Not lock target, so not finding target and use skill immediately
-                        if (RequestUsePendingSkill(isLeftHandAttacking, null))
+                        if (RequestUsePendingSkill(isLeftHandAttacking))
                             isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else
                 {
                     // Not attack skill, so use skill immediately
-                    RequestUsePendingSkill(isLeftHandAttacking, null);
+                    RequestUsePendingSkill(isLeftHandAttacking);
                 }
             }
             else
@@ -455,21 +455,21 @@ namespace MultiplayerARPG
                         else
                         {
                             // No nearby target, so use skill immediately
-                            if (RequestUsePendingSkillItem(isLeftHandAttacking, null))
+                            if (RequestUsePendingSkillItem(isLeftHandAttacking))
                                 isLeftHandAttacking = !isLeftHandAttacking;
                         }
                     }
                     else if (!wasdLockAttackTarget)
                     {
                         // Not lock target, so not finding target and use skill immediately
-                        if (RequestUsePendingSkillItem(isLeftHandAttacking, null))
+                        if (RequestUsePendingSkillItem(isLeftHandAttacking))
                             isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else
                 {
                     // Not attack skill, so use skill immediately
-                    RequestUsePendingSkillItem(isLeftHandAttacking, null);
+                    RequestUsePendingSkillItem(isLeftHandAttacking);
                 }
             }
             else
@@ -545,13 +545,13 @@ namespace MultiplayerARPG
                     {
                         // If has queue using skill, attack by the skill
                         if (queueUsingSkill.skill != null &&
-                            RequestUsePendingSkill(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
+                            RequestUsePendingSkill(isLeftHandAttacking))
                         {
                             // Change attacking hand after attack requested
                             isLeftHandAttacking = !isLeftHandAttacking;
                         }
                         else if (queueUsingSkillItem.skill != null &&
-                            RequestUsePendingSkillItem(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
+                            RequestUsePendingSkillItem(isLeftHandAttacking))
                         {
                             // Change attacking hand after attack requested
                             isLeftHandAttacking = !isLeftHandAttacking;
@@ -753,7 +753,7 @@ namespace MultiplayerARPG
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                SetQueueUsingSkill(aimPosition, skill, skillLevel);
+                SetQueueUsingSkill(aimPosition.Value, skill, skillLevel);
             }
             else
             {
@@ -764,7 +764,7 @@ namespace MultiplayerARPG
                     if (IsLockTarget())
                     {
                         // If attacking any character, will use skill later
-                        SetQueueUsingSkill(aimPosition, skill, skillLevel);
+                        SetQueueUsingSkill(aimPosition.Value, skill, skillLevel);
                         if (SelectedEntity == null && !(SelectedEntity is BaseCharacterEntity))
                         {
                             // Attacking nearest target
@@ -778,7 +778,7 @@ namespace MultiplayerARPG
                         // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking);
+                        PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, GetDefaultAttackAimPosition());
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
@@ -787,7 +787,7 @@ namespace MultiplayerARPG
                     // This is not attack skill, use it immediately
                     destination = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking);
+                    PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, GetDefaultAttackAimPosition());
                 }
             }
         }
@@ -880,7 +880,7 @@ namespace MultiplayerARPG
                         // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking);
+                        PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, GetDefaultAttackAimPosition());
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
@@ -889,7 +889,7 @@ namespace MultiplayerARPG
                     // This is not attack skill, use it immediately
                     destination = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking);
+                    PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, GetDefaultAttackAimPosition());
                 }
             }
         }
