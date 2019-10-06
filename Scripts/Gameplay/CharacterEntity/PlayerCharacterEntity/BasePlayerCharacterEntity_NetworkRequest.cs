@@ -75,20 +75,12 @@ namespace MultiplayerARPG
 
             return true;
         }
-
-        public bool RequestUseSkillItem(short index, bool isLeftHand)
-        {
-            if (!ValidateRequestUseSKillItem(index, isLeftHand))
-                return false;
-            CallNetFunction(NetFuncUseSkillItemWithoutAimPosition, FunctionReceivers.Server, index, isLeftHand);
-            return true;
-        }
-
+        
         public bool RequestUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
         {
             if (!ValidateRequestUseSKillItem(index, isLeftHand))
                 return false;
-            CallNetFunction(NetFuncUseSkillItemWithAimPosition, FunctionReceivers.Server, index, isLeftHand, aimPosition);
+            CallNetFunction(NetFuncUseSkillItem, FunctionReceivers.Server, index, isLeftHand, aimPosition);
             return true;
         }
 

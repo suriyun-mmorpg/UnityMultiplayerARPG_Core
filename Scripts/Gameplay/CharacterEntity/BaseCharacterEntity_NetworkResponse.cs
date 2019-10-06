@@ -10,57 +10,15 @@ namespace MultiplayerARPG
         public System.Action onRespawn;
         public System.Action onLevelUp;
 
-        protected void NetFuncSetAimPosition(Vector3 aimPosition)
-        {
-            HasAimPosition = true;
-            AimPosition = aimPosition;
-        }
-
-        protected void NetFuncUnsetAimPosition()
-        {
-            HasAimPosition = false;
-            AimPosition = Vector3.zero;
-        }
-
-        protected void NetFuncAttackWithoutAimPosition(bool isLeftHand)
-        {
-            NetFuncAttack(isLeftHand, false, Vector3.zero);
-        }
-
-        protected void NetFuncAttackWithAimPosition(bool isLeftHand, Vector3 aimPosition)
-        {
-            NetFuncAttack(isLeftHand, true, aimPosition);
-        }
-
-        protected void NetFuncUseSkillWithoutAimPosition(int dataId, bool isLeftHand)
-        {
-            NetFuncUseSkill(dataId, isLeftHand, false, Vector3.zero);
-        }
-
-        protected void NetFuncUseSkillWithAimPosition(int dataId, bool isLeftHand, Vector3 aimPosition)
-        {
-            NetFuncUseSkill(dataId, isLeftHand, true, aimPosition);
-        }
-
-        protected void NetFuncPlayAttackWithoutAimPosition(bool isLeftHand, byte animationIndex)
+        protected void NetFuncPlayAttack(bool isLeftHand, byte animationIndex, Vector3 aimPosition)
         {
             StartCoroutine(AttackRoutine(
                 isLeftHand,
                 animationIndex,
-                false,
-                Vector3.zero));
-        }
-
-        protected void NetFuncPlayAttackWithAimPosition(bool isLeftHand, byte animationIndex, Vector3 aimPosition)
-        {
-            StartCoroutine(AttackRoutine(
-                isLeftHand,
-                animationIndex,
-                true,
                 aimPosition));
         }
 
-        protected void NetFuncPlaySkillWithoutAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
+        protected void NetFuncPlayUseSkill(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
         {
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel >= 1)
@@ -70,27 +28,6 @@ namespace MultiplayerARPG
                     animationIndex,
                     skill,
                     skillLevel,
-                    false,
-                    Vector3.zero));
-            }
-            else
-            {
-                animActionType = AnimActionType.None;
-                isAttackingOrUsingSkill = false;
-            }
-        }
-
-        protected void NetFuncPlaySkillWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
-        {
-            BaseSkill skill;
-            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel >= 1)
-            {
-                StartCoroutine(UseSkillRoutine(
-                    isLeftHand,
-                    animationIndex,
-                    skill,
-                    skillLevel,
-                    true,
                     aimPosition));
             }
             else

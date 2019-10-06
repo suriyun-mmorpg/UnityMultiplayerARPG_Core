@@ -188,7 +188,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected virtual void NetFuncAttack(bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void NetFuncAttack(bool isLeftHand, Vector3 aimPosition)
         {
             if (!CanAttack())
                 return;
@@ -217,25 +217,15 @@ namespace MultiplayerARPG
             // Validate ammo
             if (!ValidateAmmo(weapon))
                 return;
-
-            // If no aim position set with attack function get aim position which set from client-controller if existed
-            if (!hasAimPosition && HasAimPosition)
-            {
-                hasAimPosition = true;
-                aimPosition = AimPosition;
-            }
-
+            
             // Start attack routine
             isAttackingOrUsingSkill = true;
 
             // Play animations
-            if (hasAimPosition)
-                RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex, aimPosition);
-            else
-                RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex);
+            RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex, aimPosition);
         }
 
-        protected IEnumerator AttackRoutine(bool isLeftHand, byte animationIndex, bool hasAimPosition, Vector3 aimPosition)
+        protected IEnumerator AttackRoutine(bool isLeftHand, byte animationIndex, Vector3 aimPosition)
         {
             // Prepare requires data and get weapon data
             int animationDataId;
@@ -290,13 +280,6 @@ namespace MultiplayerARPG
                 CharacterModel.PlayWeaponLaunchEffect(animActionType);
             }
 
-            if (!hasAimPosition)
-            {
-                // No aim position set, set aim position to forward direction
-                Transform damageTransform = GetDamageTransform(damageInfo.damageType, isLeftHand);
-                aimPosition = damageTransform.position + damageTransform.forward;
-            }
-
             // Call on attack to extend attack functionality while attacking
             bool overrideDefaultAttack = false;
             foreach (CharacterSkill characterSkill in Skills)
@@ -320,7 +303,6 @@ namespace MultiplayerARPG
                     weapon,
                     damageInfo,
                     damageAmounts,
-                    hasAimPosition,
                     aimPosition);
             }
 
@@ -332,7 +314,7 @@ namespace MultiplayerARPG
             isAttackingOrUsingSkill = false;
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
         {
             // Increase damage with ammo damage
             if (IsServer)

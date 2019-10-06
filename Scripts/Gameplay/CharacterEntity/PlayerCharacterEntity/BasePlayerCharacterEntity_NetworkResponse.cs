@@ -30,16 +30,6 @@ namespace MultiplayerARPG
             SetTargetEntity(tempEntity);
         }
 
-        protected void NetFuncUseSkillItemWithoutAimPosition(short itemIndex, bool isLeftHand)
-        {
-            NetFuncUseSkillItem(itemIndex, isLeftHand, false, Vector3.zero);
-        }
-
-        protected void NetFuncUseSkillItemWithAimPosition(short itemIndex, bool isLeftHand, Vector3 aimPosition)
-        {
-            NetFuncUseSkillItem(itemIndex, isLeftHand, true, aimPosition);
-        }
-
         protected void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (!CanDoActions() ||

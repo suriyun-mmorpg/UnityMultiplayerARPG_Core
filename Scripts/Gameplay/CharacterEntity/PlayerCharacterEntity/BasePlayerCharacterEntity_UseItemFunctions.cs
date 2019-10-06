@@ -10,7 +10,6 @@ namespace MultiplayerARPG
         /// This function will be called at server to order character to use item
         /// </summary>
         /// <param name="itemIndex"></param>
-        /// <param name="hasAimPosition"></param>
         /// <param name="aimPosition"></param>
         protected void NetFuncUseItem(short itemIndex)
         {
@@ -59,9 +58,8 @@ namespace MultiplayerARPG
         /// This function will be called at server to order character to use item
         /// </summary>
         /// <param name="itemIndex"></param>
-        /// <param name="hasAimPosition"></param>
         /// <param name="aimPosition"></param>
-        protected void NetFuncUseSkillItem(short itemIndex, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
+        protected void NetFuncUseSkillItem(short itemIndex, bool isLeftHand, Vector3 aimPosition)
         {
             if (!CanUseItem() || !CanUseSkill())
                 return;
@@ -77,7 +75,7 @@ namespace MultiplayerARPG
             // Use skill reset
             tempItem = characterItem.GetSkillItem();
             if (tempItem != null)
-                UseItemSkill(itemIndex, tempItem, isLeftHand, hasAimPosition, aimPosition);
+                UseItemSkill(itemIndex, tempItem, isLeftHand, aimPosition);
         }
 
         protected void UseItemPotion(short itemIndex, Item item, short level)
@@ -208,7 +206,7 @@ namespace MultiplayerARPG
             SkillPoint += countSkillPoint;
         }
 
-        protected void UseItemSkill(short itemIndex, Item item, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
+        protected void UseItemSkill(short itemIndex, Item item, bool isLeftHand, Vector3 aimPosition)
         {
             if (!CanUseItem() || !CanUseSkill() || item == null || item.skillLevel.skill == null || !this.DecreaseItemsByIndex(itemIndex, 1))
                 return;
@@ -242,21 +240,11 @@ namespace MultiplayerARPG
                 out triggerDuration,
                 out totalDuration);
 
-            // TODO: some skill type will not able to change aim position by controller
-            if (!hasAimPosition && HasAimPosition)
-            {
-                hasAimPosition = true;
-                aimPosition = AimPosition;
-            }
-
             // Start use skill routine
             isAttackingOrUsingSkill = true;
 
             // Play animations
-            if (hasAimPosition)
-                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, level, aimPosition);
-            else
-                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, level);
+            RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, level, aimPosition);
         }
     }
 }

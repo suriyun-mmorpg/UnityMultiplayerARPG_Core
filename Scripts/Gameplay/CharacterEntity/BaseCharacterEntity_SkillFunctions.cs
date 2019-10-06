@@ -58,9 +58,8 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="dataId"></param>
         /// <param name="isLeftHand"></param>
-        /// <param name="hasAimPosition"></param>
         /// <param name="aimPosition"></param>
-        protected virtual void NetFuncUseSkill(int dataId, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void NetFuncUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
             if (!CanUseSkill())
                 return;
@@ -100,22 +99,12 @@ namespace MultiplayerARPG
                 out animationIndex,
                 out triggerDuration,
                 out totalDuration);
-
-            // TODO: some skill type will not able to change aim position by controller
-            if (!hasAimPosition && HasAimPosition)
-            {
-                hasAimPosition = true;
-                aimPosition = AimPosition;
-            }
             
             // Start use skill routine
             isAttackingOrUsingSkill = true;
 
             // Play animations
-            if (hasAimPosition)
-                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition);
-            else
-                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel);
+            RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition);
         }
 
         /// <summary>
@@ -132,7 +121,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected IEnumerator UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, bool hasAimPosition, Vector3 aimPosition)
+        protected IEnumerator UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3 aimPosition)
         {
             // Update skill usage states at server only
             if (IsServer)
@@ -211,19 +200,12 @@ namespace MultiplayerARPG
                 if (IsClient)
                     CharacterModel.PlayWeaponLaunchEffect(animActionType);
 
-                if (!hasAimPosition)
-                    aimPosition = skill.GetDefaultAimPosition(this, isLeftHand);
+                // Trigger skill event
+                if (onUseSkillRoutine != null)
+                    onUseSkillRoutine.Invoke(skill, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
 
-                // Skip use skill function when using skill will override default skill functionality
-                if (!skill.OnPreApplySkill(this, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition))
-                {
-                    // Trigger skill event
-                    if (onUseSkillRoutine != null)
-                        onUseSkillRoutine.Invoke(skill, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
-
-                    // Apply skill buffs, summons and attack damages
-                    skill.ApplySkill(this, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
-                }
+                // Apply skill buffs, summons and attack damages
+                skill.ApplySkill(this, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
 
                 // Wait until animation ends to stop actions
                 yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) * playSpeedMultiplier);
