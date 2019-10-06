@@ -103,8 +103,6 @@ namespace MultiplayerARPG
         public override sealed float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / this.GetCaches().BaseMoveSpeed; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
-        public bool HasAimPosition { get; protected set; }
-        public Vector3 AimPosition { get; protected set; }
 
         private CharacterModelManager modelManager;
         public CharacterModelManager ModelManager
@@ -362,7 +360,7 @@ namespace MultiplayerARPG
             direction = aimPosition + forwardStagger - position;
             rotation = Quaternion.LookRotation(direction);
         }
-
+        
         public Transform GetDamageTransform(DamageType damageType, bool isLeftHand)
         {
             Transform transform = null;
@@ -775,7 +773,6 @@ namespace MultiplayerARPG
         /// <param name="damageInfo"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="debuff"></param>
-        /// <param name="hasAimPosition"></param>
         /// <param name="aimPosition"></param>
         /// <param name="stagger"></param>
         public virtual void LaunchDamageEntity(
