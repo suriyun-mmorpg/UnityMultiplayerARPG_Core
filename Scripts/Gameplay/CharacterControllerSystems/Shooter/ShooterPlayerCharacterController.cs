@@ -181,7 +181,7 @@ namespace MultiplayerARPG
             IsBlockController = CacheUISceneGameplay.IsBlockController();
             // Lock cursor when not show UIs
 
-            if (Application.isMobilePlatform || gameInstance.useMobileInEditor)
+            if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
             {
                 // Control camera by touch-screen
                 Cursor.lockState = CursorLockMode.None;
