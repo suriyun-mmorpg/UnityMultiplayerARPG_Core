@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("hotkeyMovementJoyStick")]
         public MobileMovementJoystick hotkeyAimJoyStick;
         public RectTransform hotkeyCancelArea;
-        private UICharacterHotkey usingHotkey;
+        public static UICharacterHotkey UsingHotkey { get; private set; }
         private Vector2 hotkeyAxes;
         private Vector3? hotkeyAimPosition;
         private CanvasGroup hotkeyAimJoyStickGroup;
@@ -152,19 +152,19 @@ namespace MultiplayerARPG
                 hotkeyAimJoyStick.transform.position = hotkey.transform.position;
             }
 
-            usingHotkey = hotkey;
+            UsingHotkey = hotkey;
         }
 
         private void UpdateHotkeyPCInputs()
         {
-            if (usingHotkey == null)
+            if (UsingHotkey == null)
                 return;
 
-            Vector3? aimPosition = usingHotkey.UpdateAimAxes(Vector2.zero);
+            Vector3? aimPosition = UsingHotkey.UpdateAimAxes(Vector2.zero);
             if (Input.GetMouseButtonDown(0))
             {
-                usingHotkey.Use(aimPosition);
-                usingHotkey = null;
+                UsingHotkey.Use(aimPosition);
+                UsingHotkey = null;
             }
         }
 
@@ -181,12 +181,12 @@ namespace MultiplayerARPG
                 hotkeyCancelAreaGroup.alpha = hotkeyStartDragged ? 1 : 0;
 
             if (hotkeyAimJoyStick != null)
-                hotkeyAimJoyStick.gameObject.SetActive(usingHotkey != null);
+                hotkeyAimJoyStick.gameObject.SetActive(UsingHotkey != null);
 
             if (hotkeyCancelArea != null)
-                hotkeyCancelArea.gameObject.SetActive(usingHotkey != null);
+                hotkeyCancelArea.gameObject.SetActive(UsingHotkey != null);
 
-            if (usingHotkey == null)
+            if (UsingHotkey == null)
                 return;
 
             hotkeyAxes = new Vector2(InputManager.GetAxis(HOTKEY_AXIS_X, false), InputManager.GetAxis(HOTKEY_AXIS_Y, false));
@@ -209,7 +209,7 @@ namespace MultiplayerARPG
 
             if (hotkeyStartDragged && hotkeyAimJoyStick.IsDragging)
             {
-                hotkeyAimPosition = usingHotkey.UpdateAimAxes(hotkeyAxes);
+                hotkeyAimPosition = UsingHotkey.UpdateAimAxes(hotkeyAxes);
             }
 
             if (hotkeyStartDragged && !hotkeyAimJoyStick.IsDragging)
@@ -217,9 +217,9 @@ namespace MultiplayerARPG
                 if (!hotkeyCancel)
                 {
                     // Use hotkey
-                    usingHotkey.Use(hotkeyAimPosition);
+                    UsingHotkey.Use(hotkeyAimPosition);
                 }
-                usingHotkey = null;
+                UsingHotkey = null;
                 hotkeyStartDragged = false;
             }
         }
