@@ -53,6 +53,12 @@ namespace MultiplayerARPG
             this.applyDuration = applyDuration;
         }
 
+        private void OnDestroy()
+        {
+            if (onDestroy != null)
+                onDestroy.Invoke();
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             TriggerEnter(other.gameObject);
@@ -67,11 +73,11 @@ namespace MultiplayerARPG
         {
             if (attacker != null && attacker.Entity.gameObject == other)
                 return;
-
+            
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
-            if (target == null || target.Entity == attacker.Entity)
+            if (target == null)
                 return;
-
+            
             if (receivingDamageEntities.ContainsKey(target.ObjectId))
                 return;
 
@@ -94,7 +100,7 @@ namespace MultiplayerARPG
                 return;
 
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
-            if (target == null || target.Entity == attacker.Entity)
+            if (target == null)
                 return;
 
             if (!receivingDamageEntities.ContainsKey(target.ObjectId))

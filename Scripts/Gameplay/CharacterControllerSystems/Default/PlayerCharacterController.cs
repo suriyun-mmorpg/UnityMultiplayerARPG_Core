@@ -15,10 +15,10 @@ namespace MultiplayerARPG
 
         public struct UsingSkillData
         {
-            public Vector3? aimPosition;
+            public Vector3 aimPosition;
             public BaseSkill skill;
             public short level;
-            public UsingSkillData(Vector3? aimPosition, BaseSkill skill, short level)
+            public UsingSkillData(Vector3 aimPosition, BaseSkill skill, short level)
             {
                 this.aimPosition = aimPosition;
                 this.skill = skill;
@@ -28,11 +28,11 @@ namespace MultiplayerARPG
 
         public struct UsingSkillItemData
         {
-            public Vector3? aimPosition;
+            public Vector3 aimPosition;
             public short itemIndex;
             public BaseSkill skill;
             public short level;
-            public UsingSkillItemData(Vector3? aimPosition, short itemIndex, BaseSkill skill, short level)
+            public UsingSkillItemData(Vector3 aimPosition, short itemIndex, BaseSkill skill, short level)
             {
                 this.aimPosition = aimPosition;
                 this.itemIndex = itemIndex;
@@ -330,7 +330,7 @@ namespace MultiplayerARPG
             if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseSkill())
             {
                 BaseSkill skill = queueUsingSkill.skill;
-                Vector3 aimPosition = queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition();
+                Vector3 aimPosition = queueUsingSkill.aimPosition;
                 ClearQueueUsingSkill();
                 return PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHand, aimPosition);
             }
@@ -342,19 +342,19 @@ namespace MultiplayerARPG
             if (queueUsingSkillItem.skill != null && PlayerCharacterEntity.CanUseItem() && PlayerCharacterEntity.CanUseSkill())
             {
                 short itemIndex = queueUsingSkillItem.itemIndex;
-                Vector3 aimPosition = queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition();
+                Vector3 aimPosition = queueUsingSkillItem.aimPosition;
                 ClearQueueUsingSkillItem();
                 return PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHand, aimPosition);
             }
             return false;
         }
 
-        public void SetQueueUsingSkill(Vector3? aimPosition, BaseSkill skill, short level)
+        public void SetQueueUsingSkill(Vector3 aimPosition, BaseSkill skill, short level)
         {
             queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
         }
 
-        public void SetQueueUsingSkillItem(Vector3? aimPosition, short itemIndex, BaseSkill skill, short level)
+        public void SetQueueUsingSkillItem(Vector3 aimPosition, short itemIndex, BaseSkill skill, short level)
         {
             queueUsingSkillItem = new UsingSkillItemData(aimPosition, itemIndex, skill, level);
         }

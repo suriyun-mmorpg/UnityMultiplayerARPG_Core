@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public Vector3? UpdateAimAxes(Vector2 axes)
+        public Vector3? UpdateAimControls(Vector2 axes)
         {
             if (hotkeySkill != null && hotkeySkillLevel > 0 &&
                 hotkeySkill.GetSkillType() == SkillType.Active &&
@@ -148,6 +148,12 @@ namespace MultiplayerARPG
                 return hotkeySkill.UpdateAimControls(axes, hotkeySkillLevel);
             }
             return null;
+        }
+
+        public void FinishAimControls()
+        {
+            if (hotkeySkill != null)
+                hotkeySkill.FinishAimControls();
         }
 
         public void OnClickAssign()

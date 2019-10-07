@@ -415,6 +415,11 @@ namespace MultiplayerARPG
             return null;
         }
 
+        public override void FinishAimControls()
+        {
+            // Do nothing
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();

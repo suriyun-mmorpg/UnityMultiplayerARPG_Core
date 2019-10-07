@@ -53,5 +53,11 @@ namespace MultiplayerARPG
                 return AreaSkillControls.UpdateAimControls_Shooter(aimAxes, this, skillLevel, CacheTargetObject);
             return BasePlayerCharacterController.OwningCharacter.CacheTransform.position;
         }
+
+        public override void FinishAimControls()
+        {
+            if (CacheTargetObject != null)
+                CacheTargetObject.SetActive(false);
+        }
     }
 }

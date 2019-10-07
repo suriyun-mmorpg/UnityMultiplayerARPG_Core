@@ -19,8 +19,8 @@ namespace MultiplayerARPG
         public MobileMovementJoystick hotkeyAimJoyStick;
         public RectTransform hotkeyCancelArea;
         public static UICharacterHotkey UsingHotkey { get; private set; }
+        public static Vector3? HotkeyAimPosition { get; private set; }
         private Vector2 hotkeyAxes;
-        private Vector3? hotkeyAimPosition;
         private CanvasGroup hotkeyAimJoyStickGroup;
         private CanvasGroup hotkeyCancelAreaGroup;
         public bool hotkeyCancel { get; private set; }
@@ -160,11 +160,13 @@ namespace MultiplayerARPG
             if (UsingHotkey == null)
                 return;
 
-            Vector3? aimPosition = UsingHotkey.UpdateAimAxes(Vector2.zero);
+            HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
             if (Input.GetMouseButtonDown(0))
             {
-                UsingHotkey.Use(aimPosition);
+                UsingHotkey.FinishAimControls();
+                UsingHotkey.Use(HotkeyAimPosition);
                 UsingHotkey = null;
+                HotkeyAimPosition = null;
             }
         }
 
@@ -191,7 +193,6 @@ namespace MultiplayerARPG
 
             hotkeyAxes = new Vector2(InputManager.GetAxis(HOTKEY_AXIS_X, false), InputManager.GetAxis(HOTKEY_AXIS_Y, false));
             hotkeyCancel = false;
-            hotkeyAimPosition = null;
 
             if (hotkeyCancelArea != null)
             {
@@ -209,18 +210,20 @@ namespace MultiplayerARPG
 
             if (hotkeyStartDragged && hotkeyAimJoyStick.IsDragging)
             {
-                hotkeyAimPosition = UsingHotkey.UpdateAimAxes(hotkeyAxes);
+                HotkeyAimPosition = UsingHotkey.UpdateAimControls(hotkeyAxes);
             }
 
             if (hotkeyStartDragged && !hotkeyAimJoyStick.IsDragging)
             {
+                UsingHotkey.FinishAimControls();
                 if (!hotkeyCancel)
                 {
                     // Use hotkey
-                    UsingHotkey.Use(hotkeyAimPosition);
+                    UsingHotkey.Use(HotkeyAimPosition);
                 }
                 UsingHotkey = null;
                 hotkeyStartDragged = false;
+                HotkeyAimPosition = null;
             }
         }
         #endregion

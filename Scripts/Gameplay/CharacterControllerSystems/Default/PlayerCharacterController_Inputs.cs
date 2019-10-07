@@ -749,6 +749,9 @@ namespace MultiplayerARPG
                 !PlayerCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return;
 
+            if (!aimPosition.HasValue)
+                aimPosition = GetDefaultAttackAimPosition();
+
             BaseCharacterEntity attackingCharacter;
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
@@ -761,7 +764,7 @@ namespace MultiplayerARPG
                 if (skill.IsAttack())
                 {
                     // Default damage type attacks
-                    if (IsLockTarget())
+                    if (IsLockTarget() && !skill.HasCustomAimControls())
                     {
                         // If attacking any character, will use skill later
                         SetQueueUsingSkill(aimPosition.Value, skill, skillLevel);
@@ -778,7 +781,7 @@ namespace MultiplayerARPG
                         // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, GetDefaultAttackAimPosition());
+                        PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, aimPosition.Value);
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
@@ -787,7 +790,7 @@ namespace MultiplayerARPG
                     // This is not attack skill, use it immediately
                     destination = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, GetDefaultAttackAimPosition());
+                    PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, aimPosition.Value);
                 }
             }
         }
@@ -852,21 +855,24 @@ namespace MultiplayerARPG
             if (skill == null)
                 return;
 
+            if (!aimPosition.HasValue)
+                aimPosition = GetDefaultAttackAimPosition();
+
             BaseCharacterEntity attackingCharacter;
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                SetQueueUsingSkillItem(aimPosition, itemIndex, skill, skillLevel);
+                SetQueueUsingSkillItem(aimPosition.Value, itemIndex, skill, skillLevel);
             }
             else
             {
                 // If not attacking any character, use skill immediately
                 if (skill.IsAttack())
                 {
-                    if (IsLockTarget())
+                    if (IsLockTarget() && !skill.HasCustomAimControls())
                     {
                         // If attacking any character, will use skill later
-                        SetQueueUsingSkillItem(aimPosition, itemIndex, skill, skillLevel);
+                        SetQueueUsingSkillItem(aimPosition.Value, itemIndex, skill, skillLevel);
                         if (SelectedEntity == null || !(SelectedEntity is BaseCharacterEntity))
                         {
                             // Attacking nearest target
@@ -880,7 +886,7 @@ namespace MultiplayerARPG
                         // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, GetDefaultAttackAimPosition());
+                        PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, aimPosition.Value);
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
@@ -889,7 +895,7 @@ namespace MultiplayerARPG
                     // This is not attack skill, use it immediately
                     destination = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, GetDefaultAttackAimPosition());
+                    PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, aimPosition.Value);
                 }
             }
         }

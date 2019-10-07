@@ -66,7 +66,7 @@ namespace MultiplayerARPG
 
         public virtual void ApplyDamageTo(IDamageableEntity target)
         {
-            if (target == null)
+            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
                 return;
             if (IsServer)
                 target.ReceiveDamage(attacker, weapon, damageAmounts, debuff);

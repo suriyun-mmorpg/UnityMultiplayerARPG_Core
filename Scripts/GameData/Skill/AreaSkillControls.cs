@@ -7,9 +7,7 @@ namespace MultiplayerARPG
     public class AreaSkillControls
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
-
-        public static PlayerCharacterController Controller { get { return BasePlayerCharacterController.Singleton as PlayerCharacterController; } }
-        public static ShooterPlayerCharacterController ShooterController { get { return BasePlayerCharacterController.Singleton as ShooterPlayerCharacterController; } }
+        
         public static bool IsMobile { get { return InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform; } }
 
         public static Vector3? UpdateAimControls(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
@@ -29,15 +27,20 @@ namespace MultiplayerARPG
         public static Vector3? UpdateAimControls_PC(Vector3 cursorPosition, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
         {
             Vector3 position = CursorWorldPosition(cursorPosition);
-            position = ValidateDistance(Controller.PlayerCharacterEntity.CacheTransform.position, position, skill.castDistance.GetAmount(skillLevel));
+            position = ValidateDistance(BasePlayerCharacterController.Singleton.PlayerCharacterEntity.CacheTransform.position, position, skill.castDistance.GetAmount(skillLevel));
             position = FindGround(position);
+            if (targetObject != null)
+            {
+                targetObject.SetActive(true);
+                targetObject.transform.position = position;
+            }
             return position;
         }
 
         public static Vector3? UpdateAimControls_Mobile(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
-            Vector3 position = ShooterController.PlayerCharacterEntity.CacheTransform.position + GetDirection(aimAxes.x, aimAxes.y) * castDistance;
+            Vector3 position = BasePlayerCharacterController.Singleton.PlayerCharacterEntity.CacheTransform.position + GetDirection(aimAxes.x, aimAxes.y) * castDistance;
             position = FindGround(position);
             if (targetObject != null)
             {
