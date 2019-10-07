@@ -131,6 +131,10 @@ namespace MultiplayerARPG
             if (CurrentBuildingEntity != null)
                 return;
 
+            // If it's aiming skills, not allow point click movement
+            if (UICharacterHotkeys.UsingHotkey != null)
+                return;
+
             getMouseDown = Input.GetMouseButtonDown(0);
             getMouseUp = Input.GetMouseButtonUp(0);
             getMouse = Input.GetMouseButton(0);
