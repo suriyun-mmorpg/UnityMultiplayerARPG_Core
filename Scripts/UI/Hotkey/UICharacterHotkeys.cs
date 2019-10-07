@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("hotkeyMovementJoyStick")]
         public MobileMovementJoystick hotkeyAimJoyStick;
         public RectTransform hotkeyCancelArea;
-        private UICharacterHotkey draggingHotkey;
+        private UICharacterHotkey usingHotkey;
         private Vector2 hotkeyAxes;
         private Vector3? hotkeyAimPosition;
         private CanvasGroup hotkeyAimJoyStickGroup;
@@ -102,7 +102,10 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            UpdateHotkeyInputs();
+            if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
+                UpdateHotkeyMobileInputs();
+            else
+                UpdateHotkeyPCInputs();
         }
 
         public override void Hide()
@@ -132,19 +135,40 @@ namespace MultiplayerARPG
         }
 
         #region Mobile Controls
-        public void EnableHotkeyJoystick(UICharacterHotkey hotkey)
+        public void SetUsingHotkey(UICharacterHotkey hotkey)
         {
-            if (hotkey == null || hotkeyStartDragged)
+            if (hotkey == null)
                 return;
-            // Set axis and key
-            hotkeyAimJoyStick.axisXName = HOTKEY_AXIS_X;
-            hotkeyAimJoyStick.axisYName = HOTKEY_AXIS_Y;
-            draggingHotkey = hotkey;
-            // Set joystick position to the same position with hotkey button
-            hotkeyAimJoyStick.transform.position = hotkey.transform.position;
+
+            if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
+            {
+                // Setup for mobile inputs
+                if (hotkeyStartDragged)
+                    return;
+                // Set axis and key
+                hotkeyAimJoyStick.axisXName = HOTKEY_AXIS_X;
+                hotkeyAimJoyStick.axisYName = HOTKEY_AXIS_Y;
+                // Set joystick position to the same position with hotkey button
+                hotkeyAimJoyStick.transform.position = hotkey.transform.position;
+            }
+
+            usingHotkey = hotkey;
         }
 
-        private void UpdateHotkeyInputs()
+        private void UpdateHotkeyPCInputs()
+        {
+            if (usingHotkey == null)
+                return;
+
+            Vector3? aimPosition = usingHotkey.UpdateAimAxes(Vector2.zero);
+            if (Input.GetMouseButtonDown(0))
+            {
+                usingHotkey.Use(aimPosition);
+                usingHotkey = null;
+            }
+        }
+
+        private void UpdateHotkeyMobileInputs()
         {
             // No joy stick set, return
             if (hotkeyAimJoyStick == null)
@@ -157,12 +181,12 @@ namespace MultiplayerARPG
                 hotkeyCancelAreaGroup.alpha = hotkeyStartDragged ? 1 : 0;
 
             if (hotkeyAimJoyStick != null)
-                hotkeyAimJoyStick.gameObject.SetActive(draggingHotkey != null);
+                hotkeyAimJoyStick.gameObject.SetActive(usingHotkey != null);
 
             if (hotkeyCancelArea != null)
-                hotkeyCancelArea.gameObject.SetActive(draggingHotkey != null);
+                hotkeyCancelArea.gameObject.SetActive(usingHotkey != null);
 
-            if (draggingHotkey == null)
+            if (usingHotkey == null)
                 return;
 
             hotkeyAxes = new Vector2(InputManager.GetAxis(HOTKEY_AXIS_X, false), InputManager.GetAxis(HOTKEY_AXIS_Y, false));
@@ -185,7 +209,7 @@ namespace MultiplayerARPG
 
             if (hotkeyStartDragged && hotkeyAimJoyStick.IsDragging)
             {
-                hotkeyAimPosition = draggingHotkey.UpdateAimAxes(hotkeyAxes);
+                hotkeyAimPosition = usingHotkey.UpdateAimAxes(hotkeyAxes);
             }
 
             if (hotkeyStartDragged && !hotkeyAimJoyStick.IsDragging)
@@ -193,9 +217,9 @@ namespace MultiplayerARPG
                 if (!hotkeyCancel)
                 {
                     // Use hotkey
-                    draggingHotkey.OnClickUse(hotkeyAimPosition);
+                    usingHotkey.Use(hotkeyAimPosition);
                 }
-                draggingHotkey = null;
+                usingHotkey = null;
                 hotkeyStartDragged = false;
             }
         }

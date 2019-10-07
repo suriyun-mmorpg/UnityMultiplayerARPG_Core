@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public Vector3? UpdateAimAxes(Vector3 axes)
+        public Vector3? UpdateAimAxes(Vector2 axes)
         {
             if (hotkeySkill != null && hotkeySkillLevel > 0 &&
                 hotkeySkill.GetSkillType() == SkillType.Active &&
@@ -161,10 +161,19 @@ namespace MultiplayerARPG
 
         public void OnClickUse()
         {
-            OnClickUse(null);
+            if (hotkeySkill != null && hotkeySkillLevel > 0 &&
+                hotkeySkill.GetSkillType() == SkillType.Active &&
+                hotkeySkill.HasCustomAimControls())
+            {
+                uiCharacterHotkeys.SetUsingHotkey(this);
+            }
+            else
+            {
+                Use(null);
+            }
         }
 
-        public void OnClickUse(Vector3? aimPosition)
+        public void Use(Vector3? aimPosition)
         {
             if (BasePlayerCharacterController.Singleton != null)
                 BasePlayerCharacterController.Singleton.UseHotkey(indexOfData, aimPosition);

@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
         public abstract bool HasCustomAimControls();
-        public abstract Vector3? UpdateAimControls(Vector3 aimAxes, short skillLevel);
+        public abstract Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel);
 
         /// <summary>
         /// Apply skill

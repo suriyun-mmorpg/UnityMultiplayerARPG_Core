@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public abstract class BaseAreaSkill : BaseSkill
     {
-        public float castDistance;
+        public IncrementalFloat castDistance;
         public IncrementalFloat areaDuration;
         public IncrementalFloat applyDuration;
         public GameObject targetObjectPrefab;
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
 
         public override float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
-            return castDistance;
+            return castDistance.GetAmount(skillLevel);
         }
 
         public override float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override Vector3? UpdateAimControls(Vector3 aimAxes, short skillLevel)
+        public override Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel)
         {
             if (BasePlayerCharacterController.Singleton is PlayerCharacterController)
                 return AreaSkillControls.UpdateAimControls(aimAxes, this, skillLevel, CacheTargetObject);

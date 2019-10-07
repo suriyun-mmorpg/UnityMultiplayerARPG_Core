@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (CacheUiCharacterHotkey.uiCharacterHotkeys != null)
-                CacheUiCharacterHotkey.uiCharacterHotkeys.EnableHotkeyJoystick(CacheUiCharacterHotkey);
+                CacheUiCharacterHotkey.uiCharacterHotkeys.SetUsingHotkey(CacheUiCharacterHotkey);
         }
     }
 }
