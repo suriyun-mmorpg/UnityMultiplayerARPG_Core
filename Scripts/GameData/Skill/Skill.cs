@@ -410,7 +410,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override Vector3? UpdateAimControls(short skillLevel)
+        public override Vector3? UpdateAimControls(Vector3 aimAxes, short skillLevel)
         {
             return null;
         }

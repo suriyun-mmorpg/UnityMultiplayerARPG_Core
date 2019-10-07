@@ -145,7 +145,7 @@ namespace MultiplayerARPG
                 hotkeySkill.GetSkillType() == SkillType.Active &&
                 hotkeySkill.HasCustomAimControls())
             {
-                return hotkeySkill.UpdateAimControls(hotkeySkillLevel);
+                return hotkeySkill.UpdateAimControls(axes, hotkeySkillLevel);
             }
             return null;
         }

@@ -5,33 +5,10 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Simple Area Buff Skill", order = -4987)]
-    public class SimpleAreaHealSkill : BaseSkill
+    public partial class SimpleAreaHealSkill : BaseAreaSkill
     {
-        public float castRadius;
-        public IncrementalFloat areaDuration;
-        public IncrementalFloat applyDuration;
         public AreaBuffEntity areaBuffEntity;
-        public GameObject targetObjectPrefab;
         public Buff buff;
-
-        private GameObject cacheTargetObject;
-        public GameObject CacheTargetObject
-        {
-            get
-            {
-                if (cacheTargetObject == null)
-                {
-                    cacheTargetObject = Instantiate(targetObjectPrefab);
-                    cacheTargetObject.SetActive(false);
-                }
-                return cacheTargetObject;
-            }
-        }
-
-        public override SkillType GetSkillType()
-        {
-            return SkillType.Active;
-        }
 
         public override GameEffectCollection GetHitEffect()
         {
@@ -44,16 +21,6 @@ namespace MultiplayerARPG
             // TODO: validate aim position
             AreaBuffEntity buffEntity = Instantiate(areaBuffEntity, aimPosition, skillUser.GetSummonRotation());
             buffEntity.Setup(skillUser, CharacterBuff.Create(BuffType.SkillBuff, DataId, skillLevel), this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
-        }
-
-        public override float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
-        {
-            return castRadius;
-        }
-
-        public override float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
-        {
-            return 360f;
         }
 
         public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
@@ -114,16 +81,6 @@ namespace MultiplayerARPG
         public override Buff GetDebuff()
         {
             return default(Buff);
-        }
-
-        public override bool HasCustomAimControls()
-        {
-            return true;
-        }
-
-        public override Vector3? UpdateAimControls(short skillLevel)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

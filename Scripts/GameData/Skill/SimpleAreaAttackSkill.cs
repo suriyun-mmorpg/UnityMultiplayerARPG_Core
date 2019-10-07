@@ -5,38 +5,15 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Simple Area Attack Skill", order = -4988)]
-    public class SimpleAreaAttackSkill : BaseSkill
+    public partial class SimpleAreaAttackSkill : BaseAreaSkill
     {
-        public float castRadius;
-        public IncrementalFloat areaDuration;
-        public IncrementalFloat applyDuration;
         public AreaDamageEntity areaDamageEntity;
-        public GameObject targetObjectPrefab;
         public GameEffectCollection hitEffects;
         public DamageIncremental damageAmount;
         public DamageIncremental[] additionalDamageAmounts;
         public bool increaseDamageWithBuffs;
         public bool isDebuff;
         public Buff debuff;
-
-        private GameObject cacheTargetObject;
-        public GameObject CacheTargetObject
-        {
-            get
-            {
-                if (cacheTargetObject == null)
-                {
-                    cacheTargetObject = Instantiate(targetObjectPrefab);
-                    cacheTargetObject.SetActive(false);
-                }
-                return cacheTargetObject;
-            }
-        }
-
-        public override SkillType GetSkillType()
-        {
-            return SkillType.Active;
-        }
 
         public override GameEffectCollection GetHitEffect()
         {
@@ -53,16 +30,6 @@ namespace MultiplayerARPG
             // TODO: validate aim position
             AreaDamageEntity damageEntity = Instantiate(areaDamageEntity, aimPosition, skillUser.GetSummonRotation());
             damageEntity.Setup(skillUser, weapon, GetAttackDamages(skillUser, skillLevel, isLeftHand), debuff, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
-        }
-
-        public override float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
-        {
-            return castRadius;
-        }
-
-        public override float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
-        {
-            return 360f;
         }
 
         public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
@@ -149,16 +116,6 @@ namespace MultiplayerARPG
             if (!IsDebuff())
                 return default(Buff);
             return debuff;
-        }
-
-        public override bool HasCustomAimControls()
-        {
-            return true;
-        }
-
-        public override Vector3? UpdateAimControls(short skillLevel)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }
