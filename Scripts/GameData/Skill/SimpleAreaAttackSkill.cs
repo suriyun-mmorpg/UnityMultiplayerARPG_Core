@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             if (isDebuff)
                 debuff = CharacterBuff.Create(BuffType.SkillDebuff, DataId, skillLevel);
             // Spawn area entity
-            // TODO: validate aim position
+            aimPosition = AreaSkillControls.FindGround(AreaSkillControls.ValidateDistance(skillUser.CacheTransform.position, aimPosition, castDistance.GetAmount(skillLevel)));
             AreaDamageEntity damageEntity = Instantiate(areaDamageEntity, aimPosition, skillUser.GetSummonRotation());
             damageEntity.Setup(skillUser, weapon, GetAttackDamages(skillUser, skillLevel, isLeftHand), debuff, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
