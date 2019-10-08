@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         public UICharacterHotkeyAssigner uiAssigner;
 
         public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
-        
+
         private BaseSkill hotkeySkill;
         private short hotkeySkillLevel;
 
@@ -167,6 +167,16 @@ namespace MultiplayerARPG
 
         public void OnClickUse()
         {
+            if (UICharacterHotkeys.UsingHotkey != null)
+            {
+                if (UICharacterHotkeys.UsingHotkey == this)
+                {
+                    uiCharacterHotkeys.SetUsingHotkey(null);
+                    return;
+                }
+                uiCharacterHotkeys.SetUsingHotkey(null);
+            }
+
             if (hotkeySkill != null && hotkeySkillLevel > 0 &&
                 hotkeySkill.GetSkillType() == SkillType.Active &&
                 hotkeySkill.HasCustomAimControls())

@@ -137,8 +137,15 @@ namespace MultiplayerARPG
         #region Mobile Controls
         public void SetUsingHotkey(UICharacterHotkey hotkey)
         {
-            if (hotkey == null)
-                return;
+            // Cancel old using hotkey
+            if (UsingHotkey != null)
+            {
+                UsingHotkey.FinishAimControls();
+                UsingHotkey = null;
+                hotkeyStartDragged = false;
+                HotkeyAimPosition = null;
+                hotkeyStartDragged = false;
+            }
 
             if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
             {
@@ -149,7 +156,8 @@ namespace MultiplayerARPG
                 hotkeyAimJoyStick.axisXName = HOTKEY_AXIS_X;
                 hotkeyAimJoyStick.axisYName = HOTKEY_AXIS_Y;
                 // Set joystick position to the same position with hotkey button
-                hotkeyAimJoyStick.transform.position = hotkey.transform.position;
+                if (hotkey != null)
+                    hotkeyAimJoyStick.transform.position = hotkey.transform.position;
             }
 
             UsingHotkey = hotkey;
