@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Simple Area Buff Skill", order = -4987)]
-    public partial class SimpleAreaHealSkill : BaseAreaSkill
+    public partial class SimpleAreaBuffSkill : BaseAreaSkill
     {
         public AreaBuffEntity areaBuffEntity;
         public Buff buff;
@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
         {
             // Spawn area entity
-            // TODO: validate aim position
+            aimPosition = AreaSkillControls.FindGround(AreaSkillControls.ValidateDistance(skillUser.CacheTransform.position, aimPosition, castDistance.GetAmount(skillLevel)));
             AreaBuffEntity buffEntity = Instantiate(areaBuffEntity, aimPosition, skillUser.GetSummonRotation());
             buffEntity.Setup(skillUser, CharacterBuff.Create(BuffType.SkillBuff, DataId, skillLevel), this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
