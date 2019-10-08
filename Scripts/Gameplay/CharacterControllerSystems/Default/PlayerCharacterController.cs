@@ -13,34 +13,6 @@ namespace MultiplayerARPG
             Both,
         }
 
-        public struct UsingSkillData
-        {
-            public Vector3 aimPosition;
-            public BaseSkill skill;
-            public short level;
-            public UsingSkillData(Vector3 aimPosition, BaseSkill skill, short level)
-            {
-                this.aimPosition = aimPosition;
-                this.skill = skill;
-                this.level = level;
-            }
-        }
-
-        public struct UsingSkillItemData
-        {
-            public Vector3 aimPosition;
-            public short itemIndex;
-            public BaseSkill skill;
-            public short level;
-            public UsingSkillItemData(Vector3 aimPosition, short itemIndex, BaseSkill skill, short level)
-            {
-                this.aimPosition = aimPosition;
-                this.itemIndex = itemIndex;
-                this.skill = skill;
-                this.level = level;
-            }
-        }
-
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
         public float angularSpeed = 800f;
@@ -58,8 +30,6 @@ namespace MultiplayerARPG
         public bool buildRotationSnap;
 
         protected Vector3? destination;
-        protected UsingSkillData queueUsingSkill;
-        protected UsingSkillItemData queueUsingSkillItem;
         protected Vector3 mouseDownPosition;
         protected float mouseDownTime;
         protected bool isMouseDragOrHoldOrOverUI;
@@ -329,10 +299,9 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseSkill())
             {
-                BaseSkill skill = queueUsingSkill.skill;
-                Vector3 aimPosition = queueUsingSkill.aimPosition;
+                bool canUseSkill = PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition());
                 ClearQueueUsingSkill();
-                return PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHand, aimPosition);
+                return canUseSkill;
             }
             return false;
         }
@@ -341,32 +310,11 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkillItem.skill != null && PlayerCharacterEntity.CanUseItem() && PlayerCharacterEntity.CanUseSkill())
             {
-                short itemIndex = queueUsingSkillItem.itemIndex;
-                Vector3 aimPosition = queueUsingSkillItem.aimPosition;
+                bool canUseSkill = PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkillItem.itemIndex, isLeftHand, queueUsingSkillItem.aimPosition.HasValue ? queueUsingSkillItem.aimPosition.Value : GetDefaultAttackAimPosition());
                 ClearQueueUsingSkillItem();
-                return PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHand, aimPosition);
+                return canUseSkill;
             }
             return false;
-        }
-
-        public void SetQueueUsingSkill(Vector3 aimPosition, BaseSkill skill, short level)
-        {
-            queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
-        }
-
-        public void SetQueueUsingSkillItem(Vector3 aimPosition, short itemIndex, BaseSkill skill, short level)
-        {
-            queueUsingSkillItem = new UsingSkillItemData(aimPosition, itemIndex, skill, level);
-        }
-
-        public void ClearQueueUsingSkill()
-        {
-            queueUsingSkill = default(UsingSkillData);
-        }
-
-        public void ClearQueueUsingSkillItem()
-        {
-            queueUsingSkillItem = default(UsingSkillItemData);
         }
 
         public Vector3 GetDefaultAttackAimPosition()

@@ -60,9 +60,6 @@ namespace MultiplayerARPG
         RaycastHit[] raycasts = new RaycastHit[RAYCAST_COLLIDER_SIZE];
         Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
         RaycastHit tempHitInfo;
-        SkillLevel queueSkill;
-        SkillLevel queueSkillByItem;
-        int queueSkillItemIndex;
         Vector3 aimPosition;
         Vector3 actionLookDirection;
         // Crosshair
@@ -270,17 +267,17 @@ namespace MultiplayerARPG
                     }
 
                     // Calculate aim distance by skill or weapon
-                    if (queueSkill.skill != null && queueSkill.skill.IsAttack())
+                    if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                     {
                         // Increase aim distance by skill attack distance
-                        attackDistance = queueSkill.skill.GetAttackDistance(PlayerCharacterEntity, queueSkill.level, isLeftHandAttacking);
-                        attackFov = queueSkill.skill.GetAttackFov(PlayerCharacterEntity, queueSkill.level, isLeftHandAttacking);
+                        attackDistance = queueUsingSkill.skill.GetAttackDistance(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
+                        attackFov = queueUsingSkill.skill.GetAttackFov(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
                     }
-                    else if (queueSkillByItem.skill != null && queueSkillByItem.skill.IsAttack())
+                    else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.skill.IsAttack())
                     {
                         // Increase aim distance by skill attack distance
-                        attackDistance = queueSkillByItem.skill.GetAttackDistance(PlayerCharacterEntity, queueSkillByItem.level, isLeftHandAttacking);
-                        attackFov = queueSkillByItem.skill.GetAttackFov(PlayerCharacterEntity, queueSkillByItem.level, isLeftHandAttacking);
+                        attackDistance = queueUsingSkillItem.skill.GetAttackDistance(PlayerCharacterEntity, queueUsingSkillItem.level, isLeftHandAttacking);
+                        attackFov = queueUsingSkillItem.skill.GetAttackFov(PlayerCharacterEntity, queueUsingSkillItem.level, isLeftHandAttacking);
                     }
                     else
                     {
@@ -523,7 +520,7 @@ namespace MultiplayerARPG
                 tempPressReload = InputManager.GetButtonDown("Reload");
                 tempPressExitVehicle = InputManager.GetButtonDown("ExitVehicle");
                 tempPressSwitchEquipWeaponSet = InputManager.GetButtonDown("SwitchEquipWeaponSet");
-                if (queueSkill.skill != null || queueSkillByItem.skill != null || tempPressAttackRight || tempPressAttackLeft || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
+                if (queueUsingSkill.skill != null || queueUsingSkillItem.skill != null || tempPressAttackRight || tempPressAttackLeft || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
                 {
                     // Find forward character / npc / building / warp entity from camera center
                     targetPlayer = null;
@@ -542,11 +539,11 @@ namespace MultiplayerARPG
                     tempCalculateAngle = Vector3.Angle(MovementTransform.forward, actionLookDirection);
                     if (tempCalculateAngle > 15f)
                     {
-                        if (queueSkill.skill != null && queueSkill.skill.IsAttack())
+                        if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                         {
                             turningState = TurningState.UseSkill;
                         }
-                        else if (queueSkillByItem.skill != null && queueSkillByItem.skill.IsAttack())
+                        else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.skill.IsAttack())
                         {
                             turningState = TurningState.UseSkillItem;
                         }
@@ -574,12 +571,12 @@ namespace MultiplayerARPG
                     else
                     {
                         // Attack immediately if character already look at target
-                        if (queueSkill.skill != null && queueSkill.skill.IsAttack())
+                        if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                         {
                             UseSkill(isLeftHandAttacking, aimPosition);
                             isDoingAction = true;
                         }
-                        else if (queueSkillByItem.skill != null && queueSkillByItem.skill.IsAttack())
+                        else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.skill.IsAttack())
                         {
                             UseSkillItem(isLeftHandAttacking, aimPosition);
                             isDoingAction = true;
@@ -596,11 +593,11 @@ namespace MultiplayerARPG
                     }
 
                     // If skill is not attack skill, use it immediately
-                    if (queueSkill.skill != null && !queueSkill.skill.IsAttack())
+                    if (queueUsingSkill.skill != null && !queueUsingSkill.skill.IsAttack())
                     {
                         UseSkill(isLeftHandAttacking, aimPosition);
                     }
-                    else if (queueSkillByItem.skill != null && queueSkillByItem.skill.IsAttack())
+                    else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.skill.IsAttack())
                     {
                         UseSkillItem(isLeftHandAttacking, aimPosition);
                     }
@@ -768,21 +765,22 @@ namespace MultiplayerARPG
             CancelBuild();
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
-            ClearQueueSkill();
+            ClearQueueUsingSkill();
+            ClearQueueUsingSkillItem();
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
             switch (hotkey.type)
             {
                 case HotkeyType.Skill:
-                    UseSkill(hotkey.relateId);
+                    UseSkill(hotkey.relateId, aimPosition);
                     break;
                 case HotkeyType.Item:
-                    UseItem(hotkey.relateId);
+                    UseItem(hotkey.relateId, aimPosition);
                     break;
             }
         }
 
-        protected void UseSkill(string id)
+        protected void UseSkill(string id, Vector3? aimPosition)
         {
             BaseSkill skill = null;
             short skillLevel = 0;
@@ -792,11 +790,10 @@ namespace MultiplayerARPG
                 return;
 
             PlayerCharacterEntity.StopMove();
-            queueSkill.skill = skill;
-            queueSkill.level = skillLevel;
+            SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
 
-        protected void UseItem(string id)
+        protected void UseItem(string id, Vector3? aimPosition)
         {
             InventoryType inventoryType;
             int itemIndex;
@@ -829,8 +826,7 @@ namespace MultiplayerARPG
                 if (item.IsSkill())
                 {
                     PlayerCharacterEntity.StopMove();
-                    queueSkillByItem = item.skillLevel;
-                    queueSkillItemIndex = itemIndex;
+                    SetQueueUsingSkillItem(aimPosition, (short)itemIndex, item.skillLevel.skill, item.skillLevel.level);
                 }
                 else
                 {
@@ -901,20 +897,20 @@ namespace MultiplayerARPG
                 ActivateBuilding(targetBuilding);
         }
 
-        public void UseSkill(bool isLeftHand, Vector3 aimPosition)
+        public void UseSkill(bool isLeftHand, Vector3 defaultAimPosition)
         {
-            if (queueSkill.skill == null)
+            if (queueUsingSkill.skill == null)
                 return;
-            PlayerCharacterEntity.RequestUseSkill(queueSkill.skill.DataId, isLeftHand, aimPosition);
-            ClearQueueSkill();
+            PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : defaultAimPosition);
+            ClearQueueUsingSkill();
         }
 
-        public void UseSkillItem(bool isLeftHand, Vector3 aimPosition)
+        public void UseSkillItem(bool isLeftHand, Vector3 defaultAimPosition)
         {
-            if (queueSkillItemIndex < 0)
+            if (queueUsingSkillItem.skill == null)
                 return;
-            PlayerCharacterEntity.RequestUseSkillItem((short)queueSkillItemIndex, isLeftHand, aimPosition);
-            ClearQueueSkill();
+            PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkillItem.itemIndex, isLeftHand, queueUsingSkillItem.aimPosition.HasValue ? queueUsingSkillItem.aimPosition.Value : defaultAimPosition);
+            ClearQueueUsingSkillItem();
         }
 
         public int OverlapObjects(Vector3 position, float distance, int layerMask)
@@ -932,13 +928,6 @@ namespace MultiplayerARPG
                     return true;
             }
             return false;
-        }
-
-        protected void ClearQueueSkill()
-        {
-            queueSkill.skill = null;
-            queueSkillByItem.skill = null;
-            queueSkillItemIndex = -1;
         }
 
         public bool GetPrimaryAttackButton()

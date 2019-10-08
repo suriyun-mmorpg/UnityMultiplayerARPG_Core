@@ -5,6 +5,34 @@ namespace MultiplayerARPG
 {
     public abstract class BasePlayerCharacterController : MonoBehaviour
     {
+        public struct UsingSkillData
+        {
+            public Vector3? aimPosition;
+            public BaseSkill skill;
+            public short level;
+            public UsingSkillData(Vector3? aimPosition, BaseSkill skill, short level)
+            {
+                this.aimPosition = aimPosition;
+                this.skill = skill;
+                this.level = level;
+            }
+        }
+
+        public struct UsingSkillItemData
+        {
+            public Vector3? aimPosition;
+            public short itemIndex;
+            public BaseSkill skill;
+            public short level;
+            public UsingSkillItemData(Vector3? aimPosition, short itemIndex, BaseSkill skill, short level)
+            {
+                this.aimPosition = aimPosition;
+                this.itemIndex = itemIndex;
+                this.skill = skill;
+                this.level = level;
+            }
+        }
+
         public static BasePlayerCharacterController Singleton { get; protected set; }
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
 
@@ -63,6 +91,8 @@ namespace MultiplayerARPG
             set { PlayerCharacterEntity.SetTargetEntity(value); }
         }
         public bool IsEditingBuilding { get; protected set; }
+        protected UsingSkillData queueUsingSkill;
+        protected UsingSkillItemData queueUsingSkillItem;
 
         protected virtual void Awake()
         {
@@ -388,6 +418,26 @@ namespace MultiplayerARPG
                     CacheUISceneGameplay.uiBuildingCraftItems.Show();
                 }
             }
+        }
+
+        public void SetQueueUsingSkill(Vector3? aimPosition, BaseSkill skill, short level)
+        {
+            queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
+        }
+
+        public void SetQueueUsingSkillItem(Vector3? aimPosition, short itemIndex, BaseSkill skill, short level)
+        {
+            queueUsingSkillItem = new UsingSkillItemData(aimPosition, itemIndex, skill, level);
+        }
+
+        public void ClearQueueUsingSkill()
+        {
+            queueUsingSkill = default(UsingSkillData);
+        }
+
+        public void ClearQueueUsingSkillItem()
+        {
+            queueUsingSkillItem = default(UsingSkillItemData);
         }
 
         public abstract void UseHotkey(int hotkeyIndex, Vector3? aimPosition);

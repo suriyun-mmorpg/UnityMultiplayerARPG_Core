@@ -753,14 +753,14 @@ namespace MultiplayerARPG
                 !PlayerCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return;
 
-            if (!aimPosition.HasValue)
-                aimPosition = GetDefaultAttackAimPosition();
+            // Set aim position to use immediately (don't add to queue)
+            Vector3 useSkillAimPosition = aimPosition.HasValue ? aimPosition.Value : GetDefaultAttackAimPosition();
 
             BaseCharacterEntity attackingCharacter;
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                SetQueueUsingSkill(aimPosition.Value, skill, skillLevel);
+                SetQueueUsingSkill(aimPosition, skill, skillLevel);
             }
             else
             {
@@ -771,7 +771,7 @@ namespace MultiplayerARPG
                     if (IsLockTarget() && !skill.HasCustomAimControls())
                     {
                         // If attacking any character, will use skill later
-                        SetQueueUsingSkill(aimPosition.Value, skill, skillLevel);
+                        SetQueueUsingSkill(aimPosition, skill, skillLevel);
                         if (SelectedEntity == null && !(SelectedEntity is BaseCharacterEntity))
                         {
                             // Attacking nearest target
@@ -785,7 +785,7 @@ namespace MultiplayerARPG
                         // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, aimPosition.Value);
+                        PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, useSkillAimPosition);
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
@@ -794,7 +794,7 @@ namespace MultiplayerARPG
                     // This is not attack skill, use it immediately
                     destination = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, aimPosition.Value);
+                    PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, useSkillAimPosition);
                 }
             }
         }
@@ -859,14 +859,14 @@ namespace MultiplayerARPG
             if (skill == null)
                 return;
 
-            if (!aimPosition.HasValue)
-                aimPosition = GetDefaultAttackAimPosition();
+            // Set aim position to use immediately (don't add to queue)
+            Vector3 useSkillAimPosition = aimPosition.HasValue ? aimPosition.Value : GetDefaultAttackAimPosition();
 
             BaseCharacterEntity attackingCharacter;
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
                 // If attacking any character, will use skill later
-                SetQueueUsingSkillItem(aimPosition.Value, itemIndex, skill, skillLevel);
+                SetQueueUsingSkillItem(aimPosition, itemIndex, skill, skillLevel);
             }
             else
             {
@@ -876,7 +876,7 @@ namespace MultiplayerARPG
                     if (IsLockTarget() && !skill.HasCustomAimControls())
                     {
                         // If attacking any character, will use skill later
-                        SetQueueUsingSkillItem(aimPosition.Value, itemIndex, skill, skillLevel);
+                        SetQueueUsingSkillItem(aimPosition, itemIndex, skill, skillLevel);
                         if (SelectedEntity == null || !(SelectedEntity is BaseCharacterEntity))
                         {
                             // Attacking nearest target
@@ -890,7 +890,7 @@ namespace MultiplayerARPG
                         // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, aimPosition.Value);
+                        PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, useSkillAimPosition);
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
@@ -899,7 +899,7 @@ namespace MultiplayerARPG
                     // This is not attack skill, use it immediately
                     destination = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, aimPosition.Value);
+                    PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, useSkillAimPosition);
                 }
             }
         }
