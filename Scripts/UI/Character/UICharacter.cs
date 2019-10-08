@@ -357,23 +357,18 @@ namespace MultiplayerARPG
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {
+                int tempIndexOfAttribute = -1;
                 CharacterAttribute tempCharacterAttribute;
-                Attribute tempAttribute;
                 float tempAmount;
-                IList<CharacterAttribute> characterAttributes = Data.Attributes;
-                for (int indexOfData = 0; indexOfData < characterAttributes.Count; ++indexOfData)
+                foreach (Attribute attribute in CacheUICharacterAttributes.Keys)
                 {
-                    tempCharacterAttribute = characterAttributes[indexOfData];
-                    tempAttribute = tempCharacterAttribute.GetAttribute();
-                    UICharacterAttribute cacheUICharacterAttribute;
+                    tempIndexOfAttribute = Data.IndexOfAttribute(attribute.DataId);
+                    tempCharacterAttribute = tempIndexOfAttribute >= 0 ? Data.Attributes[tempIndexOfAttribute] : CharacterAttribute.Create(attribute, 0);
                     tempAmount = 0;
-                    if (CacheUICharacterAttributes.TryGetValue(tempAttribute, out cacheUICharacterAttribute))
-                    {
-                        if (cacheAttributes.ContainsKey(tempAttribute))
-                            tempAmount = cacheAttributes[tempAttribute];
-                        cacheUICharacterAttribute.Setup(new UICharacterAttributeData(tempCharacterAttribute, tempAmount), Data, indexOfData);
-                        cacheUICharacterAttribute.Show();
-                    }
+                    if (cacheAttributes.ContainsKey(attribute))
+                        tempAmount = cacheAttributes[attribute];
+                    CacheUICharacterAttributes[attribute].Setup(new UICharacterAttributeData(tempCharacterAttribute, tempAmount), Data, tempIndexOfAttribute);
+                    CacheUICharacterAttributes[attribute].Show();
                 }
             }
 
