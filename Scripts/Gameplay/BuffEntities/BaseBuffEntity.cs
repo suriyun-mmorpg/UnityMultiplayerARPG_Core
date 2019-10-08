@@ -7,7 +7,6 @@ namespace MultiplayerARPG
     public class BaseBuffEntity : MonoBehaviour
     {
         protected BaseCharacterEntity buffApplier;
-        protected CharacterBuff buff;
         protected BaseSkill skill;
         protected short skillLevel;
 
@@ -49,12 +48,10 @@ namespace MultiplayerARPG
 
         public virtual void Setup(
             BaseCharacterEntity buffApplier,
-            CharacterBuff buff,
             BaseSkill skill,
             short skillLevel)
         {
             this.buffApplier = buffApplier;
-            this.buff = buff;
             this.skill = skill;
             this.skillLevel = skillLevel;
         }
@@ -63,7 +60,7 @@ namespace MultiplayerARPG
         {
             if (target == null)
                 return;
-            // TODO: Implement this
+            target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel);
         }
     }
 }

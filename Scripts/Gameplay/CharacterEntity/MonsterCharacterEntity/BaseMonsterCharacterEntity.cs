@@ -216,12 +216,12 @@ namespace MultiplayerARPG
             return characterEntity is BasePlayerCharacterEntity;
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
-            base.ReceiveDamage(attacker, weapon, damageAmounts, debuff);
+            base.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // If character is not dead, try to attack

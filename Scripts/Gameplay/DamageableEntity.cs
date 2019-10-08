@@ -70,12 +70,12 @@ namespace MultiplayerARPG
             return CurrentHp <= 0;
         }
 
-        public virtual void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
+        public virtual void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead())
                 return;
             if (onReceiveDamage != null)
-                onReceiveDamage.Invoke(attacker, weapon, damageAmounts, debuff);
+                onReceiveDamage.Invoke(attacker, weapon, damageAmounts, skill, skillLevel);
         }
 
         public virtual void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)

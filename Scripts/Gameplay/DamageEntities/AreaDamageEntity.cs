@@ -39,16 +39,15 @@ namespace MultiplayerARPG
         }
 
         public void Setup(
-            IAttackerEntity attacker, 
-            CharacterItem weapon, 
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts, 
-            CharacterBuff debuff, 
+            IAttackerEntity attacker,
+            CharacterItem weapon,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             short skillLevel,
             float areaDuration,
             float applyDuration)
         {
-            base.Setup(attacker, weapon, damageAmounts, debuff, skill, skillLevel);
+            base.Setup(attacker, weapon, damageAmounts, skill, skillLevel);
             Destroy(gameObject, areaDuration);
             this.applyDuration = applyDuration;
         }
@@ -73,11 +72,11 @@ namespace MultiplayerARPG
         {
             if (attacker != null && attacker.Entity.gameObject == other)
                 return;
-            
+
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
             if (target == null)
                 return;
-            
+
             if (receivingDamageEntities.ContainsKey(target.ObjectId))
                 return;
 

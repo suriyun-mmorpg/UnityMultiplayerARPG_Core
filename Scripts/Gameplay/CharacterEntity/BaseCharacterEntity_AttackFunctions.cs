@@ -343,7 +343,6 @@ namespace MultiplayerARPG
                     weapon,
                     damageInfo,
                     damageAmounts,
-                    CharacterBuff.Empty,
                     null,
                     0,
                     aimPosition,

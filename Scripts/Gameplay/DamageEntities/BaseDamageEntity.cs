@@ -8,7 +8,6 @@ namespace MultiplayerARPG
         protected IAttackerEntity attacker;
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> damageAmounts;
-        protected CharacterBuff debuff;
         protected BaseSkill skill;
         protected short skillLevel;
 
@@ -52,14 +51,12 @@ namespace MultiplayerARPG
             IAttackerEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-            CharacterBuff debuff,
             BaseSkill skill,
             short skillLevel)
         {
             this.attacker = attacker;
             this.weapon = weapon;
             this.damageAmounts = damageAmounts;
-            this.debuff = debuff;
             this.skill = skill;
             this.skillLevel = skillLevel;
         }
@@ -69,7 +66,7 @@ namespace MultiplayerARPG
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
                 return;
             if (IsServer)
-                target.ReceiveDamage(attacker, weapon, damageAmounts, debuff);
+                target.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
             if (IsClient)
                 target.PlayHitEffects(damageAmounts.Keys, skill);
         }

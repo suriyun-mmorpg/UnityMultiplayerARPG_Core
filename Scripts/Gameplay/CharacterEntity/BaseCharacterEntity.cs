@@ -560,7 +560,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
@@ -571,12 +571,12 @@ namespace MultiplayerARPG
                 return;
             }
 
-            ReceiveDamageFunction(attacker, weapon, damageAmounts, debuff);
+            ReceiveDamageFunction(attacker, weapon, damageAmounts, skill, skillLevel);
         }
 
-        internal void ReceiveDamageFunction(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterBuff debuff)
+        internal void ReceiveDamageFunction(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
-            base.ReceiveDamage(attacker, weapon, damageAmounts, debuff);
+            base.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // Notify enemy spotted when received damage from enemy
@@ -646,8 +646,8 @@ namespace MultiplayerARPG
             else
             {
                 // Apply debuff if character is not dead
-                if (!debuff.IsEmpty())
-                    ApplyBuff(debuff.dataId, debuff.type, debuff.level);
+                if (skill != null && skill.IsDebuff())
+                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel);
             }
         }
         #endregion
@@ -780,7 +780,6 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-            CharacterBuff debuff,
             BaseSkill skill,
             short skillLevel,
             Vector3 aimPosition,
@@ -823,7 +822,7 @@ namespace MultiplayerARPG
                         {
                             // Pass all receive damage condition, then apply damages
                             if (IsServer)
-                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, debuff);
+                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                             if (IsClient)
                                 tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                         }
@@ -846,7 +845,7 @@ namespace MultiplayerARPG
                             {
                                 // Pass all receive damage condition, then apply damages
                                 if (IsServer)
-                                    tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, debuff);
+                                    tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                                 if (IsClient)
                                     tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                             }
@@ -864,7 +863,7 @@ namespace MultiplayerARPG
                             if (!TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
-                        missileDamageEntity.Setup(this, weapon, damageAmounts, debuff, skill, skillLevel, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
+                        missileDamageEntity.Setup(this, weapon, damageAmounts, skill, skillLevel, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
                     }
                     break;
                 case DamageType.Raycast:
@@ -906,7 +905,7 @@ namespace MultiplayerARPG
                         {
                             // Pass all receive damage condition, then apply damages
                             if (IsServer)
-                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, debuff);
+                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                             if (IsClient)
                                 tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                             // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect

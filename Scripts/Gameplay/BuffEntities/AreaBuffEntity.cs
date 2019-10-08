@@ -40,13 +40,12 @@ namespace MultiplayerARPG
 
         public void Setup(
             BaseCharacterEntity buffApplier,
-            CharacterBuff buff,
             BaseSkill skill,
             short skillLevel,
             float areaDuration,
             float applyDuration)
         {
-            base.Setup(buffApplier, buff, skill, skillLevel);
+            base.Setup(buffApplier, skill, skillLevel);
             Destroy(gameObject, areaDuration);
             this.applyDuration = applyDuration;
         }
@@ -63,11 +62,8 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
-            if (buffApplier != null && buffApplier.gameObject == other)
-                return;
-
             BaseCharacterEntity target = other.GetComponent<BaseCharacterEntity>();
-            if (target == null || target == buffApplier)
+            if (target == null)
                 return;
 
             if (receivingBuffCharacters.ContainsKey(target.ObjectId))
@@ -88,11 +84,8 @@ namespace MultiplayerARPG
 
         private void TriggerExit(GameObject other)
         {
-            if (buffApplier != null && buffApplier.gameObject == other)
-                return;
-
             BaseCharacterEntity target = other.GetComponent<BaseCharacterEntity>();
-            if (target == null || target == buffApplier)
+            if (target == null)
                 return;
 
             if (!receivingBuffCharacters.ContainsKey(target.ObjectId))

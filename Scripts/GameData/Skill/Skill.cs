@@ -107,20 +107,12 @@ namespace MultiplayerARPG
                         damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
                 }
 
-                // Apply debuff
-                CharacterBuff debuff = CharacterBuff.Empty;
-                if (isDebuff)
-                    debuff = CharacterBuff.Create(BuffType.SkillDebuff, DataId, skillLevel);
-
-                // Get damage info
-
                 // Launch damage entity to apply damage to other characters
                 skillUser.LaunchDamageEntity(
                     isLeftHand,
                     weapon,
                     GetDamageInfo(skillUser, isLeftHand),
                     damageAmounts,
-                    debuff,
                     this,
                     skillLevel,
                     aimPosition,
