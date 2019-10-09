@@ -932,11 +932,15 @@ namespace MultiplayerARPG
 
         public bool GetPrimaryAttackButton()
         {
+            if (UICharacterHotkeys.UsingHotkey != null)
+                return false;
             return InputManager.GetButton("Fire1") || InputManager.GetButton("Attack");
         }
 
         public bool GetSecondaryAttackButton()
         {
+            if (UICharacterHotkeys.UsingHotkey != null)
+                return false;
             return InputManager.GetButton("Fire2");
         }
 
