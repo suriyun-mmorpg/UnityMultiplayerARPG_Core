@@ -153,7 +153,7 @@ namespace MultiplayerARPG
             secsPerFrame = 1f / anim.framesPerSec;
             currentFrame = -1;
             playing = true;
-            nextFrameTime = Time.realtimeSinceStartup + secsPerFrame;
+            nextFrameTime = Time.realtimeSinceStartup + 0.025f;   // Add some delay to avoid glitch
         }
 
         public void Stop()
