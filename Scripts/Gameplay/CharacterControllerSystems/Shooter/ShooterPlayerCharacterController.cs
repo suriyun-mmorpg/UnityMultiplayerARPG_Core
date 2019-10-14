@@ -932,14 +932,20 @@ namespace MultiplayerARPG
 
         public bool GetPrimaryAttackButton()
         {
-            if (UICharacterHotkeys.UsingHotkey != null)
+            // Check using hotkey for PC only
+            if (!InputManager.useMobileInputOnNonMobile &&
+                !Application.isMobilePlatform &&
+                UICharacterHotkeys.UsingHotkey != null)
                 return false;
             return InputManager.GetButton("Fire1") || InputManager.GetButton("Attack");
         }
 
         public bool GetSecondaryAttackButton()
         {
-            if (UICharacterHotkeys.UsingHotkey != null)
+            // Check using hotkey for PC only
+            if (!InputManager.useMobileInputOnNonMobile &&
+                !Application.isMobilePlatform &&
+                UICharacterHotkeys.UsingHotkey != null)
                 return false;
             return InputManager.GetButton("Fire2");
         }
