@@ -189,7 +189,7 @@ namespace MultiplayerARPG
                     CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
 
                 // Play special effects after trigger duration
-                yield return new WaitForSecondsRealtime(triggerDuration * playSpeedMultiplier);
+                yield return new WaitForSecondsRealtime(triggerDuration / playSpeedMultiplier);
 
                 // Special effects will plays on clients only
                 if (IsClient)
@@ -203,7 +203,7 @@ namespace MultiplayerARPG
                 skill.ApplySkill(this, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
 
                 // Wait until animation ends to stop actions
-                yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) * playSpeedMultiplier);
+                yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) / playSpeedMultiplier);
             }
 
             // Set doing action state to none at clients and server

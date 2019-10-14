@@ -218,6 +218,15 @@ namespace MultiplayerARPG
             return moveSpeed;
         }
 
+        public override float GetAttackSpeed(BaseCharacterEntity character)
+        {
+            float atkSpeed = character.GetCaches().AtkSpeed;
+            // Minimum attack speed is 0.1
+            if (atkSpeed <= 0.1f)
+                atkSpeed = 0.1f;
+            return atkSpeed;
+        }
+
         public override float GetTotalWeight(ICharacterData character)
         {
             float result = character.EquipItems.GetTotalItemWeight() + character.NonEquipItems.GetTotalItemWeight();

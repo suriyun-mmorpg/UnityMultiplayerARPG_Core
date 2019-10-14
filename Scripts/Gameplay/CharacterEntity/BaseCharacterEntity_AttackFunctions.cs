@@ -271,7 +271,7 @@ namespace MultiplayerARPG
             }
 
             // Play special effects after trigger duration
-            yield return new WaitForSecondsRealtime(triggerDuration * playSpeedMultiplier);
+            yield return new WaitForSecondsRealtime(triggerDuration / playSpeedMultiplier);
 
             // Special effects will plays on clients only
             if (IsClient)
@@ -307,7 +307,7 @@ namespace MultiplayerARPG
             }
 
             // Wait until animation ends to stop actions
-            yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) * playSpeedMultiplier);
+            yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) / playSpeedMultiplier);
 
             // Set doing action state to none at clients and server
             animActionType = AnimActionType.None;
