@@ -481,9 +481,9 @@ namespace MultiplayerARPG
 
         public void PlayWeaponLaunchEffect(AnimActionType animActionType)
         {
-            if ((animActionType == AnimActionType.AttackRightHand || animActionType == AnimActionType.SkillRightHand) && rightHandEquipmentEntity != null)
+            if (animActionType == AnimActionType.AttackRightHand && rightHandEquipmentEntity != null)
                 rightHandEquipmentEntity.PlayWeaponLaunchEffect();
-            if ((animActionType == AnimActionType.AttackLeftHand || animActionType == AnimActionType.SkillLeftHand) && leftHandEquipmentEntity != null)
+            if (animActionType == AnimActionType.AttackLeftHand && leftHandEquipmentEntity != null)
                 leftHandEquipmentEntity.PlayWeaponLaunchEffect();
         }
 
