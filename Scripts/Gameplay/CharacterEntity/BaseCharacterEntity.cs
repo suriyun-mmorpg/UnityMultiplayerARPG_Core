@@ -1211,7 +1211,7 @@ namespace MultiplayerARPG
         {
             if (animActionType == AnimActionType.AttackRightHand ||
                 animActionType == AnimActionType.AttackLeftHand)
-                return this.GetCaches().AtkSpeed;
+                return gameplayRule.GetAttackSpeed(this);
             return 1f;
         }
 
