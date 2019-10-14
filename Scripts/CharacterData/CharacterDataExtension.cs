@@ -494,7 +494,7 @@ public static partial class CharacterDataExtension
             result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetSocketsIncreaseAttributesRate()));
         }
         // Increase stats from right hand equipment
-        if (!data.EquipWeapons.NotEmptyRightHandSlot())
+        if (data.EquipWeapons.NotEmptyRightHandSlot())
         {
             result += data.EquipWeapons.rightHand.GetIncreaseStats();
             result += data.EquipWeapons.rightHand.GetSocketsIncreaseStats();
@@ -507,7 +507,7 @@ public static partial class CharacterDataExtension
             result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetSocketsIncreaseAttributesRate()));
         }
         // Increase stats from left hand equipment
-        if (!data.EquipWeapons.NotEmptyLeftHandSlot())
+        if (data.EquipWeapons.NotEmptyLeftHandSlot())
         {
             result += data.EquipWeapons.leftHand.GetIncreaseStats();
             result += data.EquipWeapons.leftHand.GetSocketsIncreaseStats();
