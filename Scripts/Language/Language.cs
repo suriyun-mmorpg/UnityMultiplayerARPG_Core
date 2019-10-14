@@ -930,10 +930,24 @@ namespace MultiplayerARPG
         {
             foreach (LanguageData entry in dataList)
             {
-                if (entry.key == key)
+                if (string.IsNullOrEmpty(entry.key))
+                    continue;
+                if (entry.key.Equals(key))
                     return true;
             }
             return false;
+        }
+
+        public static string GetText(IEnumerable<LanguageData> langs, string defaultValue)
+        {
+            foreach (LanguageData entry in langs)
+            {
+                if (string.IsNullOrEmpty(entry.key))
+                    continue;
+                if (entry.key.Equals(LanguageManager.CurrentLanguageKey))
+                    return entry.value;
+            }
+            return defaultValue;
         }
     }
 

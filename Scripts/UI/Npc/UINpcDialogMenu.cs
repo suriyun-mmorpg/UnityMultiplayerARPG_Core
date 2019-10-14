@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class UINpcDialogMenuAction
+    public struct UINpcDialogMenuAction
     {
         public string title;
         public int menuIndex;

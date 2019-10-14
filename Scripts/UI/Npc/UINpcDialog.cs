@@ -23,20 +23,118 @@ namespace MultiplayerARPG
         public UINpcSellItem uiSellItemPrefab;
         public GameObject uiSellItemRoot;
         public Transform uiSellItemContainer;
+
+        [Header("Quest Accept Menu Title")]
         public string messageQuestAccept = "Accept";
+        public LanguageData[] messageQuestAcceptTitles;
+        public string MessageQuestAccept
+        {
+            get { return Language.GetText(messageQuestAcceptTitles, messageQuestAccept); }
+        }
+
+        [Header("Quest Decline Menu Title")]
         public string messageQuestDecline = "Decline";
+        public LanguageData[] messageQuestDeclineTitles;
+        public string MessageQuestDecline
+        {
+            get { return Language.GetText(messageQuestDeclineTitles, messageQuestDecline); }
+        }
+
+        [Header("Quest Abandon Menu Title")]
         public string messageQuestAbandon = "Abandon";
+        public LanguageData[] messageQuestAbandonTitles;
+        public string MessageQuestAbandon
+        {
+            get { return Language.GetText(messageQuestAbandonTitles, messageQuestAbandon); }
+        }
+
+        [Header("Quest Complete Menu Title")]
         public string messageQuestComplete = "Complete";
-        public string messageCraftItemStart = "Craft";
+        public LanguageData[] messageQuestCompleteTitles;
+        public string MessageQuestComplete
+        {
+            get { return Language.GetText(messageQuestCompleteTitles, messageQuestComplete); }
+        }
+
+        [Header("Craft Item Confirm Menu Title")]
+        public string messageCraftItemConfirm = "Craft";
+        public LanguageData[] messageCraftItemConfirmTitles;
+        public string MessageCraftItemConfirm
+        {
+            get { return Language.GetText(messageCraftItemConfirmTitles, messageCraftItemConfirm); }
+        }
+
+        [Header("Craft Item Cancel Menu Title")]
         public string messageCraftItemCancel = "Cancel";
+        public LanguageData[] messageCraftItemCancelTitles;
+        public string MessageCraftItemCancel
+        {
+            get { return Language.GetText(messageCraftItemCancelTitles, messageCraftItemCancel); }
+        }
+
+        [Header("Save Respawn Point Confirm Menu Title")]
         public string messageSaveRespawnPointConfirm = "Confirm";
+        public LanguageData[] messageSaveRespawnPointConfirmTitles;
+        public string MessageSaveRespawnPointConfirm
+        {
+            get { return Language.GetText(messageSaveRespawnPointConfirmTitles, messageSaveRespawnPointConfirm); }
+        }
+
+        [Header("Save Respawn Point Cancel Menu Title")]
         public string messageSaveRespawnPointCancel = "Cancel";
+        public LanguageData[] messageSaveRespawnPointCancelTitles;
+        public string MessageSaveRespawnPointCancel
+        {
+            get { return Language.GetText(messageSaveRespawnPointCancelTitles, messageSaveRespawnPointCancel); }
+        }
+
+        [Header("Warp Confirm Menu Title")]
         public string messageWarpConfirm = "Confirm";
+        public LanguageData[] messageWarpConfirmTitles;
+        public string MessageWarpConfirm
+        {
+            get { return Language.GetText(messageWarpConfirmTitles, messageWarpConfirm); }
+        }
+
+        [Header("Warp Cancel Menu Title")]
         public string messageWarpCancel = "Cancel";
+        public LanguageData[] messageWarpCancelTitles;
+        public string MessageWarpCancel
+        {
+            get { return Language.GetText(messageWarpCancelTitles, messageWarpCancel); }
+        }
+
+        [Header("Open Player Storage Confirm Menu Title")]
         public string messagePlayerStorageConfirm = "Open Storage";
+        public LanguageData[] messagePlayerStorageConfirmTitles;
+        public string MessagePlayerStorageConfirm
+        {
+            get { return Language.GetText(messagePlayerStorageConfirmTitles, messagePlayerStorageConfirm); }
+        }
+
+        [Header("Open Player Storage Cancel Menu Title")]
         public string messagePlayerStorageCancel = "Cancel";
+        public LanguageData[] messagePlayerStorageCancelTitles;
+        public string MessagePlayerStorageCancel
+        {
+            get { return Language.GetText(messagePlayerStorageCancelTitles, messagePlayerStorageCancel); }
+        }
+
+        [Header("Open Guild Storage Confirm Menu Title")]
         public string messageGuildStorageConfirm = "Open Storage";
+        public LanguageData[] messageGuildStorageConfirmTitles;
+        public string MessageGuildStorageConfirm
+        {
+            get { return Language.GetText(messageGuildStorageConfirmTitles, messageGuildStorageConfirm); }
+        }
+
+        [Header("Open Guild Storage Cancel Menu Title")]
         public string messageGuildStorageCancel = "Cancel";
+        public LanguageData[] messageGuildStorageCancelTitles;
+        public string MessageGuildStorageCancel
+        {
+            get { return Language.GetText(messageGuildStorageCancelTitles, messageGuildStorageCancel); }
+        }
 
         [Header("Event")]
         public UnityEvent onSwitchToNormalDialog;
@@ -112,7 +210,7 @@ namespace MultiplayerARPG
                         if (menu.IsPassConditions(owningCharacter))
                         {
                             UINpcDialogMenuAction menuAction = new UINpcDialogMenuAction();
-                            menuAction.title = menu.title;
+                            menuAction.title = menu.Title;
                             menuAction.menuIndex = i;
                             menuActions.Add(menuAction);
                         }
@@ -130,13 +228,13 @@ namespace MultiplayerARPG
                             UINpcDialogMenuAction declineMenuAction = new UINpcDialogMenuAction();
                             UINpcDialogMenuAction abandonMenuAction = new UINpcDialogMenuAction();
                             UINpcDialogMenuAction completeMenuAction = new UINpcDialogMenuAction();
-                            acceptMenuAction.title = messageQuestAccept;
+                            acceptMenuAction.title = MessageQuestAccept;
                             acceptMenuAction.menuIndex = NpcDialog.QUEST_ACCEPT_MENU_INDEX;
-                            declineMenuAction.title = messageQuestDecline;
+                            declineMenuAction.title = MessageQuestDecline;
                             declineMenuAction.menuIndex = NpcDialog.QUEST_DECLINE_MENU_INDEX;
-                            abandonMenuAction.title = messageQuestAbandon;
+                            abandonMenuAction.title = MessageQuestAbandon;
                             abandonMenuAction.menuIndex = NpcDialog.QUEST_ABANDON_MENU_INDEX;
-                            completeMenuAction.title = messageQuestComplete;
+                            completeMenuAction.title = MessageQuestComplete;
                             completeMenuAction.menuIndex = NpcDialog.QUEST_COMPLETE_MENU_INDEX;
 
                             CharacterQuest characterQuest;
@@ -174,9 +272,9 @@ namespace MultiplayerARPG
                         {
                             UINpcDialogMenuAction startMenuAction = new UINpcDialogMenuAction();
                             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
-                            startMenuAction.title = messageCraftItemStart;
+                            startMenuAction.title = MessageCraftItemConfirm;
                             startMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_START_MENU_INDEX;
-                            cancelMenuAction.title = messageCraftItemCancel;
+                            cancelMenuAction.title = MessageCraftItemCancel;
                             cancelMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_CANCEL_MENU_INDEX;
                             uiCraftItem.SetupForNpc(Data.itemCraft);
                             menuActions.Add(startMenuAction);
@@ -189,9 +287,9 @@ namespace MultiplayerARPG
                         onSwitchToSaveRespawnPointDialog.Invoke();
                     UINpcDialogMenuAction saveRespawnPointConfirmAction = new UINpcDialogMenuAction();
                     UINpcDialogMenuAction saveRespawnPointCancelAction = new UINpcDialogMenuAction();
-                    saveRespawnPointConfirmAction.title = messageSaveRespawnPointConfirm;
+                    saveRespawnPointConfirmAction.title = MessageSaveRespawnPointConfirm;
                     saveRespawnPointConfirmAction.menuIndex = NpcDialog.SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX;
-                    saveRespawnPointCancelAction.title = messageSaveRespawnPointCancel;
+                    saveRespawnPointCancelAction.title = MessageSaveRespawnPointCancel;
                     saveRespawnPointCancelAction.menuIndex = NpcDialog.SAVE_SPAWN_POINT_CANCEL_MENU_INDEX;
                     menuActions.Add(saveRespawnPointConfirmAction);
                     menuActions.Add(saveRespawnPointCancelAction);
@@ -201,9 +299,9 @@ namespace MultiplayerARPG
                         onSwitchToWarpDialog.Invoke();
                     UINpcDialogMenuAction warpConfirmAction = new UINpcDialogMenuAction();
                     UINpcDialogMenuAction warpCancelAction = new UINpcDialogMenuAction();
-                    warpConfirmAction.title = messageWarpConfirm;
+                    warpConfirmAction.title = MessageWarpConfirm;
                     warpConfirmAction.menuIndex = NpcDialog.WARP_CONFIRM_MENU_INDEX;
-                    warpCancelAction.title = messageWarpCancel;
+                    warpCancelAction.title = MessageWarpCancel;
                     warpCancelAction.menuIndex = NpcDialog.WARP_CANCEL_MENU_INDEX;
                     menuActions.Add(warpConfirmAction);
                     menuActions.Add(warpCancelAction);
@@ -213,9 +311,9 @@ namespace MultiplayerARPG
                         onSwitchToPlayerStorageDialog.Invoke();
                     UINpcDialogMenuAction playerStorageConfirmAction = new UINpcDialogMenuAction();
                     UINpcDialogMenuAction playerStorageCancelAction = new UINpcDialogMenuAction();
-                    playerStorageConfirmAction.title = messagePlayerStorageConfirm;
+                    playerStorageConfirmAction.title = MessagePlayerStorageConfirm;
                     playerStorageConfirmAction.menuIndex = NpcDialog.STORAGE_CONFIRM_MENU_INDEX;
-                    playerStorageCancelAction.title = messagePlayerStorageCancel;
+                    playerStorageCancelAction.title = MessagePlayerStorageCancel;
                     playerStorageCancelAction.menuIndex = NpcDialog.STORAGE_CANCEL_MENU_INDEX;
                     menuActions.Add(playerStorageConfirmAction);
                     menuActions.Add(playerStorageCancelAction);
@@ -225,9 +323,9 @@ namespace MultiplayerARPG
                         onSwitchToGuildStorageDialog.Invoke();
                     UINpcDialogMenuAction guildStorageConfirmAction = new UINpcDialogMenuAction();
                     UINpcDialogMenuAction guildStorageCancelAction = new UINpcDialogMenuAction();
-                    guildStorageConfirmAction.title = messageGuildStorageConfirm;
+                    guildStorageConfirmAction.title = MessageGuildStorageConfirm;
                     guildStorageConfirmAction.menuIndex = NpcDialog.STORAGE_CONFIRM_MENU_INDEX;
-                    guildStorageCancelAction.title = messageGuildStorageCancel;
+                    guildStorageCancelAction.title = MessageGuildStorageCancel;
                     guildStorageCancelAction.menuIndex = NpcDialog.STORAGE_CANCEL_MENU_INDEX;
                     menuActions.Add(guildStorageConfirmAction);
                     menuActions.Add(guildStorageCancelAction);

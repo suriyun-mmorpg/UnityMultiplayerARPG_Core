@@ -22,23 +22,13 @@ namespace MultiplayerARPG
         public Sprite icon;
         
         public virtual string Id { get { return name; } }
-        public virtual string Title
+        public string Title
         {
-            get
-            {
-                if (CacheTitles.ContainsKey(LanguageManager.CurrentLanguageKey))
-                    return CacheTitles[LanguageManager.CurrentLanguageKey];
-                return title;
-            }
+            get { return Language.GetText(titles, title); }
         }
-        public virtual string Description
+        public string Description
         {
-            get
-            {
-                if (CacheDescriptions.ContainsKey(LanguageManager.CurrentLanguageKey))
-                    return CacheDescriptions[LanguageManager.CurrentLanguageKey];
-                return description;
-            }
+            get { return Language.GetText(descriptions, description); }
         }
         public int DataId { get { return MakeDataId(Id); } }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
@@ -46,48 +36,6 @@ namespace MultiplayerARPG
         public static int MakeDataId(string id)
         {
             return id.GenerateHashId();
-        }
-
-        [System.NonSerialized]
-        private Dictionary<string, string> cacheTitles;
-        public Dictionary<string, string> CacheTitles
-        {
-            get
-            {
-                if (cacheTitles == null)
-                {
-                    cacheTitles = new Dictionary<string, string>();
-                    if (titles != null)
-                    {
-                        foreach (LanguageData entry in titles)
-                        {
-                            cacheTitles[entry.key] = entry.value;
-                        }
-                    }
-                }
-                return cacheTitles;
-            }
-        }
-
-        [System.NonSerialized]
-        private Dictionary<string, string> cacheDescriptions;
-        public Dictionary<string, string> CacheDescriptions
-        {
-            get
-            {
-                if (cacheDescriptions == null)
-                {
-                    cacheDescriptions = new Dictionary<string, string>();
-                    if (descriptions != null)
-                    {
-                        foreach (LanguageData entry in descriptions)
-                        {
-                            cacheDescriptions[entry.key] = entry.value;
-                        }
-                    }
-                }
-                return cacheDescriptions;
-            }
         }
 
 #if UNITY_EDITOR
