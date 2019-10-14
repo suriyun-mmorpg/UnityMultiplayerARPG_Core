@@ -22,11 +22,11 @@ namespace MultiplayerARPG
         public Sprite icon;
         
         public virtual string Id { get { return name; } }
-        public string Title
+        public virtual string Title
         {
             get { return Language.GetText(titles, title); }
         }
-        public string Description
+        public virtual string Description
         {
             get { return Language.GetText(descriptions, description); }
         }
