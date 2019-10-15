@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
 using UnityEngine.Profiling;
+using UnityEngine.Tilemaps;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,6 +15,7 @@ namespace MultiplayerARPG
         [Header("Building Data")]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
         public string buildingType;
+        public List<string> buildingTypes;
         public float characterForwardDistance = 4;
         public int maxHp = 100;
 
@@ -83,6 +85,7 @@ namespace MultiplayerARPG
         public bool isBuildMode { get; private set; }
 
         private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
+        private readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
         private readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
         private readonly List<BuildingEntity> children = new List<BuildingEntity>();
         private BuildingMaterial[] buildingMaterials;
@@ -93,6 +96,12 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = gameInstance.buildingTag;
             gameObject.layer = gameInstance.buildingLayer;
+
+            if (buildingTypes == null)
+                buildingTypes = new List<string>();
+
+            if (!string.IsNullOrEmpty(buildingType) && !buildingTypes.Contains(buildingType))
+                buildingTypes.Add(buildingType);
 
             buildingMaterials = GetComponentsInChildren<BuildingMaterial>(true);
             if (buildingMaterials != null && buildingMaterials.Length > 0)
@@ -165,9 +174,9 @@ namespace MultiplayerARPG
 
         public bool CanBuild()
         {
-            if (buildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0)
+            if (buildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
                 return false;
-            return buildingType.Equals(buildingArea.buildingType);
+            return buildingTypes.Contains(buildingArea.buildingType);
         }
 
         protected override void OnValidate()
@@ -215,13 +224,25 @@ namespace MultiplayerARPG
             foreach (Collider collider in colliders)
             {
                 collider.isTrigger = true;
-                // We'll use rigidbody to detect trigger events
+                // Use rigidbody to detect trigger events
                 Rigidbody rigidbody = collider.GetComponent<Rigidbody>();
                 if (rigidbody == null)
                     rigidbody = collider.gameObject.AddComponent<Rigidbody>();
                 rigidbody.useGravity = false;
                 rigidbody.isKinematic = true;
                 rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            }
+            Collider2D[] colliders2D = GetComponentsInChildren<Collider2D>(true);
+            foreach (Collider2D collider in colliders2D)
+            {
+                collider.isTrigger = true;
+                // Use rigidbody to detect trigger events
+                Rigidbody2D rigidbody = collider.GetComponent<Rigidbody2D>();
+                if (rigidbody == null)
+                    rigidbody = collider.gameObject.AddComponent<Rigidbody2D>();
+                rigidbody.gravityScale = 0;
+                rigidbody.isKinematic = true;
+                rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
             }
             isBuildMode = true;
         }
@@ -251,6 +272,18 @@ namespace MultiplayerARPG
         {
             if (buildingMaterial != null)
                 triggerMaterials.Remove(buildingMaterial);
+        }
+
+        public void TriggerEnterTilemap(TilemapCollider2D tilemapCollider)
+        {
+            if (tilemapCollider != null && !triggerTilemaps.Contains(tilemapCollider))
+                triggerTilemaps.Add(tilemapCollider);
+        }
+
+        public void TriggerExitTilemap(TilemapCollider2D tilemapCollider)
+        {
+            if (tilemapCollider != null)
+                triggerTilemaps.Remove(tilemapCollider);
         }
 
         public override void OnNetworkDestroy(byte reasons)

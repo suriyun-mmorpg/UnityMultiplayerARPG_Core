@@ -352,6 +352,23 @@ namespace MultiplayerARPG
         {
             get { return newCharacterSetting != null; }
         }
+
+        private List<int> cacheNonTargetLayersValues;
+        public List<int> NonTargetLayersValues
+        {
+            get
+            {
+                if (cacheNonTargetLayersValues == null)
+                {
+                    cacheNonTargetLayersValues = new List<int>();
+                    foreach (UnityLayer layer in nonTargetingLayers)
+                    {
+                        cacheNonTargetLayersValues.Add(layer.LayerIndex);
+                    }
+                }
+                return cacheNonTargetLayersValues;
+            }
+        }
         #endregion
 
         protected virtual void Awake()

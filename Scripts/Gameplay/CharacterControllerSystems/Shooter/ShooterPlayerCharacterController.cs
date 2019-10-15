@@ -385,7 +385,7 @@ namespace MultiplayerARPG
                         buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
                         if (buildingArea == null ||
                             (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity) ||
-                            !CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
+                            !CurrentBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                         {
                             // Skip because this area is not allowed to build the building that you are going to build
                             continue;

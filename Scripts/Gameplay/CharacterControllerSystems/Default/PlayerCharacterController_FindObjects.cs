@@ -88,7 +88,7 @@ namespace MultiplayerARPG
                 BuildingArea buildingArea = tempTransform.GetComponent<BuildingArea>();
                 if (buildingArea == null ||
                     (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity) ||
-                    !CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
+                    !CurrentBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                     continue;
 
                 CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
