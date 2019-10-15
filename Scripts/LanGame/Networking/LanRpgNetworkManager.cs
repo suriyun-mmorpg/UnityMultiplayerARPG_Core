@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         private readonly StorageSaveData storageSaveData = new StorageSaveData();
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
+        private bool isSceneLoaded;
 
         private LiteNetLibDiscovery cacheDiscovery;
         public LiteNetLibDiscovery CacheDiscovery
@@ -193,6 +194,8 @@ namespace MultiplayerARPG
 
         private void SaveWorld()
         {
+            if (!isSceneLoaded)
+                return;
             // Save building entities / Tree / Rocks
             BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
             worldSaveData.buildings.Clear();
@@ -216,6 +219,8 @@ namespace MultiplayerARPG
 
         private void SaveStorage()
         {
+            if (!isSceneLoaded)
+                return;
             BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
             storageSaveData.storageItems.Clear();
             foreach (StorageId key in storageItems.Keys)
@@ -550,20 +555,23 @@ namespace MultiplayerARPG
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
+            isSceneLoaded = false;
             StartCoroutine(OnServerOnlineSceneLoadedRoutine());
         }
 
         private IEnumerator OnServerOnlineSceneLoadedRoutine()
         {
-            yield return new WaitForSecondsRealtime(1);
+            yield return new WaitForSecondsRealtime(0.5f);
             // Load and Spawn buildings
             worldSaveData.LoadPersistentData(selectedCharacter.Id, selectedCharacter.CurrentMapName);
+            yield return null;
             foreach (BuildingSaveData building in worldSaveData.buildings)
             {
                 CreateBuildingEntity(building, true);
             }
             // Load storage data
             storageSaveData.LoadPersistentData(selectedCharacter.Id);
+            yield return null;
             foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
             {
                 StorageId storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
@@ -577,6 +585,7 @@ namespace MultiplayerARPG
             {
                 harvestableSpawnArea.SpawnAll();
             }
+            isSceneLoaded = true;
         }
         #endregion
     }
