@@ -152,7 +152,7 @@ namespace MultiplayerARPG
                 out totalDuration);
 
             // Prepare requires data and get damages data
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, level, isLeftHand);
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
 
             // Set doing action state at clients and server
             isAttackingOrUsingSkill = true;
@@ -167,7 +167,7 @@ namespace MultiplayerARPG
             isCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
             isCastingSkillInterrupted = false;
             // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
-            castingSkillDuration = castingSkillCountDown = skill.GetCastDuration(level);
+            castingSkillDuration = castingSkillCountDown = skill.GetCastDuration(skillLevel);
             if (castingSkillDuration > 0f)
             {
                 // Tell clients that character is casting
