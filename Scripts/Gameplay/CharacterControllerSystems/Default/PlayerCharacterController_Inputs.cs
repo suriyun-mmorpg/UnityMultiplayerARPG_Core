@@ -145,19 +145,30 @@ namespace MultiplayerARPG
                 mouseDownTime = Time.unscaledTime;
                 mouseDownPosition = Input.mousePosition;
             }
+            // Read inputs
             isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
             isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
             isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
             isMouseHoldAndNotDrag = !isMouseDragDetected && isMouseHoldDetected;
             if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
+            {
+                // Detected mouse dragging or hold on an UIs
                 isMouseDragOrHoldOrOverUI = true;
+            }
+            // Will set move target when pointer isn't point on an UIs 
             if (!isPointerOverUI && (getMouse || getMouseUp))
             {
+                // Clear target
                 targetEntity = null;
                 targetPosition = null;
-                Vector3? tempMapPosition = null;
+                // Prepare temp variables
+                Transform tempTransform;
+                Vector3 tempVector3;
+                bool tempHasMapPosition = false;
+                Vector3 tempMapPosition = Vector3.zero;
                 float tempHighestY = float.MinValue;
                 BuildingMaterial tempBuildingMaterial;
+                // If mouse up while cursor point to target (character, item, npc and so on)
                 bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI && (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
                 int tempCount = FindClickObjects(out tempVector3);
                 for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
@@ -174,7 +185,7 @@ namespace MultiplayerARPG
                         {
                             IsEditingBuilding = true;
                             SetTarget(targetBuilding);
-                            tempMapPosition = null;
+                            tempHasMapPosition = false;
                             break;
                         }
                     }
@@ -194,57 +205,64 @@ namespace MultiplayerARPG
                         lastNpcObjectId = 0;
                         if (targetPlayer != null && !targetPlayer.IsDead())
                         {
+                            // Found activating entity as player character entity
                             SetTarget(targetPlayer);
-                            tempMapPosition = null;
+                            tempHasMapPosition = false;
                             break;
                         }
                         else if (targetMonster != null && !targetMonster.IsDead())
                         {
+                            // Found activating entity as monster character entity
                             SetTarget(targetMonster);
-                            tempMapPosition = null;
+                            tempHasMapPosition = false;
                             break;
                         }
                         else if (targetNpc != null)
                         {
+                            // Found activating entity as npc entity
                             SetTarget(targetNpc);
-                            tempMapPosition = null;
+                            tempHasMapPosition = false;
                             break;
                         }
                         else if (targetItemDrop != null)
                         {
+                            // Found activating entity as item drop entity
                             SetTarget(targetItemDrop);
-                            tempMapPosition = null;
+                            tempHasMapPosition = false;
                             break;
                         }
                         else if (targetHarvestable != null && !targetHarvestable.IsDead())
                         {
+                            // Found activating entity as harvestable entity
                             SetTarget(targetHarvestable);
-                            tempMapPosition = null;
+                            tempHasMapPosition = false;
                             break;
                         }
                         else if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
                         {
+                            // Found activating entity as building entity
                             IsEditingBuilding = false;
                             SetTarget(targetBuilding);
-                            tempMapPosition = null;
+                            tempHasMapPosition = false;
                             break;
                         }
                         else if (!GetRaycastIsTrigger(tempCounter))
                         {
                             // Set clicked map position, it will be used if no activating entity found
+                            tempHasMapPosition = true;
                             tempMapPosition = GetRaycastPoint(tempCounter);
-                            if (tempMapPosition.Value.y > tempHighestY)
-                                tempHighestY = tempMapPosition.Value.y;
+                            if (tempMapPosition.y > tempHighestY)
+                                tempHighestY = tempMapPosition.y;
                         }
                     }
                 }
                 // When clicked on map (Not touch any game entity)
                 // - Clear selected target to hide selected entity UIs
                 // - Set target position to position where mouse clicked
-                if (tempMapPosition.HasValue)
+                if (tempHasMapPosition)
                 {
                     SelectedEntity = null;
-                    targetPosition = tempMapPosition.Value;
+                    targetPosition = tempMapPosition;
                 }
                 // When clicked on map (any non-collider position)
                 // tempVector3 is come from FindClickObjects()
@@ -268,7 +286,9 @@ namespace MultiplayerARPG
 
                     // Move to target, will hide destination when target is object
                     if (targetEntity != null)
+                    {
                         destination = null;
+                    }
                     else
                     {
                         destination = targetPosition.Value;

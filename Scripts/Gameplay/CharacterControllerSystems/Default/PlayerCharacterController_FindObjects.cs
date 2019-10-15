@@ -12,9 +12,6 @@ namespace MultiplayerARPG
         protected Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
         protected RaycastHit2D[] raycasts2D = new RaycastHit2D[RAYCAST_COLLIDER_SIZE];
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
-        protected GameObject tempGameObject;
-        protected Transform tempTransform;
-        protected Vector3 tempVector3;
 
         public int FindClickObjects(out Vector3 worldPointFor2D)
         {
@@ -28,6 +25,7 @@ namespace MultiplayerARPG
         public void FindAndSetBuildingAreaFromMousePosition()
         {
             int tempCount = 0;
+            Vector3 tempVector3;
             switch (gameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
@@ -46,6 +44,7 @@ namespace MultiplayerARPG
             if (CurrentBuildingEntity == null)
                 return;
             int tempCount = 0;
+            Vector3 tempVector3;
             switch (gameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
@@ -53,19 +52,32 @@ namespace MultiplayerARPG
                     CurrentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(MovementTransform.eulerAngles);
                     CurrentBuildingEntity.buildingArea = null;
                     tempCount = Physics.RaycastNonAlloc(new Ray(tempVector3 + (Vector3.up * 2.5f), Vector3.down), raycasts, 5f, gameInstance.GetBuildLayerMask());
+                    if (!LoopSetBuildingArea(tempCount))
+                        CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
                     break;
                 case DimensionType.Dimension2D:
-                    // TODO: implement this
+                    tempVector3 = MovementTransform.position;
+                    if (PlayerCharacterEntity.CurrentDirectionType.HasFlag(DirectionType2D.Down))
+                        tempVector3 += Vector3.down * CurrentBuildingEntity.characterForwardDistance;
+                    if (PlayerCharacterEntity.CurrentDirectionType.HasFlag(DirectionType2D.Up))
+                        tempVector3 += Vector3.up * CurrentBuildingEntity.characterForwardDistance;
+                    if (PlayerCharacterEntity.CurrentDirectionType.HasFlag(DirectionType2D.Left))
+                        tempVector3 += Vector3.left * CurrentBuildingEntity.characterForwardDistance;
+                    if (PlayerCharacterEntity.CurrentDirectionType.HasFlag(DirectionType2D.Right))
+                        tempVector3 += Vector3.right * CurrentBuildingEntity.characterForwardDistance;
+                    CurrentBuildingEntity.buildingArea = null;
+                    tempCount = Physics2D.LinecastNonAlloc(tempVector3, tempVector3, raycasts2D, gameInstance.GetBuildLayerMask());
+                    if (!LoopSetBuildingArea(tempCount))
+                        CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
                     break;
             }
-
-            if (!LoopSetBuildingArea(tempCount))
-                CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
         }
 
         private bool LoopSetBuildingArea(int count)
         {
             BuildingArea nonSnapBuildingArea = null;
+            Transform tempTransform;
+            Vector3 tempVector3;
             for (int tempCounter = 0; tempCounter < count; ++tempCounter)
             {
                 tempTransform = GetRaycastTransform(tempCounter);
