@@ -162,10 +162,7 @@ namespace MultiplayerARPG
 
         public bool ValidateTriggerLayer(GameObject gameObject)
         {
-            return !(GameInstance.Singleton.NonTargetLayersValues.Contains(gameObject.layer) ||
-                gameObject.layer == 1 ||
-                gameObject.layer == 2 ||
-                gameObject.layer == 3);
+            return !(gameObject.layer == 1 || gameObject.layer == 2 || gameObject.layer == 3);
         }
 
         public bool IsDead()
