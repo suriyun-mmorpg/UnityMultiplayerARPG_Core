@@ -372,37 +372,6 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make damage - amount key-value pair which calculates with damage inflictions
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <param name="effectiveness"></param>
-        /// <param name="damageInflictions"></param>
-        /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> MakeDamageWithInflictions(DamageIncremental source, short level, float rate, float effectiveness, Dictionary<DamageElement, float> damageInflictions)
-        {
-            Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
-            MinMaxFloat baseDamage = (source.amount.GetAmount(level) * rate) + effectiveness;
-            if (damageInflictions != null && damageInflictions.Count > 0)
-            {
-                foreach (DamageElement element in damageInflictions.Keys)
-                {
-                    if (element == null) continue;
-                    result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(element, baseDamage * damageInflictions[element]));
-                }
-            }
-            else
-            {
-                DamageElement damageElement = source.damageElement;
-                if (damageElement == null)
-                    damageElement = GameInstance.Singleton.DefaultDamageElement;
-                result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage));
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Make damage infliction - amount key-value pair
         /// </summary>
         /// <param name="source"></param>

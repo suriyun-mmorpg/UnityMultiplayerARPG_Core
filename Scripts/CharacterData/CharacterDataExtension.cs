@@ -978,6 +978,34 @@ public static partial class CharacterDataExtension
         return CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem);
     }
 
+    public static DamageInfo GetWeaponDamageInfo(this ICharacterData data, ref bool isLeftHand)
+    {
+        if (data is BaseMonsterCharacterEntity)
+        {
+            BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
+            isLeftHand = false;
+            return monsterCharacterEntity.MonsterDatabase.damageInfo;
+        }
+        else
+        {
+            return data.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.damageInfo;
+        }
+    }
+
+    public static KeyValuePair<DamageElement, MinMaxFloat> GetWeaponDamage(this ICharacterData data, ref bool isLeftHand)
+    {
+        if (data is BaseMonsterCharacterEntity)
+        {
+            BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
+            isLeftHand = false;
+            return GameDataHelpers.MakeDamage(monsterCharacterEntity.MonsterDatabase.damageAmount, monsterCharacterEntity.Level, 1f, 0f);
+        }
+        else
+        {
+            return data.GetAvailableWeapon(ref isLeftHand).GetDamageAmount(data);
+        }
+    }
+
     public static int IndexOfAttribute(this ICharacterData data, int dataId)
     {
         IList<CharacterAttribute> list = data.Attributes;

@@ -5,35 +5,36 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public enum SkillAttackType : byte
-    {
-        None,
-        Normal,
-        BasedOnWeapon,
-    }
-
-    public enum SkillBuffType : byte
-    {
-        None,
-        BuffToUser,
-        BuffToNearbyAllies,
-        BuffToNearbyCharacters,
-    }
-
     [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Skill", order = -4989)]
     public partial class Skill : BaseSkill
     {
+        public enum SkillAttackType : byte
+        {
+            None,
+            Normal,
+            BasedOnWeapon,
+        }
+
+        public enum SkillBuffType : byte
+        {
+            None,
+            BuffToUser,
+            BuffToNearbyAllies,
+            BuffToNearbyCharacters,
+        }
+
         public SkillType skillType;
 
         [Header("Attack")]
         public SkillAttackType skillAttackType;
         public GameEffectCollection hitEffects;
         public DamageInfo damageInfo;
-        public DamageEffectivenessAttribute[] effectivenessAttributes;
         public DamageIncremental damageAmount;
+        public DamageEffectivenessAttribute[] effectivenessAttributes;
         public DamageInflictionIncremental[] weaponDamageInflictions;
         public DamageIncremental[] additionalDamageAmounts;
-        public bool increaseDamageWithBuffs;
+        [FormerlySerializedAs("increaseDamageWithBuffs")]
+        public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
 
@@ -196,20 +197,9 @@ namespace MultiplayerARPG
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    // Get damage info from skill
                     return damageInfo;
                 case SkillAttackType.BasedOnWeapon:
-                    // Assign damage data
-                    if (skillUser is BaseMonsterCharacterEntity)
-                    {
-                        // Monster has its own damage info
-                        return (skillUser as BaseMonsterCharacterEntity).MonsterDatabase.damageInfo;
-                    }
-                    else
-                    {
-                        // Get damage info from weapon
-                        return skillUser.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.damageInfo;
-                    }
+                    return skillUser.GetWeaponDamageInfo(ref isLeftHand);
             }
             return default(DamageInfo);
         }
@@ -286,96 +276,16 @@ namespace MultiplayerARPG
             return skillUser.GetAttackFov(isLeftHand);
         }
 
-        public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
-        {
-            Dictionary<DamageElement, MinMaxFloat>  damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            // If it is attack skill
-            if (IsAttack())
-            {
-                switch (skillAttackType)
-                {
-                    case SkillAttackType.Normal:
-                        // Sum damage with skill damage because this skill damages based on itself
-                        damageAmounts = GameDataHelpers.CombineDamages(
-                            damageAmounts,
-                            GetAttackAdditionalDamageAmounts(skillUser, skillLevel));
-                        // Sum damage with additional damage amounts
-                        damageAmounts = GameDataHelpers.CombineDamages(
-                            damageAmounts,
-                            GetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand));
-                        break;
-                    case SkillAttackType.BasedOnWeapon:
-                        // Assign damage data
-                        if (skillUser is BaseMonsterCharacterEntity)
-                        {
-                            // Character is monster
-                            BaseMonsterCharacterEntity monsterSkillUser = skillUser as BaseMonsterCharacterEntity;
-                            // Calculate all damages
-                            damageAmounts = GameDataHelpers.MakeDamageWithInflictions(
-                                monsterSkillUser.MonsterDatabase.damageAmount,
-                                monsterSkillUser.Level, // Monster Level
-                                1f, // Equipment Stats Rate, this is not based on equipment so its rate is 1f
-                                GetEffectivenessDamage(skillUser),
-                                GetAttackWeaponDamageInflictions(skillUser, skillLevel));
-                        }
-                        else
-                        {
-                            // Character isn't monster
-                            CharacterItem weapon = skillUser.GetAvailableWeapon(ref isLeftHand);
-                            // Calculate all damages
-                            damageAmounts = GameDataHelpers.MakeDamageWithInflictions(
-                                weapon.GetWeaponItem().damageAmount,
-                                weapon.level,
-                                weapon.GetEquipmentStatsRate(),
-                                weapon.GetWeaponItem().GetEffectivenessDamage(skillUser),
-                                GetAttackWeaponDamageInflictions(skillUser, skillLevel));
-                        }
-                        // Sum damage with additional damage amounts
-                        damageAmounts = GameDataHelpers.CombineDamages(
-                            damageAmounts,
-                            GetAttackAdditionalDamageAmounts(skillUser, skillLevel));
-                        break;
-                }
-                if (increaseDamageWithBuffs)
-                {
-                    // Sum damage with buffs
-                    damageAmounts = GameDataHelpers.CombineDamages(
-                        damageAmounts,
-                        skillUser.GetCaches().IncreaseDamages);
-                }
-            }
-            return damageAmounts;
-        }
-
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    return GameDataHelpers.MakeDamage(
-                        damageAmount,
-                        skillLevel,
-                        1f, // Equipment Stats Rate, this is not based on equipment so its rate is 1f
-                        GetEffectivenessDamage(skillUser));
+                    return GameDataHelpers.MakeDamage(damageAmount, skillLevel, 1f, GetEffectivenessDamage(skillUser));
                 case SkillAttackType.BasedOnWeapon:
-                    if (skillUser is BaseMonsterCharacterEntity)
-                    {
-                        // Character is monster
-                        BaseMonsterCharacterEntity monsterSkillUser = skillUser as BaseMonsterCharacterEntity;
-                        return GameDataHelpers.MakeDamage(
-                            monsterSkillUser.MonsterDatabase.damageAmount,
-                            monsterSkillUser.Level,
-                            1f, // Equipment Stats Rate, this is not based on equipment so its rate is 1f
-                            GetEffectivenessDamage(skillUser));
-                    }
-                    else
-                    {
-                        // Get damage amount from weapon
-                        return skillUser.GetAvailableWeapon(ref isLeftHand).GetDamageAmount(skillUser);
-                    }
-                default:
-                    return new KeyValuePair<DamageElement, MinMaxFloat>();
+                    return skillUser.GetWeaponDamage(ref isLeftHand);
             }
+            return new KeyValuePair<DamageElement, MinMaxFloat>();
         }
 
         public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel)
@@ -390,6 +300,11 @@ namespace MultiplayerARPG
             if (!IsAttack())
                 return new Dictionary<DamageElement, MinMaxFloat>();
             return GameDataHelpers.CombineDamages(additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), skillLevel, 1f);
+        }
+
+        public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel)
+        {
+            return increaseDamageAmountsWithBuffs;
         }
 
         protected float GetEffectivenessDamage(ICharacterData skillUser)

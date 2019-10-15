@@ -19,24 +19,21 @@ namespace MultiplayerARPG
             animActionType = AnimActionType.None;
             animationDataId = 0;
             weapon = this.GetAvailableWeapon(ref isLeftHand);
-            // Prepare weapon data
-            Item weaponItem = weapon.GetWeaponItem();
-            WeaponType weaponType = weaponItem.WeaponType;
             // Assign data id
-            animationDataId = weaponType.DataId;
+            animationDataId = weapon.GetWeaponItem().WeaponType.DataId;
             // Assign animation action type
             animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
         }
 
-        public virtual void GetWeaponDamages(CharacterItem weapon, out DamageInfo damageInfo, out Dictionary<DamageElement, MinMaxFloat> damageAmounts)
+        public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamageAmounts(ref bool isLeftHand)
         {
-            Item weaponItem = weapon.GetWeaponItem();
-            damageInfo = weaponItem.WeaponType.damageInfo;
-            damageAmounts = null;
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Calculate all damages
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, weapon.GetDamageAmount(this));
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetWeaponDamage(ref isLeftHand));
             // Sum damage with buffs
             damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetCaches().IncreaseDamages);
+
+            return damageAmounts;
         }
 
         public bool ValidateAmmo(CharacterItem weapon)
@@ -247,12 +244,8 @@ namespace MultiplayerARPG
                 out totalDuration);
 
             // Prepare requires data and get damages data
-            DamageInfo damageInfo;
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts;
-            GetWeaponDamages(
-                weapon,
-                out damageInfo,
-                out damageAmounts);
+            DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamageAmounts(ref isLeftHand);
 
             // Set doing action state at clients and server
             isAttackingOrUsingSkill = true;

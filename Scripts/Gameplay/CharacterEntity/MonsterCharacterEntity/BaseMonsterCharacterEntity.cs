@@ -257,19 +257,6 @@ namespace MultiplayerARPG
             weapon = null;
         }
 
-        public override void GetWeaponDamages(
-            CharacterItem weapon,
-            out DamageInfo damageInfo,
-            out Dictionary<DamageElement, MinMaxFloat> damageAmounts)
-        {
-            // Assign damage data
-            damageInfo = monsterCharacter.damageInfo;
-            // Assign damage amounts
-            damageAmounts = GameDataHelpers.CombineDamages(null, GameDataHelpers.MakeDamage(monsterCharacter.damageAmount, Level, 1f, 1f));
-            // Sum damage with buffs
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetCaches().IncreaseDamages);
-        }
-
         public override void GetUsingSkillData(
             BaseSkill skill, 
             ref bool isLeftHand, 

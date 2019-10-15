@@ -71,13 +71,56 @@ namespace MultiplayerARPG
         public abstract GameEffectCollection GetHitEffect();
         public abstract float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
         public abstract float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
-        public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand);
         public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand);
         public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
+        public abstract bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel);
         public abstract bool HasCustomAimControls();
         public abstract Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel);
         public abstract void FinishAimControls();
+
+        public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
+        {
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+
+            if (!IsAttack())
+                return damageAmounts;
+
+            // Base attack damage amount will sum with other variables later
+            damageAmounts = GameDataHelpers.CombineDamages(
+                damageAmounts,
+                GetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand));
+
+            // Sum damage with weapon damage inflictions
+            Dictionary<DamageElement, float> damageInflictions = GetAttackWeaponDamageInflictions(skillUser, skillLevel);
+            if (damageInflictions != null && damageInflictions.Count > 0)
+            {
+                // Prepare weapon damage amount
+                KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount = skillUser.GetWeaponDamage(ref isLeftHand);
+                foreach (DamageElement element in damageInflictions.Keys)
+                {
+                    if (element == null) continue;
+                    damageAmounts = GameDataHelpers.CombineDamages(
+                        damageAmounts,
+                        new KeyValuePair<DamageElement, MinMaxFloat>(element, weaponDamageAmount.Value * damageInflictions[element]));
+                }
+            }
+
+            // Sum damage with additional damage amounts
+            damageAmounts = GameDataHelpers.CombineDamages(
+                damageAmounts,
+                GetAttackAdditionalDamageAmounts(skillUser, skillLevel));
+
+            // Sum damage with buffs
+            if (IsIncreaseAttackDamageAmountsWithBuffs(skillUser, skillLevel))
+            {
+                damageAmounts = GameDataHelpers.CombineDamages(
+                    damageAmounts,
+                    skillUser.GetCaches().IncreaseDamages);
+            }
+
+            return damageAmounts;
+        }
 
         /// <summary>
         /// Apply skill

@@ -23,11 +23,6 @@ namespace MultiplayerARPG
             buffEntity.Setup(skillUser, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
 
-        public override Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
-        {
-            return new Dictionary<DamageElement, MinMaxFloat>();
-        }
-
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
             return new KeyValuePair<DamageElement, MinMaxFloat>();
@@ -41,6 +36,11 @@ namespace MultiplayerARPG
         public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel)
         {
             return new Dictionary<DamageElement, float>();
+        }
+
+        public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel)
+        {
+            return false;
         }
 
         public override BaseMonsterCharacterEntity GetSummonMonsterEntity()
