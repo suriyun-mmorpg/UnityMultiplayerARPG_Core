@@ -360,7 +360,7 @@ namespace MultiplayerARPG
             direction = aimPosition + forwardStagger - position;
             rotation = Quaternion.LookRotation(direction);
         }
-        
+
         public Transform GetDamageTransform(DamageType damageType, bool isLeftHand)
         {
             Transform transform = null;
@@ -433,7 +433,7 @@ namespace MultiplayerARPG
             gameMessageType = GameMessage.Type.None;
             shouldUnequipRightHand = false;
             shouldUnequipLeftHand = false;
-            
+
             if (equippingItem.GetWeaponItem() == null && equippingItem.GetShieldItem() == null)
             {
                 gameMessageType = GameMessage.Type.CannotEquip;
@@ -474,7 +474,8 @@ namespace MultiplayerARPG
                         // if there are weapons on left hand it should unequip
                         if (hasRightHandItem)
                             shouldUnequipRightHand = true;
-                        if (hasLeftHandItem)
+                        // Unequip left-hand weapon, don't unequip shield
+                        if (hasLeftHandItem && tempEquipWeapons.GetLeftHandWeaponItem() != null)
                             shouldUnequipLeftHand = true;
                         break;
                     case WeaponItemEquipType.OneHandCanDual:
@@ -924,8 +925,8 @@ namespace MultiplayerARPG
         #region Allowed abilities
         public virtual bool IsPlayingActionAnimation()
         {
-            return animActionType == AnimActionType.AttackRightHand || 
-                animActionType == AnimActionType.AttackLeftHand || 
+            return animActionType == AnimActionType.AttackRightHand ||
+                animActionType == AnimActionType.AttackLeftHand ||
                 animActionType == AnimActionType.SkillRightHand ||
                 animActionType == AnimActionType.ReloadRightHand ||
                 animActionType == AnimActionType.ReloadLeftHand;
