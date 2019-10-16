@@ -940,12 +940,15 @@ namespace MultiplayerARPG
 
         public static string GetText(IEnumerable<LanguageData> langs, string defaultValue)
         {
-            foreach (LanguageData entry in langs)
+            if (langs != null)
             {
-                if (string.IsNullOrEmpty(entry.key))
-                    continue;
-                if (entry.key.Equals(LanguageManager.CurrentLanguageKey))
-                    return entry.value;
+                foreach (LanguageData entry in langs)
+                {
+                    if (string.IsNullOrEmpty(entry.key))
+                        continue;
+                    if (entry.key.Equals(LanguageManager.CurrentLanguageKey))
+                        return entry.value;
+                }
             }
             return defaultValue;
         }
