@@ -216,7 +216,7 @@ namespace MultiplayerARPG
 
         public override bool IsBuff()
         {
-            return skillBuffType != SkillBuffType.None;
+            return skillType == SkillType.Passive || skillBuffType != SkillBuffType.None;
         }
 
         public override Buff GetBuff()
