@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             {
                 if (itemRefine == null)
                     return "Normal";
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + itemRefine.title + "</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + itemRefine.Title + "</color>";
             }
         }
         
