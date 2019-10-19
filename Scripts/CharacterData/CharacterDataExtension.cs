@@ -600,7 +600,7 @@ public static partial class CharacterDataExtension
 
     public static void FillEmptySlots(this ICharacterData data)
     {
-        data.NonEquipItems.FillEmptySlots(GameInstance.Singleton.IsLimitInventorySlot, (short)(data.GetCaches().Stats.slotLimit + GameInstance.Singleton.baseSlotLimit));
+        data.NonEquipItems.FillEmptySlots(GameInstance.Singleton.IsLimitInventorySlot, GameInstance.Singleton.GameplayRule.GetTotalSlot(data));
     }
 
     public static void FillWeaponSetsIfNeeded(this ICharacterData data, byte equipWeaponSet)
@@ -684,6 +684,19 @@ public static partial class CharacterDataExtension
         return true;
     }
 
+    public static bool UnEquipItemWillOverwhelming(this ICharacterData data, int unEquipCount = 1)
+    {
+        if (!GameInstance.Singleton.IsLimitInventorySlot)
+            return false;
+        int countUsedSlots = 0;
+        for (int i = 0; i < data.NonEquipItems.Count; ++i)
+        {
+            if (!data.NonEquipItems[i].IsEmptySlot())
+                ++countUsedSlots;
+        }
+        return countUsedSlots + unEquipCount > GameInstance.Singleton.GameplayRule.GetTotalSlot(data);
+    }
+
     public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
     {
         return data.NonEquipItems.IncreasingItemsWillOverwhelming(
@@ -693,7 +706,7 @@ public static partial class CharacterDataExtension
             (short)data.GetCaches().Stats.weightLimit,
             data.GetCaches().TotalItemWeight,
             GameInstance.Singleton.IsLimitInventorySlot,
-            (short)(data.GetCaches().Stats.slotLimit + GameInstance.Singleton.baseSlotLimit));
+            GameInstance.Singleton.GameplayRule.GetTotalSlot(data));
     }
     #endregion
 

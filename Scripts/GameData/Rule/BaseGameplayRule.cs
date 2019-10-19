@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public abstract float GetMoveSpeed(BaseCharacterEntity character);
         public abstract float GetAttackSpeed(BaseCharacterEntity character);
         public abstract float GetTotalWeight(ICharacterData character);
+        public abstract short GetTotalSlot(ICharacterData character);
         public abstract bool IsHungry(BaseCharacterEntity character);
         public abstract bool IsThirsty(BaseCharacterEntity character);
         public abstract bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType);

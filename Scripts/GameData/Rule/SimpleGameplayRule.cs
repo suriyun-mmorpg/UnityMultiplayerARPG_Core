@@ -239,6 +239,11 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public override short GetTotalSlot(ICharacterData character)
+        {
+            return (short)(character.GetCaches().Stats.slotLimit + GameInstance.Singleton.baseSlotLimit);
+        }
+
         public override bool IsHungry(BaseCharacterEntity character)
         {
             return character.CurrentFood < hungryWhenFoodLowerThan;
