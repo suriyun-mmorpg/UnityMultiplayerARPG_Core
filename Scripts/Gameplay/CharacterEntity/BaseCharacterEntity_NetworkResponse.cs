@@ -126,39 +126,53 @@ namespace MultiplayerARPG
                 return;
             }
 
-            bool ableToEquipWeapon = true;
+            int unEquipCount = -1;
+            if (shouldUnequipRightHand)
+                ++unEquipCount;
+            if (shouldUnequipLeftHand)
+                ++unEquipCount;
+
+            if (this.UnEquipItemWillOverwhelming(unEquipCount))
+            {
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                return;
+            }
+
             if (shouldUnequipRightHand)
             {
-                if (!UnEquipWeapon(equipWeaponSet, false))
-                    ableToEquipWeapon = false;
+                if (!UnEquipWeapon(equipWeaponSet, false, true, out gameMessageType))
+                {
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    return;
+                }
             }
             if (shouldUnequipLeftHand)
             {
-                if (!UnEquipWeapon(equipWeaponSet, true))
-                    ableToEquipWeapon = false;
+                if (!UnEquipWeapon(equipWeaponSet, true, true, out gameMessageType))
+                {
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    return;
+                }
             }
 
             // Equipping items
             this.FillWeaponSetsIfNeeded(equipWeaponSet);
             EquipWeapons tempEquipWeapons = SelectableWeaponSets[equipWeaponSet];
-            if (ableToEquipWeapon)
+            if (isLeftHand)
             {
-                if (isLeftHand)
-                {
-                    equippingItem.equipSlotIndex = equipWeaponSet;
-                    tempEquipWeapons.leftHand = equippingItem;
-                    SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
-                }
-                else
-                {
-                    equippingItem.equipSlotIndex = equipWeaponSet;
-                    tempEquipWeapons.rightHand = equippingItem;
-                    SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
-                }
-                // Update inventory
-                nonEquipItems.RemoveAt(nonEquipIndex);
-                this.FillEmptySlots();
+                equippingItem.equipSlotIndex = equipWeaponSet;
+                tempEquipWeapons.leftHand = equippingItem;
+                SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
             }
+            else
+            {
+                equippingItem.equipSlotIndex = equipWeaponSet;
+                tempEquipWeapons.rightHand = equippingItem;
+                SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
+            }
+            // Update inventory
+            nonEquipItems.RemoveAt(nonEquipIndex);
+            this.FillEmptySlots();
         }
 
         /// <summary>
@@ -182,30 +196,35 @@ namespace MultiplayerARPG
                 return;
             }
 
-            bool ableToEquipWeapon = true;
-            if (unEquippingIndex >= 0 && !UnEquipItem(unEquippingIndex))
-                ableToEquipWeapon = false;
-
-            if (ableToEquipWeapon)
+            if (unEquippingIndex >= 0 && !UnEquipArmor(unEquippingIndex, true, out gameMessageType))
             {
-                // Can equip the item when there is no equipped item or able to unequip the equipped item
-                equippingItem.equipSlotIndex = equipSlotIndex;
-                equipItems.Add(equippingItem);
-                // Update equip item indexes
-                equipItemIndexes[GetEquipPosition(equippingItem.GetArmorItem().EquipPosition, equipSlotIndex)] = equipItems.Count - 1;
-                // Update inventory
-                nonEquipItems.RemoveAt(nonEquipIndex);
-                this.FillEmptySlots();
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                return;
             }
+
+            // Can equip the item when there is no equipped item or able to unequip the equipped item
+            equippingItem.equipSlotIndex = equipSlotIndex;
+            equipItems.Add(equippingItem);
+            // Update equip item indexes
+            equipItemIndexes[GetEquipPosition(equippingItem.GetArmorItem().EquipPosition, equipSlotIndex)] = equipItems.Count - 1;
+            // Update inventory
+            nonEquipItems.RemoveAt(nonEquipIndex);
+            this.FillEmptySlots();
         }
 
         protected virtual void NetFuncUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
         {
-            UnEquipWeapon(equipWeaponSet, isLeftHand);
+            GameMessage.Type gameMessageType;
+            if (!UnEquipWeapon(equipWeaponSet, isLeftHand, false, out gameMessageType))
+            {
+                // Cannot unequip weapon, send reasons to client
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+            }
         }
 
-        protected bool UnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
+        protected bool UnEquipWeapon(byte equipWeaponSet, bool isLeftHand, bool doNotValidate, out GameMessage.Type gameMessageType)
         {
+            gameMessageType = GameMessage.Type.None;
             if (!CanDoActions())
                 return false;
 
@@ -217,6 +236,12 @@ namespace MultiplayerARPG
             {
                 // Unequip left-hand weapon
                 unEquipItem = tempEquipWeapons.leftHand;
+                if (!doNotValidate && unEquipItem.NotEmptySlot() &&
+                    this.UnEquipItemWillOverwhelming())
+                {
+                    gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                    return false;
+                }
                 tempEquipWeapons.leftHand = CharacterItem.Empty;
                 SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
             }
@@ -224,13 +249,21 @@ namespace MultiplayerARPG
             {
                 // Unequip right-hand weapon
                 unEquipItem = tempEquipWeapons.rightHand;
+                if (!doNotValidate && unEquipItem.NotEmptySlot() &&
+                    this.UnEquipItemWillOverwhelming())
+                {
+                    gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                    return false;
+                }
                 tempEquipWeapons.rightHand = CharacterItem.Empty;
                 SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
             }
 
             if (unEquipItem.NotEmptySlot())
+            {
                 this.AddOrInsertNonEquipItems(unEquipItem);
-            this.FillEmptySlots();
+                this.FillEmptySlots();
+            }
 
             return true;
         }
@@ -241,22 +274,36 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         protected virtual void NetFuncUnEquipArmor(short index)
         {
-            UnEquipItem(index);
+            GameMessage.Type gameMessageType;
+            if (!UnEquipArmor(index, false, out gameMessageType))
+            {
+                // Cannot unequip weapon, send reasons to client
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+            }
         }
 
-        protected bool UnEquipItem(short index)
+        protected bool UnEquipArmor(short index, bool doNotValidate, out GameMessage.Type gameMessageType)
         {
+            gameMessageType = GameMessage.Type.None;
             if (!CanDoActions() || index >= equipItems.Count)
                 return false;
 
             EquipWeapons tempEquipWeapons = EquipWeapons;
             CharacterItem unEquipItem = equipItems[index];
+            if (!doNotValidate && unEquipItem.NotEmptySlot() &&
+                this.UnEquipItemWillOverwhelming())
+            {
+                gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                return false;
+            }
             equipItems.RemoveAt(index);
             UpdateEquipItemIndexes();
 
             if (unEquipItem.NotEmptySlot())
+            {
                 this.AddOrInsertNonEquipItems(unEquipItem);
-            this.FillEmptySlots();
+                this.FillEmptySlots();
+            }
 
             return true;
         }
