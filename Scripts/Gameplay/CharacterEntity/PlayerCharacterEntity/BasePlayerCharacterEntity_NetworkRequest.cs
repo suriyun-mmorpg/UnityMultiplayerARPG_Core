@@ -463,6 +463,12 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool RequestSwapOrMergeStorageItem(short fromIndex, short toIndex)
+        {
+            CallNetFunction(NetFuncSwapOrMergeStorageItem, FunctionReceivers.Server, fromIndex, toIndex);
+            return true;
+        }
+
         public bool RequestDepositGold(int amount)
         {
             CallNetFunction(NetFuncDepositGold, FunctionReceivers.Server, amount);

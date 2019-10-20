@@ -286,12 +286,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestSwapOrMergeNonEquipItems(short index1, short index2)
-        {
-            CallNetFunction(NetFuncSwapOrMergeNonEquipItems, FunctionReceivers.Server, index1, index2);
-            return true;
-        }
-
         public bool RequestReload(bool isLeftHand)
         {
             CallNetFunction(NetFuncReload, FunctionReceivers.Server, isLeftHand);

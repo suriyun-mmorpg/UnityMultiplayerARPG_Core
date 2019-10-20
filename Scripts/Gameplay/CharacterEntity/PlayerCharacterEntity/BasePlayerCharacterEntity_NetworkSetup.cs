@@ -118,6 +118,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<byte, short, short>(NetFuncShowStorage);
             RegisterNetFunction<short, short, short>(NetFuncMoveItemToStorage);
             RegisterNetFunction<short, short, short>(NetFuncMoveItemFromStorage);
+            RegisterNetFunction<short, short>(NetFuncSwapOrMergeStorageItem);
             RegisterNetFunction<int>(NetFuncDepositGold);
             RegisterNetFunction<int>(NetFuncWithdrawGold);
             RegisterNetFunction<int>(NetFuncDepositGuildGold);

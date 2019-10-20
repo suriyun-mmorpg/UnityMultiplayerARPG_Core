@@ -82,7 +82,6 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncOnRespawn);
             RegisterNetFunction(NetFuncOnLevelUp);
             RegisterNetFunction<PackedUInt>(NetFuncUnSummon);
-            RegisterNetFunction<short, short>(NetFuncSwapOrMergeNonEquipItems);
             RegisterNetFunction<bool>(NetFuncReload);
             RegisterNetFunction<byte>(NetFuncSwitchEquipWeaponSet);
         }

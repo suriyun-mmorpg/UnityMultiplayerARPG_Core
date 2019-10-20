@@ -344,38 +344,6 @@ namespace MultiplayerARPG
             summon.UnSummon(this);
         }
 
-        protected virtual void NetFuncSwapOrMergeNonEquipItems(short index1, short index2)
-        {
-            if (!CanDoActions() ||
-                index1 >= nonEquipItems.Count ||
-                index2 >= nonEquipItems.Count)
-                return;
-
-            CharacterItem nonEquipItem1 = nonEquipItems[index1];
-            CharacterItem nonEquipItem2 = nonEquipItems[index2];
-
-            if (nonEquipItem1.dataId == nonEquipItem2.dataId &&
-                nonEquipItem1.NotEmptySlot() && nonEquipItem2.NotEmptySlot())
-            {
-                // Merge or swap
-                if (nonEquipItem1.IsFull() || nonEquipItem2.IsFull())
-                {
-                    // Swap
-                    NetFuncSwapNonEquipItems(index1, index2);
-                }
-                else
-                {
-                    // Merge
-                    NetFuncMergeNonEquipItems(index1, index2);
-                }
-            }
-            else
-            {
-                // Swap
-                NetFuncSwapNonEquipItems(index1, index2);
-            }
-        }
-
         protected void NetFuncMergeNonEquipItems(short index1, short index2)
         {
             if (!CanDoActions() ||

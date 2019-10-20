@@ -39,8 +39,6 @@ namespace MultiplayerARPG
 
             CharacterItem fromItem = NonEquipItems[fromIndex];
             CharacterItem toItem = NonEquipItems[toIndex];
-            if (fromItem.IsEmptySlot() || toItem.IsEmptySlot())
-                return;
 
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
             {
@@ -1035,6 +1033,16 @@ namespace MultiplayerARPG
                 return;
 
             gameManager.MoveItemFromStorage(this, currentStorageId, storageItemIndex, amount, nonEquipIndex);
+        }
+
+        protected void NetFuncSwapOrMergeStorageItem(short fromIndex, short toIndex)
+        {
+            if (IsDead() ||
+                fromIndex >= storageItems.Count ||
+                toIndex >= storageItems.Count)
+                return;
+
+            gameManager.SwapOrMergeStorageItem(this, currentStorageId, fromIndex, toIndex);
         }
         #endregion
 
