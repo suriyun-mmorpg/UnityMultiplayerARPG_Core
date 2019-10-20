@@ -38,8 +38,6 @@ namespace MultiplayerARPG
             UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
             if (dragHandler == null || dragHandler.isDropped)
                 return;
-            // Set UI drop state
-            dragHandler.isDropped = true;
             // Get dragged item UI, if dragging item UI is UI for character item.
             // try to equip the item
             UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
@@ -61,6 +59,9 @@ namespace MultiplayerARPG
 
         private void OnDropNonEquipItem(UICharacterItemDragHandler draggedItemUI)
         {
+            // Set UI drop state
+            draggedItemUI.isDropped = true;
+
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -82,6 +83,9 @@ namespace MultiplayerARPG
 
         private void OnDropStorageItem(UICharacterItemDragHandler draggedItemUI)
         {
+            // Set UI drop state
+            draggedItemUI.isDropped = true;
+
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -147,4 +151,3 @@ namespace MultiplayerARPG
         }
     }
 }
-
