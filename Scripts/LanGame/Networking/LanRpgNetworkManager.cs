@@ -282,6 +282,171 @@ namespace MultiplayerARPG
             }
         }
 
+        #region Implement Singleplayer / Lan - in-app purchasing
+        protected override void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            long connectionId = messageHandler.connectionId;
+            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
+            // Set response data
+            ResponseCashShopInfoMessage.Error error = ResponseCashShopInfoMessage.Error.None;
+            int cash = 0;
+            List<int> cashShopItemIds = new List<int>();
+            BasePlayerCharacterEntity playerCharacter;
+            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
+            {
+                // Canot find user
+                error = ResponseCashShopInfoMessage.Error.UserNotFound;
+            }
+            else
+            {
+                // Get user cash amount
+                cash = playerCharacter.UserCash;
+                // Set cash shop item ids
+                cashShopItemIds.AddRange(GameInstance.CashShopItems.Keys);
+            }
+            // Send response message
+            ResponseCashShopInfoMessage responseMessage = new ResponseCashShopInfoMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.cash = cash;
+            responseMessage.cashShopItemIds = cashShopItemIds.ToArray();
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
+        }
+
+        protected override void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        {
+            long connectionId = messageHandler.connectionId;
+            RequestCashShopBuyMessage message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
+            // Set response data
+            ResponseCashShopBuyMessage.Error error = ResponseCashShopBuyMessage.Error.None;
+            int dataId = message.dataId;
+            int cash = 0;
+            BasePlayerCharacterEntity playerCharacter;
+            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
+            {
+                // Canot find user
+                error = ResponseCashShopBuyMessage.Error.UserNotFound;
+            }
+            else
+            {
+                // Get user cash amount
+                cash = playerCharacter.UserCash;
+                CashShopItem cashShopItem;
+                if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
+                {
+                    // Cannot find item
+                    error = ResponseCashShopBuyMessage.Error.ItemNotFound;
+                }
+                else if (cash < cashShopItem.sellPrice)
+                {
+                    // Not enough cash
+                    error = ResponseCashShopBuyMessage.Error.NotEnoughCash;
+                }
+                else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.receiveItems))
+                {
+                    // Cannot carry all rewards
+                    error = ResponseCashShopBuyMessage.Error.CannotCarryAllRewards;
+                }
+                else
+                {
+                    // Decrease cash amount
+                    cash -= cashShopItem.sellPrice;
+                    playerCharacter.UserCash = cash;
+                    // Increase character gold
+                    playerCharacter.Gold += cashShopItem.receiveGold;
+                    // Increase character item
+                    foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
+                    {
+                        if (receiveItem.item == null || receiveItem.amount <= 0) continue;
+                        playerCharacter.AddOrInsertNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
+                    }
+                }
+            }
+            // Send response message
+            ResponseCashShopBuyMessage responseMessage = new ResponseCashShopBuyMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.dataId = dataId;
+            responseMessage.cash = cash;
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
+        }
+
+        protected override void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            long connectionId = messageHandler.connectionId;
+            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
+            // Set response data
+            ResponseCashPackageInfoMessage.Error error = ResponseCashPackageInfoMessage.Error.None;
+            int cash = 0;
+            List<int> cashPackageIds = new List<int>();
+            BasePlayerCharacterEntity playerCharacter;
+            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
+            {
+                // Canot find user
+                error = ResponseCashPackageInfoMessage.Error.UserNotFound;
+            }
+            else
+            {
+                // Get user cash amount
+                cash = playerCharacter.UserCash;
+                // Set cash package ids
+                cashPackageIds.AddRange(GameInstance.CashPackages.Keys);
+            }
+            // Send response message
+            ResponseCashPackageInfoMessage responseMessage = new ResponseCashPackageInfoMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.cash = cash;
+            responseMessage.cashPackageIds = cashPackageIds.ToArray();
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
+        }
+
+        protected override void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        {
+            long connectionId = messageHandler.connectionId;
+            RequestCashPackageBuyValidationMessage message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
+            // TODO: Validate purchasing at server side
+            // Set response data
+            ResponseCashPackageBuyValidationMessage.Error error = ResponseCashPackageBuyValidationMessage.Error.None;
+            int dataId = message.dataId;
+            int cash = 0;
+            BasePlayerCharacterEntity playerCharacter;
+            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
+            {
+                // Canot find user
+                error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
+            }
+            else
+            {
+                // Get user cash amount
+                cash = playerCharacter.UserCash;
+                CashPackage cashPackage;
+                if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
+                {
+                    // Cannot find package
+                    error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
+                }
+                else
+                {
+                    // Increase cash amount
+                    cash += cashPackage.cashAmount;
+                    playerCharacter.UserCash = cash;
+                }
+            }
+            // Send response message
+            ResponseCashPackageBuyValidationMessage responseMessage = new ResponseCashPackageBuyValidationMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.dataId = dataId;
+            responseMessage.cash = cash;
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
+        }
+        #endregion
+
         #region Implement Abstract Functions
         public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
