@@ -128,7 +128,7 @@ namespace MultiplayerARPG
             damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
             // Reduce damage by armor
             float armorAmount = 0f;
-            damageReceiver.GetCaches().Armors.TryGetValue(damageElement, out resistanceAmount);
+            damageReceiver.GetCaches().Armors.TryGetValue(damageElement, out armorAmount);
             // Formula: Attack * 100 / (100 + Defend)
             damageAmount *= 100f / (100f + armorAmount);
             return damageAmount;
