@@ -699,7 +699,12 @@ public static partial class CharacterDataExtension
 
     public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
     {
-        return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+        return data.IncreasingItemsWillOverwhelming(data.NonEquipItems, dataId, amount);
+    }
+
+    public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IList<CharacterItem> itemList, int dataId, short amount)
+    {
+        return itemList.IncreasingItemsWillOverwhelming(
             dataId,
             amount,
             true,
@@ -707,6 +712,26 @@ public static partial class CharacterDataExtension
             data.GetCaches().TotalItemWeight,
             GameInstance.Singleton.IsLimitInventorySlot,
             GameInstance.Singleton.GameplayRule.GetTotalSlot(data));
+    }
+
+    public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<ItemAmount> increasingItems)
+    {
+        List<CharacterItem> tempCharacterItems = new List<CharacterItem>(data.NonEquipItems);
+        foreach (ItemAmount receiveItem in increasingItems)
+        {
+            if (receiveItem.item == null || receiveItem.amount <= 0) continue;
+            if (data.IncreasingItemsWillOverwhelming(tempCharacterItems, receiveItem.item.DataId, receiveItem.amount))
+            {
+                // Overwhelming
+                return true;
+            }
+            else
+            {
+                // Add item to temp list to check it will overwhelming or not later
+                tempCharacterItems.Add(CharacterItem.Create(receiveItem.item, receiveItem.amount));
+            }
+        }
+        return false;
     }
     #endregion
 
