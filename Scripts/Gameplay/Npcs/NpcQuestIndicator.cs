@@ -40,15 +40,16 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - lastUpdateTime >= updateRepeatRate)
             {
                 lastUpdateTime = Time.unscaledTime;
-
+                // Indicator priority haveInProgress > haveNewQuest
                 tempVisibleResult = npcEntity.HaveInProgressQuests(BasePlayerCharacterController.OwningCharacter);
                 if (haveInProgressQuestIndicator != null && haveInProgressQuestIndicator.activeSelf != tempVisibleResult)
                     haveInProgressQuestIndicator.SetActive(tempVisibleResult);
 
-                if (tempVisibleResult)
-                    return;
+                if (!tempVisibleResult)
+                    tempVisibleResult = npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter);
+                else
+                    tempVisibleResult = false;
 
-                tempVisibleResult = npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter);
                 if (haveNewQuestIndicator != null && haveNewQuestIndicator.activeSelf != tempVisibleResult)
                     haveNewQuestIndicator.SetActive(tempVisibleResult);
             }
