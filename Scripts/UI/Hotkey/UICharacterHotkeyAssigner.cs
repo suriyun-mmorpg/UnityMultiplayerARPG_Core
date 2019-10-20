@@ -117,8 +117,8 @@ namespace MultiplayerARPG
                 ++counter;
             }
 
-            CacheSkillList.DetectPrefab();
-            CacheItemList.DetectPrefab();
+            CacheSkillList.doNotRemoveContainerChildren = true;
+            CacheItemList.doNotRemoveContainerChildren = true;
 
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
             {
