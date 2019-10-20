@@ -12,6 +12,7 @@ namespace MultiplayerARPG
             UserNotFound,
             ItemNotFound,
             NotEnoughCash,
+            CannotCarryAllRewards,
         }
         public Error error;
         public int dataId;

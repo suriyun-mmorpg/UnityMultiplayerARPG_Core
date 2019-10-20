@@ -164,6 +164,9 @@ namespace MultiplayerARPG
                         case ResponseCashShopBuyMessage.Error.NotEnoughCash:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString());
                             break;
+                        case ResponseCashShopBuyMessage.Error.CannotCarryAllRewards:
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_CARRY_ALL_REWARDS.ToString());
+                            break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;

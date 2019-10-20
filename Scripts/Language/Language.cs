@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         UI_ERROR_INVALID_CHARACTER_DATA,
         UI_ERROR_USERNAME_IS_EMPTY,
         UI_ERROR_PASSWORD_IS_EMPTY,
+        UI_ERROR_CANNOT_CARRY_ALL_REWARDS,
         // Error - UI Login
         UI_ERROR_INVALID_USERNAME_OR_PASSWORD,
         UI_ERROR_ALREADY_LOGGED_IN,
@@ -826,6 +827,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString(), "Invalid character data");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString(), "Username is empty");
             Texts.Add(UITextKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString(), "Password is empty");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_CARRY_ALL_REWARDS.ToString(), "Cannot carry all rewards");
             // Error - UI Login
             Texts.Add(UITextKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD.ToString(), "Invalid username or password");
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString(), "User already logged in");
