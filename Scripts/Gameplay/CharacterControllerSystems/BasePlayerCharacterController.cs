@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public abstract class BasePlayerCharacterController : MonoBehaviour
+    public abstract partial class BasePlayerCharacterController : MonoBehaviour
     {
         public struct UsingSkillData
         {
@@ -97,6 +97,8 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             Singleton = this;
+            this.InvokeInstanceDevExtMethods("Awake");
+
             if (gameplayCameraPrefab != null)
                 CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
             if (minimapCameraPrefab != null)
@@ -219,6 +221,8 @@ namespace MultiplayerARPG
         protected virtual void OnDestroy()
         {
             Desetup(PlayerCharacterEntity);
+            this.InvokeInstanceDevExtMethods("OnDestroy");
+
             if (CacheGameplayCameraControls != null)
                 Destroy(CacheGameplayCameraControls.gameObject);
             if (CacheMinimapCameraControls != null)
@@ -246,6 +250,7 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
                 CacheUISceneGameplay.UpdateEquipWeapons();
+                CacheUISceneGameplay.UpdateSkills();
             }
         }
 
@@ -256,6 +261,7 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
                 CacheUISceneGameplay.UpdateEquipWeapons();
+                CacheUISceneGameplay.UpdateSkills();
             }
         }
 
@@ -300,6 +306,7 @@ namespace MultiplayerARPG
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
+                CacheUISceneGameplay.UpdateSkills();
             }
         }
 
