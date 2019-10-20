@@ -903,6 +903,14 @@ namespace MultiplayerARPG
         public abstract void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex);
 
         /// <summary>
+        /// Swap or merge storage item
+        /// </summary>
+        /// <param name="playerCharacterEntity"></param>
+        /// <param name="storageId"></param>
+        /// <param name="storageItemIndex"></param>
+        public abstract void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex);
+
+        /// <summary>
         /// Check if storage entity is opened or not
         /// </summary>
         /// <param name="storageEntity">Checking storage entity</param>

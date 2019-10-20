@@ -421,6 +421,59 @@ namespace MultiplayerARPG
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
+        public override void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
+        {
+            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
+                return;
+            }
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
+            List<CharacterItem> storageItemList = storageItems[storageId];
+            if (fromIndex >= storageItemList.Count ||
+                toIndex >= storageItemList.Count)
+            {
+                // Don't do anything, if storage item index is invalid
+                return;
+            }
+            // Prepare storage data
+            Storage storage = GetStorage(storageId);
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Prepare item data
+            CharacterItem fromItem = storageItemList[fromIndex];
+            CharacterItem toItem = storageItemList[toIndex];
+
+            if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
+            {
+                // Merge if same id and not full
+                short maxStack = toItem.GetMaxStack();
+                if (toItem.amount + fromItem.amount <= maxStack)
+                {
+                    toItem.amount += fromItem.amount;
+                    storageItemList[fromIndex] = CharacterItem.Empty;
+                    storageItemList[toIndex] = toItem;
+                }
+                else
+                {
+                    short remains = (short)(toItem.amount + fromItem.amount - maxStack);
+                    toItem.amount = maxStack;
+                    fromItem.amount = remains;
+                    storageItemList[fromIndex] = fromItem;
+                    storageItemList[toIndex] = toItem;
+                }
+            }
+            else
+            {
+                // Swap
+                storageItemList[fromIndex] = toItem;
+                storageItemList[toIndex] = fromItem;
+            }
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
         public override bool IsStorageEntityOpen(StorageEntity storageEntity)
         {
             if (storageEntity == null)
