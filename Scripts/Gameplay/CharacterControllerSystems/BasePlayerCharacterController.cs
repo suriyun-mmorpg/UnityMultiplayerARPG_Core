@@ -251,6 +251,7 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateEquipItems();
                 CacheUISceneGameplay.UpdateEquipWeapons();
                 CacheUISceneGameplay.UpdateSkills();
+                CacheUISceneGameplay.UpdateHotkeys();
             }
         }
 
@@ -262,6 +263,7 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateEquipItems();
                 CacheUISceneGameplay.UpdateEquipWeapons();
                 CacheUISceneGameplay.UpdateSkills();
+                CacheUISceneGameplay.UpdateHotkeys();
             }
         }
 
@@ -307,6 +309,7 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
                 CacheUISceneGameplay.UpdateSkills();
+                CacheUISceneGameplay.UpdateHotkeys();
             }
         }
 
