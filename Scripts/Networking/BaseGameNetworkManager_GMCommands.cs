@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                     {
                         if (amount > item.maxStack)
                             amount = item.maxStack;
-                        playerCharacter.AddOrInsertNonEquipItems(CharacterItem.Create(item, 1, amount));
+                        playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
                     }
                 }
                 if (commandKey.Equals(GMCommands.GiveGold))
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
                     {
                         if (amount > item.maxStack)
                             amount = item.maxStack;
-                        playerCharacter.AddOrInsertNonEquipItems(CharacterItem.Create(item, 1, amount));
+                        playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
                     }
                 }
             }
