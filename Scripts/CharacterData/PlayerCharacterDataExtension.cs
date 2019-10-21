@@ -163,7 +163,7 @@ public static partial class PlayerCharacterDataExtension
         foreach (CharacterItem returningItem in returningItems)
         {
             if (returningItem.NotEmptySlot())
-                character.AddOrInsertNonEquipItems(returningItem);
+                character.AddOrSetNonEquipItems(returningItem);
         }
         character.FillEmptySlots();
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "ValidateCharacterData", character);
@@ -244,7 +244,7 @@ public static partial class PlayerCharacterDataExtension
                 short addAmount = amount;
                 if (addAmount > startItem.item.maxStack)
                     addAmount = startItem.item.maxStack;
-                character.AddOrInsertNonEquipItems(CharacterItem.Create(startItem.item, 1, addAmount));
+                character.AddOrSetNonEquipItems(CharacterItem.Create(startItem.item, 1, addAmount));
                 amount -= addAmount;
             }
         }
