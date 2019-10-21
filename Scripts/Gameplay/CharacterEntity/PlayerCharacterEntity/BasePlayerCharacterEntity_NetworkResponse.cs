@@ -317,13 +317,24 @@ namespace MultiplayerARPG
             switch (menuIndex)
             {
                 case NpcDialog.CRAFT_ITEM_START_MENU_INDEX:
-                    if (currentNpcDialog.itemCraft.CanCraft(this))
+                    GameMessage.Type gameMessageType;
+                    if (currentNpcDialog.itemCraft.CanCraft(this, out gameMessageType))
                     {
                         currentNpcDialog.itemCraft.CraftItem(this);
                         currentNpcDialog = currentNpcDialog.craftDoneDialog;
                     }
                     else
-                        currentNpcDialog = currentNpcDialog.craftNotMeetRequirementsDialog;
+                    {
+                        switch (gameMessageType)
+                        {
+                            case GameMessage.Type.CannotCarryAnymore:
+                                currentNpcDialog = currentNpcDialog.craftItemWillOverwhelmingDialog;
+                                break;
+                            default:
+                                currentNpcDialog = currentNpcDialog.craftNotMeetRequirementsDialog;
+                                break;
+                        }
+                    }
                     break;
                 case NpcDialog.CRAFT_ITEM_CANCEL_MENU_INDEX:
                     currentNpcDialog = currentNpcDialog.craftCancelDialog;
@@ -487,11 +498,22 @@ namespace MultiplayerARPG
             Quest quest;
             if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
                 return;
+
             CharacterQuest characterQuest = quests[indexOfQuest];
             if (!characterQuest.IsAllTasksDone(this))
                 return;
+
             if (characterQuest.isComplete)
                 return;
+
+            Reward reward = gameplayRule.MakeQuestReward(quest);
+            if (this.IncreasingItemsWillOverwhelming(quest.rewardItems))
+            {
+                // Overwhelming
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                return;
+            }
+            // Decrease task items
             QuestTask[] tasks = quest.tasks;
             foreach (QuestTask task in tasks)
             {
@@ -502,18 +524,20 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            Reward reward = gameplayRule.MakeQuestReward(quest);
-            RewardExp(reward, 1f, RewardGivenType.Quest);
-            RewardCurrencies(reward, 1f, RewardGivenType.Quest);
-            ItemAmount[] rewardItems = quest.rewardItems;
-            if (rewardItems != null && rewardItems.Length > 0)
+            // Add reward items
+            if (quest.rewardItems != null && quest.rewardItems.Length > 0)
             {
-                foreach (ItemAmount rewardItem in rewardItems)
+                foreach (ItemAmount rewardItem in quest.rewardItems)
                 {
                     if (rewardItem.item != null && rewardItem.amount > 0)
                         this.IncreaseItems(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount));
                 }
             }
+            // Add exp
+            RewardExp(reward, 1f, RewardGivenType.Quest);
+            // Add currency
+            RewardCurrencies(reward, 1f, RewardGivenType.Quest);
+            // Set quest state
             characterQuest.isComplete = true;
             if (!quest.canRepeat)
                 quests[indexOfQuest] = characterQuest;

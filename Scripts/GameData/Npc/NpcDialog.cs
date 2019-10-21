@@ -52,6 +52,7 @@ namespace MultiplayerARPG
         // Craft Item
         public ItemCraft itemCraft;
         public NpcDialog craftDoneDialog;
+        public NpcDialog craftItemWillOverwhelmingDialog;
         public NpcDialog craftNotMeetRequirementsDialog;
         public NpcDialog craftCancelDialog;
         // Save Spawn Point
