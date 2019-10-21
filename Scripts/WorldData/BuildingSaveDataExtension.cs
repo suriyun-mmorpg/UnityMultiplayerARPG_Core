@@ -6,7 +6,7 @@
         get
         {
             if (classType == null)
-                classType = typeof(PlayerCharacterDataExtension);
+                classType = typeof(BuildingSaveDataExtension);
             return classType;
         }
     }
