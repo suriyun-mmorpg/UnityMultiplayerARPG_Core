@@ -611,7 +611,7 @@ public static partial class CharacterDataExtension
     #endregion
 
     #region Increasing Items Will Overwhelming
-    public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitWeight, short weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
+    public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
     {
         Item itemData;
         if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
@@ -699,16 +699,11 @@ public static partial class CharacterDataExtension
 
     public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
     {
-        return data.IncreasingItemsWillOverwhelming(data.NonEquipItems, dataId, amount);
-    }
-
-    public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IList<CharacterItem> itemList, int dataId, short amount)
-    {
-        return itemList.IncreasingItemsWillOverwhelming(
+        return data.NonEquipItems.IncreasingItemsWillOverwhelming(
             dataId,
             amount,
             true,
-            (short)data.GetCaches().Stats.weightLimit,
+            data.GetCaches().Stats.weightLimit,
             data.GetCaches().TotalItemWeight,
             GameInstance.Singleton.IsLimitInventorySlot,
             GameInstance.Singleton.GameplayRule.GetTotalSlot(data));
@@ -716,11 +711,20 @@ public static partial class CharacterDataExtension
 
     public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<ItemAmount> increasingItems)
     {
+        if (increasingItems == null)
+            return false;
         List<CharacterItem> tempCharacterItems = new List<CharacterItem>(data.NonEquipItems);
         foreach (ItemAmount receiveItem in increasingItems)
         {
             if (receiveItem.item == null || receiveItem.amount <= 0) continue;
-            if (data.IncreasingItemsWillOverwhelming(tempCharacterItems, receiveItem.item.DataId, receiveItem.amount))
+            if (tempCharacterItems.IncreasingItemsWillOverwhelming(
+                receiveItem.item.DataId,
+                receiveItem.amount,
+                true,
+                data.GetCaches().Stats.weightLimit,
+                GameInstance.Singleton.GameplayRule.GetTotalWeight(data),
+                GameInstance.Singleton.IsLimitInventorySlot,
+                GameInstance.Singleton.GameplayRule.GetTotalSlot(data)))
             {
                 // Overwhelming
                 return true;
@@ -728,7 +732,7 @@ public static partial class CharacterDataExtension
             else
             {
                 // Add item to temp list to check it will overwhelming or not later
-                tempCharacterItems.Add(CharacterItem.Create(receiveItem.item, receiveItem.amount));
+                tempCharacterItems.AddOrSetItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
             }
         }
         return false;
@@ -824,7 +828,7 @@ public static partial class CharacterDataExtension
                 amount = 0;
             }
             tempNewItem.amount = addAmount;
-            itemList.AddOrInsertItems(tempNewItem);
+            itemList.AddOrSetItems(tempNewItem);
             if (amount == 0)
                 break;
         }
@@ -1225,18 +1229,18 @@ public static partial class CharacterDataExtension
         return false;
     }
 
-    public static void AddOrInsertNonEquipItems(this ICharacterData data, CharacterItem characterItem)
+    public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem)
     {
-        data.NonEquipItems.AddOrInsertItems(characterItem);
+        data.NonEquipItems.AddOrSetItems(characterItem);
     }
 
-    public static void AddOrInsertItems(this IList<CharacterItem> itemList, CharacterItem characterItem)
+    public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem)
     {
-        int insertIndex = IndexOfEmptyItemSlot(itemList);
-        if (insertIndex >= 0)
+        int setIndex = IndexOfEmptyItemSlot(itemList);
+        if (setIndex >= 0)
         {
             // Insert to empty slot
-            itemList.Insert(insertIndex, characterItem);
+            itemList[setIndex] = characterItem;
         }
         else
         {
