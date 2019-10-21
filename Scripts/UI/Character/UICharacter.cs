@@ -64,7 +64,6 @@ namespace MultiplayerARPG
         public bool showDamageWithBuffs;
 
         // Improve garbage collector
-        private float cacheWeightLimit;
         private CharacterStats cacheStats;
         private Dictionary<Attribute, float> cacheAttributes;
         private Dictionary<DamageElement, float> cacheResistances;
@@ -234,7 +233,6 @@ namespace MultiplayerARPG
             cacheResistances = showResistanceWithBuffs ? Data.GetResistances() : Data.GetResistances(true, false);
             cacheArmors = showArmorWithBuffs ? Data.GetArmors() : Data.GetArmors(true, false);
             cacheDamages = showDamageWithBuffs ? Data.GetIncreaseDamages() : Data.GetIncreaseDamages(true, false);
-            cacheWeightLimit = cacheStats.weightLimit;
 
             if (!showStatsWithBuffs)
             {
@@ -244,8 +242,6 @@ namespace MultiplayerARPG
                     baseStats += Data.GetDatabase().GetCharacterStats(Data.Level);
                 Dictionary<Attribute, float> baseAttributes = Data.GetCharacterAttributes();
                 baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
-                // Always increase weight limit by buff bonus because it should always show real weight limit in UIs
-                cacheWeightLimit += Data.GetBuffStats(baseStats, baseAttributes).weightLimit;
             }
 
             if (bonusAttributes == null)
@@ -268,14 +264,13 @@ namespace MultiplayerARPG
             cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, bonusResistances);
             cacheArmors = GameDataHelpers.CombineArmors(cacheArmors, bonusArmors);
             cacheDamages = GameDataHelpers.CombineDamages(cacheDamages, bonusDamages);
-            cacheWeightLimit += bonusStats.weightLimit;
 
             if (uiTextWeightLimit != null)
             {
                 uiTextWeightLimit.text = string.Format(
                     LanguageManager.GetText(formatKeyWeightLimitStats),
-                    GameInstance.Singleton.GameplayRule.GetTotalWeight(Data).ToString("N2"),
-                    cacheWeightLimit.ToString("N2"));
+                    Data.GetCaches().TotalItemWeight.ToString("N2"),
+                    Data.GetCaches().Stats.weightLimit.ToString("N2"));
             }
 
             CharacterItem rightHandItem = Data.EquipWeapons.rightHand;
