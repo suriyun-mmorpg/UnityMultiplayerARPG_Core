@@ -39,6 +39,7 @@ namespace MultiplayerARPG
             DealingRequestDeclined,
             InvalidDealingState,
             DealingCanceled,
+            AnotherCharacterCannotCarryAnymore,
             // Party
             PartyInvitationDeclined,
             CannotSendPartyInvitation,

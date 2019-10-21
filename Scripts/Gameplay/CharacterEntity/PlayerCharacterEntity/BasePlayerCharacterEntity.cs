@@ -122,7 +122,7 @@ namespace MultiplayerARPG
             currentNpcDialog = null;
         }
 
-        public virtual void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
+        public void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
         {
             if (!IsServer || monsterCharacterEntity == null)
                 return;
@@ -135,17 +135,37 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void ExchangeDealingItemsAndGold()
+        public bool ExchangingDealingItemsWillOverwhelming()
+        {
+            if (DealingCharacter == null)
+                return true;
+            List<ItemAmount> itemAmounts = new List<ItemAmount>();
+            for (int i = 0; i < DealingItems.Count; ++i)
+            {
+                if (DealingItems[i].characterItem.IsEmptySlot()) continue;
+                itemAmounts.Add(new ItemAmount()
+                {
+                    item = DealingItems[i].characterItem.GetItem(),
+                    amount = DealingItems[i].characterItem.amount,
+                });
+            }
+            return DealingCharacter.IncreasingItemsWillOverwhelming(itemAmounts);
+        }
+
+        public void ExchangeDealingItemsAndGold()
         {
             if (DealingCharacter == null)
                 return;
             List<DealingCharacterItem> tempDealingItems = new List<DealingCharacterItem>(DealingItems);
-            for (int i = nonEquipItems.Count - 1; i >= 0; --i)
+            CharacterItem nonEquipItem;
+            DealingCharacterItem dealingItem;
+            int i, j;
+            for (i = nonEquipItems.Count - 1; i >= 0; --i)
             {
-                CharacterItem nonEquipItem = nonEquipItems[i];
-                for (int j = tempDealingItems.Count - 1; j >= 0; --j)
+                nonEquipItem = nonEquipItems[i];
+                for (j = tempDealingItems.Count - 1; j >= 0; --j)
                 {
-                    DealingCharacterItem dealingItem = tempDealingItems[j];
+                    dealingItem = tempDealingItems[j];
                     if (dealingItem.nonEquipIndex == i && nonEquipItem.amount >= dealingItem.characterItem.amount)
                     {
                         if (DealingCharacter.IncreaseItems(dealingItem.characterItem))
@@ -167,7 +187,7 @@ namespace MultiplayerARPG
             DealingCharacter.Gold += DealingGold;
         }
 
-        public virtual void ClearDealingData()
+        public void ClearDealingData()
         {
             DealingState = DealingState.None;
             DealingGold = 0;

@@ -857,8 +857,21 @@ namespace MultiplayerARPG
             DealingState = DealingState.ConfirmDealing;
             if (DealingState == DealingState.ConfirmDealing && DealingCharacter.DealingState == DealingState.ConfirmDealing)
             {
-                ExchangeDealingItemsAndGold();
-                DealingCharacter.ExchangeDealingItemsAndGold();
+                if (ExchangingDealingItemsWillOverwhelming())
+                {
+                    gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.AnotherCharacterCannotCarryAnymore);
+                    gameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                }
+                else if (DealingCharacter.ExchangingDealingItemsWillOverwhelming())
+                {
+                    gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                    gameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.AnotherCharacterCannotCarryAnymore);
+                }
+                else
+                {
+                    ExchangeDealingItemsAndGold();
+                    DealingCharacter.ExchangeDealingItemsAndGold();
+                }
                 StopDealing();
             }
         }

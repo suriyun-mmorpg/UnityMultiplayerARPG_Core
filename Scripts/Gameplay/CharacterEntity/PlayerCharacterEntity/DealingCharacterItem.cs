@@ -6,7 +6,6 @@ namespace MultiplayerARPG
     [System.Serializable]
     public sealed class DealingCharacterItem : INetSerializable
     {
-        public static readonly DealingCharacterItem Empty = new DealingCharacterItem();
         public int nonEquipIndex;
         public CharacterItem characterItem;
 

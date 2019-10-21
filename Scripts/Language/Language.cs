@@ -624,6 +624,7 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.DealingRequestDeclined.ToString(), "Dealing request declined");
             Texts.Add(GameMessage.Type.InvalidDealingState.ToString(), "Invalid dealing state");
             Texts.Add(GameMessage.Type.DealingCanceled.ToString(), "Dealing canceled");
+            Texts.Add(GameMessage.Type.AnotherCharacterCannotCarryAnymore.ToString(), "Another character cannot carry anymore items");
             // Party
             Texts.Add(GameMessage.Type.PartyInvitationDeclined.ToString(), "Party invitation declined");
             Texts.Add(GameMessage.Type.CannotSendPartyInvitation.ToString(), "Cannot send party invitation");
