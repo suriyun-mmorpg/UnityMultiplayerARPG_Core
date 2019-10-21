@@ -48,6 +48,11 @@ namespace MultiplayerARPG
                 gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
             }
+            if (character.IncreasingItemsWillOverwhelming(craftingItem.DataId, 1))
+            {
+                gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                return false;
+            }
             if (craftRequirements == null || craftRequirements.Length == 0)
             {
                 // No required items
