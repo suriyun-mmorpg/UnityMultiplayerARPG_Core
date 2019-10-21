@@ -53,7 +53,8 @@ namespace MultiplayerARPG
             if (!requestUseSkillErrorTime.ContainsKey(dataId))
                 requestUseSkillErrorTime[dataId] = currentTime;
 
-            if (CurrentMp < skill.GetConsumeMp(skillLevel))
+            GameMessage.Type gameMessageType;
+            if (!skill.CanUse(this, skillLevel, out gameMessageType))
             {
                 if (!IsOwnerClient)
                     return false;
@@ -61,7 +62,7 @@ namespace MultiplayerARPG
                 if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
                 {
                     requestUseSkillErrorTime[dataId] = Time.unscaledTime;
-                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NotEnoughMp });
+                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
                 }
                 return false;
             }

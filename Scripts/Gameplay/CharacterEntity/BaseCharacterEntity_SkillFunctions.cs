@@ -71,7 +71,8 @@ namespace MultiplayerARPG
                 return;
 
             // Validate mp amount, skill level, 
-            if (!skill.CanUse(this, skillLevel))
+            GameMessage.Type gameMessageType;
+            if (!skill.CanUse(this, skillLevel, out gameMessageType))
                 return;
 
             // Prepare requires data and get skill data
