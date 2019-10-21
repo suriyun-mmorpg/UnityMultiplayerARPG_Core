@@ -110,7 +110,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            if (uiItemDialog != null && ui.Data.characterItem.NotEmptySlot())
+            if (ui.Data.characterItem.IsEmptySlot())
+            {
+                CacheItemSelectionManager.DeselectSelectedUI();
+                return;
+            }
+            if (uiItemDialog != null)
             {
                 uiItemDialog.selectionManager = CacheItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, -1);
@@ -121,7 +126,11 @@ namespace MultiplayerARPG
         protected void OnDeselectCharacterItem(UICharacterItem ui)
         {
             if (uiItemDialog != null)
+            {
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
                 uiItemDialog.Hide();
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
+            }
         }
 
         protected override void UpdateUI()
