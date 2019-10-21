@@ -486,9 +486,7 @@ namespace MultiplayerARPG
             // Drop item to the ground
             if (amount > item.maxStack)
                 amount = item.maxStack;
-            CharacterItem dropData = CharacterItem.Create(item, 1);
-            dropData.amount = amount;
-            ItemDropEntity.DropItem(this, dropData, looters);
+            ItemDropEntity.DropItem(this, CharacterItem.Create(item, 1, amount), looters);
         }
 
         public override void Respawn()
