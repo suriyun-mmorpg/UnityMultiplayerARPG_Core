@@ -90,13 +90,22 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
             CacheItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
             CacheItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
             base.Show();
         }
 
         public override void Hide()
         {
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
             base.Hide();
+        }
+
+        protected void OnItemDialogHide()
+        {
+            CacheItemSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
