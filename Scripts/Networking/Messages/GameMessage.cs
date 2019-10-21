@@ -86,6 +86,10 @@ namespace MultiplayerARPG
             TooLongGuildRoleName,
             // Guild Message
             TooLongGuildMessage,
+            // Skills
+            SkillLevelIsZero,
+            CannotUseSkillByCurrentWeapon,
+            SkillIsCoolingDown,
         }
         public Type type;
 

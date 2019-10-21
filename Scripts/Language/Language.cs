@@ -669,6 +669,10 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.TooLongGuildRoleName.ToString(), "Guild role name is too long");
             // Guild Message
             Texts.Add(GameMessage.Type.TooLongGuildMessage.ToString(), "Guild message is too long");
+            // Skill
+            Texts.Add(GameMessage.Type.SkillLevelIsZero.ToString(), "Skill not trained yet");
+            Texts.Add(GameMessage.Type.CannotUseSkillByCurrentWeapon.ToString(), "Cannot use skill by current weapon");
+            Texts.Add(GameMessage.Type.SkillIsCoolingDown.ToString(), "Skill is cooling down");
             // UI Generic Title
             Texts.Add(UITextKeys.UI_LABEL_DISCONNECTED.ToString(), "Disconnected");
             Texts.Add(UITextKeys.UI_LABEL_SUCCESS.ToString(), "Success");
