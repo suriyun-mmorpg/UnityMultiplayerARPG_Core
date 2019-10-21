@@ -261,7 +261,7 @@ namespace MultiplayerARPG
 
             if (unEquipItem.NotEmptySlot())
             {
-                this.AddOrInsertNonEquipItems(unEquipItem);
+                this.AddOrSetNonEquipItems(unEquipItem);
                 this.FillEmptySlots();
             }
 
@@ -301,7 +301,7 @@ namespace MultiplayerARPG
 
             if (unEquipItem.NotEmptySlot())
             {
-                this.AddOrInsertNonEquipItems(unEquipItem);
+                this.AddOrSetNonEquipItems(unEquipItem);
                 this.FillEmptySlots();
             }
 

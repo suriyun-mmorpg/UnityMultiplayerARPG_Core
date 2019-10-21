@@ -53,8 +53,9 @@ namespace MultiplayerARPG
             return (!checkSkillPoint || character.SkillPoint > 0) && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level);
         }
 
-        public static bool CanUse(this BaseSkill skill, ICharacterData character, short level)
+        public static bool CanUse(this BaseSkill skill, ICharacterData character, short level, out GameMessage.Type gameMessageType)
         {
+            gameMessageType = GameMessage.Type.None;
             if (skill == null || character == null)
                 return false;
 
@@ -65,13 +66,12 @@ namespace MultiplayerARPG
                 switch (skill.GetSkillType())
                 {
                     case SkillType.Active:
-                        WeaponType[] availableWeapons = skill.availableWeapons;
-                        available = availableWeapons == null || availableWeapons.Length == 0;
+                        available = skill.availableWeapons == null || skill.availableWeapons.Length == 0;
                         if (!available)
                         {
-                            Item rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();
-                            Item leftWeaponItem = character.EquipWeapons.leftHand.GetWeaponItem();
-                            foreach (WeaponType availableWeapon in availableWeapons)
+                            Item rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
+                            Item leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
+                            foreach (WeaponType availableWeapon in skill.availableWeapons)
                             {
                                 if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
                                 {
@@ -92,7 +92,8 @@ namespace MultiplayerARPG
                         }
                         break;
                     case SkillType.CraftItem:
-                        if (!(character is BasePlayerCharacterEntity) || !skill.GetItemCraft().CanCraft(character as BasePlayerCharacterEntity))
+                        if (!(character is BasePlayerCharacterEntity) ||
+                            !skill.GetItemCraft().CanCraft(character as BasePlayerCharacterEntity, out gameMessageType))
                             return false;
                         break;
                     default:
@@ -101,17 +102,29 @@ namespace MultiplayerARPG
             }
 
             if (level <= 0)
+            {
+                gameMessageType = GameMessage.Type.SkillLevelIsZero;
                 return false;
+            }
 
             if (!available)
+            {
+                gameMessageType = GameMessage.Type.CannotUseSkillByCurrentWeapon;
                 return false;
+            }
 
             if (character.CurrentMp < skill.GetConsumeMp(level))
+            {
+                gameMessageType = GameMessage.Type.NotEnoughMp;
                 return false;
+            }
 
             int skillUsageIndex = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
             if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
+            {
+                gameMessageType = GameMessage.Type.SkillIsCoolingDown;
                 return false;
+            }
             return true;
         }
 
