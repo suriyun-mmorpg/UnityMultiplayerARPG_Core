@@ -20,13 +20,13 @@ namespace MultiplayerARPG
             return skill.maxLevel;
         }
 
-        public static bool CanLevelUp(this BaseSkill skill, IPlayerCharacterData character, short level, bool checkSkillPoint = true)
+        public static bool CanLevelUp(this BaseSkill skill, IPlayerCharacterData skillLearner, short level, bool checkSkillPoint = true)
         {
-            if (skill == null || character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(skill))
+            if (skill == null || skillLearner == null || !skillLearner.GetDatabase().CacheSkillLevels.ContainsKey(skill))
                 return false;
 
             // Check is it pass attribute requirement or not
-            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(false, false);
+            Dictionary<Attribute, float> attributeAmountsDict = skillLearner.GetAttributes(false, false);
             Dictionary<Attribute, float> requireAttributeAmounts = skill.CacheRequireAttributeAmounts;
             foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
             {
@@ -36,21 +36,20 @@ namespace MultiplayerARPG
             }
             // Check is it pass skill level requirement or not
             Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
-            foreach (CharacterSkill skillLevel in character.Skills)
+            foreach (CharacterSkill skillLevel in skillLearner.Skills)
             {
                 if (skillLevel.GetSkill() == null)
                     continue;
                 skillLevelsDict[skillLevel.GetSkill()] = skillLevel.level;
             }
-            Dictionary<BaseSkill, short> requireSkillLevels = skill.CacheRequireSkillLevels;
-            foreach (KeyValuePair<BaseSkill, short> requireSkillLevel in requireSkillLevels)
+            foreach (BaseSkill requireSkill in skill.CacheRequireSkillLevels.Keys)
             {
-                if (!skillLevelsDict.ContainsKey(requireSkillLevel.Key) ||
-                    skillLevelsDict[requireSkillLevel.Key] < requireSkillLevel.Value)
+                if (!skillLevelsDict.ContainsKey(requireSkill) ||
+                    skillLevelsDict[requireSkill] < skill.CacheRequireSkillLevels[requireSkill])
                     return false;
             }
             // Check another requirements
-            return (!checkSkillPoint || character.SkillPoint > 0) && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level);
+            return (!checkSkillPoint || skillLearner.SkillPoint > 0) && level < skill.maxLevel && skillLearner.Level >= skill.GetRequireCharacterLevel(level);
         }
 
         public static bool CanUse(this BaseSkill skill, ICharacterData character, short level, out GameMessage.Type gameMessageType)
@@ -58,6 +57,21 @@ namespace MultiplayerARPG
             gameMessageType = GameMessage.Type.None;
             if (skill == null || character == null)
                 return false;
+
+            // Check required skills
+            Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
+            foreach (CharacterSkill skillLevel in character.Skills)
+            {
+                if (skillLevel.GetSkill() == null)
+                    continue;
+                skillLevelsDict[skillLevel.GetSkill()] = skillLevel.level;
+            }
+            foreach (BaseSkill requireSkill in skill.CacheRequireSkillLevels.Keys)
+            {
+                if (!skillLevelsDict.ContainsKey(requireSkill) ||
+                    skillLevelsDict[requireSkill] < skill.CacheRequireSkillLevels[requireSkill])
+                    return false;
+            }
 
             bool available = true;
             if (character is IPlayerCharacterData)
