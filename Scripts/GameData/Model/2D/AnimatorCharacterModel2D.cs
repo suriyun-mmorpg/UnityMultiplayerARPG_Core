@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -78,7 +79,8 @@ namespace MultiplayerARPG
         public AnimatorCharacterAnimation2D moveAnimation2D;
         public AnimatorCharacterAnimation2D deadAnimation2D;
         public AnimatorActionAnimation2D defaultAttackAnimation2D;
-        public AnimatorCharacterAnimation2D defaultSkillCastClip2D;
+        [FormerlySerializedAs("defaultSkillCastClip2D")]
+        public AnimatorCharacterAnimation2D defaultSkillCastAnimation2D;
         public AnimatorActionAnimation2D defaultSkillActivateAnimation2D;
         public AnimatorActionAnimation2D defaultReloadAnimation2D;
         public AnimatorWeaponAnimations2D[] weaponAnimations2D;
