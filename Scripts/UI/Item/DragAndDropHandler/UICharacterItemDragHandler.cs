@@ -79,7 +79,7 @@ namespace MultiplayerARPG
         public override void OnEndDrag(PointerEventData eventData)
         {
             base.OnEndDrag(eventData);
-            if (isDropped || !CanDrag)
+            if (isDropped)
                 return;
             if (sourceLocation == SourceLocation.NonEquipItems && !EventSystem.current.IsPointerOverGameObject())
                 uiCharacterItem.OnClickDrop();

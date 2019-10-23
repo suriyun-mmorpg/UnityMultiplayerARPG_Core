@@ -63,7 +63,7 @@ namespace MultiplayerARPG
         public override void OnEndDrag(PointerEventData eventData)
         {
             base.OnEndDrag(eventData);
-            if (isDropped || !CanDrag)
+            if (isDropped)
                 return;
             if (sourceLocation == SourceLocation.Hotkey)
                 BasePlayerCharacterController.OwningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.None, string.Empty);

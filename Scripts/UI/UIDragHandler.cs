@@ -87,15 +87,11 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public virtual void OnDrag(PointerEventData eventData)
     {
-        if (!CanDrag)
-            return;
         rootTransform.position = Input.mousePosition;
     }
 
     public virtual void OnEndDrag(PointerEventData eventData)
     {
-        if (!CanDrag)
-            return;
         rootTransform.SetParent(defaultParent);
         rootTransform.SetSiblingIndex(defaultSiblingIndex);
         rootTransform.localPosition = defaultLocalPosition;
