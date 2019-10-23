@@ -201,17 +201,16 @@ namespace MultiplayerARPG
 
         public bool CanAssignCharacterItem(CharacterItem characterItem)
         {
-            if (characterItem == null)
+            if (characterItem.IsEmpty() || characterItem.IsEmptySlot())
                 return false;
-            if (characterItem.NotEmptySlot() &&
-                uiCharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().itemType))
+            if (uiCharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().itemType))
                 return true;
             return false;
         }
 
         public bool CanAssignCharacterSkill(CharacterSkill characterSkill)
         {
-            if (characterSkill == null)
+            if (characterSkill.IsEmpty())
                 return false;
             if (characterSkill.IsLearned(OwningCharacter) &&
                 uiCharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().GetSkillType()))
