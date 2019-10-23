@@ -91,6 +91,7 @@ namespace MultiplayerARPG
             SkillLevelIsZero,
             CannotUseSkillByCurrentWeapon,
             SkillIsCoolingDown,
+            SkillIsNotLearned,
         }
         public Type type;
 

@@ -674,6 +674,7 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.SkillLevelIsZero.ToString(), "Skill not trained yet");
             Texts.Add(GameMessage.Type.CannotUseSkillByCurrentWeapon.ToString(), "Cannot use skill by current weapon");
             Texts.Add(GameMessage.Type.SkillIsCoolingDown.ToString(), "Skill is cooling down");
+            Texts.Add(GameMessage.Type.SkillIsNotLearned.ToString(), "Skill is not learned");
             // UI Generic Title
             Texts.Add(UITextKeys.UI_LABEL_DISCONNECTED.ToString(), "Disconnected");
             Texts.Add(UITextKeys.UI_LABEL_SUCCESS.ToString(), "Success");
