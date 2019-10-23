@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
@@ -32,7 +31,9 @@ namespace MultiplayerARPG
         public CharacterAnimation2D defaultSkillCastAnimation2D;
         public ActionAnimation2D defaultSkillActivateAnimation2D;
         public ActionAnimation2D defaultReloadAnimation2D;
+        [ArrayElementTitle("weaponType", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public WeaponAnimations2D[] weaponAnimations2D;
+        [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillAnimations2D[] skillAnimations2D;
 
         public float magnitudeToPlayMoveClip = 0.1f;

@@ -86,7 +86,9 @@ namespace MultiplayerARPG
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
         public AnimationClip deadClip;
+        [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] rightHandAttackAnimations;
+        [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] leftHandAttackAnimations;
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
@@ -120,7 +122,9 @@ namespace MultiplayerARPG
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
         public AnimationClip deadClip;
+        [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] rightHandAttackAnimations;
+        [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] leftHandAttackAnimations;
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;

@@ -32,7 +32,9 @@ namespace MultiplayerARPG
 
         [Header("Animations")]
         public DefaultAnimations defaultAnimations;
+        [ArrayElementTitle("weaponType", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public WeaponAnimations[] weaponAnimations;
+        [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillAnimations[] skillAnimations;
 
         public override void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer)

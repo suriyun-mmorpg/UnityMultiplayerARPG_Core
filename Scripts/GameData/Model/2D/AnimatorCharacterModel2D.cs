@@ -83,7 +83,9 @@ namespace MultiplayerARPG
         public AnimatorCharacterAnimation2D defaultSkillCastAnimation2D;
         public AnimatorActionAnimation2D defaultSkillActivateAnimation2D;
         public AnimatorActionAnimation2D defaultReloadAnimation2D;
+        [ArrayElementTitle("weaponType", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public AnimatorWeaponAnimations2D[] weaponAnimations2D;
+        [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public AnimatorSkillAnimations2D[] skillAnimations2D;
         public float magnitudeToPlayMoveClip = 0.1f;
 
