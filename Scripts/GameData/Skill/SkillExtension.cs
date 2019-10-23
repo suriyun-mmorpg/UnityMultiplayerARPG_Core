@@ -22,17 +22,21 @@ namespace MultiplayerARPG
 
         public static bool IsLearned(this BaseSkill skill, ICharacterData skillLearner)
         {
+            if (skill == null)
+                return false;
             // Check is skill learned
             Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
             foreach (CharacterSkill learnedSkill in skillLearner.Skills)
             {
-                if (learnedSkill.GetSkill() != null && learnedSkill.GetSkill() == skill)
+                if (learnedSkill.GetSkill() != null &&
+                    learnedSkill.GetSkill() == skill &&
+                    learnedSkill.level > 0)
                     return true;
             }
             return false;
         }
 
-        public static bool CanLevelUp(this BaseSkill skill, IPlayerCharacterData skillLearner, short level, bool checkSkillPoint = true)
+        public static bool CanLevelUp(this BaseSkill skill, IPlayerCharacterData skillLearner, short level, out GameMessage.Type gameMessageType, bool checkSkillPoint = true)
         {
             if (skill == null || skillLearner == null || !skillLearner.GetDatabase().CacheSkillLevels.ContainsKey(skill))
                 return false;
@@ -64,13 +68,19 @@ namespace MultiplayerARPG
             return (!checkSkillPoint || skillLearner.SkillPoint > 0) && level < skill.maxLevel && skillLearner.Level >= skill.GetRequireCharacterLevel(level);
         }
 
-        public static bool CanUse(this BaseSkill skill, ICharacterData skillUser, short level, out GameMessage.Type gameMessageType)
+        public static bool CanUse(this BaseSkill skill, ICharacterData skillUser, short level, out GameMessage.Type gameMessageType, bool isItem = false)
         {
             gameMessageType = GameMessage.Type.None;
             if (skill == null || skillUser == null)
                 return false;
 
-            if (skill.IsLearned(skillUser))
+            if (level <= 0)
+            {
+                gameMessageType = GameMessage.Type.SkillLevelIsZero;
+                return false;
+            }
+
+            if (!isItem && !skill.IsLearned(skillUser))
             {
                 gameMessageType = GameMessage.Type.SkillIsNotLearned;
                 return false;
@@ -116,12 +126,6 @@ namespace MultiplayerARPG
                     default:
                         return false;
                 }
-            }
-
-            if (level <= 0)
-            {
-                gameMessageType = GameMessage.Type.SkillLevelIsZero;
-                return false;
             }
 
             if (!available)

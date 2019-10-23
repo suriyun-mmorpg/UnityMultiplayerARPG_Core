@@ -20,7 +20,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool ValidateRequestUseSKillItem(short index, bool isLeftHand)
+        public bool ValidateRequestUseSkillItem(short index, bool isLeftHand)
         {
             if (!CanUseItem())
                 return false;
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
                 return false;
 
             BaseSkill skill = item.skillLevel.skill;
-            short level = item.skillLevel.level;
+            short skillLevel = item.skillLevel.level;
             if (skill == null)
                 return false;
 
@@ -46,7 +46,8 @@ namespace MultiplayerARPG
             if (!requestUseSkillErrorTime.ContainsKey(dataId))
                 requestUseSkillErrorTime[dataId] = currentTime;
 
-            if (CurrentMp < skill.GetConsumeMp(level))
+            GameMessage.Type gameMessageType;
+            if (!skill.CanUse(this, skillLevel, out gameMessageType, true))
             {
                 if (!IsOwnerClient)
                     return false;
@@ -54,7 +55,7 @@ namespace MultiplayerARPG
                 if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
                 {
                     requestUseSkillErrorTime[dataId] = Time.unscaledTime;
-                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NotEnoughMp });
+                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
                 }
                 return false;
             }
@@ -78,7 +79,7 @@ namespace MultiplayerARPG
         
         public bool RequestUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
         {
-            if (!ValidateRequestUseSKillItem(index, isLeftHand))
+            if (!ValidateRequestUseSkillItem(index, isLeftHand))
                 return false;
             CallNetFunction(NetFuncUseSkillItem, FunctionReceivers.Server, index, isLeftHand, aimPosition);
             return true;

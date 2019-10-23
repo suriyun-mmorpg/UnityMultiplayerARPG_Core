@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         protected void NetFuncPlayUseSkill(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
         {
             BaseSkill skill;
-            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel >= 1)
+            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
             {
                 StartCoroutine(UseSkillRoutine(
                     isLeftHand,

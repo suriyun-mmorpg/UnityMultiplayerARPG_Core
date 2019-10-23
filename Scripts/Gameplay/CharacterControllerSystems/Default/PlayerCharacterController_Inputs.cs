@@ -568,17 +568,25 @@ namespace MultiplayerARPG
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
-                        if (queueUsingSkill.skill != null &&
-                            RequestUsePendingSkill(isLeftHandAttacking))
+                        if (queueUsingSkill.skill != null || queueUsingSkillItem.skill != null)
                         {
-                            // Change attacking hand after attack requested
-                            isLeftHandAttacking = !isLeftHandAttacking;
-                        }
-                        else if (queueUsingSkillItem.skill != null &&
-                            RequestUsePendingSkillItem(isLeftHandAttacking))
-                        {
-                            // Change attacking hand after attack requested
-                            isLeftHandAttacking = !isLeftHandAttacking;
+                            if (queueUsingSkill.skill != null &&
+                                RequestUsePendingSkill(isLeftHandAttacking))
+                            {
+                                // Change attacking hand after attack requested
+                                isLeftHandAttacking = !isLeftHandAttacking;
+                            }
+                            else if (queueUsingSkillItem.skill != null &&
+                                RequestUsePendingSkillItem(isLeftHandAttacking))
+                            {
+                                // Change attacking hand after attack requested
+                                isLeftHandAttacking = !isLeftHandAttacking;
+                            }
+                            else
+                            {
+                                // Can't use skill
+                                return;
+                            }
                         }
                         else if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
                         {
@@ -805,8 +813,8 @@ namespace MultiplayerARPG
                         // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, useSkillAimPosition);
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                        if (PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking, useSkillAimPosition))
+                            isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else
@@ -910,8 +918,8 @@ namespace MultiplayerARPG
                         // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, useSkillAimPosition);
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                        if (PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking, useSkillAimPosition))
+                            isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else

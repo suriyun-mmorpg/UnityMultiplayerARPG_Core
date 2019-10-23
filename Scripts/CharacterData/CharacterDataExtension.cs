@@ -204,18 +204,18 @@ public static partial class CharacterDataExtension
         Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>(data.GetDatabase().CacheSkillLevels);
         // Combine with skills that character learnt
         IList<CharacterSkill> skills = data.Skills;
-        BaseSkill learntSkill;
-        short learntSkillLevel;
+        BaseSkill learnedSkill;
+        short learnedSkillLevel;
         foreach (CharacterSkill characterSkill in skills)
         {
-            learntSkill = characterSkill.GetSkill();
-            learntSkillLevel = characterSkill.level;
-            if (learntSkill == null)
+            learnedSkill = characterSkill.GetSkill();
+            learnedSkillLevel = characterSkill.level;
+            if (learnedSkill == null)
                 continue;
-            if (!result.ContainsKey(learntSkill))
-                result[learntSkill] = learntSkillLevel;
+            if (!result.ContainsKey(learnedSkill))
+                result[learnedSkill] = learnedSkillLevel;
             else
-                result[learntSkill] += learntSkillLevel;
+                result[learnedSkill] += learnedSkillLevel;
         }
         return result;
     }

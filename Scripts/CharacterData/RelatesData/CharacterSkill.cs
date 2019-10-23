@@ -114,9 +114,9 @@ public class CharacterSkill : INetSerializableWithElement
         return GetSkill().CanLevelUp(skillLearner, level, checkSkillPoint);
     }
 
-    public bool CanUse(ICharacterData skillUser, GameMessage.Type gameMessageType)
+    public bool CanUse(ICharacterData skillUser, out GameMessage.Type gameMessageType, bool isItem = false)
     {
-        return GetSkill().CanUse(skillUser, level, out gameMessageType);
+        return GetSkill().CanUse(skillUser, level, out gameMessageType, isItem);
     }
 
     public float GetPassiveBuffDuration()

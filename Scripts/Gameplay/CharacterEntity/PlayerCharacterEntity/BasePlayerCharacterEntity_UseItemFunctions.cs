@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                 return;
 
             Item tempItem;
-            // Use skill reset
+            // Use skill
             tempItem = characterItem.GetSkillItem();
             if (tempItem != null)
                 UseItemSkill(itemIndex, tempItem, isLeftHand, aimPosition);
@@ -119,27 +119,27 @@ namespace MultiplayerARPG
                 return;
 
             int dataId = item.attributeAmount.attribute.DataId;
-            Attribute attributeData;
-            if (!GameInstance.Attributes.TryGetValue(dataId, out attributeData))
+            Attribute attribute;
+            if (!GameInstance.Attributes.TryGetValue(dataId, out attribute))
                 return;
 
-            CharacterAttribute atttribute;
+            CharacterAttribute characterAtttribute;
             int index = this.IndexOfSkill(dataId);
             if (index < 0)
             {
-                atttribute = CharacterAttribute.Create(attributeData, 0);
+                characterAtttribute = CharacterAttribute.Create(attribute, 0);
                 if (!this.DecreaseItemsByIndex(itemIndex, 1))
                     return;
-                atttribute.amount += 1;
-                Attributes.Add(atttribute);
+                characterAtttribute.amount += 1;
+                Attributes.Add(characterAtttribute);
             }
             else
             {
-                atttribute = Attributes[index];
+                characterAtttribute = Attributes[index];
                 if (!this.DecreaseItemsByIndex(itemIndex, 1))
                     return;
-                atttribute.amount += 1;
-                Attributes[index] = atttribute;
+                characterAtttribute.amount += 1;
+                Attributes[index] = characterAtttribute;
             }
         }
 
@@ -149,11 +149,11 @@ namespace MultiplayerARPG
                 return;
 
             short countStatPoint = 0;
-            CharacterAttribute attribute;
+            CharacterAttribute characterAttribute;
             for (int i = 0; i < Attributes.Count; ++i)
             {
-                attribute = Attributes[i];
-                countStatPoint += attribute.amount;
+                characterAttribute = Attributes[i];
+                countStatPoint += characterAttribute.amount;
             }
             Attributes.Clear();
             StatPoint += countStatPoint;
@@ -166,27 +166,27 @@ namespace MultiplayerARPG
 
             int dataId = item.skillLevel.skill.DataId;
 
-            BaseSkill skillData;
-            if (!GameInstance.Skills.TryGetValue(dataId, out skillData))
+            BaseSkill skill;
+            if (!GameInstance.Skills.TryGetValue(dataId, out skill))
                 return;
 
-            CharacterSkill skill;
+            CharacterSkill characterSkill;
             int index = this.IndexOfSkill(dataId);
             if (index < 0)
             {
-                skill = CharacterSkill.Create(skillData, 0);
-                if (!skill.CanLevelUp(this, false) || !this.DecreaseItemsByIndex(itemIndex, 1))
+                characterSkill = CharacterSkill.Create(skill, 0);
+                if (!characterSkill.CanLevelUp(this, false) || !this.DecreaseItemsByIndex(itemIndex, 1))
                     return;
-                skill.level += 1;
-                Skills.Add(skill);
+                characterSkill.level += 1;
+                Skills.Add(characterSkill);
             }
             else
             {
-                skill = Skills[index];
-                if (!skill.CanLevelUp(this, false) || !this.DecreaseItemsByIndex(itemIndex, 1))
+                characterSkill = Skills[index];
+                if (!characterSkill.CanLevelUp(this, false) || !this.DecreaseItemsByIndex(itemIndex, 1))
                     return;
-                skill.level += 1;
-                Skills[index] = skill;
+                characterSkill.level += 1;
+                Skills[index] = characterSkill;
             }
         }
 
@@ -196,11 +196,11 @@ namespace MultiplayerARPG
                 return;
 
             short countSkillPoint = 0;
-            CharacterSkill skill;
+            CharacterSkill characterSkill;
             for (int i = 0; i < Skills.Count; ++i)
             {
-                skill = Skills[i];
-                countSkillPoint += skill.level;
+                characterSkill = Skills[i];
+                countSkillPoint += characterSkill.level;
             }
             Skills.Clear();
             SkillPoint += countSkillPoint;
@@ -212,7 +212,12 @@ namespace MultiplayerARPG
                 return;
 
             BaseSkill skill = item.skillLevel.skill;
-            short level = item.skillLevel.level;
+            short skillLevel = item.skillLevel.level;
+
+            // Validate mp amount, skill level, 
+            GameMessage.Type gameMessageType;
+            if (!skill.CanUse(this, skillLevel, out gameMessageType, true))
+                return;
 
             // Prepare requires data and get skill data
             AnimActionType animActionType;
@@ -244,7 +249,7 @@ namespace MultiplayerARPG
             isAttackingOrUsingSkill = true;
 
             // Play animations
-            RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, level, aimPosition);
+            RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition);
         }
     }
 }
