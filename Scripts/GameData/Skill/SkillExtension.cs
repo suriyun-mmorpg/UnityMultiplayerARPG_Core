@@ -38,6 +38,7 @@ namespace MultiplayerARPG
 
         public static bool CanLevelUp(this BaseSkill skill, IPlayerCharacterData skillLearner, short level, out GameMessage.Type gameMessageType, bool checkSkillPoint = true)
         {
+            gameMessageType = GameMessage.Type.None;
             if (skill == null || skillLearner == null || !skillLearner.GetDatabase().CacheSkillLevels.ContainsKey(skill))
                 return false;
 
