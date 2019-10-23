@@ -10,6 +10,9 @@ namespace MultiplayerARPG
         public const string HOTKEY_AXIS_Y = "HotkeyAxisY";
 
         public IPlayerCharacterData character { get; protected set; }
+        public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Pet, ItemType.Mount, ItemType.AttributeIncrease, ItemType.AttributeReset, ItemType.Skill, ItemType.SkillLearn, ItemType.SkillReset };
+        public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active, SkillType.CraftItem };
+        public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;
         public UICharacterHotkeyPair[] uiCharacterHotkeys;
         public UICharacterSkill uiCharacterSkillPrefab;
         public UICharacterItem uiCharacterItemPrefab;
@@ -69,7 +72,7 @@ namespace MultiplayerARPG
                         characterHotkey.hotkeyId = id;
                         characterHotkey.type = HotkeyType.None;
                         characterHotkey.relateId = string.Empty;
-                        ui.Setup(this, characterHotkey, -1);
+                        ui.Setup(this, uiCharacterHotkeyAssigner, characterHotkey, -1);
                         if (!cacheUICharacterHotkeys.ContainsKey(id))
                             cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());
                         cacheUICharacterHotkeys[id].Add(ui);
@@ -127,7 +130,7 @@ namespace MultiplayerARPG
                 {
                     foreach (UICharacterHotkey ui in uis)
                     {
-                        ui.Setup(this, characterHotkey, i);
+                        ui.Setup(this, uiCharacterHotkeyAssigner, characterHotkey, i);
                         ui.Show();
                     }
                 }

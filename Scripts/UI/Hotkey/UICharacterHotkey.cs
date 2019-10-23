@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -9,20 +9,24 @@ namespace MultiplayerARPG
     {
         public int indexOfData { get; protected set; }
         public string hotkeyId { get { return Data.hotkeyId; } }
-        public KeyCode key;
-        public UICharacterHotkeys uiCharacterHotkeys;
-        public UICharacterSkill uiCharacterSkill;
-        public UICharacterItem uiCharacterItem;
-        public UICharacterHotkeyAssigner uiAssigner;
-
         public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
+        public UICharacterHotkeys uiCharacterHotkeys { get; private set; }
 
+        [FormerlySerializedAs("uiAssigner")]
+        public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;
+        public KeyCode key;
+
+
+        private UICharacterSkill uiCharacterSkill;
+        private UICharacterItem uiCharacterItem;
         private BaseSkill hotkeySkill;
         private short hotkeySkillLevel;
 
-        public void Setup(UICharacterHotkeys uiCharacterHotkeys, CharacterHotkey data, int indexOfData)
+        public void Setup(UICharacterHotkeys uiCharacterHotkeys, UICharacterHotkeyAssigner uiCharacterHotkeyAssigner, CharacterHotkey data, int indexOfData)
         {
             this.uiCharacterHotkeys = uiCharacterHotkeys;
+            if (this.uiCharacterHotkeyAssigner == null)
+                this.uiCharacterHotkeyAssigner = uiCharacterHotkeyAssigner;
             this.indexOfData = indexOfData;
             Data = data;
         }
@@ -158,10 +162,10 @@ namespace MultiplayerARPG
 
         public void OnClickAssign()
         {
-            if (uiAssigner != null)
+            if (uiCharacterHotkeyAssigner != null)
             {
-                uiAssigner.Setup(this);
-                uiAssigner.Show();
+                uiCharacterHotkeyAssigner.Setup(this);
+                uiCharacterHotkeyAssigner.Show();
             }
         }
 
@@ -199,9 +203,8 @@ namespace MultiplayerARPG
         {
             if (characterItem == null)
                 return false;
-            Item item = characterItem.GetItem();
-            if (item != null && characterItem.level > 0 && characterItem.amount > 0 &&
-                (item.IsEquipment() || item.IsUsable() || item.IsBuilding()))
+            if (characterItem.NotEmptySlot() &&
+                uiCharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().itemType))
                 return true;
             return false;
         }
@@ -210,9 +213,8 @@ namespace MultiplayerARPG
         {
             if (characterSkill == null)
                 return false;
-            BaseSkill skill = characterSkill.GetSkill();
-            if (skill != null && characterSkill.level > 0 &&
-                (skill.GetSkillType() == SkillType.Active || skill.GetSkillType() == SkillType.CraftItem))
+            if (characterSkill.IsLearned(OwningCharacter) &&
+                uiCharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().GetSkillType()))
                 return true;
             return false;
         }
