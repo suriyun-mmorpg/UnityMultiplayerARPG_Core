@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         [Tooltip("Amount of gold that will be added to character when create new character")]
         public int startGold = 0;
         [Tooltip("Items that will be added to character when create new character")]
+        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ItemAmount[] startItems;
     }
 }

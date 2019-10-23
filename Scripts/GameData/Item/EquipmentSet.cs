@@ -30,11 +30,17 @@ namespace MultiplayerARPG
     {
         public CharacterStats stats;
         public CharacterStats statsRate;
+        [ArrayElementTitle("attribute", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public AttributeAmount[] attributes;
+        [ArrayElementTitle("attribute", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public AttributeAmount[] attributesRate;
+        [ArrayElementTitle("damageElement", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ResistanceAmount[] resistances;
+        [ArrayElementTitle("damageElement", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ArmorAmount[] armors;
+        [ArrayElementTitle("damageElement", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public DamageAmount[] damages;
+        [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillLevel[] skills;
     }
 }

@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private Item craftingItem;
         [SerializeField]
+        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         private ItemAmount[] craftRequirements;
         [SerializeField]
         private int requireGold;

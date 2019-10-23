@@ -82,11 +82,17 @@ namespace MultiplayerARPG
         [Header("Equipment Bonus Stats")]
         public CharacterStatsIncremental increaseStats;
         public CharacterStatsIncremental increaseStatsRate;
+        [ArrayElementTitle("attribute", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public AttributeIncremental[] increaseAttributes;
+        [ArrayElementTitle("attribute", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public AttributeIncremental[] increaseAttributesRate;
+        [ArrayElementTitle("damageElement", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ResistanceIncremental[] increaseResistances;
+        [ArrayElementTitle("damageElement", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ArmorIncremental[] increaseArmors;
+        [ArrayElementTitle("damageElement", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public DamageIncremental[] increaseDamages;
+        [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillLevel[] increaseSkillLevels;
 
         [Header("Fire Configs")]
@@ -385,6 +391,7 @@ namespace MultiplayerARPG
     {
         public PlayerCharacter character;
         public short level;
+        [ArrayElementTitle("attribute", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public AttributeAmount[] attributeAmounts;
     }
 

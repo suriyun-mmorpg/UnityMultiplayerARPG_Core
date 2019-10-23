@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public string externalIconUrl;
         public int sellPrice;
         public int receiveGold;
+        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ItemAmount[] receiveItems;
     }
 }

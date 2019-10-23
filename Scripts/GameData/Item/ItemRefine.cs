@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private float successRate;
         [SerializeField]
+        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         private ItemAmount[] requireItems;
         [SerializeField]
         private int requireGold;

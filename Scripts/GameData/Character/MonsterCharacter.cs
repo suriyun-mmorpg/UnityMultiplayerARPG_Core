@@ -45,6 +45,7 @@ namespace MultiplayerARPG
         public int randomGoldMax;
         [Tooltip("Max kind of items that will be dropped in ground")]
         public byte maxDropItems = 5;
+        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ItemDrop[] randomItems;
         public ItemDropTable itemDropTable;
 

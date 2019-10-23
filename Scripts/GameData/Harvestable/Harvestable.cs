@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         [Tooltip("This will multiply with harvest damage amount")]
         [Range(0.1f, 5f)]
         public float damageEffectiveness;
+        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ItemDropByWeight[] items;
     }
 }

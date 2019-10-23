@@ -13,6 +13,7 @@ namespace MultiplayerARPG
     {
         [Header("Skills")]
         [SerializeField]
+        [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         private SkillLevel[] skillLevels;
 
         [Header("Start Equipments")]
