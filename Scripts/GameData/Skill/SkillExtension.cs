@@ -20,6 +20,18 @@ namespace MultiplayerARPG
             return skill.maxLevel;
         }
 
+        public static bool IsLearned(this BaseSkill skill, ICharacterData skillLearner)
+        {
+            // Check is skill learned
+            Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
+            foreach (CharacterSkill learnedSkill in skillLearner.Skills)
+            {
+                if (learnedSkill.GetSkill() != null && learnedSkill.GetSkill() == skill)
+                    return true;
+            }
+            return false;
+        }
+
         public static bool CanLevelUp(this BaseSkill skill, IPlayerCharacterData skillLearner, short level, bool checkSkillPoint = true)
         {
             if (skill == null || skillLearner == null || !skillLearner.GetDatabase().CacheSkillLevels.ContainsKey(skill))
@@ -36,11 +48,11 @@ namespace MultiplayerARPG
             }
             // Check is it pass skill level requirement or not
             Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
-            foreach (CharacterSkill skillLevel in skillLearner.Skills)
+            foreach (CharacterSkill learnedSkill in skillLearner.Skills)
             {
-                if (skillLevel.GetSkill() == null)
+                if (learnedSkill.GetSkill() == null)
                     continue;
-                skillLevelsDict[skillLevel.GetSkill()] = skillLevel.level;
+                skillLevelsDict[learnedSkill.GetSkill()] = learnedSkill.level;
             }
             foreach (BaseSkill requireSkill in skill.CacheRequireSkillLevels.Keys)
             {
@@ -52,29 +64,20 @@ namespace MultiplayerARPG
             return (!checkSkillPoint || skillLearner.SkillPoint > 0) && level < skill.maxLevel && skillLearner.Level >= skill.GetRequireCharacterLevel(level);
         }
 
-        public static bool CanUse(this BaseSkill skill, ICharacterData character, short level, out GameMessage.Type gameMessageType)
+        public static bool CanUse(this BaseSkill skill, ICharacterData skillUser, short level, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.None;
-            if (skill == null || character == null)
+            if (skill == null || skillUser == null)
                 return false;
 
-            // Check required skills
-            Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
-            foreach (CharacterSkill skillLevel in character.Skills)
+            if (skill.IsLearned(skillUser))
             {
-                if (skillLevel.GetSkill() == null)
-                    continue;
-                skillLevelsDict[skillLevel.GetSkill()] = skillLevel.level;
-            }
-            foreach (BaseSkill requireSkill in skill.CacheRequireSkillLevels.Keys)
-            {
-                if (!skillLevelsDict.ContainsKey(requireSkill) ||
-                    skillLevelsDict[requireSkill] < skill.CacheRequireSkillLevels[requireSkill])
-                    return false;
+                gameMessageType = GameMessage.Type.SkillIsNotLearned;
+                return false;
             }
 
             bool available = true;
-            if (character is IPlayerCharacterData)
+            if (skillUser is IPlayerCharacterData)
             {
                 // Only player character will check for available weapons
                 switch (skill.GetSkillType())
@@ -83,8 +86,8 @@ namespace MultiplayerARPG
                         available = skill.availableWeapons == null || skill.availableWeapons.Length == 0;
                         if (!available)
                         {
-                            Item rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
-                            Item leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
+                            Item rightWeaponItem = skillUser.EquipWeapons.GetRightHandWeaponItem();
+                            Item leftWeaponItem = skillUser.EquipWeapons.GetLeftHandWeaponItem();
                             foreach (WeaponType availableWeapon in skill.availableWeapons)
                             {
                                 if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
@@ -106,8 +109,8 @@ namespace MultiplayerARPG
                         }
                         break;
                     case SkillType.CraftItem:
-                        if (!(character is BasePlayerCharacterEntity) ||
-                            !skill.GetItemCraft().CanCraft(character as BasePlayerCharacterEntity, out gameMessageType))
+                        if (!(skillUser is BasePlayerCharacterEntity) ||
+                            !skill.GetItemCraft().CanCraft(skillUser as BasePlayerCharacterEntity, out gameMessageType))
                             return false;
                         break;
                     default:
@@ -127,14 +130,14 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (character.CurrentMp < skill.GetConsumeMp(level))
+            if (skillUser.CurrentMp < skill.GetConsumeMp(level))
             {
                 gameMessageType = GameMessage.Type.NotEnoughMp;
                 return false;
             }
 
-            int skillUsageIndex = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
-            if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
+            int skillUsageIndex = skillUser.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
+            if (skillUsageIndex >= 0 && skillUser.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
             {
                 gameMessageType = GameMessage.Type.SkillIsCoolingDown;
                 return false;

@@ -104,6 +104,11 @@ public class CharacterSkill : INetSerializableWithElement
         return cacheSkill;
     }
 
+    public bool IsLearned(ICharacterData skillLearner)
+    {
+        return GetSkill().IsLearned(skillLearner);
+    }
+
     public bool CanLevelUp(IPlayerCharacterData skillLearner, bool checkSkillPoint = true)
     {
         return GetSkill().CanLevelUp(skillLearner, level, checkSkillPoint);
