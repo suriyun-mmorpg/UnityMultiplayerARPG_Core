@@ -171,14 +171,13 @@ public static partial class CharacterDataExtension
             result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
         }
         // Increase attributes from passive skills
-        IList<CharacterSkill> skills = data.Skills;
-        foreach (CharacterSkill skill in skills)
+        foreach (CharacterSkill learnedSkill in data.Skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
+            if (learnedSkill.GetSkill() == null || learnedSkill.GetSkill().GetSkillType() != SkillType.Passive || learnedSkill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineAttributes(result, skill.GetPassiveBuffIncreaseAttributes());
+            result = GameDataHelpers.CombineAttributes(result, learnedSkill.GetPassiveBuffIncreaseAttributes());
             // Increase with rates
-            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.GetPassiveBuffIncreaseAttributesRate()));
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), learnedSkill.GetPassiveBuffIncreaseAttributesRate()));
         }
         return result;
     }
@@ -307,12 +306,11 @@ public static partial class CharacterDataExtension
         }
 
         // Passive skills
-        IList<CharacterSkill> skills = data.Skills;
-        foreach (CharacterSkill skill in skills)
+        foreach (CharacterSkill learnedSkill in data.Skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
+            if (learnedSkill.GetSkill() == null || learnedSkill.GetSkill().GetSkillType() != SkillType.Passive || learnedSkill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineResistances(result, skill.GetPassiveBuffIncreaseResistances());
+            result = GameDataHelpers.CombineResistances(result, learnedSkill.GetPassiveBuffIncreaseResistances());
         }
         return result;
     }
@@ -382,12 +380,11 @@ public static partial class CharacterDataExtension
         }
 
         // Passive skills
-        IList<CharacterSkill> skills = data.Skills;
-        foreach (CharacterSkill skill in skills)
+        foreach (CharacterSkill learnedSkill in data.Skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
+            if (learnedSkill.GetSkill() == null || learnedSkill.GetSkill().GetSkillType() != SkillType.Passive || learnedSkill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineArmors(result, skill.GetPassiveBuffIncreaseArmors());
+            result = GameDataHelpers.CombineArmors(result, learnedSkill.GetPassiveBuffIncreaseArmors());
         }
         return result;
     }
@@ -442,12 +439,11 @@ public static partial class CharacterDataExtension
         }
 
         // Passive skills
-        IList<CharacterSkill> skills = data.Skills;
-        foreach (CharacterSkill skill in skills)
+        foreach (CharacterSkill learnedSkill in data.Skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
+            if (learnedSkill.GetSkill() == null || learnedSkill.GetSkill().GetSkillType() != SkillType.Passive || learnedSkill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineDamages(result, skill.GetPassiveBuffIncreaseDamages());
+            result = GameDataHelpers.CombineDamages(result, learnedSkill.GetPassiveBuffIncreaseDamages());
         }
         return result;
     }
@@ -538,16 +534,15 @@ public static partial class CharacterDataExtension
             result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
         }
         // Increase stats from passive skills
-        IList<CharacterSkill> skills = data.Skills;
-        foreach (CharacterSkill skill in skills)
+        foreach (CharacterSkill learnedSkill in data.Skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().GetSkillType() != SkillType.Passive || skill.level <= 0)
+            if (learnedSkill.GetSkill() == null || learnedSkill.GetSkill().GetSkillType() != SkillType.Passive || learnedSkill.level <= 0)
                 continue;
-            result += skill.GetPassiveBuffIncreaseStats();
-            result += GameDataHelpers.GetStatsFromAttributes(skill.GetPassiveBuffIncreaseAttributes());
+            result += learnedSkill.GetPassiveBuffIncreaseStats();
+            result += GameDataHelpers.GetStatsFromAttributes(learnedSkill.GetPassiveBuffIncreaseAttributes());
             // Increase with rates
-            result += baseStats * skill.GetPassiveBuffIncreaseStatsRate();
-            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.GetPassiveBuffIncreaseAttributesRate()));
+            result += baseStats * learnedSkill.GetPassiveBuffIncreaseStatsRate();
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), learnedSkill.GetPassiveBuffIncreaseAttributesRate()));
         }
         return result;
     }
