@@ -121,14 +121,14 @@ namespace MultiplayerARPG
                 formatKeyFoodRateStats,
                 formatKeyWaterRateStats);
 
-            if (!string.IsNullOrEmpty(statsText) || !string.IsNullOrEmpty(statsRateText))
-            {
+            if (!string.IsNullOrEmpty(statsText))
                 result += statsText;
-                if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(statsRateText))
-                {
+
+            if (!string.IsNullOrEmpty(statsRateText))
+            {
+                if (!string.IsNullOrEmpty(result))
                     result += "\n";
-                    result += statsRateText;
-                }
+                result += statsRateText;
             }
 
             foreach (AttributeAmount entry in equipmentBonus.attributes)
