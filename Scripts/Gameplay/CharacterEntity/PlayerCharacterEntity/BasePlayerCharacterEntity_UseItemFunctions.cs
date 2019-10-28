@@ -118,45 +118,15 @@ namespace MultiplayerARPG
             if (!CanUseItem() || item == null || item.attributeAmount.attribute == null)
                 return;
 
-            int dataId = item.attributeAmount.attribute.DataId;
-            Attribute attribute;
-            if (!GameInstance.Attributes.TryGetValue(dataId, out attribute))
-                return;
-
-            CharacterAttribute characterAtttribute;
-            int index = this.IndexOfSkill(dataId);
-            if (index < 0)
-            {
-                characterAtttribute = CharacterAttribute.Create(attribute, 0);
-                if (!this.DecreaseItemsByIndex(itemIndex, 1))
-                    return;
-                characterAtttribute.amount += 1;
-                Attributes.Add(characterAtttribute);
-            }
-            else
-            {
-                characterAtttribute = Attributes[index];
-                if (!this.DecreaseItemsByIndex(itemIndex, 1))
-                    return;
-                characterAtttribute.amount += 1;
-                Attributes[index] = characterAtttribute;
-            }
+            this.AddAttribute(item.attributeAmount.attribute.DataId, (short)item.attributeAmount.amount, itemIndex);
         }
 
         protected void UseItemAttributeReset(short itemIndex, Item item)
         {
-            if (!CanUseItem() || item == null || !this.DecreaseItemsByIndex(itemIndex, 1))
+            if (!CanUseItem() || item == null)
                 return;
 
-            short countStatPoint = 0;
-            CharacterAttribute characterAttribute;
-            for (int i = 0; i < Attributes.Count; ++i)
-            {
-                characterAttribute = Attributes[i];
-                countStatPoint += characterAttribute.amount;
-            }
-            Attributes.Clear();
-            StatPoint += countStatPoint;
+            this.ResetAttributes(itemIndex);
         }
 
         protected void UseItemSkillLearn(short itemIndex, Item item)
@@ -164,46 +134,15 @@ namespace MultiplayerARPG
             if (!CanUseItem() || item == null || item.skillLevel.skill == null)
                 return;
 
-            int dataId = item.skillLevel.skill.DataId;
-
-            BaseSkill skill;
-            if (!GameInstance.Skills.TryGetValue(dataId, out skill))
-                return;
-
-            CharacterSkill characterSkill;
-            int index = this.IndexOfSkill(dataId);
-            if (index < 0)
-            {
-                characterSkill = CharacterSkill.Create(skill, 0);
-                if (!characterSkill.CanLevelUp(this, false) || !this.DecreaseItemsByIndex(itemIndex, 1))
-                    return;
-                characterSkill.level += 1;
-                Skills.Add(characterSkill);
-            }
-            else
-            {
-                characterSkill = Skills[index];
-                if (!characterSkill.CanLevelUp(this, false) || !this.DecreaseItemsByIndex(itemIndex, 1))
-                    return;
-                characterSkill.level += 1;
-                Skills[index] = characterSkill;
-            }
+            this.AddSkill(item.skillLevel.skill.DataId, item.skillLevel.level, itemIndex);
         }
 
         protected void UseItemSkillReset(short itemIndex, Item item)
         {
-            if (!CanUseItem() || item == null || !this.DecreaseItemsByIndex(itemIndex, 1))
+            if (!CanUseItem() || item == null)
                 return;
 
-            short countSkillPoint = 0;
-            CharacterSkill characterSkill;
-            for (int i = 0; i < Skills.Count; ++i)
-            {
-                characterSkill = Skills[i];
-                countSkillPoint += characterSkill.level;
-            }
-            Skills.Clear();
-            SkillPoint += countSkillPoint;
+            this.ResetSkills();
         }
 
         protected void UseItemSkill(short itemIndex, Item item, bool isLeftHand, Vector3 aimPosition)

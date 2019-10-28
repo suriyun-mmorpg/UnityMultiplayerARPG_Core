@@ -72,30 +72,8 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            Attribute attributeData;
-            if (!GameInstance.Attributes.TryGetValue(dataId, out attributeData))
-                return;
-
-            CharacterAttribute attribute;
-            int index = this.IndexOfAttribute(dataId);
-            if (index < 0)
-            {
-                attribute = CharacterAttribute.Create(attributeData, 0);
-                if (!attribute.CanIncrease(this))
-                    return;
-                attribute.amount += 1;
-                Attributes.Add(attribute);
-            }
-            else
-            {
-                attribute = Attributes[index];
-                if (!attribute.CanIncrease(this))
-                    return;
-                attribute.amount += 1;
-                Attributes[index] = attribute;
-            }
-
-            StatPoint -= 1;
+            if (this.AddAttribute(dataId))
+                StatPoint -= 1;
         }
 
         protected void NetFuncAddSkill(int dataId)
@@ -103,30 +81,8 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            BaseSkill skillData;
-            if (!GameInstance.Skills.TryGetValue(dataId, out skillData))
-                return;
-
-            CharacterSkill skill;
-            int index = this.IndexOfSkill(dataId);
-            if (index < 0)
-            {
-                skill = CharacterSkill.Create(skillData, 0);
-                if (!skill.CanLevelUp(this))
-                    return;
-                skill.level += 1;
-                Skills.Add(skill);
-            }
-            else
-            {
-                skill = Skills[index];
-                if (!skill.CanLevelUp(this))
-                    return;
-                skill.level += 1;
-                Skills[index] = skill;
-            }
-
-            SkillPoint -= 1;
+            if (this.AddSkill(dataId))
+                SkillPoint -= 1;
         }
 
         protected void NetFuncAddGuildSkill(int dataId)

@@ -592,4 +592,96 @@ public static partial class PlayerCharacterDataExtension
         }
         return index;
     }
+
+    public static bool AddAttribute(this IPlayerCharacterData characterData, int dataId, short amount = 1, short itemIndex = -1)
+    {
+        Attribute attribute;
+        if (!GameInstance.Attributes.TryGetValue(dataId, out attribute))
+            return false;
+
+        CharacterAttribute characterAtttribute;
+        int index = characterData.IndexOfAttribute(dataId);
+        if (index < 0)
+        {
+            characterAtttribute = CharacterAttribute.Create(attribute, 0);
+            if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
+                return false;
+            characterAtttribute.amount += amount;
+            characterData.Attributes.Add(characterAtttribute);
+        }
+        else
+        {
+            characterAtttribute = characterData.Attributes[index];
+            if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
+                return false;
+            characterAtttribute.amount += amount;
+            characterData.Attributes[index] = characterAtttribute;
+        }
+        return true;
+    }
+
+    public static bool ResetAttributes(this IPlayerCharacterData characterData, short itemIndex = -1)
+    {
+        if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
+            return false;
+
+        short countStatPoint = 0;
+        CharacterAttribute characterAttribute;
+        for (int i = 0; i < characterData.Attributes.Count; ++i)
+        {
+            characterAttribute = characterData.Attributes[i];
+            countStatPoint += characterAttribute.amount;
+        }
+        characterData.Attributes.Clear();
+        characterData.StatPoint += countStatPoint;
+        return true;
+    }
+
+    public static bool AddSkill(this IPlayerCharacterData characterData, int dataId, short level = 1, short itemIndex = -1)
+    {
+        BaseSkill skill;
+        if (!GameInstance.Skills.TryGetValue(dataId, out skill))
+            return false;
+
+        CharacterSkill characterSkill;
+        int index = characterData.IndexOfSkill(dataId);
+        if (index < 0)
+        {
+            characterSkill = CharacterSkill.Create(skill, 0);
+            if (!characterSkill.CanLevelUp(characterData, false))
+                return false;
+            if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
+                return false;
+            characterSkill.level += level;
+            characterData.Skills.Add(characterSkill);
+        }
+        else
+        {
+            characterSkill = characterData.Skills[index];
+            if (!characterSkill.CanLevelUp(characterData, false))
+                return false;
+            if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
+                return false;
+            characterSkill.level += level;
+            characterData.Skills[index] = characterSkill;
+        }
+        return true;
+    }
+
+    public static bool ResetSkills(this IPlayerCharacterData characterData, short itemIndex = -1)
+    {
+        if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
+            return false;
+
+        short countSkillPoint = 0;
+        CharacterSkill characterSkill;
+        for (int i = 0; i < characterData.Skills.Count; ++i)
+        {
+            characterSkill = characterData.Skills[i];
+            countSkillPoint += characterSkill.level;
+        }
+        characterData.Skills.Clear();
+        characterData.SkillPoint += countSkillPoint;
+        return true;
+    }
 }
