@@ -99,6 +99,174 @@ namespace MultiplayerARPG
             // Add quest
             GameInstance.AddQuests(new Quest[] { quest });
         }
+
+        public bool ValidateDialog(BasePlayerCharacterEntity characterEntity)
+        {
+            switch (type)
+            {
+                case NpcDialogType.Quest:
+                    if (quest == null)
+                    {
+                        // Validate quest data
+                        Debug.LogWarning("[NpcDialog] Quest dialog's quest is empty");
+                        return false;
+                    }
+                    break;
+                case NpcDialogType.CraftItem:
+                    if (itemCraft.CraftingItem == null)
+                    {
+                        // Validate crafting item
+                        Debug.LogWarning("[NpcDialog] Item craft dialog's crafting item is empty");
+                        return false;
+                    }
+                    break;
+                case NpcDialogType.SaveRespawnPoint:
+                    if (saveRespawnMap == null)
+                    {
+                        // Validate quest data
+                        Debug.LogWarning("[NpcDialog] Save respawn point dialog's save respawn map is empty");
+                        return false;
+                    }
+                    break;
+                case NpcDialogType.Warp:
+                    if (warpMap == null)
+                    {
+                        // Validate quest data
+                        Debug.LogWarning("[NpcDialog] Warp dialog's warp map is empty");
+                        return false;
+                    }
+                    break;
+                case NpcDialogType.RefineItem:
+                    // If next dialog is refine dialog, show refine dialog at client
+                    characterEntity.RequestShowNpcRefine();
+                    return false;
+            }
+            return true;
+        }
+
+        public NpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
+        {
+            // This dialog is current NPC dialog
+            NpcDialog nextDialog = null;
+            switch (type)
+            {
+                case NpcDialogType.Normal:
+                    if (menuIndex >= menus.Length)
+                    {
+                        // Invalid menu, so no next dialog, so return itself
+                        return this;
+                    }
+                    // Changing current npc dialog
+                    NpcDialogMenu selectedMenu = menus[menuIndex];
+                    if (!selectedMenu.IsPassConditions(characterEntity) || selectedMenu.dialog == null || selectedMenu.isCloseMenu)
+                    {
+                        // Close dialog, so return null
+                        return null;
+                    }
+                    nextDialog = selectedMenu.dialog;
+                    break;
+                case NpcDialogType.Quest:
+                    switch (menuIndex)
+                    {
+                        case QUEST_ACCEPT_MENU_INDEX:
+                            characterEntity.AcceptQuest(quest.DataId);
+                            nextDialog = questAcceptedDialog;
+                            break;
+                        case QUEST_DECLINE_MENU_INDEX:
+                            nextDialog = questDeclinedDialog;
+                            break;
+                        case QUEST_ABANDON_MENU_INDEX:
+                            characterEntity.AbandonQuest(quest.DataId);
+                            nextDialog = questAbandonedDialog;
+                            break;
+                        case QUEST_COMPLETE_MENU_INDEX:
+                            characterEntity.CompleteQuest(quest.DataId);
+                            nextDialog = questCompletedDialog;
+                            break;
+                    }
+                    break;
+                case NpcDialogType.CraftItem:
+                    switch (menuIndex)
+                    {
+                        case CRAFT_ITEM_START_MENU_INDEX:
+                            GameMessage.Type gameMessageType;
+                            if (itemCraft.CanCraft(characterEntity, out gameMessageType))
+                            {
+                                itemCraft.CraftItem(characterEntity);
+                                nextDialog = craftDoneDialog;
+                            }
+                            else
+                            {
+                                // Cannot craft item
+                                switch (gameMessageType)
+                                {
+                                    case GameMessage.Type.CannotCarryAnymore:
+                                        nextDialog = craftItemWillOverwhelmingDialog;
+                                        break;
+                                    default:
+                                        nextDialog = craftNotMeetRequirementsDialog;
+                                        break;
+                                }
+                            }
+                            break;
+                        case CRAFT_ITEM_CANCEL_MENU_INDEX:
+                            nextDialog = craftCancelDialog;
+                            break;
+                    }
+                    break;
+                case NpcDialogType.SaveRespawnPoint:
+                    switch (menuIndex)
+                    {
+                        case SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX:
+                            characterEntity.RespawnMapName = saveRespawnMap.Id;
+                            characterEntity.RespawnPosition = saveRespawnPosition;
+                            nextDialog = saveRespawnConfirmDialog;
+                            break;
+                        case SAVE_SPAWN_POINT_CANCEL_MENU_INDEX:
+                            nextDialog = saveRespawnCancelDialog;
+                            break;
+                    }
+                    break;
+                case NpcDialogType.Warp:
+                    switch (menuIndex)
+                    {
+                        case WARP_CONFIRM_MENU_INDEX:
+                            BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition);
+                            return null;
+                        case WARP_CANCEL_MENU_INDEX:
+                            nextDialog = warpCancelDialog;
+                            break;
+                    }
+                    break;
+                case NpcDialogType.PlayerStorage:
+                    switch (menuIndex)
+                    {
+                        case STORAGE_CONFIRM_MENU_INDEX:
+                            characterEntity.OpenStorage(StorageType.Player, characterEntity.UserId);
+                            return null;
+                        case STORAGE_CANCEL_MENU_INDEX:
+                            nextDialog = storageCancelDialog;
+                            break;
+                    }
+                    break;
+                case NpcDialogType.GuildStorage:
+                    switch (menuIndex)
+                    {
+                        case STORAGE_CONFIRM_MENU_INDEX:
+                            characterEntity.OpenStorage(StorageType.Guild, characterEntity.GuildId.ToString());
+                            return null;
+                        case STORAGE_CANCEL_MENU_INDEX:
+                            nextDialog = storageCancelDialog;
+                            break;
+                    }
+                    break;
+            }
+
+            if (nextDialog == null || !nextDialog.ValidateDialog(characterEntity))
+                return null;
+
+            return nextDialog;
+        }
     }
 
     public enum NpcDialogConditionType : byte

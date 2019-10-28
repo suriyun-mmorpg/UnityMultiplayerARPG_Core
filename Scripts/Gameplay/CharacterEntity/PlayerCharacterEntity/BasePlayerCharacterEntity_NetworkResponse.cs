@@ -177,328 +177,13 @@ namespace MultiplayerARPG
         {
             if (currentNpcDialog == null)
                 return;
-            NpcDialogMenu[] menus = currentNpcDialog.menus;
-            NpcDialogMenu selectedMenu;
-            switch (currentNpcDialog.type)
-            {
-                case NpcDialogType.Normal:
-                    if (menuIndex >= menus.Length)
-                        return;
-                    // Changing current npc dialog
-                    selectedMenu = menus[menuIndex];
-                    if (!selectedMenu.IsPassConditions(this) || selectedMenu.dialog == null || selectedMenu.isCloseMenu)
-                    {
-                        currentNpcDialog = null;
-                        RequestShowNpcDialog(0);
-                        return;
-                    }
-                    currentNpcDialog = selectedMenu.dialog;
-                    // Show Npc dialog on client
-                    RequestShowNpcDialog(currentNpcDialog.DataId);
-                    break;
-                case NpcDialogType.Quest:
-                    NetFuncSelectNpcDialogQuestMenu(menuIndex);
-                    break;
-                case NpcDialogType.CraftItem:
-                    NetFuncSelectNpcDialogCraftItemMenu(menuIndex);
-                    break;
-                case NpcDialogType.SaveRespawnPoint:
-                    NetFuncSelectNpcDialogSaveRespawnPointMenu(menuIndex);
-                    break;
-                case NpcDialogType.Warp:
-                    NetFuncSelectNpcDialogWarpMenu(menuIndex);
-                    break;
-                case NpcDialogType.PlayerStorage:
-                    NetFuncSelectNpcDialogPlayerStorageMenu(menuIndex);
-                    break;
-                case NpcDialogType.GuildStorage:
-                    NetFuncSelectNpcDialogGuildStorageMenu(menuIndex);
-                    break;
-            }
 
-            // `currentNpcDialog` have changed after select menu, then proceed new dialog activity if needed
+            currentNpcDialog = currentNpcDialog.GetNextDialog(this, menuIndex);
             if (currentNpcDialog != null)
             {
-                switch (currentNpcDialog.type)
-                {
-                    case NpcDialogType.RefineItem:
-                        // If dialog is refine dialog, show refine dialog at client
-                        RequestShowNpcRefine();
-                        currentNpcDialog = null;
-                        break;
-                }
-            }
-        }
-
-        protected void NetFuncSelectNpcDialogQuestMenu(int menuIndex)
-        {
-            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.Quest || currentNpcDialog.quest == null)
-            {
-                currentNpcDialog = null;
-                RequestShowNpcDialog(0);
-                return;
-            }
-            switch (menuIndex)
-            {
-                case NpcDialog.QUEST_ACCEPT_MENU_INDEX:
-                    NetFuncAcceptQuest(currentNpcDialog.quest.DataId);
-                    currentNpcDialog = currentNpcDialog.questAcceptedDialog;
-                    break;
-                case NpcDialog.QUEST_DECLINE_MENU_INDEX:
-                    currentNpcDialog = currentNpcDialog.questDeclinedDialog;
-                    break;
-                case NpcDialog.QUEST_ABANDON_MENU_INDEX:
-                    NetFuncAbandonQuest(currentNpcDialog.quest.DataId);
-                    currentNpcDialog = currentNpcDialog.questAbandonedDialog;
-                    break;
-                case NpcDialog.QUEST_COMPLETE_MENU_INDEX:
-                    NetFuncCompleteQuest(currentNpcDialog.quest.DataId);
-                    currentNpcDialog = currentNpcDialog.questCompletedDialog;
-                    break;
-            }
-            if (currentNpcDialog == null)
-                RequestShowNpcDialog(0);
-            else
+                // Show Npc dialog on client
                 RequestShowNpcDialog(currentNpcDialog.DataId);
-        }
-
-        protected void NetFuncSelectNpcDialogCraftItemMenu(int menuIndex)
-        {
-            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.CraftItem || currentNpcDialog.itemCraft.CraftingItem == null)
-            {
-                currentNpcDialog = null;
-                RequestShowNpcDialog(0);
-                return;
             }
-            switch (menuIndex)
-            {
-                case NpcDialog.CRAFT_ITEM_START_MENU_INDEX:
-                    GameMessage.Type gameMessageType;
-                    if (currentNpcDialog.itemCraft.CanCraft(this, out gameMessageType))
-                    {
-                        currentNpcDialog.itemCraft.CraftItem(this);
-                        currentNpcDialog = currentNpcDialog.craftDoneDialog;
-                    }
-                    else
-                    {
-                        switch (gameMessageType)
-                        {
-                            case GameMessage.Type.CannotCarryAnymore:
-                                currentNpcDialog = currentNpcDialog.craftItemWillOverwhelmingDialog;
-                                break;
-                            default:
-                                currentNpcDialog = currentNpcDialog.craftNotMeetRequirementsDialog;
-                                break;
-                        }
-                    }
-                    break;
-                case NpcDialog.CRAFT_ITEM_CANCEL_MENU_INDEX:
-                    currentNpcDialog = currentNpcDialog.craftCancelDialog;
-                    break;
-            }
-            if (currentNpcDialog == null)
-                RequestShowNpcDialog(0);
-            else
-                RequestShowNpcDialog(currentNpcDialog.DataId);
-        }
-
-        protected void NetFuncSelectNpcDialogSaveRespawnPointMenu(int menuIndex)
-        {
-            if (currentNpcDialog == null ||
-                currentNpcDialog.type != NpcDialogType.SaveRespawnPoint)
-            {
-                currentNpcDialog = null;
-                RequestShowNpcDialog(0);
-                return;
-            }
-            switch (menuIndex)
-            {
-                case NpcDialog.SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX:
-                    RespawnMapName = currentNpcDialog.saveRespawnMap.Id;
-                    RespawnPosition = currentNpcDialog.saveRespawnPosition;
-                    currentNpcDialog = currentNpcDialog.saveRespawnConfirmDialog;
-                    break;
-                case NpcDialog.SAVE_SPAWN_POINT_CANCEL_MENU_INDEX:
-                    currentNpcDialog = currentNpcDialog.saveRespawnCancelDialog;
-                    break;
-            }
-            if (currentNpcDialog == null)
-                RequestShowNpcDialog(0);
-            else
-                RequestShowNpcDialog(currentNpcDialog.DataId);
-        }
-
-        protected void NetFuncSelectNpcDialogWarpMenu(int menuIndex)
-        {
-            if (currentNpcDialog == null ||
-                currentNpcDialog.type != NpcDialogType.Warp)
-            {
-                currentNpcDialog = null;
-                RequestShowNpcDialog(0);
-                return;
-            }
-            switch (menuIndex)
-            {
-                case NpcDialog.WARP_CONFIRM_MENU_INDEX:
-                    gameManager.WarpCharacter(currentNpcDialog.warpPortalType, this, currentNpcDialog.warpMap.Id, currentNpcDialog.warpPosition);
-                    currentNpcDialog = null;
-                    break;
-                case NpcDialog.WARP_CANCEL_MENU_INDEX:
-                    currentNpcDialog = currentNpcDialog.warpCancelDialog;
-                    break;
-            }
-            if (currentNpcDialog == null)
-                RequestShowNpcDialog(0);
-            else
-                RequestShowNpcDialog(currentNpcDialog.DataId);
-        }
-
-        protected void NetFuncSelectNpcDialogPlayerStorageMenu(int menuIndex)
-        {
-            if (currentNpcDialog == null ||
-                currentNpcDialog.type != NpcDialogType.PlayerStorage)
-            {
-                currentNpcDialog = null;
-                RequestShowNpcDialog(0);
-                return;
-            }
-            switch (menuIndex)
-            {
-                case NpcDialog.STORAGE_CONFIRM_MENU_INDEX:
-                    OpenStorage(StorageType.Player, UserId);
-                    currentNpcDialog = null;
-                    break;
-                case NpcDialog.STORAGE_CANCEL_MENU_INDEX:
-                    currentNpcDialog = currentNpcDialog.storageCancelDialog;
-                    break;
-            }
-            if (currentNpcDialog == null)
-                RequestShowNpcDialog(0);
-            else
-                RequestShowNpcDialog(currentNpcDialog.DataId);
-        }
-
-        protected void NetFuncSelectNpcDialogGuildStorageMenu(int menuIndex)
-        {
-            if (currentNpcDialog == null ||
-                currentNpcDialog.type != NpcDialogType.GuildStorage)
-            {
-                currentNpcDialog = null;
-                RequestShowNpcDialog(0);
-                return;
-            }
-            switch (menuIndex)
-            {
-                case NpcDialog.STORAGE_CONFIRM_MENU_INDEX:
-                    OpenStorage(StorageType.Guild, GuildId.ToString());
-                    currentNpcDialog = null;
-                    break;
-                case NpcDialog.STORAGE_CANCEL_MENU_INDEX:
-                    currentNpcDialog = currentNpcDialog.storageCancelDialog;
-                    break;
-            }
-            if (currentNpcDialog == null)
-                RequestShowNpcDialog(0);
-            else
-                RequestShowNpcDialog(currentNpcDialog.DataId);
-        }
-
-        protected void NetFuncBuyNpcItem(short itemIndex, short amount)
-        {
-            if (currentNpcDialog == null)
-                return;
-            NpcSellItem[] sellItems = currentNpcDialog.sellItems;
-            if (sellItems == null || itemIndex >= sellItems.Length)
-                return;
-            NpcSellItem sellItem = sellItems[itemIndex];
-            if (!gameplayRule.CurrenciesEnoughToBuyItem(this, sellItem, amount))
-            {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
-                return;
-            }
-            int dataId = sellItem.item.DataId;
-            if (this.IncreasingItemsWillOverwhelming(dataId, amount))
-            {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
-                return;
-            }
-            gameplayRule.DecreaseCurrenciesWhenBuyItem(this, sellItem, amount);
-            this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
-        }
-
-        protected void NetFuncAcceptQuest(int questDataId)
-        {
-            int indexOfQuest = this.IndexOfQuest(questDataId);
-            Quest quest;
-            if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
-                return;
-            CharacterQuest characterQuest = CharacterQuest.Create(quest);
-            quests.Add(characterQuest);
-        }
-
-        protected void NetFuncAbandonQuest(int questDataId)
-        {
-            int indexOfQuest = this.IndexOfQuest(questDataId);
-            Quest quest;
-            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
-                return;
-            CharacterQuest characterQuest = quests[indexOfQuest];
-            if (characterQuest.isComplete)
-                return;
-            quests.RemoveAt(indexOfQuest);
-        }
-
-        protected void NetFuncCompleteQuest(int questDataId)
-        {
-            int indexOfQuest = this.IndexOfQuest(questDataId);
-            Quest quest;
-            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
-                return;
-
-            CharacterQuest characterQuest = quests[indexOfQuest];
-            if (!characterQuest.IsAllTasksDone(this))
-                return;
-
-            if (characterQuest.isComplete)
-                return;
-
-            Reward reward = gameplayRule.MakeQuestReward(quest);
-            if (this.IncreasingItemsWillOverwhelming(quest.rewardItems))
-            {
-                // Overwhelming
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
-                return;
-            }
-            // Decrease task items
-            QuestTask[] tasks = quest.tasks;
-            foreach (QuestTask task in tasks)
-            {
-                switch (task.taskType)
-                {
-                    case QuestTaskType.CollectItem:
-                        this.DecreaseItems(task.itemAmount.item.DataId, task.itemAmount.amount);
-                        break;
-                }
-            }
-            // Add reward items
-            if (quest.rewardItems != null && quest.rewardItems.Length > 0)
-            {
-                foreach (ItemAmount rewardItem in quest.rewardItems)
-                {
-                    if (rewardItem.item != null && rewardItem.amount > 0)
-                        this.IncreaseItems(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount));
-                }
-            }
-            // Add exp
-            RewardExp(reward, 1f, RewardGivenType.Quest);
-            // Add currency
-            RewardCurrencies(reward, 1f, RewardGivenType.Quest);
-            // Set quest state
-            characterQuest.isComplete = true;
-            if (!quest.canRepeat)
-                quests[indexOfQuest] = characterQuest;
-            else
-                quests.RemoveAt(indexOfQuest);
         }
 
         protected void NetFuncEnterWarp()
@@ -1136,7 +821,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        protected void StopDealing()
+        public void StopDealing()
         {
             if (DealingCharacter == null)
             {
@@ -1151,21 +836,21 @@ namespace MultiplayerARPG
             DealingCharacter = null;
         }
 
-        protected void StopPartyInvitation()
+        public void StopPartyInvitation()
         {
             if (DealingCharacter != null)
                 DealingCharacter.DealingCharacter = null;
             DealingCharacter = null;
         }
 
-        protected void StopGuildInvitation()
+        public void StopGuildInvitation()
         {
             if (DealingCharacter != null)
                 DealingCharacter.DealingCharacter = null;
             DealingCharacter = null;
         }
 
-        protected void OpenStorage(StorageType storageType, string ownerId)
+        public void OpenStorage(StorageType storageType, string ownerId)
         {
             StorageId storageId = new StorageId(storageType, ownerId);
             if (!gameManager.CanAccessStorage(this, storageId))
