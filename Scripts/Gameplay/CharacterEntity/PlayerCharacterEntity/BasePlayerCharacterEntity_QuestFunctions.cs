@@ -6,29 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public void BuyNpcItem(short itemIndex, short amount)
-        {
-            if (currentNpcDialog == null)
-                return;
-            NpcSellItem[] sellItems = currentNpcDialog.sellItems;
-            if (sellItems == null || itemIndex >= sellItems.Length)
-                return;
-            NpcSellItem sellItem = sellItems[itemIndex];
-            if (!gameplayRule.CurrenciesEnoughToBuyItem(this, sellItem, amount))
-            {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
-                return;
-            }
-            int dataId = sellItem.item.DataId;
-            if (this.IncreasingItemsWillOverwhelming(dataId, amount))
-            {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
-                return;
-            }
-            gameplayRule.DecreaseCurrenciesWhenBuyItem(this, sellItem, amount);
-            this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
-        }
-
         public void AcceptQuest(int questDataId)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
