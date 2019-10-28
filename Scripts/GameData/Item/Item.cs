@@ -166,20 +166,6 @@ namespace MultiplayerARPG
                         hasChanges = true;
                     }
                     break;
-                case ItemType.AttributeIncrease:
-                    if (attributeAmount.amount > 1)
-                    {
-                        attributeAmount.amount = 1;
-                        hasChanges = true;
-                    }
-                    break;
-                case ItemType.SkillLearn:
-                    if (skillLevel.level > 1)
-                    {
-                        skillLevel.level = 1;
-                        hasChanges = true;
-                    }
-                    break;
             }
             // Migrate character stats → armor (equipment)
             if (GameDataMigration.MigrateArmor(increaseStats, increaseArmors, out increaseStats, out increaseArmors))
