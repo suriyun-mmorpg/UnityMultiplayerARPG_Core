@@ -16,3 +16,6 @@
 [submodule "SerializationSurrogates"]
 	path = SerializationSurrogates
 	url = https://github.com/insthync/unity3d-serialization-surrogates
+[submodule "NodeBasedNpcDialog"]
+	path = NodeBasedNpcDialog
+	url = https://github.com/insthync/UnityMultiplayerARPG_NodeBasedNpcDialog.git
