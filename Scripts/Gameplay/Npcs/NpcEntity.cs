@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         [Tooltip("It will use `startDialog` if `graph` is empty")]
         private NpcDialog startDialog;
         [SerializeField]
-        [Tooltip("It will use `graph` first dialog as start dialog if this is not empty")]
+        [Tooltip("It will use `graph` start dialog if this is not empty")]
         private NpcDialogGraph graph;
         [Header("Relates Element Containers")]
         public Transform uiElementTransform;
