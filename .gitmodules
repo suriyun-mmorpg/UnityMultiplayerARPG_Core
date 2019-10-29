@@ -16,3 +16,6 @@
 [submodule "SerializationSurrogates"]
 	path = SerializationSurrogates
 	url = https://github.com/insthync/unity3d-serialization-surrogates
+[submodule "xNode"]
+	path = xNode
+	url = https://github.com/Siccity/xNode.git
