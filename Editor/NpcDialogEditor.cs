@@ -13,6 +13,15 @@ namespace MultiplayerARPG
         {
             if (cacheNpcDialog == null)
                 cacheNpcDialog = CreateInstance<NpcDialog>();
+
+            if (cacheNpcDialog.graph == null)
+            {
+                hiddenFields.Add("graph");
+                hiddenFields.Add("position");
+                hiddenFields.Add("ports");
+            }
+            hiddenFields.Add("input");
+
             // Normal
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Normal.ToString(), cacheNpcDialog.GetMemberName(a => a.menus));
             // Quest
