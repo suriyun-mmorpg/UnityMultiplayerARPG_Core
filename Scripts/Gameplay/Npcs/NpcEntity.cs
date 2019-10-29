@@ -6,9 +6,12 @@ namespace MultiplayerARPG
 {
     public sealed class NpcEntity : BaseGameEntity
     {
-        [Tooltip("Set it to force to not change character model by data Id, when set it model container will not be used")]
         [SerializeField]
+        [Tooltip("It will use `startDialog` if `graph` is empty")]
         private NpcDialog startDialog;
+        [SerializeField]
+        [Tooltip("It will use `graph` first dialog as start dialog if this is not empty")]
+        private NpcDialogGraph graph;
         [Header("Relates Element Containers")]
         public Transform uiElementTransform;
         public Transform miniMapElementContainer;
@@ -23,14 +26,27 @@ namespace MultiplayerARPG
 
         public NpcDialog StartDialog
         {
-            get { return startDialog; }
+            get
+            {
+                if (graph != null && graph.nodes.Count > 0)
+                    return graph.nodes[0] as NpcDialog;
+                return startDialog;
+            }
             set
             {
-                if (startDialog != value)
-                {
-                    startDialog = value;
-                    SetupQuestIds();
-                }
+                startDialog = value;
+            }
+        }
+
+        public NpcDialogGraph Graph
+        {
+            get
+            {
+                return graph;
+            }
+            set
+            {
+                graph = value;
             }
         }
 
@@ -69,6 +85,12 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = gameInstance.npcTag;
             gameObject.layer = gameInstance.characterLayer;
+        }
+
+        protected override void EntityStart()
+        {
+            base.EntityStart();
+            SetupQuestIds();
         }
 
         protected override void SetupNetElements()
@@ -124,9 +146,9 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            
+
             questIds.Clear();
-            FindQuestFromDialog(startDialog);
+            FindQuestFromDialog(StartDialog);
         }
 
         private void FindQuestFromDialog(NpcDialog dialog, List<NpcDialog> foundDialogs = null)

@@ -818,8 +818,9 @@ namespace MultiplayerARPG
                         {
                             GameObject spawnObj = Instantiate(npcPrefab.gameObject, npc.position, Quaternion.Euler(npc.rotation));
                             NpcEntity npcEntity = spawnObj.GetComponent<NpcEntity>();
-                            npcEntity.StartDialog = npc.startDialog;
                             npcEntity.Title = npc.title;
+                            npcEntity.StartDialog = npc.startDialog;
+                            npcEntity.Graph = npc.graph;
                             Assets.NetworkSpawn(spawnObj);
                         }
                     }
