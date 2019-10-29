@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using XNode;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -21,7 +22,7 @@ namespace MultiplayerARPG
     }
 
     [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog", order = -4798)]
-    public partial class NpcDialog : BaseGameData
+    public partial class NpcDialog : Node
     {
         public const int QUEST_ACCEPT_MENU_INDEX = 0;
         public const int QUEST_DECLINE_MENU_INDEX = 1;
@@ -38,40 +39,95 @@ namespace MultiplayerARPG
         public const int STORAGE_CONFIRM_MENU_INDEX = 0;
         public const int STORAGE_CANCEL_MENU_INDEX = 1;
 
+        [Input]
+        public NpcDialog input;
+
         [Header("NPC Dialog Configs")]
+        [Tooltip("Default title")]
+        public string title;
+        [Tooltip("Titles by language keys")]
+        public LanguageData[] titles;
+        [Tooltip("Default description")]
+        [TextArea]
+        public string description;
+        [Tooltip("Descriptions by language keys")]
+        public LanguageData[] descriptions;
+        public Sprite icon;
         public NpcDialogType type;
+        [Output(dynamicPortList = true, connectionType = ConnectionType.Override)]
         public NpcDialogMenu[] menus;
         // Quest
         public Quest quest;
+        [Output(backingValue = ShowBackingValue.Always, connectionType = ConnectionType.Override)]
         public NpcDialog questAcceptedDialog;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog questDeclinedDialog;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog questAbandonedDialog;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog questCompletedDialog;
         // Shop
         public NpcSellItem[] sellItems;
         // Craft Item
         public ItemCraft itemCraft;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog craftDoneDialog;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog craftItemWillOverwhelmingDialog;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog craftNotMeetRequirementsDialog;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog craftCancelDialog;
         // Save Spawn Point
         public MapInfo saveRespawnMap;
         public Vector3 saveRespawnPosition;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog saveRespawnConfirmDialog;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog saveRespawnCancelDialog;
         // Teleport
         public WarpPortalType warpPortalType;
         public MapInfo warpMap;
         public Vector3 warpPosition;
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog warpCancelDialog;
-        // Teleport
+        // Storage
+        [Output(connectionType = ConnectionType.Override)]
         public NpcDialog storageCancelDialog;
 
-        public override void PrepareRelatesData()
+        #region Generic Data
+        public string Id { get { return name; } }
+        public string Title
         {
-            base.PrepareRelatesData();
+            get { return Language.GetText(titles, title); }
+        }
+        public string Description
+        {
+            get { return Language.GetText(descriptions, description); }
+        }
+        public int DataId { get { return MakeDataId(Id); } }
 
+        public static int MakeDataId(string id)
+        {
+            return id.GenerateHashId();
+        }
+        #endregion
+        
+#if UNITY_EDITOR
+        protected void OnValidate()
+        {
+            if (Validate())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        public bool Validate()
+        {
+            return false;
+        }
+
+        public void PrepareRelatesData()
+        {
             // Add dialogs from menus
             List<NpcDialog> menuDialogs = new List<NpcDialog>();
             if (menus != null && menus.Length > 0)
@@ -266,6 +322,68 @@ namespace MultiplayerARPG
                 return null;
 
             return nextDialog;
+        }
+
+        public override object GetValue(NodePort port)
+        {
+            return port.node;
+        }
+
+        public override void OnCreateConnection(NodePort from, NodePort to)
+        {
+            SetDialogByPort(from, to);
+        }
+
+        public override void OnRemoveConnection(NodePort port)
+        {
+            SetDialogByPort(port, null);
+        }
+
+        private void SetDialogByPort(NodePort from, NodePort to)
+        {
+            NpcDialog dialog = null;
+            if (to != null && to.node != null)
+                dialog = to.node as NpcDialog;
+
+            int arrayIndex;
+            if (from.fieldName.Contains("menus ") && int.TryParse(from.fieldName.Split(' ')[1], out arrayIndex) && arrayIndex < menus.Length)
+                menus[arrayIndex].dialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.questAcceptedDialog)))
+                questAcceptedDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.questDeclinedDialog)))
+                questDeclinedDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.questAbandonedDialog)))
+                questAbandonedDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.questCompletedDialog)))
+                questCompletedDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.craftDoneDialog)))
+                craftDoneDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.craftItemWillOverwhelmingDialog)))
+                craftItemWillOverwhelmingDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.craftNotMeetRequirementsDialog)))
+                craftNotMeetRequirementsDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.craftCancelDialog)))
+                craftCancelDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.saveRespawnConfirmDialog)))
+                saveRespawnConfirmDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.saveRespawnCancelDialog)))
+                saveRespawnCancelDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.warpCancelDialog)))
+                warpCancelDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.storageCancelDialog)))
+                storageCancelDialog = dialog;
         }
     }
 
