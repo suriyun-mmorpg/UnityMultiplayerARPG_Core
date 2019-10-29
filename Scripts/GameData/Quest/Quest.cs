@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         CollectItem,
     }
 
-    [CreateAssetMenu(fileName = "Quest", menuName = "Create GameData/Quest", order = -4797)]
+    [CreateAssetMenu(fileName = "Quest", menuName = "Create GameData/Quest", order = -4796)]
     public partial class Quest : BaseGameData
     {
         [Header("Quest Configs")]
