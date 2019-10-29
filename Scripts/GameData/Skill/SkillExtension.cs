@@ -25,7 +25,6 @@ namespace MultiplayerARPG
             if (skill == null)
                 return false;
             // Check is skill learned
-            Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
             foreach (CharacterSkill learnedSkill in skillLearner.Skills)
             {
                 if (learnedSkill.GetSkill() != null &&
