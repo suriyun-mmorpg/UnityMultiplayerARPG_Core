@@ -52,6 +52,11 @@ namespace MultiplayerARPG
                 // Show Npc dialog on client
                 RequestShowNpcDialog(currentNpcDialog.DataId);
             }
+            else
+            {
+                // Hide Npc dialog on client
+                RequestShowNpcDialog(0);
+            }
         }
 
         protected void NetFuncBuyNpcItem(short itemIndex, short amount)
