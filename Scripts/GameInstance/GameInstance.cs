@@ -571,8 +571,8 @@ namespace MultiplayerARPG
                 if (attribute == null || Attributes.ContainsKey(attribute.DataId))
                     continue;
                 attribute.Validate();
-                attribute.PrepareRelatesData();
                 Attributes[attribute.DataId] = attribute;
+                attribute.PrepareRelatesData();
             }
         }
 
@@ -585,8 +585,8 @@ namespace MultiplayerARPG
                 if (item == null || Items.ContainsKey(item.DataId))
                     continue;
                 item.Validate();
-                item.PrepareRelatesData();
                 Items[item.DataId] = item;
+                item.PrepareRelatesData();
                 // Validate equipment set
                 if (item.equipmentSet != null)
                 {
@@ -605,8 +605,8 @@ namespace MultiplayerARPG
                 if (character == null || Characters.ContainsKey(character.DataId))
                     continue;
                 character.Validate();
-                character.PrepareRelatesData();
                 Characters[character.DataId] = character;
+                character.PrepareRelatesData();
                 if (character is PlayerCharacter)
                 {
                     PlayerCharacter playerCharacter = character as PlayerCharacter;
@@ -682,8 +682,8 @@ namespace MultiplayerARPG
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
                 skill.Validate();
-                skill.PrepareRelatesData();
                 Skills[skill.DataId] = skill;
+                skill.PrepareRelatesData();
             }
         }
 
@@ -696,8 +696,8 @@ namespace MultiplayerARPG
                 if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.DataId))
                     continue;
                 npcDialog.Validate();
-                npcDialog.PrepareRelatesData();
                 NpcDialogs[npcDialog.DataId] = npcDialog;
+                npcDialog.PrepareRelatesData();
             }
         }
 
@@ -710,8 +710,8 @@ namespace MultiplayerARPG
                 if (quest == null || Quests.ContainsKey(quest.DataId))
                     continue;
                 quest.Validate();
-                quest.PrepareRelatesData();
                 Quests[quest.DataId] = quest;
+                quest.PrepareRelatesData();
             }
         }
 
@@ -724,8 +724,8 @@ namespace MultiplayerARPG
                 if (guildSkill == null || GuildSkills.ContainsKey(guildSkill.DataId))
                     continue;
                 guildSkill.Validate();
-                guildSkill.PrepareRelatesData();
                 GuildSkills[guildSkill.DataId] = guildSkill;
+                guildSkill.PrepareRelatesData();
             }
         }
         
@@ -774,8 +774,8 @@ namespace MultiplayerARPG
                 if (armorType == null || ArmorTypes.ContainsKey(armorType.DataId))
                     continue;
                 armorType.Validate();
-                armorType.PrepareRelatesData();
                 ArmorTypes[armorType.DataId] = armorType;
+                armorType.PrepareRelatesData();
             }
         }
 
@@ -788,8 +788,8 @@ namespace MultiplayerARPG
                 if (weaponType == null || WeaponTypes.ContainsKey(weaponType.DataId))
                     continue;
                 weaponType.Validate();
-                weaponType.PrepareRelatesData();
                 WeaponTypes[weaponType.DataId] = weaponType;
+                weaponType.PrepareRelatesData();
             }
         }
 
@@ -852,8 +852,8 @@ namespace MultiplayerARPG
                 if (mapInfo == null || MapInfos.ContainsKey(mapInfo.Id) || !mapInfo.IsSceneSet())
                     continue;
                 mapInfo.Validate();
-                mapInfo.PrepareRelatesData();
                 MapInfos[mapInfo.Id] = mapInfo;
+                mapInfo.PrepareRelatesData();
             }
         }
 
@@ -866,8 +866,8 @@ namespace MultiplayerARPG
                 if (faction == null || Factions.ContainsKey(faction.DataId))
                     continue;
                 faction.Validate();
-                faction.PrepareRelatesData();
                 Factions[faction.DataId] = faction;
+                faction.PrepareRelatesData();
             }
         }
     }
