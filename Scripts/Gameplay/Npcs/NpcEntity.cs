@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (graph != null && graph.nodes.Count > 0)
+                if (graph != null && graph.nodes != null && graph.nodes.Count > 0)
                     return graph.nodes[0] as NpcDialog;
                 return startDialog;
             }
@@ -90,6 +90,8 @@ namespace MultiplayerARPG
         protected override void EntityStart()
         {
             base.EntityStart();
+            if (StartDialog != null && !GameInstance.NpcDialogs.ContainsKey(StartDialog.DataId))
+                GameInstance.AddNpcDialogs(new NpcDialog[] { StartDialog });
             SetupQuestIds();
         }
 

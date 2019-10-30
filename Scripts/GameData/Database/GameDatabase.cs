@@ -10,10 +10,7 @@ namespace MultiplayerARPG
     public class GameDatabase : BaseGameDatabase
     {
         public Attribute[] attributes;
-        public DamageElement[] damageElements;
         public Item[] items;
-        public NpcDialog[] npcDialogs;
-        public Quest[] quests;
         public GuildSkill[] guildSkills;
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
@@ -25,8 +22,6 @@ namespace MultiplayerARPG
         {
             GameInstance.AddAttributes(attributes);
             GameInstance.AddItems(items);
-            GameInstance.AddNpcDialogs(npcDialogs);
-            GameInstance.AddQuests(quests);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
