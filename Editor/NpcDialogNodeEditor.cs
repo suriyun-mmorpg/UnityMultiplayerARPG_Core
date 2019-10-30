@@ -58,6 +58,7 @@ namespace MultiplayerARPG
                     NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.warpCancelDialog)));
                     break;
                 case NpcDialogType.RefineItem:
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.refineItemCancelDialog)));
                     break;
                 case NpcDialogType.PlayerStorage:
                     NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.storageCancelDialog)));
