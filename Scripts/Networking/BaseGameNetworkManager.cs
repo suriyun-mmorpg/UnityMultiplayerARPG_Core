@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -27,6 +28,8 @@ namespace MultiplayerARPG
         }
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
+        public const string INSTANTIATES_OBJECTS_DELAY_STATE_KEY = "INSTANTIATES_OBJECTS_DELAY";
+        public const float INSTANTIATES_OBJECTS_DELAY = 0.5f;
 
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
@@ -39,6 +42,16 @@ namespace MultiplayerARPG
         protected static readonly Dictionary<long, PartyData> updatingPartyMembers = new Dictionary<long, PartyData>();
         protected static readonly Dictionary<long, GuildData> updatingGuildMembers = new Dictionary<long, GuildData>();
         protected static readonly Dictionary<string, NotifyOnlineCharacterTime> lastCharacterOnlineTimes = new Dictionary<string, NotifyOnlineCharacterTime>();
+        /// <summary>
+        /// This dictionary will be cleared in `OnServerOnlineSceneLoaded`
+        /// </summary>
+        protected static readonly Dictionary<string, bool> readyToInstantiateObjectsStates = new Dictionary<string, bool>();
+        /// <summary>
+        /// * This value will be `TRUE` when all values in `readyToInstantiateObjectsStates` are `TRUE`<para />
+        /// * The manager will not validate values in `readyToInstantiateObjectsStates` after this value was `TRUE`<para />
+        /// * This value will reset to `FALSE` in `OnServerOnlineSceneLoaded`<para />
+        /// </summary>
+        protected static bool isReadyToInstantiateObjects;
         public static PartyData ClientParty { get; protected set; }
         public static GuildData ClientGuild { get; protected set; }
         public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(1);
@@ -52,6 +65,7 @@ namespace MultiplayerARPG
         public System.Action<SocialGroupData> onClientUpdateFoundCharacters;
         public System.Action<SocialGroupData> onClientUpdateFriends;
         protected float lastUpdateOnlineCharacterTime;
+        protected float serverSceneLoadedTime;
 
         public bool TryGetPlayerCharacter(long connectionId, out BasePlayerCharacterEntity result)
         {
@@ -245,7 +259,7 @@ namespace MultiplayerARPG
         {
             updatingPartyMembers.Clear();
             updatingGuildMembers.Clear();
-            
+
             PartyData tempParty;
             GuildData tempGuild;
             foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
@@ -776,7 +790,19 @@ namespace MultiplayerARPG
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
+            readyToInstantiateObjectsStates.Clear();
+            isReadyToInstantiateObjects = false;
+            serverSceneLoadedTime = Time.unscaledTime;
             this.InvokeInstanceDevExtMethods("OnServerOnlineSceneLoaded");
+            StartCoroutine(OnServerOnlineSceneLoaded_SpawnEntitiesRoutine());
+        }
+
+        private IEnumerator OnServerOnlineSceneLoaded_SpawnEntitiesRoutine()
+        {
+            while (!IsReadyToInstantiateObjects())
+            {
+                yield return null;
+            }
             RegisterEntities();
             // Spawn monsters
             MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
@@ -917,6 +943,22 @@ namespace MultiplayerARPG
             UpdateMapInfoMessage message = new UpdateMapInfoMessage();
             message.mapId = CurrentMapInfo.Id;
             ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MsgTypes.UpdateMapInfo, message);
+        }
+
+        public bool IsReadyToInstantiateObjects()
+        {
+            if (!isReadyToInstantiateObjects)
+            {
+                readyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - serverSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;
+                this.InvokeInstanceDevExtMethods("UpdateReadyToInstantiateObjectsStates");
+                foreach (bool value in readyToInstantiateObjectsStates.Values)
+                {
+                    if (!value)
+                        return false;
+                }
+                isReadyToInstantiateObjects = true;
+            }
+            return true;
         }
     }
 }

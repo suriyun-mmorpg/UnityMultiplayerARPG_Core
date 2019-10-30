@@ -23,6 +23,12 @@ namespace MultiplayerARPG
             HostOnly,
         }
 
+        public struct PendingSpawnPlayerCharacter
+        {
+            public long connectionId;
+            public PlayerCharacterData playerCharacterData;
+        }
+
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
@@ -35,7 +41,8 @@ namespace MultiplayerARPG
         private readonly StorageSaveData storageSaveData = new StorageSaveData();
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
-        private bool isSceneLoaded;
+        private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
+        private bool isInstantiateSceneObjects;
 
         private LiteNetLibDiscovery cacheDiscovery;
         public LiteNetLibDiscovery CacheDiscovery
@@ -115,6 +122,16 @@ namespace MultiplayerARPG
                 Profiler.EndSample();
                 lastSaveTime = tempUnscaledTime;
             }
+
+            if (IsServer && pendingSpawnPlayerCharacters.Count > 0 && IsReadyToInstantiateObjects())
+            {
+                // Spawn pending player characters
+                foreach (PendingSpawnPlayerCharacter spawnPlayerCharacter in pendingSpawnPlayerCharacters)
+                {
+                    SpawnPlayerCharacter(spawnPlayerCharacter.connectionId, spawnPlayerCharacter.playerCharacterData);
+                }
+                pendingSpawnPlayerCharacters.Clear();
+            }
         }
 
         protected override void Clean()
@@ -139,8 +156,24 @@ namespace MultiplayerARPG
 
         public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
+            if (!IsReadyToInstantiateObjects())
+            {
+                // Not ready to instantiate objects, add spawning player character to pending dictionary
+                if (LogDev) Debug.Log("[LanRpgNetworkManager] Not ready to deserializing client ready extra");
+                pendingSpawnPlayerCharacters.Add(new PendingSpawnPlayerCharacter()
+                {
+                    connectionId = connectionId,
+                    playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader)
+                });
+                return;
+            }
+
             if (LogDev) Debug.Log("[LanRpgNetworkManager] Deserializing client ready extra");
-            PlayerCharacterData playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
+            SpawnPlayerCharacter(connectionId, new PlayerCharacterData().DeserializeCharacterData(reader));
+        }
+
+        private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData)
+        {
             BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
             // If it is not allow this character data, disconnect user
             if (entityPrefab == null)
@@ -194,7 +227,7 @@ namespace MultiplayerARPG
 
         private void SaveWorld()
         {
-            if (!isSceneLoaded)
+            if (!isInstantiateSceneObjects)
                 return;
             // Save building entities / Tree / Rocks
             BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
@@ -219,7 +252,7 @@ namespace MultiplayerARPG
 
         private void SaveStorage()
         {
-            if (!isSceneLoaded)
+            if (!isInstantiateSceneObjects)
                 return;
             BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
             storageSaveData.storageItems.Clear();
@@ -774,13 +807,16 @@ namespace MultiplayerARPG
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
-            isSceneLoaded = false;
+            isInstantiateSceneObjects = false;
             StartCoroutine(OnServerOnlineSceneLoadedRoutine());
         }
 
         private IEnumerator OnServerOnlineSceneLoadedRoutine()
         {
-            yield return new WaitForSecondsRealtime(0.5f);
+            while (!IsReadyToInstantiateObjects())
+            {
+                yield return null;
+            }
             // Load and Spawn buildings
             worldSaveData.LoadPersistentData(selectedCharacter.Id, selectedCharacter.CurrentMapName);
             yield return null;
@@ -804,7 +840,7 @@ namespace MultiplayerARPG
             {
                 harvestableSpawnArea.SpawnAll();
             }
-            isSceneLoaded = true;
+            isInstantiateSceneObjects = true;
         }
         #endregion
     }
