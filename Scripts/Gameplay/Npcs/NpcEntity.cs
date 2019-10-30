@@ -90,7 +90,9 @@ namespace MultiplayerARPG
         protected override void EntityStart()
         {
             base.EntityStart();
-            if (StartDialog != null && !GameInstance.NpcDialogs.ContainsKey(StartDialog.DataId))
+            if (Graph != null)
+                GameInstance.AddNpcDialogs(Graph.GetDialogs());
+            else if (StartDialog != null)
                 GameInstance.AddNpcDialogs(new NpcDialog[] { StartDialog });
             SetupQuestIds();
         }
