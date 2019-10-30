@@ -333,7 +333,7 @@ namespace MultiplayerARPG
                     refineItemCancelAction.title = MessageRefineItemCancel;
                     refineItemCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
                     menuActions.Add(refineItemConfirmAction);
-                    menuActions.Add(refineItemConfirmAction);
+                    menuActions.Add(refineItemCancelAction);
                     break;
                 case NpcDialogType.PlayerStorage:
                     if (onSwitchToPlayerStorageDialog != null)
