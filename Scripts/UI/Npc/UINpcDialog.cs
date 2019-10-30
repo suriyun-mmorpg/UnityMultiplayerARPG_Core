@@ -104,6 +104,22 @@ namespace MultiplayerARPG
             get { return Language.GetText(messageWarpCancelTitles, messageWarpCancel); }
         }
 
+        [Header("Refine Item Confirm Menu Title")]
+        public string messageRefineItemConfirm = "Refine Item";
+        public LanguageData[] messageRefineItemConfirmTitles;
+        public string MessageRefineItemConfirm
+        {
+            get { return Language.GetText(messageRefineItemConfirmTitles, messageRefineItemConfirm); }
+        }
+
+        [Header("Refine Item Cancel Menu Title")]
+        public string messageRefineItemCancel = "Cancel";
+        public LanguageData[] messageRefineItemCancelTitles;
+        public string MessageRefineItemCancel
+        {
+            get { return Language.GetText(messageRefineItemCancelTitles, messageRefineItemCancel); }
+        }
+
         [Header("Open Player Storage Confirm Menu Title")]
         public string messagePlayerStorageConfirm = "Open Storage";
         public LanguageData[] messagePlayerStorageConfirmTitles;
@@ -143,6 +159,7 @@ namespace MultiplayerARPG
         public UnityEvent onSwitchToCraftItemDialog;
         public UnityEvent onSwitchToSaveRespawnPointDialog;
         public UnityEvent onSwitchToWarpDialog;
+        public UnityEvent onSwitchToRefineItemDialog;
         public UnityEvent onSwitchToPlayerStorageDialog;
         public UnityEvent onSwitchToGuildStorageDialog;
 
@@ -273,9 +290,9 @@ namespace MultiplayerARPG
                             UINpcDialogMenuAction startMenuAction = new UINpcDialogMenuAction();
                             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
                             startMenuAction.title = MessageCraftItemConfirm;
-                            startMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_START_MENU_INDEX;
+                            startMenuAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
                             cancelMenuAction.title = MessageCraftItemCancel;
-                            cancelMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_CANCEL_MENU_INDEX;
+                            cancelMenuAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
                             uiCraftItem.SetupForNpc(Data.itemCraft);
                             menuActions.Add(startMenuAction);
                             menuActions.Add(cancelMenuAction);
@@ -288,9 +305,9 @@ namespace MultiplayerARPG
                     UINpcDialogMenuAction saveRespawnPointConfirmAction = new UINpcDialogMenuAction();
                     UINpcDialogMenuAction saveRespawnPointCancelAction = new UINpcDialogMenuAction();
                     saveRespawnPointConfirmAction.title = MessageSaveRespawnPointConfirm;
-                    saveRespawnPointConfirmAction.menuIndex = NpcDialog.SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX;
+                    saveRespawnPointConfirmAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
                     saveRespawnPointCancelAction.title = MessageSaveRespawnPointCancel;
-                    saveRespawnPointCancelAction.menuIndex = NpcDialog.SAVE_SPAWN_POINT_CANCEL_MENU_INDEX;
+                    saveRespawnPointCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
                     menuActions.Add(saveRespawnPointConfirmAction);
                     menuActions.Add(saveRespawnPointCancelAction);
                     break;
@@ -300,11 +317,23 @@ namespace MultiplayerARPG
                     UINpcDialogMenuAction warpConfirmAction = new UINpcDialogMenuAction();
                     UINpcDialogMenuAction warpCancelAction = new UINpcDialogMenuAction();
                     warpConfirmAction.title = MessageWarpConfirm;
-                    warpConfirmAction.menuIndex = NpcDialog.WARP_CONFIRM_MENU_INDEX;
+                    warpConfirmAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
                     warpCancelAction.title = MessageWarpCancel;
-                    warpCancelAction.menuIndex = NpcDialog.WARP_CANCEL_MENU_INDEX;
+                    warpCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
                     menuActions.Add(warpConfirmAction);
                     menuActions.Add(warpCancelAction);
+                    break;
+                case NpcDialogType.RefineItem:
+                    if (onSwitchToRefineItemDialog != null)
+                        onSwitchToRefineItemDialog.Invoke();
+                    UINpcDialogMenuAction refineItemConfirmAction = new UINpcDialogMenuAction();
+                    UINpcDialogMenuAction refineItemCancelAction = new UINpcDialogMenuAction();
+                    refineItemConfirmAction.title = MessageRefineItemConfirm;
+                    refineItemConfirmAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
+                    refineItemCancelAction.title = MessageRefineItemCancel;
+                    refineItemCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
+                    menuActions.Add(refineItemConfirmAction);
+                    menuActions.Add(refineItemConfirmAction);
                     break;
                 case NpcDialogType.PlayerStorage:
                     if (onSwitchToPlayerStorageDialog != null)
@@ -312,9 +341,9 @@ namespace MultiplayerARPG
                     UINpcDialogMenuAction playerStorageConfirmAction = new UINpcDialogMenuAction();
                     UINpcDialogMenuAction playerStorageCancelAction = new UINpcDialogMenuAction();
                     playerStorageConfirmAction.title = MessagePlayerStorageConfirm;
-                    playerStorageConfirmAction.menuIndex = NpcDialog.STORAGE_CONFIRM_MENU_INDEX;
+                    playerStorageConfirmAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
                     playerStorageCancelAction.title = MessagePlayerStorageCancel;
-                    playerStorageCancelAction.menuIndex = NpcDialog.STORAGE_CANCEL_MENU_INDEX;
+                    playerStorageCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
                     menuActions.Add(playerStorageConfirmAction);
                     menuActions.Add(playerStorageCancelAction);
                     break;
@@ -324,9 +353,9 @@ namespace MultiplayerARPG
                     UINpcDialogMenuAction guildStorageConfirmAction = new UINpcDialogMenuAction();
                     UINpcDialogMenuAction guildStorageCancelAction = new UINpcDialogMenuAction();
                     guildStorageConfirmAction.title = MessageGuildStorageConfirm;
-                    guildStorageConfirmAction.menuIndex = NpcDialog.STORAGE_CONFIRM_MENU_INDEX;
+                    guildStorageConfirmAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
                     guildStorageCancelAction.title = MessageGuildStorageCancel;
-                    guildStorageCancelAction.menuIndex = NpcDialog.STORAGE_CANCEL_MENU_INDEX;
+                    guildStorageCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
                     menuActions.Add(guildStorageConfirmAction);
                     menuActions.Add(guildStorageCancelAction);
                     break;
