@@ -835,6 +835,8 @@ namespace MultiplayerARPG
                         npcEntities.Add(npc.entityPrefab);
                     if (npc.startDialog != null)
                         npcDialogs.Add(npc.startDialog);
+                    if (npc.graph != null)
+                        npcDialogs.AddRange(npc.graph.GetDialogs());
                 }
             }
             AddNpcEntities(npcEntities);
@@ -847,7 +849,7 @@ namespace MultiplayerARPG
                 return;
             foreach (MapInfo mapInfo in mapInfos)
             {
-                if (mapInfo == null || !mapInfo.IsSceneSet())
+                if (mapInfo == null || MapInfos.ContainsKey(mapInfo.Id) || !mapInfo.IsSceneSet())
                     continue;
                 mapInfo.Validate();
                 mapInfo.PrepareRelatesData();
@@ -861,7 +863,7 @@ namespace MultiplayerARPG
                 return;
             foreach (Faction faction in factions)
             {
-                if (faction == null)
+                if (faction == null || Factions.ContainsKey(faction.DataId))
                     continue;
                 faction.Validate();
                 faction.PrepareRelatesData();

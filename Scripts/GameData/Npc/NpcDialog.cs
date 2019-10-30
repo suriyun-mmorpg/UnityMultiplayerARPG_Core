@@ -28,16 +28,8 @@ namespace MultiplayerARPG
         public const int QUEST_DECLINE_MENU_INDEX = 1;
         public const int QUEST_ABANDON_MENU_INDEX = 2;
         public const int QUEST_COMPLETE_MENU_INDEX = 3;
-        public const int CRAFT_ITEM_START_MENU_INDEX = 0;
-        public const int CRAFT_ITEM_CANCEL_MENU_INDEX = 1;
-        public const int REFINE_ITEM_START_MENU_INDEX = 0;
-        public const int REFINE_ITEM_CANCEL_MENU_INDEX = 1;
-        public const int SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX = 0;
-        public const int SAVE_SPAWN_POINT_CANCEL_MENU_INDEX = 1;
-        public const int WARP_CONFIRM_MENU_INDEX = 0;
-        public const int WARP_CANCEL_MENU_INDEX = 1;
-        public const int STORAGE_CONFIRM_MENU_INDEX = 0;
-        public const int STORAGE_CANCEL_MENU_INDEX = 1;
+        public const int CONFIRM_MENU_INDEX = 0;
+        public const int CANCEL_MENU_INDEX = 1;
 
         [Input]
         public NpcDialog input;
@@ -85,12 +77,15 @@ namespace MultiplayerARPG
         public NpcDialog saveRespawnConfirmDialog;
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog saveRespawnCancelDialog;
-        // Teleport
+        // Warp
         public WarpPortalType warpPortalType;
         public MapInfo warpMap;
         public Vector3 warpPosition;
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog warpCancelDialog;
+        // Refine Item
+        [Output(connectionType = ConnectionType.Override)]
+        public NpcDialog refineItemCancelDialog;
         // Storage
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog storageCancelDialog;
@@ -192,10 +187,6 @@ namespace MultiplayerARPG
                         return false;
                     }
                     break;
-                case NpcDialogType.RefineItem:
-                    // If next dialog is refine dialog, show refine dialog at client
-                    characterEntity.RequestShowNpcRefine();
-                    return false;
             }
             return true;
         }
@@ -244,7 +235,7 @@ namespace MultiplayerARPG
                 case NpcDialogType.CraftItem:
                     switch (menuIndex)
                     {
-                        case CRAFT_ITEM_START_MENU_INDEX:
+                        case CONFIRM_MENU_INDEX:
                             GameMessage.Type gameMessageType;
                             if (itemCraft.CanCraft(characterEntity, out gameMessageType))
                             {
@@ -265,7 +256,7 @@ namespace MultiplayerARPG
                                 }
                             }
                             break;
-                        case CRAFT_ITEM_CANCEL_MENU_INDEX:
+                        case CANCEL_MENU_INDEX:
                             nextDialog = craftCancelDialog;
                             break;
                     }
@@ -273,12 +264,12 @@ namespace MultiplayerARPG
                 case NpcDialogType.SaveRespawnPoint:
                     switch (menuIndex)
                     {
-                        case SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX:
+                        case CONFIRM_MENU_INDEX:
                             characterEntity.RespawnMapName = saveRespawnMap.Id;
                             characterEntity.RespawnPosition = saveRespawnPosition;
                             nextDialog = saveRespawnConfirmDialog;
                             break;
-                        case SAVE_SPAWN_POINT_CANCEL_MENU_INDEX:
+                        case CANCEL_MENU_INDEX:
                             nextDialog = saveRespawnCancelDialog;
                             break;
                     }
@@ -286,21 +277,32 @@ namespace MultiplayerARPG
                 case NpcDialogType.Warp:
                     switch (menuIndex)
                     {
-                        case WARP_CONFIRM_MENU_INDEX:
+                        case CONFIRM_MENU_INDEX:
                             BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition);
                             return null;
-                        case WARP_CANCEL_MENU_INDEX:
+                        case CANCEL_MENU_INDEX:
                             nextDialog = warpCancelDialog;
+                            break;
+                    }
+                    break;
+                case NpcDialogType.RefineItem:
+                    switch (menuIndex)
+                    {
+                        case CONFIRM_MENU_INDEX:
+                            characterEntity.RequestShowNpcRefine();
+                            return null;
+                        case CANCEL_MENU_INDEX:
+                            nextDialog = refineItemCancelDialog;
                             break;
                     }
                     break;
                 case NpcDialogType.PlayerStorage:
                     switch (menuIndex)
                     {
-                        case STORAGE_CONFIRM_MENU_INDEX:
+                        case CONFIRM_MENU_INDEX:
                             characterEntity.OpenStorage(StorageType.Player, characterEntity.UserId);
                             return null;
-                        case STORAGE_CANCEL_MENU_INDEX:
+                        case CANCEL_MENU_INDEX:
                             nextDialog = storageCancelDialog;
                             break;
                     }
@@ -308,10 +310,10 @@ namespace MultiplayerARPG
                 case NpcDialogType.GuildStorage:
                     switch (menuIndex)
                     {
-                        case STORAGE_CONFIRM_MENU_INDEX:
+                        case CONFIRM_MENU_INDEX:
                             characterEntity.OpenStorage(StorageType.Guild, characterEntity.GuildId.ToString());
                             return null;
-                        case STORAGE_CANCEL_MENU_INDEX:
+                        case CANCEL_MENU_INDEX:
                             nextDialog = storageCancelDialog;
                             break;
                     }
@@ -381,6 +383,9 @@ namespace MultiplayerARPG
 
             if (from.fieldName.Equals(this.GetMemberName(a => a.warpCancelDialog)))
                 warpCancelDialog = dialog;
+            
+            if (from.fieldName.Equals(this.GetMemberName(a => a.refineItemCancelDialog)))
+                refineItemCancelDialog = dialog;
 
             if (from.fieldName.Equals(this.GetMemberName(a => a.storageCancelDialog)))
                 storageCancelDialog = dialog;
