@@ -117,11 +117,7 @@ namespace MultiplayerARPG
         UI_ITEM_TYPE_PET,
         UI_ITEM_TYPE_SOCKET_ENHANCER,
         UI_ITEM_TYPE_MOUNT,
-        UI_ITEM_TYPE_ATTRIBUTE_INCREASE,
-        UI_ITEM_TYPE_ATTRIBUTE_RESET,
         UI_ITEM_TYPE_SKILL,
-        UI_ITEM_TYPE_SKILL_LEARN,
-        UI_ITEM_TYPE_SKILL_RESET,
         // Skill Type Titles
         UI_SKILL_TYPE_ACTIVE,
         UI_SKILL_TYPE_PASSIVE,
@@ -599,6 +595,36 @@ namespace MultiplayerARPG
         /// Format => {0} = {Attribute Title}, {1} = {Amount * 100}
         /// </summary>
         UI_FORMAT_ATTRIBUTE_RATE,
+        // Format - Item Building
+        /// <summary>
+        /// Format => {0} = {Building Title}
+        /// </summary>
+        UI_FORMAT_ITEM_BUILDING,
+        // Format - Item Pet
+        /// <summary>
+        /// Format => {0} = {Pet Title}
+        /// </summary>
+        UI_FORMAT_ITEM_PET,
+        // Format - Item Mount
+        /// <summary>
+        /// Format => {0} = {Mount Title}
+        /// </summary>
+        UI_FORMAT_ITEM_MOUNT,
+        // Format - Item Skill
+        /// <summary>
+        /// Format => {0} = {Skill Title}, {1} = {Skill Level}
+        /// </summary>
+        UI_FORMAT_ITEM_SKILL,
+        // Format - Skill Summon
+        /// <summary>
+        /// Format => {0} = {Monster Title}, {1} = {Monster Level}, {2} = {Amount}, {3} = {Max Stack}, {4} = {Duration}
+        /// </summary>
+        UI_FORMAT_SKILL_SUMMON,
+        // Format - Skill Mount
+        /// <summary>
+        /// Format => {0} = {Mount Title}
+        /// </summary>
+        UI_FORMAT_SKILL_MOUNT
     }
 
     public static class DefaultLocale
@@ -745,11 +771,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ITEM_TYPE_PET.ToString(), "Pet");
             Texts.Add(UITextKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString(), "Socket Enhancer");
             Texts.Add(UITextKeys.UI_ITEM_TYPE_MOUNT.ToString(), "Mount");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_ATTRIBUTE_INCREASE.ToString(), "Attribute Increase");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_ATTRIBUTE_RESET.ToString(), "Attribute Reset");
             Texts.Add(UITextKeys.UI_ITEM_TYPE_SKILL.ToString(), "Skill");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString(), "Skill Learn");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_SKILL_RESET.ToString(), "Skill Reset");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_RARITY.ToString(), "Rarity: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_STACK.ToString(), "{0}/{1}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_DURABILITY.ToString(), "Durability: {0}");
@@ -925,6 +947,18 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_ATTACK_SPEED_RATE.ToString(), "Attack Speed: {0}%");
             // Format - Attribute Amount Rate
             Texts.Add(UIFormatKeys.UI_FORMAT_ATTRIBUTE_RATE.ToString(), "{0}: {1}%");
+            // Format - Item Building
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_BUILDING.ToString(), "Build {0}");
+            // Format - Item Pet
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_PET.ToString(), "Summon {0}");
+            // Format - Item Mount
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_MOUNT.ToString(), "Mount {0}");
+            // Format - Item Skill
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_SKILL.ToString(), "Use Skill {0} Lv. {1}");
+            // Format - Skill Summon
+            Texts.Add(UIFormatKeys.UI_FORMAT_SKILL_SUMMON.ToString(), "Summon {0} Lv. {1} x {2} (Max: {3}), {4} Secs.");
+            // Format - Skill Mount
+            Texts.Add(UIFormatKeys.UI_FORMAT_SKILL_MOUNT.ToString(), "Mount {0}");
         }
     }
 
