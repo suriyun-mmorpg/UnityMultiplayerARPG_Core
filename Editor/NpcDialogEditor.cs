@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             if (cacheNpcDialog == null)
                 cacheNpcDialog = CreateInstance<NpcDialog>();
 
-            if (cacheNpcDialog.graph == null)
+            if ((target as NpcDialog).graph == null)
             {
                 hiddenFields.Add("graph");
                 hiddenFields.Add("position");
