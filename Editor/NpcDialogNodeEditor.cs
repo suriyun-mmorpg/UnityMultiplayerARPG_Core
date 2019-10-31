@@ -73,8 +73,7 @@ namespace MultiplayerARPG
 
         public override Color GetTint()
         {
-            NpcDialog node = target as NpcDialog;
-            if (node.graph.nodes[0] == node)
+            if (target != null && target.graph != null && target.graph.nodes[0] == target)
                 return new Color(0.3f, 0.6f, 0.3f);
             return base.GetTint();
         }
