@@ -559,19 +559,19 @@ namespace MultiplayerARPG
         /// </summary>
         UI_FORMAT_EVASION_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 100}
+        /// Format => {0} = {Amount * 10000}
         /// </summary>
         UI_FORMAT_CRITICAL_RATE_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 100}
+        /// Format => {0} = {Amount * 10000}
         /// </summary>
         UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 100}
+        /// Format => {0} = {Amount * 10000}
         /// </summary>
         UI_FORMAT_BLOCK_RATE_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 100}
+        /// Format => {0} = {Amount * 10000}
         /// </summary>
         UI_FORMAT_BLOCK_DAMAGE_RATE_RATE,
         /// <summary>
