@@ -74,7 +74,7 @@ namespace MultiplayerARPG
             if (uiCharacterSkill != null)
             {
                 // All skills included equipment skills
-                Dictionary<BaseSkill, short> skills = OwningCharacter.GetSkills();
+                Dictionary<BaseSkill, short> skills = OwningCharacter.GetCaches().Skills;
 
                 if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.relateId), out hotkeySkill) ||
                     hotkeySkill == null || !skills.TryGetValue(hotkeySkill, out hotkeySkillLevel))
