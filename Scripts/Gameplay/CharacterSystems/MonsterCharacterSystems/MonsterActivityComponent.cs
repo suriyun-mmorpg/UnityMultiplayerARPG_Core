@@ -180,16 +180,9 @@ namespace MultiplayerARPG
                 if (queueSkill != null || MonsterDatabase.RandomSkill(CacheMonsterCharacterEntity, out queueSkill, out queueSkillLevel))
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
-                    if (CacheMonsterCharacterEntity.CurrentMp < queueSkill.GetConsumeMp(queueSkillLevel))
-                    {
-                        // Clear queue skill when there is no enough mp
-                        queueSkill = null;
-                    }
-                    else if (CacheEntity.RequestUseSkill(queueSkill.DataId, false, targetEntity.OpponentAimTransform.position))
-                    {
-                        // Clear queue skill to random using skill later
-                        queueSkill = null;
-                    }
+                    CacheEntity.RequestUseSkill(queueSkill.DataId, false, targetEntity.OpponentAimTransform.position);
+                    // Clear queue skill to random using skill later
+                    queueSkill = null;
                 }
 
                 if (queueSkill == null)
