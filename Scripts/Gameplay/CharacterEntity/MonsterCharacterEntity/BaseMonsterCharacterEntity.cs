@@ -29,20 +29,16 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldByte summonType = new SyncFieldByte();
 
-        public override string DisplayCharacterName
+        public override string Title
         {
             get
             {
                 // Return title (Can set in prefab) if it is not empty
-                if (!string.IsNullOrEmpty(Title))
-                    return Title;
-                return monsterCharacter == null ? LanguageManager.GetUnknowTitle() : monsterCharacter.Title;
+                if (!string.IsNullOrEmpty(base.Title))
+                    return base.Title;
+                return MonsterDatabase == null ? LanguageManager.GetUnknowTitle() : MonsterDatabase.Title;
             }
-        }
-
-        public override short DisplayLevel
-        {
-            get { return Level; }
+            set { }
         }
 
         private BaseCharacterEntity summoner;
@@ -71,7 +67,7 @@ namespace MultiplayerARPG
 
         public MonsterSpawnArea spawnArea { get; protected set; }
         public Vector3 spawnPosition { get; protected set; }
-        public override int DataId { get { return monsterCharacter.DataId; } set { } }
+        public override int DataId { get { return MonsterDatabase.DataId; } set { } }
         public MonsterCharacter MonsterDatabase { get { return monsterCharacter; } }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
@@ -117,6 +113,9 @@ namespace MultiplayerARPG
             {
                 if (spawnArea == null)
                     spawnPosition = CacheTransform.position;
+
+                if (Level <= 0)
+                    Level = MonsterDatabase.defaultLevel;
 
                 CharacterStats stats = this.GetStats();
                 CurrentHp = (int)stats.hp;
@@ -194,7 +193,7 @@ namespace MultiplayerARPG
                 {
                     if (monsterCharacterEntity.IsSummoned)
                         return IsAlly(monsterCharacterEntity.Summoner);
-                    return monsterCharacterEntity.monsterCharacter.allyId == monsterCharacter.allyId;
+                    return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
                 }
             }
 
@@ -296,12 +295,12 @@ namespace MultiplayerARPG
 
         public override float GetAttackDistance(bool isLeftHand)
         {
-            return monsterCharacter.damageInfo.GetDistance();
+            return MonsterDatabase.damageInfo.GetDistance();
         }
 
         public override float GetAttackFov(bool isLeftHand)
         {
-            return monsterCharacter.damageInfo.GetFov();
+            return MonsterDatabase.damageInfo.GetFov();
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType damageAmountType, int damage)
@@ -346,7 +345,7 @@ namespace MultiplayerARPG
             GuildData tempGuildData;
             PartyData tempPartyData;
             BasePlayerCharacterEntity tempPlayerCharacter;
-            BaseMonsterCharacterEntity tempMonsterCharacter;
+            BaseMonsterCharacterEntity tempMonsterCharacterEntity;
             bool givenRewardExp;
             bool givenRewardCurrency;
             float shareGuildExpRate;
@@ -432,11 +431,11 @@ namespace MultiplayerARPG
                             int petIndex = tempPlayerCharacter.IndexOfSummon(SummonType.Pet);
                             if (petIndex >= 0)
                             {
-                                tempMonsterCharacter = tempPlayerCharacter.Summons[petIndex].CacheEntity;
-                                if (tempMonsterCharacter != null)
+                                tempMonsterCharacterEntity = tempPlayerCharacter.Summons[petIndex].CacheEntity;
+                                if (tempMonsterCharacterEntity != null)
                                 {
                                     // Share exp to pet, set multiplier to 0.5, because it will be shared to player
-                                    tempMonsterCharacter.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
+                                    tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
                                 }
                                 // Set multiplier to 0.5, because it was shared to monster
                                 tempPlayerCharacter.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
@@ -464,7 +463,7 @@ namespace MultiplayerARPG
             }   // End count recived damage record count
             receivedDamageRecords.Clear();
             // Drop items
-            monsterCharacter.RandomItems(OnRandomDropItem);
+            MonsterDatabase.RandomItems(OnRandomDropItem);
             // Clear looters because they are already set to dropped items
             looters.Clear();
 
@@ -538,7 +537,7 @@ namespace MultiplayerARPG
 
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
         {
-            if ((Summoner != null && Summoner == ally) || monsterCharacter.characteristic == MonsterCharacteristic.Assist)
+            if ((Summoner != null && Summoner == ally) || MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
     }
