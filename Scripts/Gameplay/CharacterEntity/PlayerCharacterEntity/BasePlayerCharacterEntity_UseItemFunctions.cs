@@ -118,7 +118,9 @@ namespace MultiplayerARPG
             if (!CanUseItem() || item == null || item.attributeAmount.attribute == null)
                 return;
 
-            this.AddAttribute(item.attributeAmount.attribute.DataId, (short)item.attributeAmount.amount, itemIndex);
+            GameMessage.Type gameMessageType;
+            if (!this.AddAttribute(out gameMessageType, item.attributeAmount.attribute.DataId, (short)item.attributeAmount.amount, itemIndex))
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
         }
 
         protected void UseItemAttributeReset(short itemIndex, Item item)
@@ -134,7 +136,9 @@ namespace MultiplayerARPG
             if (!CanUseItem() || item == null || item.skillLevel.skill == null)
                 return;
 
-            this.AddSkill(item.skillLevel.skill.DataId, item.skillLevel.level, itemIndex);
+            GameMessage.Type gameMessageType;
+            if (!this.AddSkill(out gameMessageType, item.skillLevel.skill.DataId, item.skillLevel.level, itemIndex))
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
         }
 
         protected void UseItemSkillReset(short itemIndex, Item item)

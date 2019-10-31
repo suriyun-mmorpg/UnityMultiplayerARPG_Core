@@ -108,14 +108,7 @@ public class CharacterSkill : INetSerializableWithElement
     {
         return GetSkill().IsLearned(skillLearner);
     }
-
-    public bool CanLevelUp(IPlayerCharacterData skillLearner, bool checkSkillPoint = true)
-    {
-        // TODO: Remove this
-        GameMessage.Type gameMessageType;
-        return GetSkill().CanLevelUp(skillLearner, level, out gameMessageType, checkSkillPoint);
-    }
-
+    
     public bool CanLevelUp(IPlayerCharacterData skillLearner, out GameMessage.Type gameMessageType, bool checkSkillPoint = true)
     {
         return GetSkill().CanLevelUp(skillLearner, level, out gameMessageType, checkSkillPoint);

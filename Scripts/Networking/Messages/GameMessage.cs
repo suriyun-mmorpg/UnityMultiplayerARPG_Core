@@ -92,6 +92,15 @@ namespace MultiplayerARPG
             CannotUseSkillByCurrentWeapon,
             SkillIsCoolingDown,
             SkillIsNotLearned,
+            // Requirements
+            NotEnoughLevel,
+            NotMatchCharacterClass,
+            NotEnoughAttributeAmounts,
+            NotEnoughSkillLevels,
+            NotEnoughStatPoint,
+            NotEnoughSkillPoint,
+            AttributeReachedMaxAmount,
+            SkillReachedMaxLevel,
         }
         public Type type;
 

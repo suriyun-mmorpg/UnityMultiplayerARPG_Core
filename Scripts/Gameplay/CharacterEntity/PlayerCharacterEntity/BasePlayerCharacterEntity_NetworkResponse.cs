@@ -72,8 +72,11 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            if (this.AddAttribute(dataId))
+            GameMessage.Type gameMessageType;
+            if (this.AddAttribute(out gameMessageType, dataId))
                 StatPoint -= 1;
+            else
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
         }
 
         protected void NetFuncAddSkill(int dataId)
@@ -81,8 +84,11 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            if (this.AddSkill(dataId))
+            GameMessage.Type gameMessageType;
+            if (this.AddSkill(out gameMessageType, dataId))
                 SkillPoint -= 1;
+            else
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
         }
 
         protected void NetFuncAddGuildSkill(int dataId)

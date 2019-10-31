@@ -39,9 +39,9 @@ public class CharacterAttribute : INetSerializableWithElement
         return cacheAttribute;
     }
 
-    public bool CanIncrease(IPlayerCharacterData character)
+    public bool CanIncreaseAmount(IPlayerCharacterData character, out GameMessage.Type gameMessageType, bool checkStatPoint = true)
     {
-        return GetAttribute() != null && character != null && character.StatPoint > 0;
+        return GetAttribute().CanIncreaseAmount(character, amount, out gameMessageType, checkStatPoint);
     }
 
     public static CharacterAttribute Create(Attribute attribute, short amount)

@@ -5,8 +5,9 @@ namespace MultiplayerARPG
     public static class ItemExtension
     {
         #region Equipment Extension
-        public static bool CanEquip(this Item equipmentItem, ICharacterData character, short level)
+        public static bool CanEquip(this Item equipmentItem, ICharacterData character, short level, out GameMessage.Type gameMessageType)
         {
+            gameMessageType = GameMessage.Type.None;
             if (equipmentItem == null ||
                 !equipmentItem.IsEquipment() ||
                 character == null)
@@ -19,14 +20,26 @@ namespace MultiplayerARPG
             {
                 if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
                     attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
+                {
+                    gameMessageType = GameMessage.Type.NotEnoughAttributeAmounts;
                     return false;
+                }
             }
 
             // Check another requirements
             if (equipmentItem.requirement.character != null && equipmentItem.requirement.character != character.GetDatabase())
+            {
+                gameMessageType = GameMessage.Type.NotMatchCharacterClass;
                 return false;
+            }
 
-            return character.Level >= equipmentItem.requirement.level;
+            if (character.Level < equipmentItem.requirement.level)
+            {
+                gameMessageType = GameMessage.Type.NotEnoughLevel;
+                return false;
+            }
+
+            return true;
         }
 
         public static bool CanAttack(this Item weaponItem, ICharacterData character)

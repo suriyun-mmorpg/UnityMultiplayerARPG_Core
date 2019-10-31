@@ -440,11 +440,8 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!equippingItem.CanEquip(this))
-            {
-                gameMessageType = GameMessage.Type.LevelOrAttributeNotEnough;
+            if (!equippingItem.CanEquip(this, out gameMessageType))
                 return false;
-            }
 
             this.FillWeaponSetsIfNeeded(equipWeaponSet);
             EquipWeapons tempEquipWeapons = SelectableWeaponSets[equipWeaponSet];
@@ -544,11 +541,8 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!equippingItem.CanEquip(this))
-            {
-                gameMessageType = GameMessage.Type.LevelOrAttributeNotEnough;
+            if (!equippingItem.CanEquip(this, out gameMessageType))
                 return false;
-            }
 
             // Equipping item is armor
             Item equippingArmorItem = equippingItem.GetArmorItem();

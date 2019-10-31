@@ -593,8 +593,9 @@ public static partial class PlayerCharacterDataExtension
         return index;
     }
 
-    public static bool AddAttribute(this IPlayerCharacterData characterData, int dataId, short amount = 1, short itemIndex = -1)
+    public static bool AddAttribute(this IPlayerCharacterData characterData, out GameMessage.Type gameMessageType, int dataId, short amount = 1, short itemIndex = -1)
     {
+        gameMessageType = GameMessage.Type.None;
         Attribute attribute;
         if (!GameInstance.Attributes.TryGetValue(dataId, out attribute))
             return false;
@@ -604,6 +605,8 @@ public static partial class PlayerCharacterDataExtension
         if (index < 0)
         {
             characterAtttribute = CharacterAttribute.Create(attribute, 0);
+            if (!characterAtttribute.CanIncreaseAmount(characterData, out gameMessageType, itemIndex < 0))
+                return false;
             if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
                 return false;
             characterAtttribute.amount += amount;
@@ -612,6 +615,8 @@ public static partial class PlayerCharacterDataExtension
         else
         {
             characterAtttribute = characterData.Attributes[index];
+            if (!characterAtttribute.CanIncreaseAmount(characterData, out gameMessageType, itemIndex < 0))
+                return false;
             if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
                 return false;
             characterAtttribute.amount += amount;
@@ -637,8 +642,9 @@ public static partial class PlayerCharacterDataExtension
         return true;
     }
 
-    public static bool AddSkill(this IPlayerCharacterData characterData, int dataId, short level = 1, short itemIndex = -1)
+    public static bool AddSkill(this IPlayerCharacterData characterData, out GameMessage.Type gameMessageType, int dataId, short level = 1, short itemIndex = -1)
     {
+        gameMessageType = GameMessage.Type.None;
         BaseSkill skill;
         if (!GameInstance.Skills.TryGetValue(dataId, out skill))
             return false;
@@ -648,7 +654,7 @@ public static partial class PlayerCharacterDataExtension
         if (index < 0)
         {
             characterSkill = CharacterSkill.Create(skill, 0);
-            if (!characterSkill.CanLevelUp(characterData, false))
+            if (!characterSkill.CanLevelUp(characterData, out gameMessageType, itemIndex < 0))
                 return false;
             if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
                 return false;
@@ -658,7 +664,7 @@ public static partial class PlayerCharacterDataExtension
         else
         {
             characterSkill = characterData.Skills[index];
-            if (!characterSkill.CanLevelUp(characterData, false))
+            if (!characterSkill.CanLevelUp(characterData, out gameMessageType, itemIndex < 0))
                 return false;
             if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
                 return false;
