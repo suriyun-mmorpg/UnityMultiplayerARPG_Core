@@ -75,9 +75,7 @@ namespace MultiplayerARPG
         public string Id { get { return id.Value; } set { id.Value = value; } }
         public int EntityId { get { return Identity.HashAssetId; } set { } }
         public string CharacterName { get { return syncTitle.Value; } set { syncTitle.Value = value; } }
-        public virtual string DisplayCharacterName { get { return CharacterName; } }
         public short Level { get { return level.Value; } set { level.Value = value; } }
-        public virtual short DisplayLevel { get { return Level; } }
         public int Exp { get { return exp.Value; } set { exp.Value = value; } }
         public int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
         public int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }

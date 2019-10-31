@@ -53,9 +53,10 @@ public partial class CharacterData : ICharacterData
         get { return characterName; }
         set { characterName = value; }
     }
-    public string DisplayCharacterName
+    public string Title
     {
         get { return CharacterName; }
+        set { CharacterName = value; }
     }
     public short Level
     {
@@ -66,17 +67,13 @@ public partial class CharacterData : ICharacterData
             this.MarkToMakeCaches();
         }
     }
-    public short DisplayLevel
-    {
-        get { return Level; }
-    }
     public int Exp { get { return exp; } set { exp = value; } }
     public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
     public int CurrentMp { get { return currentMp; } set { currentMp = value; } }
     public int CurrentStamina { get { return currentStamina; } set { currentStamina = value; } }
     public int CurrentFood { get { return currentFood; } set { currentFood = value; } }
     public int CurrentWater { get { return currentWater; } set { currentWater = value; } }
-    
+
     public EquipWeapons EquipWeapons
     {
         get
