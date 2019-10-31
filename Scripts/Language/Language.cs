@@ -810,7 +810,7 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_AMOUNT.ToString(), "{0}: {1}");
             // Format - Damage
             Texts.Add(UIFormatKeys.UI_FORMAT_DAMAGE_AMOUNT.ToString(), "{0}~{1}");
-            Texts.Add(UIFormatKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL.ToString(), "{0}: {1}~{2}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL.ToString(), "{0} Damage: {1}~{2}");
             Texts.Add(UIFormatKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString(), "Inflict {0}% damage");
             Texts.Add(UIFormatKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString(), "Inflict {1}% as {0} damage");
             // Format - Gold Amount
