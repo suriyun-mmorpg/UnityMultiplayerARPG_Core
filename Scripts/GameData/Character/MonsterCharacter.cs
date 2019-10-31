@@ -250,6 +250,10 @@ namespace MultiplayerARPG
         {
             skill = null;
             level = 1;
+
+            if (!entity.CanUseSkill())
+                return false;
+
             float random = Random.value;
             foreach (MonsterSkill monsterSkill in monsterSkills)
             {
