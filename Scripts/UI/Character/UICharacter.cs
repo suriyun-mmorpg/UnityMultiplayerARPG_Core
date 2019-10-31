@@ -319,9 +319,12 @@ namespace MultiplayerARPG
             if (uiRightHandDamages != null)
             {
                 if (rightHandWeapon == null)
+                {
                     uiRightHandDamages.Hide();
+                }
                 else
                 {
+                    uiRightHandDamages.isBonus = false;
                     uiRightHandDamages.Show();
                     uiRightHandDamages.Data = rightHandDamages;
                 }
@@ -330,9 +333,12 @@ namespace MultiplayerARPG
             if (uiLeftHandDamages != null)
             {
                 if (leftHandWeapon == null)
+                {
                     uiLeftHandDamages.Hide();
+                }
                 else
                 {
+                    uiLeftHandDamages.isBonus = false;
                     uiLeftHandDamages.Show();
                     uiLeftHandDamages.Data = leftHandDamages;
                 }
@@ -341,14 +347,21 @@ namespace MultiplayerARPG
             if (uiCharacterStats != null)
             {
                 uiCharacterStats.displayType = UICharacterStats.DisplayType.Simple;
+                uiCharacterStats.isBonus = false;
                 uiCharacterStats.Data = cacheStats;
             }
 
             if (uiCharacterResistances != null)
+            {
+                uiCharacterResistances.isBonus = false;
                 uiCharacterResistances.Data = cacheResistances;
+            }
 
             if (uiCharacterArmors != null)
+            {
+                uiCharacterArmors.isBonus = false;
                 uiCharacterArmors.Data = cacheArmors;
+            }
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {

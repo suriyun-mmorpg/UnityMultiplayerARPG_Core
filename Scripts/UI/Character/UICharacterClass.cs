@@ -48,20 +48,29 @@ namespace MultiplayerARPG
             if (uiStats != null)
             {
                 uiStats.displayType = UICharacterStats.DisplayType.Simple;
+                uiStats.isBonus = false;
                 uiStats.Data = Data.GetCharacterStats(1);
             }
 
             if (uiAttributes != null)
             {
                 uiAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
+                uiAttributes.isBonus = false;
                 uiAttributes.Data = Data.GetCharacterAttributes(1);
             }
 
             if (uiResistances != null)
+            {
+                uiResistances.isBonus = false;
                 uiResistances.Data = Data.GetCharacterResistances(1);
+            }
 
             if (uiSkills != null)
+            {
+                uiSkills.displayType = UISkillLevels.DisplayType.Simple;
+                uiSkills.isBonus = false;
                 uiSkills.Data = Data.CacheSkillLevels;
+            }
         }
     }
 }

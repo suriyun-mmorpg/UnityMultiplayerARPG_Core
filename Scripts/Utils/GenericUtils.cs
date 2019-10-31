@@ -231,4 +231,19 @@ public static class GenericUtils
         color.a = alpha;
         return color;
     }
+
+    public static string ToBonusString(this short value, string format = "N0")
+    {
+        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+    }
+
+    public static string ToBonusString(this int value, string format = "N0")
+    {
+        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+    }
+
+    public static string ToBonusString(this float value, string format = "N0")
+    {
+        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+    }
 }

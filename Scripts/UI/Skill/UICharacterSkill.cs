@@ -225,7 +225,9 @@ namespace MultiplayerARPG
             if (uiRequirement != null)
             {
                 if (Skill == null || (Skill.GetRequireCharacterLevel(Level) == 0 && Skill.CacheRequireSkillLevels.Count == 0))
+                {
                     uiRequirement.Hide();
+                }
                 else
                 {
                     uiRequirement.Show();
@@ -236,7 +238,9 @@ namespace MultiplayerARPG
             if (uiTextSummon != null)
             {
                 if (Skill == null || Skill.GetSkillType() != SkillType.Active || Skill.GetSummon().monsterEntity == null)
+                {
                     uiTextSummon.gameObject.SetActive(false);
+                }
                 else
                 {
                     uiTextSummon.gameObject.SetActive(true);
@@ -253,7 +257,9 @@ namespace MultiplayerARPG
             if (uiTextMount != null)
             {
                 if (Skill == null || Skill.GetSkillType() != SkillType.Active || Skill.GetMount().mountEntity == null)
+                {
                     uiTextMount.gameObject.SetActive(false);
+                }
                 else
                 {
                     uiTextMount.gameObject.SetActive(true);
@@ -266,7 +272,9 @@ namespace MultiplayerARPG
             if (uiCraftItem != null)
             {
                 if (Skill == null || Skill.GetSkillType() != SkillType.CraftItem)
+                {
                     uiCraftItem.Hide();
+                }
                 else
                 {
                     uiCraftItem.SetupForCharacter(Skill.GetItemCraft());
@@ -279,7 +287,9 @@ namespace MultiplayerARPG
             {
                 KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount = Skill.GetBaseAttackDamageAmount(Character, Level, false);
                 if (!isAttack)
+                {
                     uiDamageAmount.Hide();
+                }
                 else
                 {
                     uiDamageAmount.Show();
@@ -291,7 +301,9 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, float> damageInflictionRates = Skill.GetAttackWeaponDamageInflictions(Character, Level);
                 if (!isAttack || damageInflictionRates == null || damageInflictionRates.Count == 0)
+                {
                     uiDamageInflictions.Hide();
+                }
                 else
                 {
                     uiDamageInflictions.Show();
@@ -303,9 +315,12 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts = Skill.GetAttackAdditionalDamageAmounts(Character, Level);
                 if (!isAttack || additionalDamageAmounts == null || additionalDamageAmounts.Count == 0)
+                {
                     uiAdditionalDamageAmounts.Hide();
+                }
                 else
                 {
+                    uiAdditionalDamageAmounts.isBonus = false;
                     uiAdditionalDamageAmounts.Show();
                     uiAdditionalDamageAmounts.Data = additionalDamageAmounts;
                 }
@@ -314,7 +329,9 @@ namespace MultiplayerARPG
             if (uiSkillBuff != null)
             {
                 if (!Skill.IsBuff())
+                {
                     uiSkillBuff.Hide();
+                }
                 else
                 {
                     uiSkillBuff.Show();
@@ -325,7 +342,9 @@ namespace MultiplayerARPG
             if (uiSkillDebuff != null)
             {
                 if (!Skill.IsDebuff())
+                {
                     uiSkillDebuff.Hide();
+                }
                 else
                 {
                     uiSkillDebuff.Show();
@@ -345,7 +364,9 @@ namespace MultiplayerARPG
             if (uiNextLevelSkill != null)
             {
                 if (Level + 1 > Skill.maxLevel)
+                {
                     uiNextLevelSkill.Hide();
+                }
                 else
                 {
                     uiNextLevelSkill.Setup(new UICharacterSkillData(CharacterSkill, (short)(Level + 1)), Character, IndexOfData);

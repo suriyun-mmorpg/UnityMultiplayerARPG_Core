@@ -446,6 +446,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiIncreaseStats.displayType = UICharacterStats.DisplayType.Simple;
+                    uiIncreaseStats.isBonus = true;
                     uiIncreaseStats.Show();
                     uiIncreaseStats.Data = stats;
                 }
@@ -467,6 +468,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiIncreaseStatsRate.displayType = UICharacterStats.DisplayType.Rate;
+                    uiIncreaseStatsRate.isBonus = true;
                     uiIncreaseStatsRate.Show();
                     uiIncreaseStatsRate.Data = statsRate;
                 }
@@ -488,6 +490,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiIncreaseAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
+                    uiIncreaseAttributes.isBonus = true;
                     uiIncreaseAttributes.Show();
                     uiIncreaseAttributes.Data = attributes;
                 }
@@ -509,6 +512,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiIncreaseAttributesRate.displayType = UIAttributeAmounts.DisplayType.Rate;
+                    uiIncreaseAttributesRate.isBonus = true;
                     uiIncreaseAttributesRate.Show();
                     uiIncreaseAttributesRate.Data = attributesRate;
                 }
@@ -529,6 +533,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiIncreaseResistances.isBonus = true;
                     uiIncreaseResistances.Show();
                     uiIncreaseResistances.Data = resistances;
                 }
@@ -549,6 +554,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiIncreaseArmors.isBonus = true;
                     uiIncreaseArmors.Show();
                     uiIncreaseArmors.Data = armors;
                 }
@@ -569,6 +575,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiIncreaseDamages.isBonus = true;
                     uiIncreaseDamages.Show();
                     uiIncreaseDamages.Data = damageAmounts;
                 }
@@ -589,6 +596,8 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiIncreaseSkillLevels.displayType = UISkillLevels.DisplayType.Simple;
+                    uiIncreaseSkillLevels.isBonus = true;
                     uiIncreaseSkillLevels.Show();
                     uiIncreaseSkillLevels.Data = skillLevels;
                 }

@@ -91,6 +91,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextFood;
         public TextWrapper uiTextWater;
         public DisplayType displayType;
+        public bool isBonus;
 
         protected override void UpdateData()
         {
@@ -99,8 +100,10 @@ namespace MultiplayerARPG
             switch (displayType)
             {
                 case DisplayType.Rate:
-                    statsString = CharacterStats.GetRateText(
+                    statsString = CharacterStats.GetText(
                         Data,
+                        true,
+                        isBonus,
                         formatKeyHpRateStats,
                         formatKeyMpRateStats,
                         formatKeyAccuracyRateStats,
@@ -136,6 +139,8 @@ namespace MultiplayerARPG
                 default:
                     statsString = CharacterStats.GetText(
                         Data,
+                        false,
+                        isBonus,
                         formatKeyHpStats,
                         formatKeyMpStats,
                         formatKeyAccuracyStats,

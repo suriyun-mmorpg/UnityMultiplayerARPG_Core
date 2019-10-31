@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllDamages;
         public TextWrapper uiTextSumDamage;
         public UIDamageElementTextPair[] textDamages;
+        public bool isBonus;
 
         private Dictionary<DamageElement, TextWrapper> cacheTextDamages;
         public Dictionary<DamageElement, TextWrapper> CacheTextDamages
@@ -28,15 +29,15 @@ namespace MultiplayerARPG
                     TextWrapper tempTextComponent;
                     foreach (UIDamageElementTextPair textAmount in textDamages)
                     {
-                        if (textAmount.damageElement == null || textAmount.uiText == null)
+                        if (textAmount.uiText == null)
                             continue;
-                        tempElement = textAmount.damageElement;
+                        tempElement = textAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : textAmount.damageElement;
                         tempTextComponent = textAmount.uiText;
                         tempTextComponent.text = string.Format(
                             LanguageManager.GetText(formatKeyDamage),
                             tempElement.Title,
-                            "0",
-                            "0");
+                            isBonus ? "+0" : "0",
+                            isBonus ? "+0" : "0");
                         cacheTextDamages[tempElement] = tempTextComponent;
                     }
                 }
@@ -55,8 +56,8 @@ namespace MultiplayerARPG
                 {
                     uiTextSumDamage.text = string.Format(
                         LanguageManager.GetText(formatKeySumDamage),
-                        "0",
-                        "0");
+                        isBonus ? "+0" : "0",
+                        isBonus ? "+0" : "0");
                 }
 
                 foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextDamages)
@@ -64,8 +65,8 @@ namespace MultiplayerARPG
                     entry.Value.text = string.Format(
                         LanguageManager.GetText(formatKeyDamage),
                         entry.Key.Title,
-                        "0",
-                        "0");
+                        isBonus ? "+0" : "0",
+                        isBonus ? "+0" : "0");
                 }
             }
             else
@@ -74,6 +75,8 @@ namespace MultiplayerARPG
                 MinMaxFloat sumDamage = new MinMaxFloat();
                 DamageElement tempElement;
                 MinMaxFloat tempAmount;
+                string tempMinValue;
+                string tempMaxValue;
                 string tempAmountText;
                 TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> dataEntry in Data)
@@ -87,11 +90,21 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(tempAllText))
                         tempAllText += "\n";
                     // Set current elemental damage text
+                    if (isBonus)
+                    {
+                        tempMinValue = tempAmount.min.ToBonusString("N0");
+                        tempMaxValue = tempAmount.max.ToBonusString("N0");
+                    }
+                    else
+                    {
+                        tempMinValue = tempAmount.min.ToString("N0");
+                        tempMaxValue = tempAmount.max.ToString("N0");
+                    }
                     tempAmountText = string.Format(
                         LanguageManager.GetText(formatKeyDamage),
                         tempElement.Title,
-                        tempAmount.min.ToString("N0"),
-                        tempAmount.max.ToString("N0"));
+                        tempMinValue,
+                        tempMaxValue);
                     // Append current elemental damage text
                     tempAllText += tempAmountText;
                     // Set current elemental damage text to UI
@@ -108,10 +121,20 @@ namespace MultiplayerARPG
 
                 if (uiTextSumDamage != null)
                 {
+                    if (isBonus)
+                    {
+                        tempMinValue = sumDamage.min.ToBonusString("N0");
+                        tempMaxValue = sumDamage.max.ToBonusString("N0");
+                    }
+                    else
+                    {
+                        tempMinValue = sumDamage.min.ToString("N0");
+                        tempMaxValue = sumDamage.max.ToString("N0");
+                    }
                     uiTextSumDamage.text = string.Format(
                         LanguageManager.GetText(formatKeySumDamage),
-                        sumDamage.min.ToString("N0"),
-                        sumDamage.max.ToString("N0"));
+                        tempMinValue,
+                        tempMaxValue);
                 }
             }
         }

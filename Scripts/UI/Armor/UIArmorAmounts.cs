@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
         public UIArmorTextPair[] textAmounts;
+        public bool isBonus;
 
         private Dictionary<DamageElement, TextWrapper> cacheTextAmounts;
         public Dictionary<DamageElement, TextWrapper> CacheTextAmounts
@@ -25,15 +26,14 @@ namespace MultiplayerARPG
                     TextWrapper tempTextComponent;
                     foreach (UIArmorTextPair textAmount in textAmounts)
                     {
-                        if (textAmount.damageElement == null || textAmount.uiText == null)
+                        if (textAmount.uiText == null)
                             continue;
-                        tempElement = textAmount.damageElement;
+                        tempElement = textAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : textAmount.damageElement;
                         tempTextComponent = textAmount.uiText;
                         tempTextComponent.text = string.Format(
                             LanguageManager.GetText(formatKeyAmount),
                             tempElement.Title,
-                            "0",
-                            "0");
+                            isBonus ? "+0" : "0");
                         cacheTextAmounts[tempElement] = tempTextComponent;
                     }
                 }
@@ -53,8 +53,7 @@ namespace MultiplayerARPG
                     entry.Value.text = string.Format(
                             LanguageManager.GetText(formatKeyAmount),
                             entry.Key.Title,
-                            "0",
-                            "0");
+                            isBonus ? "+0" : "0");
                 }
             }
             else
@@ -62,6 +61,7 @@ namespace MultiplayerARPG
                 string tempAllText = string.Empty;
                 DamageElement tempElement;
                 float tempAmount;
+                string tempValue;
                 string tempAmountText;
                 TextWrapper tempTextWarpper;
                 foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
@@ -75,10 +75,14 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(tempAllText))
                         tempAllText += "\n";
                     // Set current elemental armor text
+                    if (isBonus)
+                        tempValue = tempAmount.ToBonusString("N0");
+                    else
+                        tempValue = tempAmount.ToString("N0");
                     tempAmountText = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
                         tempElement.Title,
-                        tempAmount.ToString("N0"));
+                        tempValue);
                     // Append current elemental armor text
                     tempAllText += tempAmountText;
                     // Set current elemental armor text to UI

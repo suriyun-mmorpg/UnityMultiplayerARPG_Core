@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllAmounts;
         public UIAttributeTextPair[] textAmounts;
         public DisplayType displayType;
+        public bool isBonus;
 
         private Dictionary<Attribute, TextWrapper> cacheTextAmounts;
         public Dictionary<Attribute, TextWrapper> CacheTextAmounts
@@ -43,11 +44,7 @@ namespace MultiplayerARPG
                             continue;
                         tempAttribute = textAmount.attribute;
                         tempTextComponent = textAmount.uiText;
-                        tempTextComponent.text = string.Format(
-                            LanguageManager.GetText(formatKeyAmount),
-                            tempAttribute.Title,
-                            "0",
-                            "0");
+                        SetDefaultText(tempTextComponent, tempAttribute.Title);
                         cacheTextAmounts[tempAttribute] = tempTextComponent;
                     }
                 }
@@ -65,11 +62,7 @@ namespace MultiplayerARPG
 
                 foreach (KeyValuePair<Attribute, TextWrapper> entry in CacheTextAmounts)
                 {
-                    entry.Value.text = string.Format(
-                        LanguageManager.GetText(formatKeyAmount),
-                        entry.Key.Title,
-                        "0",
-                        "0");
+                    SetDefaultText(entry.Value, entry.Key.Title);
                 }
             }
             else
@@ -78,6 +71,8 @@ namespace MultiplayerARPG
                 Attribute tempAttribute;
                 float tempCurrentAmount;
                 float tempTargetAmount;
+                string tempCurrentValue;
+                string tempTargetValue;
                 string tempFormat;
                 string tempAmountText;
                 TextWrapper tempTextWrapper;
@@ -100,24 +95,34 @@ namespace MultiplayerARPG
                     {
                         case DisplayType.Rate:
                             // This will show only target amount, so current character attribute amount will not be shown
+                            if (isBonus)
+                                tempTargetValue = (tempTargetAmount * 100).ToBonusString("N2");
+                            else
+                                tempTargetValue = (tempTargetAmount * 100).ToString("N2");
                             tempAmountText = string.Format(
                                 LanguageManager.GetText(formatKeyRateAmount),
                                 tempAttribute.Title,
-                                (tempTargetAmount * 100).ToString("N2"));
+                                tempTargetValue);
                             break;
                         case DisplayType.Requirement:
                             // This will show both current character attribute amount and target amount
                             tempFormat = tempCurrentAmount >= tempTargetAmount ?
                                 LanguageManager.GetText(formatKeyAmount) :
                                 LanguageManager.GetText(formatKeyAmountNotEnough);
-                            tempAmountText = string.Format(tempFormat, tempAttribute.Title, tempCurrentAmount.ToString("N0"), tempTargetAmount.ToString("N0"));
+                            tempCurrentValue = tempCurrentAmount.ToString("N0");
+                            tempTargetValue = tempTargetAmount.ToString("N0");
+                            tempAmountText = string.Format(tempFormat, tempAttribute.Title, tempCurrentValue, tempTargetValue);
                             break;
                         default:
                             // This will show only target amount, so current character attribute amount will not be shown
+                            if (isBonus)
+                                tempTargetValue = tempTargetAmount.ToBonusString("N0");
+                            else
+                                tempTargetValue = tempTargetAmount.ToString("N0");
                             tempAmountText = string.Format(
                                 LanguageManager.GetText(formatKeySimpleAmount),
                                 tempAttribute.Title,
-                                tempTargetAmount.ToString("N0"));
+                                tempTargetValue);
                             break;
                     }
                     // Append current attribute amount text
@@ -132,6 +137,31 @@ namespace MultiplayerARPG
                     uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));
                     uiTextAllAmounts.text = tempAllText;
                 }
+            }
+        }
+
+        private void SetDefaultText(TextWrapper text, string title)
+        {
+            switch (displayType)
+            {
+                case DisplayType.Rate:
+                    text.text = string.Format(
+                        LanguageManager.GetText(formatKeyRateAmount),
+                        title,
+                        isBonus ? "+0.00%" : "0.00%");
+                    break;
+                case DisplayType.Requirement:
+                    text.text = string.Format(
+                        LanguageManager.GetText(formatKeyAmount),
+                        title,
+                        "0", "0");
+                    break;
+                case DisplayType.Simple:
+                    text.text = string.Format(
+                        LanguageManager.GetText(formatKeySimpleAmount),
+                        title,
+                        isBonus ? "+0" : "0");
+                    break;
             }
         }
     }

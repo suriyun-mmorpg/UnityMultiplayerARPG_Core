@@ -61,6 +61,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRequireAttributeAmounts.displayType = UIAttributeAmounts.DisplayType.Requirement;
+                    uiRequireAttributeAmounts.isBonus = false;
                     uiRequireAttributeAmounts.Show();
                     uiRequireAttributeAmounts.Data = equipmentItem.CacheRequireAttributeAmounts;
                 }

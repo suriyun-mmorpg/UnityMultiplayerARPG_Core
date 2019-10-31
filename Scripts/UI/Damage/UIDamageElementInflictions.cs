@@ -27,9 +27,9 @@ namespace MultiplayerARPG
                     TextWrapper tempTextComponent;
                     foreach (UIDamageElementTextPair textAmount in textInflictions)
                     {
-                        if (textAmount.damageElement == null || textAmount.uiText == null)
+                        if (textAmount.uiText == null)
                             continue;
-                        tempElement = textAmount.damageElement;
+                        tempElement = textAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : textAmount.damageElement;
                         tempTextComponent = textAmount.uiText;
                         tempTextComponent.text = string.Format(
                             LanguageManager.GetText(formatKeyInflictionAsElemental),

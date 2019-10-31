@@ -526,7 +526,7 @@ namespace MultiplayerARPG
         UI_FORMAT_CHAT_GUILD,
         // Format - Armor Amount
         /// <summary>
-        /// Format => {0} = {Armor Title}, {1} = {Target Amount}
+        /// Format => {0} = {Damage Element Title}, {1} = {Target Amount}
         /// </summary>
         UI_FORMAT_ARMOR_AMOUNT = 197,
         // Format - Character Stats Rate

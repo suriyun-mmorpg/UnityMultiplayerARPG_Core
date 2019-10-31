@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         public Buff Buff { get { return Data.buff; } }
         public short Level { get { return Data.targetLevel; } }
-        
+
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Buff Duration}")]
         public UILocaleKeySetting formatKeyDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_DURATION);
@@ -104,39 +104,121 @@ namespace MultiplayerARPG
 
             if (uiBuffStats != null)
             {
-                uiBuffStats.displayType = UICharacterStats.DisplayType.Simple;
-                uiBuffStats.Data = Buff.GetIncreaseStats(Level);
+                CharacterStats stats = Buff.GetIncreaseStats(Level);
+                if (stats.IsEmpty())
+                {
+                    uiBuffStats.Hide();
+                }
+                else
+                {
+                    uiBuffStats.displayType = UICharacterStats.DisplayType.Simple;
+                    uiBuffStats.isBonus = true;
+                    uiBuffStats.Show();
+                    uiBuffStats.Data = stats;
+                }
             }
 
             if (uiBuffStatsRate != null)
             {
-                uiBuffStatsRate.displayType = UICharacterStats.DisplayType.Rate;
-                uiBuffStatsRate.Data = Buff.GetIncreaseStatsRate(Level);
+                CharacterStats statsRate = Buff.GetIncreaseStatsRate(Level);
+                if (statsRate.IsEmpty())
+                {
+                    uiBuffStatsRate.Hide();
+                }
+                else
+                {
+                    uiBuffStatsRate.displayType = UICharacterStats.DisplayType.Rate;
+                    uiBuffStatsRate.isBonus = true;
+                    uiBuffStatsRate.Show();
+                    uiBuffStatsRate.Data = statsRate;
+                }
             }
 
             if (uiBuffAttributes != null)
             {
-                uiBuffAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
-                uiBuffAttributes.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributes, new Dictionary<Attribute, float>(), Level, 1f);
+                if (Buff.increaseAttributes == null || Buff.increaseAttributes.Length == 0)
+                {
+                    uiBuffAttributes.Hide();
+                }
+                else
+                {
+                    uiBuffAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
+                    uiBuffAttributes.isBonus = true;
+                    uiBuffAttributes.Show();
+                    uiBuffAttributes.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributes, new Dictionary<Attribute, float>(), Level, 1f);
+                }
             }
 
             if (uiBuffAttributesRate != null)
             {
-                uiBuffAttributesRate.displayType = UIAttributeAmounts.DisplayType.Simple;
-                uiBuffAttributesRate.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributesRate, new Dictionary<Attribute, float>(), Level, 1f);
+                if (Buff.increaseAttributesRate == null || Buff.increaseAttributesRate.Length == 0)
+                {
+                    uiBuffAttributesRate.Hide();
+                }
+                else
+                {
+                    uiBuffAttributesRate.displayType = UIAttributeAmounts.DisplayType.Rate;
+                    uiBuffAttributesRate.isBonus = true;
+                    uiBuffAttributesRate.Show();
+                    uiBuffAttributesRate.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributesRate, new Dictionary<Attribute, float>(), Level, 1f);
+                }
             }
 
             if (uiBuffResistances != null)
-                uiBuffResistances.Data = GameDataHelpers.CombineResistances(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);
+            {
+                if (Buff.increaseResistances == null || Buff.increaseResistances.Length == 0)
+                {
+                    uiBuffResistances.Hide();
+                }
+                else
+                {
+                    uiBuffResistances.isBonus = true;
+                    uiBuffResistances.Show();
+                    uiBuffResistances.Data = GameDataHelpers.CombineResistances(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);
+                }
+            }
 
             if (uiBuffArmors != null)
-                uiBuffArmors.Data = GameDataHelpers.CombineArmors(Buff.increaseArmors, new Dictionary<DamageElement, float>(), Level, 1f);
+            {
+                if (Buff.increaseArmors == null || Buff.increaseArmors.Length == 0)
+                {
+                    uiBuffArmors.Hide();
+                }
+                else
+                {
+                    uiBuffArmors.isBonus = true;
+                    uiBuffArmors.Show();
+                    uiBuffArmors.Data = GameDataHelpers.CombineArmors(Buff.increaseArmors, new Dictionary<DamageElement, float>(), Level, 1f);
+                }
+            }
 
             if (uiBuffDamages != null)
-                uiBuffDamages.Data = GameDataHelpers.CombineDamages(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+            {
+                if (Buff.increaseDamages == null || Buff.increaseDamages.Length == 0)
+                {
+                    uiBuffDamages.Hide();
+                }
+                else
+                {
+                    uiBuffDamages.isBonus = true;
+                    uiBuffDamages.Show();
+                    uiBuffDamages.Data = GameDataHelpers.CombineDamages(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+                }
+            }
 
             if (uiDamageOverTimes != null)
-                uiDamageOverTimes.Data = GameDataHelpers.CombineDamages(Buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+            {
+                if (Buff.damageOverTimes == null || Buff.damageOverTimes.Length == 0)
+                {
+                    uiDamageOverTimes.Hide();
+                }
+                else
+                {
+                    uiDamageOverTimes.isBonus = false;
+                    uiDamageOverTimes.Show();
+                    uiDamageOverTimes.Data = GameDataHelpers.CombineDamages(Buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+                }
+            }
 
             if (disallowMoveObject != null)
                 disallowMoveObject.SetActive(Data.buff.disallowMove);

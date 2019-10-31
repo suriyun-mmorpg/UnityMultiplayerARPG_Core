@@ -75,6 +75,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyResistanceAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RESISTANCE_AMOUNT);
         [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Min Damage}, {2} = {Max Damage}")]
         public UILocaleKeySetting formatKeyDamageAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL);
+        [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Target Amount}")]
+        public UILocaleKeySetting formatKeyArmorAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
         [Tooltip("Format => {0} = {Skill Title}, {1} = {Level}")]
         public UILocaleKeySetting formatKeySkillLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_LEVEL);
 
@@ -87,6 +89,8 @@ namespace MultiplayerARPG
 
             string statsText = CharacterStats.GetText(
                 equipmentBonus.stats,
+                false,
+                true,
                 formatKeyHpStats,
                 formatKeyMpStats,
                 formatKeyAccuracyStats,
@@ -103,8 +107,10 @@ namespace MultiplayerARPG
                 formatKeyFoodStats,
                 formatKeyWaterStats);
 
-            string statsRateText = CharacterStats.GetRateText(
+            string statsRateText = CharacterStats.GetText(
                 equipmentBonus.statsRate,
+                true,
+                true,
                 formatKeyHpRateStats,
                 formatKeyMpRateStats,
                 formatKeyAccuracyRateStats,
@@ -131,6 +137,7 @@ namespace MultiplayerARPG
                 result += statsRateText;
             }
 
+            // Attributes
             foreach (AttributeAmount entry in equipmentBonus.attributes)
             {
                 if (entry.attribute == null || entry.amount == 0)
@@ -140,7 +147,7 @@ namespace MultiplayerARPG
                 result += string.Format(
                     LanguageManager.GetText(formatKeyAttributeAmount),
                     entry.attribute.Title,
-                    entry.amount.ToString("N0"));
+                    entry.amount.ToBonusString());
             }
             foreach (AttributeAmount entry in equipmentBonus.attributesRate)
             {
@@ -151,31 +158,54 @@ namespace MultiplayerARPG
                 result += string.Format(
                     LanguageManager.GetText(formatKeyAttributeAmountRate),
                     entry.attribute.Title,
-                    (entry.amount * 100).ToString("N2"));
+                    (entry.amount * 100).ToBonusString());
             }
+
+            DamageElement tempElement;
+            // Resistances
             foreach (ResistanceAmount entry in equipmentBonus.resistances)
             {
-                if (entry.damageElement == null || entry.amount == 0)
+                if (entry.amount == 0)
                     continue;
                 if (!string.IsNullOrEmpty(result))
                     result += "\n";
+                tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
                 result += string.Format(
                     LanguageManager.GetText(formatKeyResistanceAmount),
-                    entry.damageElement.Title,
-                    (entry.amount * 100).ToString("N0"));
+                    tempElement.Title,
+                    (entry.amount * 100).ToBonusString());
             }
+
+            // Damages
             foreach (DamageAmount entry in equipmentBonus.damages)
             {
-                if (entry.damageElement == null || (entry.amount.min == 0 && entry.amount.max == 0))
+                if (entry.amount.min == 0 && entry.amount.max == 0)
                     continue;
                 if (!string.IsNullOrEmpty(result))
                     result += "\n";
+                tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
                 result += string.Format(
                     LanguageManager.GetText(formatKeyDamageAmount),
-                    entry.damageElement.Title,
-                    entry.amount.min.ToString("N0"),
-                    entry.amount.max.ToString("N0"));
+                    tempElement.Title,
+                    entry.amount.min.ToBonusString(),
+                    entry.amount.max.ToBonusString());
             }
+
+            // Armors
+            foreach (ArmorAmount entry in equipmentBonus.armors)
+            {
+                if (entry.amount == 0)
+                    continue;
+                if (!string.IsNullOrEmpty(result))
+                    result += "\n";
+                tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                result += string.Format(
+                    LanguageManager.GetText(formatKeyArmorAmount),
+                    tempElement.Title,
+                    entry.amount.ToBonusString());
+            }
+
+            // Skills
             foreach (SkillLevel entry in equipmentBonus.skills)
             {
                 if (entry.skill == null || entry.level == 0)
@@ -185,8 +215,9 @@ namespace MultiplayerARPG
                 result += string.Format(
                     LanguageManager.GetText(formatKeySkillLevel),
                     entry.skill.Title,
-                    entry.level.ToString("N0"));
+                    entry.level.ToBonusString());
             }
+
             return result;
         }
     }
