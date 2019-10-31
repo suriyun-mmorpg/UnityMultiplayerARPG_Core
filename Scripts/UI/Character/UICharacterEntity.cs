@@ -38,7 +38,7 @@ namespace MultiplayerARPG
             {
                 uiTextLevel.text = string.Format(
                     LanguageManager.GetText(formatKeyLevel),
-                    Data == null ? "1" : Data.DisplayLevel.ToString("N0"));
+                    Data == null ? "1" : Data.Level.ToString("N0"));
             }
 
             currentMp = 0;
