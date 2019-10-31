@@ -213,9 +213,9 @@ namespace MultiplayerARPG
 
             // Cri Rate
             if (isBonus)
-                tempValue = isRate ? (data.criRate * 100).ToBonusString("N2") : (data.criRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.criRate * 10000).ToBonusString("N2") : (data.criRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.criRate * 100).ToString("N2") : (data.criRate * 100).ToString("N2");
+                tempValue = isRate ? (data.criRate * 10000).ToString("N2") : (data.criRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(criRateStatsFormat),
                 tempValue);
@@ -230,9 +230,9 @@ namespace MultiplayerARPG
 
             // Cri Dmg Rate
             if (isBonus)
-                tempValue = isRate ? (data.criDmgRate * 100).ToBonusString("N2") : (data.criDmgRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.criDmgRate * 10000).ToBonusString("N2") : (data.criDmgRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.criDmgRate * 100).ToString("N2") : (data.criDmgRate * 100).ToString("N2");
+                tempValue = isRate ? (data.criDmgRate * 10000).ToString("N2") : (data.criDmgRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(criDmgRateStatsFormat),
                 tempValue);
@@ -247,9 +247,9 @@ namespace MultiplayerARPG
 
             // Block Rate
             if (isBonus)
-                tempValue = isRate ? (data.blockRate * 100).ToBonusString("N2") : (data.blockRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.blockRate * 10000).ToBonusString("N2") : (data.blockRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.blockRate * 100).ToString("N2") : (data.blockRate * 100).ToString("N2");
+                tempValue = isRate ? (data.blockRate * 10000).ToString("N2") : (data.blockRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(blockRateStatsFormat),
                 tempValue);
@@ -264,9 +264,9 @@ namespace MultiplayerARPG
 
             // Block Dmg Rate
             if (isBonus)
-                tempValue = isRate ? (data.blockDmgRate * 100).ToBonusString("N2") : (data.blockDmgRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.blockDmgRate * 10000).ToBonusString("N2") : (data.blockDmgRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.blockDmgRate * 100).ToString("N2") : (data.blockDmgRate * 100).ToString("N2");
+                tempValue = isRate ? (data.blockDmgRate * 10000).ToString("N2") : (data.blockDmgRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(blockDmgRateStatsFormat),
                 tempValue);
