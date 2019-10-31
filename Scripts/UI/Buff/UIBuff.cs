@@ -36,6 +36,15 @@ namespace MultiplayerARPG
         public UIResistanceAmounts uiBuffResistances;
         public UIArmorAmounts uiBuffArmors;
         public UIDamageElementAmounts uiBuffDamages;
+        public UIDamageElementAmounts uiDamageOverTimes;
+        [Tooltip("This will activate if buff's disallow move is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowMoveObject;
+        [Tooltip("This will activate if buff's disallow attack is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowAttackObject;
+        [Tooltip("This will activate if buff's disallow use skill is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowUseSkillObject;
+        [Tooltip("This will activate if buff's disallow use item is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowUseItemObject;
 
         protected override void UpdateData()
         {
@@ -125,6 +134,21 @@ namespace MultiplayerARPG
 
             if (uiBuffDamages != null)
                 uiBuffDamages.Data = GameDataHelpers.CombineDamages(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+
+            if (uiDamageOverTimes != null)
+                uiDamageOverTimes.Data = GameDataHelpers.CombineDamages(Buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+
+            if (disallowMoveObject != null)
+                disallowMoveObject.SetActive(Data.buff.disallowMove);
+
+            if (disallowAttackObject != null)
+                disallowAttackObject.SetActive(Data.buff.disallowAttack);
+
+            if (disallowUseSkillObject != null)
+                disallowUseSkillObject.SetActive(Data.buff.disallowUseSkill);
+
+            if (disallowUseItemObject != null)
+                disallowUseItemObject.SetActive(Data.buff.disallowUseItem);
         }
     }
 }
