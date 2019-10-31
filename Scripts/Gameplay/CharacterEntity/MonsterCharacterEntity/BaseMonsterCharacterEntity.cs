@@ -84,6 +84,8 @@ namespace MultiplayerARPG
         {
             base.EntityStart();
             InitStats();
+            if (spawnArea == null)
+                spawnPosition = CacheTransform.position;
         }
 
         protected override void EntityUpdate()
@@ -111,9 +113,6 @@ namespace MultiplayerARPG
         {
             if (IsServer)
             {
-                if (spawnArea == null)
-                    spawnPosition = CacheTransform.position;
-
                 if (Level <= 0)
                     Level = MonsterDatabase.defaultLevel;
 
