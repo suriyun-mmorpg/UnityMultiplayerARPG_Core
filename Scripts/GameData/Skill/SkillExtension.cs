@@ -73,22 +73,23 @@ namespace MultiplayerARPG
             gameMessageType = GameMessage.Type.None;
             if (skill == null || skillUser == null)
                 return false;
-
+            
             if (level <= 0)
             {
                 gameMessageType = GameMessage.Type.SkillLevelIsZero;
                 return false;
             }
-
-            if (!isItem && !skill.IsLearned(skillUser))
-            {
-                gameMessageType = GameMessage.Type.SkillIsNotLearned;
-                return false;
-            }
-
+            
             bool available = true;
             if (skillUser is IPlayerCharacterData)
             {
+                // Only player character will check is skill is learned
+                if (!isItem && !skill.IsLearned(skillUser))
+                {
+                    gameMessageType = GameMessage.Type.SkillIsNotLearned;
+                    return false;
+                }
+
                 // Only player character will check for available weapons
                 switch (skill.GetSkillType())
                 {
@@ -127,19 +128,19 @@ namespace MultiplayerARPG
                         return false;
                 }
             }
-
+            
             if (!available)
             {
                 gameMessageType = GameMessage.Type.CannotUseSkillByCurrentWeapon;
                 return false;
             }
-
+            
             if (skillUser.CurrentMp < skill.GetConsumeMp(level))
             {
                 gameMessageType = GameMessage.Type.NotEnoughMp;
                 return false;
             }
-
+            
             int skillUsageIndex = skillUser.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
             if (skillUsageIndex >= 0 && skillUser.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
             {
