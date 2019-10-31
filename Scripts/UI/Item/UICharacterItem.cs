@@ -58,6 +58,14 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyExp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_EXP);
         [Tooltip("Format => {0} = {Lock Remains Duration}")]
         public UILocaleKeySetting formatKeyLockRemainsDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Building Title}")]
+        public UILocaleKeySetting formatKeyBuilding = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_BUILDING);
+        [Tooltip("Format => {0} = {Pet Title}")]
+        public UILocaleKeySetting formatKeyPet = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_PET);
+        [Tooltip("Format => {0} = {Mount Title}")]
+        public UILocaleKeySetting formatKeyMount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_MOUNT);
+        [Tooltip("Format => {0} = {Skill Title}")]
+        public UILocaleKeySetting formatKeySkill = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_SKILL);
         [Tooltip("Format => {0} = {Item Type Title}")]
         public UILocaleKeySetting formatKeyItemType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_TYPE);
 
@@ -96,6 +104,18 @@ namespace MultiplayerARPG
         [Header("Weapon - UI Elements")]
         [FormerlySerializedAs("uiDamageAmounts")]
         public UIDamageElementAmount uiDamageAmount;
+
+        [Header("Building - UI Elements")]
+        public TextWrapper uiTextBuilding;
+
+        [Header("Pet - UI Elements")]
+        public TextWrapper uiTextPet;
+
+        [Header("Mount - UI Elements")]
+        public TextWrapper uiTextMount;
+
+        [Header("Skill - UI Elements")]
+        public TextWrapper uiTextSkill;
 
         [Header("Events")]
         public UnityEvent onSetLevelZeroData;
@@ -301,6 +321,10 @@ namespace MultiplayerARPG
                                 LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SHIELD.ToString()));
                             break;
                         case ItemType.Potion:
+                        case ItemType.AttributeIncrease:
+                        case ItemType.AttributeReset:
+                        case ItemType.SkillLearn:
+                        case ItemType.SkillReset:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
                                 LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_POTION.ToString()));
@@ -330,30 +354,10 @@ namespace MultiplayerARPG
                                 LanguageManager.GetText(formatKeyItemType),
                                 LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_MOUNT.ToString()));
                             break;
-                        case ItemType.AttributeIncrease:
-                            uiTextItemType.text = string.Format(
-                                LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_ATTRIBUTE_INCREASE.ToString()));
-                            break;
-                        case ItemType.AttributeReset:
-                            uiTextItemType.text = string.Format(
-                                LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_ATTRIBUTE_RESET.ToString()));
-                            break;
                         case ItemType.Skill:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
                                 LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SKILL.ToString()));
-                            break;
-                        case ItemType.SkillLearn:
-                            uiTextItemType.text = string.Format(
-                                LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString()));
-                            break;
-                        case ItemType.SkillReset:
-                            uiTextItemType.text = string.Format(
-                                LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString()));
                             break;
                     }
                 }
@@ -671,6 +675,59 @@ namespace MultiplayerARPG
             {
                 if (uiTextExp != null)
                     uiTextExp.gameObject.SetActive(false);
+            }
+
+            if (uiTextBuilding != null)
+            {
+                if (BuildingItem == null || BuildingItem.petEntity == null)
+                    uiTextBuilding.gameObject.SetActive(false);
+                else
+                {
+                    uiTextBuilding.gameObject.SetActive(true);
+                    uiTextBuilding.text = string.Format(
+                        LanguageManager.GetText(formatKeyBuilding),
+                        BuildingItem.buildingEntity.Title);
+                }
+            }
+
+            if (uiTextPet != null)
+            {
+                if (PetItem == null || PetItem.petEntity == null)
+                    uiTextPet.gameObject.SetActive(false);
+                else
+                {
+                    uiTextPet.gameObject.SetActive(true);
+                    uiTextPet.text = string.Format(
+                        LanguageManager.GetText(formatKeyPet),
+                        PetItem.petEntity.Title);
+                }
+            }
+
+            if (uiTextMount != null)
+            {
+                if (MountItem == null || MountItem.mountEntity == null)
+                    uiTextMount.gameObject.SetActive(false);
+                else
+                {
+                    uiTextMount.gameObject.SetActive(true);
+                    uiTextMount.text = string.Format(
+                        LanguageManager.GetText(formatKeyMount),
+                        MountItem.mountEntity.Title);
+                }
+            }
+
+            if (uiTextSkill != null)
+            {
+                if (SkillItem == null || SkillItem.skillLevel.skill == null)
+                    uiTextSkill.gameObject.SetActive(false);
+                else
+                {
+                    uiTextSkill.gameObject.SetActive(true);
+                    uiTextSkill.text = string.Format(
+                        LanguageManager.GetText(formatKeySkill),
+                        SkillItem.skillLevel.skill.Title,
+                        SkillItem.skillLevel.level);
+                }
             }
 
             if (clones != null && clones.Length > 0)

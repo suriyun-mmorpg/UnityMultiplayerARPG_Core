@@ -26,6 +26,10 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
         [Tooltip("Format => {0} = {Cooldown Remains Duration}")]
         public UILocaleKeySetting formatKeyCoolDownRemainsDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Monster Title}, {1} = {Monster Level}, {2} = {Amount}, {3} = {Duration}")]
+        public UILocaleKeySetting formatKeySummon = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_SUMMON);
+        [Tooltip("Format => {0} = {Mount Title}")]
+        public UILocaleKeySetting formatKeyMount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_MOUNT);
         [Tooltip("Format => {0} = {Skill Type Title}")]
         public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_TYPE);
 
@@ -41,6 +45,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextCoolDownRemainsDuration;
         public Image imageCoolDownGage;
         public UISkillRequirement uiRequirement;
+        public TextWrapper uiTextSummon;
+        public TextWrapper uiTextMount;
         public UICraftItem uiCraftItem;
 
         [Header("Skill Attack")]
@@ -218,13 +224,41 @@ namespace MultiplayerARPG
             if (uiRequirement != null)
             {
                 if (Skill == null || (Skill.GetRequireCharacterLevel(Level) == 0 && Skill.CacheRequireSkillLevels.Count == 0))
-                {
                     uiRequirement.Hide();
-                }
                 else
                 {
                     uiRequirement.Show();
-                    uiRequirement.Data = new UICharacterSkillData(CharacterSkill, Level);
+                    uiRequirement.Data = Data;
+                }
+            }
+
+            if (uiTextSummon != null)
+            {
+                if (Skill == null || Skill.GetSkillType() != SkillType.Active || Skill.GetSummon().monsterEntity == null)
+                    uiTextSummon.gameObject.SetActive(false);
+                else
+                {
+                    uiTextSummon.gameObject.SetActive(true);
+                    uiTextSummon.text = string.Format(
+                        LanguageManager.GetText(formatKeySummon),
+                        Skill.GetSummon().monsterEntity.Title,
+                        Skill.GetSummon().level.GetAmount(Level),
+                        Skill.GetSummon().amountEachTime.GetAmount(Level),
+                        Skill.GetSummon().maxStack.GetAmount(Level),
+                        Skill.GetSummon().duration.GetAmount(Level));
+                }
+            }
+
+            if (uiTextMount != null)
+            {
+                if (Skill == null || Skill.GetSkillType() != SkillType.Active || Skill.GetMount().mountEntity == null)
+                    uiTextMount.gameObject.SetActive(false);
+                else
+                {
+                    uiTextMount.gameObject.SetActive(true);
+                    uiTextMount.text = string.Format(
+                        LanguageManager.GetText(formatKeyMount),
+                        Skill.GetMount().mountEntity.Title);
                 }
             }
 
