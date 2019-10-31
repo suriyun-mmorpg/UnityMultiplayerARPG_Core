@@ -219,43 +219,9 @@ namespace MultiplayerARPG
             return skillType == SkillType.Passive || skillBuffType != SkillBuffType.None;
         }
 
-        public override Buff GetBuff()
-        {
-            if (!IsBuff())
-                return default(Buff);
-            return buff;
-        }
-
         public override bool IsDebuff()
         {
             return IsAttack() && isDebuff;
-        }
-
-        public override Buff GetDebuff()
-        {
-            if (!IsDebuff())
-                return default(Buff);
-            return debuff;
-        }
-
-        public override BaseMonsterCharacterEntity GetSummonMonsterEntity()
-        {
-            return summon.monsterEntity;
-        }
-
-        public override MountEntity GetMountEntity()
-        {
-            return mount.mountEntity;
-        }
-
-        public override ItemCraft GetItemCraft()
-        {
-            return itemCraft;
-        }
-
-        public override GameEffectCollection GetHitEffect()
-        {
-            return hitEffects;
         }
 
         public override float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
@@ -325,6 +291,40 @@ namespace MultiplayerARPG
         public override void FinishAimControls()
         {
             // Do nothing
+        }
+
+        public override sealed Buff GetBuff()
+        {
+            if (!IsBuff())
+                return new Buff();
+            return buff;
+        }
+
+        public override sealed Buff GetDebuff()
+        {
+            if (!IsDebuff())
+                return new Buff();
+            return debuff;
+        }
+
+        public override sealed SkillSummon GetSummon()
+        {
+            return summon;
+        }
+
+        public override sealed SkillMount GetMount()
+        {
+            return mount;
+        }
+
+        public override sealed ItemCraft GetItemCraft()
+        {
+            return itemCraft;
+        }
+
+        public override sealed GameEffectCollection GetHitEffect()
+        {
+            return hitEffects;
         }
 
         public override void PrepareRelatesData()

@@ -62,13 +62,7 @@ namespace MultiplayerARPG
         public abstract SkillType GetSkillType();
         public abstract bool IsAttack();
         public abstract bool IsBuff();
-        public abstract Buff GetBuff();
         public abstract bool IsDebuff();
-        public abstract Buff GetDebuff();
-        public abstract BaseMonsterCharacterEntity GetSummonMonsterEntity();
-        public abstract MountEntity GetMountEntity();
-        public abstract ItemCraft GetItemCraft();
-        public abstract GameEffectCollection GetHitEffect();
         public abstract float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
         public abstract float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
         public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand);
@@ -78,6 +72,12 @@ namespace MultiplayerARPG
         public abstract bool HasCustomAimControls();
         public abstract Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel);
         public abstract void FinishAimControls();
+        public virtual Buff GetBuff() { return new Buff(); }
+        public virtual Buff GetDebuff() { return new Buff(); }
+        public virtual SkillSummon GetSummon() { return new SkillSummon(); }
+        public virtual SkillMount GetMount() { return new SkillMount(); }
+        public virtual ItemCraft GetItemCraft() { return new ItemCraft(); }
+        public virtual GameEffectCollection GetHitEffect() { return new GameEffectCollection(); }
 
         public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {

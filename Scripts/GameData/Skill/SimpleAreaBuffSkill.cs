@@ -10,11 +10,6 @@ namespace MultiplayerARPG
         public AreaBuffEntity areaBuffEntity;
         public Buff buff;
 
-        public override GameEffectCollection GetHitEffect()
-        {
-            return default(GameEffectCollection);
-        }
-
         public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
         {
             // Spawn area entity
@@ -43,21 +38,6 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override BaseMonsterCharacterEntity GetSummonMonsterEntity()
-        {
-            return null;
-        }
-
-        public override MountEntity GetMountEntity()
-        {
-            return null;
-        }
-
-        public override ItemCraft GetItemCraft()
-        {
-            return default(ItemCraft);
-        }
-
         public override bool IsAttack()
         {
             return false;
@@ -68,19 +48,14 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override Buff GetBuff()
-        {
-            return buff;
-        }
-
         public override bool IsDebuff()
         {
             return false;
         }
 
-        public override Buff GetDebuff()
+        public override sealed Buff GetBuff()
         {
-            return default(Buff);
+            return buff;
         }
     }
 }
