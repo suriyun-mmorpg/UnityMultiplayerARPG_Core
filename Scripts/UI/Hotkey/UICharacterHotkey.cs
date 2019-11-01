@@ -14,11 +14,10 @@ namespace MultiplayerARPG
 
         [FormerlySerializedAs("uiAssigner")]
         public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;
+        public UICharacterSkill uiCharacterSkill;
+        public UICharacterItem uiCharacterItem;
         public KeyCode key;
-
-
-        private UICharacterSkill uiCharacterSkill;
-        private UICharacterItem uiCharacterItem;
+        
         private BaseSkill hotkeySkill;
         private short hotkeySkillLevel;
 
