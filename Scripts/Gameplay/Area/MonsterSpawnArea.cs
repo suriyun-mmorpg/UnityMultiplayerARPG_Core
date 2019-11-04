@@ -16,7 +16,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(monsterCharacterEntity.Identity);
         }
 
-        public void SpawnAll()
+        public virtual void SpawnAll()
         {
             if (monsterCharacterEntity != null)
             {
@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Spawn(float delay)
+        public virtual void Spawn(float delay)
         {
             StartCoroutine(SpawnRoutine(delay));
         }
