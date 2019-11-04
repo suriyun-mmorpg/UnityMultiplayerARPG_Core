@@ -6,5 +6,6 @@
         KillMonster,
         PartyShare,
         Quest,
+        Harvestable
     }
 }
