@@ -82,7 +82,8 @@ namespace MultiplayerARPG
                     if (enemyEntityDetector.characters.Count > 0)
                     {
                         SetTarget(null);
-                        if (!enemyEntityDetector.characters[findingEnemyIndex].IsDead())
+                        if (!enemyEntityDetector.characters[findingEnemyIndex].GetCaches().IsHide &&
+                            !enemyEntityDetector.characters[findingEnemyIndex].IsDead())
                         {
                             SetTarget(enemyEntityDetector.characters[findingEnemyIndex]);
                             if (SelectedEntity != null)
@@ -203,14 +204,14 @@ namespace MultiplayerARPG
                             targetBuilding = tempBuildingMaterial.buildingEntity;
                         PlayerCharacterEntity.SetTargetEntity(null);
                         lastNpcObjectId = 0;
-                        if (targetPlayer != null && !targetPlayer.IsDead())
+                        if (targetPlayer != null && !targetCharacter.GetCaches().IsHide)
                         {
                             // Found activating entity as player character entity
                             SetTarget(targetPlayer);
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetMonster != null && !targetMonster.IsDead())
+                        else if (targetMonster != null && !targetCharacter.GetCaches().IsHide && !targetMonster.IsDead())
                         {
                             // Found activating entity as monster character entity
                             SetTarget(targetMonster);
@@ -541,7 +542,7 @@ namespace MultiplayerARPG
             // Temp variables
             if (TryGetAttackingCharacter(out targetEnemy))
             {
-                if (targetEnemy.IsDead())
+                if (!targetCharacter.GetCaches().IsHide || targetEnemy.IsDead())
                 {
                     ClearQueueUsingSkill();
                     ClearQueueUsingSkillItem();
@@ -600,14 +601,6 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetPlayer))
             {
-                if (targetPlayer.IsDead())
-                {
-                    ClearQueueUsingSkill();
-                    ClearQueueUsingSkillItem();
-                    PlayerCharacterEntity.StopMove();
-                    ClearTarget();
-                    return;
-                }
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
                 if (Vector3.Distance(MovementTransform.position, targetPlayer.CacheTransform.position) <= actDistance)
                 {

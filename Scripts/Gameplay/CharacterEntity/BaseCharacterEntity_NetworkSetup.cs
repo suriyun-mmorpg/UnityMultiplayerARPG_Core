@@ -29,8 +29,6 @@ namespace MultiplayerARPG
             equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
-            isHidding.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            isHidding.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
             selectableWeaponSets.forOwnerOnly = false;
             attributes.forOwnerOnly = false;
@@ -55,7 +53,6 @@ namespace MultiplayerARPG
             currentWater.onChange += OnCurrentWaterChange;
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
             pitch.onChange += OnPitchChange;
-            isHidding.onChange += OnIsHiddingChange;
             // On list changes events
             selectableWeaponSets.onOperation += OnSelectableWeaponSetsOperation;
             attributes.onOperation += OnAttributesOperation;
@@ -98,7 +95,6 @@ namespace MultiplayerARPG
             currentFood.onChange -= OnCurrentFoodChange;
             currentWater.onChange -= OnCurrentWaterChange;
             equipWeaponSet.onChange -= OnEquipWeaponSetChange;
-            isHidding.onChange -= OnIsHiddingChange;
             // On list changes events
             selectableWeaponSets.onOperation -= OnSelectableWeaponSetsOperation;
             attributes.onOperation -= OnAttributesOperation;

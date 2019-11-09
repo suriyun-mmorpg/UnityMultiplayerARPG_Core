@@ -32,6 +32,7 @@ namespace MultiplayerARPG
         public bool disallowAttack;
         public bool disallowUseSkill;
         public bool disallowUseItem;
+        public bool isHide;
         public GameEffect[] effects;
     }
 }

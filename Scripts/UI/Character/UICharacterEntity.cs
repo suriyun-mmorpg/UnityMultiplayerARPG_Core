@@ -68,6 +68,11 @@ namespace MultiplayerARPG
                 imageSkillCastGage.fillAmount = castingSkillDuration <= 0 ? 0 : 1 - (castingSkillCountDown / castingSkillDuration);
         }
 
+        protected override bool ValidateToUpdateUI()
+        {
+            return base.ValidateToUpdateUI() && (Data.IsOwnerClient || !Data.GetCaches().IsHide);
+        }
+
         protected override void UpdateUI()
         {
             if (!ValidateToUpdateUI())

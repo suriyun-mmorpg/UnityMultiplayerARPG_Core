@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         [Tooltip("These object will be deactivate while hidding")]
         public GameObject[] hiddingObjects;
 
-        public bool IsHidding { get; protected set; }
+        public bool IsHide { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         [Header("Effect Containers")]
@@ -77,13 +77,15 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetHidding(bool isHidding)
+        public void SetHide(bool isHide)
         {
-            IsHidding = isHidding;
+            if (IsHide == isHide)
+                return;
+            IsHide = isHide;
             foreach (GameObject hiddingObject in hiddingObjects)
             {
-                if (hiddingObject.activeSelf != !IsHidding)
-                    hiddingObject.SetActive(!IsHidding);
+                if (hiddingObject.activeSelf != !IsHide)
+                    hiddingObject.SetActive(!IsHide);
             }
         }
 

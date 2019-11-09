@@ -9,6 +9,9 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public class CharacterModelManager : MonoBehaviour
     {
+        public const byte HIDE_SETTER_ENTITY = 0;
+        public const byte HIDE_SETTER_CONTROLLER = 1;
+
         [SerializeField]
         private BaseCharacterModel mainModel;
         public BaseCharacterModel MainModel
@@ -56,6 +59,20 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool IsHide
+        {
+            get
+            {
+                foreach (bool hideState in hideStates.Values)
+                {
+                    if (hideState)
+                        return true;
+                }
+                return false;
+            }
+        }
+
+        private Dictionary<byte, bool> hideStates = new Dictionary<byte, bool>();
         private int dirtyVehicleDataId;
         private byte dirtySeatIndex;
 
@@ -148,6 +165,12 @@ namespace MultiplayerARPG
             BaseCharacterModel previousModel = activeModel;
             activeModel = nextModel;
             activeModel.SwitchModel(previousModel);
+        }
+
+        public void SetHide(byte setter, bool hideState)
+        {
+            hideStates[setter] = hideState;
+            MainModel.SetHide(IsHide);
         }
     }
 

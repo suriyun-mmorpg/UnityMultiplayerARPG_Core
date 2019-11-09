@@ -24,8 +24,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt currentWater = new SyncFieldInt();
         [SerializeField]
-        protected SyncFieldBool isHidding = new SyncFieldBool();
-        [SerializeField]
         protected SyncFieldByte equipWeaponSet = new SyncFieldByte();
         [SerializeField]
         protected SyncFieldByte pitch = new SyncFieldByte();
@@ -96,7 +94,6 @@ namespace MultiplayerARPG
         }
         public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
         public float Pitch { get { return pitch.Value * 100f; } set { pitch.Value = (byte)(value * 0.01f); } }
-        public bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
 
         public IList<EquipWeapons> SelectableWeaponSets
         {
@@ -307,27 +304,6 @@ namespace MultiplayerARPG
         {
             if (onPitchChange != null)
                 onPitchChange.Invoke(pitch);
-        }
-
-        /// <summary>
-        /// Override this to do stuffs when hidding state changes
-        /// </summary>
-        /// <param name="isHidding"></param>
-        protected virtual void OnIsHiddingChange(bool isInitial, bool isHidding)
-        {
-            Renderer[] renderers = GetComponentsInChildren<Renderer>();
-            foreach (Renderer renderer in renderers)
-            {
-                renderer.enabled = !isHidding;
-            }
-            Collider[] colliders = GetComponentsInChildren<Collider>();
-            foreach (Collider collider in colliders)
-            {
-                collider.enabled = !isHidding;
-            }
-
-            if (onIsHiddingChange != null)
-                onIsHiddingChange.Invoke(isHidding);
         }
         #endregion
 

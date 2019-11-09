@@ -228,6 +228,7 @@ namespace MultiplayerARPG
 
             if (respawnGroundedCheckCountDown <= 0)
             {
+                // Killing character when it fall below dead Y
                 if (gameInstance.DimensionType == DimensionType.Dimension3D &&
                     BaseGameNetworkManager.CurrentMapInfo != null &&
                     CacheTransform.position.y <= BaseGameNetworkManager.CurrentMapInfo.deadY)
@@ -257,6 +258,7 @@ namespace MultiplayerARPG
                 ExitVehicle();
             }
 
+            // Enabling movement
             if (Movement != null && Movement.enabled != tempEnableMovement)
                 Movement.enabled = tempEnableMovement;
 
@@ -264,12 +266,6 @@ namespace MultiplayerARPG
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicle.seatIndex);
             // Update current model
             model = ModelManager.ActiveModel;
-            // Update is dead state
-            CharacterModel.SetIsDead(IsDead());
-            // Update move speed multiplier
-            CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-            // Update movement animation
-            CharacterModel.SetMovementState(MovementState);
             // Update casting skill count down, will show gage at clients
             if (castingSkillCountDown > 0)
             {
@@ -277,12 +273,24 @@ namespace MultiplayerARPG
                 if (castingSkillCountDown < 0)
                     castingSkillCountDown = 0;
             }
-            // Update direction type if character model is character model 2D
-            if (CharacterModel is ICharacterModel2D)
+            // Update animation states at clients
+            if (IsClient)
             {
-                // Set current direction to character model 2D
-                (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
+                // Update is dead state
+                CharacterModel.SetIsDead(IsDead());
+                // Update move speed multiplier
+                CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                // Update movement animation
+                CharacterModel.SetMovementState(MovementState);
+                // Update direction type if character model is character model 2D
+                if (CharacterModel is ICharacterModel2D)
+                {
+                    // Set current direction to character model 2D
+                    (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
+                }
             }
+            // Set character model hide state
+            ModelManager.SetHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
             Profiler.EndSample();
         }
 

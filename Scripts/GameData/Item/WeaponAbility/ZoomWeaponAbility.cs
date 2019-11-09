@@ -121,7 +121,7 @@ namespace MultiplayerARPG
             }
 
             // Hidding character model while activate
-            shooterController.PlayerCharacterEntity.CharacterModel.SetHidding(isActive);
+            shooterController.PlayerCharacterEntity.ModelManager.SetHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, isActive);
 
             return state;
         }

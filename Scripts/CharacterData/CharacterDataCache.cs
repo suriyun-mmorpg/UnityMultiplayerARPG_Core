@@ -41,6 +41,7 @@ namespace MultiplayerARPG
         public bool DisallowAttack { get; private set; }
         public bool DisallowUseSkill { get; private set; }
         public bool DisallowUseItem { get; private set; }
+        public bool IsHide { get; private set; }
 
         public CharacterDataCache()
         {
@@ -90,6 +91,7 @@ namespace MultiplayerARPG
             DisallowAttack = false;
             DisallowUseSkill = false;
             DisallowUseItem = false;
+            IsHide = false;
             Buff tempBuff;
             foreach (CharacterBuff characterBuff in characterData.Buffs)
             {
@@ -102,10 +104,13 @@ namespace MultiplayerARPG
                     DisallowUseSkill = true;
                 if (tempBuff.disallowUseItem)
                     DisallowUseItem = true;
+                if (tempBuff.isHide)
+                    IsHide = true;
                 if (DisallowMove &&
                     DisallowAttack &&
                     DisallowUseSkill &&
-                    DisallowUseItem)
+                    DisallowUseItem &&
+                    IsHide)
                     break;
             }
 
