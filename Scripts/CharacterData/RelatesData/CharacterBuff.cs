@@ -239,30 +239,6 @@ public class CharacterBuff : INetSerializableWithElement
         return cacheDamageOverTimes;
     }
 
-    public bool GetDisallowMove()
-    {
-        MakeCache();
-        return cacheBuff.disallowMove;
-    }
-
-    public bool GetDisallowAttack()
-    {
-        MakeCache();
-        return cacheBuff.disallowAttack;
-    }
-
-    public bool GetDisallowUseSkill()
-    {
-        MakeCache();
-        return cacheBuff.disallowUseSkill;
-    }
-
-    public bool GetDisallowUseItem()
-    {
-        MakeCache();
-        return cacheBuff.disallowUseItem;
-    }
-
     public bool ShouldRemove()
     {
         return buffRemainsDuration <= 0f;
