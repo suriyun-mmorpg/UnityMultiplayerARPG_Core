@@ -204,14 +204,14 @@ namespace MultiplayerARPG
                             targetBuilding = tempBuildingMaterial.buildingEntity;
                         PlayerCharacterEntity.SetTargetEntity(null);
                         lastNpcObjectId = 0;
-                        if (targetPlayer != null && !targetCharacter.GetCaches().IsHide)
+                        if (targetPlayer != null && !targetPlayer.GetCaches().IsHide)
                         {
                             // Found activating entity as player character entity
                             SetTarget(targetPlayer);
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetMonster != null && !targetCharacter.GetCaches().IsHide && !targetMonster.IsDead())
+                        else if (targetMonster != null && !targetMonster.GetCaches().IsHide && !targetMonster.IsDead())
                         {
                             // Found activating entity as monster character entity
                             SetTarget(targetMonster);
@@ -542,7 +542,7 @@ namespace MultiplayerARPG
             // Temp variables
             if (TryGetAttackingCharacter(out targetEnemy))
             {
-                if (!targetCharacter.GetCaches().IsHide || targetEnemy.IsDead())
+                if (targetEnemy.GetCaches().IsHide || targetEnemy.IsDead())
                 {
                     ClearQueueUsingSkill();
                     ClearQueueUsingSkillItem();
