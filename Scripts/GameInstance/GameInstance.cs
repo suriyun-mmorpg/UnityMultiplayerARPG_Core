@@ -12,6 +12,13 @@ namespace MultiplayerARPG
         Simple,
         LimitSlots,
     }
+
+    public enum CurrentPositionSaveMode
+    {
+        UseCurrentPosition,
+        UseRespawnPosition
+    }
+
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
 #else
@@ -85,6 +92,8 @@ namespace MultiplayerARPG
         private SocialSystemSetting socialSystemSetting;
 
         [Header("Gameplay Configs")]
+        [Tooltip("How character position load when start game")]
+        public CurrentPositionSaveMode currentPositionSaveMode;
         public UnityTag playerTag;
         public UnityTag monsterTag;
         public UnityTag npcTag;

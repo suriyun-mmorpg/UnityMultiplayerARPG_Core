@@ -778,11 +778,15 @@ namespace MultiplayerARPG
 
         public virtual string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
+            if (gameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
+                return playerCharacterEntity.RespawnMapName;
             return CurrentMapInfo.Id;
         }
 
         public virtual Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
+            if (gameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
+                return playerCharacterEntity.RespawnPosition;
             return playerCharacterEntity.CacheTransform.position;
         }
 
