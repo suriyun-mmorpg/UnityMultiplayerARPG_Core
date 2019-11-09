@@ -4,7 +4,7 @@ using LiteNetLibManager;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterQuest : INetSerializableWithElement
+public class CharacterQuest : INetSerializable
 {
     public static readonly CharacterQuest Empty = new CharacterQuest();
     public int dataId;
@@ -16,14 +16,6 @@ public class CharacterQuest : INetSerializableWithElement
 
     [System.NonSerialized]
     private Quest cacheQuest;
-
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
 
     public Dictionary<int, int> KilledMonsters
     {
