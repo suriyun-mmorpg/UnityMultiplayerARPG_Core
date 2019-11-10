@@ -33,6 +33,7 @@ namespace MultiplayerARPG
         public bool disallowUseSkill;
         public bool disallowUseItem;
         public bool isHide;
+        public bool muteFootstepSound;
         public GameEffect[] effects;
     }
 }

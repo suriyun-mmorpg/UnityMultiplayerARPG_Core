@@ -21,6 +21,8 @@ namespace MultiplayerARPG
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float triggerDurationRate;
+        [Tooltip("If this length more than 1, will use each entry for trigger duration rate")]
+        public float[] multiHitTriggerDurationRates;
         [Tooltip("How animation duration defined")]
         public AnimationDurationType durationType;
         [StringShowConditional("durationType", "ByFixValue")]
@@ -57,10 +59,20 @@ namespace MultiplayerARPG
         {
             return extraDuration;
         }
-
-        public float GetTriggerDuration()
+        
+        public float[] GetTriggerDurations()
         {
-            return GetClipLength() * triggerDurationRate;
+            if (multiHitTriggerDurationRates != null &&
+                multiHitTriggerDurationRates.Length > 0)
+            {
+                float[] durations = new float[multiHitTriggerDurationRates.Length];
+                for (int i = 0; i < durations.Length; ++i)
+                {
+                    durations[i] = GetClipLength() * multiHitTriggerDurationRates[i];
+                }
+                return durations;
+            }
+            return new float[] { GetClipLength() * triggerDurationRate };
         }
 
         public float GetTotalDuration()

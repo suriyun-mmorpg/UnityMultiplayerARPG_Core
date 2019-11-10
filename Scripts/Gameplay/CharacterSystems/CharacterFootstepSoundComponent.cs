@@ -23,16 +23,23 @@ namespace MultiplayerARPG
 
         protected void Update()
         {
-            if (audioSource == null)
+            // Play sound on clients only
+            if (!IsClient || audioSource == null)
+            {
+                enabled = false;
                 return;
+            }
 
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
+            if (CacheEntity is BaseCharacterEntity)
+                audioSource.mute = audioSource.mute || (CacheEntity as BaseCharacterEntity).GetCaches().MuteFootstepSound;
 
             if (!CacheEntity.MovementState.HasFlag(MovementState.Forward) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Backward) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Right) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Left))
             {
+                // No movement
                 delayCounter = 0f;
                 return;
             }

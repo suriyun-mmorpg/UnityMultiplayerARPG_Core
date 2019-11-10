@@ -142,12 +142,12 @@ namespace MultiplayerARPG
             Item reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
 
             // Prepare requires data and get animation data
-            float triggerDuration = 0f;
-            float totalDuration = 0f;
+            float[] triggerDurations;
+            float totalDuration;
             if (!isLeftHand)
-                CharacterModel.GetRightHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDuration, out totalDuration);
+                CharacterModel.GetRightHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDurations, out totalDuration);
             else
-                CharacterModel.GetLeftHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDuration, out totalDuration);
+                CharacterModel.GetLeftHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDurations, out totalDuration);
 
             // Set doing action state at clients and server
             isAttackingOrUsingSkill = true;
@@ -162,22 +162,25 @@ namespace MultiplayerARPG
                 CharacterModel.PlayActionAnimation(animActionType, reloadingWeaponItem.WeaponType.DataId, 0);
             }
 
-            // Wait until triggger before reload ammo
-            yield return new WaitForSecondsRealtime(triggerDuration);
-
-            // Prepare data
-            EquipWeapons equipWeapons = EquipWeapons;
-            Dictionary<CharacterItem, short> decreaseItems;
-            if (IsServer && this.DecreaseAmmos(reloadingWeaponItem.WeaponType.requireAmmoType, reloadingAmmoAmount, out decreaseItems))
+            for (int i = 0; i < triggerDurations.Length; ++i)
             {
-                reloadingWeapon.ammo += reloadingAmmoAmount;
-                if (isLeftHand)
-                    equipWeapons.leftHand = reloadingWeapon;
-                else
-                    equipWeapons.rightHand = reloadingWeapon;
-                EquipWeapons = equipWeapons;
+                // Wait until triggger before reload ammo
+                yield return new WaitForSecondsRealtime(triggerDurations[i]);
+
+                // Prepare data
+                EquipWeapons equipWeapons = EquipWeapons;
+                Dictionary<CharacterItem, short> decreaseItems;
+                if (IsServer && this.DecreaseAmmos(reloadingWeaponItem.WeaponType.requireAmmoType, reloadingAmmoAmount, out decreaseItems))
+                {
+                    reloadingWeapon.ammo += reloadingAmmoAmount;
+                    if (isLeftHand)
+                        equipWeapons.leftHand = reloadingWeapon;
+                    else
+                        equipWeapons.rightHand = reloadingWeapon;
+                    EquipWeapons = equipWeapons;
+                }
+                yield return new WaitForSecondsRealtime(totalDuration - triggerDurations[i]);
             }
-            yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             animActionType = AnimActionType.None;
             isAttackingOrUsingSkill = false;
         }
@@ -202,13 +205,13 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get animation data
             int animationIndex;
-            float triggerDuration;
+            float[] triggerDurations;
             float totalDuration;
             GetRandomAnimationData(
                 animActionType,
                 animationDataId,
                 out animationIndex,
-                out triggerDuration,
+                out triggerDurations,
                 out totalDuration);
 
             // Validate ammo
@@ -234,13 +237,13 @@ namespace MultiplayerARPG
                 out weapon);
 
             // Prepare requires data and get animation data
-            float triggerDuration;
+            float[] triggerDurations;
             float totalDuration;
             GetAnimationData(
                 animActionType,
                 animationDataId,
                 animationIndex,
-                out triggerDuration,
+                out triggerDurations,
                 out totalDuration);
 
             // Prepare requires data and get damages data
@@ -263,44 +266,47 @@ namespace MultiplayerARPG
                 CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
             }
 
-            // Play special effects after trigger duration
-            yield return new WaitForSecondsRealtime(triggerDuration / playSpeedMultiplier);
-
-            // Special effects will plays on clients only
-            if (IsClient)
+            for (int i = 0; i < triggerDurations.Length; ++i)
             {
-                // Play weapon launch special effects
-                CharacterModel.PlayWeaponLaunchEffect(animActionType);
+                // Play special effects after trigger duration
+                yield return new WaitForSecondsRealtime(triggerDurations[i] / playSpeedMultiplier);
+
+                // Special effects will plays on clients only
+                if (IsClient)
+                {
+                    // Play weapon launch special effects
+                    CharacterModel.PlayWeaponLaunchEffect(animActionType);
+                }
+
+                // Call on attack to extend attack functionality while attacking
+                bool overrideDefaultAttack = false;
+                foreach (CharacterSkill characterSkill in Skills)
+                {
+                    if (characterSkill.level <= 0)
+                        continue;
+                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, damageAmounts, aimPosition))
+                        overrideDefaultAttack = true;
+                }
+
+                // Skip attack function when applied skills (buffs) will override default attack functionality
+                if (!overrideDefaultAttack)
+                {
+                    // Trigger attack event
+                    if (onAttackRoutine != null)
+                        onAttackRoutine.Invoke(isLeftHand, weapon, damageAmounts, aimPosition);
+
+                    // Apply attack damages
+                    ApplyAttack(
+                        isLeftHand,
+                        weapon,
+                        damageInfo,
+                        damageAmounts,
+                        aimPosition);
+                }
+
+                // Wait until animation ends to stop actions
+                yield return new WaitForSecondsRealtime((totalDuration - triggerDurations[i]) / playSpeedMultiplier);
             }
-
-            // Call on attack to extend attack functionality while attacking
-            bool overrideDefaultAttack = false;
-            foreach (CharacterSkill characterSkill in Skills)
-            {
-                if (characterSkill.level <= 0)
-                    continue;
-                if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, damageAmounts, aimPosition))
-                    overrideDefaultAttack = true;
-            }
-
-            // Skip attack function when applied skills (buffs) will override default attack functionality
-            if (!overrideDefaultAttack)
-            {
-                // Trigger attack event
-                if (onAttackRoutine != null)
-                    onAttackRoutine.Invoke(isLeftHand, weapon, damageAmounts, aimPosition);
-
-                // Apply attack damages
-                ApplyAttack(
-                    isLeftHand,
-                    weapon,
-                    damageInfo,
-                    damageAmounts,
-                    aimPosition);
-            }
-
-            // Wait until animation ends to stop actions
-            yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) / playSpeedMultiplier);
 
             // Set doing action state to none at clients and server
             animActionType = AnimActionType.None;

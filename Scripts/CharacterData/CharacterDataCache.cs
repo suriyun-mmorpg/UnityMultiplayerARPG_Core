@@ -42,6 +42,7 @@ namespace MultiplayerARPG
         public bool DisallowUseSkill { get; private set; }
         public bool DisallowUseItem { get; private set; }
         public bool IsHide { get; private set; }
+        public bool MuteFootstepSound { get; private set; }
 
         public CharacterDataCache()
         {
@@ -92,6 +93,7 @@ namespace MultiplayerARPG
             DisallowUseSkill = false;
             DisallowUseItem = false;
             IsHide = false;
+            MuteFootstepSound = false;
             Buff tempBuff;
             foreach (CharacterBuff characterBuff in characterData.Buffs)
             {
@@ -106,11 +108,14 @@ namespace MultiplayerARPG
                     DisallowUseItem = true;
                 if (tempBuff.isHide)
                     IsHide = true;
+                if (tempBuff.muteFootstepSound)
+                    MuteFootstepSound = true;
                 if (DisallowMove &&
                     DisallowAttack &&
                     DisallowUseSkill &&
                     DisallowUseItem &&
-                    IsHide)
+                    IsHide &&
+                    MuteFootstepSound)
                     break;
             }
 

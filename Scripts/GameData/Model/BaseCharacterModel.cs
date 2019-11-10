@@ -404,43 +404,43 @@ namespace MultiplayerARPG
         public bool GetRandomRightHandAttackAnimation(
             WeaponType weaponType,
             out int animationIndex,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
-            return GetRandomRightHandAttackAnimation(weaponType.DataId, out animationIndex, out triggerDuration, out totalDuration);
+            return GetRandomRightHandAttackAnimation(weaponType.DataId, out animationIndex, out triggerDurations, out totalDuration);
         }
 
         public bool GetRandomLeftHandAttackAnimation(
             WeaponType weaponType,
             out int animationIndex,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
-            return GetRandomLeftHandAttackAnimation(weaponType.DataId, out animationIndex, out triggerDuration, out totalDuration);
+            return GetRandomLeftHandAttackAnimation(weaponType.DataId, out animationIndex, out triggerDurations, out totalDuration);
         }
 
         public bool GetSkillActivateAnimation(
             BaseSkill skill,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
-            return GetSkillActivateAnimation(skill.DataId, out triggerDuration, out totalDuration);
+            return GetSkillActivateAnimation(skill.DataId, out triggerDurations, out totalDuration);
         }
 
         public bool GetRightHandReloadAnimation(
             WeaponType weaponType,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
-            return GetRightHandReloadAnimation(weaponType.DataId, out triggerDuration, out totalDuration);
+            return GetRightHandReloadAnimation(weaponType.DataId, out triggerDurations, out totalDuration);
         }
 
         public bool GetLeftHandReloadAnimation(
             WeaponType weaponType,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
-            return GetLeftHandReloadAnimation(weaponType.DataId, out triggerDuration, out totalDuration);
+            return GetLeftHandReloadAnimation(weaponType.DataId, out triggerDurations, out totalDuration);
         }
 
         public SkillActivateAnimationType UseSkillActivateAnimationType(BaseSkill skill)
@@ -520,13 +520,13 @@ namespace MultiplayerARPG
         public abstract Coroutine PlaySkillCastClip(int dataId, float duration);
         public abstract void StopActionAnimation();
         public abstract void StopSkillCastAnimation();
-        public abstract bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
-        public abstract bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
-        public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration);
-        public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration);
-        public abstract bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration);
-        public abstract bool GetRightHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);
-        public abstract bool GetLeftHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);
+        public abstract bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetSkillActivateAnimation(int dataId, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRightHandReloadAnimation(int dataId, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetLeftHandReloadAnimation(int dataId, out float[] triggerDurations, out float totalDuration);
         public abstract SkillActivateAnimationType UseSkillActivateAnimationType(int dataId);
     }
 

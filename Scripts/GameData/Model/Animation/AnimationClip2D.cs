@@ -11,7 +11,7 @@ public class AnimationClip2D : ScriptableObject
     public bool flipX;
     public bool flipY;
 
-    public float duration
+    public float length
     {
         get { return frames.Length / framesPerSec; }
         set { framesPerSec = frames.Length / value; }

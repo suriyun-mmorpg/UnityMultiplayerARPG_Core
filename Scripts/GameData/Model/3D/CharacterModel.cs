@@ -796,76 +796,76 @@ namespace MultiplayerARPG
         public override bool GetRandomRightHandAttackAnimation(
             int dataId,
             out int animationIndex,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
             animationIndex = Random.Range(0, GetRightHandAttackAnimations(dataId).Length);
-            return GetRightHandAttackAnimation(dataId, animationIndex, out triggerDuration, out totalDuration);
+            return GetRightHandAttackAnimation(dataId, animationIndex, out triggerDurations, out totalDuration);
         }
 
         public override bool GetRandomLeftHandAttackAnimation(
             int dataId,
             out int animationIndex,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
             animationIndex = Random.Range(0, GetLeftHandAttackAnimations(dataId).Length);
-            return GetLeftHandAttackAnimation(dataId, animationIndex, out triggerDuration, out totalDuration);
+            return GetLeftHandAttackAnimation(dataId, animationIndex, out triggerDurations, out totalDuration);
         }
 
-        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration)
+        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation[] tempActionAnimations = GetRightHandAttackAnimations(dataId);
-            triggerDuration = 0f;
+            triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (tempActionAnimations.Length == 0 || animationIndex >= tempActionAnimations.Length) return false;
             animationIndex = Random.Range(0, tempActionAnimations.Length);
-            triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
+            triggerDurations = tempActionAnimations[animationIndex].GetTriggerDurations();
             totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
             return true;
         }
 
-        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration)
+        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation[] tempActionAnimations = GetLeftHandAttackAnimations(dataId);
-            triggerDuration = 0f;
+            triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (tempActionAnimations.Length == 0 || animationIndex >= tempActionAnimations.Length) return false;
             animationIndex = Random.Range(0, tempActionAnimations.Length);
-            triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
+            triggerDurations = tempActionAnimations[animationIndex].GetTriggerDurations();
             totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
             return true;
         }
 
         public override bool GetSkillActivateAnimation(
             int dataId,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
             ActionAnimation tempActionAnimation = GetSkillActivateAnimation(dataId);
-            triggerDuration = tempActionAnimation.GetTriggerDuration();
+            triggerDurations = tempActionAnimation.GetTriggerDurations();
             totalDuration = tempActionAnimation.GetTotalDuration();
             return true;
         }
 
         public override bool GetRightHandReloadAnimation(
             int dataId,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
             ActionAnimation tempActionAnimation = GetRightHandReloadAnimation(dataId);
-            triggerDuration = tempActionAnimation.GetTriggerDuration();
+            triggerDurations = tempActionAnimation.GetTriggerDurations();
             totalDuration = tempActionAnimation.GetTotalDuration();
             return true;
         }
 
         public override bool GetLeftHandReloadAnimation(
             int dataId,
-            out float triggerDuration,
+            out float[] triggerDurations,
             out float totalDuration)
         {
             ActionAnimation tempActionAnimation = GetLeftHandReloadAnimation(dataId);
-            triggerDuration = tempActionAnimation.GetTriggerDuration();
+            triggerDurations = tempActionAnimation.GetTriggerDurations();
             totalDuration = tempActionAnimation.GetTotalDuration();
             return true;
         }

@@ -92,13 +92,13 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get animation data
             int animationIndex;
-            float triggerDuration;
+            float[] triggerDurations;
             float totalDuration;
             GetRandomAnimationData(
                 animActionType,
                 animatonDataId,
                 out animationIndex,
-                out triggerDuration,
+                out triggerDurations,
                 out totalDuration);
             
             // Start use skill routine
@@ -143,13 +143,13 @@ namespace MultiplayerARPG
                 out weapon);
 
             // Prepare requires data and get animation data
-            float triggerDuration;
+            float[] triggerDurations;
             float totalDuration;
             GetAnimationData(
                 animActionType,
                 animationDataId,
                 animationIndex,
-                out triggerDuration,
+                out triggerDurations,
                 out totalDuration);
 
             // Prepare requires data and get damages data
@@ -188,23 +188,26 @@ namespace MultiplayerARPG
                 // Animations will plays on clients only
                 if (IsClient)
                     CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
+                
+                for (int i = 0; i < triggerDurations.Length; ++i)
+                {
+                    // Play special effects after trigger duration
+                    yield return new WaitForSecondsRealtime(triggerDurations[i] / playSpeedMultiplier);
 
-                // Play special effects after trigger duration
-                yield return new WaitForSecondsRealtime(triggerDuration / playSpeedMultiplier);
+                    // Special effects will plays on clients only
+                    if (IsClient)
+                        CharacterModel.PlayWeaponLaunchEffect(animActionType);
 
-                // Special effects will plays on clients only
-                if (IsClient)
-                    CharacterModel.PlayWeaponLaunchEffect(animActionType);
+                    // Trigger skill event
+                    if (onUseSkillRoutine != null)
+                        onUseSkillRoutine.Invoke(skill, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
 
-                // Trigger skill event
-                if (onUseSkillRoutine != null)
-                    onUseSkillRoutine.Invoke(skill, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
+                    // Apply skill buffs, summons and attack damages
+                    skill.ApplySkill(this, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
 
-                // Apply skill buffs, summons and attack damages
-                skill.ApplySkill(this, skillLevel, isLeftHand, weapon, damageAmounts, aimPosition);
-
-                // Wait until animation ends to stop actions
-                yield return new WaitForSecondsRealtime((totalDuration - triggerDuration) / playSpeedMultiplier);
+                    // Wait until animation ends to stop actions
+                    yield return new WaitForSecondsRealtime((totalDuration - triggerDurations[i]) / playSpeedMultiplier);
+                }
             }
 
             // Set doing action state to none at clients and server

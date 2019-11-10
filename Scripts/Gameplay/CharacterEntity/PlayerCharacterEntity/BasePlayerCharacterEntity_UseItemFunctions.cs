@@ -179,13 +179,13 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get animation data
             int animationIndex;
-            float triggerDuration;
+            float[] triggerDurations;
             float totalDuration;
             GetRandomAnimationData(
                 animActionType,
                 animatonDataId,
                 out animationIndex,
-                out triggerDuration,
+                out triggerDurations,
                 out totalDuration);
 
             // Start use skill routine

@@ -341,95 +341,95 @@ namespace MultiplayerARPG
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }
 
-        public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float[] triggerDurations, out float totalDuration)
         {
             animationIndex = 0;
-            return GetRightHandAttackAnimation(dataId, animationIndex, out triggerDuration, out totalDuration);
+            return GetRightHandAttackAnimation(dataId, animationIndex, out triggerDurations, out totalDuration);
         }
 
-        public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float[] triggerDurations, out float totalDuration)
         {
             animationIndex = 0;
-            return GetLeftHandAttackAnimation(dataId, animationIndex, out triggerDuration, out totalDuration);
+            return GetLeftHandAttackAnimation(dataId, animationIndex, out triggerDurations, out totalDuration);
         }
 
-        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration)
+        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float[] triggerDurations, out float totalDuration)
         {
             AnimatorActionAnimation2D animation2D = defaultAttackAnimation2D;
             AnimatorWeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.rightHandAttackAnimation;
-            triggerDuration = 0f;
+            triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
             AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
-            triggerDuration = clip.length * animation2D.triggerDurationRate;
-            totalDuration = clip.length + animation2D.extraDuration;
+            triggerDurations = animation2D.GetTriggerDurations(clip.length);
+            totalDuration = animation2D.GetTotalDuration(clip.length);
             return true;
         }
 
-        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float triggerDuration, out float totalDuration)
+        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float[] triggerDurations, out float totalDuration)
         {
             AnimatorActionAnimation2D animation2D = defaultAttackAnimation2D;
             AnimatorWeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.leftHandAttackAnimation;
-            triggerDuration = 0f;
+            triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
             AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
-            triggerDuration = clip.length * animation2D.triggerDurationRate;
-            totalDuration = clip.length + animation2D.extraDuration;
+            triggerDurations = animation2D.GetTriggerDurations(clip.length);
+            totalDuration = animation2D.GetTotalDuration(clip.length);
             return true;
         }
 
-        public override bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        public override bool GetSkillActivateAnimation(int dataId, out float[] triggerDurations, out float totalDuration)
         {
             AnimatorActionAnimation2D animation2D = defaultSkillActivateAnimation2D;
             AnimatorSkillAnimations2D skillAnims;
             if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out skillAnims))
                 animation2D = skillAnims.activateAnimation;
-            triggerDuration = 0f;
+            triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
             AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
-            triggerDuration = clip.length * animation2D.triggerDurationRate;
-            totalDuration = clip.length + animation2D.extraDuration;
+            triggerDurations = animation2D.GetTriggerDurations(clip.length);
+            totalDuration = animation2D.GetTotalDuration(clip.length);
             return true;
         }
 
-        public override bool GetRightHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        public override bool GetRightHandReloadAnimation(int dataId, out float[] triggerDurations, out float totalDuration)
         {
             AnimatorActionAnimation2D animation2D = defaultReloadAnimation2D;
             AnimatorWeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.rightHandReloadAnimation;
-            triggerDuration = 0f;
+            triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
             AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
-            triggerDuration = clip.length * animation2D.triggerDurationRate;
-            totalDuration = clip.length + animation2D.extraDuration;
+            triggerDurations = animation2D.GetTriggerDurations(clip.length);
+            totalDuration = animation2D.GetTotalDuration(clip.length);
             return true;
         }
 
-        public override bool GetLeftHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        public override bool GetLeftHandReloadAnimation(int dataId, out float[] triggerDurations, out float totalDuration)
         {
             AnimatorActionAnimation2D animation2D = defaultReloadAnimation2D;
             AnimatorWeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.leftHandReloadAnimation;
-            triggerDuration = 0f;
+            triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
             AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
-            triggerDuration = clip.length * animation2D.triggerDurationRate;
-            totalDuration = clip.length + animation2D.extraDuration;
+            triggerDurations = animation2D.GetTriggerDurations(clip.length);
+            totalDuration = animation2D.GetTotalDuration(clip.length);
             return true;
         }
 

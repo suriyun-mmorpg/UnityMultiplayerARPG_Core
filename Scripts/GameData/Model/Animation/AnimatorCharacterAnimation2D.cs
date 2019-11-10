@@ -62,6 +62,8 @@ namespace MultiplayerARPG
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float triggerDurationRate;
+        [Tooltip("If this length more than 1, will use each entry for trigger duration rate")]
+        public float[] multiHitTriggerDurationRates;
         [Tooltip("This will be in use with attack/skill animations, This is duration after played animation clip to add delay before next animation")]
         public float extraDuration;
         [Tooltip("This will be in use with attack/skill animations, These audio clips playing randomly while play this animation (not loop)")]
@@ -73,6 +75,31 @@ namespace MultiplayerARPG
             if (audioClips != null && audioClips.Length > 0)
                 clip = audioClips[Random.Range(0, audioClips.Length)];
             return clip;
+        }
+
+        public float GetExtraDuration()
+        {
+            return extraDuration;
+        }
+
+        public float[] GetTriggerDurations(float clipLength)
+        {
+            if (multiHitTriggerDurationRates != null &&
+                multiHitTriggerDurationRates.Length > 0)
+            {
+                float[] durations = new float[multiHitTriggerDurationRates.Length];
+                for (int i = 0; i < durations.Length; ++i)
+                {
+                    durations[i] = clipLength * multiHitTriggerDurationRates[i];
+                }
+                return durations;
+            }
+            return new float[] { clipLength * triggerDurationRate };
+        }
+
+        public float GetTotalDuration(float clipLength)
+        {
+            return clipLength + extraDuration;
         }
     }
 
