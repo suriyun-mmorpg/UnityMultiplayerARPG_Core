@@ -129,6 +129,7 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
+        /// <param name="hitIndex"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="aimPosition"></param>
         /// <returns></returns>
@@ -137,6 +138,7 @@ namespace MultiplayerARPG
             short skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
+            int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             Vector3 aimPosition);
 
@@ -147,6 +149,7 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
+        /// <param name="hitIndex"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="aimPosition"></param>
         /// <returns></returns>
@@ -155,6 +158,7 @@ namespace MultiplayerARPG
             short skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
+            int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             Vector3 aimPosition)
         {

@@ -266,10 +266,10 @@ namespace MultiplayerARPG
                 CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
             }
 
-            for (int i = 0; i < triggerDurations.Length; ++i)
+            for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
             {
                 // Play special effects after trigger duration
-                yield return new WaitForSecondsRealtime(triggerDurations[i] / playSpeedMultiplier);
+                yield return new WaitForSecondsRealtime(triggerDurations[hitIndex] / playSpeedMultiplier);
 
                 // Special effects will plays on clients only
                 if (IsClient)
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
                 {
                     if (characterSkill.level <= 0)
                         continue;
-                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, damageAmounts, aimPosition))
+                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition))
                         overrideDefaultAttack = true;
                 }
 
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
                 {
                     // Trigger attack event
                     if (onAttackRoutine != null)
-                        onAttackRoutine.Invoke(isLeftHand, weapon, damageAmounts, aimPosition);
+                        onAttackRoutine.Invoke(isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
 
                     // Apply attack damages
                     ApplyAttack(
@@ -305,7 +305,7 @@ namespace MultiplayerARPG
                 }
 
                 // Wait until animation ends to stop actions
-                yield return new WaitForSecondsRealtime((totalDuration - triggerDurations[i]) / playSpeedMultiplier);
+                yield return new WaitForSecondsRealtime((totalDuration - triggerDurations[hitIndex]) / playSpeedMultiplier);
             }
 
             // Set doing action state to none at clients and server
