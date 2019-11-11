@@ -62,14 +62,15 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public virtual void OnBeginDrag(PointerEventData eventData)
     {
-        if (!CanDrag)
-            return;
-        isDropped = false;
         defaultSiblingIndex = rootTransform.GetSiblingIndex();
         defaultParent = rootTransform.parent;
         defaultLocalPosition = rootTransform.localPosition;
         defaultLocalScale = rootTransform.localScale;
 
+        if (!CanDrag)
+            return;
+
+        isDropped = false;
         rootTransform.SetParent(CacheCanvas.transform);
         rootTransform.SetAsLastSibling();
 
@@ -87,6 +88,8 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public virtual void OnDrag(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
         rootTransform.position = Input.mousePosition;
     }
 
