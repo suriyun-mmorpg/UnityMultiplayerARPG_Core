@@ -164,6 +164,145 @@ namespace MultiplayerARPG
         {
             return false;
         }
+
+        public virtual bool CanLevelUp(IPlayerCharacterData character, short level, out GameMessage.Type gameMessageType, bool checkSkillPoint = true)
+        {
+            gameMessageType = GameMessage.Type.None;
+            if (character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(this))
+                return false;
+
+            // Check is it pass attribute requirement or not
+            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(false, false);
+            Dictionary<Attribute, float> requireAttributeAmounts = CacheRequireAttributeAmounts;
+            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
+            {
+                if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
+                    attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
+                {
+                    gameMessageType = GameMessage.Type.NotEnoughAttributeAmounts;
+                    return false;
+                }
+            }
+            // Check is it pass skill level requirement or not
+            Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
+            foreach (CharacterSkill learnedSkill in character.Skills)
+            {
+                if (learnedSkill.GetSkill() == null)
+                    continue;
+                skillLevelsDict[learnedSkill.GetSkill()] = learnedSkill.level;
+            }
+            foreach (BaseSkill requireSkill in CacheRequireSkillLevels.Keys)
+            {
+                if (!skillLevelsDict.ContainsKey(requireSkill) ||
+                    skillLevelsDict[requireSkill] < CacheRequireSkillLevels[requireSkill])
+                {
+                    gameMessageType = GameMessage.Type.NotEnoughSkillLevels;
+                    return false;
+                }
+            }
+
+            if (character.Level < this.GetRequireCharacterLevel(level))
+            {
+                gameMessageType = GameMessage.Type.NotEnoughLevel;
+                return false;
+            }
+
+            if (maxLevel > 0 && level >= maxLevel)
+            {
+                gameMessageType = GameMessage.Type.SkillReachedMaxLevel;
+                return false;
+            }
+
+            if (checkSkillPoint && character.SkillPoint <= 0)
+            {
+                gameMessageType = GameMessage.Type.NotEnoughSkillPoint;
+                return false;
+            }
+
+            return true;
+        }
+
+        public virtual bool CanUse(ICharacterData skillUser, short level, out GameMessage.Type gameMessageType, bool isItem = false)
+        {
+            gameMessageType = GameMessage.Type.None;
+            if (skillUser == null)
+                return false;
+
+            if (level <= 0)
+            {
+                gameMessageType = GameMessage.Type.SkillLevelIsZero;
+                return false;
+            }
+
+            bool available = true;
+            if (skillUser is IPlayerCharacterData)
+            {
+                // Only player character will check is skill is learned
+                if (!isItem && !this.IsLearned(skillUser))
+                {
+                    gameMessageType = GameMessage.Type.SkillIsNotLearned;
+                    return false;
+                }
+
+                // Only player character will check for available weapons
+                switch (GetSkillType())
+                {
+                    case SkillType.Active:
+                        available = availableWeapons == null || availableWeapons.Length == 0;
+                        if (!available)
+                        {
+                            Item rightWeaponItem = skillUser.EquipWeapons.GetRightHandWeaponItem();
+                            Item leftWeaponItem = skillUser.EquipWeapons.GetLeftHandWeaponItem();
+                            foreach (WeaponType availableWeapon in availableWeapons)
+                            {
+                                if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
+                                {
+                                    available = true;
+                                    break;
+                                }
+                                else if (leftWeaponItem != null && leftWeaponItem.WeaponType == availableWeapon)
+                                {
+                                    available = true;
+                                    break;
+                                }
+                                else if (rightWeaponItem == null && leftWeaponItem == null && GameInstance.Singleton.DefaultWeaponItem.WeaponType == availableWeapon)
+                                {
+                                    available = true;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case SkillType.CraftItem:
+                        if (!(skillUser is BasePlayerCharacterEntity) ||
+                            !GetItemCraft().CanCraft(skillUser as BasePlayerCharacterEntity, out gameMessageType))
+                            return false;
+                        break;
+                    default:
+                        return false;
+                }
+            }
+
+            if (!available)
+            {
+                gameMessageType = GameMessage.Type.CannotUseSkillByCurrentWeapon;
+                return false;
+            }
+
+            if (skillUser.CurrentMp < this.GetConsumeMp(level))
+            {
+                gameMessageType = GameMessage.Type.NotEnoughMp;
+                return false;
+            }
+
+            int skillUsageIndex = skillUser.IndexOfSkillUsage(DataId, SkillUsageType.Skill);
+            if (skillUsageIndex >= 0 && skillUser.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
+            {
+                gameMessageType = GameMessage.Type.SkillIsCoolingDown;
+                return false;
+            }
+            return true;
+        }
     }
 
     public enum SkillType : byte
