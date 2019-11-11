@@ -21,6 +21,7 @@ namespace MultiplayerARPG
             BuffToUser,
             BuffToNearbyAllies,
             BuffToNearbyCharacters,
+            Toggle,
         }
 
         public SkillType skillType;
@@ -69,7 +70,7 @@ namespace MultiplayerARPG
                 GameDataMigration.MigrateBuffArmor(debuff, out debuff);
         }
 
-        public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
+        public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -147,6 +148,13 @@ namespace MultiplayerARPG
                         applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
                     }
                     skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
+                    break;
+                case SkillBuffType.Toggle:
+                    int indexOfBuff = skillUser.IndexOfBuff(DataId, BuffType.SkillBuff);
+                    if (indexOfBuff >= 0)
+                        skillUser.Buffs.RemoveAt(indexOfBuff);
+                    else
+                        skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
                     break;
             }
         }
