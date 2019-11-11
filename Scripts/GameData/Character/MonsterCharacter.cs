@@ -57,8 +57,7 @@ namespace MultiplayerARPG
         private ResistanceIncremental[] adjustResistances;
         [System.NonSerialized]
         private ArmorIncremental[] adjustArmors;
-
-        [System.NonSerialized]
+        
         private List<ItemDrop> cacheRandomItems;
         public List<ItemDrop> CacheRandomItems
         {
@@ -200,7 +199,6 @@ namespace MultiplayerARPG
             }
         }
 
-        [System.NonSerialized]
         private Dictionary<BaseSkill, short> cacheSkillLevels;
         public override Dictionary<BaseSkill, short> CacheSkillLevels
         {
@@ -211,6 +209,8 @@ namespace MultiplayerARPG
                 return cacheSkillLevels;
             }
         }
+        
+        private readonly List<MonsterSkill> tempRandomSkills = new List<MonsterSkill>();
 
         public int RandomExp()
         {
@@ -254,8 +254,17 @@ namespace MultiplayerARPG
             if (!entity.CanUseSkill())
                 return false;
 
+            if (monsterSkills == null || monsterSkills.Length == 0)
+                return false;
+
+            if (tempRandomSkills.Count != monsterSkills.Length)
+            {
+                tempRandomSkills.Clear();
+                tempRandomSkills.AddRange(monsterSkills);
+            }
+
             float random = Random.value;
-            foreach (MonsterSkill monsterSkill in monsterSkills)
+            foreach (MonsterSkill monsterSkill in tempRandomSkills)
             {
                 if (monsterSkill.skill == null)
                     continue;
@@ -263,7 +272,9 @@ namespace MultiplayerARPG
                 if (random < monsterSkill.useRate && (monsterSkill.useWhenHpRate <= 0 || entity.HpRate <= monsterSkill.useWhenHpRate))
                 {
                     skill = monsterSkill.skill;
-                    level = CacheSkillLevels[skill];
+                    level = monsterSkill.level;
+                    // Shuffle for next random
+                    tempRandomSkills.Shuffle();
                     return true;
                 }
             }
