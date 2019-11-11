@@ -246,4 +246,19 @@ public static class GenericUtils
     {
         return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
     }
+
+    public static void Shuffle<T>(this IList<T> list)
+    {
+        if (list == null || list.Count <= 1)
+            return;
+        int tempRandomIndex;
+        T tempEntry;
+        for (int i = 0; i < list.Count - 1; ++i)
+        {
+            tempRandomIndex = Random.Range(i, list.Count);
+            tempEntry = list[i];
+            list[i] = list[tempRandomIndex];
+            list[tempRandomIndex] = tempEntry;
+        }
+    }
 }
