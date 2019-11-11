@@ -259,20 +259,24 @@ namespace MultiplayerARPG
         private void SetupList(UIList list, DealingCharacterItems dealingItems, List<UICharacterItem> uiList)
         {
             CacheItemSelectionManager.DeselectSelectedUI();
-            List<CharacterItem> filterItems = new List<CharacterItem>();
-            foreach (DealingCharacterItem dealingItem in dealingItems)
-            {
-                CharacterItem characterItem = dealingItem.characterItem;
-                filterItems.Add(characterItem);
-            }
             uiList.Clear();
-            list.Generate(filterItems, (index, characterItem, ui) =>
+
+            UICharacterItem tempUiCharacterItem;
+            list.Generate(dealingItems, (index, dealingItem, ui) =>
             {
-                UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, -1);
-                uiCharacterItem.Show();
-                uiList.Add(uiCharacterItem);
+                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
+                if (dealingItem.characterItem.NotEmptySlot())
+                {
+                    tempUiCharacterItem.Setup(new UICharacterItemData(dealingItem.characterItem, dealingItem.characterItem.level, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, -1);
+                    tempUiCharacterItem.Show();
+                    uiList.Add(tempUiCharacterItem);
+                }
+                else
+                {
+                    tempUiCharacterItem.Hide();
+                }
             });
+
             CacheItemSelectionManager.Clear();
             foreach (UICharacterItem tempDealingItemUI in tempDealingItemUIs)
             {

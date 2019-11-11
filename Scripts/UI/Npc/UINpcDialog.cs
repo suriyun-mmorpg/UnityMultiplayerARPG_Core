@@ -381,11 +381,15 @@ namespace MultiplayerARPG
             // Shop
             if (uiSellItemRoot != null)
                 uiSellItemRoot.SetActive(sellItems.Count > 0);
+
+            UINpcSellItem tempUiNpcSellItem;
             CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
             {
-                UINpcSellItem uiNpcSellItem = ui.GetComponent<UINpcSellItem>();
-                uiNpcSellItem.Setup(sellItem, index);
+                tempUiNpcSellItem = ui.GetComponent<UINpcSellItem>();
+                tempUiNpcSellItem.Setup(sellItem, index);
+                tempUiNpcSellItem.Show();
             });
+
             // Craft Item
             if (uiCraftItem != null)
             {

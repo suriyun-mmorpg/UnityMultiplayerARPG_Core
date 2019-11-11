@@ -126,25 +126,26 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
+            UICraftItem tempUiCraftItem;
             CacheItemList.Generate(itemCrafts, (index, craftItem, ui) =>
             {
-                UICraftItem uiCraftItem = ui.GetComponent<UICraftItem>();
+                tempUiCraftItem = ui.GetComponent<UICraftItem>();
                 switch (CrafterType)
                 {
                     case CrafterType.Character:
-                        uiCraftItem.SetupForCharacter(craftItem);
+                        tempUiCraftItem.SetupForCharacter(craftItem);
                         break;
                     case CrafterType.Npc:
-                        uiCraftItem.SetupForNpc(craftItem);
+                        tempUiCraftItem.SetupForNpc(craftItem);
                         break;
                     case CrafterType.Workbench:
-                        uiCraftItem.SetupForWorkbench(BuildingObjectId, craftItem);
+                        tempUiCraftItem.SetupForWorkbench(BuildingObjectId, craftItem);
                         break;
                 }
-                uiCraftItem.Show();
-                CacheItemSelectionManager.Add(uiCraftItem);
+                tempUiCraftItem.Show();
+                CacheItemSelectionManager.Add(tempUiCraftItem);
                 if (selectedIdx == index)
-                    uiCraftItem.OnClickSelect();
+                    tempUiCraftItem.OnClickSelect();
             });
         }
     }

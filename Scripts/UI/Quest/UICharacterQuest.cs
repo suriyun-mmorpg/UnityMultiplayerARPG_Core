@@ -79,13 +79,14 @@ namespace MultiplayerARPG
 
             if (quest != null && showQuestTaskList)
             {
+                UIQuestTask tempUiQuestTask;
                 CacheQuestTaskList.Generate(quest.tasks, (index, task, ui) =>
                 {
-                    UIQuestTask uiQuestTask = ui.GetComponent<UIQuestTask>();
+                    tempUiQuestTask = ui.GetComponent<UIQuestTask>();
                     bool isComplete = false;
                     int progress = Data.GetProgress(Character, index, out isComplete);
-                    uiQuestTask.Data = new UIQuestTaskData(task, progress);
-                    uiQuestTask.Show();
+                    tempUiQuestTask.Data = new UIQuestTaskData(task, progress);
+                    tempUiQuestTask.Show();
                 });
             }
             Profiler.EndSample();

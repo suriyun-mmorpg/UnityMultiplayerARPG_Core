@@ -109,21 +109,22 @@ namespace MultiplayerARPG
             CacheQuestSelectionManager.DeselectSelectedUI();
             CacheQuestSelectionManager.Clear();
 
-            List<CharacterQuest> characterQuests = new List<CharacterQuest>();
-            foreach (CharacterQuest characterQuest in character.Quests)
+            UICharacterQuest tempUiCharacterQuest;
+            CacheQuestList.Generate(character.Quests, (index, characterQuest, ui) =>
             {
-                if (HideCompleteQuest || characterQuest.isComplete)
-                    continue;
-                characterQuests.Add(characterQuest);
-            }
-            CacheQuestList.Generate(characterQuests, (index, characterQuest, ui) =>
-            {
-                UICharacterQuest uiCharacterQuest = ui.GetComponent<UICharacterQuest>();
-                uiCharacterQuest.Setup(characterQuest, character, index);
-                uiCharacterQuest.Show();
-                CacheQuestSelectionManager.Add(uiCharacterQuest);
-                if (selectedQuestId == characterQuest.dataId)
-                    uiCharacterQuest.OnClickSelect();
+                tempUiCharacterQuest = ui.GetComponent<UICharacterQuest>();
+                if (!HideCompleteQuest || characterQuest.isComplete)
+                {
+                    tempUiCharacterQuest.Setup(characterQuest, character, index);
+                    tempUiCharacterQuest.Show();
+                    CacheQuestSelectionManager.Add(tempUiCharacterQuest);
+                    if (selectedQuestId == characterQuest.dataId)
+                        tempUiCharacterQuest.OnClickSelect();
+                }
+                else
+                {
+                    tempUiCharacterQuest.Hide();
+                }
             });
         }
     }

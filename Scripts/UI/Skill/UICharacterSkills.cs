@@ -101,42 +101,45 @@ namespace MultiplayerARPG
             BaseCharacter database = character.GetDatabase();
             if (database != null)
             {
+                // Generate UIs
+                UICharacterSkill tempUiCharacterSkill;
                 CharacterSkill tempCharacterSkill;
                 BaseSkill tempSkill;
                 int tempIndexOfSkill;
                 // Combine skills from database (skill that can level up) with increased skill and equipment skill
-                Dictionary<BaseSkill, short> skillLevels = character.GetCaches().Skills;
-                // Filter skills to show by specific skill types / categories
-                Dictionary<BaseSkill, short> filteredSkillLevels = new Dictionary<BaseSkill, short>();
-                foreach (KeyValuePair<BaseSkill, short> skillLevel in skillLevels)
+                CacheSkillList.Generate(character.GetCaches().Skills, (index, skillLevel, ui) =>
                 {
+                    tempUiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                     if (string.IsNullOrEmpty(skillLevel.Key.category) ||
                         filterCategories == null || filterCategories.Count == 0 ||
                         filterCategories.Contains(skillLevel.Key.category))
                     {
                         if (filterSkillTypes == null || filterSkillTypes.Count == 0 ||
                             filterSkillTypes.Contains(skillLevel.Key.GetSkillType()))
-                            filteredSkillLevels.Add(skillLevel.Key, skillLevel.Value);
+                        {
+                            tempSkill = skillLevel.Key;
+                            tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
+                            // Set character skill data
+                            tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
+                            // Set UI data
+                            tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), character, tempIndexOfSkill);
+                            tempUiCharacterSkill.Show();
+                            UICharacterSkillDragHandler dragHandler = tempUiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
+                            if (dragHandler != null)
+                                dragHandler.SetupForSkills(tempUiCharacterSkill);
+                            CacheSkillSelectionManager.Add(tempUiCharacterSkill);
+                            if (selectedSkillId == skillLevel.Key.DataId)
+                                tempUiCharacterSkill.OnClickSelect();
+                        }
+                        else
+                        {
+                            tempUiCharacterSkill.Hide();
+                        }
                     }
-                }
-                skillLevels = filteredSkillLevels;
-                // Generate UIs
-                CacheSkillList.Generate(skillLevels, (index, skillLevel, ui) =>
-                {
-                    UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                    tempSkill = skillLevel.Key;
-                    tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
-                    // Set character skill data
-                    tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
-                    // Set UI data
-                    uiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), character, tempIndexOfSkill);
-                    uiCharacterSkill.Show();
-                    UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
-                    if (dragHandler != null)
-                        dragHandler.SetupForSkills(uiCharacterSkill);
-                    CacheSkillSelectionManager.Add(uiCharacterSkill);
-                    if (selectedSkillId == skillLevel.Key.DataId)
-                        uiCharacterSkill.OnClickSelect();
+                    else
+                    {
+                        tempUiCharacterSkill.Hide();
+                    }
                 });
             }
         }

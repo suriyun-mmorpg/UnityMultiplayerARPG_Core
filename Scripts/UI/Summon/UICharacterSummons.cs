@@ -101,8 +101,8 @@ namespace MultiplayerARPG
             CacheSummonSelectionManager.Clear();
 
             Dictionary<int, UICharacterSummon> stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
-            IList<CharacterSummon> summons = character.Summons;
-            CacheSummonList.Generate(summons, (index, characterSummon, ui) =>
+            UICharacterSummon tempUiCharacterSummon;
+            CacheSummonList.Generate(character.Summons, (index, characterSummon, ui) =>
             {
                 if (characterSummon.type == SummonType.Skill && stackingSkillSummons.ContainsKey(characterSummon.dataId))
                 {
@@ -111,21 +111,21 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    UICharacterSummon uiCharacterSummon = ui.GetComponent<UICharacterSummon>();
-                    uiCharacterSummon.Setup(characterSummon, character, index);
-                    uiCharacterSummon.Show();
+                    tempUiCharacterSummon = ui.GetComponent<UICharacterSummon>();
+                    tempUiCharacterSummon.Setup(characterSummon, character, index);
+                    tempUiCharacterSummon.Show();
                     switch (characterSummon.type)
                     {
                         case SummonType.Skill:
-                            stackingSkillSummons.Add(characterSummon.dataId, uiCharacterSummon);
+                            stackingSkillSummons.Add(characterSummon.dataId, tempUiCharacterSummon);
                             break;
                         case SummonType.Pet:
                             ui.transform.SetAsFirstSibling();
                             break;
                     }
-                    CacheSummonSelectionManager.Add(uiCharacterSummon);
+                    CacheSummonSelectionManager.Add(tempUiCharacterSummon);
                     if (selectedSummonObjectId == characterSummon.objectId)
-                        uiCharacterSummon.OnClickSelect();
+                        tempUiCharacterSummon.OnClickSelect();
                 }
             });
         }

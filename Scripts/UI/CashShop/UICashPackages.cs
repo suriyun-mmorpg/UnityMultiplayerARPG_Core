@@ -145,15 +145,16 @@ namespace MultiplayerARPG
                     CacheCashPackageSelectionManager.DeselectSelectedUI();
                     CacheCashPackageSelectionManager.Clear();
 
+                    UICashPackage tempUiCashPackage;
                     CacheCashPackageList.Generate(cashPackages, (index, cashShopItem, ui) =>
                     {
-                        UICashPackage uiCashPackage = ui.GetComponent<UICashPackage>();
-                        uiCashPackage.uiCashPackages = this;
-                        uiCashPackage.Data = cashShopItem;
-                        uiCashPackage.Show();
-                        CacheCashPackageSelectionManager.Add(uiCashPackage);
+                        tempUiCashPackage = ui.GetComponent<UICashPackage>();
+                        tempUiCashPackage.uiCashPackages = this;
+                        tempUiCashPackage.Data = cashShopItem;
+                        tempUiCashPackage.Show();
+                        CacheCashPackageSelectionManager.Add(tempUiCashPackage);
                         if (selectedIdx == index)
-                            uiCashPackage.OnClickSelect();
+                            tempUiCashPackage.OnClickSelect();
                     });
                     break;
             }

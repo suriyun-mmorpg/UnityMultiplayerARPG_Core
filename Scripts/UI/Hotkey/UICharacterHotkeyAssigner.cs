@@ -87,53 +87,49 @@ namespace MultiplayerARPG
                 CacheItemList.HideAll();
                 return;
             }
-
-            // Skills
-            List<CharacterSkill> filterSkills = new List<CharacterSkill>();
-            List<int> filterSkillsIndexes = new List<int>();
-            // Items
-            List<CharacterItem> filterItems = new List<CharacterItem>();
-            List<int> filterItemsIndexes = new List<int>();
             
-            CharacterSkill tempCharacterSkill;
-            foreach (KeyValuePair<BaseSkill, short> characterSkill in owningCharacter.GetCaches().Skills)
-            {
-                tempCharacterSkill = CharacterSkill.Create(characterSkill.Key, characterSkill.Value);
-                if (uiCharacterHotkey.CanAssignCharacterSkill(tempCharacterSkill))
-                {
-                    filterSkills.Add(tempCharacterSkill);
-                    filterSkillsIndexes.Add(owningCharacter.IndexOfSkill(tempCharacterSkill.dataId));
-                }
-            }
-
-            int counter = 0;
-            foreach (CharacterItem characterItem in owningCharacter.NonEquipItems)
-            {
-                if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
-                {
-                    filterItems.Add(characterItem);
-                    filterItemsIndexes.Add(counter);
-                }
-                ++counter;
-            }
-
             CacheSkillList.doNotRemoveContainerChildren = true;
             CacheItemList.doNotRemoveContainerChildren = true;
 
-            CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
+            // Setup skill list
+            UICharacterSkill tempUiCharacterSkill;
+            CharacterSkill tempCharacterSkill;
+            BaseSkill tempSkill;
+            int tempIndexOfSkill;
+            CacheSkillList.Generate(owningCharacter.GetCaches().Skills, (index, skillLevel, ui) =>
             {
-                UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                uiCharacterSkill.Setup(new UICharacterSkillData(characterSkill, characterSkill.level), BasePlayerCharacterController.OwningCharacter, filterSkillsIndexes[index]);
-                uiCharacterSkill.Show();
-                CacheSkillSelectionManager.Add(uiCharacterSkill);
+                tempUiCharacterSkill = ui.GetComponent<UICharacterSkill>();
+                tempSkill = skillLevel.Key;
+                tempIndexOfSkill = owningCharacter.IndexOfSkill(tempSkill.DataId);
+                // Set character skill data
+                tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
+                if (uiCharacterHotkey.CanAssignCharacterSkill(tempCharacterSkill))
+                {
+                    tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), owningCharacter, tempIndexOfSkill);
+                    tempUiCharacterSkill.Show();
+                    CacheSkillSelectionManager.Add(tempUiCharacterSkill);
+                }
+                else
+                {
+                    tempUiCharacterSkill.Hide();
+                }
             });
 
-            CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
+            // Setup item list
+            UICharacterItem tempUiCharacterItem;
+            CacheItemList.Generate(owningCharacter.NonEquipItems, (index, characterItem, ui) =>
             {
-                UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, filterItemsIndexes[index]);
-                uiCharacterItem.Show();
-                CacheItemSelectionManager.Add(uiCharacterItem);
+                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
+                if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
+                {
+                    tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), owningCharacter, index);
+                    tempUiCharacterItem.Show();
+                    CacheItemSelectionManager.Add(tempUiCharacterItem);
+                }
+                else
+                {
+                    tempUiCharacterItem.Hide();
+                }
             });
             base.Show();
         }

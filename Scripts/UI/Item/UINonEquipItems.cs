@@ -102,52 +102,52 @@ namespace MultiplayerARPG
                 CacheItemList.HideAll();
                 return;
             }
-
-            IList<CharacterItem> nonEquipItems = character.NonEquipItems;
-            IList<CharacterItem> filteredItems = new List<CharacterItem>();
-            List<int> filterIndexes = new List<int>();
+            
             // Filter items to show by specific item types
-            Item item;
-            int counter = 0;
-            foreach (CharacterItem nonEquipItem in nonEquipItems)
+            Item tempItem;
+            UICharacterItem tempUiCharacterItem;
+            CacheItemList.Generate(character.NonEquipItems, (index, nonEquipItem, ui) =>
             {
-                item = nonEquipItem.GetItem();
+                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
+                tempItem = nonEquipItem.GetItem();
                 if (!GameInstance.Singleton.IsLimitInventorySlot ||
                     (filterCategories != null && filterCategories.Count > 0) ||
                     (filterItemTypes != null && filterItemTypes.Count > 0))
                 {
-                    if (item == null)
+                    // If inventory type isn't limit inventory slot, hide empty slot
+                    if (tempItem == null)
                     {
-                        ++counter;
-                        continue;
+                        tempUiCharacterItem.Hide();
+                        return;
                     }
                 }
 
-                if (item == null ||
-                    string.IsNullOrEmpty(item.category) ||
+                if (tempItem == null ||
+                    string.IsNullOrEmpty(tempItem.category) ||
                     filterCategories == null || filterCategories.Count == 0 ||
-                    filterCategories.Contains(item.category))
+                    filterCategories.Contains(tempItem.category))
                 {
                     if (filterItemTypes == null || filterItemTypes.Count == 0 ||
-                        filterItemTypes.Contains(item.itemType))
+                        filterItemTypes.Contains(tempItem.itemType))
                     {
-                        filteredItems.Add(nonEquipItem);
-                        filterIndexes.Add(counter);
+                        tempUiCharacterItem.Setup(new UICharacterItemData(nonEquipItem, nonEquipItem.level, InventoryType.NonEquipItems), this.character, index);
+                        tempUiCharacterItem.Show();
+                        UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
+                        if (dragHandler != null)
+                            dragHandler.SetupForNonEquipItems(tempUiCharacterItem);
+                        CacheItemSelectionManager.Add(tempUiCharacterItem);
+                        if (selectedIdx == index)
+                            tempUiCharacterItem.OnClickSelect();
+                    }
+                    else
+                    {
+                        tempUiCharacterItem.Hide();
                     }
                 }
-                ++counter;
-            }
-            CacheItemList.Generate(filteredItems, (index, characterItem, ui) =>
-            {
-                UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), this.character, filterIndexes[index]);
-                uiCharacterItem.Show();
-                UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
-                if (dragHandler != null)
-                    dragHandler.SetupForNonEquipItems(uiCharacterItem);
-                CacheItemSelectionManager.Add(uiCharacterItem);
-                if (selectedIdx == index)
-                    uiCharacterItem.OnClickSelect();
+                else
+                {
+                    tempUiCharacterItem.Hide();
+                }
             });
         }
     }

@@ -136,22 +136,23 @@ namespace MultiplayerARPG
             totalWeight = 0;
             usedSlots = 0;
             IList<CharacterItem> characterItems = BasePlayerCharacterController.OwningCharacter.StorageItems;
+            UICharacterItem tempUiCharacterItem;
             CacheCharacterItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
-                UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
-                uiCharacterItem.Show();
+                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
+                tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
+                tempUiCharacterItem.Show();
                 if (characterItem.NotEmptySlot())
                 {
                     totalWeight += characterItem.GetItem().weight * characterItem.amount;
                     usedSlots++;
                 }
-                UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
+                UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
-                    dragHandler.SetupForStorageItems(uiCharacterItem);
-                CacheCharacterItemSelectionManager.Add(uiCharacterItem);
+                    dragHandler.SetupForStorageItems(tempUiCharacterItem);
+                CacheCharacterItemSelectionManager.Add(tempUiCharacterItem);
                 if (selectedIdx == index)
-                    uiCharacterItem.OnClickSelect();
+                    tempUiCharacterItem.OnClickSelect();
             });
         }
     }

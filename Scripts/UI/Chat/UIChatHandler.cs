@@ -169,13 +169,16 @@ namespace MultiplayerARPG
             ChatMessages.Add(chatMessage);
             if (ChatMessages.Count > chatEntrySize)
                 ChatMessages.RemoveAt(0);
+
+            UIChatMessage tempUiChatMessage;
             CacheList.Generate(ChatMessages, (index, message, ui) =>
             {
-                UIChatMessage uiChatMessage = ui.GetComponent<UIChatMessage>();
-                uiChatMessage.uiChatHandler = this;
-                uiChatMessage.Data = message;
-                uiChatMessage.Show();
+                tempUiChatMessage = ui.GetComponent<UIChatMessage>();
+                tempUiChatMessage.uiChatHandler = this;
+                tempUiChatMessage.Data = message;
+                tempUiChatMessage.Show();
             });
+
             StartCoroutine(VerticalScroll(0f));
         }
 
