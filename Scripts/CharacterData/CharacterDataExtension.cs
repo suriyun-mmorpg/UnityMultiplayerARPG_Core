@@ -572,14 +572,19 @@ public static partial class CharacterDataExtension
     #region Fill Empty Slots
     public static void FillEmptySlots(this IList<CharacterItem> itemList, bool isLimitSlot, short slotLimit)
     {
+        int i;
         if (!isLimitSlot)
         {
-            // If it is not limit slots, don't fill it
+            // If it is not limit slots, don't fill it, and also remove empty slots
+            for (i = itemList.Count - 1; i >= 0; --i)
+            {
+                if (itemList[i].IsEmptySlot())
+                    itemList.RemoveAt(i);
+            }
             return;
         }
 
         // Fill empty slots
-        int i;
         for (i = itemList.Count; i < slotLimit; ++i)
         {
             itemList.Add(CharacterItem.CreateEmptySlot());
