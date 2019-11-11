@@ -339,6 +339,52 @@ namespace MultiplayerARPG
             get { return WeaponType == null ? WeaponItemEquipType.OneHand : WeaponType.equipType; }
         }
         #endregion
+
+        public bool CanEquip(ICharacterData character, short level, out GameMessage.Type gameMessageType)
+        {
+            gameMessageType = GameMessage.Type.None;
+            if (!IsEquipment() ||
+                character == null)
+                return false;
+
+            // Check is it pass attribute requirement or not
+            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(true, false);
+            Dictionary<Attribute, float> requireAttributeAmounts = CacheRequireAttributeAmounts;
+            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
+            {
+                if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
+                    attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
+                {
+                    gameMessageType = GameMessage.Type.NotEnoughAttributeAmounts;
+                    return false;
+                }
+            }
+
+            // Check another requirements
+            if (requirement.character != null && requirement.character != character.GetDatabase())
+            {
+                gameMessageType = GameMessage.Type.NotMatchCharacterClass;
+                return false;
+            }
+
+            if (character.Level < requirement.level)
+            {
+                gameMessageType = GameMessage.Type.NotEnoughLevel;
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool CanAttack(ICharacterData character)
+        {
+            if (!IsWeapon() ||
+                character == null)
+                return false;
+
+            AmmoType requireAmmoType = WeaponType.requireAmmoType;
+            return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
+        }
     }
 
     [System.Serializable]

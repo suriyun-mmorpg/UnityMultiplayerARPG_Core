@@ -605,7 +605,7 @@ public static partial class PlayerCharacterDataExtension
         if (index < 0)
         {
             characterAtttribute = CharacterAttribute.Create(attribute, 0);
-            if (!characterAtttribute.CanIncreaseAmount(characterData, out gameMessageType, itemIndex < 0))
+            if (!attribute.CanIncreaseAmount(characterData, characterAtttribute.amount, out gameMessageType, itemIndex < 0))
                 return false;
             if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
                 return false;
@@ -615,7 +615,7 @@ public static partial class PlayerCharacterDataExtension
         else
         {
             characterAtttribute = characterData.Attributes[index];
-            if (!characterAtttribute.CanIncreaseAmount(characterData, out gameMessageType, itemIndex < 0))
+            if (!attribute.CanIncreaseAmount(characterData, characterAtttribute.amount, out gameMessageType, itemIndex < 0))
                 return false;
             if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
                 return false;
@@ -654,7 +654,7 @@ public static partial class PlayerCharacterDataExtension
         if (index < 0)
         {
             characterSkill = CharacterSkill.Create(skill, 0);
-            if (!characterSkill.CanLevelUp(characterData, out gameMessageType, itemIndex < 0))
+            if (!skill.CanLevelUp(characterData, characterSkill.level, out gameMessageType, itemIndex < 0))
                 return false;
             if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
                 return false;
@@ -664,7 +664,7 @@ public static partial class PlayerCharacterDataExtension
         else
         {
             characterSkill = characterData.Skills[index];
-            if (!characterSkill.CanLevelUp(characterData, out gameMessageType, itemIndex < 0))
+            if (!skill.CanLevelUp(characterData, characterSkill.level, out gameMessageType, itemIndex < 0))
                 return false;
             if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
                 return false;

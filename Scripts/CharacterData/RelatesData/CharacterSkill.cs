@@ -104,21 +104,6 @@ public class CharacterSkill : INetSerializableWithElement
         return cacheSkill;
     }
 
-    public bool IsLearned(ICharacterData skillLearner)
-    {
-        return GetSkill().IsLearned(skillLearner);
-    }
-    
-    public bool CanLevelUp(IPlayerCharacterData skillLearner, out GameMessage.Type gameMessageType, bool checkSkillPoint = true)
-    {
-        return GetSkill().CanLevelUp(skillLearner, level, out gameMessageType, checkSkillPoint);
-    }
-
-    public bool CanUse(ICharacterData skillUser, out GameMessage.Type gameMessageType, bool isItem = false)
-    {
-        return GetSkill().CanUse(skillUser, level, out gameMessageType, isItem);
-    }
-
     public float GetPassiveBuffDuration()
     {
         MakeCache();

@@ -11,6 +11,27 @@ namespace MultiplayerARPG
         public CharacterStats statsIncreaseEachLevel;
         [Tooltip("If this value more than 0 it will limit max amount of this attribute by this value")]
         public short maxAmount;
+
+        public bool CanIncreaseAmount(IPlayerCharacterData character, short amount, out GameMessage.Type gameMessageType, bool checkStatPoint = true)
+        {
+            gameMessageType = GameMessage.Type.None;
+            if (character == null)
+                return false;
+
+            if (maxAmount > 0 && amount >= maxAmount)
+            {
+                gameMessageType = GameMessage.Type.AttributeReachedMaxAmount;
+                return false;
+            }
+
+            if (checkStatPoint && character.StatPoint <= 0)
+            {
+                gameMessageType = GameMessage.Type.NotEnoughStatPoint;
+                return false;
+            }
+
+            return true;
+        }
     }
 
     [System.Serializable]

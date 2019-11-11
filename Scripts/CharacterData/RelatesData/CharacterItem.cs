@@ -305,11 +305,6 @@ public class CharacterItem : INetSerializableWithElement
         return GameInstance.Singleton.GameplayRule.GetEquipmentStatsRate(this);
     }
 
-    public bool CanEquip(ICharacterData character, out GameMessage.Type gameMessageType)
-    {
-        return GetEquipmentItem().CanEquip(character, level, out gameMessageType);
-    }
-
     public int GetNextLevelExp()
     {
         if (GetPetItem() == null || level <= 0)

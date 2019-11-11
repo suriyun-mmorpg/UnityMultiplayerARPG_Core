@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             GameMessage.Type gameMessageType;
-            if (IsOwningCharacter() && CharacterAttribute.CanIncreaseAmount(OwningCharacter, out gameMessageType))
+            if (IsOwningCharacter() && Attribute.CanIncreaseAmount(OwningCharacter, CharacterAttribute.amount, out gameMessageType))
                 onAbleToIncrease.Invoke();
             else
                 onUnableToIncrease.Invoke();

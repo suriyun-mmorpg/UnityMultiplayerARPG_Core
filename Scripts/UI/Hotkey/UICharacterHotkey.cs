@@ -211,7 +211,7 @@ namespace MultiplayerARPG
         {
             if (characterSkill.IsEmpty())
                 return false;
-            if (characterSkill.IsLearned(OwningCharacter) &&
+            if (characterSkill.GetSkill().IsLearned(OwningCharacter) &&
                 uiCharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().GetSkillType()))
                 return true;
             return false;

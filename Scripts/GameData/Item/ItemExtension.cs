@@ -5,54 +5,6 @@ namespace MultiplayerARPG
     public static class ItemExtension
     {
         #region Equipment Extension
-        public static bool CanEquip(this Item equipmentItem, ICharacterData character, short level, out GameMessage.Type gameMessageType)
-        {
-            gameMessageType = GameMessage.Type.None;
-            if (equipmentItem == null ||
-                !equipmentItem.IsEquipment() ||
-                character == null)
-                return false;
-
-            // Check is it pass attribute requirement or not
-            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(true, false);
-            Dictionary<Attribute, float> requireAttributeAmounts = equipmentItem.CacheRequireAttributeAmounts;
-            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
-            {
-                if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
-                    attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
-                {
-                    gameMessageType = GameMessage.Type.NotEnoughAttributeAmounts;
-                    return false;
-                }
-            }
-
-            // Check another requirements
-            if (equipmentItem.requirement.character != null && equipmentItem.requirement.character != character.GetDatabase())
-            {
-                gameMessageType = GameMessage.Type.NotMatchCharacterClass;
-                return false;
-            }
-
-            if (character.Level < equipmentItem.requirement.level)
-            {
-                gameMessageType = GameMessage.Type.NotEnoughLevel;
-                return false;
-            }
-
-            return true;
-        }
-
-        public static bool CanAttack(this Item weaponItem, ICharacterData character)
-        {
-            if (weaponItem == null ||
-                !weaponItem.IsWeapon() ||
-                character == null)
-                return false;
-
-            AmmoType requireAmmoType = weaponItem.WeaponType.requireAmmoType;
-            return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
-        }
-
         public static CharacterStats GetIncreaseStats(this Item equipmentItem, short level)
         {
             if (equipmentItem == null ||

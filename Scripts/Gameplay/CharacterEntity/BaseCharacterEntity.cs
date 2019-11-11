@@ -448,7 +448,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!equippingItem.CanEquip(this, out gameMessageType))
+            if (!equippingItem.GetItem().CanEquip(this, equippingItem.level, out gameMessageType))
                 return false;
 
             this.FillWeaponSetsIfNeeded(equipWeaponSet);
@@ -549,7 +549,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!equippingItem.CanEquip(this, out gameMessageType))
+            if (!equippingItem.GetItem().CanEquip(this, equippingItem.level, out gameMessageType))
                 return false;
 
             // Equipping item is armor

@@ -27,26 +27,5 @@ namespace MultiplayerARPG
             Attribute attribute = attributeIncremental.attribute;
             return attribute.GetStats(attributeIncremental.amount.GetAmount(level));
         }
-
-        public static bool CanIncreaseAmount(this Attribute attribute, IPlayerCharacterData character, short amount, out GameMessage.Type gameMessageType, bool checkStatPoint = true)
-        {
-            gameMessageType = GameMessage.Type.None;
-            if (attribute == null || character == null)
-                return false;
-
-            if (attribute.maxAmount > 0 && amount >= attribute.maxAmount)
-            {
-                gameMessageType = GameMessage.Type.AttributeReachedMaxAmount;
-                return false;
-            }
-
-            if (checkStatPoint && character.StatPoint <= 0)
-            {
-                gameMessageType = GameMessage.Type.NotEnoughStatPoint;
-                return false;
-            }
-
-            return true;
-        }
     }
 }
