@@ -211,7 +211,7 @@ namespace MultiplayerARPG
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetMonster != null && !targetMonster.GetCaches().IsHide && !targetMonster.IsDead())
+                        else if (targetMonster != null && !targetMonster.GetCaches().IsHide)
                         {
                             // Found activating entity as monster character entity
                             SetTarget(targetMonster);
@@ -612,14 +612,6 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetMonster))
             {
-                if (targetMonster.IsDead())
-                {
-                    ClearQueueUsingSkill();
-                    ClearQueueUsingSkillItem();
-                    PlayerCharacterEntity.StopMove();
-                    ClearTarget();
-                    return;
-                }
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
                 if (Vector3.Distance(MovementTransform.position, targetMonster.CacheTransform.position) <= actDistance)
                 {
