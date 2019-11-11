@@ -25,14 +25,8 @@ namespace MultiplayerARPG
             if (skill == null)
                 return false;
             // Check is skill learned
-            foreach (CharacterSkill learnedSkill in skillLearner.Skills)
-            {
-                if (learnedSkill.GetSkill() != null &&
-                    learnedSkill.GetSkill() == skill &&
-                    learnedSkill.level > 0)
-                    return true;
-            }
-            return false;
+            short skillLevel;
+            return skillLearner.GetCaches().Skills.TryGetValue(skill, out skillLevel) && skillLevel > 0;
         }
 
         public static bool CanLevelUp(this BaseSkill skill, IPlayerCharacterData character, short level, out GameMessage.Type gameMessageType, bool checkSkillPoint = true)
