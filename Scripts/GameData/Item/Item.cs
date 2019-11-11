@@ -148,7 +148,7 @@ namespace MultiplayerARPG
                 return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + itemRefine.Title + "</color>";
             }
         }
-        
+
         public override bool Validate()
         {
             bool hasChanges = false;
@@ -340,11 +340,10 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public bool CanEquip(ICharacterData character, short level, out GameMessage.Type gameMessageType)
+        public bool CanEquip(BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.None;
-            if (!IsEquipment() ||
-                character == null)
+            if (!IsEquipment() || character == null)
                 return false;
 
             // Check is it pass attribute requirement or not
@@ -376,10 +375,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CanAttack(ICharacterData character)
+        public bool CanAttack(BaseCharacterEntity character)
         {
-            if (!IsWeapon() ||
-                character == null)
+            if (!IsWeapon() || character == null)
                 return false;
 
             AmmoType requireAmmoType = WeaponType.requireAmmoType;

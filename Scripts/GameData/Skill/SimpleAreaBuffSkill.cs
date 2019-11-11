@@ -33,11 +33,6 @@ namespace MultiplayerARPG
             return new Dictionary<DamageElement, float>();
         }
 
-        public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel)
-        {
-            return false;
-        }
-
         public override bool IsAttack()
         {
             return false;

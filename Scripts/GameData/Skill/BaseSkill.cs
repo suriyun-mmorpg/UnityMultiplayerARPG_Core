@@ -68,10 +68,10 @@ namespace MultiplayerARPG
         public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand);
         public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
-        public abstract bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel);
-        public abstract bool HasCustomAimControls();
-        public abstract Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel);
-        public abstract void FinishAimControls();
+        public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel) { return false; }
+        public virtual bool HasCustomAimControls() { return false; }
+        public virtual Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel) { return null; }
+        public virtual void FinishAimControls() { }
         public virtual Buff GetBuff() { return new Buff(); }
         public virtual Buff GetDebuff() { return new Buff(); }
         public virtual SkillSummon GetSummon() { return new SkillSummon(); }
@@ -222,10 +222,10 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanUse(ICharacterData skillUser, short level, out GameMessage.Type gameMessageType, bool isItem = false)
+        public virtual bool CanUse(BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType, bool isItem = false)
         {
             gameMessageType = GameMessage.Type.None;
-            if (skillUser == null)
+            if (character == null)
                 return false;
 
             if (level <= 0)
@@ -235,10 +235,11 @@ namespace MultiplayerARPG
             }
 
             bool available = true;
-            if (skillUser is IPlayerCharacterData)
+            BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
+            if (playerCharacter != null)
             {
                 // Only player character will check is skill is learned
-                if (!isItem && !this.IsLearned(skillUser))
+                if (!isItem && !this.IsLearned(character))
                 {
                     gameMessageType = GameMessage.Type.SkillIsNotLearned;
                     return false;
@@ -251,8 +252,8 @@ namespace MultiplayerARPG
                         available = availableWeapons == null || availableWeapons.Length == 0;
                         if (!available)
                         {
-                            Item rightWeaponItem = skillUser.EquipWeapons.GetRightHandWeaponItem();
-                            Item leftWeaponItem = skillUser.EquipWeapons.GetLeftHandWeaponItem();
+                            Item rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
+                            Item leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
                             foreach (WeaponType availableWeapon in availableWeapons)
                             {
                                 if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
@@ -274,8 +275,7 @@ namespace MultiplayerARPG
                         }
                         break;
                     case SkillType.CraftItem:
-                        if (!(skillUser is BasePlayerCharacterEntity) ||
-                            !GetItemCraft().CanCraft(skillUser as BasePlayerCharacterEntity, out gameMessageType))
+                        if (playerCharacter == null || !GetItemCraft().CanCraft(playerCharacter, out gameMessageType))
                             return false;
                         break;
                     default:
@@ -289,14 +289,14 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (skillUser.CurrentMp < this.GetConsumeMp(level))
+            if (character.CurrentMp < this.GetConsumeMp(level))
             {
                 gameMessageType = GameMessage.Type.NotEnoughMp;
                 return false;
             }
 
-            int skillUsageIndex = skillUser.IndexOfSkillUsage(DataId, SkillUsageType.Skill);
-            if (skillUsageIndex >= 0 && skillUser.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
+            int skillUsageIndex = character.IndexOfSkillUsage(DataId, SkillUsageType.Skill);
+            if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
             {
                 gameMessageType = GameMessage.Type.SkillIsCoolingDown;
                 return false;

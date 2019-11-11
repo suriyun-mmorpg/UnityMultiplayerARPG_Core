@@ -286,21 +286,6 @@ namespace MultiplayerARPG
             return GameDataHelpers.GetEffectivenessDamage(CacheEffectivenessAttributes, skillUser);
         }
 
-        public override bool HasCustomAimControls()
-        {
-            return false;
-        }
-
-        public override Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel)
-        {
-            return null;
-        }
-
-        public override void FinishAimControls()
-        {
-            // Do nothing
-        }
-
         public override sealed Buff GetBuff()
         {
             if (!IsBuff())
