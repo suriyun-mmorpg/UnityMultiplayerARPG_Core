@@ -68,6 +68,7 @@ namespace MultiplayerARPG
         public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand);
         public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
+        public virtual bool RequiredTarget() { return false; }
         public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel) { return false; }
         public virtual bool HasCustomAimControls() { return false; }
         public virtual Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel) { return null; }
