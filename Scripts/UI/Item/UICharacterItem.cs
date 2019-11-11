@@ -388,7 +388,7 @@ namespace MultiplayerARPG
                         Item.maxStack);
                 }
                 uiTextStack.text = stackString;
-                uiTextStack.gameObject.SetActive(showAmountWhenMaxIsOne || (Item != null && Item.maxStack > 1));
+                uiTextStack.gameObject.SetActive(CharacterItem.NotEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.maxStack > 1)));
             }
 
             if (uiTextDurability != null)
