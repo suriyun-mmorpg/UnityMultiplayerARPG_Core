@@ -20,11 +20,10 @@ namespace MultiplayerARPG
             return skill.maxLevel;
         }
 
-        public static bool IsLearned(this BaseSkill skill, ICharacterData skillLearner)
+        public static bool IsAvailable(this BaseSkill skill, ICharacterData skillLearner)
         {
             if (skill == null)
                 return false;
-            // Check is skill learned
             short skillLevel;
             return skillLearner.GetCaches().Skills.TryGetValue(skill, out skillLevel) && skillLevel > 0;
         }

@@ -240,7 +240,7 @@ namespace MultiplayerARPG
             if (playerCharacter != null)
             {
                 // Only player character will check is skill is learned
-                if (!isItem && !this.IsLearned(character))
+                if (!isItem && !this.IsAvailable(character))
                 {
                     gameMessageType = GameMessage.Type.SkillIsNotLearned;
                     return false;
