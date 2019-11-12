@@ -437,7 +437,11 @@ namespace MultiplayerARPG
 
         public void ClearQueueUsingSkill()
         {
-            queueUsingSkill = default(UsingSkillData);
+            queueUsingSkill = new UsingSkillData();
+            queueUsingSkill.aimPosition = null;
+            queueUsingSkill.skill = null;
+            queueUsingSkill.level = 0;
+            queueUsingSkill.itemIndex = -1;
         }
 
         public abstract void UseHotkey(int hotkeyIndex, Vector3? aimPosition);

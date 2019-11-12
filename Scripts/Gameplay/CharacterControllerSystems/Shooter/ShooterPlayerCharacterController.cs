@@ -562,10 +562,7 @@ namespace MultiplayerARPG
                         // Attack immediately if character already look at target
                         if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                         {
-                            if (queueUsingSkill.itemIndex >= 0)
-                                UseSkillItem(isLeftHandAttacking, aimPosition);
-                            else
-                                UseSkill(isLeftHandAttacking, aimPosition);
+                            UseSkill(isLeftHandAttacking, aimPosition);
                             isDoingAction = true;
                         }
                         else if (tempPressAttackRight || tempPressAttackLeft)
@@ -582,10 +579,7 @@ namespace MultiplayerARPG
                     // If skill is not attack skill, use it immediately
                     if (queueUsingSkill.skill != null && !queueUsingSkill.skill.IsAttack())
                     {
-                        if (queueUsingSkill.itemIndex >= 0)
-                            UseSkillItem(isLeftHandAttacking, aimPosition);
-                        else
-                            UseSkill(isLeftHandAttacking, aimPosition);
+                        UseSkill(isLeftHandAttacking, aimPosition);
                     }
                 }
                 else if (tempPressWeaponAbility)
@@ -723,10 +717,7 @@ namespace MultiplayerARPG
                             Activate();
                             break;
                         case TurningState.UseSkill:
-                            if (queueUsingSkill.itemIndex >= 0)
-                                UseSkillItem(isLeftHandAttacking, aimPosition);
-                            else
-                                UseSkill(isLeftHandAttacking, aimPosition);
+                            UseSkill(isLeftHandAttacking, aimPosition);
                             break;
                     }
                     turningState = TurningState.None;
@@ -884,17 +875,13 @@ namespace MultiplayerARPG
 
         public void UseSkill(bool isLeftHand, Vector3 defaultAimPosition)
         {
-            if (queueUsingSkill.skill == null)
-                return;
-            PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : defaultAimPosition);
-            ClearQueueUsingSkill();
-        }
-
-        public void UseSkillItem(bool isLeftHand, Vector3 defaultAimPosition)
-        {
-            if (queueUsingSkill.skill == null)
-                return;
-            PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : defaultAimPosition);
+            if (queueUsingSkill.skill != null)
+            {
+                if (queueUsingSkill.itemIndex >= 0)
+                    PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : defaultAimPosition);
+                else
+                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : defaultAimPosition);
+            }
             ClearQueueUsingSkill();
         }
 

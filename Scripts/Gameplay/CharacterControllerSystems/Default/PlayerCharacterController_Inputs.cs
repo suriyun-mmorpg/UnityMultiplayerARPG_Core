@@ -354,12 +354,7 @@ namespace MultiplayerARPG
 
             // Attack when player pressed attack button
             if (queueUsingSkill.skill != null)
-            {
-                if (queueUsingSkill.itemIndex >= 0)
-                    UpdateWASDPendingSkill(queueUsingSkill.skill, queueUsingSkill.level, () => RequestUsePendingSkillItem(isLeftHandAttacking));
-                else
-                    UpdateWASDPendingSkill(queueUsingSkill.skill, queueUsingSkill.level, () => RequestUsePendingSkill(isLeftHandAttacking));
-            }
+                UpdateWASDPendingSkill(queueUsingSkill.skill, queueUsingSkill.level);
             else if (InputManager.GetButton("Attack"))
                 UpdateWASDAttack();
 
@@ -425,7 +420,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateWASDPendingSkill(BaseSkill skill, short skillLevel, BoolAction useFunction)
+        protected void UpdateWASDPendingSkill(BaseSkill skill, short skillLevel)
         {
             destination = null;
             PlayerCharacterEntity.StopMove();
@@ -452,14 +447,14 @@ namespace MultiplayerARPG
                     else
                     {
                         // No nearby target, so use skill immediately
-                        if (useFunction())
+                        if (RequestUsePendingSkill(isLeftHandAttacking))
                             isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else if (!IsLockTarget())
                 {
                     // Not lock target, so not finding target and use skill immediately
-                    if (useFunction())
+                    if (RequestUsePendingSkill(isLeftHandAttacking))
                         isLeftHandAttacking = !isLeftHandAttacking;
                 }
             }
@@ -479,7 +474,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Target not required, use skill immediately
-                    useFunction();
+                    RequestUsePendingSkill(isLeftHandAttacking);
                 }
             }
         }
@@ -585,13 +580,13 @@ namespace MultiplayerARPG
                 float actDistance = castDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (FindTarget(targetCharacter.gameObject, actDistance, gameInstance.characterLayer.Mask))
+                if (targetCharacter == PlayerCharacterEntity || FindTarget(targetCharacter.gameObject, actDistance, gameInstance.characterLayer.Mask))
                 {
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
                     // Set direction to turn character to target
                     targetLookDirection = (targetCharacter.CacheTransform.position - MovementTransform.position).normalized;
-                    if (PlayerCharacterEntity.IsPositionInFov(castFov, targetCharacter.CacheTransform.position))
+                    if (targetCharacter == PlayerCharacterEntity || PlayerCharacterEntity.IsPositionInFov(castFov, targetCharacter.CacheTransform.position))
                     {
                         if (queueUsingSkill.skill != null)
                         {

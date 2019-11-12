@@ -309,18 +309,12 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseSkill())
             {
-                bool canUseSkill = PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition());
-                ClearQueueUsingSkill();
-                return canUseSkill;
-            }
-            return false;
-        }
 
-        public bool RequestUsePendingSkillItem(bool isLeftHand)
-        {
-            if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseItem() && PlayerCharacterEntity.CanUseSkill())
-            {
-                bool canUseSkill = PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition());
+                bool canUseSkill = false;
+                if (queueUsingSkill.itemIndex >= 0)
+                    PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition());
+                else
+                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition());
                 ClearQueueUsingSkill();
                 return canUseSkill;
             }
