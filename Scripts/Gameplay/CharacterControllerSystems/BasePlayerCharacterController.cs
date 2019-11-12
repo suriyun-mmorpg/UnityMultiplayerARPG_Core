@@ -78,17 +78,18 @@ namespace MultiplayerARPG
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;
         public BaseGameEntity SelectedEntity { get; protected set; }
+        public BaseGameEntity TargetEntity { get; protected set; }
         public BuildingEntity CurrentBuildingEntity { get; protected set; }
         public BuildingEntity ActiveBuildingEntity
         {
             get
             {
-                BuildingEntity result;
-                if (PlayerCharacterEntity.TryGetTargetEntity(out result))
-                    return result;
+                BuildingEntity building = TargetEntity as BuildingEntity;
+                if (building != null)
+                    return building;
                 return null;
             }
-            set { PlayerCharacterEntity.SetTargetEntity(value); }
+            set { TargetEntity = value; }
         }
         public bool IsEditingBuilding { get; protected set; }
         protected UsingSkillData queueUsingSkill;

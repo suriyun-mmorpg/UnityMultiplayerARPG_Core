@@ -48,7 +48,6 @@ namespace MultiplayerARPG
         
         public GameObject CacheTargetObject { get; protected set; }
 
-        protected BaseGameEntity targetEntity;
         protected Vector3? targetPosition;
         protected TargetActionType targetActionType;
         // Optimizing garbage collection
@@ -192,13 +191,15 @@ namespace MultiplayerARPG
             return eulerAngles;
         }
 
-        public bool TryGetSelectedTargetAsAttackingCharacter(out BaseCharacterEntity character)
+        public bool TryGetSelectedTargetAsAttackingEntity(out BaseCharacterEntity character)
         {
             character = null;
             if (SelectedEntity != null)
             {
                 character = SelectedEntity as BaseCharacterEntity;
-                if (character != null && character.CanReceiveDamageFrom(PlayerCharacterEntity))
+                if (character != null &&
+                    character != PlayerCharacterEntity &&
+                    character.CanReceiveDamageFrom(PlayerCharacterEntity))
                     return true;
                 else
                     character = null;
@@ -212,9 +213,12 @@ namespace MultiplayerARPG
             if (targetActionType != TargetActionType.Attack)
                 return false;
 
-            if (PlayerCharacterEntity.TryGetTargetEntity(out character))
+            if (TargetEntity != null)
             {
-                if (character != PlayerCharacterEntity && character.CanReceiveDamageFrom(PlayerCharacterEntity))
+                character = TargetEntity as BaseCharacterEntity;
+                if (character != null &&
+                    character != PlayerCharacterEntity &&
+                    character.CanReceiveDamageFrom(PlayerCharacterEntity))
                     return true;
                 else
                     character = null;
@@ -228,7 +232,16 @@ namespace MultiplayerARPG
             if (targetActionType != TargetActionType.UseSkill)
                 return false;
 
-            return PlayerCharacterEntity.TryGetTargetEntity(out character);
+            if (TargetEntity != null)
+            {
+                character = TargetEntity as BaseCharacterEntity;
+                if (character != null &&
+                    character != PlayerCharacterEntity)
+                    return true;
+                else
+                    character = null;
+            }
+            return false;
         }
 
         public bool TryGetTargetCharacter(out BaseCharacterEntity character)
