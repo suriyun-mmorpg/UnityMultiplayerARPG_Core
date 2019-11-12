@@ -149,7 +149,6 @@ namespace MultiplayerARPG
             if (PlayerCharacterEntity.IsDead())
             {
                 ClearQueueUsingSkill();
-                ClearQueueUsingSkillItem();
                 destination = null;
                 if (CacheUISceneGameplay != null)
                     CacheUISceneGameplay.SetTargetEntity(null);
@@ -250,59 +249,28 @@ namespace MultiplayerARPG
             return PlayerCharacterEntity.TryGetTargetEntity(out character);
         }
 
-        public bool GetAttackDataOrUseNonAttackSkill(bool isLeftHand, out float attackDistance, out float attackFov)
+        public void GetAttackDistanceAndFov(bool isLeftHand, out float attackDistance, out float attackFov)
         {
             attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHand);
             attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHand);
+            
+            if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
+            {
+                // If skill is attack skill, set distance and fov by skill
+                GetUseSkillDistanceAndFov(out attackDistance, out attackFov);
+            }
+        }
 
-            BaseSkill skill = null;
-            short skillLevel = 0;
-
+        public void GetUseSkillDistanceAndFov(out float castDistance, out float castFov)
+        {
+            castDistance = gameInstance.conversationDistance;
+            castFov = 360f;
             if (queueUsingSkill.skill != null)
             {
-                skill = queueUsingSkill.skill;
-                skillLevel = queueUsingSkill.level;
-                if (queueUsingSkill.level <= 0)
-                {
-                    ClearQueueUsingSkill();
-                }
+                // If skill is attack skill, set distance and fov by skill
+                castDistance = queueUsingSkill.skill.GetCastDistance(PlayerCharacterEntity, queueUsingSkill.level, false);
+                castFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, false);
             }
-
-            if (queueUsingSkillItem.skill != null)
-            {
-                skill = queueUsingSkillItem.skill;
-                skillLevel = queueUsingSkillItem.level;
-                if (queueUsingSkillItem.level <= 0)
-                {
-                    ClearQueueUsingSkillItem();
-                }
-            }
-
-            if (skill == null)
-            {
-                // No using skill, just attack
-                return true;
-            }
-
-            if (skill.IsAttack())
-            {
-                attackDistance = skill.GetAttackDistance(PlayerCharacterEntity, skillLevel, isLeftHand);
-                attackFov = skill.GetAttackFov(PlayerCharacterEntity, skillLevel, isLeftHand);
-            }
-            else
-            {
-                // Stop movement to use non attack skill
-                PlayerCharacterEntity.StopMove();
-                // Use skill / skill item
-                if (queueUsingSkill.skill != null)
-                    RequestUsePendingSkill(false);
-                else if (queueUsingSkillItem.skill != null)
-                    RequestUsePendingSkillItem(false);
-                return false;
-            }
-
-            // Return true if it's going to attack
-            return true;
         }
 
         public bool IsLockTarget()
@@ -350,10 +318,10 @@ namespace MultiplayerARPG
 
         public bool RequestUsePendingSkillItem(bool isLeftHand)
         {
-            if (queueUsingSkillItem.skill != null && PlayerCharacterEntity.CanUseItem() && PlayerCharacterEntity.CanUseSkill())
+            if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseItem() && PlayerCharacterEntity.CanUseSkill())
             {
-                bool canUseSkill = PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkillItem.itemIndex, isLeftHand, queueUsingSkillItem.aimPosition.HasValue ? queueUsingSkillItem.aimPosition.Value : GetDefaultAttackAimPosition());
-                ClearQueueUsingSkillItem();
+                bool canUseSkill = PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition());
+                ClearQueueUsingSkill();
                 return canUseSkill;
             }
             return false;

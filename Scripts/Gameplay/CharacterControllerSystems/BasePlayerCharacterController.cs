@@ -10,26 +10,21 @@ namespace MultiplayerARPG
             public Vector3? aimPosition;
             public BaseSkill skill;
             public short level;
+            public short itemIndex;
+            public UsingSkillData(Vector3? aimPosition, BaseSkill skill, short level, short itemIndex)
+            {
+                this.aimPosition = aimPosition;
+                this.skill = skill;
+                this.level = level;
+                this.itemIndex = itemIndex;
+            }
+
             public UsingSkillData(Vector3? aimPosition, BaseSkill skill, short level)
             {
                 this.aimPosition = aimPosition;
                 this.skill = skill;
                 this.level = level;
-            }
-        }
-
-        public struct UsingSkillItemData
-        {
-            public Vector3? aimPosition;
-            public short itemIndex;
-            public BaseSkill skill;
-            public short level;
-            public UsingSkillItemData(Vector3? aimPosition, short itemIndex, BaseSkill skill, short level)
-            {
-                this.aimPosition = aimPosition;
-                this.itemIndex = itemIndex;
-                this.skill = skill;
-                this.level = level;
+                this.itemIndex = -1;
             }
         }
 
@@ -93,7 +88,6 @@ namespace MultiplayerARPG
         }
         public bool IsEditingBuilding { get; protected set; }
         protected UsingSkillData queueUsingSkill;
-        protected UsingSkillItemData queueUsingSkillItem;
 
         protected virtual void Awake()
         {
@@ -436,19 +430,14 @@ namespace MultiplayerARPG
             queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
         }
 
-        public void SetQueueUsingSkillItem(Vector3? aimPosition, short itemIndex, BaseSkill skill, short level)
+        public void SetQueueUsingSkill(Vector3? aimPosition, BaseSkill skill, short level, short itemIndex)
         {
-            queueUsingSkillItem = new UsingSkillItemData(aimPosition, itemIndex, skill, level);
+            queueUsingSkill = new UsingSkillData(aimPosition, skill, level, itemIndex);
         }
 
         public void ClearQueueUsingSkill()
         {
             queueUsingSkill = default(UsingSkillData);
-        }
-
-        public void ClearQueueUsingSkillItem()
-        {
-            queueUsingSkillItem = default(UsingSkillItemData);
         }
 
         public abstract void UseHotkey(int hotkeyIndex, Vector3? aimPosition);

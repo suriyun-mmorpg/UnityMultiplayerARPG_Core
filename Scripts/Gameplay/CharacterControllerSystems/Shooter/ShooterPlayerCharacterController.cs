@@ -21,7 +21,6 @@ namespace MultiplayerARPG
             Attack,
             Activate,
             UseSkill,
-            UseSkillItem,
         }
 
         public Mode mode;
@@ -270,14 +269,8 @@ namespace MultiplayerARPG
                     if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                     {
                         // Increase aim distance by skill attack distance
-                        attackDistance = queueUsingSkill.skill.GetAttackDistance(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
-                        attackFov = queueUsingSkill.skill.GetAttackFov(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
-                    }
-                    else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.skill.IsAttack())
-                    {
-                        // Increase aim distance by skill attack distance
-                        attackDistance = queueUsingSkillItem.skill.GetAttackDistance(PlayerCharacterEntity, queueUsingSkillItem.level, isLeftHandAttacking);
-                        attackFov = queueUsingSkillItem.skill.GetAttackFov(PlayerCharacterEntity, queueUsingSkillItem.level, isLeftHandAttacking);
+                        attackDistance = queueUsingSkill.skill.GetCastDistance(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
+                        attackFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
                     }
                     else
                     {
@@ -520,7 +513,7 @@ namespace MultiplayerARPG
                 tempPressReload = InputManager.GetButtonDown("Reload");
                 tempPressExitVehicle = InputManager.GetButtonDown("ExitVehicle");
                 tempPressSwitchEquipWeaponSet = InputManager.GetButtonDown("SwitchEquipWeaponSet");
-                if (queueUsingSkill.skill != null || queueUsingSkillItem.skill != null || tempPressAttackRight || tempPressAttackLeft || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
+                if (queueUsingSkill.skill != null || tempPressAttackRight || tempPressAttackLeft || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
                 {
                     // Find forward character / npc / building / warp entity from camera center
                     targetPlayer = null;
@@ -542,10 +535,6 @@ namespace MultiplayerARPG
                         if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                         {
                             turningState = TurningState.UseSkill;
-                        }
-                        else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.skill.IsAttack())
-                        {
-                            turningState = TurningState.UseSkillItem;
                         }
                         else if (tempPressAttackRight || tempPressAttackLeft)
                         {
@@ -573,12 +562,10 @@ namespace MultiplayerARPG
                         // Attack immediately if character already look at target
                         if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                         {
-                            UseSkill(isLeftHandAttacking, aimPosition);
-                            isDoingAction = true;
-                        }
-                        else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.skill.IsAttack())
-                        {
-                            UseSkillItem(isLeftHandAttacking, aimPosition);
+                            if (queueUsingSkill.itemIndex >= 0)
+                                UseSkillItem(isLeftHandAttacking, aimPosition);
+                            else
+                                UseSkill(isLeftHandAttacking, aimPosition);
                             isDoingAction = true;
                         }
                         else if (tempPressAttackRight || tempPressAttackLeft)
@@ -595,11 +582,10 @@ namespace MultiplayerARPG
                     // If skill is not attack skill, use it immediately
                     if (queueUsingSkill.skill != null && !queueUsingSkill.skill.IsAttack())
                     {
-                        UseSkill(isLeftHandAttacking, aimPosition);
-                    }
-                    else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.skill.IsAttack())
-                    {
-                        UseSkillItem(isLeftHandAttacking, aimPosition);
+                        if (queueUsingSkill.itemIndex >= 0)
+                            UseSkillItem(isLeftHandAttacking, aimPosition);
+                        else
+                            UseSkill(isLeftHandAttacking, aimPosition);
                     }
                 }
                 else if (tempPressWeaponAbility)
@@ -737,10 +723,10 @@ namespace MultiplayerARPG
                             Activate();
                             break;
                         case TurningState.UseSkill:
-                            UseSkill(isLeftHandAttacking, aimPosition);
-                            break;
-                        case TurningState.UseSkillItem:
-                            UseSkillItem(isLeftHandAttacking, aimPosition);
+                            if (queueUsingSkill.itemIndex >= 0)
+                                UseSkillItem(isLeftHandAttacking, aimPosition);
+                            else
+                                UseSkill(isLeftHandAttacking, aimPosition);
                             break;
                     }
                     turningState = TurningState.None;
@@ -766,7 +752,6 @@ namespace MultiplayerARPG
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
             ClearQueueUsingSkill();
-            ClearQueueUsingSkillItem();
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
             switch (hotkey.type)
@@ -826,7 +811,7 @@ namespace MultiplayerARPG
                 if (item.IsSkill())
                 {
                     PlayerCharacterEntity.StopMove();
-                    SetQueueUsingSkillItem(aimPosition, (short)itemIndex, item.skillLevel.skill, item.skillLevel.level);
+                    SetQueueUsingSkill(aimPosition, item.skillLevel.skill, item.skillLevel.level, (short)itemIndex);
                 }
                 else
                 {
@@ -907,10 +892,10 @@ namespace MultiplayerARPG
 
         public void UseSkillItem(bool isLeftHand, Vector3 defaultAimPosition)
         {
-            if (queueUsingSkillItem.skill == null)
+            if (queueUsingSkill.skill == null)
                 return;
-            PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkillItem.itemIndex, isLeftHand, queueUsingSkillItem.aimPosition.HasValue ? queueUsingSkillItem.aimPosition.Value : defaultAimPosition);
-            ClearQueueUsingSkillItem();
+            PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : defaultAimPosition);
+            ClearQueueUsingSkill();
         }
 
         public int OverlapObjects(Vector3 position, float distance, int layerMask)

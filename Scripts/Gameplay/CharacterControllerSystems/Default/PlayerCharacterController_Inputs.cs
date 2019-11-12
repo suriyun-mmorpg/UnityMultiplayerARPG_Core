@@ -289,7 +289,6 @@ namespace MultiplayerARPG
                         // Close NPC dialog, when target changes
                         HideNpcDialogs();
                         ClearQueueUsingSkill();
-                        ClearQueueUsingSkillItem();
 
                         // Move to target, will hide destination when target is object
                         if (TargetEntity != null)
@@ -350,15 +349,17 @@ namespace MultiplayerARPG
             {
                 HideNpcDialogs();
                 ClearQueueUsingSkill();
-                ClearQueueUsingSkillItem();
                 FindAndSetBuildingAreaFromCharacterDirection();
             }
 
             // Attack when player pressed attack button
-            if (queueUsingSkill.skill != null && queueUsingSkill.level > 0)
-                UpdateWASDPendingSkill(queueUsingSkill.skill, queueUsingSkill.level, () => RequestUsePendingSkill(isLeftHandAttacking), ClearQueueUsingSkill);
-            else if (queueUsingSkillItem.skill != null && queueUsingSkillItem.level > 0)
-                UpdateWASDPendingSkill(queueUsingSkillItem.skill, queueUsingSkillItem.level, () => RequestUsePendingSkillItem(isLeftHandAttacking), ClearQueueUsingSkillItem);
+            if (queueUsingSkill.skill != null)
+            {
+                if (queueUsingSkill.itemIndex >= 0)
+                    UpdateWASDPendingSkill(queueUsingSkill.skill, queueUsingSkill.level, () => RequestUsePendingSkillItem(isLeftHandAttacking));
+                else
+                    UpdateWASDPendingSkill(queueUsingSkill.skill, queueUsingSkill.level, () => RequestUsePendingSkill(isLeftHandAttacking));
+            }
             else if (InputManager.GetButton("Attack"))
                 UpdateWASDAttack();
 
@@ -424,7 +425,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateWASDPendingSkill(BaseSkill skill, short skillLevel, BoolAction useFunction, VoidAction clearFunction)
+        protected void UpdateWASDPendingSkill(BaseSkill skill, short skillLevel, BoolAction useFunction)
         {
             destination = null;
             PlayerCharacterEntity.StopMove();
@@ -439,7 +440,7 @@ namespace MultiplayerARPG
                 {
                     BaseCharacterEntity nearestTarget = PlayerCharacterEntity
                         .FindNearestAliveCharacter<BaseCharacterEntity>(
-                        skill.GetAttackDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking) + lockAttackTargetDistance,
+                        skill.GetCastDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking) + lockAttackTargetDistance,
                         false,
                         true,
                         false);
@@ -473,7 +474,7 @@ namespace MultiplayerARPG
                         return;
                     }
                     // TODO: Check is target nearby or not
-                    clearFunction();
+                    ClearQueueUsingSkill();
                 }
                 else
                 {
@@ -519,23 +520,28 @@ namespace MultiplayerARPG
         {
             if (!IsLockTarget())
                 return;
-            // Temp variables
+
             if (TryGetAttackingCharacter(out targetCharacter))
             {
                 if (targetCharacter.GetCaches().IsHide || targetCharacter.IsDead())
                 {
                     ClearQueueUsingSkill();
-                    ClearQueueUsingSkillItem();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
+                    return;
+                }
+
+                if (queueUsingSkill.skill != null && !queueUsingSkill.skill.IsAttack())
+                {
+                    // Try use non-attack skill
+                    RequestUsePendingSkill(false);
                     return;
                 }
 
                 // Find attack distance and fov, from weapon or skill
                 float attackDistance = 0f;
                 float attackFov = 0f;
-                if (!GetAttackDataOrUseNonAttackSkill(isLeftHandAttacking, out attackDistance, out attackFov))
-                    return;
+                GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
 
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
@@ -544,35 +550,25 @@ namespace MultiplayerARPG
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
-                    // Turn character to target
+                    // Set direction to turn character to target
                     targetLookDirection = (targetCharacter.CacheTransform.position - MovementTransform.position).normalized;
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetCharacter.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
-                        if (queueUsingSkill.skill != null || queueUsingSkillItem.skill != null)
+                        if (queueUsingSkill.skill != null)
                         {
-                            if (queueUsingSkill.skill != null &&
-                                RequestUsePendingSkill(isLeftHandAttacking))
+                            if (RequestUsePendingSkill(isLeftHandAttacking))
                             {
                                 // Change attacking hand after attack requested
                                 isLeftHandAttacking = !isLeftHandAttacking;
                             }
-                            else if (queueUsingSkillItem.skill != null &&
-                                RequestUsePendingSkillItem(isLeftHandAttacking))
-                            {
-                                // Change attacking hand after attack requested
-                                isLeftHandAttacking = !isLeftHandAttacking;
-                            }
-                            else
-                            {
-                                // Can't use skill
-                                return;
-                            }
+                            return;
                         }
                         else if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetCharacter.OpponentAimTransform.position))
                         {
                             // Change attacking hand after attack requested
                             isLeftHandAttacking = !isLeftHandAttacking;
+                            return;
                         }
                     }
                 }
@@ -581,39 +577,37 @@ namespace MultiplayerARPG
             }
             else if (TryGetUsingSkillCharacter(out targetCharacter))
             {
-                float actDistance = gameInstance.conversationDistance - StoppingDistance;
+                // Find attack distance and fov, from weapon or skill
+                float castDistance = 0f;
+                float castFov = 0f;
+                GetUseSkillDistanceAndFov(out castDistance, out castFov);
+
+                float actDistance = castDistance;
+                actDistance -= actDistance * 0.1f;
+                actDistance -= StoppingDistance;
                 if (FindTarget(targetCharacter.gameObject, actDistance, gameInstance.characterLayer.Mask))
                 {
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
-                    // If has queue using skill
-                    if (queueUsingSkill.skill != null || queueUsingSkillItem.skill != null)
+                    // Set direction to turn character to target
+                    targetLookDirection = (targetCharacter.CacheTransform.position - MovementTransform.position).normalized;
+                    if (PlayerCharacterEntity.IsPositionInFov(castFov, targetCharacter.CacheTransform.position))
                     {
-                        if (queueUsingSkill.skill != null &&
-                            RequestUsePendingSkill(isLeftHandAttacking))
+                        if (queueUsingSkill.skill != null)
                         {
-                            // Change attacking hand after attack requested
-                            isLeftHandAttacking = !isLeftHandAttacking;
-                            targetActionType = TargetActionType.Undefined;
-                        }
-                        else if (queueUsingSkillItem.skill != null &&
-                            RequestUsePendingSkillItem(isLeftHandAttacking))
-                        {
-                            // Change attacking hand after attack requested
-                            isLeftHandAttacking = !isLeftHandAttacking;
-                            targetActionType = TargetActionType.Undefined;
+                            if (RequestUsePendingSkill(false))
+                            {
+                                // Change attacking hand after attack requested
+                                isLeftHandAttacking = !isLeftHandAttacking;
+                            }
+                            return;
                         }
                         else
                         {
                             // Can't use skill
+                            targetActionType = TargetActionType.Undefined;
                             return;
                         }
-                    }
-                    else
-                    {
-                        // Can't use skill
-                        targetActionType = TargetActionType.Undefined;
-                        return;
                     }
                 }
                 else
@@ -680,16 +674,16 @@ namespace MultiplayerARPG
                 if (targetHarvestable.IsDead())
                 {
                     ClearQueueUsingSkill();
-                    ClearQueueUsingSkillItem();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
                 }
 
+                // Find attack distance and fov, from weapon
                 float attackDistance = 0f;
                 float attackFov = 0f;
-                if (!GetAttackDataOrUseNonAttackSkill(isLeftHandAttacking, out attackDistance, out attackFov))
-                    return;
+                GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
+
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
@@ -697,7 +691,7 @@ namespace MultiplayerARPG
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
-                    // Turn character to target
+                    // Set direction to turn character to target
                     targetLookDirection = (targetHarvestable.CacheTransform.position - MovementTransform.position).normalized;
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
                     {
@@ -740,7 +734,6 @@ namespace MultiplayerARPG
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
             ClearQueueUsingSkill();
-            ClearQueueUsingSkillItem();
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
             switch (hotkey.type)
@@ -801,7 +794,7 @@ namespace MultiplayerARPG
                             // Attacking nearest target
                             BaseCharacterEntity nearestTarget = PlayerCharacterEntity
                                 .FindNearestAliveCharacter<BaseCharacterEntity>(
-                                skill.GetAttackDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking) + lockAttackTargetDistance,
+                                skill.GetCastDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking) + lockAttackTargetDistance,
                                 false,
                                 true,
                                 false);
@@ -876,7 +869,7 @@ namespace MultiplayerARPG
                     UseSkill(
                         skill,
                         skillLevel,
-                        () => SetQueueUsingSkillItem(aimPosition, (short)itemIndex, skill, skillLevel),
+                        () => SetQueueUsingSkill(aimPosition, skill, skillLevel, (short)itemIndex),
                         () => PlayerCharacterEntity.RequestUseSkillItem((short)itemIndex, isLeftHandAttacking, useSkillAimPosition));
                 }
                 else

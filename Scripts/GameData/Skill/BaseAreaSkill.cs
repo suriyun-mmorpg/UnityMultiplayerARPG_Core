@@ -30,12 +30,12 @@ namespace MultiplayerARPG
             return SkillType.Active;
         }
 
-        public override float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
+        public override float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
             return castDistance.GetAmount(skillLevel);
         }
 
-        public override float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
+        public override float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
             return 360f;
         }

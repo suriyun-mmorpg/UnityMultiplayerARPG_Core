@@ -19,6 +19,10 @@ namespace UtilsComponents
             copyToCamera.farClipPlane = copyFromCamera.farClipPlane;
             copyToCamera.fieldOfView = copyFromCamera.fieldOfView;
             copyToCamera.rect = copyFromCamera.rect;
+            copyToCamera.usePhysicalProperties = copyFromCamera.usePhysicalProperties;
+            copyToCamera.focalLength = copyFromCamera.focalLength;
+            copyToCamera.sensorSize = copyFromCamera.sensorSize;
+            copyToCamera.lensShift = copyFromCamera.lensShift;
         }
     }
 }

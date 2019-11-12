@@ -18,6 +18,9 @@ namespace MultiplayerARPG
         public float resurrectFoodRate = 0.1f;
         [Range(0.01f, 1f)]
         public float resurrectWaterRate = 0.1f;
+
+        [Header("Buffs")]
+        public IncrementalFloat buffDistance;
         public Buff buff;
 
         public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
@@ -42,14 +45,14 @@ namespace MultiplayerARPG
             return new Dictionary<DamageElement, MinMaxFloat>();
         }
 
-        public override float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
+        public override float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
-            return 0;
+            return buffDistance.GetAmount(skillLevel);
         }
 
-        public override float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
+        public override float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
-            return 0;
+            return 360f;
         }
 
         public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel)

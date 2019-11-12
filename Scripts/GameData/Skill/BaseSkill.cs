@@ -63,8 +63,8 @@ namespace MultiplayerARPG
         public abstract bool IsAttack();
         public abstract bool IsBuff();
         public abstract bool IsDebuff();
-        public abstract float GetAttackDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
-        public abstract float GetAttackFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
+        public abstract float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
+        public abstract float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
         public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand);
         public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
