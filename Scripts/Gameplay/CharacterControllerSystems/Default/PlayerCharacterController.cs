@@ -234,8 +234,7 @@ namespace MultiplayerARPG
             if (TargetEntity != null)
             {
                 character = TargetEntity as BaseCharacterEntity;
-                if (character != null &&
-                    character != PlayerCharacterEntity)
+                if (character != null)
                     return true;
                 else
                     character = null;

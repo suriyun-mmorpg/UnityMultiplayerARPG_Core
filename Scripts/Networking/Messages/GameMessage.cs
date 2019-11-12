@@ -92,6 +92,7 @@ namespace MultiplayerARPG
             CannotUseSkillByCurrentWeapon,
             SkillIsCoolingDown,
             SkillIsNotLearned,
+            NoSkillTarget,
             // Requirements
             NotEnoughLevel,
             NotMatchCharacterClass,

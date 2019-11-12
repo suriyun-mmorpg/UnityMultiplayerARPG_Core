@@ -701,6 +701,7 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.CannotUseSkillByCurrentWeapon.ToString(), "Cannot use skill by current weapon");
             Texts.Add(GameMessage.Type.SkillIsCoolingDown.ToString(), "Skill is cooling down");
             Texts.Add(GameMessage.Type.SkillIsNotLearned.ToString(), "Skill is not learned");
+            Texts.Add(GameMessage.Type.NoSkillTarget.ToString(), "No target");
             Texts.Add(GameMessage.Type.NotEnoughLevel.ToString(), "Not enough level");
             Texts.Add(GameMessage.Type.NotMatchCharacterClass.ToString(), "Not match character class");
             Texts.Add(GameMessage.Type.NotEnoughAttributeAmounts.ToString(), "Not enough attribute amounts");

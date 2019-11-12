@@ -580,7 +580,7 @@ namespace MultiplayerARPG
                 float actDistance = castDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (targetCharacter == PlayerCharacterEntity || FindTarget(targetCharacter.gameObject, actDistance, gameInstance.characterLayer.Mask))
+                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
                 {
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
@@ -590,13 +590,15 @@ namespace MultiplayerARPG
                     {
                         if (queueUsingSkill.skill != null)
                         {
-                            RequestUsePendingSkill(false);
+                            if (RequestUsePendingSkill(false))
+                                targetActionType = TargetActionType.Undefined;
                             return;
                         }
                         else
                         {
                             // Can't use skill
                             targetActionType = TargetActionType.Undefined;
+                            ClearQueueUsingSkill();
                             return;
                         }
                     }

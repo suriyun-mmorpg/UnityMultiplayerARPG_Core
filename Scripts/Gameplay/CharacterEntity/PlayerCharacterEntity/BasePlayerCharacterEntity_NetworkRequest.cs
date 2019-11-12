@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                 requestUseSkillErrorTime[dataId] = currentTime;
 
             GameMessage.Type gameMessageType;
-            if (!skill.CanUse(this, skillLevel, out gameMessageType, true))
+            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessageType, true))
             {
                 if (!IsOwnerClient)
                     return false;

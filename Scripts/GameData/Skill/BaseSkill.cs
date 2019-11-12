@@ -223,7 +223,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanUse(BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType, bool isItem = false)
+        public virtual bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out GameMessage.Type gameMessageType, bool isItem = false)
         {
             gameMessageType = GameMessage.Type.None;
             if (character == null)
@@ -301,6 +301,24 @@ namespace MultiplayerARPG
             {
                 gameMessageType = GameMessage.Type.SkillIsCoolingDown;
                 return false;
+            }
+
+            if (RequiredTarget())
+            {
+                BaseCharacterEntity targetEntity;
+                if (character.TryGetTargetEntity(out targetEntity))
+                {
+                    if (Vector3.Distance(character.MovementTransform.position, targetEntity.CacheTransform.position) > GetCastDistance(character, level, isLeftHand))
+                    {
+                        gameMessageType = GameMessage.Type.CharacterIsTooFar;
+                        return false;
+                    }
+                }
+                else
+                {
+                    gameMessageType = GameMessage.Type.NoSkillTarget;
+                    return false;
+                }
             }
             return true;
         }
