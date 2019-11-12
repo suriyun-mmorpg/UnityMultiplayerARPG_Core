@@ -35,9 +35,9 @@ namespace MultiplayerARPG
             targetEntity.CurrentStamina = Mathf.CeilToInt(targetEntity.GetCaches().MaxStamina * resurrectStaminaRate);
             targetEntity.CurrentFood = Mathf.CeilToInt(targetEntity.GetCaches().MaxFood * resurrectFoodRate);
             targetEntity.CurrentWater = Mathf.CeilToInt(targetEntity.GetCaches().MaxWater * resurrectWaterRate);
-            targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
             targetEntity.StopMove();
             targetEntity.RequestOnRespawn();
+            targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
         }
 
         public override Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel)
@@ -88,6 +88,11 @@ namespace MultiplayerARPG
         public override bool RequiredTarget()
         {
             return true;
+        }
+
+        public override Buff GetBuff()
+        {
+            return buff;
         }
 
         public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out GameMessage.Type gameMessageType, bool isItem = false)
