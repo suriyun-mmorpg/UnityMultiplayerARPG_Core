@@ -595,11 +595,7 @@ namespace MultiplayerARPG
                     {
                         if (queueUsingSkill.skill != null)
                         {
-                            if (RequestUsePendingSkill(false))
-                            {
-                                // Change attacking hand after attack requested
-                                isLeftHandAttacking = !isLeftHandAttacking;
-                            }
+                            RequestUsePendingSkill(false);
                             return;
                         }
                         else
