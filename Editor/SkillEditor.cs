@@ -44,6 +44,8 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToUser.ToString(), cacheSkill.GetMemberName(a => a.buff));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToNearbyAllies.ToString(), cacheSkill.GetMemberName(a => a.buff));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToNearbyCharacters.ToString(), cacheSkill.GetMemberName(a => a.buff));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToTarget.ToString(), cacheSkill.GetMemberName(a => a.buff));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.Toggle.ToString(), cacheSkill.GetMemberName(a => a.buff));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheSkill.GetMemberName(a => a.buff));
             // Summon
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.summon));
