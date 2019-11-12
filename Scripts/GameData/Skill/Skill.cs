@@ -21,6 +21,7 @@ namespace MultiplayerARPG
             BuffToUser,
             BuffToNearbyAllies,
             BuffToNearbyCharacters,
+            BuffToTarget,
             Toggle,
         }
 
@@ -148,6 +149,13 @@ namespace MultiplayerARPG
                         applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
                     }
                     skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
+                    break;
+                case SkillBuffType.BuffToTarget:
+                    BaseCharacterEntity targetEntity;
+                    if (skillUser.TryGetTargetEntity(out targetEntity) && !targetEntity.IsDead())
+                        targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
+                    else
+                        skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
                     break;
                 case SkillBuffType.Toggle:
                     int indexOfBuff = skillUser.IndexOfBuff(DataId, BuffType.SkillBuff);
@@ -318,6 +326,11 @@ namespace MultiplayerARPG
         public override sealed GameEffectCollection GetHitEffect()
         {
             return hitEffects;
+        }
+
+        public override sealed bool RequiredTarget()
+        {
+            return skillBuffType == SkillBuffType.BuffToTarget;
         }
 
         public override void PrepareRelatesData()
