@@ -246,12 +246,12 @@ namespace MultiplayerARPG
 
         public override bool IsHungry(BaseCharacterEntity character)
         {
-            return character.CurrentFood < hungryWhenFoodLowerThan;
+            return foodDecreasePerSeconds > 0 && character.CurrentFood < hungryWhenFoodLowerThan;
         }
 
         public override bool IsThirsty(BaseCharacterEntity character)
         {
-            return character.CurrentWater < thirstyWhenWaterLowerThan;
+            return waterDecreasePerSeconds > 0 && character.CurrentWater < thirstyWhenWaterLowerThan;
         }
 
         public override bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType)
