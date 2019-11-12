@@ -41,10 +41,29 @@ namespace MultiplayerARPG
         public abstract int MaxHp { get; }
         public float HpRate { get { return CurrentHp / MaxHp; } }
 
+        private readonly Queue<KeyValuePair<CombatAmountType, int>> spawningCombatTexts = new Queue<KeyValuePair<CombatAmountType, int>>();
+        KeyValuePair<CombatAmountType, int> tempCombatTextData;
+        private float tempTime;
+        private float lastSpawnCombatTextTime;
+
         public override void OnSetup()
         {
             base.OnSetup();
             RegisterNetFunction<byte, int>(NetFuncCombatAmount);
+        }
+
+        protected override void EntityLateUpdate()
+        {
+            base.EntityLateUpdate();
+            if (spawningCombatTexts.Count == 0 || UISceneGameplay.Singleton == null)
+                return;
+            tempTime = Time.time;
+            if (tempTime - lastSpawnCombatTextTime >= 0.1f)
+            {
+                lastSpawnCombatTextTime = tempTime;
+                tempCombatTextData = spawningCombatTexts.Dequeue();
+                UISceneGameplay.Singleton.SpawnCombatText(CombatTextTransform, tempCombatTextData.Key, tempCombatTextData.Value);
+            }
         }
 
         /// <summary>
@@ -54,10 +73,7 @@ namespace MultiplayerARPG
         /// <param name="amount"></param>
         protected void NetFuncCombatAmount(byte byteCombatAmountType, int amount)
         {
-            UISceneGameplay uiSceneGameplay = UISceneGameplay.Singleton;
-            if (uiSceneGameplay == null)
-                return;
-            uiSceneGameplay.SpawnCombatText(CombatTextTransform, (CombatAmountType)byteCombatAmountType, amount);
+            spawningCombatTexts.Enqueue(new KeyValuePair<CombatAmountType, int>((CombatAmountType)byteCombatAmountType, amount));
         }
 
         public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
