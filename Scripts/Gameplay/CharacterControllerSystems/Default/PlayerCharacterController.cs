@@ -13,6 +13,17 @@ namespace MultiplayerARPG
             Both,
         }
 
+        public enum TargetActionType
+        {
+            Undefined,
+            Attack,
+            UseSkill
+        }
+
+        protected delegate bool UsePendingSkillAction(bool isLeftHand);
+        protected delegate void VoidAction();
+        protected delegate bool BoolAction();
+
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
         public float angularSpeed = 800f;
@@ -39,6 +50,7 @@ namespace MultiplayerARPG
 
         protected BaseGameEntity targetEntity;
         protected Vector3? targetPosition;
+        protected TargetActionType targetActionType;
         // Optimizing garbage collection
         protected bool getMouseUp;
         protected bool getMouseDown;
@@ -48,7 +60,6 @@ namespace MultiplayerARPG
         protected bool isMouseHoldDetected;
         protected bool isMouseHoldAndNotDrag;
         protected BaseCharacterEntity targetCharacter;
-        protected BaseCharacterEntity targetEnemy;
         protected BasePlayerCharacterEntity targetPlayer;
         protected BaseMonsterCharacterEntity targetMonster;
         protected NpcEntity targetNpc;
@@ -198,6 +209,9 @@ namespace MultiplayerARPG
         public bool TryGetAttackingCharacter(out BaseCharacterEntity character)
         {
             character = null;
+            if (targetActionType != TargetActionType.Attack)
+                return false;
+
             if (PlayerCharacterEntity.TryGetTargetEntity(out character))
             {
                 if (character != PlayerCharacterEntity && character.CanReceiveDamageFrom(PlayerCharacterEntity))
@@ -206,6 +220,21 @@ namespace MultiplayerARPG
                     character = null;
             }
             return false;
+        }
+
+        public bool TryGetUsingSkillCharacter(out BaseCharacterEntity character)
+        {
+            character = null;
+            if (targetActionType != TargetActionType.UseSkill)
+                return false;
+
+            return PlayerCharacterEntity.TryGetTargetEntity(out character);
+        }
+
+        public bool TryGetTargetCharacter(out BaseCharacterEntity character)
+        {
+            character = null;
+            return PlayerCharacterEntity.TryGetTargetEntity(out character);
         }
 
         public bool GetAttackDataOrUseNonAttackSkill(bool isLeftHand, out float attackDistance, out float attackFov)
