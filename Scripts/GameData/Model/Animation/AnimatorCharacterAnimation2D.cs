@@ -63,6 +63,7 @@ namespace MultiplayerARPG
         [Range(0f, 1f)]
         public float triggerDurationRate;
         [Tooltip("If this length more than 1, will use each entry for trigger duration rate")]
+        [Range(0f, 1f)]
         public float[] multiHitTriggerDurationRates;
         [Tooltip("This will be in use with attack/skill animations, This is duration after played animation clip to add delay before next animation")]
         public float extraDuration;

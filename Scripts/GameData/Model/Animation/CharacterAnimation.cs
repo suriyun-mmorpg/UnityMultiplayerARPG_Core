@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         [Range(0f, 1f)]
         public float triggerDurationRate;
         [Tooltip("If this length more than 1, will use each entry for trigger duration rate")]
+        [Range(0f, 1f)]
         public float[] multiHitTriggerDurationRates;
         [Tooltip("How animation duration defined")]
         public AnimationDurationType durationType;
