@@ -302,7 +302,7 @@ namespace MultiplayerARPG
 
                         // Target must be damageable, not player character entity, within aim distance and alive
                         if (tempDamageableEntity.ObjectId == PlayerCharacterEntity.ObjectId ||
-                            tempDamageableEntity.IsDead())
+                            (tempDamageableEntity.Entity is BaseCharacterEntity && (tempDamageableEntity as BaseCharacterEntity).GetCaches().IsHide))
                             continue;
 
                         // Set aim position and found target
@@ -350,6 +350,7 @@ namespace MultiplayerARPG
                 }
                 // Show target hp/mp
                 CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
+                PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
             }
             else
             {
@@ -649,7 +650,6 @@ namespace MultiplayerARPG
             {
                 HideNpcDialogs();
                 PlayerCharacterEntity.StopMove();
-                PlayerCharacterEntity.SetTargetEntity(null);
             }
             // If jumping add jump state
             if (InputManager.GetButtonDown("Jump"))
