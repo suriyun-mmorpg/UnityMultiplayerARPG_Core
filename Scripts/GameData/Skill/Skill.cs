@@ -154,8 +154,6 @@ namespace MultiplayerARPG
                     BaseCharacterEntity targetEntity;
                     if (skillUser.TryGetTargetEntity(out targetEntity) && !targetEntity.IsDead())
                         targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
-                    else
-                        skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel);
                     break;
                 case SkillBuffType.Toggle:
                     int indexOfBuff = skillUser.IndexOfBuff(DataId, BuffType.SkillBuff);
