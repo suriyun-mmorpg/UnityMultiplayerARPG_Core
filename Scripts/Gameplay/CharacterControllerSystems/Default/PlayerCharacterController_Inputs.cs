@@ -516,7 +516,7 @@ namespace MultiplayerARPG
             if (!IsLockTarget())
                 return;
 
-            if (TryGetAttackingCharacter(out targetCharacter))
+            if (TryGetAttackingCharacter(out targetCharacter, false))
             {
                 if (targetCharacter.GetCaches().IsHide || targetCharacter.IsDead())
                 {
@@ -548,7 +548,8 @@ namespace MultiplayerARPG
                     PlayerCharacterEntity.StopMove();
                     // Set direction to turn character to target
                     targetLookDirection = (targetCharacter.CacheTransform.position - MovementTransform.position).normalized;
-                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetCharacter.CacheTransform.position))
+                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetCharacter.CacheTransform.position) &&
+                        TryGetAttackingCharacter(out targetCharacter))
                     {
                         // If has queue using skill, attack by the skill
                         if (queueUsingSkill.skill != null)

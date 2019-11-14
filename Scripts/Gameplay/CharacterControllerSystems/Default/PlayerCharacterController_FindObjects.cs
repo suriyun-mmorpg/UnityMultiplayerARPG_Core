@@ -142,7 +142,7 @@ namespace MultiplayerARPG
             Collider tempCollider = target.GetComponent<Collider>();
             if (tempCollider != null)
             {
-                Ray ray = new Ray(MovementTransform.position, (target.transform.position - MovementTransform.position).normalized);
+                Ray ray = new Ray(MovementTransform.position, (tempCollider.bounds.center - MovementTransform.position).normalized);
                 float intersectDist;
                 return tempCollider.bounds.IntersectRay(ray, out intersectDist) && intersectDist < actDistance;
             }
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
             Collider2D tempCollider2D = target.GetComponent<Collider2D>();
             if (tempCollider2D != null)
             {
-                Ray ray = new Ray(MovementTransform.position, (target.transform.position - MovementTransform.position).normalized);
+                Ray ray = new Ray(MovementTransform.position, (tempCollider2D.bounds.center - MovementTransform.position).normalized);
                 float intersectDist;
                 return tempCollider2D.bounds.IntersectRay(ray, out intersectDist) && intersectDist < actDistance;
             }
