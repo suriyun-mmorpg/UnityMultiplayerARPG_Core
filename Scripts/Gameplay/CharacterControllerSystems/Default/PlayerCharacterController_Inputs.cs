@@ -529,6 +529,7 @@ namespace MultiplayerARPG
                 if (queueUsingSkill.skill != null && !queueUsingSkill.skill.IsAttack())
                 {
                     // Try use non-attack skill
+                    PlayerCharacterEntity.StopMove();
                     RequestUsePendingSkill(false);
                     return;
                 }
