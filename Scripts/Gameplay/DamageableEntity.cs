@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public abstract int MaxHp { get; }
-        public float HpRate { get { return CurrentHp / MaxHp; } }
+        public float HpRate { get { return (float)CurrentHp / (float)MaxHp; } }
 
         private readonly Queue<KeyValuePair<CombatAmountType, int>> spawningCombatTexts = new Queue<KeyValuePair<CombatAmountType, int>>();
         KeyValuePair<CombatAmountType, int> tempCombatTextData;
