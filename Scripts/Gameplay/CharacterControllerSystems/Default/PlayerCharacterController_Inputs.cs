@@ -28,14 +28,14 @@ namespace MultiplayerARPG
                 if (InputManager.GetButtonDown("Activate"))
                 {
                     targetPlayer = null;
-                    if (activatableEntityDetector.players.Count > 0)
-                        targetPlayer = activatableEntityDetector.players[0];
+                    if (ActivatableEntityDetector.players.Count > 0)
+                        targetPlayer = ActivatableEntityDetector.players[0];
                     targetNpc = null;
-                    if (activatableEntityDetector.npcs.Count > 0)
-                        targetNpc = activatableEntityDetector.npcs[0];
+                    if (ActivatableEntityDetector.npcs.Count > 0)
+                        targetNpc = ActivatableEntityDetector.npcs[0];
                     targetBuilding = null;
-                    if (activatableEntityDetector.buildings.Count > 0)
-                        targetBuilding = activatableEntityDetector.buildings[0];
+                    if (ActivatableEntityDetector.buildings.Count > 0)
+                        targetBuilding = ActivatableEntityDetector.buildings[0];
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null && CacheUISceneGameplay != null)
                     {
@@ -65,8 +65,8 @@ namespace MultiplayerARPG
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
                     targetItemDrop = null;
-                    if (itemDropEntityDetector.itemDrops.Count > 0)
-                        targetItemDrop = itemDropEntityDetector.itemDrops[0];
+                    if (ItemDropEntityDetector.itemDrops.Count > 0)
+                        targetItemDrop = ItemDropEntityDetector.itemDrops[0];
                     if (targetItemDrop != null)
                         PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                 }
@@ -80,15 +80,15 @@ namespace MultiplayerARPG
                 if (InputManager.GetButtonDown("FindEnemy"))
                 {
                     ++findingEnemyIndex;
-                    if (findingEnemyIndex < 0 || findingEnemyIndex >= enemyEntityDetector.characters.Count)
+                    if (findingEnemyIndex < 0 || findingEnemyIndex >= EnemyEntityDetector.characters.Count)
                         findingEnemyIndex = 0;
-                    if (enemyEntityDetector.characters.Count > 0)
+                    if (EnemyEntityDetector.characters.Count > 0)
                     {
                         SetTarget(null, TargetActionType.Attack);
-                        if (!enemyEntityDetector.characters[findingEnemyIndex].GetCaches().IsHide &&
-                            !enemyEntityDetector.characters[findingEnemyIndex].IsDead())
+                        if (!EnemyEntityDetector.characters[findingEnemyIndex].GetCaches().IsHide &&
+                            !EnemyEntityDetector.characters[findingEnemyIndex].IsDead())
                         {
-                            SetTarget(enemyEntityDetector.characters[findingEnemyIndex], TargetActionType.Attack);
+                            SetTarget(EnemyEntityDetector.characters[findingEnemyIndex], TargetActionType.Attack);
                             if (SelectedEntity != null)
                                 targetLookDirection = (SelectedEntity.CacheTransform.position - MovementTransform.position).normalized;
                         }
@@ -113,7 +113,7 @@ namespace MultiplayerARPG
                 }
             }
             // Update enemy detecting radius to attack distance
-            enemyEntityDetector.detectingRadius = PlayerCharacterEntity.GetAttackDistance(false) + lockAttackTargetDistance;
+            EnemyEntityDetector.detectingRadius = PlayerCharacterEntity.GetAttackDistance(false) + lockAttackTargetDistance;
             // Update inputs
             UpdatePointClickInput();
             UpdateWASDInput();

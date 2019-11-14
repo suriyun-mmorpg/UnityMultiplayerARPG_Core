@@ -67,9 +67,9 @@ namespace MultiplayerARPG
         protected HarvestableEntity targetHarvestable;
         protected Quaternion tempLookAt;
         protected Vector3 targetLookDirection;
-        public NearbyEntityDetector activatableEntityDetector { get; protected set; }
-        public NearbyEntityDetector itemDropEntityDetector { get; protected set; }
-        public NearbyEntityDetector enemyEntityDetector { get; protected set; }
+        public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
+        public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
+        public NearbyEntityDetector EnemyEntityDetector { get; protected set; }
         protected int findingEnemyIndex;
         protected bool isLeftHandAttacking;
 
@@ -89,28 +89,28 @@ namespace MultiplayerARPG
             }
             // This entity detector will be find entities to use when pressed activate key
             GameObject tempGameObject = new GameObject("_ActivatingEntityDetector");
-            activatableEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            activatableEntityDetector.detectingRadius = gameInstance.conversationDistance;
-            activatableEntityDetector.findPlayer = true;
-            activatableEntityDetector.findOnlyAlivePlayers = true;
-            activatableEntityDetector.findNpc = true;
-            activatableEntityDetector.findBuilding = true;
-            activatableEntityDetector.findOnlyAliveBuildings = true;
-            activatableEntityDetector.findOnlyActivatableBuildings = true;
+            ActivatableEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            ActivatableEntityDetector.detectingRadius = gameInstance.conversationDistance;
+            ActivatableEntityDetector.findPlayer = true;
+            ActivatableEntityDetector.findOnlyAlivePlayers = true;
+            ActivatableEntityDetector.findNpc = true;
+            ActivatableEntityDetector.findBuilding = true;
+            ActivatableEntityDetector.findOnlyAliveBuildings = true;
+            ActivatableEntityDetector.findOnlyActivatableBuildings = true;
             // This entity detector will be find item drop entities to use when pressed pickup key
             tempGameObject = new GameObject("_ItemDropEntityDetector");
-            itemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            itemDropEntityDetector.detectingRadius = gameInstance.pickUpItemDistance;
-            itemDropEntityDetector.findItemDrop = true;
+            ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            ItemDropEntityDetector.detectingRadius = gameInstance.pickUpItemDistance;
+            ItemDropEntityDetector.findItemDrop = true;
             // This entity detector will be find item drop entities to use when pressed pickup key
             tempGameObject = new GameObject("_EnemyEntityDetector");
-            enemyEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            enemyEntityDetector.findPlayer = true;
-            enemyEntityDetector.findOnlyAlivePlayers = true;
-            enemyEntityDetector.findPlayerToAttack = true;
-            enemyEntityDetector.findMonster = true;
-            enemyEntityDetector.findOnlyAliveMonsters = true;
-            enemyEntityDetector.findMonsterToAttack = true;
+            EnemyEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            EnemyEntityDetector.findPlayer = true;
+            EnemyEntityDetector.findOnlyAlivePlayers = true;
+            EnemyEntityDetector.findPlayerToAttack = true;
+            EnemyEntityDetector.findMonster = true;
+            EnemyEntityDetector.findOnlyAliveMonsters = true;
+            EnemyEntityDetector.findMonsterToAttack = true;
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -128,12 +128,12 @@ namespace MultiplayerARPG
             base.OnDestroy();
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
-            if (activatableEntityDetector != null)
-                Destroy(activatableEntityDetector.gameObject);
-            if (itemDropEntityDetector != null)
-                Destroy(itemDropEntityDetector.gameObject);
-            if (enemyEntityDetector != null)
-                Destroy(enemyEntityDetector.gameObject);
+            if (ActivatableEntityDetector != null)
+                Destroy(ActivatableEntityDetector.gameObject);
+            if (ItemDropEntityDetector != null)
+                Destroy(ItemDropEntityDetector.gameObject);
+            if (EnemyEntityDetector != null)
+                Destroy(EnemyEntityDetector.gameObject);
         }
 
         protected override void Update()

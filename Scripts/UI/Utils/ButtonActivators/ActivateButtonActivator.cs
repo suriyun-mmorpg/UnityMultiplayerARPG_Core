@@ -21,9 +21,9 @@ namespace MultiplayerARPG
 
             if (controller != null)
             {
-                canActivate = controller.activatableEntityDetector.players.Count > 0 ||
-                    controller.activatableEntityDetector.npcs.Count > 0 ||
-                    controller.activatableEntityDetector.buildings.Count > 0;
+                canActivate = controller.ActivatableEntityDetector.players.Count > 0 ||
+                    controller.ActivatableEntityDetector.npcs.Count > 0 ||
+                    controller.ActivatableEntityDetector.buildings.Count > 0;
             }
 
             if (shooterController != null && shooterController.SelectedEntity != null)
