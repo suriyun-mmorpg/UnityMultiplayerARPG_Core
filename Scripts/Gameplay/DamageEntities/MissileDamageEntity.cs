@@ -109,21 +109,6 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // Turn to locking target position
-            if (lockingTarget != null)
-            {
-                // Lookat target then do anything when it's in range
-                Vector3 lookAtDirection = (lockingTarget.transform.position - CacheTransform.position).normalized;
-                // slerp to the desired rotation over time
-                if (lookAtDirection.magnitude > 0)
-                {
-                    Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
-                    lookRotationEuler.x = 0;
-                    lookRotationEuler.z = 0;
-                    CacheTransform.rotation = Quaternion.Euler(lookRotationEuler);
-                }
-            }
-
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 if (CacheRigidbody2D != null)
