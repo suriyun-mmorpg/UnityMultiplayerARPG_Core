@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public const string HOTKEY_AXIS_Y = "HotkeyAxisY";
 
         public IPlayerCharacterData character { get; protected set; }
-        public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Pet, ItemType.Mount, ItemType.AttributeIncrease, ItemType.AttributeReset, ItemType.Skill, ItemType.SkillLearn, ItemType.SkillReset };
+        public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Building, ItemType.Pet, ItemType.Mount, ItemType.AttributeIncrease, ItemType.AttributeReset, ItemType.Skill, ItemType.SkillLearn, ItemType.SkillReset };
         public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active, SkillType.CraftItem };
         public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;
         public UICharacterHotkeyPair[] uiCharacterHotkeys;
