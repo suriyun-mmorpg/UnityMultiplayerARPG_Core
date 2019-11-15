@@ -581,7 +581,7 @@ namespace MultiplayerARPG
                 float actDistance = castDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(CacheTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
+                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
                 {
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
@@ -610,7 +610,7 @@ namespace MultiplayerARPG
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter))
             {
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
-                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(CacheTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
+                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
                 {
                     // Stop movement to do something
                     PlayerCharacterEntity.StopMove();
