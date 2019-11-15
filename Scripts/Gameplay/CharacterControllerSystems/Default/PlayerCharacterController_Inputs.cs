@@ -516,7 +516,7 @@ namespace MultiplayerARPG
             if (!IsLockTarget())
                 return;
 
-            if (TryGetAttackingCharacter(out targetCharacter, false))
+            if (TryGetAttackingCharacter(out targetCharacter))
             {
                 if (targetCharacter.GetCaches().IsHide || targetCharacter.IsDead())
                 {
@@ -548,8 +548,7 @@ namespace MultiplayerARPG
                     PlayerCharacterEntity.StopMove();
                     // Set direction to turn character to target
                     targetLookDirection = (targetCharacter.CacheTransform.position - MovementTransform.position).normalized;
-                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetCharacter.CacheTransform.position) &&
-                        TryGetAttackingCharacter(out targetCharacter))
+                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetCharacter.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
                         if (queueUsingSkill.skill != null)
@@ -582,7 +581,7 @@ namespace MultiplayerARPG
                 float actDistance = castDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
+                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(CacheTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
                 {
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
@@ -604,6 +603,17 @@ namespace MultiplayerARPG
                             return;
                         }
                     }
+                }
+                else
+                    UpdateTargetEntityPosition(targetCharacter);
+            }
+            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter))
+            {
+                float actDistance = gameInstance.conversationDistance - StoppingDistance;
+                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(CacheTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
+                {
+                    // Stop movement to do something
+                    PlayerCharacterEntity.StopMove();
                 }
                 else
                     UpdateTargetEntityPosition(targetCharacter);

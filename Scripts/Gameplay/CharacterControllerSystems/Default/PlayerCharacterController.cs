@@ -206,7 +206,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool TryGetAttackingCharacter(out BaseCharacterEntity character, bool checkSafeArea = true)
+        public bool TryGetAttackingCharacter(out BaseCharacterEntity character)
         {
             character = null;
             if (targetActionType != TargetActionType.Attack)
@@ -216,13 +216,9 @@ namespace MultiplayerARPG
             {
                 character = TargetEntity as BaseCharacterEntity;
                 if (character != null &&
-                    character != PlayerCharacterEntity)
-                {
-                    if (checkSafeArea)
-                        return character.CanReceiveDamageFrom(PlayerCharacterEntity);
-                    else
-                        return !character.IsAlly(PlayerCharacterEntity);
-                }
+                    character != PlayerCharacterEntity &&
+                    character.CanReceiveDamageFrom(PlayerCharacterEntity))
+                    return true;
                 else
                     character = null;
             }
