@@ -27,6 +27,12 @@ namespace MultiplayerARPG
         public float shellOffset = 0f;
         public bool useNavMeshForKeyMovement;
 
+        [Header("Root Motion Settings")]
+        public bool useRootMotionForMovement;
+        public bool useRootMotionForAirMovement;
+        public bool useRootMotionForJump;
+        public bool useRootMotionForFall;
+
         [Header("Network Settings")]
         public MovementSecure movementSecure;
 
@@ -41,6 +47,19 @@ namespace MultiplayerARPG
                 return CacheEntity.MovementState;
             }
             set { CacheEntity.MovementState = value; }
+        }
+
+        private Animator cacheAnimator;
+        public Animator CacheAnimator
+        {
+            get
+            {
+                if (cacheAnimator == null)
+                    cacheAnimator = GetComponent<Animator>();
+                if (cacheAnimator == null)
+                    cacheAnimator = gameObject.AddComponent<Animator>();
+                return cacheAnimator;
+            }
         }
 
         private LiteNetLibTransform cacheNetTransform;
@@ -119,6 +138,25 @@ namespace MultiplayerARPG
         {
             CacheNetTransform.enabled = false;
             CacheRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        }
+
+        protected void OnAnimatorMove()
+        {
+            if (!MovementState.HasFlag(MovementState.Forward) &&
+                !MovementState.HasFlag(MovementState.Backward) &&
+                !MovementState.HasFlag(MovementState.Left) &&
+                !MovementState.HasFlag(MovementState.Right) &&
+                !MovementState.HasFlag(MovementState.IsJump))
+            {
+                // No movement, apply root motion position / rotation
+                CacheAnimator.ApplyBuiltinRootMotion();
+                return;
+            }
+
+            if (MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForMovement)
+                cacheAnimator.ApplyBuiltinRootMotion();
+            if (!MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForAirMovement)
+                cacheAnimator.ApplyBuiltinRootMotion();
         }
 
         public override void EntityOnSetup(BaseGameEntity entity)
@@ -308,8 +346,10 @@ namespace MultiplayerARPG
             }
 
             // Turn Use Gravity when this is allowed to update
-            if (!CacheRigidbody.useGravity)
+            if (!useRootMotionForFall && !CacheRigidbody.useGravity)
                 CacheRigidbody.useGravity = true;
+            if (useRootMotionForFall && CacheRigidbody.useGravity)
+                CacheRigidbody.useGravity = false;
 
             tempMoveDirection = Vector3.zero;
             tempTargetDistance = -1f;
@@ -365,7 +405,7 @@ namespace MultiplayerARPG
             centerY = centerY * transform.localScale.y;
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position + Vector3.up * centerY, radius, Vector3.down, out hitInfo,
-                                   maxDistance, GetGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore))
+                maxDistance, GetGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore))
             {
                 if (Mathf.Abs(Vector3.Angle(hitInfo.normal, Vector3.up)) < 85f)
                 {
@@ -389,7 +429,7 @@ namespace MultiplayerARPG
             centerY = centerY * transform.localScale.y;
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position + Vector3.up * centerY, radius, Vector3.down, out hitInfo,
-                                   maxDistance, GetGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore))
+                maxDistance, GetGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore))
             {
                 IsGrounded = true;
                 groundContactNormal = hitInfo.normal;
@@ -432,9 +472,9 @@ namespace MultiplayerARPG
                     currentTargetSpeed *= backwardMoveSpeedRate;
 
                 tempMoveDirection *= currentTargetSpeed;
-                if (IsGrounded)
+                if (IsGrounded && !useRootMotionForMovement)
                     CacheRigidbody.velocity = tempMoveDirection;
-                else
+                else if (!IsGrounded && !useRootMotionForAirMovement)
                     CacheRigidbody.velocity = new Vector3(tempMoveDirection.x, CacheRigidbody.velocity.y, tempMoveDirection.z);
             }
             else
@@ -449,9 +489,12 @@ namespace MultiplayerARPG
                 if (IsJumping)
                 {
                     RequestTriggerJump();
-                    CacheRigidbody.drag = 0f;
-                    CacheRigidbody.velocity = new Vector3(CacheRigidbody.velocity.x, 0f, CacheRigidbody.velocity.z);
-                    CacheRigidbody.AddForce(new Vector3(0f, CalculateJumpVerticalSpeed(), 0f), ForceMode.Impulse);
+                    if (!useRootMotionForJump)
+                    {
+                        CacheRigidbody.drag = 0f;
+                        CacheRigidbody.velocity = new Vector3(CacheRigidbody.velocity.x, 0f, CacheRigidbody.velocity.z);
+                        CacheRigidbody.AddForce(new Vector3(0f, CalculateJumpVerticalSpeed(), 0f), ForceMode.Impulse);
+                    }
                     applyingJump = true;
                     IsGrounded = false;
                 }
