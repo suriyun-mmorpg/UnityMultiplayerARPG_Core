@@ -720,6 +720,8 @@ namespace MultiplayerARPG
 
         public void UpdateLookAtTarget()
         {
+            if (PlayerCharacterEntity.IsPlayingActionAnimation())
+                return;
             if (destination != null)
                 targetLookDirection = (destination.Value - MovementTransform.position).normalized;
             if (Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection) > 0)
