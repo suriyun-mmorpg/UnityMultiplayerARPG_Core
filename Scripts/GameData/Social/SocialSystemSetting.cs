@@ -69,6 +69,8 @@ namespace MultiplayerARPG
         public int MaxGuildMessageLength { get { return maxGuildMessageLength; } }
         public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }
         public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
+
+        [System.NonSerialized]
         private Dictionary<Item, short> cacheCreateGuildRequireItems;
         public Dictionary<Item, short> CacheCreateGuildRequireItems
         {
@@ -79,7 +81,9 @@ namespace MultiplayerARPG
                 return cacheCreateGuildRequireItems;
             }
         }
+
         public int CreateGuildRequiredGold { get { return createGuildRequiredGold; } }
+
         public int[] GuildExpTree
         {
             get

@@ -53,7 +53,8 @@ namespace MultiplayerARPG
 
         [Header("Craft")]
         public ItemCraft itemCraft;
-
+        
+        [System.NonSerialized]
         private Dictionary<Attribute, float> cacheEffectivenessAttributes;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
         {

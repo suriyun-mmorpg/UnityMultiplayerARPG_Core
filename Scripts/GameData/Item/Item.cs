@@ -295,8 +295,7 @@ namespace MultiplayerARPG
                 return itemRefine.levels.Length;
             }
         }
-
-        #region Cache Data
+        
         [System.NonSerialized]
         private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
         public Dictionary<Attribute, float> CacheRequireAttributeAmounts
@@ -338,7 +337,6 @@ namespace MultiplayerARPG
         {
             get { return WeaponType == null ? WeaponItemEquipType.OneHand : WeaponType.equipType; }
         }
-        #endregion
 
         public bool CanEquip(BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType)
         {

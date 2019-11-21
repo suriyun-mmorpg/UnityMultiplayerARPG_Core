@@ -57,7 +57,8 @@ namespace MultiplayerARPG
         private ResistanceIncremental[] adjustResistances;
         [System.NonSerialized]
         private ArmorIncremental[] adjustArmors;
-        
+
+        [System.NonSerialized]
         private List<ItemDrop> cacheRandomItems;
         public List<ItemDrop> CacheRandomItems
         {
@@ -199,6 +200,7 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
         private Dictionary<BaseSkill, short> cacheSkillLevels;
         public override Dictionary<BaseSkill, short> CacheSkillLevels
         {
