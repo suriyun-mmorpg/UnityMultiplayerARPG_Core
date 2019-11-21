@@ -188,11 +188,15 @@ namespace MultiplayerARPG
                 // Animations will plays on clients only
                 if (IsClient)
                     CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
-                
-                for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
+
+                float remainsDuration = totalDuration;
+                float tempTriggerDuration;
+                for (int hitIndex = 0; hitIndex < triggerDurations.Length && remainsDuration > 0f; ++hitIndex)
                 {
                     // Play special effects after trigger duration
-                    yield return new WaitForSecondsRealtime(triggerDurations[hitIndex] / playSpeedMultiplier);
+                    tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
+                    remainsDuration -= tempTriggerDuration;
+                    yield return new WaitForSecondsRealtime(tempTriggerDuration / playSpeedMultiplier);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -204,9 +208,12 @@ namespace MultiplayerARPG
 
                     // Apply skill buffs, summons and attack damages
                     skill.ApplySkill(this, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+                }
 
+                if (remainsDuration > 0f)
+                {
                     // Wait until animation ends to stop actions
-                    yield return new WaitForSecondsRealtime((totalDuration - triggerDurations[hitIndex]) / playSpeedMultiplier);
+                    yield return new WaitForSecondsRealtime(remainsDuration / playSpeedMultiplier);
                 }
             }
 
