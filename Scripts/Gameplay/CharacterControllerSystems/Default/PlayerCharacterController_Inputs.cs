@@ -311,6 +311,7 @@ namespace MultiplayerARPG
             if (checkControllerMode && controllerMode == PlayerCharacterControllerMode.WASD)
             {
                 this.targetActionType = targetActionType;
+                destination = null;
                 SelectedEntity = entity;
                 return;
             }
@@ -319,6 +320,7 @@ namespace MultiplayerARPG
                 (entity != null && entity is ItemDropEntity))
             {
                 this.targetActionType = targetActionType;
+                destination = null;
                 TargetEntity = entity;
                 PlayerCharacterEntity.SetTargetEntity(entity);
             }
