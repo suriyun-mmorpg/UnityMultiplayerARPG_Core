@@ -1503,12 +1503,12 @@ public static partial class CharacterDataExtension
         resultEquipmentSets.Clear();
 
         GetEquipmentSetBonus(data, out resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets);
-        resultStats = resultStats + data.GetStats();
-        resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes());
-        resultResistances = GameDataHelpers.CombineResistances(resultResistances, data.GetResistances());
-        resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.GetArmors());
-        resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages());
-        resultSkills = GameDataHelpers.CombineSkills(resultSkills, data.GetSkills());
+        resultStats = data.GetStats() + resultStats;
+        resultAttributes = GameDataHelpers.CombineAttributes(data.GetAttributes(), resultAttributes);
+        resultResistances = GameDataHelpers.CombineResistances(data.GetResistances(), resultResistances);
+        resultArmors = GameDataHelpers.CombineArmors(data.GetArmors(), resultArmors);
+        resultIncreaseDamages = GameDataHelpers.CombineDamages(data.GetIncreaseDamages(), resultIncreaseDamages);
+        resultSkills = GameDataHelpers.CombineSkills(data.GetSkills(), resultSkills);
         // Sum with other stats
         resultMaxHp = (int)resultStats.hp;
         resultMaxMp = (int)resultStats.mp;
