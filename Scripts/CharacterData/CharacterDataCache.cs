@@ -69,7 +69,7 @@ namespace MultiplayerARPG
             IsRecaching = false;
 
             characterData.GetAllStats(
-                out stats,
+                ref stats,
                 attributes,
                 resistances,
                 armors,

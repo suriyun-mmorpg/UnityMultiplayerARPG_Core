@@ -1373,22 +1373,25 @@ public static partial class CharacterDataExtension
     }
 
     public static void GetEquipmentSetBonus(this ICharacterData data,
-        out CharacterStats bonusStats,
+        ref CharacterStats bonusStats,
         Dictionary<Attribute, float> bonusAttributes,
         Dictionary<DamageElement, float> bonusResistances,
         Dictionary<DamageElement, float> bonusArmors,
         Dictionary<DamageElement, MinMaxFloat> bonusDamages,
         Dictionary<BaseSkill, short> bonusSkills,
-        Dictionary<EquipmentSet, int> equipmentSets)
+        Dictionary<EquipmentSet, int> equipmentSets,
+        bool combine = false)
     {
-        bonusStats = new CharacterStats();
-        bonusAttributes.Clear();
-        bonusResistances.Clear();
-        bonusArmors.Clear();
-        bonusDamages.Clear();
-        bonusSkills.Clear();
-        // Equipment Set
-        equipmentSets.Clear();
+        if (!combine)
+        {
+            bonusStats = new CharacterStats();
+            bonusAttributes.Clear();
+            bonusResistances.Clear();
+            bonusArmors.Clear();
+            bonusDamages.Clear();
+            bonusSkills.Clear();
+            equipmentSets.Clear();
+        }
 
         Item tempEquipmentItem;
         // Armor equipment set
@@ -1478,7 +1481,7 @@ public static partial class CharacterDataExtension
     }
 
     public static void GetAllStats(this ICharacterData data,
-        out CharacterStats resultStats,
+        ref CharacterStats resultStats,
         Dictionary<Attribute, float> resultAttributes,
         Dictionary<DamageElement, float> resultResistances,
         Dictionary<DamageElement, float> resultArmors,
@@ -1492,23 +1495,27 @@ public static partial class CharacterDataExtension
         out int resultMaxWater,
         out float resultTotalItemWeight,
         out float resultAtkSpeed,
-        out float resultMoveSpeed)
+        out float resultMoveSpeed,
+        bool combine = false)
     {
-        resultStats = new CharacterStats();
-        resultAttributes.Clear();
-        resultResistances.Clear();
-        resultArmors.Clear();
-        resultIncreaseDamages.Clear();
-        resultSkills.Clear();
-        resultEquipmentSets.Clear();
+        if (!combine)
+        {
+            resultStats = new CharacterStats();
+            resultAttributes.Clear();
+            resultResistances.Clear();
+            resultArmors.Clear();
+            resultIncreaseDamages.Clear();
+            resultSkills.Clear();
+            resultEquipmentSets.Clear();
+        }
 
-        GetEquipmentSetBonus(data, out resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets);
-        resultStats = data.GetStats() + resultStats;
-        resultAttributes = GameDataHelpers.CombineAttributes(data.GetAttributes(), resultAttributes);
-        resultResistances = GameDataHelpers.CombineResistances(data.GetResistances(), resultResistances);
-        resultArmors = GameDataHelpers.CombineArmors(data.GetArmors(), resultArmors);
-        resultIncreaseDamages = GameDataHelpers.CombineDamages(data.GetIncreaseDamages(), resultIncreaseDamages);
-        resultSkills = GameDataHelpers.CombineSkills(data.GetSkills(), resultSkills);
+        resultStats = resultStats + data.GetStats();
+        resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes());
+        resultResistances = GameDataHelpers.CombineResistances(resultResistances, data.GetResistances());
+        resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.GetArmors());
+        resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages());
+        resultSkills = GameDataHelpers.CombineSkills(resultSkills, data.GetSkills());
+        GetEquipmentSetBonus(data, ref resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets, true);
         // Sum with other stats
         resultMaxHp = (int)resultStats.hp;
         resultMaxMp = (int)resultStats.mp;

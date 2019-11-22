@@ -257,7 +257,7 @@ namespace MultiplayerARPG
             if (cacheEquipmentSets == null)
                 cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
 
-            Data.GetEquipmentSetBonus(out bonusStats, bonusAttributes, bonusResistances, bonusArmors, bonusDamages, bonusSkills, cacheEquipmentSets);
+            Data.GetEquipmentSetBonus(ref bonusStats, bonusAttributes, bonusResistances, bonusArmors, bonusDamages, bonusSkills, cacheEquipmentSets);
             // Increase stats by equipment set bonus
             cacheStats += bonusStats;
             cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, bonusAttributes);
