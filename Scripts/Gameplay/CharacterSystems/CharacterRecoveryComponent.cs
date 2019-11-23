@@ -62,7 +62,7 @@ namespace MultiplayerARPG
 
                 // Decrease Hp
                 recoveryData.decreasingHp += recoveryData.updatingTime * gameplayRule.GetDecreasingHpPerSeconds(characterEntity);
-                if (!characterEntity.IsDead())
+                if (characterEntity.CurrentHp > 0)
                 {
                     if (recoveryData.decreasingHp >= 1)
                     {
@@ -74,6 +74,9 @@ namespace MultiplayerARPG
                 }
                 else
                     recoveryData.decreasingHp = 0;
+
+                if (characterEntity.CurrentHp <= 0)
+                    characterEntity.CurrentHp = 0;
 
                 // Mp
                 recoveryData.recoveryingMp += recoveryData.updatingTime * gameplayRule.GetRecoveryMpPerSeconds(characterEntity);
@@ -92,7 +95,7 @@ namespace MultiplayerARPG
 
                 // Decrease Mp
                 recoveryData.decreasingMp += recoveryData.updatingTime * gameplayRule.GetDecreasingMpPerSeconds(characterEntity);
-                if (!characterEntity.IsDead() && characterEntity.CurrentMp > 0)
+                if (characterEntity.CurrentMp > 0)
                 {
                     if (recoveryData.decreasingMp >= 1)
                     {
@@ -104,6 +107,9 @@ namespace MultiplayerARPG
                 }
                 else
                     recoveryData.decreasingMp = 0;
+
+                if (characterEntity.CurrentMp <= 0)
+                    characterEntity.CurrentMp = 0;
 
                 // Stamina
                 recoveryData.recoveryingStamina += recoveryData.updatingTime * gameplayRule.GetRecoveryStaminaPerSeconds(characterEntity);
@@ -122,7 +128,7 @@ namespace MultiplayerARPG
 
                 // Decrease Stamina while sprinting
                 recoveryData.decreasingStamina += recoveryData.updatingTime * gameplayRule.GetDecreasingStaminaPerSeconds(characterEntity);
-                if (!characterEntity.IsDead() && characterEntity.MovementState.HasFlag(MovementState.IsSprinting) && characterEntity.CurrentStamina > 0)
+                if (characterEntity.CurrentStamina > 0)
                 {
                     if (recoveryData.decreasingStamina >= 1)
                     {
@@ -134,6 +140,9 @@ namespace MultiplayerARPG
                 }
                 else
                     recoveryData.decreasingStamina = 0;
+
+                if (characterEntity.CurrentStamina <= 0)
+                    characterEntity.CurrentStamina = 0;
 
                 // Food
                 if (characterEntity.CurrentFood < characterEntity.MaxFood)
@@ -151,7 +160,7 @@ namespace MultiplayerARPG
 
                 // Decrease Food
                 recoveryData.decreasingFood += recoveryData.updatingTime * gameplayRule.GetDecreasingFoodPerSeconds(characterEntity);
-                if (!characterEntity.IsDead() && characterEntity.CurrentFood > 0)
+                if (characterEntity.CurrentFood > 0)
                 {
                     if (recoveryData.decreasingFood >= 1)
                     {
@@ -163,6 +172,9 @@ namespace MultiplayerARPG
                 }
                 else
                     recoveryData.decreasingFood = 0;
+
+                if (characterEntity.CurrentFood <= 0)
+                    characterEntity.CurrentFood = 0;
 
                 // Water
                 if (characterEntity.CurrentWater < characterEntity.MaxWater)
@@ -180,7 +192,7 @@ namespace MultiplayerARPG
 
                 // Decrease Water
                 recoveryData.decreasingWater += recoveryData.updatingTime * gameplayRule.GetDecreasingWaterPerSeconds(characterEntity);
-                if (!characterEntity.IsDead() && characterEntity.CurrentWater > 0)
+                if (characterEntity.CurrentWater > 0)
                 {
                     if (recoveryData.decreasingWater >= 1)
                     {
@@ -192,6 +204,9 @@ namespace MultiplayerARPG
                 }
                 else
                     recoveryData.decreasingWater = 0;
+
+                if (characterEntity.CurrentWater <= 0)
+                    characterEntity.CurrentWater = 0;
 
                 recoveryData.updatingTime = 0;
             }
