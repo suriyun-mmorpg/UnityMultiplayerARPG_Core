@@ -96,6 +96,7 @@ namespace MultiplayerARPG
             }
             set { CacheEntity.MovementState = value; }
         }
+        protected MovementState extraMovementState = MovementState.None;
 
         private float tempMoveDirectionMagnitude;
         private Vector2 tempInputDirection;
@@ -147,6 +148,7 @@ namespace MultiplayerARPG
             entity.RegisterNetFunction(StopMove);
             entity.RegisterNetFunction<byte>(NetFuncSetMovementState);
             entity.RegisterNetFunction<sbyte, sbyte>(NetFuncUpdateDirection);
+            entity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -166,10 +168,12 @@ namespace MultiplayerARPG
 
         protected void NetFuncSetMovementState(byte movementState)
         {
-            if (!IsServer)
-                return;
-
             MovementState = (MovementState)movementState;
+        }
+
+        protected void NetFuncSetExtraMovement(byte movementState)
+        {
+            extraMovementState = (MovementState)movementState;
         }
 
         protected void NetFuncUpdateDirection(sbyte x, sbyte y)
@@ -215,6 +219,19 @@ namespace MultiplayerARPG
                     break;
                 case MovementSecure.NotSecure:
                     currentDestination = position;
+                    break;
+            }
+        }
+
+        public override void SetExtraMovement(MovementState movementState)
+        {
+            switch (movementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    CacheEntity.CallNetFunction(NetFuncSetExtraMovement, FunctionReceivers.Server, (byte)movementState);
+                    break;
+                case MovementSecure.NotSecure:
+                    extraMovementState = movementState;
                     break;
             }
         }
@@ -281,7 +298,11 @@ namespace MultiplayerARPG
         public void SetMovementState(MovementState state)
         {
             if (IsGrounded)
+            {
+                if (state.HasFlag(MovementState.Forward) && extraMovementState.HasFlag(MovementState.IsSprinting))
+                    state |= MovementState.IsSprinting;
                 state |= MovementState.IsGrounded;
+            }
 
             // Set local movement state which will be used by owner client
             localMovementState = state;

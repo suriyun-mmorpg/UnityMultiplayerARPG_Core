@@ -104,6 +104,11 @@ namespace MultiplayerARPG
                     // Switch equip weapon set
                     PlayerCharacterEntity.RequestSwitchEquipWeaponSet((byte)(PlayerCharacterEntity.EquipWeaponSet + 1));
                 }
+                if (InputManager.GetButtonDown("Sprint"))
+                {
+                    isSprinting = !isSprinting;
+                    PlayerCharacterEntity.SetExtraMovement(isSprinting ? MovementState.IsSprinting : MovementState.None);
+                }
                 // Auto reload
                 if (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
                     PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoEmpty())

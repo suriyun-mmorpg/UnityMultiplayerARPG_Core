@@ -474,6 +474,12 @@ namespace MultiplayerARPG
                 ActiveMovement.PointClickMovement(position);
         }
 
+        public void SetExtraMovement(MovementState movementState)
+        {
+            if (ActiveMovement != null)
+                ActiveMovement.SetExtraMovement(movementState);
+        }
+
         public void SetLookRotation(Vector3 eulerAngles)
         {
             if (ActiveMovement != null)

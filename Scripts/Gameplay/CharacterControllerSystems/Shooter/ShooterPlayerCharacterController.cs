@@ -655,6 +655,10 @@ namespace MultiplayerARPG
             if (InputManager.GetButtonDown("Jump"))
                 movementState |= MovementState.IsJump;
 
+            // If sprinting add is sprinting state
+            if (InputManager.GetButton("Sprint"))
+                movementState |= MovementState.IsSprinting;
+
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 
