@@ -56,7 +56,8 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddWeaponTypes(availableWeapons);
+            if (availableWeapons != null && availableWeapons.Length > 0)
+                GameInstance.AddWeaponTypes(availableWeapons);
         }
 
         public abstract SkillType GetSkillType();

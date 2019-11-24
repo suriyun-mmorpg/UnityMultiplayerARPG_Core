@@ -191,7 +191,8 @@ namespace MultiplayerARPG
             GameInstance.AddMountEntities(new MountEntity[] { mountEntity });
             // Add skills
             List<SkillLevel> skillLevels = new List<SkillLevel>();
-            skillLevels.AddRange(increaseSkillLevels);
+            if (increaseSkillLevels != null && increaseSkillLevels.Length > 0)
+                skillLevels.AddRange(increaseSkillLevels);
             skillLevels.Add(skillLevel);
             GameInstance.AddSkillLevels(skillLevels);
         }

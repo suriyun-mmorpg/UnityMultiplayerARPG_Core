@@ -138,7 +138,8 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             List<Item> items = new List<Item>();
-            items.AddRange(armorItems);
+            if (armorItems != null && armorItems.Length > 0)
+                items.AddRange(armorItems);
             items.Add(rightHandEquipItem);
             items.Add(leftHandEquipItem);
         }

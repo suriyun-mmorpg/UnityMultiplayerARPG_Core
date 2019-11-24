@@ -71,7 +71,8 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             // Add skills
             List<BaseSkill> skills = new List<BaseSkill>();
-            skills.AddRange(CacheSkillLevels.Keys);
+            if (CacheSkillLevels.Count > 0)
+                skills.AddRange(CacheSkillLevels.Keys);
             GameInstance.AddSkills(skills);
         }
     }
