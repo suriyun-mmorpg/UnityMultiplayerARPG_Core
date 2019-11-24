@@ -400,12 +400,15 @@ namespace MultiplayerARPG
         QuestOngoing,
         QuestTasksCompleted,
         QuestCompleted,
+        FactionIs,
     }
 
     [System.Serializable]
     public struct NpcDialogCondition
     {
         public NpcDialogConditionType conditionType;
+        [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "FactionIs" })]
+        public Faction faction;
         [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "QuestNotStarted", "QuestOngoing", "QuestTasksCompleted", "QuestCompleted" })]
         public Quest quest;
         [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "LevelMoreThanOrEqual", "LevelLessThanOrEqual" })]
@@ -439,6 +442,8 @@ namespace MultiplayerARPG
                     return questTasksCompleted;
                 case NpcDialogConditionType.QuestCompleted:
                     return questCompleted;
+                case NpcDialogConditionType.FactionIs:
+                    return character.FactionId == faction.DataId;
             }
             return true;
         }
