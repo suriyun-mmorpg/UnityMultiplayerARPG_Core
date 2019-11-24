@@ -146,7 +146,7 @@ namespace MultiplayerARPG
             if (!CanUseItem() || item == null)
                 return;
 
-            this.ResetSkills();
+            this.ResetSkills(itemIndex);
         }
 
         protected void UseItemSkill(short itemIndex, Item item, bool isLeftHand, Vector3 aimPosition)
