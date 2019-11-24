@@ -247,7 +247,7 @@ namespace MultiplayerARPG
                     CreatorName = buildingEntity.CreatorName,
                 });
             }
-            worldSaveData.SavePersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
+            worldSaveData.SavePersistentData(playerCharacterEntity.Id, CurrentMapInfo.Id);
         }
 
         private void SaveStorage()
@@ -275,11 +275,17 @@ namespace MultiplayerARPG
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-            base.WarpCharacter(playerCharacterEntity, mapName, position);
+
+            // If map name is empty, just teleport character to target position
+            if (string.IsNullOrEmpty(mapName))
+            {
+                playerCharacterEntity.Teleport(position);
+                return;
+            }
+
             long connectionId = playerCharacterEntity.ConnectionId;
             MapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
-                !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
                 playerCharacters.ContainsKey(connectionId) &&
                 playerCharacterEntity.IsServer &&
                 playerCharacterEntity.IsOwnerClient &&
@@ -297,7 +303,7 @@ namespace MultiplayerARPG
                 if (owningCharacter != null)
                 {
                     selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
-                    selectedCharacter.CurrentMapName = mapInfo.GetSceneName();
+                    selectedCharacter.CurrentMapName = mapInfo.Id;
                     selectedCharacter.CurrentPosition = position;
                     selectedCharacter.SavePersistentCharacterData();
                 }
@@ -816,7 +822,7 @@ namespace MultiplayerARPG
                 yield return null;
             }
             // Load and Spawn buildings
-            worldSaveData.LoadPersistentData(selectedCharacter.Id, selectedCharacter.CurrentMapName);
+            worldSaveData.LoadPersistentData(selectedCharacter.Id, CurrentMapInfo.Id);
             yield return null;
             foreach (BuildingSaveData building in worldSaveData.buildings)
             {

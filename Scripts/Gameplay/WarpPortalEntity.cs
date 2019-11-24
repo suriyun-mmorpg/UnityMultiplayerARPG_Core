@@ -4,16 +4,13 @@ namespace MultiplayerARPG
 {
     public sealed class WarpPortalEntity : BaseGameEntity
     {
-        [Tooltip("Signal to tell players that their character can warp")]
+        [Tooltip("Signal to tell players that their character can enter the portal")]
         public GameObject[] warpSignals;
         public bool warpImmediatelyWhenEnter;
         public WarpPortalType type;
+        [Tooltip("Leave this empty to warp character to other position in the same map")]
         public MapInfo mapInfo;
         public Vector3 position;
-        [Header("Deprecated")]
-        [System.Obsolete("`Map` is deprecated, use `Map Info` instead")]
-        [Tooltip("`Map` is deprecated, use `Map Info` instead")]
-        public UnityScene mapScene;
 
         protected override void EntityAwake()
         {
@@ -98,7 +95,7 @@ namespace MultiplayerARPG
         public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (mapInfo == null)
-                gameManager.WarpCharacter(type, playerCharacterEntity, playerCharacterEntity.CurrentMapName, position);
+                gameManager.WarpCharacter(type, playerCharacterEntity, string.Empty, position);
             else
                 gameManager.WarpCharacter(type, playerCharacterEntity, mapInfo.Id, position);
         }

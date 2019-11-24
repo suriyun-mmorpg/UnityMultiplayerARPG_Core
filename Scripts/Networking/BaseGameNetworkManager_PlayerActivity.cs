@@ -494,16 +494,6 @@ namespace MultiplayerARPG
             WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition);
         }
 
-        protected virtual void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
-        {
-            if (!CanWarpCharacter(playerCharacterEntity))
-                return;
-
-            // If warping to same map player does not have to reload new map data
-            if (string.IsNullOrEmpty(mapName) || mapName.Equals(playerCharacterEntity.CurrentMapName))
-                playerCharacterEntity.Teleport(position);
-        }
-
         public virtual void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem, int partyId)
         {
             if (!CanCreateParty(playerCharacterEntity))
@@ -975,6 +965,14 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="playerCharacterEntity">Character who request friend list</param>
         public abstract void GetFriends(BasePlayerCharacterEntity playerCharacterEntity);
+
+        /// <summary>
+        /// Warp character to other map if `mapName` is not empty
+        /// </summary>
+        /// <param name="playerCharacterEntity"></param>
+        /// <param name="mapName"></param>
+        /// <param name="position"></param>
+        protected abstract void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position);
 
         /// <summary>
         /// Warp character to instance map
