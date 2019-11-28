@@ -208,11 +208,13 @@ public class SyncListCharacterSummon : LiteNetLibSyncList<CharacterSummon>
     {
         CharacterSummon result = this[index];
         result.summonRemainsDuration = reader.GetFloat();
+        result.objectId = reader.GetPackedUInt();
         return result;
     }
 
     protected override void SerializeValueForSetOrDirty(int index, NetDataWriter writer, CharacterSummon value)
     {
         writer.Put(value.summonRemainsDuration);
+        writer.PutPackedUInt(value.objectId);
     }
 }
