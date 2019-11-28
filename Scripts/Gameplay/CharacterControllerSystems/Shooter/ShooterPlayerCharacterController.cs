@@ -155,7 +155,7 @@ namespace MultiplayerARPG
         Quaternion tempLookAt;
         TurningState turningState;
         float tempDeltaTime;
-        float turnTimeCounter;
+        float calculatedTurnDuration;
         float tempCalculateAngle;
         bool tempPressAttackRight;
         bool tempPressAttackLeft;
@@ -174,7 +174,6 @@ namespace MultiplayerARPG
         Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
         RaycastHit tempHitInfo;
         Vector3 aimPosition;
-        Vector3 actionLookDirection;
         // Crosshair
         public Vector2 CurrentCrosshairSize { get; private set; }
         public CrosshairSetting CurrentCrosshairSetting { get; private set; }
@@ -278,9 +277,8 @@ namespace MultiplayerARPG
                 UpdateCameraSettings();
             }
 
-            UpdateLookAtTarget();
             tempDeltaTime = Time.deltaTime;
-            turnTimeCounter += tempDeltaTime;
+            calculatedTurnDuration += tempDeltaTime;
 
             // Hide construction UI
             if (CurrentBuildingEntity == null)
@@ -335,6 +333,12 @@ namespace MultiplayerARPG
             // Prepare variables to find nearest raycasted hit point
             centerRay = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             centerRayToCharacterDist = Vector3.Distance(centerRay.origin, MovementTransform.position);
+            cameraForward = CacheGameplayCameraControls.CacheCameraTransform.forward;
+            cameraRight = CacheGameplayCameraControls.CacheCameraTransform.right;
+            cameraForward.y = 0f;
+            cameraRight.y = 0f;
+            cameraForward.Normalize();
+            cameraRight.Normalize();
             tempNearestDistance = float.MaxValue;
 
             if (CurrentBuildingEntity != null)
@@ -365,6 +369,7 @@ namespace MultiplayerARPG
                 movementState |= MovementState.IsSprinting;
 
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
+            UpdateLookAtTarget();
         }
 
         private void UpdateTarget_BuildingMode()
@@ -388,7 +393,7 @@ namespace MultiplayerARPG
 
                 // Set aim position
                 tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
-                if (tempDistance < tempNearestDistance)
+                if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
                 {
                     aimPosition = tempHitInfo.point;
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
@@ -477,10 +482,7 @@ namespace MultiplayerARPG
                 }
                 aimDistance += attackDistance;
             }
-            actionLookDirection = aimPosition = centerRay.origin + centerRay.direction * aimDistance;
-            actionLookDirection.y = MovementTransform.position.y;
-            actionLookDirection = actionLookDirection - MovementTransform.position;
-            actionLookDirection.Normalize();
+            aimPosition = centerRay.origin + centerRay.direction * aimDistance;
             // Find for enemy character
             bool foundDamageableEntity = false;
             int tempCount = Physics.RaycastNonAlloc(centerRay, raycasts, findTargetRaycastDistance);
@@ -503,7 +505,7 @@ namespace MultiplayerARPG
                         continue;
 
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance)
+                    if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
                     {
                         tempNearestDistance = tempDistance;
                         aimPosition = tempHitInfo.point;
@@ -523,7 +525,7 @@ namespace MultiplayerARPG
                 if (tempEntity != null && tempDistance <= gameInstance.pickUpItemDistance)
                 {
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance)
+                    if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
                     {
                         tempNearestDistance = tempDistance;
                         aimPosition = tempHitInfo.point;
@@ -536,7 +538,7 @@ namespace MultiplayerARPG
                 if (tempEntity != null && tempDistance <= gameInstance.conversationDistance)
                 {
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance)
+                    if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
                     {
                         tempNearestDistance = tempDistance;
                         aimPosition = tempHitInfo.point;
@@ -557,12 +559,6 @@ namespace MultiplayerARPG
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             moveDirection = Vector3.zero;
-            cameraForward = CacheGameplayCameraControls.CacheCameraTransform.forward;
-            cameraRight = CacheGameplayCameraControls.CacheCameraTransform.right;
-            cameraForward.y = 0f;
-            cameraRight.y = 0f;
-            cameraForward.Normalize();
-            cameraRight.Normalize();
             inputV = InputManager.GetAxis("Vertical", raw);
             inputH = InputManager.GetAxis("Horizontal", raw);
             moveDirection += cameraForward * inputV;
@@ -584,15 +580,15 @@ namespace MultiplayerARPG
                         movementState |= MovementState.Right;
                     else if (inputH < -0.5f)
                         movementState |= MovementState.Left;
-                    moveLookDirection = actionLookDirection;
+                    moveLookDirection = cameraForward;
                     break;
             }
 
             if (ViewMode == ControllerViewMode.Fps)
             {
                 // Force turn to look direction
-                moveLookDirection = actionLookDirection;
-                targetLookDirection = actionLookDirection;
+                moveLookDirection = cameraForward;
+                targetLookDirection = cameraForward;
             }
 
             // normalize input if it exceeds 1 in combined length:
@@ -649,7 +645,11 @@ namespace MultiplayerARPG
             tempPressReload = InputManager.GetButtonDown("Reload");
             tempPressExitVehicle = InputManager.GetButtonDown("ExitVehicle");
             tempPressSwitchEquipWeaponSet = InputManager.GetButtonDown("SwitchEquipWeaponSet");
-            if (queueUsingSkill.skill != null || tempPressAttackRight || tempPressAttackLeft || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
+            if (queueUsingSkill.skill != null || 
+                tempPressAttackRight || 
+                tempPressAttackLeft || 
+                tempPressActivate || 
+                PlayerCharacterEntity.IsPlayingActionAnimation())
             {
                 // Find forward character / npc / building / warp entity from camera center
                 targetPlayer = null;
@@ -665,11 +665,17 @@ namespace MultiplayerARPG
                         targetBuilding = SelectedEntity as BuildingEntity;
                 }
                 // While attacking turn character to camera forward
-                tempCalculateAngle = Vector3.Angle(MovementTransform.forward, actionLookDirection);
-                // Fps mode character always turn to camera forward.
-                // So set turning state for Tps view mode only
-                if (tempCalculateAngle > 15f && ViewMode == ControllerViewMode.Tps)
+                tempCalculateAngle = Vector3.Angle(MovementTransform.forward, cameraForward);
+
+                if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 {
+                    // Just look at camera forward while character playing action animation
+                    targetLookDirection = cameraForward;
+                }
+                else if (tempCalculateAngle > 15f && ViewMode == ControllerViewMode.Tps)
+                {
+                    // Fps mode character always turn to camera forward.
+                    // So set turning state for Tps view mode only
                     if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                     {
                         turningState = TurningState.UseSkill;
@@ -682,9 +688,9 @@ namespace MultiplayerARPG
                     {
                         turningState = TurningState.Activate;
                     }
-
-                    turnTimeCounter = (180f - tempCalculateAngle) / 180f * turnToTargetDuration;
-                    targetLookDirection = actionLookDirection;
+                    // Calculate turn duration to smoothing character rotation in `UpdateLookAtTarget()`
+                    calculatedTurnDuration = (180f - tempCalculateAngle) / 180f * turnToTargetDuration;
+                    targetLookDirection = cameraForward;
                     // Set movement state by inputs
                     if (inputV > 0.5f)
                         movementState |= MovementState.Forward;
@@ -843,13 +849,21 @@ namespace MultiplayerARPG
         {
             if (ViewMode == ControllerViewMode.Tps)
             {
+                if (PlayerCharacterEntity.IsPlayingActionAnimation())
+                {
+                    // Turn character to look direction immediately
+                    // If character playing action animation
+                    tempLookAt = Quaternion.LookRotation(targetLookDirection);
+                    PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                    return;
+                }
                 tempCalculateAngle = Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection);
                 if (turningState != TurningState.None)
                 {
                     if (tempCalculateAngle > 0)
                     {
                         // Update rotation when angle difference more than 0
-                        tempLookAt = Quaternion.Slerp(tempLookAt, Quaternion.LookRotation(targetLookDirection), turnTimeCounter / turnToTargetDuration);
+                        tempLookAt = Quaternion.Slerp(tempLookAt, Quaternion.LookRotation(targetLookDirection), calculatedTurnDuration / turnToTargetDuration);
                         PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
                     }
                     else
@@ -882,7 +896,8 @@ namespace MultiplayerARPG
             else if (ViewMode == ControllerViewMode.Fps)
             {
                 // Turn character to look direction immediately
-                PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(targetLookDirection).eulerAngles);
+                tempLookAt = Quaternion.LookRotation(targetLookDirection);
+                PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
             }
         }
 
@@ -1112,6 +1127,11 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
             CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
             CacheGameplayCameraControls.enableWallHitSpring = viewMode == ControllerViewMode.Tps ? true : false;
+        }
+
+        public bool IsInFront(Vector3 position)
+        {
+            return Mathf.Abs(Vector3.Angle(cameraForward, PlayerCharacterEntity.CacheTransform.position - position)) > 120f;
         }
     }
 }
