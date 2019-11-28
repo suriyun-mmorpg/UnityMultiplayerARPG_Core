@@ -13,13 +13,12 @@ namespace MultiplayerARPG
         public bool disableRenderersOnZoom;
         public Sprite zoomCrosshair;
 
+        [System.NonSerialized]
         private float zoomInterpTime;
+        [System.NonSerialized]
         private ShooterPlayerCharacterController shooterController;
-
-        public float DefaultCameraFOV { get; protected set; }
-        public Vector3 DefaultCameraOffset { get; protected set; }
-        public float DefaultCameraZoomDistance { get; protected set; }
-        public bool DefaultCameraEnableWallHitSpring { get; protected set; }
+        [System.NonSerialized]
+        private ShooterPlayerCharacterController.ControllerViewMode preActivateViewMode;
 
         public override void Setup(BasePlayerCharacterController controller, CharacterItem weapon)
         {
@@ -31,25 +30,15 @@ namespace MultiplayerARPG
 
         public override void Desetup()
         {
-            shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView = DefaultCameraFOV;
-            shooterController.CacheGameplayCameraControls.targetOffset = DefaultCameraOffset;
-            shooterController.CacheGameplayCameraControls.zoomDistance = DefaultCameraZoomDistance;
-            shooterController.CacheGameplayCameraControls.enableWallHitSpring = DefaultCameraEnableWallHitSpring;
             if (shooterController.zoomCrosshairImage != null)
                 shooterController.zoomCrosshairImage.gameObject.SetActive(false);
         }
 
-        public override bool IsTurnToTargetWhileActivated()
-        {
-            return true;
-        }
-
         public override void OnPreActivate()
         {
-            DefaultCameraFOV = shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView;
-            DefaultCameraOffset = shooterController.CacheGameplayCameraControls.targetOffset;
-            DefaultCameraZoomDistance = shooterController.CacheGameplayCameraControls.zoomDistance;
-            DefaultCameraEnableWallHitSpring = shooterController.CacheGameplayCameraControls.enableWallHitSpring;
+            preActivateViewMode = shooterController.ViewMode;
+            shooterController.ViewMode = ShooterPlayerCharacterController.ControllerViewMode.Fps;
+            shooterController.SetZoomCrosshairSprite(zoomCrosshair);
         }
 
         public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime)
@@ -57,7 +46,7 @@ namespace MultiplayerARPG
             if (state == WeaponAbilityState.Deactivating)
             {
                 zoomInterpTime += deltaTime * ZOOM_SPEED;
-                shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView = Mathf.Lerp(shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView, DefaultCameraFOV, zoomInterpTime);
+                shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView = Mathf.Lerp(shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView, shooterController.CameraFov, zoomInterpTime);
                 if (zoomInterpTime >= 1f)
                 {
                     zoomInterpTime = 0;
@@ -76,49 +65,11 @@ namespace MultiplayerARPG
             }
 
             bool isActive = state == WeaponAbilityState.Activated || state == WeaponAbilityState.Activating;
-            if (shooterController.crosshairRect != null &&
-                shooterController.crosshairRect.gameObject.activeSelf && isActive)
-            {
-                // Hide crosshair when not active
-                shooterController.crosshairRect.gameObject.SetActive(false);
-            }
+            shooterController.SetActiveZoomCrosshair(isActive);
+            shooterController.SetActiveCrosshair(!isActive && !shooterController.CurrentCrosshairSetting.hidden);
 
-            if (shooterController.zoomCrosshairImage != null &&
-                shooterController.zoomCrosshairImage.gameObject.activeSelf != isActive)
-            {
-                shooterController.zoomCrosshairImage.gameObject.SetActive(isActive);
-                shooterController.zoomCrosshairImage.sprite = zoomCrosshair;
-            }
-
-            if (isActive)
-            {
-                Vector3 offset = shooterController.CacheGameplayCameraControls.targetOffset;
-                offset.x = 0f;
-                // Change offset
-                shooterController.CacheGameplayCameraControls.targetOffset = offset;
-            }
-            else
-            {
-                shooterController.CacheGameplayCameraControls.targetOffset = DefaultCameraOffset;
-            }
-
-            if (isActive)
-            {
-                shooterController.CacheGameplayCameraControls.zoomDistance = 0;
-            }
-            else
-            {
-                shooterController.CacheGameplayCameraControls.zoomDistance = DefaultCameraZoomDistance;
-            }
-
-            if (isActive)
-            {
-                shooterController.CacheGameplayCameraControls.enableWallHitSpring = false;
-            }
-            else
-            {
-                shooterController.CacheGameplayCameraControls.enableWallHitSpring = DefaultCameraEnableWallHitSpring;
-            }
+            if (!isActive)
+                shooterController.ViewMode = preActivateViewMode;
 
             // Hidding character model while activate
             shooterController.PlayerCharacterEntity.ModelManager.SetHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, isActive);
@@ -128,6 +79,7 @@ namespace MultiplayerARPG
 
         public override void OnPreDeactivate()
         {
+            // Do Nothing
         }
     }
 }

@@ -9,10 +9,16 @@ namespace MultiplayerARPG
         public const int RAYCAST_COLLIDER_SIZE = 32;
         public const int OVERLAP_COLLIDER_SIZE = 32;
 
-        public enum Mode
+        public enum ControllerMode
         {
             Adventure,
             Combat,
+        }
+
+        public enum ControllerViewMode
+        {
+            Tps,
+            Fps,
         }
 
         public enum TurningState
@@ -23,16 +29,115 @@ namespace MultiplayerARPG
             UseSkill,
         }
 
-        public Mode mode;
-        public float angularSpeed = 800f;
+        [SerializeField]
+        private ControllerMode mode;
+        [SerializeField]
+        private ControllerViewMode viewMode;
+        [SerializeField]
+        private float angularSpeed = 800f;
         [Range(0, 1f)]
-        public float turnToTargetDuration = 0.1f;
-        public float findTargetRaycastDistance = 512f;
-        public bool showConfirmConstructionUI;
-        public RectTransform crosshairRect;
+        [SerializeField]
+        private float turnToTargetDuration = 0.1f;
+        [SerializeField]
+        private float findTargetRaycastDistance = 512f;
+        [SerializeField]
+        private bool showConfirmConstructionUI;
+        [SerializeField]
+        private RectTransform crosshairRect;
+
+        [Header("TPS Settings")]
+        [SerializeField]
+        private float tpsZoomDistance = 3f;
+        [SerializeField]
+        private float tpsMinZoomDistance = 3f;
+        [SerializeField]
+        private float tpsMaxZoomDistance = 3f;
+        [SerializeField]
+        private Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
+        [SerializeField]
+        private float tpsFov = 60f;
+
+        [Header("FPS Settings")]
+        [SerializeField]
+        private float fpsZoomDistance = 0f;
+        [SerializeField]
+        private Vector3 fpsTargetOffset = new Vector3(0f, 1.25f, 0f);
+        [SerializeField]
+        private float fpsFov = 60f;
+
         public bool IsBlockController { get; protected set; }
 
+        public ControllerMode Mode
+        {
+            get
+            {
+                if (viewMode == ControllerViewMode.Fps)
+                {
+                    // If view mode is fps, controls type must be combat
+                    return ControllerMode.Combat;
+                }
+                return mode;
+            }
+        }
+
+        public ControllerViewMode ViewMode
+        {
+            get { return viewMode; }
+            set { viewMode = value; }
+        }
+
+        public float CameraZoomDistance
+        {
+            get
+            {
+                if (viewMode == ControllerViewMode.Tps)
+                    return tpsZoomDistance;
+                return fpsZoomDistance;
+            }
+        }
+
+        public float CameraMinZoomDistance
+        {
+            get
+            {
+                if (viewMode == ControllerViewMode.Tps)
+                    return tpsMinZoomDistance;
+                return fpsZoomDistance;
+            }
+        }
+
+        public float CameraMaxZoomDistance
+        {
+            get
+            {
+                if (viewMode == ControllerViewMode.Tps)
+                    return tpsMaxZoomDistance;
+                return fpsZoomDistance;
+            }
+        }
+
+        public Vector3 CameraTargetOffset
+        {
+            get
+            {
+                if (viewMode == ControllerViewMode.Tps)
+                    return tpsTargetOffset;
+                return fpsTargetOffset;
+            }
+        }
+
+        public float CameraFov
+        {
+            get
+            {
+                if (viewMode == ControllerViewMode.Tps)
+                    return tpsFov;
+                return fpsFov;
+            }
+        }
+
         // Temp data
+        ControllerViewMode dirtyViewMode;
         BuildingMaterial tempBuildingMaterial;
         IDamageableEntity tempDamageableEntity;
         BaseGameEntity tempEntity;
@@ -62,16 +167,16 @@ namespace MultiplayerARPG
         Vector3 aimPosition;
         Vector3 actionLookDirection;
         // Crosshair
-        Vector2 currentCrosshairSize;
-        CrosshairSetting currentCrosshairSetting;
+        public Vector2 CurrentCrosshairSize { get; private set; }
+        public CrosshairSetting CurrentCrosshairSetting { get; private set; }
         // Controlling states
         bool isDoingAction;
         bool mustReleaseFireKey;
         Item rightHandWeapon;
         Item leftHandWeapon;
         MovementState movementState;
-        public BaseWeaponAbility weaponAbility { get; private set; }
-        public WeaponAbilityState weaponAbilityState { get; private set; }
+        public BaseWeaponAbility WeaponAbility { get; private set; }
+        public WeaponAbilityState WeaponAbilityState { get; private set; }
 
         protected override void Awake()
         {
@@ -118,30 +223,30 @@ namespace MultiplayerARPG
 
         protected void SetupEquipWeapons(EquipWeapons equipWeapons)
         {
-            currentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
-            UpdateCrosshair(currentCrosshairSetting, -currentCrosshairSetting.shrinkPerFrame);
+            CurrentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
+            UpdateCrosshair(CurrentCrosshairSetting, -CurrentCrosshairSetting.shrinkPerFrame);
 
             rightHandWeapon = equipWeapons.GetRightHandWeaponItem();
             leftHandWeapon = equipWeapons.GetLeftHandWeaponItem();
             // Weapon ability will be able to use when equip weapon at main-hand only
             if (rightHandWeapon != null && leftHandWeapon == null)
             {
-                if (rightHandWeapon.weaponAbility != weaponAbility)
+                if (rightHandWeapon.weaponAbility != WeaponAbility)
                 {
-                    if (weaponAbility != null)
-                        weaponAbility.Desetup();
-                    weaponAbility = rightHandWeapon.weaponAbility;
-                    if (weaponAbility != null)
-                        weaponAbility.Setup(this, equipWeapons.rightHand);
-                    weaponAbilityState = WeaponAbilityState.Deactivated;
+                    if (WeaponAbility != null)
+                        WeaponAbility.Desetup();
+                    WeaponAbility = rightHandWeapon.weaponAbility;
+                    if (WeaponAbility != null)
+                        WeaponAbility.Setup(this, equipWeapons.rightHand);
+                    WeaponAbilityState = WeaponAbilityState.Deactivated;
                 }
             }
             else
             {
-                if (weaponAbility != null)
-                    weaponAbility.Desetup();
-                weaponAbility = null;
-                weaponAbilityState = WeaponAbilityState.Deactivated;
+                if (WeaponAbility != null)
+                    WeaponAbility.Desetup();
+                WeaponAbility = null;
+                WeaponAbilityState = WeaponAbilityState.Deactivated;
             }
         }
 
@@ -158,6 +263,12 @@ namespace MultiplayerARPG
                 return;
 
             base.Update();
+            if (dirtyViewMode != viewMode)
+            {
+                dirtyViewMode = viewMode;
+                UpdateCameraSettings();
+            }
+
             UpdateLookAtTarget();
             tempDeltaTime = Time.deltaTime;
             turnTimeCounter += tempDeltaTime;
@@ -199,7 +310,7 @@ namespace MultiplayerARPG
             // Update crosshair (with states from last update)
             if (isDoingAction)
             {
-                UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.expandPerFrameWhileAttacking);
+                UpdateCrosshair(CurrentCrosshairSetting, CurrentCrosshairSetting.expandPerFrameWhileAttacking);
             }
             else if (movementState.HasFlag(MovementState.Forward) ||
                 movementState.HasFlag(MovementState.Backward) ||
@@ -207,12 +318,9 @@ namespace MultiplayerARPG
                 movementState.HasFlag(MovementState.Right) ||
                 movementState.HasFlag(MovementState.IsJump))
             {
-                UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.expandPerFrameWhileMoving);
+                UpdateCrosshair(CurrentCrosshairSetting, CurrentCrosshairSetting.expandPerFrameWhileMoving);
             }
-            else
-            {
-                UpdateCrosshair(currentCrosshairSetting, -currentCrosshairSetting.shrinkPerFrame);
-            }
+            UpdateCrosshair(CurrentCrosshairSetting, -CurrentCrosshairSetting.shrinkPerFrame);
 
             // Clear controlling states from last update
             isDoingAction = false;
@@ -247,12 +355,12 @@ namespace MultiplayerARPG
                 {
                     // Attack with right hand weapon
                     tempPressAttackRight = GetPrimaryAttackButton();
-                    if (weaponAbility == null && leftHandWeapon != null)
+                    if (WeaponAbility == null && leftHandWeapon != null)
                     {
                         // Attack with left hand weapon if left hand weapon not empty
                         tempPressAttackLeft = GetSecondaryAttackButton();
                     }
-                    else if (weaponAbility != null)
+                    else if (WeaponAbility != null)
                     {
                         // Use weapon ability if it can
                         tempPressWeaponAbility = GetSecondaryAttackButtonDown();
@@ -432,14 +540,14 @@ namespace MultiplayerARPG
             moveDirection += forward * inputV;
             moveDirection += right * inputH;
             // Set movement state by inputs
-            switch (mode)
+            switch (Mode)
             {
-                case Mode.Adventure:
+                case ControllerMode.Adventure:
                     if (inputV > 0.5f || inputV < -0.5f || inputH > 0.5f || inputH < -0.5f)
                         movementState = MovementState.Forward;
                     moveLookDirection = moveDirection;
                     break;
-                case Mode.Combat:
+                case ControllerMode.Combat:
                     if (inputV > 0.5f)
                         movementState |= MovementState.Forward;
                     else if (inputV < -0.5f)
@@ -452,13 +560,10 @@ namespace MultiplayerARPG
                     break;
             }
 
-            if (weaponAbility != null &&
-                weaponAbility.IsTurnToTargetWhileActivated() &&
-                (weaponAbilityState == WeaponAbilityState.Activated ||
-                weaponAbilityState == WeaponAbilityState.Activating))
+            if (ViewMode == ControllerViewMode.Fps)
             {
                 // Force turn to look direction
-                moveLookDirection = moveDirection;
+                moveLookDirection = actionLookDirection;
                 targetLookDirection = actionLookDirection;
             }
 
@@ -488,7 +593,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Update move direction
-                    if (moveDirection.magnitude != 0f)
+                    if (moveDirection.magnitude != 0f && ViewMode == ControllerViewMode.Tps)
                         targetLookDirection = moveLookDirection;
                 }
             }
@@ -529,9 +634,11 @@ namespace MultiplayerARPG
                         if (SelectedEntity is BuildingEntity)
                             targetBuilding = SelectedEntity as BuildingEntity;
                     }
-                    // While attacking turn to camera forward
+                    // While attacking turn character to camera forward
                     tempCalculateAngle = Vector3.Angle(MovementTransform.forward, actionLookDirection);
-                    if (tempCalculateAngle > 15f)
+                    // Fps mode character always turn to camera forward.
+                    // So set turning state for Tps view mode only
+                    if (tempCalculateAngle > 15f && ViewMode == ControllerViewMode.Tps)
                     {
                         if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                         {
@@ -546,7 +653,7 @@ namespace MultiplayerARPG
                             turningState = TurningState.Activate;
                         }
 
-                        turnTimeCounter = ((180f - tempCalculateAngle) / 180f) * turnToTargetDuration;
+                        turnTimeCounter = (180f - tempCalculateAngle) / 180f * turnToTargetDuration;
                         targetLookDirection = actionLookDirection;
                         // Set movement state by inputs
                         if (inputV > 0.5f)
@@ -585,7 +692,7 @@ namespace MultiplayerARPG
                 }
                 else if (tempPressWeaponAbility)
                 {
-                    switch (weaponAbilityState)
+                    switch (WeaponAbilityState)
                     {
                         case WeaponAbilityState.Activated:
                         case WeaponAbilityState.Activating:
@@ -621,7 +728,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Update move direction
-                    if (moveDirection.magnitude != 0f)
+                    if (moveDirection.magnitude != 0f && ViewMode == ControllerViewMode.Tps)
                         targetLookDirection = moveLookDirection;
                 }
                 // Setup releasing state
@@ -677,12 +784,13 @@ namespace MultiplayerARPG
                 return;
 
             crosshairRect.gameObject.SetActive(!setting.hidden);
-            currentCrosshairSize = crosshairRect.sizeDelta;
             // Change crosshair size by power
-            currentCrosshairSize.x += power;
-            currentCrosshairSize.y += power;
+            Vector3 sizeDelta = crosshairRect.sizeDelta;
+            sizeDelta.x += power;
+            sizeDelta.y += power;
+            CurrentCrosshairSize = sizeDelta;
             // Set crosshair size
-            crosshairRect.sizeDelta = new Vector2(Mathf.Clamp(currentCrosshairSize.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(currentCrosshairSize.y, setting.minSpread, setting.maxSpread));
+            crosshairRect.sizeDelta = new Vector2(Mathf.Clamp(CurrentCrosshairSize.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(CurrentCrosshairSize.y, setting.minSpread, setting.maxSpread));
         }
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
@@ -701,40 +809,48 @@ namespace MultiplayerARPG
 
         protected void UpdateLookAtTarget()
         {
-            tempCalculateAngle = Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection);
-            if (turningState != TurningState.None)
+            if (ViewMode == ControllerViewMode.Tps)
             {
-                if (tempCalculateAngle > 0)
+                tempCalculateAngle = Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection);
+                if (turningState != TurningState.None)
                 {
-                    // Update rotation when angle difference more than 0
-                    tempLookAt = Quaternion.Slerp(tempLookAt, Quaternion.LookRotation(targetLookDirection), turnTimeCounter / turnToTargetDuration);
-                    PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                    if (tempCalculateAngle > 0)
+                    {
+                        // Update rotation when angle difference more than 0
+                        tempLookAt = Quaternion.Slerp(tempLookAt, Quaternion.LookRotation(targetLookDirection), turnTimeCounter / turnToTargetDuration);
+                        PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                    }
+                    else
+                    {
+                        switch (turningState)
+                        {
+                            case TurningState.Attack:
+                                Attack(isLeftHandAttacking, aimPosition);
+                                break;
+                            case TurningState.Activate:
+                                Activate();
+                                break;
+                            case TurningState.UseSkill:
+                                UseSkill(isLeftHandAttacking, aimPosition);
+                                break;
+                        }
+                        turningState = TurningState.None;
+                    }
                 }
                 else
                 {
-                    switch (turningState)
+                    if (tempCalculateAngle > 0)
                     {
-                        case TurningState.Attack:
-                            Attack(isLeftHandAttacking, aimPosition);
-                            break;
-                        case TurningState.Activate:
-                            Activate();
-                            break;
-                        case TurningState.UseSkill:
-                            UseSkill(isLeftHandAttacking, aimPosition);
-                            break;
+                        // Update rotation when angle difference more than 0
+                        tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
+                        PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
                     }
-                    turningState = TurningState.None;
                 }
             }
-            else
+            else if (ViewMode == ControllerViewMode.Fps)
             {
-                if (tempCalculateAngle > 0)
-                {
-                    // Update rotation when angle difference more than 0
-                    tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
-                    PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
-                }
+                // Turn character to look direction immediately
+                PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(targetLookDirection).eulerAngles);
             }
         }
 
@@ -830,40 +946,40 @@ namespace MultiplayerARPG
 
         public void ActivateWeaponAbility()
         {
-            if (weaponAbility == null)
+            if (WeaponAbility == null)
                 return;
 
-            if (weaponAbilityState == WeaponAbilityState.Activated ||
-                weaponAbilityState == WeaponAbilityState.Activating)
+            if (WeaponAbilityState == WeaponAbilityState.Activated ||
+                WeaponAbilityState == WeaponAbilityState.Activating)
                 return;
 
-            weaponAbility.OnPreActivate();
-            weaponAbilityState = WeaponAbilityState.Activating;
+            WeaponAbility.OnPreActivate();
+            WeaponAbilityState = WeaponAbilityState.Activating;
         }
 
         private void UpdateActivatedWeaponAbility(float deltaTime)
         {
-            if (weaponAbility == null)
+            if (WeaponAbility == null)
                 return;
 
-            if (weaponAbilityState == WeaponAbilityState.Activated ||
-                weaponAbilityState == WeaponAbilityState.Deactivated)
+            if (WeaponAbilityState == WeaponAbilityState.Activated ||
+                WeaponAbilityState == WeaponAbilityState.Deactivated)
                 return;
 
-            weaponAbilityState = weaponAbility.UpdateActivation(weaponAbilityState, deltaTime);
+            WeaponAbilityState = WeaponAbility.UpdateActivation(WeaponAbilityState, deltaTime);
         }
 
         private void DeactivateWeaponAbility()
         {
-            if (weaponAbility == null)
+            if (WeaponAbility == null)
                 return;
 
-            if (weaponAbilityState == WeaponAbilityState.Deactivated ||
-                weaponAbilityState == WeaponAbilityState.Deactivating)
+            if (WeaponAbilityState == WeaponAbilityState.Deactivated ||
+                WeaponAbilityState == WeaponAbilityState.Deactivating)
                 return;
 
-            weaponAbility.OnPreDeactivate();
-            weaponAbilityState = WeaponAbilityState.Deactivating;
+            WeaponAbility.OnPreDeactivate();
+            WeaponAbilityState = WeaponAbilityState.Deactivating;
         }
 
         public void Activate()
@@ -944,6 +1060,26 @@ namespace MultiplayerARPG
         public bool GetSecondaryAttackButtonDown()
         {
             return InputManager.GetButtonDown("Fire2");
+        }
+
+        public void SetActiveCrosshair(bool isActive)
+        {
+            if (crosshairRect != null &&
+                crosshairRect.gameObject.activeSelf != isActive)
+            {
+                // Hide crosshair when not active
+                crosshairRect.gameObject.SetActive(isActive);
+            }
+        }
+
+        public void UpdateCameraSettings()
+        {
+            CacheGameplayCameraControls.CacheCamera.fieldOfView = CameraFov;
+            CacheGameplayCameraControls.targetOffset = CameraTargetOffset;
+            CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
+            CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
+            CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
+            CacheGameplayCameraControls.enableWallHitSpring = viewMode == ControllerViewMode.Tps ? true : false;
         }
     }
 }

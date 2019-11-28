@@ -15,8 +15,8 @@ namespace MultiplayerARPG
         {
             if (BasePlayerCharacterController.Singleton != null && controller == null)
                 controller = BasePlayerCharacterController.Singleton as ShooterPlayerCharacterController;
-            canZoom = controller != null && controller.weaponAbility != null &&
-                controller.weaponAbility is ZoomWeaponAbility;
+            canZoom = controller != null && controller.WeaponAbility != null &&
+                controller.WeaponAbility is ZoomWeaponAbility;
 
             foreach (GameObject obj in activateObjects)
             {
