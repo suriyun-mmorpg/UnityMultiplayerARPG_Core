@@ -57,13 +57,7 @@ public class CharacterItem : INetSerializableWithElement
     [System.NonSerialized]
     private Item cacheSkillResetItem;
 
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
+    public LiteNetLibElement Element { get; set; }
 
     public List<int> Sockets
     {

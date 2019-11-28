@@ -7,13 +7,7 @@ public class EquipWeapons : INetSerializableWithElement
     public CharacterItem rightHand;
     public CharacterItem leftHand;
 
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
+    public LiteNetLibElement Element { get; set; }
 
     public EquipWeapons()
     {

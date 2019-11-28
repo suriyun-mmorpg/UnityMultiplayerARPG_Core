@@ -53,14 +53,8 @@ public class CharacterSummon : INetSerializableWithElement
             return cacheEntity;
         }
     }
-
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
+    
+    public LiteNetLibElement Element { get; set; }
 
     private void MakeCache()
     {

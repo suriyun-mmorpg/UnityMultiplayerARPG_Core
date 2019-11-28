@@ -46,13 +46,7 @@ public class CharacterSkill : INetSerializableWithElement
     [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cachePassiveBuffIncreaseDamages;
 
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
+    public LiteNetLibElement Element { get; set; }
 
     private void MakeCache()
     {

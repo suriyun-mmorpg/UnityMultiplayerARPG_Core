@@ -15,14 +15,8 @@ public class CharacterHotkey : INetSerializableWithElement
     public string hotkeyId;
     public HotkeyType type;
     public string relateId;
-
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
+    
+    public LiteNetLibElement Element { get; set; }
 
     public void Serialize(NetDataWriter writer)
     {
