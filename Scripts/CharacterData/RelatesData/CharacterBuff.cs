@@ -65,7 +65,13 @@ public class CharacterBuff : INetSerializableWithElement
     [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
 
-    public LiteNetLibElement Element { get; set; }
+    [System.NonSerialized]
+    private LiteNetLibElement element;
+    public LiteNetLibElement Element
+    {
+        get { return element; }
+        set { element = value; }
+    }
 
     private void MakeCache()
     {
