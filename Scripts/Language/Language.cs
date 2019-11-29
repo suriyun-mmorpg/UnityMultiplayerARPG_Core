@@ -624,7 +624,16 @@ namespace MultiplayerARPG
         /// <summary>
         /// Format => {0} = {Mount Title}
         /// </summary>
-        UI_FORMAT_SKILL_MOUNT
+        UI_FORMAT_SKILL_MOUNT,
+        // Format - Skip Title
+        /// <summary>
+        /// Format => {1} = {Value}
+        /// </summary>
+        UI_FORMAT_SKIP_TITLE,
+        /// <summary>
+        /// Format => {1} = {Value}
+        /// </summary>
+        UI_FORMAT_SKIP_TITLE_PERCENTAGE,
     }
 
     public static class DefaultLocale
@@ -969,6 +978,9 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_SKILL_SUMMON.ToString(), "Summon {0} Lv. {1} x {2} (Max: {3}), {4} Secs.");
             // Format - Skill Mount
             Texts.Add(UIFormatKeys.UI_FORMAT_SKILL_MOUNT.ToString(), "Mount {0}");
+            // Format - Skip Title
+            Texts.Add(UIFormatKeys.UI_FORMAT_SKIP_TITLE.ToString(), "{1}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_SKIP_TITLE_PERCENTAGE.ToString(), "{1}%");
         }
     }
 
