@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override sealed Buff GetBuff()
+        public override Buff GetBuff()
         {
             return buff;
         }

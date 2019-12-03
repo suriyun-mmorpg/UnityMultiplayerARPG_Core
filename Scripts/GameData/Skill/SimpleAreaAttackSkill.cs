@@ -90,14 +90,14 @@ namespace MultiplayerARPG
             return isDebuff;
         }
 
-        public sealed override Buff GetDebuff()
+        public override Buff GetDebuff()
         {
             if (!IsDebuff())
                 return default(Buff);
             return debuff;
         }
 
-        public sealed override GameEffectCollection GetHitEffect()
+        public override GameEffectCollection GetHitEffect()
         {
             return hitEffects;
         }

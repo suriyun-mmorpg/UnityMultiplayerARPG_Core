@@ -294,41 +294,41 @@ namespace MultiplayerARPG
             return GameDataHelpers.GetEffectivenessDamage(CacheEffectivenessAttributes, skillUser);
         }
 
-        public override sealed Buff GetBuff()
+        public override Buff GetBuff()
         {
             if (!IsBuff())
                 return new Buff();
             return buff;
         }
 
-        public override sealed Buff GetDebuff()
+        public override Buff GetDebuff()
         {
             if (!IsDebuff())
                 return new Buff();
             return debuff;
         }
 
-        public override sealed SkillSummon GetSummon()
+        public override SkillSummon GetSummon()
         {
             return summon;
         }
 
-        public override sealed SkillMount GetMount()
+        public override SkillMount GetMount()
         {
             return mount;
         }
 
-        public override sealed ItemCraft GetItemCraft()
+        public override ItemCraft GetItemCraft()
         {
             return itemCraft;
         }
 
-        public override sealed GameEffectCollection GetHitEffect()
+        public override GameEffectCollection GetHitEffect()
         {
             return hitEffects;
         }
 
-        public override sealed bool RequiredTarget()
+        public override bool RequiredTarget()
         {
             return skillBuffType == SkillBuffType.BuffToTarget;
         }
