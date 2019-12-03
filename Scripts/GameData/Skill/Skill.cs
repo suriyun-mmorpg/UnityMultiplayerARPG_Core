@@ -25,6 +25,7 @@ namespace MultiplayerARPG
             Toggle,
         }
 
+        [Header("Type")]
         public SkillType skillType;
 
         [Header("Attack")]

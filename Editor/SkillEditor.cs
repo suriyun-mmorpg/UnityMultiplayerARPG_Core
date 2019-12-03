@@ -19,8 +19,16 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.coolDownDuration));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.skillAttackType));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.skillBuffType));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.moveSpeedRateWhileUsingSkill));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.castEffects));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.castDuration));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.canBeInterruptedWhileCasting));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.consumeMp));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.coolDownDuration));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.moveSpeedRateWhileUsingSkill));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.castEffects));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.castDuration));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.canBeInterruptedWhileCasting));
             // Normal Attack skill
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.hitEffects));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.damageInfo));
