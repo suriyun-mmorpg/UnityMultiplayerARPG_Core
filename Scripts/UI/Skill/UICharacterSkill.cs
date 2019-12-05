@@ -101,7 +101,9 @@ namespace MultiplayerARPG
                     coolDownRemainsDuration = 0f;
             }
             else
+            {
                 coolDownRemainsDuration = 0f;
+            }
 
             // Update UIs
             float coolDownDuration = Skill.GetCoolDownDuration(Level);
@@ -122,24 +124,34 @@ namespace MultiplayerARPG
             }
 
             if (imageCoolDownGage != null)
+            {
                 imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+            }
         }
 
         protected override void UpdateUI()
         {
             GameMessage.Type gameMessageType;
             if (IsOwningCharacter() && Skill.CanLevelUp(OwningCharacter, CharacterSkill.level, out gameMessageType))
+            {
                 onAbleToLevelUp.Invoke();
+            }
             else
+            {
                 onUnableToLevelUp.Invoke();
+            }
         }
 
         protected override void UpdateData()
         {
             if (Level <= 0)
+            {
                 onSetLevelZeroData.Invoke();
+            }
             else
+            {
                 onSetNonLevelZeroData.Invoke();
+            }
 
             if (uiTextTitle != null)
             {
@@ -193,22 +205,15 @@ namespace MultiplayerARPG
 
             if (uiTextAvailableWeapons != null)
             {
-                if (Skill.availableWeapons == null || Skill.availableWeapons.Length == 0)
+                if (string.IsNullOrEmpty(Skill.AvailableWeaponsText))
                 {
                     uiTextAvailableWeapons.gameObject.SetActive(false);
                 }
                 else
                 {
-                    string str = string.Empty;
-                    foreach (WeaponType availableWeapon in Skill.availableWeapons)
-                    {
-                        if (!string.IsNullOrEmpty(str))
-                            str += "/";
-                        str += availableWeapon.Title;
-                    }
                     uiTextAvailableWeapons.text = string.Format(
                         LanguageManager.GetText(formatKeyAvailableWeapons),
-                        str);
+                        Skill.AvailableWeaponsText);
                     uiTextAvailableWeapons.gameObject.SetActive(true);
                 }
             }

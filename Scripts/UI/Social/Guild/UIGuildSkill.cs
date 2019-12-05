@@ -87,7 +87,9 @@ namespace MultiplayerARPG
                     coolDownRemainsDuration = 0f;
             }
             else
+            {
                 coolDownRemainsDuration = 0f;
+            }
 
             // Update UIs
             float coolDownDuration = GuildSkill.GetCoolDownDuration(Level);
@@ -108,27 +110,35 @@ namespace MultiplayerARPG
             }
 
             if (imageCoolDownGage != null)
+            {
                 imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+            }
         }
 
         protected override void UpdateUI()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null &&
-                Level < GuildSkill.GetMaxLevel() &&
+            if (owningCharacter != null && Level < GuildSkill.maxLevel &&
                 BaseGameNetworkManager.ClientGuild != null &&
                 BaseGameNetworkManager.ClientGuild.IsLeader(owningCharacter) &&
                 BaseGameNetworkManager.ClientGuild.skillPoint > 0)
+            {
                 onAbleToLevelUp.Invoke();
+            }
             else
+            {
                 onUnableToLevelUp.Invoke();
+            }
 
-            if (owningCharacter != null &&
-                Level > 1 &&
-                GuildSkill.skillType == GuildSkillType.Active)
+            if (owningCharacter != null && Level > 1 &&
+                GuildSkill.GetSkillType() == GuildSkillType.Active)
+            {
                 onAbleToUse.Invoke();
+            }
             else
+            {
                 onUnableToUse.Invoke();
+            }
         }
 
         protected override void UpdateData()
@@ -168,7 +178,7 @@ namespace MultiplayerARPG
 
             if (uiTextSkillType != null)
             {
-                switch (GuildSkill.skillType)
+                switch (GuildSkill.GetSkillType())
                 {
                     case GuildSkillType.Active:
                         uiTextSkillType.text = string.Format(
@@ -185,7 +195,7 @@ namespace MultiplayerARPG
 
             if (uiTextIncreaseMaxMember != null)
             {
-                int amount = GuildSkill.increaseMaxMember.GetAmount(Level);
+                int amount = GuildSkill.GetIncreaseMaxMember(Level);
                 uiTextIncreaseMaxMember.text = string.Format(
                     LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_MAX_MEMBER.ToString()),
                     amount.ToString("N0"));
@@ -194,7 +204,7 @@ namespace MultiplayerARPG
 
             if (uiTextIncreaseExpGainPercentage != null)
             {
-                float amount = GuildSkill.increaseExpGainPercentage.GetAmount(Level);
+                float amount = GuildSkill.GetIncreaseExpGainPercentage(Level);
                 uiTextIncreaseExpGainPercentage.text = string.Format(
                     LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
@@ -203,7 +213,7 @@ namespace MultiplayerARPG
 
             if (uiTextIncreaseGoldGainPercentage != null)
             {
-                float amount = GuildSkill.increaseGoldGainPercentage.GetAmount(Level);
+                float amount = GuildSkill.GetIncreaseGoldGainPercentage(Level);
                 uiTextIncreaseGoldGainPercentage.text = string.Format(
                     LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
@@ -212,7 +222,7 @@ namespace MultiplayerARPG
 
             if (uiTextIncreaseShareExpGainPercentage != null)
             {
-                float amount = GuildSkill.increaseShareExpGainPercentage.GetAmount(Level);
+                float amount = GuildSkill.GetIncreaseShareExpGainPercentage(Level);
                 uiTextIncreaseShareExpGainPercentage.text = string.Format(
                     LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
@@ -221,7 +231,7 @@ namespace MultiplayerARPG
 
             if (uiTextIncreaseShareGoldGainPercentage != null)
             {
-                float amount = GuildSkill.increaseShareGoldGainPercentage.GetAmount(Level);
+                float amount = GuildSkill.GetIncreaseShareGoldGainPercentage(Level);
                 uiTextIncreaseShareGoldGainPercentage.text = string.Format(
                     LanguageManager.GetText(UIFormatKeys.UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
@@ -230,7 +240,7 @@ namespace MultiplayerARPG
 
             if (uiTextDecreaseExpLostPercentage != null)
             {
-                float amount = GuildSkill.decreaseExpLostPercentage.GetAmount(Level);
+                float amount = GuildSkill.GetDecreaseExpLostPercentage(Level);
                 uiTextDecreaseExpLostPercentage.text = string.Format(
                     LanguageManager.GetText(UIFormatKeys.UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE.ToString()),
                     amount.ToString("N2"));
@@ -240,18 +250,22 @@ namespace MultiplayerARPG
             if (uiSkillBuff != null)
             {
                 if (!GuildSkill.IsBuff())
+                {
                     uiSkillBuff.Hide();
+                }
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new UIBuffData(GuildSkill.buff, Level);
+                    uiSkillBuff.Data = new UIBuffData(GuildSkill.GetBuff(), Level);
                 }
             }
 
             if (uiNextLevelSkill != null)
             {
                 if (Level + 1 > GuildSkill.maxLevel)
+                {
                     uiNextLevelSkill.Hide();
+                }
                 else
                 {
                     uiNextLevelSkill.Data = new UIGuildSkillData(GuildSkill, (short)(Level + 1));

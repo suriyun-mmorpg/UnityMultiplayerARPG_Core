@@ -313,8 +313,8 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (armorType == null && gameInstance != null)
-                    armorType = gameInstance.DefaultArmorType;
+                if (armorType == null && GameInstance.Singleton != null)
+                    armorType = GameInstance.Singleton.DefaultArmorType;
                 return armorType;
             }
         }
@@ -328,8 +328,8 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (weaponType == null && gameInstance != null)
-                    weaponType = gameInstance.DefaultWeaponType;
+                if (weaponType == null && GameInstance.Singleton != null)
+                    weaponType = GameInstance.Singleton.DefaultWeaponType;
                 return weaponType;
             }
         }

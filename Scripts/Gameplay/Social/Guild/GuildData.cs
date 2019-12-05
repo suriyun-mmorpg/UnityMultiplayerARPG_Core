@@ -268,12 +268,12 @@ namespace MultiplayerARPG
                 if (!GameInstance.GuildSkills.TryGetValue(skill.Key, out tempGuildSkill) || tempLevel <= 0)
                     continue;
 
-                IncreaseMaxMember += tempGuildSkill.increaseMaxMember.GetAmount(tempLevel);
-                IncreaseExpGainPercentage += tempGuildSkill.increaseExpGainPercentage.GetAmount(tempLevel);
-                IncreaseGoldGainPercentage += tempGuildSkill.increaseGoldGainPercentage.GetAmount(tempLevel);
-                IncreaseShareExpGainPercentage += tempGuildSkill.increaseShareExpGainPercentage.GetAmount(tempLevel);
-                IncreaseShareGoldGainPercentage += tempGuildSkill.increaseShareGoldGainPercentage.GetAmount(tempLevel);
-                DecreaseExpLostPercentage += tempGuildSkill.decreaseExpLostPercentage.GetAmount(tempLevel);
+                IncreaseMaxMember += tempGuildSkill.GetIncreaseMaxMember(tempLevel);
+                IncreaseExpGainPercentage += tempGuildSkill.GetIncreaseExpGainPercentage(tempLevel);
+                IncreaseGoldGainPercentage += tempGuildSkill.GetIncreaseGoldGainPercentage(tempLevel);
+                IncreaseShareExpGainPercentage += tempGuildSkill.GetIncreaseShareExpGainPercentage(tempLevel);
+                IncreaseShareGoldGainPercentage += tempGuildSkill.GetIncreaseShareGoldGainPercentage(tempLevel);
+                DecreaseExpLostPercentage += tempGuildSkill.GetDecreaseExpLostPercentage(tempLevel);
             }
         }
 

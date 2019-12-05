@@ -30,7 +30,6 @@ namespace MultiplayerARPG
 
         [Header("Attack")]
         public SkillAttackType skillAttackType;
-        public GameEffectCollection hitEffects;
         public DamageInfo damageInfo;
         public DamageIncremental damageAmount;
         public DamageEffectivenessAttribute[] effectivenessAttributes;
@@ -321,11 +320,6 @@ namespace MultiplayerARPG
         public override ItemCraft GetItemCraft()
         {
             return itemCraft;
-        }
-
-        public override GameEffectCollection GetHitEffect()
-        {
-            return hitEffects;
         }
 
         public override bool RequiredTarget()

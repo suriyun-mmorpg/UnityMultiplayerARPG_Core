@@ -75,7 +75,9 @@ namespace MultiplayerARPG
         private DamageElement defaultDamageElement;
         [Tooltip("Default hit effect, will be used when attacks to enemies or receives damages from enemies")]
         [SerializeField]
+        [System.Obsolete]
         private GameEffectCollection defaultHitEffects;
+        private GameEffect[] defaultDamageHitEffects;
         [SerializeField]
         private int[] expTree;
         [Tooltip("You can add game data here or leave this empty to let it load data from Resources folders")]
@@ -337,15 +339,15 @@ namespace MultiplayerARPG
                     defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
                     defaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
                     defaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
-                    defaultDamageElement.hitEffects = DefaultHitEffects;
+                    defaultDamageElement.SetDamageHitEffects(DefaultDamageHitEffects);
                 }
                 return defaultDamageElement;
             }
         }
 
-        public GameEffectCollection DefaultHitEffects
+        public GameEffect[] DefaultDamageHitEffects
         {
-            get { return defaultHitEffects; }
+            get { return defaultDamageHitEffects; }
         }
 
         public SocialSystemSetting SocialSystemSetting

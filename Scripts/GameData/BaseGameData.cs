@@ -31,7 +31,6 @@ namespace MultiplayerARPG
             get { return Language.GetText(descriptions, description); }
         }
         public int DataId { get { return MakeDataId(Id); } }
-        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         public static int MakeDataId(string id)
         {

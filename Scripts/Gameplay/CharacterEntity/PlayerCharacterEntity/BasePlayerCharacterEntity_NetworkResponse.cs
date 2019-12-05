@@ -105,7 +105,7 @@ namespace MultiplayerARPG
                 return;
 
             GuildSkill guildSkill;
-            if (!GameInstance.GuildSkills.TryGetValue(dataId, out guildSkill) || guildSkill.skillType != GuildSkillType.Active)
+            if (!GameInstance.GuildSkills.TryGetValue(dataId, out guildSkill) || guildSkill.GetSkillType() != GuildSkillType.Active)
                 return;
 
             GuildData guild;

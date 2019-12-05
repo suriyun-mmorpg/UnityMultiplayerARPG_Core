@@ -111,7 +111,7 @@ public class CharacterBuff : INetSerializableWithElement
                     break;
                 case BuffType.GuildSkillBuff:
                     if (GameInstance.GuildSkills.TryGetValue(dataId, out cacheGuildSkill) && cacheGuildSkill != null)
-                        cacheBuff = cacheGuildSkill.buff;
+                        cacheBuff = cacheGuildSkill.GetBuff();
                     break;
             }
             cacheDuration = cacheBuff.GetDuration(level);

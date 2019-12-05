@@ -14,9 +14,16 @@ namespace MultiplayerARPG
         public float moveSpeedRateWhileUsingSkill = 0f;
 
         [Header("Casting Effects")]
+        [System.Obsolete("`GameEffectCollection` will be removed in future version")]
         public GameEffectCollection castEffects;
+        public GameEffect[] skillCastEffects;
         public IncrementalFloat castDuration;
         public bool canBeInterruptedWhileCasting;
+
+        [Header("Casted Effects")]
+        [System.Obsolete("`GameEffectCollection` will be removed in future version")]
+        public GameEffectCollection hitEffects;
+        public GameEffect[] damageHitEffects;
 
         [Header("Available Weapons")]
         [Tooltip("An available weapons, if it not set every weapons is available")]
@@ -31,6 +38,7 @@ namespace MultiplayerARPG
         [Header("Requirements to Levelup")]
         public SkillRequirement requirement;
 
+        [System.NonSerialized]
         private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
         public Dictionary<Attribute, float> CacheRequireAttributeAmounts
         {
@@ -42,6 +50,7 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
         private Dictionary<BaseSkill, short> cacheRequireSkillLevels;
         public Dictionary<BaseSkill, short> CacheRequireSkillLevels
         {
@@ -53,11 +62,93 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
+        private bool alreadySetAvailableWeaponsText;
+        [System.NonSerialized]
+        private string availableWeaponsText;
+        public string AvailableWeaponsText
+        {
+            get
+            {
+                if (!alreadySetAvailableWeaponsText)
+                {
+                    string str = string.Empty;
+                    foreach (WeaponType availableWeapon in availableWeapons)
+                    {
+                        if (!string.IsNullOrEmpty(str))
+                            str += "/";
+                        str += availableWeapon.Title;
+                    }
+                    availableWeaponsText = str;
+                    alreadySetAvailableWeaponsText = true;
+                }
+                return availableWeaponsText;
+            }
+        }
+
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            if (castEffects.effects != null && castEffects.effects.Length > 0)
+            {
+                skillCastEffects = castEffects.effects;
+                castEffects.effects = null;
+                hasChanges = true;
+            }
+
+            if (hitEffects.effects != null && hitEffects.effects.Length > 0)
+            {
+                damageHitEffects = hitEffects.effects;
+                hitEffects.effects = null;
+                hasChanges = true;
+            }
+            return hasChanges;
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
             if (availableWeapons != null && availableWeapons.Length > 0)
                 GameInstance.AddWeaponTypes(availableWeapons);
+        }
+
+        public GameEffect[] GetSkillCastEffect()
+        {
+            return skillCastEffects;
+        }
+
+        public float GetCastDuration(short skillLevel)
+        {
+            return castDuration.GetAmount(skillLevel);
+        }
+
+        public GameEffect[] GetDamageHitEffects()
+        {
+            return damageHitEffects;
+        }
+
+        public int GetConsumeMp(short level)
+        {
+            return consumeMp.GetAmount(level);
+        }
+
+        public float GetCoolDownDuration(short level)
+        {
+            float duration = coolDownDuration.GetAmount(level);
+            if (duration < 0f)
+                duration = 0f;
+            return duration;
+        }
+
+        public short GetRequireCharacterLevel(short level)
+        {
+            return requirement.characterLevel.GetAmount((short)(level + 1));
+        }
+
+        public bool IsAvailable(ICharacterData character)
+        {
+            short skillLevel;
+            return character.GetCaches().Skills.TryGetValue(this, out skillLevel) && skillLevel > 0;
         }
 
         public abstract SkillType GetSkillType();
@@ -79,7 +170,6 @@ namespace MultiplayerARPG
         public virtual SkillSummon GetSummon() { return new SkillSummon(); }
         public virtual SkillMount GetMount() { return new SkillMount(); }
         public virtual ItemCraft GetItemCraft() { return new ItemCraft(); }
-        public virtual GameEffectCollection GetHitEffect() { return new GameEffectCollection(); }
 
         public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
@@ -203,7 +293,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (character.Level < this.GetRequireCharacterLevel(level))
+            if (character.Level < GetRequireCharacterLevel(level))
             {
                 gameMessageType = GameMessage.Type.NotEnoughLevel;
                 return false;
@@ -241,7 +331,7 @@ namespace MultiplayerARPG
             if (playerCharacter != null)
             {
                 // Only player character will check is skill is learned
-                if (!isItem && !this.IsAvailable(character))
+                if (!isItem && !IsAvailable(character))
                 {
                     gameMessageType = GameMessage.Type.SkillIsNotLearned;
                     return false;
@@ -291,7 +381,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (character.CurrentMp < this.GetConsumeMp(level))
+            if (character.CurrentMp < GetConsumeMp(level))
             {
                 gameMessageType = GameMessage.Type.NotEnoughMp;
                 return false;

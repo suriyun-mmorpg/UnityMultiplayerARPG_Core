@@ -174,7 +174,7 @@ namespace MultiplayerARPG
                 // Tell clients that character is casting
                 // Play special effect
                 if (IsClient)
-                    Model.InstantiateEffect(skill.castEffects.effects);
+                    Model.InstantiateEffect(skill.GetSkillCastEffect());
                 // Play casting animation
                 if (IsClient)
                     CharacterModel.PlaySkillCastClip(skill.DataId, castingSkillDuration);

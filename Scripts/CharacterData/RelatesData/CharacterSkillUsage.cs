@@ -68,13 +68,19 @@ public class CharacterSkillUsage : INetSerializableWithElement
         switch (type)
         {
             case SkillUsageType.Skill:
-                coolDownRemainsDuration = GetSkill().GetCoolDownDuration(level);
-                int consumeMp = GetSkill().GetConsumeMp(level);
-                if (character.CurrentMp >= consumeMp)
-                    character.CurrentMp -= consumeMp;
+                if (GetSkill() != null)
+                {
+                    coolDownRemainsDuration = GetSkill().GetCoolDownDuration(level);
+                    int consumeMp = GetSkill().GetConsumeMp(level);
+                    if (character.CurrentMp >= consumeMp)
+                        character.CurrentMp -= consumeMp;
+                }
                 break;
             case SkillUsageType.GuildSkill:
-                coolDownRemainsDuration = GetGuildSkill().GetCoolDownDuration(level);
+                if (GetGuildSkill() != null)
+                {
+                    coolDownRemainsDuration = GetGuildSkill().GetCoolDownDuration(level);
+                }
                 break;
         }
     }
