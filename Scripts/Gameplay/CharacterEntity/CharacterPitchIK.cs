@@ -15,10 +15,12 @@ namespace MultiplayerARPG
         public Axis axis = Axis.Z;
         public HumanBodyBones pitchBone = HumanBodyBones.UpperChest;
         public Vector3 rotateOffset;
-        [Range(-1f, 1f)]
-        public float multiplier = -1f;
+        public bool inversePitch = true;
         public float lerpDamping = 25f;
+        [Range(0f, 180f)]
+        public float maxAngle = 0f;
         private BaseCharacterEntity characterEntity;
+        private float tempPitch;
         private Quaternion tempRotation;
         private Quaternion pitchRotation;
 
@@ -41,17 +43,29 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            tempPitch = characterEntity.Pitch;
+            if (maxAngle > 0f)
+            {
+                if (tempPitch >= 180f && tempPitch < 360f - maxAngle)
+                {
+                    tempPitch = 360f - maxAngle;
+                }
+                else if (tempPitch < 180f && tempPitch > maxAngle)
+                {
+                    tempPitch = maxAngle;
+                }
+            }
             tempRotation = Quaternion.identity;
             switch (axis)
             {
                 case Axis.X:
-                    tempRotation = Quaternion.Euler(Vector3.left * characterEntity.Pitch * multiplier);
+                    tempRotation = Quaternion.Euler(Vector3.left * tempPitch * (inversePitch ? -1 : 1));
                     break;
                 case Axis.Y:
-                    tempRotation = Quaternion.Euler(Vector3.up * characterEntity.Pitch * multiplier);
+                    tempRotation = Quaternion.Euler(Vector3.up * tempPitch * (inversePitch ? -1 : 1));
                     break;
                 case Axis.Z:
-                    tempRotation = Quaternion.Euler(Vector3.forward * characterEntity.Pitch * multiplier);
+                    tempRotation = Quaternion.Euler(Vector3.forward * tempPitch * (inversePitch ? -1 : 1));
                     break;
             }
             tempRotation = tempRotation * Quaternion.Euler(rotateOffset);
