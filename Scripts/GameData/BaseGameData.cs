@@ -45,6 +45,7 @@ namespace MultiplayerARPG
         }
 #endif
 
+        [ContextMenu("Force Validate")]
         public virtual bool Validate()
         {
             return false;

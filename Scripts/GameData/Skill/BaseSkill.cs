@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         public float moveSpeedRateWhileUsingSkill = 0f;
 
         [HideInInspector]
-        [System.Obsolete("`GameEffectCollection` will be removed in future version")]
+        [System.Obsolete("`GameEffectCollection` is deprecated and will be removed in future version")]
         public GameEffectCollection castEffects;
         [Header("Casting Effects")]
         public GameEffect[] skillCastEffects;
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         public bool canBeInterruptedWhileCasting;
 
         [HideInInspector]
-        [System.Obsolete("`GameEffectCollection` will be removed in future version")]
+        [System.Obsolete("`GameEffectCollection` is deprecated and will be removed in future version")]
         public GameEffectCollection hitEffects;
         [Header("Casted Effects")]
         public GameEffect[] damageHitEffects;
@@ -93,18 +93,20 @@ namespace MultiplayerARPG
             bool hasChanges = false;
             if (castEffects.effects != null && castEffects.effects.Length > 0)
             {
-                skillCastEffects = castEffects.effects;
+                if (skillCastEffects == null || skillCastEffects.Length == 0)
+                    skillCastEffects = castEffects.effects;
                 castEffects.effects = null;
                 hasChanges = true;
             }
 
             if (hitEffects.effects != null && hitEffects.effects.Length > 0)
             {
-                damageHitEffects = hitEffects.effects;
+                if (damageHitEffects == null || damageHitEffects.Length == 0)
+                    damageHitEffects = hitEffects.effects;
                 hitEffects.effects = null;
                 hasChanges = true;
             }
-            return hasChanges;
+            return base.Validate() || hasChanges;
         }
 
         public override void PrepareRelatesData()

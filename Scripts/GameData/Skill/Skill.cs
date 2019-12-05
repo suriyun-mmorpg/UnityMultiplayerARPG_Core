@@ -68,7 +68,8 @@ namespace MultiplayerARPG
 
         public override bool Validate()
         {
-            return GameDataMigration.MigrateBuffArmor(buff, out buff) ||
+            return base.Validate() ||
+                GameDataMigration.MigrateBuffArmor(buff, out buff) ||
                 GameDataMigration.MigrateBuffArmor(debuff, out debuff);
         }
 
