@@ -13,16 +13,18 @@ namespace MultiplayerARPG
         [Tooltip("This is move speed rate while using this skill")]
         public float moveSpeedRateWhileUsingSkill = 0f;
 
-        [Header("Casting Effects")]
+        [HideInInspector]
         [System.Obsolete("`GameEffectCollection` will be removed in future version")]
         public GameEffectCollection castEffects;
+        [Header("Casting Effects")]
         public GameEffect[] skillCastEffects;
         public IncrementalFloat castDuration;
         public bool canBeInterruptedWhileCasting;
 
-        [Header("Casted Effects")]
+        [HideInInspector]
         [System.Obsolete("`GameEffectCollection` will be removed in future version")]
         public GameEffectCollection hitEffects;
+        [Header("Casted Effects")]
         public GameEffect[] damageHitEffects;
 
         [Header("Available Weapons")]
