@@ -61,22 +61,8 @@ namespace MultiplayerARPG
 
                 if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
                 {
-                    requestUseSkillErrorTime[dataId] = Time.unscaledTime;
+                    requestUseSkillErrorTime[dataId] = currentTime;
                     gameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
-                }
-                return false;
-            }
-
-            CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
-            if (skill.IsAttack() && !ValidateAmmo(weapon))
-            {
-                if (!IsOwnerClient)
-                    return false;
-
-                if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
-                {
-                    requestUseSkillErrorTime[dataId] = Time.unscaledTime;
-                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
                 }
                 return false;
             }

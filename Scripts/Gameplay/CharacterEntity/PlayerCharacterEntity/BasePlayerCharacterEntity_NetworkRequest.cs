@@ -27,12 +27,11 @@ namespace MultiplayerARPG
 
             if (index >= nonEquipItems.Count)
                 return false;
-
-            CharacterItem characterItem = nonEquipItems[index];
-            if (characterItem.IsLock())
+            
+            if (nonEquipItems[index].IsLock())
                 return false;
 
-            Item item = characterItem.GetSkillItem();
+            Item item = nonEquipItems[index].GetSkillItem();
             if (item == null)
                 return false;
 
@@ -54,22 +53,8 @@ namespace MultiplayerARPG
 
                 if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
                 {
-                    requestUseSkillErrorTime[dataId] = Time.unscaledTime;
+                    requestUseSkillErrorTime[dataId] = currentTime;
                     gameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
-                }
-                return false;
-            }
-
-            CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
-            if (skill.IsAttack() && !ValidateAmmo(weapon))
-            {
-                if (!IsOwnerClient)
-                    return false;
-
-                if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
-                {
-                    requestUseSkillErrorTime[dataId] = Time.unscaledTime;
-                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
                 }
                 return false;
             }

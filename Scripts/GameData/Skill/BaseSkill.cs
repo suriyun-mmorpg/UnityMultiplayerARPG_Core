@@ -415,6 +415,14 @@ namespace MultiplayerARPG
                     return false;
                 }
             }
+
+            CharacterItem weapon = character.GetAvailableWeapon(ref isLeftHand);
+            if (IsAttack() && !character.ValidateAmmo(weapon))
+            {
+                gameMessageType = GameMessage.Type.NoAmmo;
+                return false;
+            }
+
             return true;
         }
     }

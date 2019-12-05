@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncReload(bool isLeftHand)
+        protected virtual void NetFuncReload(bool isLeftHand)
         {
             if (!CanAttack())
                 return;
