@@ -554,7 +554,7 @@ namespace MultiplayerARPG
 
         private void UpdateMovementInputs()
         {
-            // TODO: Set pitch
+            PlayerCharacterEntity.Pitch = CacheGameplayCameraControls.CacheCameraTransform.eulerAngles.x;
 
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;

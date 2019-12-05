@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             }
         }
         public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
-        public float Pitch { get { return pitch.Value * 100f; } set { pitch.Value = (byte)(value * 0.01f); } }
+        public float Pitch { get { return (float)pitch.Value * 0.01f * 360f; } set { pitch.Value = (byte)(value / 360f * 100); } }
 
         public IList<EquipWeapons> SelectableWeaponSets
         {
