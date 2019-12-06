@@ -129,7 +129,7 @@ namespace MultiplayerARPG
                 return;
 
             // Start reload routine
-            isAttackingOrUsingSkill = true;
+            IsAttackingOrUsingSkill = true;
 
             // Play animations
             RequestPlayReloadAnimation(isLeftHand);
@@ -150,10 +150,10 @@ namespace MultiplayerARPG
                 CharacterModel.GetLeftHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDurations, out totalDuration);
 
             // Set doing action state at clients and server
-            isAttackingOrUsingSkill = true;
+            IsAttackingOrUsingSkill = true;
 
             // Calculate move speed rate while doing action at clients and server
-            moveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, null);
+            MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, null);
 
             // Animations will plays on clients only
             if (IsClient)
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
                 yield return new WaitForSecondsRealtime(totalDuration - triggerDurations[i]);
             }
             animActionType = AnimActionType.None;
-            isAttackingOrUsingSkill = false;
+            IsAttackingOrUsingSkill = false;
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
                 return;
             
             // Start attack routine
-            isAttackingOrUsingSkill = true;
+            IsAttackingOrUsingSkill = true;
 
             // Play animations
             RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex, aimPosition);
@@ -251,10 +251,10 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamageAmounts(ref isLeftHand);
 
             // Set doing action state at clients and server
-            isAttackingOrUsingSkill = true;
+            IsAttackingOrUsingSkill = true;
 
             // Calculate move speed rate while doing action at clients and server
-            moveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, null);
+            MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, null);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             float playSpeedMultiplier = GetAnimSpeedRate(animActionType);
@@ -317,7 +317,7 @@ namespace MultiplayerARPG
 
             // Set doing action state to none at clients and server
             animActionType = AnimActionType.None;
-            isAttackingOrUsingSkill = false;
+            IsAttackingOrUsingSkill = false;
         }
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)

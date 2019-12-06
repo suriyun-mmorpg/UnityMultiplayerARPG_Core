@@ -108,7 +108,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (CacheMonsterCharacterEntity.Summoner == null && CacheEntity.isInSafeArea)
+            if (CacheMonsterCharacterEntity.Summoner == null && CacheEntity.IsInSafeArea)
             {
                 // If monster move into safe area, wander to another place
                 RandomWanderTarget(time);
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
             BaseCharacterEntity targetEntity;
             if (CacheEntity.TryGetTargetEntity(out targetEntity))
             {
-                if (targetEntity.IsDead() || targetEntity.isInSafeArea)
+                if (targetEntity.IsDead() || targetEntity.IsInSafeArea)
                 {
                     // If target is dead or in safe area stop attacking
                     CacheEntity.SetTargetEntity(null);

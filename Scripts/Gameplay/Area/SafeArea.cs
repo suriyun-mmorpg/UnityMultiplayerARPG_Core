@@ -21,7 +21,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            characterEntity.isInSafeArea = true;
+            characterEntity.IsInSafeArea = true;
         }
 
         private void OnTriggerExit(Collider other)
@@ -33,7 +33,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            characterEntity.isInSafeArea = false;
+            characterEntity.IsInSafeArea = false;
         }
     }
 }

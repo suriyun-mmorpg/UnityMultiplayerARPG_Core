@@ -215,8 +215,8 @@ namespace MultiplayerARPG
                 character.MovementState.HasFlag(MovementState.IsSprinting) &&
                 character.CurrentStamina > 0f)
                 moveSpeed *= moveSpeedRateWhileSprint;
-            if (character.isAttackingOrUsingSkill)
-                moveSpeed *= character.moveSpeedRateWhileAttackOrUseSkill;
+            if (character.IsAttackingOrUsingSkill)
+                moveSpeed *= character.MoveSpeedRateWhileAttackOrUseSkill;
             return moveSpeed;
         }
 

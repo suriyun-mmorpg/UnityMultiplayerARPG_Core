@@ -41,10 +41,9 @@ namespace MultiplayerARPG
                 return x.distance.CompareTo(y.distance);
             }
         }
-
-        [HideInInspector, System.NonSerialized]
+        
         // This will be TRUE when this character enter to safe area
-        public bool isInSafeArea;
+        public bool IsInSafeArea { get; set; }
 
         #region Serialize data
         [Header("Character Settings")]
@@ -71,13 +70,13 @@ namespace MultiplayerARPG
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
         protected short reloadingAmmoAmount;
-        public bool isAttackingOrUsingSkill { get; protected set; }
-        public bool isCastingSkillCanBeInterrupted { get; protected set; }
-        public bool isCastingSkillInterrupted { get; protected set; }
-        public float castingSkillDuration { get; protected set; }
-        public float castingSkillCountDown { get; protected set; }
-        public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
-        public float respawnGroundedCheckCountDown { get; protected set; }
+        public bool IsAttackingOrUsingSkill { get; protected set; }
+        public bool IsCastingSkillCanBeInterrupted { get; protected set; }
+        public bool IsCastingSkillInterrupted { get; protected set; }
+        public float CastingSkillDuration { get; protected set; }
+        public float CastingSkillCountDown { get; protected set; }
+        public float MoveSpeedRateWhileAttackOrUseSkill { get; protected set; }
+        public float RespawnGroundedCheckCountDown { get; protected set; }
         protected float lastActionTime;
         protected float lastCombatantErrorTime;
         protected float lastMountTime;
@@ -226,7 +225,7 @@ namespace MultiplayerARPG
             if (PassengingVehicleEntity != null)
                 tempEnableMovement = false;
 
-            if (respawnGroundedCheckCountDown <= 0)
+            if (RespawnGroundedCheckCountDown <= 0)
             {
                 // Killing character when it fall below dead Y
                 if (gameInstance.DimensionType == DimensionType.Dimension3D &&
@@ -245,7 +244,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                respawnGroundedCheckCountDown -= Time.deltaTime;
+                RespawnGroundedCheckCountDown -= Time.deltaTime;
             }
 
             // Clear data when character dead
@@ -253,7 +252,7 @@ namespace MultiplayerARPG
             {
                 // Clear action states when character dead
                 animActionType = AnimActionType.None;
-                isAttackingOrUsingSkill = false;
+                IsAttackingOrUsingSkill = false;
                 InterruptCastingSkill();
                 ExitVehicle();
             }
@@ -267,11 +266,11 @@ namespace MultiplayerARPG
             // Update current model
             model = ModelManager.ActiveModel;
             // Update casting skill count down, will show gage at clients
-            if (castingSkillCountDown > 0)
+            if (CastingSkillCountDown > 0)
             {
-                castingSkillCountDown -= Time.deltaTime;
-                if (castingSkillCountDown < 0)
-                    castingSkillCountDown = 0;
+                CastingSkillCountDown -= Time.deltaTime;
+                if (CastingSkillCountDown < 0)
+                    CastingSkillCountDown = 0;
             }
             // Update animation states at clients
             if (IsClient)
@@ -414,7 +413,7 @@ namespace MultiplayerARPG
             CurrentStamina = this.GetCaches().MaxStamina;
             CurrentFood = this.GetCaches().MaxFood;
             CurrentWater = this.GetCaches().MaxWater;
-            respawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
+            RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
             // Send OnRespawn to owner player only
             RequestOnRespawn();
         }
@@ -936,7 +935,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanDoActions()
         {
-            return !IsDead() && !IsPlayingActionAnimation() && !isAttackingOrUsingSkill;
+            return !IsDead() && !IsPlayingActionAnimation() && !IsAttackingOrUsingSkill;
         }
 
         public override sealed float GetMoveSpeed()
@@ -1280,7 +1279,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return true;
 
-            if (isInSafeArea || characterEntity.isInSafeArea)
+            if (IsInSafeArea || characterEntity.IsInSafeArea)
             {
                 // If this character or another character is in safe area so it cannot receive damage
                 return false;

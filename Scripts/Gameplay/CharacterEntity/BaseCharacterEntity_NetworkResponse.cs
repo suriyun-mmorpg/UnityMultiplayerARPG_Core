@@ -33,7 +33,7 @@ namespace MultiplayerARPG
             else
             {
                 animActionType = AnimActionType.None;
-                isAttackingOrUsingSkill = false;
+                IsAttackingOrUsingSkill = false;
             }
         }
 

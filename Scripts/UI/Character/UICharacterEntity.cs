@@ -49,8 +49,8 @@ namespace MultiplayerARPG
             {
                 currentMp = Data.CurrentMp;
                 maxMp = Data.GetCaches().MaxMp;
-                castingSkillCountDown = Data.castingSkillCountDown;
-                castingSkillDuration = Data.castingSkillDuration;
+                castingSkillCountDown = Data.CastingSkillCountDown;
+                castingSkillDuration = Data.CastingSkillDuration;
             }
             if (uiGageMp != null)
                 uiGageMp.Update(currentMp, maxMp);

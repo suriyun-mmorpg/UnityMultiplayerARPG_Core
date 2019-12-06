@@ -189,7 +189,7 @@ namespace MultiplayerARPG
                 out totalDuration);
 
             // Start use skill routine
-            isAttackingOrUsingSkill = true;
+            IsAttackingOrUsingSkill = true;
 
             // Play animations
             RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition);
