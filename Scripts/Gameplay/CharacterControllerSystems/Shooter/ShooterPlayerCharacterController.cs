@@ -813,7 +813,10 @@ namespace MultiplayerARPG
             {
                 UpdateCrosshair(CurrentCrosshairSetting, CurrentCrosshairSetting.expandPerFrameWhileMoving);
             }
-            UpdateCrosshair(CurrentCrosshairSetting, -CurrentCrosshairSetting.shrinkPerFrame);
+            else
+            {
+                UpdateCrosshair(CurrentCrosshairSetting, -CurrentCrosshairSetting.shrinkPerFrame);
+            }
         }
 
         private void UpdateCrosshair(CrosshairSetting setting, float power)
