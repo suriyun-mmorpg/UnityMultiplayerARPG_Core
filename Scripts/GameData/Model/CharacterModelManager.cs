@@ -25,6 +25,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private BaseCharacterModel fpsModel;
+        public BaseCharacterModel FpsModel
+        {
+            get { return fpsModel; }
+        }
+
+        [SerializeField]
         private VehicleCharacterModel[] vehicleModels;
 
         private Dictionary<int, VehicleCharacterModel> cacheVehicleModels;

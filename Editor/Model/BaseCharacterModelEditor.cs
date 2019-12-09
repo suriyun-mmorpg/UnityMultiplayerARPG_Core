@@ -8,11 +8,11 @@ namespace MultiplayerARPG
     {
         protected override void SetFieldCondition()
         {
-            ShowOnBool("isMainModel", true, "hiddingObjects");
-            ShowOnBool("isMainModel", true, "effectContainers");
-            ShowOnBool("isMainModel", true, "setEffectContainersBySetters");
-            ShowOnBool("isMainModel", true, "equipmentContainers");
-            ShowOnBool("isMainModel", true, "setEquipmentContainersBySetters");
+            ShowOnBool("IsMainOrFpsModel", true, "hiddingObjects");
+            ShowOnBool("IsMainOrFpsModel", true, "effectContainers");
+            ShowOnBool("IsMainOrFpsModel", true, "setEffectContainersBySetters");
+            ShowOnBool("IsMainOrFpsModel", true, "equipmentContainers");
+            ShowOnBool("IsMainOrFpsModel", true, "setEquipmentContainersBySetters");
         }
     }
 }

@@ -11,7 +11,9 @@ namespace MultiplayerARPG
     {
         [HideInInspector]
         public CharacterModelManager modelManager;
-        public bool isMainModel { get { return modelManager != null && modelManager.MainModel == this; } }
+        public bool IsMainModel { get { return modelManager != null && modelManager.MainModel == this; } }
+        public bool IsFpsModel { get { return modelManager != null && modelManager.FpsModel == this; } }
+        public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
 
         [Header("Equipment Containers")]
         public EquipmentContainer[] equipmentContainers;
@@ -94,7 +96,7 @@ namespace MultiplayerARPG
             DestroyCacheModels();
             DestroyCacheEffects();
 
-            if (modelManager != null && !isMainModel)
+            if (modelManager != null && !IsMainOrFpsModel)
             {
                 // Sub-model will use some data same as main model
                 hiddingObjects = modelManager.MainModel.hiddingObjects;
