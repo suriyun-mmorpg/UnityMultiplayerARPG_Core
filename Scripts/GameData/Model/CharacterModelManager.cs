@@ -30,7 +30,7 @@ namespace MultiplayerARPG
         {
             get { return fpsModel; }
         }
-
+        
         [SerializeField]
         private VehicleCharacterModel[] vehicleModels;
 
@@ -77,6 +77,11 @@ namespace MultiplayerARPG
                 }
                 return false;
             }
+        }
+
+        public bool IsFpsMode
+        {
+            get; private set;
         }
 
         private Dictionary<byte, bool> hideStates = new Dictionary<byte, bool>();
@@ -178,10 +183,21 @@ namespace MultiplayerARPG
             activeModel.SwitchModel(previousModel);
         }
 
-        public void SetHide(byte setter, bool hideState)
+        public void SetHide(byte setter, bool isHide)
         {
-            hideStates[setter] = hideState;
-            MainModel.SetHide(IsHide);
+            hideStates[setter] = isHide;
+            SetFpsMode(IsFpsMode);
+        }
+
+        public void SetFpsMode(bool isFpsMode)
+        {
+            IsFpsMode = isFpsMode;
+            MainModel.SetHide(IsFpsMode || IsHide);
+            if (FpsModel != null)
+            {
+                // FPS model will hide when it's not fps mode
+                FpsModel.SetHide(!IsFpsMode || IsHide);
+            }
         }
     }
 

@@ -9,9 +9,9 @@ namespace MultiplayerARPG
 {
     public class GameEntityModel : MonoBehaviour
     {
-        [Tooltip("These object will be deactivate while hidding")]
+        [Tooltip("These object will be deactivated while hidding")]
         public GameObject[] hiddingObjects;
-        [Tooltip("These renderers will be deactivate while hidding")]
+        [Tooltip("These renderers will be disabled while hidding")]
         public Renderer[] hiddingRenderers;
 
         public bool IsHide { get; protected set; }

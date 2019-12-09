@@ -90,7 +90,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (viewMode == ControllerViewMode.Tps)
+                if (ViewMode == ControllerViewMode.Tps)
                     return tpsZoomDistance;
                 return fpsZoomDistance;
             }
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (viewMode == ControllerViewMode.Tps)
+                if (ViewMode == ControllerViewMode.Tps)
                     return tpsMinZoomDistance;
                 return fpsZoomDistance;
             }
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (viewMode == ControllerViewMode.Tps)
+                if (ViewMode == ControllerViewMode.Tps)
                     return tpsMaxZoomDistance;
                 return fpsZoomDistance;
             }
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (viewMode == ControllerViewMode.Tps)
+                if (ViewMode == ControllerViewMode.Tps)
                     return tpsTargetOffset;
                 return fpsTargetOffset;
             }
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (viewMode == ControllerViewMode.Tps)
+                if (ViewMode == ControllerViewMode.Tps)
                     return tpsFov;
                 return fpsFov;
             }
@@ -1129,7 +1129,8 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
             CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
             CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
-            CacheGameplayCameraControls.enableWallHitSpring = viewMode == ControllerViewMode.Tps ? true : false;
+            CacheGameplayCameraControls.enableWallHitSpring = ViewMode == ControllerViewMode.Tps ? true : false;
+            PlayerCharacterEntity.ModelManager.SetFpsMode(viewMode == ControllerViewMode.Fps);
         }
 
         public bool IsInFront(Vector3 position)
