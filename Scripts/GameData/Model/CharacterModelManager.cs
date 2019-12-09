@@ -79,6 +79,10 @@ namespace MultiplayerARPG
         private void Awake()
         {
             SetupModelManager();
+        }
+
+        private void Start()
+        {
             SwitchModel(MainModel);
         }
 
