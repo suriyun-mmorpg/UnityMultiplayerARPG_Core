@@ -11,6 +11,8 @@ namespace MultiplayerARPG
     {
         [Tooltip("These object will be deactivate while hidding")]
         public GameObject[] hiddingObjects;
+        [Tooltip("These renderers will be deactivate while hidding")]
+        public Renderer[] hiddingRenderers;
 
         public bool IsHide { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
@@ -82,10 +84,21 @@ namespace MultiplayerARPG
             if (IsHide == isHide)
                 return;
             IsHide = isHide;
-            foreach (GameObject hiddingObject in hiddingObjects)
+            if (hiddingObjects != null && hiddingObjects.Length > 0)
             {
-                if (hiddingObject.activeSelf != !IsHide)
-                    hiddingObject.SetActive(!IsHide);
+                foreach (GameObject hiddingObject in hiddingObjects)
+                {
+                    if (hiddingObject.activeSelf != !IsHide)
+                        hiddingObject.SetActive(!IsHide);
+                }
+            }
+            if (hiddingRenderers != null && hiddingRenderers.Length > 0)
+            {
+                foreach (Renderer hiddingRenderer in hiddingRenderers)
+                {
+                    if (hiddingRenderer.enabled != !IsHide)
+                        hiddingRenderer.enabled = !IsHide;
+                }
             }
         }
 
