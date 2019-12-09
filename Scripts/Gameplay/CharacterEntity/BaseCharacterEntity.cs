@@ -121,6 +121,11 @@ namespace MultiplayerARPG
             get { return ModelManager.ActiveModel; }
         }
 
+        public BaseCharacterModel FpsModel
+        {
+            get { return ModelManager.FpsModel; }
+        }
+
         public Transform MeleeDamageTransform
         {
             get
@@ -286,6 +291,15 @@ namespace MultiplayerARPG
                 {
                     // Set current direction to character model 2D
                     (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
+                }
+                if (FpsModel != null)
+                {
+                    // Update is dead state
+                    FpsModel.SetIsDead(IsDead());
+                    // Update move speed multiplier
+                    FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                    // Update movement animation
+                    FpsModel.SetMovementState(MovementState);
                 }
             }
             // Set character model hide state
@@ -636,8 +650,8 @@ namespace MultiplayerARPG
             else
                 ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);
 
-            if (CharacterModel != null)
-                CharacterModel.PlayHitAnimation();
+            // Only TPS model will plays hit animation
+            CharacterModel.PlayHitAnimation();
 
             // If current hp <= 0, character dead
             if (IsDead())
@@ -801,23 +815,28 @@ namespace MultiplayerARPG
                 case DamageType.Melee:
                     if (damageInfo.hitOnlySelectedTarget)
                     {
+                        IDamageableEntity selectedTarget;
+                        bool foundSelectedTarget = TryGetTargetEntity(out selectedTarget);
                         // If hit only selected target, find selected character (only 1 character) to apply damage
-                        if (!TryGetTargetEntity(out tempDamageableEntity))
+                        int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
+                        if (tempOverlapSize == 0)
+                            return;
+                        // Find characters that receiving damages
+                        for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
-                            int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
-                            if (tempOverlapSize == 0)
-                                return;
-                            // Target entity not set, use overlapped object as target
-                            for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
+                            tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
+                            tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                            if (tempDamageableEntity != null &&
+                                (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this))
                             {
-                                tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
-                                tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                                if (tempDamageableEntity != null &&
-                                    (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this))
+                                if (foundSelectedTarget && selectedTarget.Entity == tempDamageableEntity.Entity)
+                                {
+                                    // This is selected target, so this is character which must receives damages
                                     break;
+                                }
                             }
                         }
-                        // Target receive damage
+                        // Only 1 target will receives damages
                         if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
                             (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this) &&
                             IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
@@ -840,7 +859,7 @@ namespace MultiplayerARPG
                         {
                             tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                            // Target receive damage
+                            // Target receives damages
                             if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
                                 (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this) &&
                                 IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))

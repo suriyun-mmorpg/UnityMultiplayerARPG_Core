@@ -39,7 +39,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private float turnToTargetDuration = 0.1f;
         [SerializeField]
-        private float findTargetRaycastDistance = 512f;
+        private float findTargetRaycastDistance = 16f;
         [SerializeField]
         private bool showConfirmConstructionUI;
         [SerializeField]
@@ -495,7 +495,7 @@ namespace MultiplayerARPG
                 tempDistance = Vector3.Distance(MovementTransform.position, tempHitInfo.point);
                 // If this is damageable entity
                 tempDamageableEntity = tempHitInfo.collider.GetComponent<IDamageableEntity>();
-                if (tempDamageableEntity != null && tempDistance <= attackDistance)
+                if (tempDamageableEntity != null)
                 {
                     tempEntity = tempDamageableEntity.Entity;
 

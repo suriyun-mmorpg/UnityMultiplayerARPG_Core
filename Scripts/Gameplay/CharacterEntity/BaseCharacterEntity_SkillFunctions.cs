@@ -115,10 +115,12 @@ namespace MultiplayerARPG
         {
             IsAttackingOrUsingSkill = false;
             CastingSkillDuration = CastingSkillCountDown = 0;
-            if (CharacterModel != null)
+            CharacterModel.StopActionAnimation();
+            CharacterModel.StopSkillCastAnimation();
+            if (FpsModel != null)
             {
-                CharacterModel.StopActionAnimation();
-                CharacterModel.StopSkillCastAnimation();
+                FpsModel.StopActionAnimation();
+                FpsModel.StopSkillCastAnimation();
             }
         }
 
@@ -172,12 +174,20 @@ namespace MultiplayerARPG
             if (CastingSkillDuration > 0f)
             {
                 // Tell clients that character is casting
-                // Play special effect
                 if (IsClient)
-                    Model.InstantiateEffect(skill.GetSkillCastEffect());
-                // Play casting animation
-                if (IsClient)
+                {
+                    // Play special effect
+                    CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
+                    // Play casting animation
                     CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                    if (FpsModel)
+                    {
+                        // Play special effect
+                        FpsModel.InstantiateEffect(skill.GetSkillCastEffect());
+                        // Play casting animation
+                        FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                    }
+                }
                 // Wait until end of cast duration
                 yield return new WaitForSeconds(CastingSkillDuration);
             }
@@ -187,7 +197,11 @@ namespace MultiplayerARPG
             {
                 // Animations will plays on clients only
                 if (IsClient)
+                {
                     CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
+                    if (FpsModel)
+                        FpsModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
+                }
 
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
@@ -200,7 +214,11 @@ namespace MultiplayerARPG
 
                     // Special effects will plays on clients only
                     if (IsClient)
+                    {
                         CharacterModel.PlayWeaponLaunchEffect(animActionType);
+                        if (FpsModel != null)
+                            FpsModel.PlayWeaponLaunchEffect(animActionType);
+                    }
 
                     // Trigger skill event
                     if (onUseSkillRoutine != null)

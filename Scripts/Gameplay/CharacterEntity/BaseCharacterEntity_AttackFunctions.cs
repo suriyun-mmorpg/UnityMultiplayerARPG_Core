@@ -160,6 +160,8 @@ namespace MultiplayerARPG
             {
                 // Play animation
                 CharacterModel.PlayActionAnimation(animActionType, reloadingWeaponItem.WeaponType.DataId, 0);
+                if (FpsModel != null)
+                    FpsModel.PlayActionAnimation(animActionType, reloadingWeaponItem.WeaponType.DataId, 0);
             }
 
             for (int i = 0; i < triggerDurations.Length; ++i)
@@ -264,6 +266,8 @@ namespace MultiplayerARPG
             {
                 // Play animation
                 CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
+                if (FpsModel != null)
+                    FpsModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
             }
 
             float remainsDuration = totalDuration;
@@ -280,6 +284,8 @@ namespace MultiplayerARPG
                 {
                     // Play weapon launch special effects
                     CharacterModel.PlayWeaponLaunchEffect(animActionType);
+                    if (FpsModel != null)
+                        FpsModel.PlayWeaponLaunchEffect(animActionType);
                 }
 
                 // Call on attack to extend attack functionality while attacking
