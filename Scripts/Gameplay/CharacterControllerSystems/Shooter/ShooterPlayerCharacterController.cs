@@ -206,6 +206,7 @@ namespace MultiplayerARPG
 
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
+            characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraControls.CacheCameraTransform);
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)

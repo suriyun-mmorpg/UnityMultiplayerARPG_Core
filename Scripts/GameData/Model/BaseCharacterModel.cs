@@ -9,10 +9,9 @@ namespace MultiplayerARPG
 {
     public abstract class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel
     {
-        [HideInInspector]
-        public CharacterModelManager modelManager;
-        public bool IsMainModel { get { return modelManager != null && modelManager.MainModel == this; } }
-        public bool IsFpsModel { get { return modelManager != null && modelManager.FpsModel == this; } }
+        public CharacterModelManager ModelManager { get; set; }
+        public bool IsMainModel { get { return ModelManager != null && ModelManager.MainModel == this; } }
+        public bool IsFpsModel { get { return ModelManager != null && ModelManager.FpsModel == this; } }
         public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
 
         [Header("Equipment Containers")]
@@ -96,12 +95,13 @@ namespace MultiplayerARPG
             DestroyCacheModels();
             DestroyCacheEffects();
 
-            if (modelManager != null && !IsMainOrFpsModel)
+            if (ModelManager != null && !IsMainOrFpsModel)
             {
                 // Sub-model will use some data same as main model
-                hiddingObjects = modelManager.MainModel.hiddingObjects;
-                effectContainers = modelManager.MainModel.effectContainers;
-                equipmentContainers = modelManager.MainModel.equipmentContainers;
+                hiddingObjects = ModelManager.MainModel.hiddingObjects;
+                hiddingRenderers = ModelManager.MainModel.hiddingRenderers;
+                effectContainers = ModelManager.MainModel.effectContainers;
+                equipmentContainers = ModelManager.MainModel.equipmentContainers;
             }
 
             if (previousModel != null)
