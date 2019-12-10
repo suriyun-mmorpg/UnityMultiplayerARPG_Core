@@ -394,7 +394,7 @@ namespace MultiplayerARPG
 
                 // Set aim position
                 tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
-                if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
+                if (tempDistance < tempNearestDistance)
                 {
                     aimPosition = tempHitInfo.point;
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
@@ -507,7 +507,7 @@ namespace MultiplayerARPG
                         continue;
 
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
+                    if (tempDistance < tempNearestDistance)
                     {
                         tempNearestDistance = tempDistance;
                         if (tempEntity != null)
@@ -1132,11 +1132,6 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
             CacheGameplayCameraControls.enableWallHitSpring = ViewMode == ControllerViewMode.Tps ? true : false;
             PlayerCharacterEntity.ModelManager.SetFpsMode(viewMode == ControllerViewMode.Fps);
-        }
-
-        public bool IsInFront(Vector3 position)
-        {
-            return Mathf.Abs(Vector3.Angle(cameraForward, PlayerCharacterEntity.CacheTransform.position - position)) > 120f;
         }
     }
 }
