@@ -45,6 +45,7 @@ namespace MultiplayerARPG
         KeyValuePair<CombatAmountType, int> tempCombatTextData;
         private float tempTime;
         private float lastSpawnCombatTextTime;
+        private GameEffect[] pendingHitEffects;
 
         public override void OnSetup()
         {
@@ -74,6 +75,15 @@ namespace MultiplayerARPG
         protected void NetFuncCombatAmount(byte byteCombatAmountType, int amount)
         {
             spawningCombatTexts.Enqueue(new KeyValuePair<CombatAmountType, int>((CombatAmountType)byteCombatAmountType, amount));
+            switch ((CombatAmountType)byteCombatAmountType)
+            {
+                case CombatAmountType.NormalDamage:
+                case CombatAmountType.CriticalDamage:
+                case CombatAmountType.BlockedDamage:
+                    if (Model != null)
+                        Model.InstantiateEffect(pendingHitEffects);
+                    break;
+            }
         }
 
         public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
@@ -125,8 +135,7 @@ namespace MultiplayerARPG
                     break;
                 }
             }
-            if (Model != null)
-                Model.InstantiateEffect(effects);
+            pendingHitEffects = effects;
         }
     }
 }
