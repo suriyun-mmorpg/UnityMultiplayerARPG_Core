@@ -339,13 +339,29 @@ namespace MultiplayerARPG
                 return;
 
             Reward reward = gameplayRule.MakeMonsterReward(MonsterDatabase);
-            BasePlayerCharacterEntity lastPlayer = null;
-            if (lastAttacker != null)
-                lastPlayer = lastAttacker as BasePlayerCharacterEntity;
-            GuildData tempGuildData;
-            PartyData tempPartyData;
+            // Temp data which will be in-use in loop
+            BaseCharacterEntity tempCharacterEntity;
             BasePlayerCharacterEntity tempPlayerCharacterEntity;
             BaseMonsterCharacterEntity tempMonsterCharacterEntity;
+            // Last player is last player who kill the monster
+            // Whom will have permission to pickup an items before other
+            BasePlayerCharacterEntity lastPlayer = null;
+            if (lastAttacker != null)
+            {
+                if (lastAttacker is BaseMonsterCharacterEntity)
+                {
+                    tempMonsterCharacterEntity = lastAttacker as BaseMonsterCharacterEntity;
+                    if (tempMonsterCharacterEntity.Summoner != null &&
+                        tempMonsterCharacterEntity.Summoner is BasePlayerCharacterEntity)
+                    {
+                        // Set its summoner as main enemy
+                        lastAttacker = tempMonsterCharacterEntity.Summoner;
+                    }
+                }
+                lastPlayer = lastAttacker as BasePlayerCharacterEntity;
+            }
+            GuildData tempGuildData;
+            PartyData tempPartyData;
             bool givenRewardExp;
             bool givenRewardCurrency;
             float shareGuildExpRate;
@@ -357,19 +373,31 @@ namespace MultiplayerARPG
                     if (enemy == null)
                         continue;
 
+                    tempCharacterEntity = enemy;
                     givenRewardExp = false;
                     givenRewardCurrency = false;
                     shareGuildExpRate = 0f;
 
-                    ReceivedDamageRecord receivedDamageRecord = receivedDamageRecords[enemy];
+                    ReceivedDamageRecord receivedDamageRecord = receivedDamageRecords[tempCharacterEntity];
                     float rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)this.GetCaches().MaxHp;
                     if (rewardRate > 1f)
                         rewardRate = 1f;
 
-                    if (enemy is BasePlayerCharacterEntity)
+                    if (tempCharacterEntity is BaseMonsterCharacterEntity)
+                    {
+                        tempMonsterCharacterEntity = tempCharacterEntity as BaseMonsterCharacterEntity;
+                        if (tempMonsterCharacterEntity.Summoner != null &&
+                            tempMonsterCharacterEntity.Summoner is BasePlayerCharacterEntity)
+                        {
+                            // Set its summoner as main enemy
+                            tempCharacterEntity = tempMonsterCharacterEntity.Summoner;
+                        }
+                    }
+
+                    if (tempCharacterEntity is BasePlayerCharacterEntity)
                     {
                         bool makeMostDamage = false;
-                        tempPlayerCharacterEntity = enemy as BasePlayerCharacterEntity;
+                        tempPlayerCharacterEntity = tempCharacterEntity as BasePlayerCharacterEntity;
                         // Clear looters list when it is found new player character who make most damages
                         if (rewardRate > tempHighRewardRate)
                         {
