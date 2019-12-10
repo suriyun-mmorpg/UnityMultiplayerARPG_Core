@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public abstract class BaseDamageEntity : MonoBehaviour
     {
-        protected IAttackerEntity attacker;
+        protected IGameEntity attacker;
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> damageAmounts;
         protected BaseSkill skill;
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
         }
 
         public virtual void Setup(
-            IAttackerEntity attacker,
+            IGameEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,

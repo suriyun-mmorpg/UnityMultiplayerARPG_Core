@@ -60,7 +60,7 @@ namespace MultiplayerARPG
         {
             if (target == null)
                 return;
-            target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel);
+            target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel, buffApplier);
         }
     }
 }

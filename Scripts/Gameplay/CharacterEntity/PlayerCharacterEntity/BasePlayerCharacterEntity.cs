@@ -104,7 +104,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override sealed void Killed(BaseCharacterEntity lastAttacker)
+        public override sealed void Killed(IGameEntity lastAttacker)
         {
             float expLostPercentage = gameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;

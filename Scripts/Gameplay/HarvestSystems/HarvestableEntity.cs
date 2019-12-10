@@ -92,13 +92,16 @@ namespace MultiplayerARPG
                 onHarvestableDestroy.Invoke();
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
+        public override void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || weapon == null)
                 return;
 
             base.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
-            BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
+
+            BaseCharacterEntity attackerCharacter = null;
+            if (attacker != null && attacker.Entity is BaseCharacterEntity)
+                attackerCharacter = attacker.Entity as BaseCharacterEntity;
 
             // Apply damages
             int totalDamage = 0;
@@ -113,16 +116,27 @@ namespace MultiplayerARPG
                 int dataId = receivingItem.item.DataId;
                 short amount = (short)(receivingItem.amountPerDamage * totalDamage);
                 bool droppingToGround = collectType == HarvestableCollectType.DropToGround;
-                if (attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
-                    droppingToGround = true;
-                if (!droppingToGround)
-                    attackerCharacter.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
+
+                if (attackerCharacter != null)
+                {
+                    if (attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
+                        droppingToGround = true;
+                    if (!droppingToGround)
+                        attackerCharacter.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
+                    attackerCharacter.RewardExp(new Reward() { exp = totalDamage * harvestable.expPerDamage }, 1, RewardGivenType.Harvestable);
+                }
                 else
+                {
+                    // Attacker is not character, always drop item to ground
+                    droppingToGround = true;
+                }
+
+                if (droppingToGround)
                     ItemDropEntity.DropItem(this, CharacterItem.Create(dataId, 1, amount), new uint[0]);
-                attackerCharacter.RewardExp(new Reward() { exp = totalDamage * harvestable.expPerDamage }, 1, RewardGivenType.Harvestable);
             }
+
             CurrentHp -= totalDamage;
-            ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);
+            ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
 
             if (IsDead())
             {
@@ -155,10 +169,10 @@ namespace MultiplayerARPG
                 gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
+        public override void ReceivedDamage(IGameEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
-            if (attacker.Entity is BaseCharacterEntity)
+            if (attacker != null && attacker.Entity is BaseCharacterEntity)
                 gameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage);
         }
 

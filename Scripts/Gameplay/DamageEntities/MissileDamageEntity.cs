@@ -50,7 +50,7 @@ namespace MultiplayerARPG
         }
 
         public void Setup(
-            IAttackerEntity attacker,
+            IGameEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,

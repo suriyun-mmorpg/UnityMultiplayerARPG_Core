@@ -123,7 +123,7 @@ namespace MultiplayerARPG
             CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.GuildSkill, dataId);
             newSkillUsage.Use(this, level);
             skillUsages.Add(newSkillUsage);
-            ApplyBuff(dataId, BuffType.GuildSkillBuff, level);
+            ApplyBuff(dataId, BuffType.GuildSkillBuff, level, this);
         }
 
         protected void NetFuncRespawn()

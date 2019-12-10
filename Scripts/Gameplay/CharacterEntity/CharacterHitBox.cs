@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             return characterEntity.IsDead();
         }
 
-        public void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
+        public void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
             foreach (DamageElement key in keys)
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             characterEntity.ReceiveDamageFunction(attacker, weapon, damageAmounts, skill, skillLevel);
         }
 
-        public bool CanReceiveDamageFrom(IAttackerEntity attacker)
+        public bool CanReceiveDamageFrom(IGameEntity attacker)
         {
             return characterEntity.CanReceiveDamageFrom(attacker);
         }

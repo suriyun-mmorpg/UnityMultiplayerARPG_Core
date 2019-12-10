@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         public event ApplyBuffDelegate onApplyBuff;
 
-        public void ApplyBuff(int dataId, BuffType type, short level)
+        public void ApplyBuff(int dataId, BuffType type, short level, IGameEntity buffApplier)
         {
             if (IsDead() || !IsServer)
                 return;
@@ -18,11 +18,12 @@ namespace MultiplayerARPG
                 buffs.RemoveAt(buffIndex);
 
             CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);
-            newBuff.Apply();
+            newBuff.Apply(buffApplier);
             buffs.Add(newBuff);
 
             if (newBuff.GetDuration() <= 0f)
             {
+                CharacterRecoveryData recoveryData = default(CharacterRecoveryData);
                 int tempAmount = 0;
                 // Damage over time
                 DamageElement damageElement;
@@ -36,53 +37,44 @@ namespace MultiplayerARPG
                     if (tempReceivingDamage > 0f)
                         tempAmount += (int)tempReceivingDamage;
                 }
-                CurrentHp -= tempAmount;
+                recoveryData.decreasingHp += tempAmount;
                 // Hp recovery
                 tempAmount = newBuff.GetRecoveryHp();
-                if (tempAmount != 0)
-                {
-                    CurrentHp += tempAmount;
-                    RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
-                }
+                if (tempAmount > 0)
+                    recoveryData.recoveryingHp += tempAmount;
+                else if (tempAmount < 0)
+                    recoveryData.decreasingHp += tempAmount;
                 // Mp recovery
                 tempAmount = newBuff.GetRecoveryMp();
-                if (tempAmount != 0)
-                {
-                    CurrentMp += tempAmount;
-                    RequestCombatAmount(CombatAmountType.MpRecovery, tempAmount);
-                }
+                if (tempAmount > 0)
+                    recoveryData.recoveryingMp += tempAmount;
+                else if (tempAmount < 0)
+                    recoveryData.decreasingMp += tempAmount;
                 // Stamina recovery
                 tempAmount = newBuff.GetRecoveryStamina();
-                if (tempAmount != 0)
-                {
-                    CurrentStamina += tempAmount;
-                    RequestCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
-                }
+                if (tempAmount > 0)
+                    recoveryData.recoveryingStamina += tempAmount;
+                else if (tempAmount < 0)
+                    recoveryData.decreasingStamina += tempAmount;
                 // Food recovery
                 tempAmount = newBuff.GetRecoveryFood();
-                if (tempAmount != 0)
-                {
-                    CurrentFood += tempAmount;
-                    RequestCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
-                }
+                if (tempAmount > 0)
+                    recoveryData.recoveryingFood += tempAmount;
+                else if (tempAmount < 0)
+                    recoveryData.decreasingFood += tempAmount;
                 // Water recovery
                 tempAmount = newBuff.GetRecoveryWater();
-                if (tempAmount != 0)
-                {
-                    CurrentWater += tempAmount;
-                    RequestCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
-                }
+                if (tempAmount > 0)
+                    recoveryData.recoveryingWater += tempAmount;
+                else if (tempAmount < 0)
+                    recoveryData.decreasingWater += tempAmount;
+
+                recoveryData = recoveryData.Apply(this, buffApplier);
+                ValidateRecovery(buffApplier);
             }
-            ValidateRecovery();
+
             if (onApplyBuff != null)
                 onApplyBuff.Invoke(dataId, type, level);
-        }
-
-        protected virtual void ApplyGuildSkillBuff(GuildSkill guildSkill, short level)
-        {
-            if (IsDead() || !IsServer || guildSkill == null || level <= 0)
-                return;
-            ApplyBuff(guildSkill.DataId, BuffType.GuildSkillBuff, level);
         }
     }
 }

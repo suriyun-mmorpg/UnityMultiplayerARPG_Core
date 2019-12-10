@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterModelManager))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
-    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
+    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IGameEntity
     {
         public const float ACTION_DELAY = 0.2f;
         public const float COMBATANT_MESSAGE_DELAY = 1f;
@@ -321,7 +321,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Attack / Receive Damage / Dead / Spawn
-        public void ValidateRecovery(BaseCharacterEntity attacker = null)
+        public void ValidateRecovery(IGameEntity causer = null)
         {
             if (!IsServer)
                 return;
@@ -353,7 +353,7 @@ namespace MultiplayerARPG
                 CurrentWater = this.GetCaches().MaxWater;
 
             if (IsDead())
-                Killed(attacker);
+                Killed(causer);
         }
 
         public void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
@@ -416,15 +416,7 @@ namespace MultiplayerARPG
             return transform;
         }
 
-        public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
-        {
-            base.ReceivedDamage(attacker, combatAmountType, damage);
-            InterruptCastingSkill();
-            if (attacker.Entity is BaseCharacterEntity)
-                gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage);
-        }
-
-        public virtual void Killed(BaseCharacterEntity lastAttacker)
+        public virtual void Killed(IGameEntity lastAttacker)
         {
             StopAllCoroutines();
             buffs.Clear();
@@ -591,7 +583,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
+        public override void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
@@ -605,7 +597,7 @@ namespace MultiplayerARPG
             ReceiveDamageFunction(attacker, weapon, damageAmounts, skill, skillLevel);
         }
 
-        internal void ReceiveDamageFunction(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
+        internal void ReceiveDamageFunction(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             base.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
@@ -658,12 +650,18 @@ namespace MultiplayerARPG
             int totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
 
+            CombatAmountType combatAmountType = CombatAmountType.NormalDamage;
             if (isBlocked)
-                ReceivedDamage(attackerCharacter, CombatAmountType.BlockedDamage, totalDamage);
+                combatAmountType = CombatAmountType.BlockedDamage;
             else if (isCritical)
-                ReceivedDamage(attackerCharacter, CombatAmountType.CriticalDamage, totalDamage);
-            else
-                ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);
+                combatAmountType = CombatAmountType.CriticalDamage;
+            ReceivedDamage(attackerCharacter, combatAmountType, totalDamage);
+
+            // Decrease equipment durability
+            gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, totalDamage);
+
+            // Interrupt casting skill when receive damage
+            InterruptCastingSkill();
 
             // Only TPS model will plays hit animation
             CharacterModel.PlayHitAnimation();
@@ -678,7 +676,7 @@ namespace MultiplayerARPG
             {
                 // Apply debuff if character is not dead
                 if (skill != null && skill.IsDebuff())
-                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel);
+                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, attacker);
             }
         }
         #endregion
@@ -1304,7 +1302,7 @@ namespace MultiplayerARPG
             return !IsAlly(characterEntity) && !IsEnemy(characterEntity);
         }
 
-        public override sealed bool CanReceiveDamageFrom(IAttackerEntity attacker)
+        public override sealed bool CanReceiveDamageFrom(IGameEntity attacker)
         {
             if (attacker == null || attacker.Entity == null)
                 return true;

@@ -398,7 +398,8 @@ namespace MultiplayerARPG
             float decreaseArmorDurability = normalDecreaseArmorDurability;
             GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
             // Decrease Weapon Durability
-            DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
+            if (attacker != null)
+                DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
             // Decrease Shield Durability
             DecreaseEquipShieldsDurability(damageReceiver, decreaseShieldDurability);
             // Decrease Armor Durability

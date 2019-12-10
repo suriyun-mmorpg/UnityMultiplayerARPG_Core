@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         {
             if (!CanUseItem() || item == null || level <= 0 || !this.DecreaseItemsByIndex(itemIndex, 1))
                 return;
-            ApplyBuff(item.DataId, BuffType.PotionBuff, level);
+            ApplyBuff(item.DataId, BuffType.PotionBuff, level, this);
         }
 
         protected void UseItemPetSummon(short itemIndex, Item item, short level, int exp)
