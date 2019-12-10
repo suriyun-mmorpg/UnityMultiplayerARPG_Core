@@ -600,7 +600,10 @@ namespace MultiplayerARPG
         internal void ReceiveDamageFunction(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             base.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
-            BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
+
+            BaseCharacterEntity attackerCharacter = null;
+            if (attacker != null)
+                attackerCharacter = attacker.Entity as BaseCharacterEntity;
 
             // Notify enemy spotted when received damage from enemy
             NotifyEnemySpottedToAllies(attackerCharacter);
@@ -608,18 +611,26 @@ namespace MultiplayerARPG
             // Notify enemy spotted when damage taken to enemy
             attackerCharacter.NotifyEnemySpottedToAllies(this);
 
-            // Calculate chance to hit
-            float hitChance = gameInstance.GameplayRule.GetHitChance(attackerCharacter, this);
-            // If miss, return don't calculate damages
-            if (Random.value > hitChance)
+            bool isCritical = false;
+            bool isBlocked = false;
+            if (attackerCharacter != null)
             {
-                ReceivedDamage(attackerCharacter, CombatAmountType.Miss, 0);
-                return;
+                // Calculate chance to critical
+                isCritical = Random.value <= gameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
+
+                // If miss, return don't calculate damages
+                if (!isCritical && Random.value > gameInstance.GameplayRule.GetHitChance(attackerCharacter, this))
+                {
+                    ReceivedDamage(attackerCharacter, CombatAmountType.Miss, 0);
+                    return;
+                }
+
+                isBlocked = Random.value <= gameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
             }
 
             // Calculate damages
             float calculatingTotalDamage = 0f;
-            if (damageAmounts.Count > 0)
+            if (damageAmounts != null && damageAmounts.Count > 0)
             {
                 MinMaxFloat damageAmount;
                 float tempReceivingDamage;
@@ -632,19 +643,16 @@ namespace MultiplayerARPG
                 }
             }
 
-            // Calculate chance to critical
-            float criticalChance = gameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
-            bool isCritical = Random.value <= criticalChance;
-            // If critical occurs
-            if (isCritical)
-                calculatingTotalDamage = gameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
+            if (attackerCharacter != null)
+            {
+                // If critical occurs
+                if (isCritical)
+                    calculatingTotalDamage = gameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
 
-            // Calculate chance to block
-            float blockChance = gameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
-            bool isBlocked = Random.value <= blockChance;
-            // If block occurs
-            if (isBlocked)
-                calculatingTotalDamage = gameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
+                // If block occurs
+                if (isBlocked)
+                    calculatingTotalDamage = gameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
+            }
 
             // Apply damages
             int totalDamage = (int)calculatingTotalDamage;
@@ -655,10 +663,10 @@ namespace MultiplayerARPG
                 combatAmountType = CombatAmountType.BlockedDamage;
             else if (isCritical)
                 combatAmountType = CombatAmountType.CriticalDamage;
-            ReceivedDamage(attackerCharacter, combatAmountType, totalDamage);
+            ReceivedDamage(attacker, combatAmountType, totalDamage);
 
             // Decrease equipment durability
-            gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, totalDamage);
+            gameInstance.GameplayRule.OnCharacterReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage);
 
             // Interrupt casting skill when receive damage
             InterruptCastingSkill();
@@ -670,7 +678,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 // Call killed function, this should be called only once when dead
-                ValidateRecovery(attackerCharacter);
+                ValidateRecovery(attacker);
             }
             else
             {
