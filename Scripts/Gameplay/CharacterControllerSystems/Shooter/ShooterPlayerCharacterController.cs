@@ -502,7 +502,7 @@ namespace MultiplayerARPG
 
                     // Target must be damageable, not player character entity, within aim distance and alive
                     if (tempDamageableEntity.ObjectId == PlayerCharacterEntity.ObjectId ||
-                        (tempDamageableEntity.Entity is BaseCharacterEntity && (tempDamageableEntity as BaseCharacterEntity).GetCaches().IsHide))
+                        (tempDamageableEntity.Entity is BaseCharacterEntity && (tempDamageableEntity.Entity as BaseCharacterEntity).GetCaches().IsHide))
                         continue;
 
                     // Set aim position and found target
