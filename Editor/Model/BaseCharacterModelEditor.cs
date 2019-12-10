@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         protected override void SetFieldCondition()
         {
             ShowOnBool("IsMainOrFpsModel", true, "hiddingObjects");
+            ShowOnBool("IsMainOrFpsModel", true, "hiddingRenderers");
             ShowOnBool("IsMainOrFpsModel", true, "effectContainers");
             ShowOnBool("IsMainOrFpsModel", true, "setEffectContainersBySetters");
             ShowOnBool("IsMainOrFpsModel", true, "equipmentContainers");
