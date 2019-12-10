@@ -483,6 +483,7 @@ namespace MultiplayerARPG
                 }
                 aimDistance += attackDistance;
             }
+            // Not hit anything (player may look at the sky)
             aimPosition = centerRay.origin + centerRay.direction * aimDistance;
             // Find for enemy character
             bool foundDamageableEntity = false;
@@ -509,7 +510,6 @@ namespace MultiplayerARPG
                     if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
                     {
                         tempNearestDistance = tempDistance;
-                        aimPosition = tempHitInfo.point;
                         if (tempEntity != null)
                         {
                             SelectedEntity = tempEntity;
@@ -517,6 +517,7 @@ namespace MultiplayerARPG
                         }
                     }
                 }
+
                 // If already found damageable entity don't find for npc / item
                 if (foundDamageableEntity)
                     continue;
@@ -526,23 +527,22 @@ namespace MultiplayerARPG
                 if (tempEntity != null && tempDistance <= gameInstance.pickUpItemDistance)
                 {
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
+                    if (tempDistance < tempNearestDistance)
                     {
                         tempNearestDistance = tempDistance;
-                        aimPosition = tempHitInfo.point;
                         if (tempEntity != null)
                             SelectedEntity = tempEntity;
                     }
                 }
+
                 // Find activatable entity (NPC)
                 tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
                 if (tempEntity != null && tempDistance <= gameInstance.conversationDistance)
                 {
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance && IsInFront(tempHitInfo.point))
+                    if (tempDistance < tempNearestDistance)
                     {
                         tempNearestDistance = tempDistance;
-                        aimPosition = tempHitInfo.point;
                         if (tempEntity != null)
                             SelectedEntity = tempEntity;
                     }

@@ -886,7 +886,6 @@ namespace MultiplayerARPG
                         {
                             tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                            // Target receives damages
                             if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
                                 tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this) ||
                                 !IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
@@ -894,7 +893,7 @@ namespace MultiplayerARPG
                                 // Entity can't receive damage, so skip it.
                                 continue;
                             }
-                            // Pass all receive damage condition, then apply damages
+                            // Target receives damages
                             if (IsServer)
                                 tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                             if (IsClient)
@@ -937,15 +936,13 @@ namespace MultiplayerARPG
                     {
                         tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance);
                         tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
-                        // Target receives damages
                         if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
                             tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this))
                         {
                             // Entity can't receive damage, so skip it.
                             continue;
                         }
-
-                        // Target receive damage
+                        // Target receives damages
                         if (IsServer)
                             tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                         if (IsClient)
