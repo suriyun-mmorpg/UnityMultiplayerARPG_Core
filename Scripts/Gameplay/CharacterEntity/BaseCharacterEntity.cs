@@ -392,10 +392,25 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Missile:
                 case DamageType.Raycast:
-                    transform = !isLeftHand ? CharacterModel.GetRightHandMissileDamageTransform() : CharacterModel.GetLeftHandMissileDamageTransform();
-                    // Use position from default missile damage transform
+                    if (ModelManager.IsFpsMode)
+                    {
+                        if (FpsModel != null)
+                        {
+                            // Spawn bullets from fps model
+                            transform = isLeftHand ? FpsModel.GetLeftHandMissileDamageTransform() : FpsModel.GetRightHandMissileDamageTransform();
+                        }
+                    }
+                    else
+                    {
+                        // Spawn bullets from tps model
+                        transform = isLeftHand ? CharacterModel.GetLeftHandMissileDamageTransform() : CharacterModel.GetRightHandMissileDamageTransform();
+                    }
+
                     if (transform == null)
+                    {
+                        // Still no missile transform, use default missile transform
                         transform = MissileDamageTransform;
+                    }
                     break;
             }
             return transform;
