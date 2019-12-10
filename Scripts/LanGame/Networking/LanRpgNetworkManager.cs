@@ -277,7 +277,7 @@ namespace MultiplayerARPG
                 return;
 
             // If map name is empty, just teleport character to target position
-            if (string.IsNullOrEmpty(mapName))
+            if (string.IsNullOrEmpty(mapName) || (mapName.Equals(CurrentMapInfo.Id) && !IsInstanceMap()))
             {
                 playerCharacterEntity.Teleport(position);
                 return;
