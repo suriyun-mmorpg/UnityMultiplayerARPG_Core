@@ -836,8 +836,9 @@ namespace MultiplayerARPG
                 case DamageType.Melee:
                     if (damageInfo.hitOnlySelectedTarget)
                     {
-                        IDamageableEntity selectedTarget;
-                        bool foundSelectedTarget = TryGetTargetEntity(out selectedTarget);
+                        IDamageableEntity damageTakenTarget = null;
+                        IDamageableEntity selectedTarget = null;
+                        bool hasSelectedTarget = TryGetTargetEntity(out selectedTarget);
                         // If hit only selected target, find selected character (only 1 character) to apply damage
                         int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
                         if (tempOverlapSize == 0)
@@ -847,26 +848,31 @@ namespace MultiplayerARPG
                         {
                             tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                            if (tempDamageableEntity != null &&
-                                (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this))
+                            if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
+                                tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this) ||
+                                !IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                             {
-                                if (foundSelectedTarget && selectedTarget.Entity == tempDamageableEntity.Entity)
-                                {
-                                    // This is selected target, so this is character which must receives damages
-                                    break;
-                                }
+                                // Entity can't receive damage, so skip it.
+                                continue;
+                            }
+
+                            // Set damage taken target, this entity will receives damages
+                            damageTakenTarget = tempDamageableEntity;
+
+                            if (hasSelectedTarget && selectedTarget.Entity == tempDamageableEntity.Entity)
+                            {
+                                // This is selected target, so this is character which must receives damages
+                                break;
                             }
                         }
                         // Only 1 target will receives damages
-                        if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
-                            (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this) &&
-                            IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
+                        if (damageTakenTarget != null)
                         {
                             // Pass all receive damage condition, then apply damages
                             if (IsServer)
-                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
+                                damageTakenTarget.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                             if (IsClient)
-                                tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
+                                damageTakenTarget.PlayHitEffects(damageAmounts.Keys, skill);
                         }
                     }
                     else
@@ -881,16 +887,18 @@ namespace MultiplayerARPG
                             tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
                             // Target receives damages
-                            if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
-                                (!(tempDamageableEntity.Entity is BaseCharacterEntity) || tempDamageableEntity.Entity != this) &&
-                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
+                            if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
+                                tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this) ||
+                                !IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                             {
-                                // Pass all receive damage condition, then apply damages
-                                if (IsServer)
-                                    tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
-                                if (IsClient)
-                                    tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
+                                // Entity can't receive damage, so skip it.
+                                continue;
                             }
+                            // Pass all receive damage condition, then apply damages
+                            if (IsServer)
+                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
+                            if (IsClient)
+                                tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                         }
                     }
                     break;
@@ -909,18 +917,16 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Raycast:
+                    // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
+                    if (IsClient && damageInfo.projectileEffect != null)
+                    {
+                        Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
+                            .Setup(damageInfo.missileDistance, damageInfo.missileSpeed);
+                    }
                     // Just raycast to any characters to apply damage
                     int tempRaycastSize = RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, damageInfo.missileDistance, Physics.DefaultRaycastLayers);
                     if (tempRaycastSize == 0)
-                    {
-                        // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                        if (IsClient && damageInfo.projectileEffect != null)
-                        {
-                            Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
-                                .Setup(damageInfo.missileDistance, damageInfo.missileSpeed);
-                        }
                         return;
-                    }
                     // Sort index
                     Vector3 point;
                     Vector3 normal;
@@ -931,32 +937,20 @@ namespace MultiplayerARPG
                     {
                         tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance);
                         tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
-                        // Hit walls or harvestable entity, skip
-                        if (tempDamageableEntity == null || !(tempDamageableEntity.Entity is BaseCharacterEntity))
+                        // Target receives damages
+                        if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
+                            tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this) ||
+                            !IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                         {
-                            // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                            if (IsClient && damageInfo.projectileEffect != null)
-                            {
-                                Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
-                                    .Setup(distance, damageInfo.missileSpeed);
-                            }
-                            return;
+                            // Entity can't receive damage, so skip it.
+                            continue;
                         }
+
                         // Target receive damage
-                        if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() && tempDamageableEntity.Entity != this)
-                        {
-                            // Pass all receive damage condition, then apply damages
-                            if (IsServer)
-                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
-                            if (IsClient)
-                                tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
-                            // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                            if (IsClient && damageInfo.projectileEffect != null)
-                            {
-                                Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
-                                    .Setup(distance, damageInfo.missileSpeed);
-                            }
-                        }
+                        if (IsServer)
+                            tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
+                        if (IsClient)
+                            tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                     }
                     break;
             }
