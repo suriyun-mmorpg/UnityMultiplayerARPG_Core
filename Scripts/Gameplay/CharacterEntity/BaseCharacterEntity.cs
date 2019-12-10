@@ -939,8 +939,7 @@ namespace MultiplayerARPG
                         tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
                         // Target receives damages
                         if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
-                            tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this) ||
-                            !IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
+                            tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this))
                         {
                             // Entity can't receive damage, so skip it.
                             continue;
