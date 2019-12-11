@@ -150,6 +150,8 @@ namespace MultiplayerARPG
 
                         if (buff.BuffApplier != null)
                             recoveryBuffs[buff.BuffApplier] = recoveryData;
+                        else
+                            nonApplierRecoveryBuff = recoveryData;
 
                         CacheEntity.ValidateRecovery(buff.BuffApplier);
                     }
