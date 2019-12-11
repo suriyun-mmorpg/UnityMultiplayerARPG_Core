@@ -855,6 +855,9 @@ namespace MultiplayerARPG
                     }
                     else
                     {
+                        // Update temp look at to character's rotation
+                        tempLookAt = MovementTransform.rotation;
+                        // Do actions
                         switch (turningState)
                         {
                             case TurningState.Attack:
@@ -877,6 +880,11 @@ namespace MultiplayerARPG
                         // Update rotation when angle difference more than 0
                         tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
                         PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                    }
+                    else
+                    {
+                        // Update temp look at to character's rotation
+                        tempLookAt = MovementTransform.rotation;
                     }
                 }
             }

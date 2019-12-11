@@ -737,6 +737,11 @@ namespace MultiplayerARPG
                 tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
                 PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
             }
+            else
+            {
+                // Update temp look at to character's rotation
+                tempLookAt = MovementTransform.rotation;
+            }
         }
 
         public override void UseHotkey(int hotkeyIndex, Vector3? aimPosition)
