@@ -143,8 +143,6 @@ namespace MultiplayerARPG
         BaseGameEntity tempEntity;
         Ray centerRay;
         float centerRayToCharacterDist;
-        float tempDistance;
-        float tempNearestDistance;
         Vector3 moveDirection;
         Vector3 cameraForward;
         Vector3 cameraRight;
@@ -340,7 +338,6 @@ namespace MultiplayerARPG
             cameraRight.y = 0f;
             cameraForward.Normalize();
             cameraRight.Normalize();
-            tempNearestDistance = float.MaxValue;
 
             if (CurrentBuildingEntity != null)
                 UpdateTarget_BuildingMode();
@@ -379,10 +376,10 @@ namespace MultiplayerARPG
             CurrentBuildingEntity.buildingArea = null;
             // Find for position to construction building
             bool foundSnapBuildPosition = false;
-            int tempCount = Physics.RaycastNonAlloc(centerRay, raycasts, findTargetRaycastDistance);
-            int tempCounter = 0;
+            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.AllLayers);
+            float tempDistance;
             BuildingArea buildingArea = null;
-            for (; tempCounter < tempCount; ++tempCounter)
+            for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
                 tempEntity = tempHitInfo.collider.GetComponentInParent<BuildingEntity>();
@@ -394,7 +391,7 @@ namespace MultiplayerARPG
 
                 // Set aim position
                 tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
-                if (tempDistance < tempNearestDistance)
+                if (IsInFront(tempHitInfo.point))
                 {
                     aimPosition = tempHitInfo.point;
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
@@ -483,13 +480,10 @@ namespace MultiplayerARPG
                 }
                 aimDistance += attackDistance;
             }
-            // Not hit anything (player may look at the sky)
             aimPosition = centerRay.origin + centerRay.direction * aimDistance;
-            // Find for enemy character
-            bool foundDamageableEntity = false;
-            int tempCount = Physics.RaycastNonAlloc(centerRay, raycasts, findTargetRaycastDistance);
-            int tempCounter = 0;
-            for (; tempCounter < tempCount; ++tempCounter)
+            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.AllLayers);
+            float tempDistance;
+            for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
 
@@ -502,49 +496,42 @@ namespace MultiplayerARPG
                     tempEntity = tempDamageableEntity.Entity;
 
                     // Target must be damageable, not player character entity, within aim distance and alive
-                    if (tempDamageableEntity.ObjectId == PlayerCharacterEntity.ObjectId ||
-                        (tempDamageableEntity.Entity is BaseCharacterEntity && (tempDamageableEntity.Entity as BaseCharacterEntity).GetCaches().IsHide))
+                    if (tempDamageableEntity.ObjectId == PlayerCharacterEntity.ObjectId)
+                        continue;
+
+                    // Target must not hidding
+                    if (tempDamageableEntity.Entity is BaseCharacterEntity &&
+                        (tempDamageableEntity.Entity as BaseCharacterEntity).GetCaches().IsHide)
                         continue;
 
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance)
+                    if (IsInFront(tempHitInfo.point))
                     {
-                        tempNearestDistance = tempDistance;
-                        if (tempEntity != null)
-                        {
-                            SelectedEntity = tempEntity;
-                            foundDamageableEntity = true;
-                        }
+                        aimPosition = tempHitInfo.point;
+                        SelectedEntity = tempEntity;
+                        break;
                     }
                 }
-
-                // If already found damageable entity don't find for npc / item
-                if (foundDamageableEntity)
-                    continue;
-
                 // Find item drop entity
                 tempEntity = tempHitInfo.collider.GetComponent<ItemDropEntity>();
                 if (tempEntity != null && tempDistance <= gameInstance.pickUpItemDistance)
                 {
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance)
+                    if (IsInFront(tempHitInfo.point))
                     {
-                        tempNearestDistance = tempDistance;
-                        if (tempEntity != null)
-                            SelectedEntity = tempEntity;
+                        SelectedEntity = tempEntity;
+                        break;
                     }
                 }
-
-                // Find activatable entity (NPC)
+                // Find activatable entity (NPC/Building/Mount/Etc)
                 tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
                 if (tempEntity != null && tempDistance <= gameInstance.conversationDistance)
                 {
                     // Set aim position and found target
-                    if (tempDistance < tempNearestDistance)
+                    if (IsInFront(tempHitInfo.point))
                     {
-                        tempNearestDistance = tempDistance;
-                        if (tempEntity != null)
-                            SelectedEntity = tempEntity;
+                        SelectedEntity = tempEntity;
+                        break;
                     }
                 }
             }
@@ -1132,6 +1119,11 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
             CacheGameplayCameraControls.enableWallHitSpring = ViewMode == ControllerViewMode.Tps ? true : false;
             PlayerCharacterEntity.ModelManager.SetFpsMode(viewMode == ControllerViewMode.Fps);
+        }
+
+        public bool IsInFront(Vector3 position)
+        {
+            return Vector3.Angle(centerRay.direction, PlayerCharacterEntity.CacheTransform.position - position) > 120f;
         }
     }
 }

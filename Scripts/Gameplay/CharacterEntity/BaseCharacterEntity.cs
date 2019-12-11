@@ -28,19 +28,6 @@ namespace MultiplayerARPG
             public LiteNetLibSyncList.Operation operation;
             public int index;
         }
-
-        protected struct RaycastHitComparer : IComparer<RaycastHit>, IComparer<RaycastHit2D>
-        {
-            public int Compare(RaycastHit x, RaycastHit y)
-            {
-                return x.distance.CompareTo(y.distance);
-            }
-
-            public int Compare(RaycastHit2D x, RaycastHit2D y)
-            {
-                return x.distance.CompareTo(y.distance);
-            }
-        }
         
         // This will be TRUE when this character enter to safe area
         public bool IsInSafeArea { get; set; }
@@ -916,37 +903,49 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Raycast:
+                    float minDistance = damageInfo.missileDistance;
+                    // Just raycast to any entity to apply damage
+                    int tempRaycastSize = RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, damageInfo.missileDistance, Physics.DefaultRaycastLayers);
+                    if (tempRaycastSize > 0)
+                    {
+                        // Sort index
+                        Vector3 point;
+                        Vector3 normal;
+                        float distance;
+                        Transform tempHitTransform;
+                        // Find characters that receiving damages
+                        for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
+                        {
+                            tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance);
+                            if (distance < minDistance)
+                                minDistance = distance;
+                            tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
+                            if (tempDamageableEntity != null)
+                            {
+                                if (tempDamageableEntity.Entity == this)
+                                    continue;
+
+                                // Target receives damages
+                                if (!tempDamageableEntity.IsDead() && tempDamageableEntity.CanReceiveDamageFrom(this))
+                                {
+                                    if (IsServer)
+                                        tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
+                                    if (IsClient)
+                                        tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
+                                }
+                            }
+                            else
+                            {
+                                // Hit wall... so break the loop
+                                break;
+                            }
+                        } // End of for...loop (raycast result)
+                    }
                     // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
                     if (IsClient && damageInfo.projectileEffect != null)
                     {
                         Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
-                            .Setup(damageInfo.missileDistance, damageInfo.missileSpeed);
-                    }
-                    // Just raycast to any characters to apply damage
-                    int tempRaycastSize = RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, damageInfo.missileDistance, Physics.DefaultRaycastLayers);
-                    if (tempRaycastSize == 0)
-                        return;
-                    // Sort index
-                    Vector3 point;
-                    Vector3 normal;
-                    float distance;
-                    Transform tempHitTransform;
-                    // Find characters that receiving damages
-                    for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
-                    {
-                        tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance);
-                        tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
-                        if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
-                            tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this))
-                        {
-                            // Entity can't receive damage, so skip it.
-                            continue;
-                        }
-                        // Target receives damages
-                        if (IsServer)
-                            tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
-                        if (IsClient)
-                            tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
+                            .Setup(minDistance, damageInfo.missileSpeed);
                     }
                     break;
             }
@@ -1026,16 +1025,9 @@ namespace MultiplayerARPG
         #region Find objects helpers
         public int RaycastObjects_ForAttackFunctions(Vector3 origin, Vector3 direction, float distance, int layerMask)
         {
-            int count = 0;
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                count = Physics2D.RaycastNonAlloc(origin, direction, raycasts2D_ForAttackFunctions, distance, layerMask);
-                System.Array.Sort(raycasts2D_ForAttackFunctions, 0, count, new RaycastHitComparer());
-                return count;
-            }
-            count = Physics.RaycastNonAlloc(origin, direction, raycasts_ForAttackFunctions, distance, layerMask);
-            System.Array.Sort(raycasts_ForAttackFunctions, 0, count, new RaycastHitComparer());
-            return count;
+                return PhysicUtils.SortedRaycastNonAlloc2D(origin, direction, raycasts2D_ForAttackFunctions, distance, layerMask);
+            return PhysicUtils.SortedRaycastNonAlloc3D(origin, direction, raycasts_ForAttackFunctions, distance, layerMask);
         }
 
         public Transform GetRaycastObject_ForAttackFunctions(int index, out Vector3 point, out Vector3 normal, out float distance)
