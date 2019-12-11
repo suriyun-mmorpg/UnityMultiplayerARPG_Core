@@ -570,9 +570,23 @@ namespace MultiplayerARPG
             NetworkDestroy();
         }
 
+        protected override void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
+        {
+            if (MonsterDatabase.characteristic != MonsterCharacteristic.Assist)
+                return;
+            // Warn that this character received damage to nearby characters
+            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(MonsterDatabase.visualRange, true, false, false);
+            if (foundCharacters == null || foundCharacters.Count == 0) return;
+            foreach (BaseCharacterEntity foundCharacter in foundCharacters)
+            {
+                foundCharacter.NotifyEnemySpotted(this, enemy);
+            }
+        }
+
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
         {
-            if ((Summoner != null && Summoner == ally) || MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
+            if ((Summoner != null && Summoner == ally) ||
+                MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
     }

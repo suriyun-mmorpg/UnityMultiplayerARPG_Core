@@ -1262,14 +1262,13 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        private void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
+        protected virtual void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
-            // Warn that this character received damage to nearby characters
-            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(gameInstance.enemySpottedNotifyDistance, true, false, false);
-            if (foundCharacters == null || foundCharacters.Count == 0) return;
-            foreach (BaseCharacterEntity foundCharacter in foundCharacters)
+            foreach (CharacterSummon summon in Summons)
             {
-                foundCharacter.NotifyEnemySpotted(this, enemy);
+                if (summon.CacheEntity == null)
+                    continue;
+                summon.CacheEntity.NotifyEnemySpotted(this, enemy);
             }
         }
 
