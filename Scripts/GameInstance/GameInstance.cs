@@ -141,8 +141,6 @@ namespace MultiplayerARPG
         public float minSummonDistance = 2f;
         [Tooltip("This is a distance that random summon around a character")]
         public float maxSummonDistance = 3f;
-        [Tooltip("Distance to warn character that ally being attacked")]
-        public float enemySpottedNotifyDistance = 5f;
         [Tooltip("Min distance to follow summoner")]
         public float minFollowSummonerDistance = 5f;
         [Tooltip("Max distance to follow summoner, if distance between characters more than this it will teleport to summoner")]
