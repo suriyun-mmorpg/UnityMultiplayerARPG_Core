@@ -6,6 +6,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(LiteNetLibIdentity))]
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
         [Header("Game Entity Settings")]
