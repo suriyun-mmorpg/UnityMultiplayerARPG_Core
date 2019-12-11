@@ -29,7 +29,7 @@ namespace MultiplayerARPG
         public ushort allyId;
         [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
         public float wanderMoveSpeed;
-        [Tooltip("Range to see an enemy")]
+        [Tooltip("Range to see an enemies and allies")]
         public float visualRange = 5f;
         [SerializeField]
         private MonsterSkill[] monsterSkills;
