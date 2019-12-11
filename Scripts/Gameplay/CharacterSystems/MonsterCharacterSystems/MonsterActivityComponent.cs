@@ -13,80 +13,35 @@ namespace MultiplayerARPG
         [Tooltip("Random distance around spawn position to wander")]
         public float randomWanderDistance = 2f;
         [Tooltip("Delay before find enemy again")]
-        public float aggressiveFindTargetDelay = 1f;
-        [Tooltip("Delay before set following target position again")]
-        public float setTargetDestinationDelay = 1f;
+        public float findEnemyDelay = 1f;
         [Tooltip("If following target time reached this value it will stop following target")]
         public float followTargetDuration = 5f;
         [Tooltip("Turn to enemy speed")]
         public float turnToEnemySpeed = 800f;
 
-        public float wanderTime { get; private set; }
-        public float findTargetTime { get; private set; }
-        public float setDestinationTime { get; private set; }
-        public float startFollowTargetTime { get; private set; }
-        public Vector3? wanderDestination { get; private set; }
-        public Vector3 oldDestination { get; private set; }
-
+        protected bool startedAggressive;
+        protected float aggressiveElasped;
+        protected float randomedWanderElasped;
+        protected float randomedWanderDelay;
+        protected bool startedFollowEnemy;
+        protected float startFollowEnemyElasped;
+        protected Vector3 lastDestination;
+        protected Vector3 lastPosition;
+        protected BaseCharacterEntity tempTargetEnemy;
         protected BaseSkill queueSkill;
         protected short queueSkillLevel;
-        
+
         public BaseMonsterCharacterEntity CacheMonsterCharacterEntity
         {
             get { return CacheEntity as BaseMonsterCharacterEntity; }
         }
-        
+
         public MonsterCharacter MonsterDatabase
         {
             get { return CacheMonsterCharacterEntity.MonsterDatabase; }
         }
 
-        protected void Awake()
-        {
-            float time = Time.unscaledTime;
-            RandomNextWanderTime(time);
-            SetFindTargetTime(time);
-            SetStartFollowTargetTime(time);
-        }
-
         protected void Update()
-        {
-            UpdateActivity(Time.unscaledTime);
-        }
-
-        public void RandomNextWanderTime(float time)
-        {
-            wanderTime = time + Random.Range(randomWanderDelayMin, randomWanderDelayMax);
-            oldDestination = CacheEntity.CacheTransform.position;
-        }
-
-        public void SetFindTargetTime(float time)
-        {
-            findTargetTime = time + aggressiveFindTargetDelay;
-        }
-
-        public void SetStartFollowTargetTime(float time)
-        {
-            startFollowTargetTime = time;
-        }
-
-        public void SetDestination(float time, Vector3 destination)
-        {
-            setDestinationTime = time;
-            CacheMonsterCharacterEntity.isWandering = false;
-            CacheEntity.PointClickMovement(destination);
-            oldDestination = destination;
-        }
-
-        public void SetWanderDestination(float time, Vector3 destination)
-        {
-            setDestinationTime = time;
-            CacheMonsterCharacterEntity.isWandering = true;
-            CacheEntity.PointClickMovement(destination);
-            wanderDestination = destination;
-        }
-
-        protected void UpdateActivity(float time)
         {
             if (!IsServer || CacheEntity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
                 return;
@@ -98,67 +53,102 @@ namespace MultiplayerARPG
                 return;
             }
 
+            float time = Time.unscaledTime;
+            float deltaTime = Time.unscaledDeltaTime;
+
             Vector3 currentPosition = CacheEntity.CacheTransform.position;
-
-            if (CacheMonsterCharacterEntity.Summoner != null &&
-                Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.Summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
+            if (CacheMonsterCharacterEntity.Summoner != null)
             {
-                // Follow summoner with stat's move speed
-                FollowSummoner(time);
-                return;
-            }
-
-            if (CacheMonsterCharacterEntity.Summoner == null && CacheEntity.IsInSafeArea)
-            {
-                // If monster move into safe area, wander to another place
-                RandomWanderTarget(time);
-                return;
-            }
-
-            BaseCharacterEntity targetEntity;
-            if (CacheEntity.TryGetTargetEntity(out targetEntity))
-            {
-                if (targetEntity.IsDead() || targetEntity.IsInSafeArea)
+                if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
-                    // If target is dead or in safe area stop attacking
-                    CacheEntity.SetTargetEntity(null);
-                    return;
+                    if (Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.Summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
+                    {
+                        // Follow summoner
+                        FollowSummoner();
+                        startedFollowEnemy = false;
+                    }
+                    else
+                    {
+                        // Wandering when it's time
+                        randomedWanderElasped += deltaTime;
+                        if (randomedWanderElasped >= randomedWanderDelay)
+                        {
+                            randomedWanderElasped = 0f;
+                            RandomWanderDestination();
+                        }
+                        startedFollowEnemy = false;
+                    }
                 }
-                UpdateAttackTarget(time, currentPosition, targetEntity);
             }
             else
             {
-                // Find target when it's time
-                if (time >= findTargetTime)
+                if (CacheMonsterCharacterEntity.IsInSafeArea)
                 {
-                    SetFindTargetTime(time);
-                    AggressiveFindTarget(time, currentPosition);
+                    // If monster move into safe area, wander to another place
+                    RandomWanderDestination();
+                    startedFollowEnemy = false;
                     return;
                 }
 
-                // Wandering when it's time
-                if (time >= wanderTime)
+                if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
-                    RandomNextWanderTime(time);
-                    RandomWanderTarget(time);
-                    return;
+                    if (startedAggressive)
+                    {
+                        aggressiveElasped += deltaTime;
+                        // Find target when it's time
+                        if (aggressiveElasped >= findEnemyDelay &&
+                            FindEnemy(currentPosition))
+                        {
+                            aggressiveElasped = 0f;
+                            startedAggressive = false;
+                        }
+                    }
+
+                    // Wandering when it's time
+                    randomedWanderElasped += deltaTime;
+                    if (randomedWanderElasped >= randomedWanderDelay)
+                    {
+                        randomedWanderElasped = 0f;
+                        RandomWanderDestination();
+                        startedAggressive = true;
+                    }
+                    startedFollowEnemy = false;
                 }
             }
         }
-        
-        public void UpdateAttackTarget(float time, Vector3 currentPosition, BaseCharacterEntity targetEntity)
+
+        /// <summary>
+        /// Return `TRUE` if following / attacking enemy
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        /// <param name="currentPosition"></param>
+        /// <returns></returns>
+        private bool UpdateAttackEnemy(float deltaTime, Vector3 currentPosition)
         {
+            if (!CacheEntity.TryGetTargetEntity(out tempTargetEnemy))
+            {
+                // No target, stop attacking
+                return false;
+            }
+
+            if (tempTargetEnemy.IsDead() || tempTargetEnemy.IsInSafeArea)
+            {
+                // If target is dead or in safe area stop attacking
+                CacheEntity.SetTargetEntity(null);
+                return false;
+            }
+
             // If it has target then go to target
-            Vector3 targetEntityPosition = targetEntity.CacheTransform.position;
+            Vector3 targetPosition = tempTargetEnemy.CacheTransform.position;
             float attackDistance = CacheEntity.GetAttackDistance(false);
             attackDistance -= attackDistance * 0.1f;
             attackDistance -= CacheEntity.StoppingDistance;
-            if (Vector3.Distance(currentPosition, targetEntityPosition) <= attackDistance)
+            if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
             {
+                startedFollowEnemy = false;
                 CacheEntity.StopMove();
-                SetStartFollowTargetTime(time);
                 // Lookat target then do something when it's in range
-                Vector3 lookAtDirection = (targetEntityPosition - currentPosition).normalized;
+                Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
                 if (lookAtDirection.magnitude > 0)
                 {
                     if (gameInstance.DimensionType == DimensionType.Dimension3D)
@@ -180,7 +170,7 @@ namespace MultiplayerARPG
                 if (queueSkill != null || MonsterDatabase.RandomSkill(CacheMonsterCharacterEntity, out queueSkill, out queueSkillLevel))
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
-                    CacheEntity.RequestUseSkill(queueSkill.DataId, false, targetEntity.OpponentAimTransform.position);
+                    CacheEntity.RequestUseSkill(queueSkill.DataId, false, tempTargetEnemy.OpponentAimTransform.position);
                     // Clear queue skill to random using skill later
                     queueSkill = null;
                 }
@@ -188,55 +178,90 @@ namespace MultiplayerARPG
                 if (queueSkill == null)
                 {
                     // Attack when no queue skill
-                    CacheEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
+                    CacheEntity.RequestAttack(false, tempTargetEnemy.OpponentAimTransform.position);
                 }
             }
             else
             {
-                // Following target
-                if (oldDestination != targetEntityPosition &&
-                    time - setDestinationTime >= setTargetDestinationDelay)
-                    SetDestination(time, targetEntityPosition);
-                // Stop following target
-                if (time - startFollowTargetTime >= followTargetDuration)
-                    RandomWanderTarget(time);
+                if (!startedFollowEnemy)
+                {
+                    startFollowEnemyElasped = 0f;
+                    startedFollowEnemy = true;
+                }
+
+                // Update destination if target's position changed
+                if (!lastDestination.Equals(targetPosition))
+                    SetDestination(targetPosition);
+
+                if (CacheMonsterCharacterEntity.Summoner == null)
+                {
+                    startFollowEnemyElasped += deltaTime;
+                    // Stop following target and move to position nearby spawn position when follow enemy too long
+                    if (startFollowEnemyElasped >= followTargetDuration)
+                        RandomWanderDestination();
+                }
             }
+            return true;
         }
 
-        public void RandomWanderTarget(float time)
+        public void SetDestination(Vector3 destination)
         {
-            // If stopped then random
+            CacheMonsterCharacterEntity.isWandering = false;
+            CacheEntity.PointClickMovement(destination);
+            lastDestination = destination;
+        }
+
+        public void SetWanderDestination(Vector3 destination)
+        {
+            CacheMonsterCharacterEntity.isWandering = true;
+            CacheEntity.PointClickMovement(destination);
+            lastDestination = destination;
+        }
+
+        public void RandomWanderDestination()
+        {
+            // Random position around spawn point
             Vector3 randomPosition;
             if (gameInstance.DimensionType == DimensionType.Dimension3D)
                 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
                 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+            // Random position around summoner
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
+
             CacheEntity.SetTargetEntity(null);
-            SetWanderDestination(time, randomPosition);
+            SetWanderDestination(randomPosition);
+            randomedWanderDelay = Random.Range(randomWanderDelayMin, randomWanderDelayMax);
         }
 
-        public void FollowSummoner(float time)
+        public void FollowSummoner()
         {
-            // If stopped then random
+            // Random position around spawn point
             Vector3 randomPosition;
             if (gameInstance.DimensionType == DimensionType.Dimension3D)
                 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
                 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+            // Random position around summoner
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
+
             CacheEntity.SetTargetEntity(null);
-            SetDestination(time, randomPosition);
+            SetDestination(randomPosition);
         }
 
-        public void AggressiveFindTarget(float time, Vector3 currentPosition)
+        /// <summary>
+        /// Return `TRUE` if found enemy
+        /// </summary>
+        /// <param name="currentPosition"></param>
+        /// <returns></returns>
+        public bool FindEnemy(Vector3 currentPosition)
         {
             // Aggressive monster or summoned monster will find target to attack
             if (MonsterDatabase.characteristic != MonsterCharacteristic.Aggressive &&
                 CacheMonsterCharacterEntity.Summoner == null)
-                return;
+                return false;
 
             BaseCharacterEntity targetCharacter;
             if (!CacheEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
@@ -263,11 +288,12 @@ namespace MultiplayerARPG
                         continue;
                     }
                     // Found target, attack it
-                    SetStartFollowTargetTime(time);
                     CacheMonsterCharacterEntity.SetAttackTarget(characterEntity);
-                    break;
+                    return true;
                 }
             }
+
+            return false;
         }
     }
 }
