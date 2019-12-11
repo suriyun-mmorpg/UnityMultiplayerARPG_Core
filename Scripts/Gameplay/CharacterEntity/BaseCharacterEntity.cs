@@ -17,8 +17,8 @@ namespace MultiplayerARPG
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float MOUNT_DELAY = 1f;
-        public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 64;
-        public const int RAYCAST_SIZE_FOR_ATTACK = 64;
+        public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 16;
+        public const int RAYCAST_SIZE_FOR_ATTACK = 8;
         public const int OVERLAP_COLLIDER_SIZE_FOR_FIND = 32;
 
         protected struct SyncListRecachingState

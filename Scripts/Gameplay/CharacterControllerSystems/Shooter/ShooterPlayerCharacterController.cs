@@ -374,11 +374,13 @@ namespace MultiplayerARPG
         {
             // Clear area before next find
             CurrentBuildingEntity.buildingArea = null;
-            // Find for position to construction building
-            bool foundSnapBuildPosition = false;
+            // Default aim position (aim to sky/space)
+            aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + gameInstance.buildDistance);
+            // Raycast from camera position to center of screen
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.AllLayers);
             float tempDistance;
             BuildingArea buildingArea = null;
+            bool hasSnapBuildPosition = false;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
@@ -406,16 +408,10 @@ namespace MultiplayerARPG
                     CurrentBuildingEntity.buildingArea = buildingArea;
                     if (buildingArea.snapBuildingObject)
                     {
-                        foundSnapBuildPosition = true;
+                        hasSnapBuildPosition = true;
                         break;
                     }
                 }
-            }
-
-            if (tempCount <= 0)
-            {
-                // Not hit anything (player may look at the sky)
-                aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + gameInstance.buildDistance);
             }
 
             if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > gameInstance.buildDistance)
@@ -424,9 +420,9 @@ namespace MultiplayerARPG
                 CurrentBuildingEntity.buildingArea = null;
             }
 
-            if (!foundSnapBuildPosition)
+            if (!hasSnapBuildPosition)
             {
-                // Update building position when the building is not snapping to build area
+                // There is no snap build position, set building rotation by camera look direction
                 CurrentBuildingEntity.CacheTransform.position = aimPosition;
                 // Rotate to camera
                 Vector3 direction = (aimPosition - CacheGameplayCameraControls.CacheCameraTransform.position).normalized;
@@ -438,7 +434,6 @@ namespace MultiplayerARPG
         private void UpdateTarget_BattleMode()
         {
             // Prepare raycast distance / fov
-            float aimDistance = centerRayToCharacterDist;
             float attackDistance = 0f;
             float attackFov = 90f;
             // Calculating aim distance, also read attack inputs here
@@ -478,9 +473,10 @@ namespace MultiplayerARPG
                     attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
                     attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
                 }
-                aimDistance += attackDistance;
             }
-            aimPosition = centerRay.origin + centerRay.direction * aimDistance;
+            // Default aim position (aim to sky/space)
+            aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + attackDistance);
+            // Raycast from camera position to center of screen
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.AllLayers);
             float tempDistance;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
@@ -503,8 +499,8 @@ namespace MultiplayerARPG
                     if (tempDamageableEntity.Entity is BaseCharacterEntity &&
                         (tempDamageableEntity.Entity as BaseCharacterEntity).GetCaches().IsHide)
                         continue;
-
-                    // Set aim position and found target
+                    
+                    // Entity is in front of character, so this is target
                     if (IsInFront(tempHitInfo.point))
                     {
                         aimPosition = tempHitInfo.point;
@@ -516,7 +512,7 @@ namespace MultiplayerARPG
                 tempEntity = tempHitInfo.collider.GetComponent<ItemDropEntity>();
                 if (tempEntity != null && tempDistance <= gameInstance.pickUpItemDistance)
                 {
-                    // Set aim position and found target
+                    // Entity is in front of character, so this is target
                     if (IsInFront(tempHitInfo.point))
                     {
                         SelectedEntity = tempEntity;
@@ -527,7 +523,7 @@ namespace MultiplayerARPG
                 tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
                 if (tempEntity != null && tempDistance <= gameInstance.conversationDistance)
                 {
-                    // Set aim position and found target
+                    // Entity is in front of character, so this is target
                     if (IsInFront(tempHitInfo.point))
                     {
                         SelectedEntity = tempEntity;
@@ -1123,7 +1119,7 @@ namespace MultiplayerARPG
 
         public bool IsInFront(Vector3 position)
         {
-            return Vector3.Angle(centerRay.direction, PlayerCharacterEntity.CacheTransform.position - position) > 120f;
+            return Vector3.Angle(cameraForward, PlayerCharacterEntity.CacheTransform.position - position) > 135f;
         }
     }
 }
