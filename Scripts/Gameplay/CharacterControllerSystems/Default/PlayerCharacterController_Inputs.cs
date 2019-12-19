@@ -545,11 +545,8 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-
-                float actDistance = attackDistance;
-                actDistance -= actDistance * 0.1f;
-                actDistance -= StoppingDistance;
-                if (FindTarget(targetCharacter.gameObject, actDistance, gameInstance.characterLayer.Mask))
+                
+                if (FindTarget(targetCharacter.gameObject, attackDistance, gameInstance.characterLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -584,11 +581,8 @@ namespace MultiplayerARPG
                 float castDistance = 0f;
                 float castFov = 0f;
                 GetUseSkillDistanceAndFov(out castDistance, out castFov);
-
-                float actDistance = castDistance;
-                actDistance -= actDistance * 0.1f;
-                actDistance -= StoppingDistance;
-                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
+                
+                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= castDistance)
                 {
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
@@ -616,8 +610,7 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter))
             {
-                float actDistance = gameInstance.conversationDistance - StoppingDistance;
-                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= actDistance)
+                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= gameInstance.conversationDistance)
                 {
                     // Stop movement to do something
                     PlayerCharacterEntity.StopMove();
@@ -627,8 +620,7 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetNpc))
             {
-                float actDistance = gameInstance.conversationDistance - StoppingDistance;
-                if (Vector3.Distance(MovementTransform.position, targetNpc.CacheTransform.position) <= actDistance)
+                if (Vector3.Distance(MovementTransform.position, targetNpc.CacheTransform.position) <= gameInstance.conversationDistance)
                 {
                     if (lastNpcObjectId != targetNpc.ObjectId)
                     {
@@ -642,8 +634,7 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetItemDrop))
             {
-                float actDistance = gameInstance.pickUpItemDistance - StoppingDistance;
-                if (Vector3.Distance(MovementTransform.position, targetItemDrop.CacheTransform.position) <= actDistance)
+                if (Vector3.Distance(MovementTransform.position, targetItemDrop.CacheTransform.position) <= gameInstance.pickUpItemDistance)
                 {
                     PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                     PlayerCharacterEntity.StopMove();
@@ -657,8 +648,7 @@ namespace MultiplayerARPG
                 UICurrentBuilding uiCurrentBuilding = null;
                 if (CacheUISceneGameplay != null)
                     uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
-                float actDistance = gameInstance.conversationDistance - StoppingDistance;
-                if (Vector3.Distance(MovementTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
+                if (Vector3.Distance(MovementTransform.position, targetBuilding.CacheTransform.position) <= gameInstance.conversationDistance)
                 {
                     PlayerCharacterEntity.StopMove();
                     if (IsEditingBuilding)
@@ -695,11 +685,8 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-
-                float actDistance = attackDistance;
-                actDistance -= actDistance * 0.1f;
-                actDistance -= StoppingDistance;
-                if (FindTarget(targetHarvestable.gameObject, actDistance, gameInstance.harvestableLayer.Mask))
+                
+                if (FindTarget(targetHarvestable.gameObject, attackDistance, gameInstance.harvestableLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();

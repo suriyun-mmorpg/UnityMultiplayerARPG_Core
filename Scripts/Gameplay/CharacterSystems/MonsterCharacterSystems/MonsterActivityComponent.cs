@@ -25,7 +25,6 @@ namespace MultiplayerARPG
         protected float randomedWanderDelay;
         protected bool startedFollowEnemy;
         protected float startFollowEnemyElasped;
-        protected Vector3 lastDestination;
         protected Vector3 lastPosition;
         protected BaseCharacterEntity tempTargetEnemy;
         protected BaseSkill queueSkill;
@@ -141,8 +140,6 @@ namespace MultiplayerARPG
             // If it has target then go to target
             Vector3 targetPosition = tempTargetEnemy.CacheTransform.position;
             float attackDistance = CacheEntity.GetAttackDistance(false);
-            attackDistance -= attackDistance * 0.1f;
-            attackDistance -= CacheEntity.StoppingDistance;
             if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
             {
                 startedFollowEnemy = false;
@@ -190,8 +187,7 @@ namespace MultiplayerARPG
                 }
 
                 // Update destination if target's position changed
-                if (!lastDestination.Equals(targetPosition))
-                    SetDestination(targetPosition);
+                SetDestination(targetPosition);
 
                 if (CacheMonsterCharacterEntity.Summoner == null)
                 {
@@ -208,14 +204,12 @@ namespace MultiplayerARPG
         {
             CacheMonsterCharacterEntity.isWandering = false;
             CacheEntity.PointClickMovement(destination);
-            lastDestination = destination;
         }
 
         public void SetWanderDestination(Vector3 destination)
         {
             CacheMonsterCharacterEntity.isWandering = true;
             CacheEntity.PointClickMovement(destination);
-            lastDestination = destination;
         }
 
         public void RandomWanderDestination()

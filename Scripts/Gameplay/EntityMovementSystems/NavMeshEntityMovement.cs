@@ -13,8 +13,6 @@ namespace MultiplayerARPG
     {
         [Header("Network Settings")]
         public MovementSecure movementSecure;
-
-        protected Vector3 latestDestination;
         
         protected MovementState localMovementState = MovementState.None;
         public MovementState MovementState
@@ -248,9 +246,8 @@ namespace MultiplayerARPG
         
         protected void SetMovePaths(Vector3 position, float moveSpeed)
         {
-            if (!CacheEntity.CanMove() || position.Equals(latestDestination))
+            if (!CacheEntity.CanMove())
                 return;
-            latestDestination = position;
             CacheNavMeshAgent.updatePosition = true;
             CacheNavMeshAgent.updateRotation = true;
             CacheNavMeshAgent.isStopped = false;
