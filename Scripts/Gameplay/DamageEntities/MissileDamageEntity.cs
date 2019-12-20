@@ -167,7 +167,8 @@ namespace MultiplayerARPG
             if (other.layer != 1 &&
                 other.layer != 2 &&
                 other.layer != gameInstance.characterLayer &&
-                other.layer != gameInstance.itemDropLayer)
+                other.layer != gameInstance.itemDropLayer &&
+                !gameInstance.NonTargetLayersValues.Contains(other.layer))
             {
                 if (explodeDistance > 0f)
                 {
