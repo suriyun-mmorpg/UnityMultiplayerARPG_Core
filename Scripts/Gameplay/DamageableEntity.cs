@@ -82,6 +82,10 @@ namespace MultiplayerARPG
                 case CombatAmountType.BlockedDamage:
                     if (Model != null)
                         Model.InstantiateEffect(pendingHitEffects);
+                    pendingHitEffects = null;
+                    break;
+                case CombatAmountType.Miss:
+                    pendingHitEffects = null;
                     break;
             }
         }
