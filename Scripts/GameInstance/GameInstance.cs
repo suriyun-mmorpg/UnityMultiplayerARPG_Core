@@ -369,14 +369,14 @@ namespace MultiplayerARPG
             get { return newCharacterSetting != null; }
         }
 
-        private List<int> cacheNonTargetLayersValues;
-        public List<int> NonTargetLayersValues
+        private HashSet<int> cacheNonTargetLayersValues;
+        public HashSet<int> NonTargetLayersValues
         {
             get
             {
                 if (cacheNonTargetLayersValues == null)
                 {
-                    cacheNonTargetLayersValues = new List<int>();
+                    cacheNonTargetLayersValues = new HashSet<int>();
                     foreach (UnityLayer layer in nonTargetingLayers)
                     {
                         cacheNonTargetLayersValues.Add(layer.LayerIndex);
