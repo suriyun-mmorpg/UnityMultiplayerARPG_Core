@@ -49,11 +49,16 @@ namespace MultiplayerARPG
             set { CacheEntity.MovementState = value; }
         }
 
-        protected ExtraMovementState extraMovementState = ExtraMovementState.None;
+        protected ExtraMovementState localExtraMovementState = ExtraMovementState.None;
         public ExtraMovementState ExtraMovementState
         {
-            get { return extraMovementState; }
-            set { extraMovementState = value; }
+            get
+            {
+                if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
+                    return localExtraMovementState;
+                return CacheEntity.ExtraMovementState;
+            }
+            set { CacheEntity.ExtraMovementState = value; }
         }
 
         private Animator cacheAnimator;
@@ -225,11 +230,13 @@ namespace MultiplayerARPG
 
         protected void NetFuncSetMovement(byte movementState)
         {
+            // Set data at server and sync to clients later
             MovementState = (MovementState)movementState;
         }
 
         protected void NetFuncSetExtraMovement(byte extraMovementState)
         {
+            // Set data at server and sync to clients later
             ExtraMovementState = (ExtraMovementState)extraMovementState;
         }
 
@@ -286,7 +293,7 @@ namespace MultiplayerARPG
                     tempInputDirection = moveDirection;
                     tempMovementState = movementState;
                     if (!IsJumping)
-                        IsJumping = IsGrounded && movementState.HasFlag(MovementState.IsJump);
+                        IsJumping = IsGrounded && tempMovementState.HasFlag(MovementState.IsJump);
                     break;
             }
         }
@@ -310,15 +317,14 @@ namespace MultiplayerARPG
 
         public override void SetExtraMovement(ExtraMovementState extraMovementState)
         {
-            switch (movementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    CacheEntity.CallNetFunction(NetFuncSetExtraMovement, FunctionReceivers.Server, (byte)extraMovementState);
-                    break;
-                case MovementSecure.NotSecure:
-                    ExtraMovementState = extraMovementState;
-                    break;
-            }
+            // Set local movement state which will be used by owner client
+            localExtraMovementState = extraMovementState;
+
+            if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
+                ExtraMovementState = extraMovementState;
+
+            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+                CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
         }
 
         public override void SetLookRotation(Vector3 eulerAngles)

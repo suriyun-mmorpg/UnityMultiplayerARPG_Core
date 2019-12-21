@@ -97,11 +97,16 @@ namespace MultiplayerARPG
             set { CacheEntity.MovementState = value; }
         }
 
-        protected ExtraMovementState extraMovementState = ExtraMovementState.None;
+        protected ExtraMovementState localExtraMovementState = ExtraMovementState.None;
         public ExtraMovementState ExtraMovementState
         {
-            get { return extraMovementState; }
-            set { extraMovementState = value; }
+            get
+            {
+                if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
+                    return localExtraMovementState;
+                return CacheEntity.ExtraMovementState;
+            }
+            set { CacheEntity.ExtraMovementState = value; }
         }
 
         private float tempMoveDirectionMagnitude;
@@ -152,9 +157,9 @@ namespace MultiplayerARPG
             entity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             entity.RegisterNetFunction<sbyte, sbyte>(NetFuncKeyMovement);
             entity.RegisterNetFunction(StopMove);
-            entity.RegisterNetFunction<byte>(NetFuncSetMovementState);
-            entity.RegisterNetFunction<sbyte, sbyte>(NetFuncUpdateDirection);
+            entity.RegisterNetFunction<byte>(NetFuncSetMovement);
             entity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
+            entity.RegisterNetFunction<sbyte, sbyte>(NetFuncUpdateDirection);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -172,13 +177,15 @@ namespace MultiplayerARPG
             tempInputDirection = new Vector2((float)horizontalInput / 100f, (float)verticalInput / 100f);
         }
 
-        protected void NetFuncSetMovementState(byte movementState)
+        protected void NetFuncSetMovement(byte movementState)
         {
+            // Set data at server and sync to clients later
             MovementState = (MovementState)movementState;
         }
 
         protected void NetFuncSetExtraMovement(byte extraMovementState)
         {
+            // Set data at server and sync to clients later
             ExtraMovementState = (ExtraMovementState)extraMovementState;
         }
 
@@ -231,15 +238,14 @@ namespace MultiplayerARPG
 
         public override void SetExtraMovement(ExtraMovementState extraMovementState)
         {
-            switch (movementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    CacheEntity.CallNetFunction(NetFuncSetExtraMovement, FunctionReceivers.Server, (byte)extraMovementState);
-                    break;
-                case MovementSecure.NotSecure:
-                    ExtraMovementState = extraMovementState;
-                    break;
-            }
+            // Set local movement state which will be used by owner client
+            localExtraMovementState = extraMovementState;
+
+            if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
+                ExtraMovementState = extraMovementState;
+
+            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+                CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
         }
 
         public override void SetLookRotation(Vector3 eulerAngles)
@@ -313,7 +319,7 @@ namespace MultiplayerARPG
                 MovementState = state;
 
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CacheEntity.CallNetFunction(NetFuncSetMovementState, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
+                CacheEntity.CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
         }
 
         public void UpdateCurrentDirection(Vector2 direction)
