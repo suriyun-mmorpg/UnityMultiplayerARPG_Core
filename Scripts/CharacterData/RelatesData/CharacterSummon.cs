@@ -181,7 +181,11 @@ public class CharacterSummon : INetSerializableWithElement
                     break;
             }
             writer.PutPackedUInt(objectId);
-        }
+            writer.Put(level);
+            writer.Put(exp);
+            writer.Put(currentHp);
+            writer.Put(currentMp);
+}
     }
 
     public void Deserialize(NetDataReader reader)
@@ -197,6 +201,10 @@ public class CharacterSummon : INetSerializableWithElement
                     break;
             }
             objectId = reader.GetPackedUInt();
+            level = reader.GetShort();
+            exp = reader.GetInt();
+            currentHp = reader.GetInt();
+            currentMp = reader.GetInt();
         }
     }
 }
