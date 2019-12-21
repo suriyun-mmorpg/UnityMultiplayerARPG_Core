@@ -179,7 +179,7 @@ namespace MultiplayerARPG
 
         public override float GetDecreasingStaminaPerSeconds(BaseCharacterEntity character)
         {
-            if (character is BaseMonsterCharacterEntity || !character.MovementState.HasFlag(MovementState.IsSprinting))
+            if (!character.ExtraMovementState.HasFlag(ExtraMovementState.IsSprinting))
                 return 0f;
             return staminaDecreasePerSeconds;
         }
@@ -212,7 +212,7 @@ namespace MultiplayerARPG
                 (character as BaseMonsterCharacterEntity).isWandering)
                 moveSpeed = (character as BaseMonsterCharacterEntity).MonsterDatabase.wanderMoveSpeed;
             if (character.MovementState.HasFlag(MovementState.Forward) &&
-                character.MovementState.HasFlag(MovementState.IsSprinting) &&
+                character.ExtraMovementState.HasFlag(ExtraMovementState.IsSprinting) &&
                 character.CurrentStamina > 0f)
                 moveSpeed *= moveSpeedRateWhileSprint;
             if (character.IsAttackingOrUsingSkill)

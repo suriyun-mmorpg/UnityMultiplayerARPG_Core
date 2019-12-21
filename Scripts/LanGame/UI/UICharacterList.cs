@@ -96,7 +96,7 @@ namespace MultiplayerARPG
                         CharacterModelById[characterData.Id] = characterModel;
                         characterModel.SetEquipWeapons(characterData.EquipWeapons);
                         characterModel.SetEquipItems(characterData.EquipItems);
-                        characterModel.SetMovementState(MovementState.IsGrounded);
+                        characterModel.SetMovementState(MovementState.IsGrounded, ExtraMovementState.None);
                         characterModel.gameObject.SetActive(false);
                         CacheCharacterSelectionManager.Add(uiCharacter);
                     }
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
             {
                 SelectedModel.SetIsDead(false);
                 SelectedModel.SetMoveAnimationSpeedMultiplier(1);
-                SelectedModel.SetMovementState(MovementState.IsGrounded);
+                SelectedModel.SetMovementState(MovementState.IsGrounded, ExtraMovementState.None);
             }
         }
 

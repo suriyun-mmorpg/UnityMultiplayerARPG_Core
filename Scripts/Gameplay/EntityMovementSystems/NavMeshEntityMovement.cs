@@ -25,7 +25,13 @@ namespace MultiplayerARPG
             }
             set { CacheEntity.MovementState = value; }
         }
-        protected MovementState extraMovementState = MovementState.None;
+
+        protected ExtraMovementState extraMovementState = ExtraMovementState.None;
+        public ExtraMovementState ExtraMovementState
+        {
+            get { return extraMovementState; }
+            set { extraMovementState = value; }
+        }
 
         private LiteNetLibTransform cacheNetTransform;
         public LiteNetLibTransform CacheNetTransform
@@ -129,9 +135,9 @@ namespace MultiplayerARPG
             MovementState = (MovementState)movementState;
         }
 
-        protected void NetFuncSetExtraMovement(byte movementState)
+        protected void NetFuncSetExtraMovement(byte extraMovementState)
         {
-            extraMovementState = (MovementState)movementState;
+            ExtraMovementState = (ExtraMovementState)extraMovementState;
         }
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -164,15 +170,15 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
         }
 
-        public override void SetExtraMovement(MovementState movementState)
+        public override void SetExtraMovement(ExtraMovementState extraMovementState)
         {
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CacheEntity.CallNetFunction(NetFuncSetExtraMovement, FunctionReceivers.Server, (byte)movementState);
+                    CacheEntity.CallNetFunction(NetFuncSetExtraMovement, FunctionReceivers.Server, (byte)extraMovementState);
                     break;
                 case MovementSecure.NotSecure:
-                    extraMovementState = movementState;
+                    ExtraMovementState = extraMovementState;
                     break;
             }
         }
@@ -223,11 +229,7 @@ namespace MultiplayerARPG
         public void SetMovementState(MovementState state)
         {
             if (IsGrounded)
-            {
-                if (state.HasFlag(MovementState.Forward) && extraMovementState.HasFlag(MovementState.IsSprinting))
-                    state |= MovementState.IsSprinting;
                 state |= MovementState.IsGrounded;
-            }
 
             // Set local movement state which will be used by owner client
             localMovementState = state;

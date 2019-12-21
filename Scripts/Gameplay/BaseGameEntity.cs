@@ -57,6 +57,13 @@ namespace MultiplayerARPG
             set { movementState.Value = (byte)value; }
         }
         [SerializeField]
+        protected SyncFieldByte extraMovementState = new SyncFieldByte();
+        public ExtraMovementState ExtraMovementState
+        {
+            get { return (ExtraMovementState)extraMovementState.Value; }
+            set { extraMovementState.Value = (byte)value; }
+        }
+        [SerializeField]
         protected SyncFieldDirectionVector2 currentDirection = new SyncFieldDirectionVector2();
         public Vector2 CurrentDirection
         {
@@ -280,7 +287,7 @@ namespace MultiplayerARPG
             {
                 // Update movement animation
                 (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                (Model as IMoveableModel).SetMovementState(MovementState);
+                (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState);
             }
 
             if (Movement != null && Movement.enabled != (PassengingVehicleEntity == null))
@@ -379,6 +386,9 @@ namespace MultiplayerARPG
             movementState.deliveryMethod = DeliveryMethod.Sequenced;
             movementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             movementState.doNotSyncInitialDataImmediately = true;
+            extraMovementState.deliveryMethod = DeliveryMethod.Sequenced;
+            extraMovementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            extraMovementState.doNotSyncInitialDataImmediately = true;
             currentDirection.deliveryMethod = DeliveryMethod.Sequenced;
             currentDirection.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentDirection.doNotSyncInitialDataImmediately = true;
@@ -475,10 +485,10 @@ namespace MultiplayerARPG
                 ActiveMovement.PointClickMovement(position);
         }
 
-        public void SetExtraMovement(MovementState movementState)
+        public void SetExtraMovement(ExtraMovementState extraMovementState)
         {
             if (ActiveMovement != null)
-                ActiveMovement.SetExtraMovement(movementState);
+                ActiveMovement.SetExtraMovement(extraMovementState);
         }
 
         public void SetLookRotation(Vector3 eulerAngles)

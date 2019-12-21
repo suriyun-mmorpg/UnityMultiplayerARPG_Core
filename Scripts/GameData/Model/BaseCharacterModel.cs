@@ -75,6 +75,7 @@ namespace MultiplayerARPG
         public bool isDead { get; protected set; }
         public float moveAnimationSpeedMultiplier { get; protected set; }
         public MovementState movementState { get; protected set; }
+        public ExtraMovementState extraMovementState { get; protected set; }
 
         // Optimize garbage collector
         protected readonly List<string> tempAddingKeys = new List<string>();
@@ -87,7 +88,7 @@ namespace MultiplayerARPG
             base.Awake();
             SetIsDead(false);
             SetMoveAnimationSpeedMultiplier(1);
-            SetMovementState(MovementState.IsGrounded);
+            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None);
         }
 
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
@@ -113,7 +114,7 @@ namespace MultiplayerARPG
                 SetBuffs(previousModel.buffs);
                 SetIsDead(previousModel.isDead);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
-                SetMovementState(previousModel.movementState);
+                SetMovementState(previousModel.movementState, previousModel.extraMovementState);
             }
         }
 
@@ -501,9 +502,10 @@ namespace MultiplayerARPG
             this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
-        public void SetMovementState(MovementState movementState)
+        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState)
         {
             this.movementState = movementState;
+            this.extraMovementState = extraMovementState;
             PlayMoveAnimation();
         }
 

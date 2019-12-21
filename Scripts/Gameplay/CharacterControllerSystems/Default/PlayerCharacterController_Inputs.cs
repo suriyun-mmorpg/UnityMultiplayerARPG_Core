@@ -107,7 +107,7 @@ namespace MultiplayerARPG
                 if (InputManager.GetButtonDown("Sprint"))
                 {
                     isSprinting = !isSprinting;
-                    PlayerCharacterEntity.SetExtraMovement(isSprinting ? MovementState.IsSprinting : MovementState.None);
+                    PlayerCharacterEntity.SetExtraMovement(isSprinting ? ExtraMovementState.IsSprinting : ExtraMovementState.None);
                 }
                 // Auto reload
                 if (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||

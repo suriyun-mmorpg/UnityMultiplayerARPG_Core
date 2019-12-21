@@ -3,6 +3,6 @@
     public interface IMoveableModel
     {
         void SetMoveAnimationSpeedMultiplier(float moveAnimationSpeedMultiplier);
-        void SetMovementState(MovementState movementState);
+        void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState);
     }
 }

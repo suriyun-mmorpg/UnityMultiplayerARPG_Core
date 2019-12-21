@@ -181,6 +181,7 @@ namespace MultiplayerARPG
         Item rightHandWeapon;
         Item leftHandWeapon;
         MovementState movementState;
+        ExtraMovementState extraMovementState;
         public BaseWeaponAbility WeaponAbility { get; private set; }
         public WeaponAbilityState WeaponAbilityState { get; private set; }
 
@@ -319,6 +320,7 @@ namespace MultiplayerARPG
             // Clear controlling states from last update
             isDoingAction = false;
             movementState = MovementState.None;
+            extraMovementState = ExtraMovementState.None;
             UpdateActivatedWeaponAbility(tempDeltaTime);
 
             if (IsBlockController || GenericUtils.IsFocusInputField())
@@ -364,9 +366,14 @@ namespace MultiplayerARPG
 
             // If sprinting add is sprinting state
             if (InputManager.GetButton("Sprint"))
-                movementState |= MovementState.IsSprinting;
+                extraMovementState = ExtraMovementState.IsSprinting;
+            else if (InputManager.GetButton("Crouch"))
+                extraMovementState = ExtraMovementState.IsCrouching;
+            else if (InputManager.GetButton("Crawl"))
+                extraMovementState = ExtraMovementState.IsCrawling;
 
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
+            PlayerCharacterEntity.SetExtraMovement(extraMovementState);
             UpdateLookAtTarget();
         }
 
