@@ -106,8 +106,8 @@ namespace MultiplayerARPG
                 }
                 if (InputManager.GetButtonDown("Sprint"))
                 {
+                    // Toggles sprint state
                     isSprinting = !isSprinting;
-                    PlayerCharacterEntity.SetExtraMovement(isSprinting ? ExtraMovementState.IsSprinting : ExtraMovementState.None);
                 }
                 // Auto reload
                 if (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
@@ -123,6 +123,8 @@ namespace MultiplayerARPG
             UpdatePointClickInput();
             UpdateWASDInput();
             UpdateBuilding();
+            // Set sprinting state
+            PlayerCharacterEntity.SetExtraMovement(isSprinting ? ExtraMovementState.IsSprinting : ExtraMovementState.None);
         }
 
         protected void ReloadAmmo()

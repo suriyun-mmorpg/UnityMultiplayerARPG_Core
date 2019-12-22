@@ -28,9 +28,6 @@ namespace MultiplayerARPG
             public LiteNetLibSyncList.Operation operation;
             public int index;
         }
-        
-        // This will be TRUE when this character enter to safe area
-        public bool IsInSafeArea { get; set; }
 
         #region Serialize data
         [Header("Character Settings")]
@@ -1293,21 +1290,26 @@ namespace MultiplayerARPG
 
         public override sealed bool CanReceiveDamageFrom(IGameEntity attacker)
         {
-            if (attacker == null || attacker.Entity == null)
-                return true;
-
-            BaseCharacterEntity characterEntity = attacker.Entity as BaseCharacterEntity;
-            if (characterEntity == null)
-                return true;
-
-            if (IsInSafeArea || characterEntity.IsInSafeArea)
+            if (IsInSafeArea)
             {
-                // If this character or another character is in safe area so it cannot receive damage
+                // If this character is in safe area it will not receives damages
+                return false;
+            }
+
+            if (attacker == null || attacker.Entity == null)
+            {
+                // If attacker is unknow entity, can receive damages
+                return true;
+            }
+
+            if (attacker.Entity.IsInSafeArea)
+            {
+                // If attacker is in safe area, it will not receives damages
                 return false;
             }
 
             // If this character is not ally so it is enemy and also can receive damage
-            return !IsAlly(characterEntity);
+            return !IsAlly(attacker.Entity as BaseCharacterEntity);
         }
 
         public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);

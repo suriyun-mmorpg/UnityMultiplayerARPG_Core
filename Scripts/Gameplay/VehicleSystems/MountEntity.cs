@@ -6,7 +6,6 @@ namespace MultiplayerARPG
 {
     public class MountEntity : BaseVehicleEntity
     {
-
         public override sealed bool IsDestroyWhenDriverExit
         {
             get

@@ -56,6 +56,7 @@ namespace MultiplayerARPG
             get { return (MovementState)movementState.Value; }
             set { movementState.Value = (byte)value; }
         }
+
         [SerializeField]
         protected SyncFieldByte extraMovementState = new SyncFieldByte();
         public ExtraMovementState ExtraMovementState
@@ -63,6 +64,7 @@ namespace MultiplayerARPG
             get { return (ExtraMovementState)extraMovementState.Value; }
             set { extraMovementState.Value = (byte)value; }
         }
+
         [SerializeField]
         protected SyncFieldDirectionVector2 currentDirection = new SyncFieldDirectionVector2();
         public Vector2 CurrentDirection
@@ -70,10 +72,12 @@ namespace MultiplayerARPG
             get { return currentDirection.Value; }
             set { currentDirection.Value = value; }
         }
+
         public DirectionType2D CurrentDirectionType
         {
             get { return GameplayUtils.GetDirectionTypeByVector2(CurrentDirection); }
         }
+
         [SerializeField]
         protected SyncFieldPassengingVehicle passengingVehicle = new SyncFieldPassengingVehicle();
         public PassengingVehicle PassengingVehicle
@@ -88,6 +92,13 @@ namespace MultiplayerARPG
         public bool IsJumping { get { return ActiveMovement == null ? false : ActiveMovement.IsJumping; } }
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
+
+        #region Enter Area States
+        // This will be TRUE when this character enter to safe area
+        public bool IsInSafeArea { get; set; }
+        // This will be TRUE when this character enter to water area
+        public bool IsUnderWater { get; set; }
+        #endregion
 
         private Transform cacheTransform;
         public Transform CacheTransform
@@ -464,7 +475,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanMove()
         {
-            return ActiveMovement != null;
+            return false;
         }
 
         public void StopMove()

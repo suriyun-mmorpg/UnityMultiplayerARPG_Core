@@ -10,8 +10,6 @@
         Right = 1 << 3,
         IsGrounded = 1 << 4,
         IsJump = 1 << 5,
-        IsSwimming = 1 << 6,
-        IsFlying = 1 << 7,
     }
 
     [System.Flags]

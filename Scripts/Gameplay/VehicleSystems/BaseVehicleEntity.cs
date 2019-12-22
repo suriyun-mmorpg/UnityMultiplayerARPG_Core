@@ -49,6 +49,14 @@ namespace MultiplayerARPG
             return 0f;
         }
 
+        public override bool CanMove()
+        {
+            BaseGameEntity driver;
+            if (passengers.TryGetValue(0, out driver))
+                return driver.CanMove();
+            return false;
+        }
+
         public bool IsAttackable(byte seatIndex)
         {
             return Seats[seatIndex].canAttack;

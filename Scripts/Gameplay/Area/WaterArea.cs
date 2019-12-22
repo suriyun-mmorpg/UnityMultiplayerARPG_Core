@@ -1,15 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 namespace MultiplayerARPG
 {
-    public class SafeArea : MonoBehaviour
+    public class WaterArea : MonoBehaviour
     {
         private void Awake()
         {
-            // Set layer to ignore raycast
-            gameObject.layer = 2;
+            // Set layer to water
+            gameObject.layer = 4;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -28,7 +27,7 @@ namespace MultiplayerARPG
             if (gameEntity == null)
                 return;
 
-            gameEntity.IsInSafeArea = true;
+            gameEntity.IsUnderWater = true;
         }
 
         private void OnTriggerExit(Collider other)
@@ -47,7 +46,7 @@ namespace MultiplayerARPG
             if (gameEntity == null)
                 return;
 
-            gameEntity.IsInSafeArea = false;
+            gameEntity.IsUnderWater = false;
         }
     }
 }
