@@ -111,8 +111,10 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Just setup default animations when there is no previous model
                 SetDefaultAnimations();
+                SetEquipWeapons(equipWeapons);
+                SetEquipItems(equipItems);
+                SetBuffs(buffs);
             }
         }
 

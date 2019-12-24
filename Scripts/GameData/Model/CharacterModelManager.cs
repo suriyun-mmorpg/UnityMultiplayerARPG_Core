@@ -94,9 +94,6 @@ namespace MultiplayerARPG
         {
             activeModel = null;
             SwitchModel(MainModel);
-            MainModel.SetEquipWeapons(MainModel.equipWeapons);
-            MainModel.SetEquipItems(MainModel.equipItems);
-            MainModel.SetBuffs(MainModel.buffs);
         }
 
         private bool SetupModelManager()
