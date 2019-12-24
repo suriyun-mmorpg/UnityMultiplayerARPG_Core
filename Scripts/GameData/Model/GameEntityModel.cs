@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         public Renderer[] hiddingRenderers;
 
         public bool IsHide { get; protected set; }
-        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
+        protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
         [Header("Effect Containers")]
         public EffectContainer[] effectContainers;
@@ -122,7 +122,7 @@ namespace MultiplayerARPG
                 tempGameEffect.CacheTransform.position = tempGameEffect.followingTarget.position;
                 tempGameEffect.CacheTransform.rotation = tempGameEffect.followingTarget.rotation;
                 tempGameEffect.gameObject.SetActive(true);
-                tempGameEffect.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
+                tempGameEffect.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
                 AddingNewEffect(tempGameEffect);
                 tempAddingEffects.Add(tempGameEffect);
             }

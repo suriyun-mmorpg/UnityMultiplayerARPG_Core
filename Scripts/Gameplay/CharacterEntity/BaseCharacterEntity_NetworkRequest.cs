@@ -22,7 +22,7 @@ namespace MultiplayerARPG
                         return false;
 
                     lastCombatantErrorTime = Time.unscaledTime;
-                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
+                    CurrentGameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
                 }
                 return false;
             }
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                 if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
                 {
                     requestUseSkillErrorTime[dataId] = currentTime;
-                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
+                    CurrentGameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
                 }
                 return false;
             }
@@ -283,7 +283,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions() || EquipWeaponSet == equipWeaponSet)
                 return false;
-            if (equipWeaponSet >= gameInstance.maxEquipWeaponSet)
+            if (equipWeaponSet >= CurrentGameInstance.maxEquipWeaponSet)
                 equipWeaponSet = 0;
             CallNetFunction(NetFuncSwitchEquipWeaponSet, FunctionReceivers.Server, equipWeaponSet);
             return true;

@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
                 {
                     requestUseSkillErrorTime[dataId] = currentTime;
-                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
+                    CurrentGameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
                 }
                 return false;
             }

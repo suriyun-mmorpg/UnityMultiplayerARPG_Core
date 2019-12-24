@@ -382,7 +382,7 @@ namespace MultiplayerARPG
             // Clear area before next find
             CurrentBuildingEntity.buildingArea = null;
             // Default aim position (aim to sky/space)
-            aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + gameInstance.buildDistance);
+            aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + CurrentGameInstance.buildDistance);
             // Raycast from camera position to center of screen
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.AllLayers);
             float tempDistance;
@@ -421,7 +421,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > gameInstance.buildDistance)
+            if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > CurrentGameInstance.buildDistance)
             {
                 // Mark as unable to build when the building is far from character
                 CurrentBuildingEntity.buildingArea = null;
@@ -517,7 +517,7 @@ namespace MultiplayerARPG
                 }
                 // Find item drop entity
                 tempEntity = tempHitInfo.collider.GetComponent<ItemDropEntity>();
-                if (tempEntity != null && tempDistance <= gameInstance.pickUpItemDistance)
+                if (tempEntity != null && tempDistance <= CurrentGameInstance.pickUpItemDistance)
                 {
                     // Entity is in front of character, so this is target
                     if (IsInFront(tempHitInfo.point))
@@ -528,7 +528,7 @@ namespace MultiplayerARPG
                 }
                 // Find activatable entity (NPC/Building/Mount/Etc)
                 tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
-                if (tempEntity != null && tempDistance <= gameInstance.conversationDistance)
+                if (tempEntity != null && tempDistance <= CurrentGameInstance.conversationDistance)
                 {
                     // Entity is in front of character, so this is target
                     if (IsInFront(tempHitInfo.point))

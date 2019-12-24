@@ -30,8 +30,8 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = gameInstance.harvestableTag;
-            gameObject.layer = gameInstance.harvestableLayer;
+            gameObject.tag = CurrentGameInstance.harvestableTag;
+            gameObject.layer = CurrentGameInstance.harvestableLayer;
             MigrateFields();
         }
 
@@ -166,14 +166,14 @@ namespace MultiplayerARPG
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 spawnPosition,
-                gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
         public override void ReceivedDamage(IGameEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
-                gameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage);
+                CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage);
         }
 
         private void OnDrawGizmos()

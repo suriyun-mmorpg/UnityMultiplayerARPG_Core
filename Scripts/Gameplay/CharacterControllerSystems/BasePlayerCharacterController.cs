@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
         public UISceneGameplay CacheUISceneGameplay { get; protected set; }
-        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
+        public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;
         public BaseGameEntity SelectedEntity { get; protected set; }
         public BaseGameEntity TargetEntity { get; protected set; }
@@ -98,8 +98,8 @@ namespace MultiplayerARPG
                 CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
             if (minimapCameraPrefab != null)
                 CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
-            if (gameInstance.UISceneGameplayPrefab != null)
-                CacheUISceneGameplay = Instantiate(gameInstance.UISceneGameplayPrefab);
+            if (CurrentGameInstance.UISceneGameplayPrefab != null)
+                CacheUISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
         }
 
         protected virtual void Update()

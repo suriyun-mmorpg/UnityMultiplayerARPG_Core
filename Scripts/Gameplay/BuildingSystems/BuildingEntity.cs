@@ -94,8 +94,8 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = gameInstance.buildingTag;
-            gameObject.layer = gameInstance.buildingLayer;
+            gameObject.tag = CurrentGameInstance.buildingTag;
+            gameObject.layer = CurrentGameInstance.buildingLayer;
 
             if (buildingTypes == null)
                 buildingTypes = new List<string>();
@@ -109,8 +109,8 @@ namespace MultiplayerARPG
                 foreach (BuildingMaterial material in buildingMaterials)
                 {
                     material.buildingEntity = this;
-                    material.gameObject.tag = gameInstance.buildingTag;
-                    material.gameObject.layer = gameInstance.buildingLayer;
+                    material.gameObject.tag = CurrentGameInstance.buildingTag;
+                    material.gameObject.layer = CurrentGameInstance.buildingLayer;
                 }
             }
 
@@ -141,7 +141,7 @@ namespace MultiplayerARPG
             if (IsServer)
             {
                 BuildingEntity parent;
-                if (gameManager.TryGetBuildingEntity(id, out parent))
+                if (CurrentGameManager.TryGetBuildingEntity(id, out parent))
                     parent.AddChildren(this);
             }
         }

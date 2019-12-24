@@ -83,7 +83,7 @@ namespace MultiplayerARPG
         public int MaxStamina { get { return this.GetCaches().MaxStamina; } }
         public int MaxFood { get { return this.GetCaches().MaxFood; } }
         public int MaxWater { get { return this.GetCaches().MaxWater; } }
-        public override sealed float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / this.GetCaches().BaseMoveSpeed; } }
+        public override sealed float MoveAnimationSpeedMultiplier { get { return CurrentGameplayRule.GetMoveSpeed(this) / this.GetCaches().BaseMoveSpeed; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
 
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.layer = gameInstance.characterLayer;
+            gameObject.layer = CurrentGameInstance.characterLayer;
             animActionType = AnimActionType.None;
             isRecaching = true;
             HitBoxes = GetComponentsInChildren<CharacterHitBox>();
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             if (RespawnGroundedCheckCountDown <= 0)
             {
                 // Killing character when it fall below dead Y
-                if (gameInstance.DimensionType == DimensionType.Dimension3D &&
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D &&
                     BaseGameNetworkManager.CurrentMapInfo != null &&
                     CacheTransform.position.y <= BaseGameNetworkManager.CurrentMapInfo.deadY)
                 {
@@ -342,7 +342,7 @@ namespace MultiplayerARPG
 
         public void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 GetDamagePositionAndRotation2D(damageType, isLeftHand, aimPosition, stagger, out position, out direction, out rotation);
             else
                 GetDamagePositionAndRotation3D(damageType, isLeftHand, aimPosition, stagger, out position, out direction, out rotation);
@@ -427,7 +427,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            if (!gameplayRule.RewardExp(this, reward, multiplier, rewardGivenType))
+            if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType))
                 return;
             // Send OnLevelUp to owner player only
             RequestOnLevelUp();
@@ -435,7 +435,7 @@ namespace MultiplayerARPG
 
         public void RewardCurrencies(Reward reward, float multiplier, RewardGivenType rewardGivenType)
         {
-            gameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType);
+            CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType);
         }
         #endregion
 
@@ -600,16 +600,16 @@ namespace MultiplayerARPG
             if (attackerCharacter != null)
             {
                 // Calculate chance to critical
-                isCritical = Random.value <= gameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
+                isCritical = Random.value <= CurrentGameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
 
                 // If miss, return don't calculate damages
-                if (!isCritical && Random.value > gameInstance.GameplayRule.GetHitChance(attackerCharacter, this))
+                if (!isCritical && Random.value > CurrentGameInstance.GameplayRule.GetHitChance(attackerCharacter, this))
                 {
                     ReceivedDamage(attackerCharacter, CombatAmountType.Miss, 0);
                     return;
                 }
 
-                isBlocked = Random.value <= gameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
+                isBlocked = Random.value <= CurrentGameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
             }
 
             // Calculate damages
@@ -631,11 +631,11 @@ namespace MultiplayerARPG
             {
                 // If critical occurs
                 if (isCritical)
-                    calculatingTotalDamage = gameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
+                    calculatingTotalDamage = CurrentGameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
 
                 // If block occurs
                 if (isBlocked)
-                    calculatingTotalDamage = gameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
+                    calculatingTotalDamage = CurrentGameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
             }
 
             // Apply damages
@@ -650,7 +650,7 @@ namespace MultiplayerARPG
             ReceivedDamage(attacker, combatAmountType, totalDamage);
 
             // Decrease equipment durability
-            gameInstance.GameplayRule.OnCharacterReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage);
+            CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage);
 
             // Interrupt casting skill when receive damage
             InterruptCastingSkill();
@@ -739,7 +739,7 @@ namespace MultiplayerARPG
                 return rightWeaponItem.crosshairSetting;
             if (leftWeaponItem != null)
                 return leftWeaponItem.crosshairSetting;
-            return gameInstance.DefaultWeaponItem.crosshairSetting;
+            return CurrentGameInstance.DefaultWeaponItem.crosshairSetting;
         }
 
         public virtual float GetAttackDistance(bool isLeftHand)
@@ -760,7 +760,7 @@ namespace MultiplayerARPG
                 if (leftWeaponItem == null && rightWeaponItem != null)
                     return rightWeaponItem.WeaponType.damageInfo.GetDistance();
             }
-            return gameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetDistance();
+            return CurrentGameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetDistance();
         }
 
         public virtual float GetAttackFov(bool isLeftHand)
@@ -781,7 +781,7 @@ namespace MultiplayerARPG
                 if (leftWeaponItem == null && rightWeaponItem != null)
                     return rightWeaponItem.WeaponType.damageInfo.GetFov();
             }
-            return gameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetFov();
+            return CurrentGameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetFov();
         }
 
         /// <summary>
@@ -824,7 +824,7 @@ namespace MultiplayerARPG
                         IDamageableEntity selectedTarget = null;
                         bool hasSelectedTarget = TryGetTargetEntity(out selectedTarget);
                         // If hit only selected target, find selected character (only 1 character) to apply damage
-                        int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
+                        int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, CurrentGameInstance.GetDamageableLayerMask());
                         if (tempOverlapSize == 0)
                             return;
                         // Find characters that receiving damages
@@ -862,7 +862,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // If not hit only selected target, find characters within hit fov to applies damages
-                        int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
+                        int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, CurrentGameInstance.GetDamageableLayerMask());
                         if (tempOverlapSize == 0)
                             return;
                         // Find characters that receiving damages
@@ -966,7 +966,7 @@ namespace MultiplayerARPG
 
         public override sealed float GetMoveSpeed()
         {
-            return gameplayRule.GetMoveSpeed(this);
+            return CurrentGameplayRule.GetMoveSpeed(this);
         }
 
         public override sealed bool CanMove()
@@ -1022,14 +1022,14 @@ namespace MultiplayerARPG
         #region Find objects helpers
         public int RaycastObjects_ForAttackFunctions(Vector3 origin, Vector3 direction, float distance, int layerMask)
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return PhysicUtils.SortedRaycastNonAlloc2D(origin, direction, raycasts2D_ForAttackFunctions, distance, layerMask);
             return PhysicUtils.SortedRaycastNonAlloc3D(origin, direction, raycasts_ForAttackFunctions, distance, layerMask);
         }
 
         public Transform GetRaycastObject_ForAttackFunctions(int index, out Vector3 point, out Vector3 normal, out float distance)
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 point = raycasts2D_ForAttackFunctions[index].point;
                 normal = raycasts2D_ForAttackFunctions[index].normal;
@@ -1044,28 +1044,28 @@ namespace MultiplayerARPG
 
         public int OverlapObjects_ForAttackFunctions(Vector3 position, float distance, int layerMask)
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return Physics2D.OverlapCircleNonAlloc(position, distance, overlapColliders2D_ForAttackFunctions, layerMask);
             return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders_ForAttackFunctions, layerMask);
         }
 
         public GameObject GetOverlapObject_ForAttackFunctions(int index)
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return overlapColliders2D_ForAttackFunctions[index].gameObject;
             return overlapColliders_ForAttackFunctions[index].gameObject;
         }
 
         public int OverlapObjects_ForFindFunctions(Vector3 position, float distance, int layerMask)
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return Physics2D.OverlapCircleNonAlloc(position, distance, overlapColliders2D_ForFindFunctions, layerMask);
             return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders_ForFindFunctions, layerMask);
         }
 
         public GameObject GetOverlapObject_ForFindFunctions(int index)
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return overlapColliders2D_ForFindFunctions[index].gameObject;
             return overlapColliders_ForFindFunctions[index].gameObject;
         }
@@ -1077,7 +1077,7 @@ namespace MultiplayerARPG
 
         public bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return IsPositionInFov2D(fov, position, forward);
             return IsPositionInFov3D(fov, position, forward);
         }
@@ -1109,7 +1109,7 @@ namespace MultiplayerARPG
             where T : BaseCharacterEntity
         {
             List<T> result = new List<T>();
-            int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
             if (tempOverlapSize == 0)
                 return null;
             T tempEntity;
@@ -1133,7 +1133,7 @@ namespace MultiplayerARPG
         public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
             if (tempOverlapSize == 0)
                 return null;
             float tempDistance;
@@ -1232,7 +1232,7 @@ namespace MultiplayerARPG
         {
             if (animActionType == AnimActionType.AttackRightHand ||
                 animActionType == AnimActionType.AttackLeftHand)
-                return gameplayRule.GetAttackSpeed(this);
+                return CurrentGameplayRule.GetAttackSpeed(this);
             return 1f;
         }
 
@@ -1243,11 +1243,11 @@ namespace MultiplayerARPG
                 case AnimActionType.AttackRightHand:
                     if (EquipWeapons.GetRightHandWeaponItem() != null)
                         return EquipWeapons.GetRightHandWeaponItem().moveSpeedRateWhileAttacking;
-                    return gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                    return CurrentGameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
                 case AnimActionType.AttackLeftHand:
                     if (EquipWeapons.GetLeftHandWeaponItem() != null)
                         return EquipWeapons.GetLeftHandWeaponItem().moveSpeedRateWhileAttacking;
-                    return gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                    return CurrentGameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
                     // Calculate move speed rate while doing action at clients and server
@@ -1271,14 +1271,14 @@ namespace MultiplayerARPG
 
         public virtual Vector3 GetSummonPosition()
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
-                return CacheTransform.position + new Vector3(Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f);
-            return CacheTransform.position + new Vector3(Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive());
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                return CacheTransform.position + new Vector3(Random.Range(CurrentGameInstance.minSummonDistance, CurrentGameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), Random.Range(CurrentGameInstance.minSummonDistance, CurrentGameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f);
+            return CacheTransform.position + new Vector3(Random.Range(CurrentGameInstance.minSummonDistance, CurrentGameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(CurrentGameInstance.minSummonDistance, CurrentGameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive());
         }
 
         public virtual Quaternion GetSummonRotation()
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return Quaternion.identity;
             return CacheTransform.rotation;
         }

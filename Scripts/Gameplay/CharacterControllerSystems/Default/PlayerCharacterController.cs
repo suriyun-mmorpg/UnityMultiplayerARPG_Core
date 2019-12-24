@@ -91,7 +91,7 @@ namespace MultiplayerARPG
             // This entity detector will be find entities to use when pressed activate key
             GameObject tempGameObject = new GameObject("_ActivatingEntityDetector");
             ActivatableEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            ActivatableEntityDetector.detectingRadius = gameInstance.conversationDistance;
+            ActivatableEntityDetector.detectingRadius = CurrentGameInstance.conversationDistance;
             ActivatableEntityDetector.findPlayer = true;
             ActivatableEntityDetector.findOnlyAlivePlayers = true;
             ActivatableEntityDetector.findNpc = true;
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             // This entity detector will be find item drop entities to use when pressed pickup key
             tempGameObject = new GameObject("_ItemDropEntityDetector");
             ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            ItemDropEntityDetector.detectingRadius = gameInstance.pickUpItemDistance;
+            ItemDropEntityDetector.detectingRadius = CurrentGameInstance.pickUpItemDistance;
             ItemDropEntityDetector.findItemDrop = true;
             // This entity detector will be find item drop entities to use when pressed pickup key
             tempGameObject = new GameObject("_EnemyEntityDetector");
@@ -263,7 +263,7 @@ namespace MultiplayerARPG
 
         public void GetUseSkillDistanceAndFov(out float castDistance, out float castFov)
         {
-            castDistance = gameInstance.conversationDistance;
+            castDistance = CurrentGameInstance.conversationDistance;
             castFov = 360f;
             if (queueUsingSkill.skill != null)
             {
@@ -283,7 +283,7 @@ namespace MultiplayerARPG
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
         {
             Vector3 moveDirection = Vector3.zero;
-            switch (gameInstance.DimensionType)
+            switch (CurrentGameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
                     Vector3 forward = Camera.main.transform.forward;

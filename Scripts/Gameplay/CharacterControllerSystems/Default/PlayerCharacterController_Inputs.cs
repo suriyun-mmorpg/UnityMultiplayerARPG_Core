@@ -278,7 +278,7 @@ namespace MultiplayerARPG
                 // - Clear character target to make character stop doing actions
                 // - Clear selected target to hide selected entity UIs
                 // - Set target position to position where mouse clicked
-                if (gameInstance.DimensionType == DimensionType.Dimension2D && mouseUpOnTarget && tempCount == 0)
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && mouseUpOnTarget && tempCount == 0)
                 {
                     ClearTarget();
                     tempVector3.z = 0;
@@ -548,7 +548,7 @@ namespace MultiplayerARPG
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
                 
-                if (FindTarget(targetCharacter.gameObject, attackDistance, gameInstance.characterLayer.Mask))
+                if (FindTarget(targetCharacter.gameObject, attackDistance, CurrentGameInstance.characterLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -612,7 +612,7 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter))
             {
-                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= gameInstance.conversationDistance)
+                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
                 {
                     // Stop movement to do something
                     PlayerCharacterEntity.StopMove();
@@ -622,7 +622,7 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetNpc))
             {
-                if (Vector3.Distance(MovementTransform.position, targetNpc.CacheTransform.position) <= gameInstance.conversationDistance)
+                if (Vector3.Distance(MovementTransform.position, targetNpc.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
                 {
                     if (lastNpcObjectId != targetNpc.ObjectId)
                     {
@@ -636,7 +636,7 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetItemDrop))
             {
-                if (Vector3.Distance(MovementTransform.position, targetItemDrop.CacheTransform.position) <= gameInstance.pickUpItemDistance)
+                if (Vector3.Distance(MovementTransform.position, targetItemDrop.CacheTransform.position) <= CurrentGameInstance.pickUpItemDistance)
                 {
                     PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                     PlayerCharacterEntity.StopMove();
@@ -650,7 +650,7 @@ namespace MultiplayerARPG
                 UICurrentBuilding uiCurrentBuilding = null;
                 if (CacheUISceneGameplay != null)
                     uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
-                if (Vector3.Distance(MovementTransform.position, targetBuilding.CacheTransform.position) <= gameInstance.conversationDistance)
+                if (Vector3.Distance(MovementTransform.position, targetBuilding.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
                 {
                     PlayerCharacterEntity.StopMove();
                     if (IsEditingBuilding)
@@ -688,7 +688,7 @@ namespace MultiplayerARPG
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
                 
-                if (FindTarget(targetHarvestable.gameObject, attackDistance, gameInstance.harvestableLayer.Mask))
+                if (FindTarget(targetHarvestable.gameObject, attackDistance, CurrentGameInstance.harvestableLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();

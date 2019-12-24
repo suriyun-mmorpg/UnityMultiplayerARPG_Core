@@ -122,7 +122,7 @@ namespace MultiplayerARPG
 
         public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
         {
-            GameEffect[] effects = gameInstance.DefaultDamageHitEffects;
+            GameEffect[] effects = CurrentGameInstance.DefaultDamageHitEffects;
             if (skill != null && skill.GetDamageHitEffects() != null && skill.GetDamageHitEffects().Length > 0)
             {
                 // Set hit effects from skill's hit effects

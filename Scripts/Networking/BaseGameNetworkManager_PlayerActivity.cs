@@ -183,12 +183,12 @@ namespace MultiplayerARPG
         {
             if (playerCharacterEntity == null || !IsServer)
                 return false;
-            if (string.IsNullOrEmpty(guildName) || guildName.Length < gameInstance.SocialSystemSetting.MinGuildNameLength)
+            if (string.IsNullOrEmpty(guildName) || guildName.Length < CurrentGameInstance.SocialSystemSetting.MinGuildNameLength)
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooShortGuildName);
                 return false;
             }
-            if (guildName.Length > gameInstance.SocialSystemSetting.MaxGuildNameLength)
+            if (guildName.Length > CurrentGameInstance.SocialSystemSetting.MaxGuildNameLength)
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooLongGuildName);
                 return false;
@@ -199,7 +199,7 @@ namespace MultiplayerARPG
                 return false;
             }
             GameMessage.Type gameMessageType;
-            if (!gameInstance.SocialSystemSetting.CanCreateGuild(playerCharacterEntity, out gameMessageType))
+            if (!CurrentGameInstance.SocialSystemSetting.CanCreateGuild(playerCharacterEntity, out gameMessageType))
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, gameMessageType);
                 return false;
@@ -249,7 +249,7 @@ namespace MultiplayerARPG
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotGuildLeader);
                 return false;
             }
-            if (guildMessage.Length > gameInstance.SocialSystemSetting.MaxGuildMessageLength)
+            if (guildMessage.Length > CurrentGameInstance.SocialSystemSetting.MaxGuildMessageLength)
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooLongGuildMessage);
                 return false;
@@ -279,12 +279,12 @@ namespace MultiplayerARPG
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.GuildRoleNotAvailable);
                 return false;
             }
-            if (string.IsNullOrEmpty(roleName) || roleName.Length < gameInstance.SocialSystemSetting.MinGuildRoleNameLength)
+            if (string.IsNullOrEmpty(roleName) || roleName.Length < CurrentGameInstance.SocialSystemSetting.MinGuildRoleNameLength)
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooShortGuildRoleName);
                 return false;
             }
-            if (roleName.Length > gameInstance.SocialSystemSetting.MaxGuildRoleNameLength)
+            if (roleName.Length > CurrentGameInstance.SocialSystemSetting.MaxGuildRoleNameLength)
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.TooLongGuildRoleName);
                 return false;
@@ -598,7 +598,7 @@ namespace MultiplayerARPG
             if (!CanCreateGuild(playerCharacterEntity, guildName))
                 return;
 
-            gameInstance.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacterEntity);
+            CurrentGameInstance.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacterEntity);
             GuildData guild = new GuildData(guildId, guildName, playerCharacterEntity);
             guilds[guildId] = guild;
             playerCharacterEntity.GuildId = guildId;
@@ -747,7 +747,7 @@ namespace MultiplayerARPG
             if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out guild))
                 return;
 
-            guild = gameInstance.SocialSystemSetting.IncreaseGuildExp(guild, exp);
+            guild = CurrentGameInstance.SocialSystemSetting.IncreaseGuildExp(guild, exp);
             guilds[guildId] = guild;
             SendGuildLevelExpSkillPointToClients(guild);
         }
@@ -768,14 +768,14 @@ namespace MultiplayerARPG
 
         public virtual string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (gameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
+            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
                 return playerCharacterEntity.RespawnMapName;
             return CurrentMapInfo.Id;
         }
 
         public virtual Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (gameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
+            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
                 return playerCharacterEntity.RespawnPosition;
             return playerCharacterEntity.CacheTransform.position;
         }
@@ -805,10 +805,10 @@ namespace MultiplayerARPG
             switch (storageId.storageType)
             {
                 case StorageType.Player:
-                    storage = gameInstance.playerStorage;
+                    storage = CurrentGameInstance.playerStorage;
                     break;
                 case StorageType.Guild:
-                    storage = gameInstance.guildStorage;
+                    storage = CurrentGameInstance.guildStorage;
                     break;
                 case StorageType.Building:
                     BuildingEntity buildingEntity;

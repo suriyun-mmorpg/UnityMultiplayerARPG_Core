@@ -15,7 +15,7 @@ namespace MultiplayerARPG
             if (!this.TryGetEntityByObjectId(objectId, out npcEntity))
                 return;
 
-            if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
                 return;
 
             currentNpcDialog = npcEntity.StartDialog;
@@ -67,18 +67,18 @@ namespace MultiplayerARPG
             if (sellItems == null || itemIndex >= sellItems.Length)
                 return;
             NpcSellItem sellItem = sellItems[itemIndex];
-            if (!gameplayRule.CurrenciesEnoughToBuyItem(this, sellItem, amount))
+            if (!CurrentGameplayRule.CurrenciesEnoughToBuyItem(this, sellItem, amount))
             {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
                 return;
             }
             int dataId = sellItem.item.DataId;
             if (this.IncreasingItemsWillOverwhelming(dataId, amount))
             {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
-            gameplayRule.DecreaseCurrenciesWhenBuyItem(this, sellItem, amount);
+            CurrentGameplayRule.DecreaseCurrenciesWhenBuyItem(this, sellItem, amount);
             this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
         }
     }

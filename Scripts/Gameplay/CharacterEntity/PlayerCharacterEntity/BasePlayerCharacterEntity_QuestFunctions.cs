@@ -42,11 +42,11 @@ namespace MultiplayerARPG
             if (characterQuest.isComplete)
                 return;
 
-            Reward reward = gameplayRule.MakeQuestReward(quest);
+            Reward reward = CurrentGameplayRule.MakeQuestReward(quest);
             if (this.IncreasingItemsWillOverwhelming(quest.rewardItems))
             {
                 // Overwhelming
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
             // Decrease task items

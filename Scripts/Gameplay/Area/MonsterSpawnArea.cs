@@ -46,7 +46,7 @@ namespace MultiplayerARPG
 
         public override int GroundLayerMask
         {
-            get { return gameInstance.GetMonsterSpawnGroundDetectionLayerMask(); }
+            get { return CurrentGameInstance.GetMonsterSpawnGroundDetectionLayerMask(); }
         }
     }
 }

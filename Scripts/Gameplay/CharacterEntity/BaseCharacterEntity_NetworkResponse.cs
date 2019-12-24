@@ -55,12 +55,12 @@ namespace MultiplayerARPG
             if (!this.TryGetEntityByObjectId(objectId, out itemDropEntity))
                 return;
 
-            if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > gameInstance.pickUpItemDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > CurrentGameInstance.pickUpItemDistance + 5f)
                 return;
 
             if (!itemDropEntity.IsAbleToLoot(this))
             {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotAbleToLoot);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotAbleToLoot);
                 return;
             }
 
@@ -122,7 +122,7 @@ namespace MultiplayerARPG
             bool shouldUnequipLeftHand;
             if (!CanEquipWeapon(equippingItem, equipWeaponSet, isLeftHand, out gameMessageType, out shouldUnequipRightHand, out shouldUnequipLeftHand))
             {
-                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                 return;
             }
 
@@ -134,7 +134,7 @@ namespace MultiplayerARPG
 
             if (this.UnEquipItemWillOverwhelming(unEquipCount))
             {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
 
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
             {
                 if (!UnEquipWeapon(equipWeaponSet, false, true, out gameMessageType))
                 {
-                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     return;
                 }
             }
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
             {
                 if (!UnEquipWeapon(equipWeaponSet, true, true, out gameMessageType))
                 {
-                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     return;
                 }
             }
@@ -192,13 +192,13 @@ namespace MultiplayerARPG
             GameMessage.Type gameMessageType;
             if (!CanEquipItem(equippingItem, equipSlotIndex, out gameMessageType, out unEquippingIndex))
             {
-                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                 return;
             }
 
             if (unEquippingIndex >= 0 && !UnEquipArmor(unEquippingIndex, true, out gameMessageType))
             {
-                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                 return;
             }
 
@@ -218,7 +218,7 @@ namespace MultiplayerARPG
             if (!UnEquipWeapon(equipWeaponSet, isLeftHand, false, out gameMessageType))
             {
                 // Cannot unequip weapon, send reasons to client
-                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
             }
         }
 
@@ -278,7 +278,7 @@ namespace MultiplayerARPG
             if (!UnEquipArmor(index, false, out gameMessageType))
             {
                 // Cannot unequip weapon, send reasons to client
-                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
             }
         }
 
@@ -324,8 +324,8 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncOnLevelUp()
         {
-            if (gameInstance.levelUpEffect != null)
-                CharacterModel.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
+            if (CurrentGameInstance.levelUpEffect != null)
+                CharacterModel.InstantiateEffect(new GameEffect[] { CurrentGameInstance.levelUpEffect });
             if (onLevelUp != null)
                 onLevelUp.Invoke();
         }
@@ -389,8 +389,8 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            if (equipWeaponSet >= gameInstance.maxEquipWeaponSet)
-                equipWeaponSet = (byte)(gameInstance.maxEquipWeaponSet - 1);
+            if (equipWeaponSet >= CurrentGameInstance.maxEquipWeaponSet)
+                equipWeaponSet = (byte)(CurrentGameInstance.maxEquipWeaponSet - 1);
 
             this.FillWeaponSetsIfNeeded(equipWeaponSet);
             EquipWeaponSet = equipWeaponSet;

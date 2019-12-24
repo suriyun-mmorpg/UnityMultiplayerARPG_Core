@@ -271,11 +271,11 @@ namespace MultiplayerARPG
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
-                        if (playerCharacter.gameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                        if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += (int)(exp * guildData.IncreaseExpGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
-                        if (playerCharacter.gameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                        if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += (int)(exp * guildData.IncreaseShareExpGainPercentage * 0.01f);
                         break;
                 }
@@ -347,11 +347,11 @@ namespace MultiplayerARPG
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
-                        if (playerCharacter.gameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                        if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
                             gold += (int)(gold * guildData.IncreaseGoldGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
-                        if (playerCharacter.gameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                        if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
                             gold += (int)(gold * guildData.IncreaseShareGoldGainPercentage * 0.01f);
                         break;
                 }

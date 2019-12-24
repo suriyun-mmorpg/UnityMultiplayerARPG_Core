@@ -44,10 +44,10 @@ namespace MultiplayerARPG
             Collider[] overlaps = Physics.OverlapSphere(spawnPosition, colliderDetectionRadius);
             foreach (Collider overlap in overlaps)
             {
-                if (overlap.gameObject.layer == gameInstance.characterLayer ||
-                    overlap.gameObject.layer == gameInstance.itemDropLayer ||
-                    overlap.gameObject.layer == gameInstance.buildingLayer ||
-                    overlap.gameObject.layer == gameInstance.harvestableLayer)
+                if (overlap.gameObject.layer == CurrentGameInstance.characterLayer ||
+                    overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
+                    overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
+                    overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                 {
                     overlapEntities = true;
                     break;
@@ -69,7 +69,7 @@ namespace MultiplayerARPG
 
         public override int GroundLayerMask
         {
-            get { return gameInstance.GetHarvestableSpawnGroundDetectionLayerMask(); }
+            get { return CurrentGameInstance.GetHarvestableSpawnGroundDetectionLayerMask(); }
         }
     }
 }

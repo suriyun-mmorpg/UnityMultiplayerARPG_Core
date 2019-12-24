@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             // Don't move if exploded
             if (isExploded)
             {
-                if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 {
                     if (CacheRigidbody2D != null)
                         CacheRigidbody2D.velocity = Vector2.zero;
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 if (CacheRigidbody2D != null)
                     CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed;
@@ -166,9 +166,9 @@ namespace MultiplayerARPG
             // Don't hits: TransparentFX, IgnoreRaycast, character, item
             if (other.layer != 1 &&
                 other.layer != 2 &&
-                other.layer != gameInstance.characterLayer &&
-                other.layer != gameInstance.itemDropLayer &&
-                !gameInstance.NonTargetLayersValues.Contains(other.layer))
+                other.layer != CurrentGameInstance.characterLayer &&
+                other.layer != CurrentGameInstance.itemDropLayer &&
+                !CurrentGameInstance.NonTargetLayersValues.Contains(other.layer))
             {
                 if (explodeDistance > 0f)
                 {
@@ -229,7 +229,7 @@ namespace MultiplayerARPG
 
         private void ExplodeApplyDamage()
         {
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
                 foreach (Collider2D collider in colliders2D)

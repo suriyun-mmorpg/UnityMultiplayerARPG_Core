@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= gameInstance.dealingRequestDuration)
+                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= CurrentGameInstance.dealingRequestDuration)
                     dealingCharacter = null;
                 return dealingCharacter;
             }
@@ -149,11 +149,11 @@ namespace MultiplayerARPG
         public int SharedGuildExp { get; set; }
         public string UserId { get; set; }
         public byte UserLevel { get; set; }
-        public string CurrentMapName { get { return gameManager.GetCurrentMapId(this); } set { } }
+        public string CurrentMapName { get { return CurrentGameManager.GetCurrentMapId(this); } set { } }
         public Vector3 CurrentPosition
         {
-            get { return gameManager.GetCurrentPosition(this); }
-            set { gameManager.SetCurrentPosition(this, value); }
+            get { return CurrentGameManager.GetCurrentPosition(this); }
+            set { CurrentGameManager.SetCurrentPosition(this, value); }
         }
         public string RespawnMapName { get; set; }
         public Vector3 RespawnPosition { get; set; }

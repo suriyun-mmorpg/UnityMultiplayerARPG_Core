@@ -6,7 +6,7 @@
         {
             if (Movement == null)
             {
-                if (gameInstance.DimensionType == DimensionType.Dimension3D)
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                     Movement = gameObject.AddComponent<RigidBodyEntityMovement>();
                 else
                     Movement = gameObject.AddComponent<RigidBodyEntityMovement2D>();

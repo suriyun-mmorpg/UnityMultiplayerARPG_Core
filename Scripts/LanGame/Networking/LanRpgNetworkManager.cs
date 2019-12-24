@@ -59,7 +59,7 @@ namespace MultiplayerARPG
 
         public void StartGame()
         {
-            NetworkSetting gameServiceConnection = gameInstance.NetworkSetting;
+            NetworkSetting gameServiceConnection = CurrentGameInstance.NetworkSetting;
             switch (startType)
             {
                 case GameStartType.Host:

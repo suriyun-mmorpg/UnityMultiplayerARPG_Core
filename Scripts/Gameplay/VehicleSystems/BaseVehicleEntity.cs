@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         protected override sealed void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.layer = gameInstance.characterLayer;
+            gameObject.layer = CurrentGameInstance.characterLayer;
         }
 
         public override sealed float GetMoveSpeed()

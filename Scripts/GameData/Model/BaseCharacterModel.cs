@@ -314,7 +314,7 @@ namespace MultiplayerARPG
                 tempEquipmentObject.transform.localEulerAngles = Vector3.zero;
                 tempEquipmentObject.transform.localScale = Vector3.one;
                 tempEquipmentObject.gameObject.SetActive(true);
-                tempEquipmentObject.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
+                tempEquipmentObject.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
                 tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
                 // Setup equipment entity (if exists)
                 tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();

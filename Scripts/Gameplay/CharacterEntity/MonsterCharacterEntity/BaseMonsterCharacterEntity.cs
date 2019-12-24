@@ -77,7 +77,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = gameInstance.monsterTag;
+            gameObject.tag = CurrentGameInstance.monsterTag;
         }
 
         protected override void EntityStart()
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             {
                 if (Summoner != null)
                 {
-                    if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > gameInstance.maxFollowSummonerDistance)
+                    if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > CurrentGameInstance.maxFollowSummonerDistance)
                     {
                         // Teleport to summoner if too far from summoner
                         Teleport(Summoner.GetSummonPosition());
@@ -147,17 +147,17 @@ namespace MultiplayerARPG
             base.OnSetup();
 
             // Setup relates elements
-            if (gameInstance.monsterCharacterMiniMapObjects != null && gameInstance.monsterCharacterMiniMapObjects.Length > 0)
+            if (CurrentGameInstance.monsterCharacterMiniMapObjects != null && CurrentGameInstance.monsterCharacterMiniMapObjects.Length > 0)
             {
-                foreach (GameObject obj in gameInstance.monsterCharacterMiniMapObjects)
+                foreach (GameObject obj in CurrentGameInstance.monsterCharacterMiniMapObjects)
                 {
                     if (obj == null) continue;
                     Instantiate(obj, MiniMapUITransform.position, MiniMapUITransform.rotation, MiniMapUITransform);
                 }
             }
 
-            if (gameInstance.monsterCharacterUI != null)
-                InstantiateUI(gameInstance.monsterCharacterUI);
+            if (CurrentGameInstance.monsterCharacterUI != null)
+                InstantiateUI(CurrentGameInstance.monsterCharacterUI);
 
             InitStats();
         }
@@ -345,7 +345,7 @@ namespace MultiplayerARPG
             if (IsSummoned)
                 return;
 
-            Reward reward = gameplayRule.MakeMonsterReward(MonsterDatabase);
+            Reward reward = CurrentGameplayRule.MakeMonsterReward(MonsterDatabase);
             // Temp data which will be in-use in loop
             BaseCharacterEntity tempCharacterEntity;
             BasePlayerCharacterEntity tempPlayerCharacterEntity;
@@ -413,7 +413,7 @@ namespace MultiplayerARPG
                             makeMostDamage = true;
                         }
                         // Try find guild data from player character
-                        if (tempPlayerCharacterEntity.GuildId > 0 && gameManager.TryGetGuild(tempPlayerCharacterEntity.GuildId, out tempGuildData))
+                        if (tempPlayerCharacterEntity.GuildId > 0 && CurrentGameManager.TryGetGuild(tempPlayerCharacterEntity.GuildId, out tempGuildData))
                         {
                             // Calculation amount of Exp which will be shared to guild
                             shareGuildExpRate = (float)tempGuildData.ShareExpPercentage(tempPlayerCharacterEntity.Id) * 0.01f;
@@ -421,17 +421,17 @@ namespace MultiplayerARPG
                             if (shareGuildExpRate > 0)
                             {
                                 // Increase guild exp
-                                gameManager.IncreaseGuildExp(tempPlayerCharacterEntity, (int)(reward.exp * shareGuildExpRate * rewardRate));
+                                CurrentGameManager.IncreaseGuildExp(tempPlayerCharacterEntity, (int)(reward.exp * shareGuildExpRate * rewardRate));
                             }
                         }
                         // Try find party data from player character
-                        if (tempPlayerCharacterEntity.PartyId > 0 && gameManager.TryGetParty(tempPlayerCharacterEntity.PartyId, out tempPartyData))
+                        if (tempPlayerCharacterEntity.PartyId > 0 && CurrentGameManager.TryGetParty(tempPlayerCharacterEntity.PartyId, out tempPartyData))
                         {
                             BasePlayerCharacterEntity partyPlayerCharacterEntity;
                             // Loop party member to fill looter list / increase gold / increase exp
                             foreach (SocialCharacterData member in tempPartyData.GetMembers())
                             {
-                                if (gameManager.TryGetPlayerCharacterById(member.id, out partyPlayerCharacterEntity))
+                                if (CurrentGameManager.TryGetPlayerCharacterById(member.id, out partyPlayerCharacterEntity))
                                 {
                                     // If share exp, every party member will receive devided exp
                                     // If not share exp, character who make damage will receive non-devided exp
@@ -553,7 +553,7 @@ namespace MultiplayerARPG
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 spawnPosition,
-                gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
         public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)

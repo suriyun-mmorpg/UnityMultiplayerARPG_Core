@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = gameInstance.playerTag;
+            gameObject.tag = CurrentGameInstance.playerTag;
         }
 
         protected override void EntityUpdate()
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
             if (!IsServer || !IsDead())
                 return;
             base.Respawn();
-            gameManager.RespawnCharacter(this);
+            CurrentGameManager.RespawnCharacter(this);
         }
 
         public override bool IsAlly(BaseCharacterEntity characterEntity)
@@ -106,9 +106,9 @@ namespace MultiplayerARPG
 
         public override sealed void Killed(IGameEntity lastAttacker)
         {
-            float expLostPercentage = gameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
+            float expLostPercentage = CurrentGameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;
-            if (gameManager.TryGetGuild(GuildId, out guildData))
+            if (CurrentGameManager.TryGetGuild(GuildId, out guildData))
                 expLostPercentage -= expLostPercentage * guildData.DecreaseExpLostPercentage;
             if (expLostPercentage <= 0f)
                 expLostPercentage = 0f;

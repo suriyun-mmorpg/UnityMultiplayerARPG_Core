@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public float squareSizeX;
         public float squareSizeZ;
 
-        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
+        protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
         public Vector3 GetRandomPosition()
         {

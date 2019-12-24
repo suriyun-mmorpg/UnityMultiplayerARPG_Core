@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         public const float INSTANTIATES_OBJECTS_DELAY = 0.5f;
 
         public static BaseGameNetworkManager Singleton { get; protected set; }
-        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
+        protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         protected static readonly Dictionary<long, BasePlayerCharacterEntity> playerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
         protected static readonly Dictionary<string, BasePlayerCharacterEntity> playerCharactersById = new Dictionary<string, BasePlayerCharacterEntity>();
         protected static readonly Dictionary<string, BuildingEntity> buildingEntities = new Dictionary<string, BuildingEntity>();
@@ -552,7 +552,7 @@ namespace MultiplayerARPG
                         else
                         {
                             // Send messages to nearby characters
-                            List<BasePlayerCharacterEntity> receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(gameInstance.localChatDistance, false, true, true, true);
+                            List<BasePlayerCharacterEntity> receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(CurrentGameInstance.localChatDistance, false, true, true, true);
                             foreach (BasePlayerCharacterEntity receiver in receivers)
                             {
                                 ServerSendPacket(receiver.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
@@ -685,13 +685,13 @@ namespace MultiplayerARPG
         public void Init()
         {
             doNotEnterGameOnConnect = false;
-            Assets.offlineScene.SceneName = gameInstance.homeScene;
+            Assets.offlineScene.SceneName = CurrentGameInstance.homeScene;
             Assets.playerPrefab = null;
             List<LiteNetLibIdentity> spawnablePrefabs = new List<LiteNetLibIdentity>(Assets.spawnablePrefabs);
-            if (gameInstance.itemDropEntityPrefab != null)
-                spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
-            if (gameInstance.warpPortalEntityPrefab != null)
-                spawnablePrefabs.Add(gameInstance.warpPortalEntityPrefab.Identity);
+            if (CurrentGameInstance.itemDropEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.itemDropEntityPrefab.Identity);
+            if (CurrentGameInstance.warpPortalEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.warpPortalEntityPrefab.Identity);
             foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);
@@ -818,7 +818,7 @@ namespace MultiplayerARPG
                 {
                     foreach (WarpPortal warpPortal in mapWarpPortals)
                     {
-                        WarpPortalEntity warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : gameInstance.warpPortalEntityPrefab;
+                        WarpPortalEntity warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
                         if (warpPortalPrefab != null)
                         {
                             GameObject spawnObj = Instantiate(warpPortalPrefab.gameObject, warpPortal.position, Quaternion.identity);

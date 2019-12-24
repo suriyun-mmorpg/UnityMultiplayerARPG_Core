@@ -37,7 +37,7 @@ namespace MultiplayerARPG
 
             GameMessage.Type gameMessageType;
             if (!itemCraft.CanCraft(playerCharacterEntity, out gameMessageType))
-                gameManager.SendServerGameMessage(playerCharacterEntity.ConnectionId, gameMessageType);
+                CurrentGameManager.SendServerGameMessage(playerCharacterEntity.ConnectionId, gameMessageType);
             else
                 itemCraft.CraftItem(playerCharacterEntity);
         }

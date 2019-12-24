@@ -11,29 +11,29 @@ namespace MultiplayerARPG
         protected BaseSkill skill;
         protected short skillLevel;
 
-        public GameInstance gameInstance
+        public GameInstance CurrentGameInstance
         {
             get { return GameInstance.Singleton; }
         }
 
-        public BaseGameplayRule gameplayRule
+        public BaseGameplayRule CurrentGameplayRule
         {
-            get { return gameInstance.GameplayRule; }
+            get { return CurrentGameInstance.GameplayRule; }
         }
 
-        public BaseGameNetworkManager gameManager
+        public BaseGameNetworkManager CurrentGameManager
         {
             get { return BaseGameNetworkManager.Singleton; }
         }
 
         public bool IsServer
         {
-            get { return gameManager.IsServer; }
+            get { return CurrentGameManager.IsServer; }
         }
 
         public bool IsClient
         {
-            get { return gameManager.IsClient; }
+            get { return CurrentGameManager.IsClient; }
         }
 
         private Transform cacheTransform;

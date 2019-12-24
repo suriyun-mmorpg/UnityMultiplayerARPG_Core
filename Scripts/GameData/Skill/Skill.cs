@@ -82,7 +82,7 @@ namespace MultiplayerARPG
                 BasePlayerCharacterEntity castedCharacter = skillUser as BasePlayerCharacterEntity;
                 GameMessage.Type gameMessageType;
                 if (!itemCraft.CanCraft(castedCharacter, out gameMessageType))
-                    skillUser.gameManager.SendServerGameMessage(skillUser.ConnectionId, gameMessageType);
+                    skillUser.CurrentGameManager.SendServerGameMessage(skillUser.ConnectionId, gameMessageType);
                 else
                     itemCraft.CraftItem(castedCharacter);
                 return;

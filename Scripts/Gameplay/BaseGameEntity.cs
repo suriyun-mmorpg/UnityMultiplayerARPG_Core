@@ -219,17 +219,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public GameInstance gameInstance
+        public GameInstance CurrentGameInstance
         {
             get { return GameInstance.Singleton; }
         }
 
-        public BaseGameplayRule gameplayRule
+        public BaseGameplayRule CurrentGameplayRule
         {
-            get { return gameInstance.GameplayRule; }
+            get { return CurrentGameInstance.GameplayRule; }
         }
 
-        public BaseGameNetworkManager gameManager
+        public BaseGameNetworkManager CurrentGameManager
         {
             get { return BaseGameNetworkManager.Singleton; }
         }
