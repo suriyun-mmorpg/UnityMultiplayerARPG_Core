@@ -269,61 +269,58 @@ namespace MultiplayerARPG
 
         protected void SetClipBasedOnWeapon(EquipWeapons equipWeapons)
         {
-            Item weaponItem = GameInstance.Singleton.DefaultWeaponItem;
-            if (equipWeapons.rightHand.NotEmptySlot() && equipWeapons.rightHand.GetWeaponItem() != null)
-                weaponItem = equipWeapons.rightHand.GetWeaponItem();
-            if (weaponItem != null)
+            Item weaponItem = equipWeapons.GetRightHandWeaponItem();
+            if (weaponItem == null)
+                weaponItem = GameInstance.Singleton.DefaultWeaponItem;
+            WeaponAnimations weaponAnimations;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations))
             {
-                WeaponAnimations weaponAnimations;
-                if (GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations))
+                switch (animatorType)
                 {
-                    switch (animatorType)
-                    {
-                        case AnimatorType.Animator:
-                            SetupGenericClips_Animator(
-                                weaponAnimations.idleClip,
-                                weaponAnimations.moveClip,
-                                weaponAnimations.moveBackwardClip,
-                                weaponAnimations.moveLeftClip,
-                                weaponAnimations.moveRightClip,
-                                weaponAnimations.moveForwardLeftClip,
-                                weaponAnimations.moveForwardRightClip,
-                                weaponAnimations.moveBackwardLeftClip,
-                                weaponAnimations.moveBackwardRightClip,
-                                weaponAnimations.jumpClip,
-                                weaponAnimations.fallClip,
-                                weaponAnimations.hurtClip,
-                                weaponAnimations.deadClip);
-                            break;
-                        case AnimatorType.LegacyAnimtion:
-                            SetupGenericClips_LegacyAnimation(
-                                weaponAnimations.idleClip,
-                                weaponAnimations.moveClip,
-                                weaponAnimations.moveBackwardClip,
-                                weaponAnimations.moveLeftClip,
-                                weaponAnimations.moveRightClip,
-                                weaponAnimations.moveForwardLeftClip,
-                                weaponAnimations.moveForwardRightClip,
-                                weaponAnimations.moveBackwardLeftClip,
-                                weaponAnimations.moveBackwardRightClip,
-                                weaponAnimations.jumpClip,
-                                weaponAnimations.fallClip,
-                                weaponAnimations.hurtClip,
-                                weaponAnimations.deadClip);
-                            break;
-                    }
+                    case AnimatorType.Animator:
+                        SetupGenericClips_Animator(
+                            weaponAnimations.idleClip,
+                            weaponAnimations.moveClip,
+                            weaponAnimations.moveBackwardClip,
+                            weaponAnimations.moveLeftClip,
+                            weaponAnimations.moveRightClip,
+                            weaponAnimations.moveForwardLeftClip,
+                            weaponAnimations.moveForwardRightClip,
+                            weaponAnimations.moveBackwardLeftClip,
+                            weaponAnimations.moveBackwardRightClip,
+                            weaponAnimations.jumpClip,
+                            weaponAnimations.fallClip,
+                            weaponAnimations.hurtClip,
+                            weaponAnimations.deadClip);
+                        break;
+                    case AnimatorType.LegacyAnimtion:
+                        SetupGenericClips_LegacyAnimation(
+                            weaponAnimations.idleClip,
+                            weaponAnimations.moveClip,
+                            weaponAnimations.moveBackwardClip,
+                            weaponAnimations.moveLeftClip,
+                            weaponAnimations.moveRightClip,
+                            weaponAnimations.moveForwardLeftClip,
+                            weaponAnimations.moveForwardRightClip,
+                            weaponAnimations.moveBackwardLeftClip,
+                            weaponAnimations.moveBackwardRightClip,
+                            weaponAnimations.jumpClip,
+                            weaponAnimations.fallClip,
+                            weaponAnimations.hurtClip,
+                            weaponAnimations.deadClip);
+                        break;
                 }
-                else
+            }
+            else
+            {
+                switch (animatorType)
                 {
-                    switch (animatorType)
-                    {
-                        case AnimatorType.Animator:
-                            SetupGenericClips_Animator(null, null, null, null, null, null, null, null, null, null, null, null, null);
-                            break;
-                        case AnimatorType.LegacyAnimtion:
-                            SetupGenericClips_LegacyAnimation(null, null, null, null, null, null, null, null, null, null, null, null, null);
-                            break;
-                    }
+                    case AnimatorType.Animator:
+                        SetupGenericClips_Animator(null, null, null, null, null, null, null, null, null, null, null, null, null);
+                        break;
+                    case AnimatorType.LegacyAnimtion:
+                        SetupGenericClips_LegacyAnimation(null, null, null, null, null, null, null, null, null, null, null, null, null);
+                        break;
                 }
             }
         }
