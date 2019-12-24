@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class CharacterDeathSoundComponent : BaseCharacterComponent
+    public class CharacterDeathSoundComponent : BaseGameEntityComponent<BaseCharacterEntity>
     {
         public AudioSource audioSource;
         public DeathSoundData soundData;

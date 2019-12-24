@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class CharacterRecoveryComponent : BaseCharacterComponent
+    public class CharacterRecoveryComponent : BaseGameEntityComponent<BaseCharacterEntity>
     {
         private float updatingTime;
         private float deltaTime;

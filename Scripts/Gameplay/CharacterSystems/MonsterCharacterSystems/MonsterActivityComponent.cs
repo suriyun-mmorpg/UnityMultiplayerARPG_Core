@@ -30,16 +30,6 @@ namespace MultiplayerARPG
         protected BaseSkill queueSkill;
         protected short queueSkillLevel;
 
-        public BaseMonsterCharacterEntity CacheMonsterCharacterEntity
-        {
-            get { return CacheEntity as BaseMonsterCharacterEntity; }
-        }
-
-        public MonsterCharacter MonsterDatabase
-        {
-            get { return CacheMonsterCharacterEntity.MonsterDatabase; }
-        }
-
         protected void Update()
         {
             if (!IsServer || CacheEntity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
@@ -56,11 +46,11 @@ namespace MultiplayerARPG
             float deltaTime = Time.unscaledDeltaTime;
 
             Vector3 currentPosition = CacheEntity.CacheTransform.position;
-            if (CacheMonsterCharacterEntity.Summoner != null)
+            if (CacheEntity.Summoner != null)
             {
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
-                    if (Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.Summoner.CacheTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
+                    if (Vector3.Distance(currentPosition, CacheEntity.Summoner.CacheTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
                     {
                         // Follow summoner
                         FollowSummoner();
@@ -81,7 +71,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (CacheMonsterCharacterEntity.IsInSafeArea)
+                if (CacheEntity.IsInSafeArea)
                 {
                     // If monster move into safe area, wander to another place
                     RandomWanderDestination();
@@ -164,7 +154,7 @@ namespace MultiplayerARPG
                     }
                 }
 
-                if (queueSkill != null || MonsterDatabase.RandomSkill(CacheMonsterCharacterEntity, out queueSkill, out queueSkillLevel))
+                if (queueSkill != null || MonsterDatabase.RandomSkill(CacheEntity, out queueSkill, out queueSkillLevel))
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
                     CacheEntity.RequestUseSkill(queueSkill.DataId, false, tempTargetEnemy.OpponentAimTransform.position);
@@ -189,7 +179,7 @@ namespace MultiplayerARPG
                 // Update destination if target's position changed
                 SetDestination(targetPosition);
 
-                if (CacheMonsterCharacterEntity.Summoner == null)
+                if (CacheEntity.Summoner == null)
                 {
                     startFollowEnemyElasped += deltaTime;
                     // Stop following target and move to position nearby spawn position when follow enemy too long
@@ -202,13 +192,13 @@ namespace MultiplayerARPG
 
         public void SetDestination(Vector3 destination)
         {
-            CacheMonsterCharacterEntity.isWandering = false;
+            CacheEntity.isWandering = false;
             CacheEntity.PointClickMovement(destination);
         }
 
         public void SetWanderDestination(Vector3 destination)
         {
-            CacheMonsterCharacterEntity.isWandering = true;
+            CacheEntity.isWandering = true;
             CacheEntity.PointClickMovement(destination);
         }
 
@@ -217,12 +207,12 @@ namespace MultiplayerARPG
             // Random position around spawn point
             Vector3 randomPosition;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = CacheEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
-                randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = CacheEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             // Random position around summoner
-            if (CacheMonsterCharacterEntity.Summoner != null)
-                randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
+            if (CacheEntity.Summoner != null)
+                randomPosition = CacheEntity.Summoner.GetSummonPosition();
 
             CacheEntity.SetTargetEntity(null);
             SetWanderDestination(randomPosition);
@@ -234,12 +224,12 @@ namespace MultiplayerARPG
             // Random position around spawn point
             Vector3 randomPosition;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = CacheEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
-                randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = CacheEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             // Random position around summoner
-            if (CacheMonsterCharacterEntity.Summoner != null)
-                randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
+            if (CacheEntity.Summoner != null)
+                randomPosition = CacheEntity.Summoner.GetSummonPosition();
 
             CacheEntity.SetTargetEntity(null);
             SetDestination(randomPosition);
@@ -254,7 +244,7 @@ namespace MultiplayerARPG
         {
             // Aggressive monster or summoned monster will find target to attack
             if (MonsterDatabase.characteristic != MonsterCharacteristic.Aggressive &&
-                CacheMonsterCharacterEntity.Summoner == null)
+                CacheEntity.Summoner == null)
                 return false;
 
             BaseCharacterEntity targetCharacter;
@@ -270,8 +260,8 @@ namespace MultiplayerARPG
                         // If character is null or cannot receive damage from monster, skip it
                         continue;
                     }
-                    if (CacheMonsterCharacterEntity.Summoner != null &&
-                        CacheMonsterCharacterEntity.Summoner != characterEntity.GetTargetEntity())
+                    if (CacheEntity.Summoner != null &&
+                        CacheEntity.Summoner != characterEntity.GetTargetEntity())
                     {
                         // If character is not attacking summoner, skip it
                         continue;
@@ -282,7 +272,7 @@ namespace MultiplayerARPG
                         continue;
                     }
                     // Found target, attack it
-                    CacheMonsterCharacterEntity.SetAttackTarget(characterEntity);
+                    CacheEntity.SetAttackTarget(characterEntity);
                     return true;
                 }
             }
