@@ -511,7 +511,7 @@ namespace MultiplayerARPG
         public virtual void SetDefaultAnimations()
         {
             SetIsDead(false);
-            SetMoveAnimationSpeedMultiplier(1);
+            SetMoveAnimationSpeedMultiplier(1f);
             SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, false);
         }
 

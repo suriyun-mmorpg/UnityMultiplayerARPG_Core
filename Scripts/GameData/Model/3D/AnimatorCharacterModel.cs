@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
         public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
+        public static readonly int ANIM_MOVE_TYPE = Animator.StringToHash("MoveType");
 
         [Header("Settings")]
         public AnimatorControllerType controllerType;
@@ -279,6 +280,22 @@ namespace MultiplayerARPG
                 sideMoveSpeed = 1f;
             else if (movementState.HasFlag(MovementState.Left))
                 sideMoveSpeed = -1f;
+
+            int moveType = 0;
+            switch (extraMovementState)
+            {
+                case ExtraMovementState.IsCrouching:
+                    moveType = 1;
+                    break;
+                case ExtraMovementState.IsCrawling:
+                    moveType = 2;
+                    break;
+                case ExtraMovementState.IsSprinting:
+                    moveSpeed *= 2f;
+                    sideMoveSpeed *= 2f;
+                    break;
+            }
+
             // Set animator parameters
             float deltaTime = animator.updateMode == AnimatorUpdateMode.AnimatePhysics ? Time.fixedDeltaTime : Time.deltaTime;
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed, movementDampingTme, deltaTime);
@@ -287,6 +304,7 @@ namespace MultiplayerARPG
             animator.SetBool(ANIM_IS_DEAD, isDead);
             animator.SetBool(ANIM_IS_GROUNDED, !isUnderWater && movementState.HasFlag(MovementState.IsGrounded));
             animator.SetBool(ANIM_IS_UNDER_WATER, isUnderWater);
+            animator.SetInteger(ANIM_MOVE_TYPE, moveType);
         }
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
