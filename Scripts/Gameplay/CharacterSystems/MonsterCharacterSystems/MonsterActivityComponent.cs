@@ -30,7 +30,7 @@ namespace MultiplayerARPG
         protected BaseSkill queueSkill;
         protected short queueSkillLevel;
 
-        protected void Update()
+        public override void EntityUpdate()
         {
             if (!IsServer || CacheEntity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
                 return;

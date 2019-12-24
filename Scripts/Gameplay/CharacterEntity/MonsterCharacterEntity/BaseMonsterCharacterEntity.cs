@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using LiteNetLibManager;
 using LiteNetLib;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -88,6 +86,7 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
+            Profiler.BeginSample("BaseMonsterCharacterEntity - Update");
             base.EntityUpdate();
             if (IsSummoned)
             {
@@ -105,6 +104,7 @@ namespace MultiplayerARPG
                     UnSummon();
                 }
             }
+            Profiler.EndSample();
         }
 
         protected void InitStats()

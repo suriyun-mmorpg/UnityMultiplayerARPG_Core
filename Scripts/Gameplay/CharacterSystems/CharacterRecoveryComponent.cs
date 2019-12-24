@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         private float deltaTime;
         private CharacterRecoveryData recoveryData;
 
-        protected void Update()
+        public override sealed void EntityUpdate()
         {
             if (!CacheEntity.IsServer)
                 return;

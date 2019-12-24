@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public float volume = 1f;
         private bool dirtyIsDead;
 
-        protected void Update()
+        public override void EntityUpdate()
         {
             if (dirtyIsDead != CacheEntity.IsDead())
             {

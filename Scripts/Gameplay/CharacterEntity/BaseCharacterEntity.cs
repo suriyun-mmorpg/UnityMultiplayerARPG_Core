@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Profiling;
 using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -206,7 +205,6 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
-            Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
 
             tempEnableMovement = true;
@@ -247,8 +245,8 @@ namespace MultiplayerARPG
             }
 
             // Enabling movement
-            if (Movement != null && Movement.enabled != tempEnableMovement)
-                Movement.enabled = tempEnableMovement;
+            if (Movement != null && Movement.Enabled != tempEnableMovement)
+                Movement.Enabled = tempEnableMovement;
 
             // Update character model handler based on passenging vehicle
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicle.seatIndex);
@@ -288,7 +286,6 @@ namespace MultiplayerARPG
             }
             // Set character model hide state
             ModelManager.SetHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
-            Profiler.EndSample();
         }
 
         #region Relates Objects

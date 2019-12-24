@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -234,8 +235,19 @@ namespace MultiplayerARPG
             get { return BaseGameNetworkManager.Singleton; }
         }
 
+        protected IGameEntityComponent[] EntityComponents { get; private set; }
+
         private void Awake()
         {
+            InitialRequiredComponents();
+
+            EntityComponents = GetComponents<IGameEntityComponent>();
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                EntityComponents[i].EntityAwake();
+                EntityComponents[i].Enabled = true;
+            }
+
             EntityAwake();
             this.InvokeInstanceDevExtMethods("Awake");
         }
@@ -244,6 +256,11 @@ namespace MultiplayerARPG
 
         private void Start()
         {
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                if (EntityComponents[i].Enabled)
+                    EntityComponents[i].EntityStart();
+            }
             EntityStart();
             if (onStart != null)
                 onStart.Invoke();
@@ -288,6 +305,13 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            Profiler.BeginSample("Entity components update");
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                if (EntityComponents[i].Enabled)
+                    EntityComponents[i].EntityUpdate();
+            }
+            Profiler.EndSample();
             EntityUpdate();
             if (onUpdate != null)
                 onUpdate.Invoke();
@@ -301,15 +325,22 @@ namespace MultiplayerARPG
                 (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, false);
             }
 
-            if (Movement != null && Movement.enabled != (PassengingVehicleEntity == null))
+            if (Movement != null && Movement.Enabled != (PassengingVehicleEntity == null))
             {
                 // Enable movement while not passenging any vehicle
-                Movement.enabled = PassengingVehicleEntity == null;
+                Movement.Enabled = PassengingVehicleEntity == null;
             }
         }
 
         private void LateUpdate()
         {
+            Profiler.BeginSample("Entity components late update");
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                if (EntityComponents[i].Enabled)
+                    EntityComponents[i].EntityLateUpdate();
+            }
+            Profiler.EndSample();
             EntityLateUpdate();
             if (onLateUpdate != null)
                 onLateUpdate.Invoke();
@@ -331,6 +362,13 @@ namespace MultiplayerARPG
 
         private void FixedUpdate()
         {
+            Profiler.BeginSample("Entity components update");
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                if (EntityComponents[i].Enabled)
+                    EntityComponents[i].EntityFixedUpdate();
+            }
+            Profiler.EndSample();
             EntityFixedUpdate();
             if (onFixedUpdate != null)
                 onFixedUpdate.Invoke();
@@ -339,6 +377,10 @@ namespace MultiplayerARPG
 
         private void OnDestroy()
         {
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                EntityComponents[i].EntityOnDestroy();
+            }
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
@@ -346,8 +388,6 @@ namespace MultiplayerARPG
         {
             // Exit vehicle when destroy
             ExitVehicle();
-            if (Movement != null)
-                Movement.EntityOnDestroy(this);
         }
 
         protected virtual void OnValidate()
@@ -371,12 +411,11 @@ namespace MultiplayerARPG
             RegisterNetFunction<PackedUInt, byte>(NetFuncEnterVehicleToSeat);
             RegisterNetFunction(NetFuncExitVehicle);
 
-            // Setup relates component
-            InitialRequiredComponents();
-
             // Setup entity movement here to make it able to register net elements / functions
-            if (Movement != null)
-                Movement.EntityOnSetup(this);
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                EntityComponents[i].EntityOnSetup();
+            }
 
             if (teleportingPosition.HasValue)
             {

@@ -134,19 +134,19 @@ namespace MultiplayerARPG
         private bool previouslyGrounded;
         private bool applyingJump;
 
-        protected virtual void Awake()
+        public override void EntityAwake()
         {
             CacheRigidbody.useGravity = false;
             StopMove();
         }
 
-        protected virtual void OnEnable()
+        public override void ComponentOnEnable()
         {
             CacheNetTransform.enabled = true;
             CacheRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
         }
 
-        protected virtual void OnDisable()
+        public override void ComponentOnDisable()
         {
             CacheNetTransform.enabled = false;
             CacheRigidbody.constraints = RigidbodyConstraints.FreezeAll;
@@ -171,10 +171,9 @@ namespace MultiplayerARPG
                 cacheAnimator.ApplyBuiltinRootMotion();
         }
 
-        public override void EntityOnSetup(BaseGameEntity entity)
+        public override void EntityOnSetup()
         {
-            base.EntityOnSetup(entity);
-            if (entity is BaseMonsterCharacterEntity)
+            if (CacheEntity is BaseMonsterCharacterEntity)
             {
                 // Monster always server authoritative
                 movementSecure = MovementSecure.ServerAuthoritative;
@@ -192,13 +191,13 @@ namespace MultiplayerARPG
                     break;
             }
             // Register Network functions
-            entity.RegisterNetFunction(NetFuncTriggerJump);
-            entity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            entity.RegisterNetFunction<sbyte, sbyte, byte>(NetFuncKeyMovement);
-            entity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
-            entity.RegisterNetFunction(StopMove);
-            entity.RegisterNetFunction<byte>(NetFuncSetMovement);
-            entity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
+            CacheEntity.RegisterNetFunction(NetFuncTriggerJump);
+            CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
+            CacheEntity.RegisterNetFunction<sbyte, sbyte, byte>(NetFuncKeyMovement);
+            CacheEntity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
+            CacheEntity.RegisterNetFunction(StopMove);
+            CacheEntity.RegisterNetFunction<byte>(NetFuncSetMovement);
+            CacheEntity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
         }
 
         protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput, byte movementState)
@@ -358,7 +357,7 @@ namespace MultiplayerARPG
             result = fromPosition;
         }
 
-        private void FixedUpdate()
+        public override void EntityFixedUpdate()
         {
             if (movementSecure == MovementSecure.ServerAuthoritative && !IsServer)
             {

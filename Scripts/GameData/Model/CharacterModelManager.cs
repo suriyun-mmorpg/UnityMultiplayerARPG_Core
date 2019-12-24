@@ -7,7 +7,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class CharacterModelManager : MonoBehaviour
+    public class CharacterModelManager : BaseGameEntityComponent<BaseCharacterEntity>
     {
         public const byte HIDE_SETTER_ENTITY = 0;
         public const byte HIDE_SETTER_CONTROLLER = 1;
@@ -85,12 +85,12 @@ namespace MultiplayerARPG
         private int dirtyVehicleDataId;
         private byte dirtySeatIndex;
 
-        private void Awake()
+        public override void EntityAwake()
         {
             SetupModelManager();
         }
 
-        private void Start()
+        public override void EntityStart()
         {
             activeModel = null;
             SwitchModel(MainModel);

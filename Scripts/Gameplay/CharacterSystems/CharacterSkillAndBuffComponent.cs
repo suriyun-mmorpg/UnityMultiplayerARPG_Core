@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         private CharacterRecoveryData nonApplierRecoveryBuff;
         private readonly Dictionary<IGameEntity, CharacterRecoveryData> recoveryBuffs = new Dictionary<IGameEntity, CharacterRecoveryData>();
 
-        protected void Update()
+        public override sealed void EntityUpdate()
         {
             if (!CacheEntity.IsServer)
                 return;

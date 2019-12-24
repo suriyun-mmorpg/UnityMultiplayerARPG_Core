@@ -21,8 +21,5 @@ namespace MultiplayerARPG
         public abstract void SetLookRotation(Vector3 eulerAngles);
         public abstract void Teleport(Vector3 position);
         public abstract void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
-
-        public virtual void EntityOnSetup(BaseGameEntity entity) { }
-        public virtual void EntityOnDestroy(BaseGameEntity entity) { }
     }
 }

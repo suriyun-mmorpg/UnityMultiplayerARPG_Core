@@ -81,22 +81,21 @@ namespace MultiplayerARPG
             get { return CacheNavMeshAgent.stoppingDistance; }
         }
 
-        protected virtual void OnEnable()
+        public override void ComponentOnEnable()
         {
             CacheNetTransform.enabled = true;
             CacheNavMeshAgent.enabled = true;
         }
 
-        protected virtual void OnDisable()
+        public override void ComponentOnDisable()
         {
             CacheNetTransform.enabled = false;
             CacheNavMeshAgent.enabled = false;
         }
 
-        public override void EntityOnSetup(BaseGameEntity entity)
+        public override void EntityOnSetup()
         {
-            base.EntityOnSetup(entity);
-            if (entity is BaseMonsterCharacterEntity)
+            if (CacheEntity is BaseMonsterCharacterEntity)
             {
                 // Monster always server authoritative
                 movementSecure = MovementSecure.ServerAuthoritative;
@@ -114,11 +113,11 @@ namespace MultiplayerARPG
                     break;
             }
             // Register Network functions
-            entity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            entity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
-            entity.RegisterNetFunction(StopMove);
-            entity.RegisterNetFunction<byte>(NetFuncSetMovement);
-            entity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
+            CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
+            CacheEntity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
+            CacheEntity.RegisterNetFunction(StopMove);
+            CacheEntity.RegisterNetFunction<byte>(NetFuncSetMovement);
+            CacheEntity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -221,7 +220,7 @@ namespace MultiplayerARPG
                 result = navHit.position;
         }
 
-        private void FixedUpdate()
+        public override void EntityFixedUpdate()
         {
             if (movementSecure == MovementSecure.ServerAuthoritative && !IsServer)
                 return;

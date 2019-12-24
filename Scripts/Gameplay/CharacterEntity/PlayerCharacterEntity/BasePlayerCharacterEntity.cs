@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -29,6 +27,7 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
+            Profiler.BeginSample("BasePlayerCharacterEntity - Update");
             base.EntityUpdate();
             if (IsDead())
             {
@@ -36,6 +35,7 @@ namespace MultiplayerARPG
                 SetTargetEntity(null);
                 return;
             }
+            Profiler.EndSample();
         }
 
         public override void Respawn()

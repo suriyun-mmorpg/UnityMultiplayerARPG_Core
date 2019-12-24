@@ -40,8 +40,9 @@ namespace MultiplayerARPG
         private FootstepSettings currentFootstepSettings;
         private float delayCounter = 0f;
 
-        private void Awake()
+        public override sealed void EntityOnSetup()
         {
+            base.EntityOnSetup();
             MigrateSettings();
         }
 
@@ -76,7 +77,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-        protected void Update()
+        public override sealed void EntityUpdate()
         {
             // Play sound on clients only
             if (!IsClient || audioSource == null)
