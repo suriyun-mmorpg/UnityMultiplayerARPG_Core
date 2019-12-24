@@ -3,6 +3,6 @@
     public interface IMoveableModel
     {
         void SetMoveAnimationSpeedMultiplier(float moveAnimationSpeedMultiplier);
-        void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState);
+        void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, bool isUnderWater);
     }
 }

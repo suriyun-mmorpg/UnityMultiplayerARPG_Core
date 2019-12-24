@@ -269,7 +269,7 @@ namespace MultiplayerARPG
                 // Update move speed multiplier
                 CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                 // Update movement animation
-                CharacterModel.SetMovementState(MovementState, ExtraMovementState);
+                CharacterModel.SetMovementState(MovementState, ExtraMovementState, IsUnderWater);
                 // Update direction type if character model is character model 2D
                 if (CharacterModel is ICharacterModel2D)
                 {
@@ -283,7 +283,7 @@ namespace MultiplayerARPG
                     // Update move speed multiplier
                     FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                     // Update movement animation
-                    FpsModel.SetMovementState(MovementState, ExtraMovementState);
+                    FpsModel.SetMovementState(MovementState, ExtraMovementState, IsUnderWater);
                 }
             }
             // Set character model hide state

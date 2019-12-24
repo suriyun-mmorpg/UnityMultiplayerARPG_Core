@@ -211,10 +211,6 @@ namespace MultiplayerARPG
             if (character is BaseMonsterCharacterEntity &&
                 (character as BaseMonsterCharacterEntity).isWandering)
                 moveSpeed = (character as BaseMonsterCharacterEntity).MonsterDatabase.wanderMoveSpeed;
-            if (character.MovementState.HasFlag(MovementState.Forward) &&
-                character.ExtraMovementState.HasFlag(ExtraMovementState.IsSprinting) &&
-                character.CurrentStamina > 0f)
-                moveSpeed *= moveSpeedRateWhileSprint;
             if (character.IsAttackingOrUsingSkill)
                 moveSpeed *= character.MoveSpeedRateWhileAttackOrUseSkill;
             return moveSpeed;

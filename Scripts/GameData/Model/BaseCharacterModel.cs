@@ -76,20 +76,13 @@ namespace MultiplayerARPG
         public float moveAnimationSpeedMultiplier { get; protected set; }
         public MovementState movementState { get; protected set; }
         public ExtraMovementState extraMovementState { get; protected set; }
+        public bool isUnderWater { get; protected set; }
 
         // Optimize garbage collector
         protected readonly List<string> tempAddingKeys = new List<string>();
         protected readonly List<string> tempCachedKeys = new List<string>();
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            SetIsDead(false);
-            SetMoveAnimationSpeedMultiplier(1);
-            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None);
-        }
 
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
@@ -114,7 +107,12 @@ namespace MultiplayerARPG
                 SetBuffs(previousModel.buffs);
                 SetIsDead(previousModel.isDead);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
-                SetMovementState(previousModel.movementState, previousModel.extraMovementState);
+                SetMovementState(previousModel.movementState, previousModel.extraMovementState, previousModel.isUnderWater);
+            }
+            else
+            {
+                // Just setup default animations when there is no previous model
+                SetDefaultAnimations();
             }
         }
 
@@ -502,11 +500,19 @@ namespace MultiplayerARPG
             this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
-        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState)
+        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, bool isUnderWater)
         {
             this.movementState = movementState;
             this.extraMovementState = extraMovementState;
+            this.isUnderWater = isUnderWater;
             PlayMoveAnimation();
+        }
+
+        public virtual void SetDefaultAnimations()
+        {
+            SetIsDead(false);
+            SetMoveAnimationSpeedMultiplier(1);
+            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, false);
         }
 
         /// <summary>

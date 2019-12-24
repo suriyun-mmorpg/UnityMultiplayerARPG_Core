@@ -86,6 +86,7 @@ namespace MultiplayerARPG
     public struct WeaponAnimations : IWeaponAnims
     {
         public WeaponType weaponType;
+        [Header("Movements while standing")]
         public AnimationClip idleClip;
         public AnimationClip moveClip;
         public AnimationClip moveBackwardClip;
@@ -95,14 +96,55 @@ namespace MultiplayerARPG
         public AnimationClip moveForwardRightClip;
         public AnimationClip moveBackwardLeftClip;
         public AnimationClip moveBackwardRightClip;
+        public AnimationClip sprintClip;
+        public AnimationClip sprintBackwardClip;
+        public AnimationClip sprintLeftClip;
+        public AnimationClip sprintRightClip;
+        public AnimationClip sprintForwardLeftClip;
+        public AnimationClip sprintForwardRightClip;
+        public AnimationClip sprintBackwardLeftClip;
+        public AnimationClip sprintBackwardRightClip;
+        [Header("Movements while crouching")]
+        public AnimationClip crouchIdleClip;
+        public AnimationClip crouchMoveClip;
+        public AnimationClip crouchMoveBackwardClip;
+        public AnimationClip crouchMoveLeftClip;
+        public AnimationClip crouchMoveRightClip;
+        public AnimationClip crouchMoveForwardLeftClip;
+        public AnimationClip crouchMoveForwardRightClip;
+        public AnimationClip crouchMoveBackwardLeftClip;
+        public AnimationClip crouchMoveBackwardRightClip;
+        [Header("Movements while crawling")]
+        public AnimationClip crawlIdleClip;
+        public AnimationClip crawlMoveClip;
+        public AnimationClip crawlMoveBackwardClip;
+        public AnimationClip crawlMoveLeftClip;
+        public AnimationClip crawlMoveRightClip;
+        public AnimationClip crawlMoveForwardLeftClip;
+        public AnimationClip crawlMoveForwardRightClip;
+        public AnimationClip crawlMoveBackwardLeftClip;
+        public AnimationClip crawlMoveBackwardRightClip;
+        [Header("Movements while swimming")]
+        public AnimationClip swimIdleClip;
+        public AnimationClip swimMoveClip;
+        public AnimationClip swimMoveBackwardClip;
+        public AnimationClip swimMoveLeftClip;
+        public AnimationClip swimMoveRightClip;
+        public AnimationClip swimMoveForwardLeftClip;
+        public AnimationClip swimMoveForwardRightClip;
+        public AnimationClip swimMoveBackwardLeftClip;
+        public AnimationClip swimMoveBackwardRightClip;
+        [Header("Other movements")]
         public AnimationClip jumpClip;
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
         public AnimationClip deadClip;
+        [Header("Attack movements")]
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] leftHandAttackAnimations;
+        [Header("Reload(Gun) movements")]
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
         public WeaponType Data { get { return weaponType; } }
@@ -122,6 +164,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct DefaultAnimations
     {
+        [Header("Movements while standing")]
         public AnimationClip idleClip;
         public AnimationClip moveClip;
         public AnimationClip moveBackwardClip;
@@ -131,16 +174,58 @@ namespace MultiplayerARPG
         public AnimationClip moveForwardRightClip;
         public AnimationClip moveBackwardLeftClip;
         public AnimationClip moveBackwardRightClip;
+        public AnimationClip sprintClip;
+        public AnimationClip sprintBackwardClip;
+        public AnimationClip sprintLeftClip;
+        public AnimationClip sprintRightClip;
+        public AnimationClip sprintForwardLeftClip;
+        public AnimationClip sprintForwardRightClip;
+        public AnimationClip sprintBackwardLeftClip;
+        public AnimationClip sprintBackwardRightClip;
+        [Header("Movements while crouching")]
+        public AnimationClip crouchIdleClip;
+        public AnimationClip crouchMoveClip;
+        public AnimationClip crouchMoveBackwardClip;
+        public AnimationClip crouchMoveLeftClip;
+        public AnimationClip crouchMoveRightClip;
+        public AnimationClip crouchMoveForwardLeftClip;
+        public AnimationClip crouchMoveForwardRightClip;
+        public AnimationClip crouchMoveBackwardLeftClip;
+        public AnimationClip crouchMoveBackwardRightClip;
+        [Header("Movements while crawling")]
+        public AnimationClip crawlIdleClip;
+        public AnimationClip crawlMoveClip;
+        public AnimationClip crawlMoveBackwardClip;
+        public AnimationClip crawlMoveLeftClip;
+        public AnimationClip crawlMoveRightClip;
+        public AnimationClip crawlMoveForwardLeftClip;
+        public AnimationClip crawlMoveForwardRightClip;
+        public AnimationClip crawlMoveBackwardLeftClip;
+        public AnimationClip crawlMoveBackwardRightClip;
+        [Header("Movements while swimming")]
+        public AnimationClip swimIdleClip;
+        public AnimationClip swimMoveClip;
+        public AnimationClip swimMoveBackwardClip;
+        public AnimationClip swimMoveLeftClip;
+        public AnimationClip swimMoveRightClip;
+        public AnimationClip swimMoveForwardLeftClip;
+        public AnimationClip swimMoveForwardRightClip;
+        public AnimationClip swimMoveBackwardLeftClip;
+        public AnimationClip swimMoveBackwardRightClip;
+        [Header("Other movements")]
         public AnimationClip jumpClip;
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
         public AnimationClip deadClip;
+        [Header("Attack movements")]
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] leftHandAttackAnimations;
+        [Header("Reload(Gun) movements")]
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
+        [Header("Skill movements")]
         public AnimationClip skillCastClip;
         public ActionAnimation skillActivateAnimation;
     }

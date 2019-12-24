@@ -298,7 +298,7 @@ namespace MultiplayerARPG
             {
                 // Update movement animation
                 (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState);
+                (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, false);
             }
 
             if (Movement != null && Movement.enabled != (PassengingVehicleEntity == null))

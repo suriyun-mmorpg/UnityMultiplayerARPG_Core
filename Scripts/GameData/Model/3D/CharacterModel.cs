@@ -21,21 +21,56 @@ namespace MultiplayerARPG
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
         public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
         // Legacy Animation variables
-        public const string LEGACY_CLIP_IDLE = "_Idle";
-        public const string LEGACY_CLIP_MOVE = "_Move";
-        public const string LEGACY_CLIP_MOVE_BACKWARD = "_MoveBackward";
-        public const string LEGACY_CLIP_MOVE_LEFT = "_MoveLeft";
-        public const string LEGACY_CLIP_MOVE_RIGHT = "_MoveRight";
-        public const string LEGACY_CLIP_MOVE_FORWARD_LEFT = "_MoveForwardLeft";
-        public const string LEGACY_CLIP_MOVE_FORWARD_RIGHT = "_MoveForwardRight";
-        public const string LEGACY_CLIP_MOVE_BACKWARD_LEFT = "_MoveBackwardLeft";
-        public const string LEGACY_CLIP_MOVE_BACKWARD_RIGHT = "_MoveBackwardRight";
-        public const string LEGACY_CLIP_JUMP = "_Jump";
-        public const string LEGACY_CLIP_FALL = "_Fall";
-        public const string LEGACY_CLIP_HURT = "_Hurt";
-        public const string LEGACY_CLIP_DEAD = "_Dead";
-        public const string LEGACY_CLIP_ACTION = "_Action";
-        public const string LEGACY_CLIP_CAST_SKILL = "_CastSkill";
+        public const string CLIP_IDLE = "__Idle";
+        public const string CLIP_MOVE = "__MoveForward";
+        public const string CLIP_MOVE_BACKWARD = "__MoveBackward";
+        public const string CLIP_MOVE_LEFT = "__MoveLeft";
+        public const string CLIP_MOVE_RIGHT = "__MoveRight";
+        public const string CLIP_MOVE_FORWARD_LEFT = "__MoveForwardLeft";
+        public const string CLIP_MOVE_FORWARD_RIGHT = "__MoveForwardRight";
+        public const string CLIP_MOVE_BACKWARD_LEFT = "__MoveBackwardLeft";
+        public const string CLIP_MOVE_BACKWARD_RIGHT = "__MoveBackwardRight";
+        public const string CLIP_SPRINT = "__SprintForward";
+        public const string CLIP_SPRINT_BACKWARD = "__SprintBackward";
+        public const string CLIP_SPRINT_LEFT = "__SprintLeft";
+        public const string CLIP_SPRINT_RIGHT = "__SprintRight";
+        public const string CLIP_SPRINT_FORWARD_LEFT = "__SprintForwardLeft";
+        public const string CLIP_SPRINT_FORWARD_RIGHT = "__SprintForwardRight";
+        public const string CLIP_SPRINT_BACKWARD_LEFT = "__SprintBackwardLeft";
+        public const string CLIP_SPRINT_BACKWARD_RIGHT = "__SprintBackwardRight";
+        public const string CLIP_CROUCH_IDLE = "__CrouchIdle";
+        public const string CLIP_CROUCH_MOVE = "__CrouchMoveForward";
+        public const string CLIP_CROUCH_MOVE_BACKWARD = "__CrouchMoveBackward";
+        public const string CLIP_CROUCH_MOVE_LEFT = "__CrouchMoveLeft";
+        public const string CLIP_CROUCH_MOVE_RIGHT = "__CrouchMoveRight";
+        public const string CLIP_CROUCH_MOVE_FORWARD_LEFT = "__CrouchMoveForwardLeft";
+        public const string CLIP_CROUCH_MOVE_FORWARD_RIGHT = "__CrouchMoveForwardRight";
+        public const string CLIP_CROUCH_MOVE_BACKWARD_LEFT = "__CrouchMoveBackwardLeft";
+        public const string CLIP_CROUCH_MOVE_BACKWARD_RIGHT = "__CrouchMoveBackwardRight";
+        public const string CLIP_CRAWL_IDLE = "__CrawlIdle";
+        public const string CLIP_CRAWL_MOVE = "__CrawlMoveForward";
+        public const string CLIP_CRAWL_MOVE_BACKWARD = "__CrawlMoveBackward";
+        public const string CLIP_CRAWL_MOVE_LEFT = "__CrawlMoveLeft";
+        public const string CLIP_CRAWL_MOVE_RIGHT = "__CrawlMoveRight";
+        public const string CLIP_CRAWL_MOVE_FORWARD_LEFT = "__CrawlMoveForwardLeft";
+        public const string CLIP_CRAWL_MOVE_FORWARD_RIGHT = "__CrawlMoveForwardRight";
+        public const string CLIP_CRAWL_MOVE_BACKWARD_LEFT = "__CrawlMoveBackwardLeft";
+        public const string CLIP_CRAWL_MOVE_BACKWARD_RIGHT = "__CrawlMoveBackwardRight";
+        public const string CLIP_SWIM_IDLE = "__SwimIdle";
+        public const string CLIP_SWIM_MOVE = "__SwimMoveForward";
+        public const string CLIP_SWIM_MOVE_BACKWARD = "__SwimMoveBackward";
+        public const string CLIP_SWIM_MOVE_LEFT = "__SwimMoveLeft";
+        public const string CLIP_SWIM_MOVE_RIGHT = "__SwimMoveRight";
+        public const string CLIP_SWIM_MOVE_FORWARD_LEFT = "__SwimMoveForwardLeft";
+        public const string CLIP_SWIM_MOVE_FORWARD_RIGHT = "__SwimMoveForwardRight";
+        public const string CLIP_SWIM_MOVE_BACKWARD_LEFT = "__SwimMoveBackwardLeft";
+        public const string CLIP_SWIM_MOVE_BACKWARD_RIGHT = "__SwimMoveBackwardRight";
+        public const string CLIP_JUMP = "__Jump";
+        public const string CLIP_FALL = "__Fall";
+        public const string CLIP_HURT = "__Hurt";
+        public const string CLIP_DEAD = "__Dead";
+        public const string CLIP_ACTION = "__Action";
+        public const string CLIP_CAST_SKILL = "__CastSkill";
 
         public enum AnimatorType
         {
@@ -207,20 +242,20 @@ namespace MultiplayerARPG
                 case AnimatorType.LegacyAnimtion:
                     if (legacyAnimation == null)
                         legacyAnimation = GetComponentInChildren<Animation>();
-                    legacyAnimation.AddClip(legacyAnimationData.idleClip, LEGACY_CLIP_IDLE);
-                    legacyAnimation.AddClip(legacyAnimationData.moveClip, LEGACY_CLIP_MOVE);
-                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardClip, LEGACY_CLIP_MOVE_BACKWARD);
-                    legacyAnimation.AddClip(legacyAnimationData.moveLeftClip, LEGACY_CLIP_MOVE_LEFT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveRightClip, LEGACY_CLIP_MOVE_RIGHT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveForwardLeftClip, LEGACY_CLIP_MOVE_FORWARD_LEFT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveForwardRightClip, LEGACY_CLIP_MOVE_FORWARD_RIGHT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardLeftClip, LEGACY_CLIP_MOVE_BACKWARD_LEFT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardRightClip, LEGACY_CLIP_MOVE_BACKWARD_RIGHT);
-                    legacyAnimation.AddClip(legacyAnimationData.jumpClip, LEGACY_CLIP_JUMP);
-                    legacyAnimation.AddClip(legacyAnimationData.fallClip, LEGACY_CLIP_FALL);
-                    legacyAnimation.AddClip(legacyAnimationData.hurtClip, LEGACY_CLIP_HURT);
-                    legacyAnimation.AddClip(legacyAnimationData.deadClip, LEGACY_CLIP_DEAD);
-                    CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                    legacyAnimation.AddClip(legacyAnimationData.idleClip, CLIP_IDLE);
+                    legacyAnimation.AddClip(legacyAnimationData.moveClip, CLIP_MOVE);
+                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardClip, CLIP_MOVE_BACKWARD);
+                    legacyAnimation.AddClip(legacyAnimationData.moveLeftClip, CLIP_MOVE_LEFT);
+                    legacyAnimation.AddClip(legacyAnimationData.moveRightClip, CLIP_MOVE_RIGHT);
+                    legacyAnimation.AddClip(legacyAnimationData.moveForwardLeftClip, CLIP_MOVE_FORWARD_LEFT);
+                    legacyAnimation.AddClip(legacyAnimationData.moveForwardRightClip, CLIP_MOVE_FORWARD_RIGHT);
+                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardLeftClip, CLIP_MOVE_BACKWARD_LEFT);
+                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardRightClip, CLIP_MOVE_BACKWARD_RIGHT);
+                    legacyAnimation.AddClip(legacyAnimationData.jumpClip, CLIP_JUMP);
+                    legacyAnimation.AddClip(legacyAnimationData.fallClip, CLIP_FALL);
+                    legacyAnimation.AddClip(legacyAnimationData.hurtClip, CLIP_HURT);
+                    legacyAnimation.AddClip(legacyAnimationData.deadClip, CLIP_DEAD);
+                    CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                     break;
             }
         }
@@ -405,47 +440,47 @@ namespace MultiplayerARPG
             if (deadClip == null)
                 deadClip = legacyAnimationData.deadClip;
             // Remove clips
-            if (legacyAnimation.GetClip(LEGACY_CLIP_IDLE) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_IDLE);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_BACKWARD) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_BACKWARD);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_LEFT) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_LEFT);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_RIGHT) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_RIGHT);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_FORWARD_LEFT) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_FORWARD_LEFT);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_FORWARD_RIGHT) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_FORWARD_RIGHT);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_BACKWARD_LEFT) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_BACKWARD_LEFT);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_BACKWARD_RIGHT) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_BACKWARD_RIGHT);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_JUMP) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_JUMP);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_FALL) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_FALL);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_HURT) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_HURT);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_DEAD) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_DEAD);
+            if (legacyAnimation.GetClip(CLIP_IDLE) != null)
+                legacyAnimation.RemoveClip(CLIP_IDLE);
+            if (legacyAnimation.GetClip(CLIP_MOVE) != null)
+                legacyAnimation.RemoveClip(CLIP_MOVE);
+            if (legacyAnimation.GetClip(CLIP_MOVE_BACKWARD) != null)
+                legacyAnimation.RemoveClip(CLIP_MOVE_BACKWARD);
+            if (legacyAnimation.GetClip(CLIP_MOVE_LEFT) != null)
+                legacyAnimation.RemoveClip(CLIP_MOVE_LEFT);
+            if (legacyAnimation.GetClip(CLIP_MOVE_RIGHT) != null)
+                legacyAnimation.RemoveClip(CLIP_MOVE_RIGHT);
+            if (legacyAnimation.GetClip(CLIP_MOVE_FORWARD_LEFT) != null)
+                legacyAnimation.RemoveClip(CLIP_MOVE_FORWARD_LEFT);
+            if (legacyAnimation.GetClip(CLIP_MOVE_FORWARD_RIGHT) != null)
+                legacyAnimation.RemoveClip(CLIP_MOVE_FORWARD_RIGHT);
+            if (legacyAnimation.GetClip(CLIP_MOVE_BACKWARD_LEFT) != null)
+                legacyAnimation.RemoveClip(CLIP_MOVE_BACKWARD_LEFT);
+            if (legacyAnimation.GetClip(CLIP_MOVE_BACKWARD_RIGHT) != null)
+                legacyAnimation.RemoveClip(CLIP_MOVE_BACKWARD_RIGHT);
+            if (legacyAnimation.GetClip(CLIP_JUMP) != null)
+                legacyAnimation.RemoveClip(CLIP_JUMP);
+            if (legacyAnimation.GetClip(CLIP_FALL) != null)
+                legacyAnimation.RemoveClip(CLIP_FALL);
+            if (legacyAnimation.GetClip(CLIP_HURT) != null)
+                legacyAnimation.RemoveClip(CLIP_HURT);
+            if (legacyAnimation.GetClip(CLIP_DEAD) != null)
+                legacyAnimation.RemoveClip(CLIP_DEAD);
             // Setup generic clips
-            legacyAnimation.AddClip(idleClip, LEGACY_CLIP_IDLE);
-            legacyAnimation.AddClip(moveClip, LEGACY_CLIP_MOVE);
-            legacyAnimation.AddClip(moveBackwardClip, LEGACY_CLIP_MOVE_BACKWARD);
-            legacyAnimation.AddClip(moveLeftClip, LEGACY_CLIP_MOVE_LEFT);
-            legacyAnimation.AddClip(moveRightClip, LEGACY_CLIP_MOVE_RIGHT);
-            legacyAnimation.AddClip(moveForwardLeftClip, LEGACY_CLIP_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(moveForwardRightClip, LEGACY_CLIP_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(moveBackwardLeftClip, LEGACY_CLIP_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(moveBackwardRightClip, LEGACY_CLIP_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(jumpClip, LEGACY_CLIP_JUMP);
-            legacyAnimation.AddClip(fallClip, LEGACY_CLIP_FALL);
-            legacyAnimation.AddClip(hurtClip, LEGACY_CLIP_HURT);
-            legacyAnimation.AddClip(deadClip, LEGACY_CLIP_DEAD);
-            CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, 0, WrapMode.Loop);
+            legacyAnimation.AddClip(idleClip, CLIP_IDLE);
+            legacyAnimation.AddClip(moveClip, CLIP_MOVE);
+            legacyAnimation.AddClip(moveBackwardClip, CLIP_MOVE_BACKWARD);
+            legacyAnimation.AddClip(moveLeftClip, CLIP_MOVE_LEFT);
+            legacyAnimation.AddClip(moveRightClip, CLIP_MOVE_RIGHT);
+            legacyAnimation.AddClip(moveForwardLeftClip, CLIP_MOVE_FORWARD_LEFT);
+            legacyAnimation.AddClip(moveForwardRightClip, CLIP_MOVE_FORWARD_RIGHT);
+            legacyAnimation.AddClip(moveBackwardLeftClip, CLIP_MOVE_BACKWARD_LEFT);
+            legacyAnimation.AddClip(moveBackwardRightClip, CLIP_MOVE_BACKWARD_RIGHT);
+            legacyAnimation.AddClip(jumpClip, CLIP_JUMP);
+            legacyAnimation.AddClip(fallClip, CLIP_FALL);
+            legacyAnimation.AddClip(hurtClip, CLIP_HURT);
+            legacyAnimation.AddClip(deadClip, CLIP_DEAD);
+            CrossFadeLegacyAnimation(CLIP_IDLE, 0, WrapMode.Loop);
         }
 
         public override void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer)
@@ -520,44 +555,44 @@ namespace MultiplayerARPG
         private void UpdateAnimation_LegacyAnimation()
         {
             if (isDead)
-                CrossFadeLegacyAnimation(LEGACY_CLIP_DEAD, legacyAnimationData.deadClipFadeLength, WrapMode.Once);
+                CrossFadeLegacyAnimation(CLIP_DEAD, legacyAnimationData.deadClipFadeLength, WrapMode.Once);
             else
             {
-                if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null && legacyAnimation.IsPlaying(LEGACY_CLIP_ACTION))
+                if (legacyAnimation.GetClip(CLIP_ACTION) != null && legacyAnimation.IsPlaying(CLIP_ACTION))
                     return;
-                if (legacyAnimation.GetClip(LEGACY_CLIP_CAST_SKILL) != null && legacyAnimation.IsPlaying(LEGACY_CLIP_CAST_SKILL))
+                if (legacyAnimation.GetClip(CLIP_CAST_SKILL) != null && legacyAnimation.IsPlaying(CLIP_CAST_SKILL))
                     return;
                 if (!movementState.HasFlag(MovementState.IsGrounded))
-                    CrossFadeLegacyAnimation(LEGACY_CLIP_FALL, legacyAnimationData.fallClipFadeLength, WrapMode.Loop);
+                    CrossFadeLegacyAnimation(CLIP_FALL, legacyAnimationData.fallClipFadeLength, WrapMode.Loop);
                 else
                 {
                     // Forward Right
                     if (movementState.HasFlag(MovementState.Forward) && movementState.HasFlag(MovementState.Right))
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_MOVE_FORWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     // Forward Left
                     else if (movementState.HasFlag(MovementState.Forward) && movementState.HasFlag(MovementState.Left))
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_MOVE_FORWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     // Backward Right
                     else if (movementState.HasFlag(MovementState.Backward) && movementState.HasFlag(MovementState.Right))
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_MOVE_BACKWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     // Backward Left
                     else if (movementState.HasFlag(MovementState.Backward) && movementState.HasFlag(MovementState.Left))
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_MOVE_BACKWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     // Forward
                     else if (movementState.HasFlag(MovementState.Forward))
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     // Backward
                     else if (movementState.HasFlag(MovementState.Backward))
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_MOVE_BACKWARD, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     // Right
                     else if (movementState.HasFlag(MovementState.Right))
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_MOVE_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     // Left
                     else if (movementState.HasFlag(MovementState.Left))
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_MOVE_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     // Idle
                     else
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                        CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                 }
             }
         }
@@ -567,7 +602,7 @@ namespace MultiplayerARPG
             if (!legacyAnimation.IsPlaying(clipName))
             {
                 // Don't play dead animation looply
-                if (clipName == LEGACY_CLIP_DEAD && lastFadedLegacyClipName == LEGACY_CLIP_DEAD)
+                if (clipName == CLIP_DEAD && lastFadedLegacyClipName == CLIP_DEAD)
                     return;
                 lastFadedLegacyClipName = clipName;
                 legacyAnimation.wrapMode = wrapMode;
@@ -594,7 +629,7 @@ namespace MultiplayerARPG
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
-                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                 isPlayingActionAnimation = false;
                 return;
             }
@@ -605,7 +640,7 @@ namespace MultiplayerARPG
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
-                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                 return;
             }
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
@@ -644,20 +679,20 @@ namespace MultiplayerARPG
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             if (tempActionAnimation.clip != null)
             {
-                if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
-                    legacyAnimation.RemoveClip(LEGACY_CLIP_ACTION);
-                legacyAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
+                if (legacyAnimation.GetClip(CLIP_ACTION) != null)
+                    legacyAnimation.RemoveClip(CLIP_ACTION);
+                legacyAnimation.AddClip(tempActionAnimation.clip, CLIP_ACTION);
             }
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             isPlayingActionAnimation = true;
             if (tempActionAnimation.clip != null)
-                CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
+                CrossFadeLegacyAnimation(CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
             if (tempActionAnimation.clip != null)
-                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
             isPlayingActionAnimation = false;
@@ -677,13 +712,13 @@ namespace MultiplayerARPG
         private IEnumerator PlaySkillCastClip_LegacyAnimation(int dataId, float duration)
         {
             AnimationClip castClip = GetSkillCastClip(dataId);
-            if (legacyAnimation.GetClip(LEGACY_CLIP_CAST_SKILL) != null)
-                legacyAnimation.RemoveClip(LEGACY_CLIP_CAST_SKILL);
-            legacyAnimation.AddClip(castClip, LEGACY_CLIP_CAST_SKILL);
-            CrossFadeLegacyAnimation(LEGACY_CLIP_CAST_SKILL, legacyAnimationData.actionClipFadeLength, WrapMode.Loop);
+            if (legacyAnimation.GetClip(CLIP_CAST_SKILL) != null)
+                legacyAnimation.RemoveClip(CLIP_CAST_SKILL);
+            legacyAnimation.AddClip(castClip, CLIP_CAST_SKILL);
+            CrossFadeLegacyAnimation(CLIP_CAST_SKILL, legacyAnimationData.actionClipFadeLength, WrapMode.Loop);
             yield return new WaitForSecondsRealtime(duration);
             if (!isPlayingActionAnimation)
-                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
         }
         #endregion
 
@@ -691,7 +726,7 @@ namespace MultiplayerARPG
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
-                CrossFadeLegacyAnimation(LEGACY_CLIP_HURT, legacyAnimationData.hurtClipFadeLength, WrapMode.Once);
+                CrossFadeLegacyAnimation(CLIP_HURT, legacyAnimationData.hurtClipFadeLength, WrapMode.Once);
                 return;
             }
             animator.ResetTrigger(ANIM_HURT);
@@ -702,7 +737,7 @@ namespace MultiplayerARPG
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
-                CrossFadeLegacyAnimation(LEGACY_CLIP_JUMP, legacyAnimationData.jumpClipFadeLength, WrapMode.Once);
+                CrossFadeLegacyAnimation(CLIP_JUMP, legacyAnimationData.jumpClipFadeLength, WrapMode.Once);
                 return;
             }
             animator.ResetTrigger(ANIM_JUMP);
