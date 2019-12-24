@@ -1,25 +1,80 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
     public class CharacterFootstepSoundComponent : BaseGameEntityComponent<BaseGameEntity>
     {
         public AudioSource audioSource;
+        public FootstepSettings moveFootstepSettings;
+        public FootstepSettings sprintFootstepSettings;
+        public FootstepSettings crouchFootstepSettings;
+        public FootstepSettings crawlFootstepSettings;
+        public FootstepSettings swimFootstepSettings;
+
+        #region Deprecated settings
+        [HideInInspector]
         public FootstepSoundData soundData;
+        [HideInInspector]
         [Tooltip("This is delay to play future footstep sounds")]
         public float stepDelay = 0.35f;
+        [HideInInspector]
         [Tooltip("This is threshold to play footstep sounds, for example if this value is 0.1 and velocity.magnitude more or equals to 0.1 it will play sounds")]
         public float stepThreshold = 0.1f;
+        [HideInInspector]
         [Range(0f, 1f)]
         public float randomVolumeMin = 0.75f;
+        [HideInInspector]
         [Range(0f, 1f)]
         public float randomVolumeMax = 1f;
+        [HideInInspector]
         [Range(-3f, 3f)]
         public float randomPitchMin = 0.75f;
+        [HideInInspector]
         [Range(-3f, 3f)]
         public float randomPitchMax = 1f;
+        #endregion
 
+        private FootstepSettings currentFootstepSettings;
         private float delayCounter = 0f;
+
+        private void Awake()
+        {
+            MigrateSettings();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (MigrateSettings())
+                EditorUtility.SetDirty(this);
+        }
+
+        private bool MigrateSettings()
+        {
+            if (soundData.randomAudioClips != null && soundData.randomAudioClips.Length > 0 &&
+                (moveFootstepSettings == null || 
+                moveFootstepSettings.soundData.randomAudioClips == null || 
+                moveFootstepSettings.soundData.randomAudioClips.Length == 0))
+            {
+                Debug.LogWarning("[CharacterFootstepSoundComponent] Migration run to setup old footstep settings to new footstep settings due to codes structure changes");
+                moveFootstepSettings = new FootstepSettings()
+                {
+                    soundData = soundData,
+                    stepDelay = stepDelay,
+                    stepThreshold = stepThreshold,
+                    randomVolumeMin = randomVolumeMin,
+                    randomVolumeMax = randomVolumeMax,
+                    randomPitchMin = randomPitchMin,
+                    randomPitchMax = randomPitchMax,
+                };
+                return true;
+            }
+            return false;
+        }
+#endif
 
         protected void Update()
         {
@@ -34,6 +89,29 @@ namespace MultiplayerARPG
             if (CacheEntity is BaseCharacterEntity)
                 audioSource.mute = audioSource.mute || (CacheEntity as BaseCharacterEntity).GetCaches().MuteFootstepSound;
 
+            if (CacheEntity.IsUnderWater)
+            {
+                currentFootstepSettings = swimFootstepSettings;
+            }
+            else
+            {
+                switch (CacheEntity.ExtraMovementState)
+                {
+                    case ExtraMovementState.IsSprinting:
+                        currentFootstepSettings = sprintFootstepSettings;
+                        break;
+                    case ExtraMovementState.IsCrouching:
+                        currentFootstepSettings = crouchFootstepSettings;
+                        break;
+                    case ExtraMovementState.IsCrawling:
+                        currentFootstepSettings = crawlFootstepSettings;
+                        break;
+                    default:
+                        currentFootstepSettings = moveFootstepSettings;
+                        break;
+                }
+            }
+
             if (!CacheEntity.MovementState.HasFlag(MovementState.Forward) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Backward) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Right) &&
@@ -45,7 +123,7 @@ namespace MultiplayerARPG
             }
 
             delayCounter += Time.deltaTime;
-            if (delayCounter >= stepDelay / CacheEntity.MoveAnimationSpeedMultiplier)
+            if (delayCounter >= currentFootstepSettings.stepDelay / CacheEntity.MoveAnimationSpeedMultiplier)
             {
                 if (CacheEntity.MovementState.HasFlag(MovementState.IsGrounded))
                     PlaySound();
@@ -59,9 +137,9 @@ namespace MultiplayerARPG
             if (audioSource == null)
                 return;
 
-            audioSource.clip = soundData.GetRandomedAudioClip();
-            audioSource.pitch = Random.Range(randomPitchMin, randomPitchMax);
-            audioSource.volume = Random.Range(randomVolumeMin, randomVolumeMax) * (AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            audioSource.clip = currentFootstepSettings.soundData.GetRandomedAudioClip();
+            audioSource.pitch = Random.Range(currentFootstepSettings.randomPitchMin, currentFootstepSettings.randomPitchMax);
+            audioSource.volume = Random.Range(currentFootstepSettings.randomVolumeMin, currentFootstepSettings.randomVolumeMax) * (AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             audioSource.Play();
         }
     }
@@ -77,5 +155,23 @@ namespace MultiplayerARPG
                 return null;
             return randomAudioClips[Random.Range(0, randomAudioClips.Length)];
         }
+    }
+
+    [System.Serializable]
+    public class FootstepSettings
+    {
+        public FootstepSoundData soundData;
+        [Tooltip("This is delay to play next footstep sounds")]
+        public float stepDelay = 0.35f;
+        [Tooltip("This is threshold to play footstep sounds, for example if this value is 0.1 and velocity.magnitude more or equals to 0.1 it will play sounds")]
+        public float stepThreshold = 0.1f;
+        [Range(0f, 1f)]
+        public float randomVolumeMin = 0.75f;
+        [Range(0f, 1f)]
+        public float randomVolumeMax = 1f;
+        [Range(-3f, 3f)]
+        public float randomPitchMin = 0.75f;
+        [Range(-3f, 3f)]
+        public float randomPitchMax = 1f;
     }
 }
