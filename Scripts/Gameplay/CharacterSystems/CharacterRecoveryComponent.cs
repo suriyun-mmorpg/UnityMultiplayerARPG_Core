@@ -21,24 +21,24 @@ namespace MultiplayerARPG
                 return;
 
             updatingTime += deltaTime;
-            if (updatingTime >= gameplayRule.GetRecoveryUpdateDuration())
+            if (updatingTime >= CurrentGameplayRule.GetRecoveryUpdateDuration())
             {
                 // Hp
-                recoveryData.recoveryingHp += updatingTime * gameplayRule.GetRecoveryHpPerSeconds(CacheEntity);
+                recoveryData.recoveryingHp += updatingTime * CurrentGameplayRule.GetRecoveryHpPerSeconds(CacheEntity);
                 // Decrease Hp
-                recoveryData.decreasingHp += updatingTime * gameplayRule.GetDecreasingHpPerSeconds(CacheEntity);
+                recoveryData.decreasingHp += updatingTime * CurrentGameplayRule.GetDecreasingHpPerSeconds(CacheEntity);
                 // Mp
-                recoveryData.recoveryingMp += updatingTime * gameplayRule.GetRecoveryMpPerSeconds(CacheEntity);
+                recoveryData.recoveryingMp += updatingTime * CurrentGameplayRule.GetRecoveryMpPerSeconds(CacheEntity);
                 // Decrease Mp
-                recoveryData.decreasingMp += updatingTime * gameplayRule.GetDecreasingMpPerSeconds(CacheEntity);
+                recoveryData.decreasingMp += updatingTime * CurrentGameplayRule.GetDecreasingMpPerSeconds(CacheEntity);
                 // Stamina
-                recoveryData.recoveryingStamina += updatingTime * gameplayRule.GetRecoveryStaminaPerSeconds(CacheEntity);
+                recoveryData.recoveryingStamina += updatingTime * CurrentGameplayRule.GetRecoveryStaminaPerSeconds(CacheEntity);
                 // Decrease Stamina
-                recoveryData.decreasingStamina += updatingTime * gameplayRule.GetDecreasingStaminaPerSeconds(CacheEntity);
+                recoveryData.decreasingStamina += updatingTime * CurrentGameplayRule.GetDecreasingStaminaPerSeconds(CacheEntity);
                 // Decrease Food
-                recoveryData.decreasingFood += updatingTime * gameplayRule.GetDecreasingFoodPerSeconds(CacheEntity);
+                recoveryData.decreasingFood += updatingTime * CurrentGameplayRule.GetDecreasingFoodPerSeconds(CacheEntity);
                 // Decrease Water
-                recoveryData.decreasingWater += updatingTime * gameplayRule.GetDecreasingWaterPerSeconds(CacheEntity);
+                recoveryData.decreasingWater += updatingTime * CurrentGameplayRule.GetDecreasingWaterPerSeconds(CacheEntity);
 
                 recoveryData = recoveryData.Apply(CacheEntity, CacheEntity);
                 CacheEntity.ValidateRecovery(CacheEntity);

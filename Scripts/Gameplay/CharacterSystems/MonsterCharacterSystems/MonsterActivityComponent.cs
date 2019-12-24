@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             {
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
-                    if (Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.Summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
+                    if (Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.Summoner.CacheTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
                     {
                         // Follow summoner
                         FollowSummoner();
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
                 Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
                 if (lookAtDirection.magnitude > 0)
                 {
-                    if (gameInstance.DimensionType == DimensionType.Dimension3D)
+                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                     {
                         Quaternion currentLookAtRotation = CacheEntity.CacheTransform.rotation;
                         Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
@@ -216,7 +216,7 @@ namespace MultiplayerARPG
         {
             // Random position around spawn point
             Vector3 randomPosition;
-            if (gameInstance.DimensionType == DimensionType.Dimension3D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
                 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
@@ -233,7 +233,7 @@ namespace MultiplayerARPG
         {
             // Random position around spawn point
             Vector3 randomPosition;
-            if (gameInstance.DimensionType == DimensionType.Dimension3D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
                 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);

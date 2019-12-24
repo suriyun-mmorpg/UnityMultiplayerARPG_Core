@@ -16,9 +16,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public GameInstance gameInstance { get { return CacheEntity.CurrentGameInstance; } }
-        public BaseGameplayRule gameplayRule { get { return CacheEntity.CurrentGameplayRule; } }
-        public BaseGameNetworkManager gameManager { get { return CacheEntity.CurrentGameManager; } }
+        public GameInstance CurrentGameInstance { get { return CacheEntity.CurrentGameInstance; } }
+        public BaseGameplayRule CurrentGameplayRule { get { return CacheEntity.CurrentGameplayRule; } }
+        public BaseGameNetworkManager CurrentGameManager { get { return CacheEntity.CurrentGameManager; } }
         public Transform CacheTransform { get { return CacheEntity.CacheTransform; } }
         public bool IsOwnerClient { get { return CacheEntity.IsOwnerClient; } }
         public bool IsServer { get { return CacheEntity.IsServer; } }
