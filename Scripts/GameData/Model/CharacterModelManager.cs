@@ -92,6 +92,7 @@ namespace MultiplayerARPG
 
         private void Start()
         {
+            activeModel = null;
             SwitchModel(MainModel);
         }
 
