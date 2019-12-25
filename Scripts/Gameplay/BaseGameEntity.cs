@@ -305,7 +305,7 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            Profiler.BeginSample("Entity components update");
+            Profiler.BeginSample("Entity Components - Update");
             for (int i = 0; i < EntityComponents.Length; ++i)
             {
                 if (EntityComponents[i].Enabled)
@@ -334,7 +334,7 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            Profiler.BeginSample("Entity components late update");
+            Profiler.BeginSample("Entity Components - LateUpdate");
             for (int i = 0; i < EntityComponents.Length; ++i)
             {
                 if (EntityComponents[i].Enabled)
@@ -362,7 +362,7 @@ namespace MultiplayerARPG
 
         private void FixedUpdate()
         {
-            Profiler.BeginSample("Entity components update");
+            Profiler.BeginSample("Entity Components - FixedUpdate");
             for (int i = 0; i < EntityComponents.Length; ++i)
             {
                 if (EntityComponents[i].Enabled)
