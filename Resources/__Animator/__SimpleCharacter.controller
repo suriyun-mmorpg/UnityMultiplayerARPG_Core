@@ -80,7 +80,7 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
-  - m_Name: MovementType
+  - m_Name: MoveType
     m_Type: 3
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -360,7 +360,7 @@ AnimatorStateTransition:
     m_ConditionEvent: IsCastingSkill
     m_EventTreshold: 0
   - m_ConditionMode: 6
-    m_ConditionEvent: MovementType
+    m_ConditionEvent: MoveType
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1102533270689194618}
@@ -396,7 +396,7 @@ AnimatorStateTransition:
     m_ConditionEvent: IsCastingSkill
     m_EventTreshold: 0
   - m_ConditionMode: 6
-    m_ConditionEvent: MovementType
+    m_ConditionEvent: MoveType
     m_EventTreshold: 2
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1102868150835967816}
@@ -501,7 +501,7 @@ AnimatorStateTransition:
     m_ConditionEvent: IsCastingSkill
     m_EventTreshold: 0
   - m_ConditionMode: 6
-    m_ConditionEvent: MovementType
+    m_ConditionEvent: MoveType
     m_EventTreshold: 1
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1102398676853494258}
