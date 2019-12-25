@@ -12,25 +12,35 @@ namespace MultiplayerARPG
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
         [Header("Game Entity Settings")]
-        public Text textTitle;
-        public Text textTitleB;
-        [Tooltip("These objects will be hidden on non owner objects")]
-        public GameObject[] ownerObjects;
-        [Tooltip("These objects will be hidden on owner objects")]
-        public GameObject[] nonOwnerObjects;
+        [SerializeField]
+        private Text textTitle;
+        public Text TextTitle
+        {
+            get { return textTitle; }
+        }
 
-        #region Events
-        public event GenericDelegate onStart;
-        public event GenericDelegate onEnable;
-        public event GenericDelegate onDisable;
-        public event GenericDelegate onUpdate;
-        public event GenericDelegate onLateUpdate;
-        public event GenericDelegate onFixedUpdate;
-        public event GenericDelegate onSetup;
-        public event GenericDelegate onSetupNetElements;
-        public event GenericDelegate onSetOwnerClient;
-        public event NetworkDestroyDelegate onNetworkDestroy;
-        #endregion
+        [SerializeField]
+        private Text textTitleB;
+        public Text TextTitleB
+        {
+            get { return textTitleB; }
+        }
+
+        [Tooltip("These objects will be hidden on non owner objects")]
+        [SerializeField]
+        private GameObject[] ownerObjects;
+        public GameObject[] OwnerObjects
+        {
+            get { return ownerObjects; }
+        }
+
+        [Tooltip("These objects will be hidden on owner objects")]
+        [SerializeField]
+        private GameObject[] nonOwnerObjects;
+        public GameObject[] NonOwnerObjects
+        {
+            get { return nonOwnerObjects; }
+        }
 
         public BaseGameEntity Entity { get { return this; } }
 
@@ -51,7 +61,10 @@ namespace MultiplayerARPG
         }
 
         // Movement data
-        public MovementSecure MovementSecure { get; set; }
+        [Header("Entity Movement settings")]
+        [SerializeField]
+        private MovementSecure movementSecure;
+        public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
 
         [SerializeField]
         protected SyncFieldByte movementState = new SyncFieldByte();
@@ -258,6 +271,19 @@ namespace MultiplayerARPG
         }
 
         protected IGameEntityComponent[] EntityComponents { get; private set; }
+
+        #region Events
+        public event GenericDelegate onStart;
+        public event GenericDelegate onEnable;
+        public event GenericDelegate onDisable;
+        public event GenericDelegate onUpdate;
+        public event GenericDelegate onLateUpdate;
+        public event GenericDelegate onFixedUpdate;
+        public event GenericDelegate onSetup;
+        public event GenericDelegate onSetupNetElements;
+        public event GenericDelegate onSetOwnerClient;
+        public event NetworkDestroyDelegate onNetworkDestroy;
+        #endregion
 
         private void Awake()
         {

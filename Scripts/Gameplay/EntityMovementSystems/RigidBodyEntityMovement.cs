@@ -33,11 +33,6 @@ namespace MultiplayerARPG
         public bool useRootMotionForJump;
         public bool useRootMotionForFall;
 
-        [Header("Network Settings")]
-        public MovementSecure movementSecure;
-
-        protected MovementState tempMovementState = MovementState.None;
-
         private Animator cacheAnimator;
         public Animator CacheAnimator
         {
@@ -102,6 +97,7 @@ namespace MultiplayerARPG
         }
 
         // Optimize garbage collector
+        private MovementState tempMovementState;
         private Vector3 tempInputDirection;
         private Vector3 tempMoveDirection;
         private Vector3 tempTargetPosition;
@@ -150,13 +146,8 @@ namespace MultiplayerARPG
 
         public override void EntityOnSetup()
         {
-            if (CacheEntity is BaseMonsterCharacterEntity)
-            {
-                // Monster always server authoritative
-                movementSecure = MovementSecure.ServerAuthoritative;
-            }
             // Setup network components
-            switch (movementSecure)
+            switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CacheNetTransform.ownerClientCanSendTransform = false;
@@ -221,7 +212,7 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
             // Not play jump animation on owner client when running in not secure mode
-            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
+            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
                 return;
             // Play jump animation on non owner clients
             if (CacheEntity.Model is IJumppableModel)
@@ -258,7 +249,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            switch (movementSecure)
+            switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
@@ -279,7 +270,7 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
 
-            switch (movementSecure)
+            switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
@@ -296,10 +287,10 @@ namespace MultiplayerARPG
             // Set local movement state which will be used by owner client
             CacheEntity.LocalExtraMovementState = extraMovementState;
 
-            if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
+            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
                 CacheEntity.ExtraMovementState = extraMovementState;
 
-            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
         }
 
@@ -308,7 +299,7 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
 
-            switch (movementSecure)
+            switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
@@ -336,14 +327,14 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
-            if (movementSecure == MovementSecure.ServerAuthoritative && !IsServer)
+            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
             {
                 if (CacheRigidbody.useGravity)
                     CacheRigidbody.useGravity = false;
                 return;
             }
 
-            if (movementSecure == MovementSecure.NotSecure && !IsOwnerClient)
+            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
             {
                 if (CacheRigidbody.useGravity)
                     CacheRigidbody.useGravity = false;
@@ -531,10 +522,10 @@ namespace MultiplayerARPG
             // Set local movement state which will be used by owner client
             CacheEntity.LocalMovementState = state;
 
-            if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
+            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
                 CacheEntity.MovementState = state;
 
-            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CacheEntity.CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
         }
 

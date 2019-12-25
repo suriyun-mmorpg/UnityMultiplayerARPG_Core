@@ -55,12 +55,12 @@ public static partial class CharacterDataExtension
         {
             movement.enabled = false;
         }
-        GameObject[] ownerObjects = result.ownerObjects;
+        GameObject[] ownerObjects = result.OwnerObjects;
         foreach (GameObject ownerObject in ownerObjects)
         {
             ownerObject.SetActive(false);
         }
-        GameObject[] nonOwnerObjects = result.nonOwnerObjects;
+        GameObject[] nonOwnerObjects = result.NonOwnerObjects;
         foreach (GameObject nonOwnerObject in nonOwnerObjects)
         {
             nonOwnerObject.SetActive(false);

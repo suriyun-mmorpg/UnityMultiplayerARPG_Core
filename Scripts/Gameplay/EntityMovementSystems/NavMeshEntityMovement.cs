@@ -11,9 +11,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public class NavMeshEntityMovement : BaseEntityMovement
     {
-        [Header("Network Settings")]
-        public MovementSecure movementSecure;
-
         private LiteNetLibTransform cacheNetTransform;
         public LiteNetLibTransform CacheNetTransform
         {
@@ -71,13 +68,8 @@ namespace MultiplayerARPG
 
         public override void EntityOnSetup()
         {
-            if (CacheEntity is BaseMonsterCharacterEntity)
-            {
-                // Monster always server authoritative
-                movementSecure = MovementSecure.ServerAuthoritative;
-            }
             // Setup network components
-            switch (movementSecure)
+            switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CacheNetTransform.ownerClientCanSendTransform = false;
@@ -133,7 +125,7 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
 
-            switch (movementSecure)
+            switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
@@ -157,10 +149,10 @@ namespace MultiplayerARPG
             // Set local movement state which will be used by owner client
             CacheEntity.LocalExtraMovementState = extraMovementState;
 
-            if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
+            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
                 CacheEntity.ExtraMovementState = extraMovementState;
 
-            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
         }
 
@@ -169,7 +161,7 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
 
-            switch (movementSecure)
+            switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
@@ -198,10 +190,10 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
-            if (movementSecure == MovementSecure.ServerAuthoritative && !IsServer)
+            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
                 return;
 
-            if (movementSecure == MovementSecure.NotSecure && !IsOwnerClient)
+            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
                 return;
 
             SetMovementState(CacheNavMeshAgent.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None);
@@ -215,10 +207,10 @@ namespace MultiplayerARPG
             // Set local movement state which will be used by owner client
             CacheEntity.LocalMovementState = state;
 
-            if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
+            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
                 CacheEntity.MovementState = state;
 
-            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CacheEntity.CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
         }
 

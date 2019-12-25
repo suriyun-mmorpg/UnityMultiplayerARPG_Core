@@ -40,9 +40,9 @@ namespace MultiplayerARPG
         private FootstepSettings currentFootstepSettings;
         private float delayCounter = 0f;
 
-        public override sealed void EntityOnSetup()
+        public override void EntityAwake()
         {
-            base.EntityOnSetup();
+            base.EntityAwake();
             MigrateSettings();
         }
 
@@ -52,6 +52,7 @@ namespace MultiplayerARPG
             if (MigrateSettings())
                 EditorUtility.SetDirty(this);
         }
+#endif
 
         private bool MigrateSettings()
         {
@@ -75,7 +76,6 @@ namespace MultiplayerARPG
             }
             return false;
         }
-#endif
 
         public override sealed void EntityUpdate()
         {
