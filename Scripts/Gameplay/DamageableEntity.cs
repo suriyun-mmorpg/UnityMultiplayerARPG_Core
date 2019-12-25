@@ -6,13 +6,11 @@ namespace MultiplayerARPG
 {
     public abstract class DamageableEntity : BaseGameEntity, IDamageableEntity
     {
-        [SerializeField]
-        protected SyncFieldInt currentHp = new SyncFieldInt();
-
         // Events / delegates
         public event ReceiveDamageDelegate onReceiveDamage;
         public event ReceivedDamage onReceivedDamage;
 
+        [Header("Damageable Settings")]
         [Tooltip("This is transform where combat texts will be instantiates from")]
         public Transform combatTextTransform;
         public Transform CombatTextTransform
@@ -36,6 +34,10 @@ namespace MultiplayerARPG
                 return opponentAimTransform;
             }
         }
+
+        [Header("Damageable Sync Fields")]
+        [SerializeField]
+        protected SyncFieldInt currentHp = new SyncFieldInt();
 
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public abstract int MaxHp { get; }

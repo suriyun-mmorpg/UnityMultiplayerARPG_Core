@@ -507,6 +507,7 @@ namespace MultiplayerARPG
         {
             this.movementState = movementState;
             this.extraMovementState = extraMovementState;
+            this.directionType2D = directionType2D;
             this.isUnderWater = isUnderWater;
             PlayMoveAnimation();
         }

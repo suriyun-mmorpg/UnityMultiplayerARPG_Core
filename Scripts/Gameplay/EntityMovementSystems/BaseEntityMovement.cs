@@ -18,7 +18,8 @@ namespace MultiplayerARPG
         public abstract void PointClickMovement(Vector3 position);
         public abstract void StopMove();
         public abstract void SetExtraMovement(ExtraMovementState extraMovementState);
-        public abstract void SetLookRotation(Vector3 eulerAngles);
+        public abstract void SetLookRotation(Quaternion rotation);
+        public abstract Quaternion GetLookRotation();
         public abstract void Teleport(Vector3 position);
         public abstract void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
     }

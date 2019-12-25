@@ -12,7 +12,8 @@ namespace MultiplayerARPG
         void KeyMovement(Vector3 moveDirection, MovementState movementState);
         void PointClickMovement(Vector3 position);
         void SetExtraMovement(ExtraMovementState extraMovementState);
-        void SetLookRotation(Vector3 eulerAngles);
+        void SetLookRotation(Quaternion rotation);
+        Quaternion GetLookRotation();
         void Teleport(Vector3 position);
         void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
     }

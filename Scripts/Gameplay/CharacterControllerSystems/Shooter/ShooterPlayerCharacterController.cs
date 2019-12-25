@@ -199,7 +199,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            tempLookAt = MovementTransform.rotation;
+            tempLookAt = characterEntity.GetLookRotation();
 
             SetupEquipWeapons(characterEntity.EquipWeapons);
 
@@ -848,7 +848,7 @@ namespace MultiplayerARPG
                     // Turn character to look direction immediately
                     // If character playing action animation
                     tempLookAt = Quaternion.LookRotation(targetLookDirection);
-                    PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                    PlayerCharacterEntity.SetLookRotation(tempLookAt);
                     return;
                 }
                 tempCalculateAngle = Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection);
@@ -858,12 +858,12 @@ namespace MultiplayerARPG
                     {
                         // Update rotation when angle difference more than 0
                         tempLookAt = Quaternion.Slerp(tempLookAt, Quaternion.LookRotation(targetLookDirection), calculatedTurnDuration / turnToTargetDuration);
-                        PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                        PlayerCharacterEntity.SetLookRotation(tempLookAt);
                     }
                     else
                     {
                         // Update temp look at to character's rotation
-                        tempLookAt = MovementTransform.rotation;
+                        tempLookAt = PlayerCharacterEntity.GetLookRotation();
                         // Do actions
                         switch (turningState)
                         {
@@ -886,12 +886,12 @@ namespace MultiplayerARPG
                     {
                         // Update rotation when angle difference more than 0
                         tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
-                        PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                        PlayerCharacterEntity.SetLookRotation(tempLookAt);
                     }
                     else
                     {
                         // Update temp look at to character's rotation
-                        tempLookAt = MovementTransform.rotation;
+                        tempLookAt = PlayerCharacterEntity.GetLookRotation();
                     }
                 }
             }
@@ -899,7 +899,7 @@ namespace MultiplayerARPG
             {
                 // Turn character to look direction immediately
                 tempLookAt = Quaternion.LookRotation(targetLookDirection);
-                PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                PlayerCharacterEntity.SetLookRotation(tempLookAt);
             }
         }
 

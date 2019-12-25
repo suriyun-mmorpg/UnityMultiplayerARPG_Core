@@ -42,8 +42,7 @@ namespace MultiplayerARPG
             get { return nonOwnerObjects; }
         }
 
-        public BaseGameEntity Entity { get { return this; } }
-
+        [Header("Game Entity Sync Fields")]
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
         public virtual string Title
@@ -60,81 +59,13 @@ namespace MultiplayerARPG
             set { syncTitleB.Value = value; }
         }
 
-        // Movement data
-        [Header("Entity Movement settings")]
+        [Header("Model and Transform Settings")]
         [SerializeField]
-        private MovementSecure movementSecure;
-        public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
-
-        [SerializeField]
-        protected SyncFieldByte movementState = new SyncFieldByte();
-        public MovementState LocalMovementState { get; set; }
-        public MovementState MovementState
+        protected GameEntityModel model;
+        public GameEntityModel Model
         {
-            get
-            {
-                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
-                    return LocalMovementState;
-                return (MovementState)movementState.Value;
-            }
-            set { movementState.Value = (byte)value; }
+            get { return model; }
         }
-
-        [SerializeField]
-        protected SyncFieldByte extraMovementState = new SyncFieldByte();
-        public ExtraMovementState LocalExtraMovementState { get; set; }
-        public ExtraMovementState ExtraMovementState
-        {
-            get
-            {
-                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
-                    return LocalExtraMovementState;
-                return (ExtraMovementState)extraMovementState.Value;
-            }
-            set { extraMovementState.Value = (byte)value; }
-        }
-
-        [SerializeField]
-        [FormerlySerializedAs("currentDirection")]
-        protected SyncFieldDirectionVector2 currentDirection2D = new SyncFieldDirectionVector2();
-        public Vector2 LocalDirection2D { get; set; }
-        public Vector2 CurrentDirection2D
-        {
-            get
-            {
-                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
-                    return LocalDirection2D;
-                return currentDirection2D.Value;
-            }
-            set { currentDirection2D.Value = value; }
-        }
-
-        public DirectionType2D DirectionType2D
-        {
-            get { return GameplayUtils.GetDirectionTypeByVector2(CurrentDirection2D); }
-        }
-
-        [SerializeField]
-        protected SyncFieldPassengingVehicle passengingVehicle = new SyncFieldPassengingVehicle();
-        public PassengingVehicle PassengingVehicle
-        {
-            get { return passengingVehicle.Value; }
-            set { passengingVehicle.Value = value; }
-        }
-
-        protected Vector3? teleportingPosition;
-
-        public bool IsGrounded { get { return ActiveMovement == null ? true : ActiveMovement.IsGrounded; } }
-        public bool IsJumping { get { return ActiveMovement == null ? false : ActiveMovement.IsJumping; } }
-        public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
-        public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
-
-        #region Enter Area States
-        // This will be TRUE when this character enter to safe area
-        public bool IsInSafeArea { get; set; }
-        // This will be TRUE when this character enter to water area
-        public bool IsUnderWater { get; set; }
-        #endregion
 
         private Transform cacheTransform;
         public Transform CacheTransform
@@ -170,12 +101,10 @@ namespace MultiplayerARPG
             }
         }
 
+        [Header("Entity Movement Settings")]
         [SerializeField]
-        protected GameEntityModel model;
-        public GameEntityModel Model
-        {
-            get { return model; }
-        }
+        private MovementSecure movementSecure;
+        public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
 
         private BaseEntityMovement movement;
         public BaseEntityMovement Movement
@@ -255,6 +184,69 @@ namespace MultiplayerARPG
             }
         }
 
+        [Header("Entity Movement Sync Fields")]
+        [SerializeField]
+        protected SyncFieldByte movementState = new SyncFieldByte();
+        public MovementState LocalMovementState { get; set; }
+        public MovementState MovementState
+        {
+            get
+            {
+                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                    return LocalMovementState;
+                return (MovementState)movementState.Value;
+            }
+            set { movementState.Value = (byte)value; }
+        }
+
+        [SerializeField]
+        protected SyncFieldByte extraMovementState = new SyncFieldByte();
+        public ExtraMovementState LocalExtraMovementState { get; set; }
+        public ExtraMovementState ExtraMovementState
+        {
+            get
+            {
+                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                    return LocalExtraMovementState;
+                return (ExtraMovementState)extraMovementState.Value;
+            }
+            set { extraMovementState.Value = (byte)value; }
+        }
+
+        [SerializeField]
+        [FormerlySerializedAs("currentDirection")]
+        protected SyncFieldDirectionVector2 currentDirection2D = new SyncFieldDirectionVector2();
+        public Vector2 LocalDirection2D { get; set; }
+        public Vector2 CurrentDirection2D
+        {
+            get
+            {
+                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                    return LocalDirection2D;
+                return currentDirection2D.Value;
+            }
+            set { currentDirection2D.Value = value; }
+        }
+
+        public DirectionType2D DirectionType2D
+        {
+            get { return GameplayUtils.GetDirectionTypeByVector2(CurrentDirection2D); }
+        }
+        
+        [SerializeField]
+        protected SyncFieldPassengingVehicle passengingVehicle = new SyncFieldPassengingVehicle();
+        public PassengingVehicle PassengingVehicle
+        {
+            get { return passengingVehicle.Value; }
+            set { passengingVehicle.Value = value; }
+        }
+
+        public bool IsGrounded { get { return ActiveMovement == null ? true : ActiveMovement.IsGrounded; } }
+        public bool IsJumping { get { return ActiveMovement == null ? false : ActiveMovement.IsJumping; } }
+        public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
+        public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
+        protected Vector3? teleportingPosition;
+
         public GameInstance CurrentGameInstance
         {
             get { return GameInstance.Singleton; }
@@ -270,7 +262,16 @@ namespace MultiplayerARPG
             get { return BaseGameNetworkManager.Singleton; }
         }
 
+        public BaseGameEntity Entity { get { return this; } }
+
         protected IGameEntityComponent[] EntityComponents { get; private set; }
+        
+        #region Enter Area States
+        // This will be TRUE when this character enter to safe area
+        public bool IsInSafeArea { get; set; }
+        // This will be TRUE when this character enter to water area
+        public bool IsUnderWater { get; set; }
+        #endregion
 
         #region Events
         public event GenericDelegate onStart;
@@ -591,10 +592,17 @@ namespace MultiplayerARPG
                 ActiveMovement.SetExtraMovement(extraMovementState);
         }
 
-        public void SetLookRotation(Vector3 eulerAngles)
+        public void SetLookRotation(Quaternion rotation)
         {
             if (ActiveMovement != null)
-                ActiveMovement.SetLookRotation(eulerAngles);
+                ActiveMovement.SetLookRotation(rotation);
+        }
+
+        public Quaternion GetLookRotation()
+        {
+            if (ActiveMovement != null)
+                return ActiveMovement.GetLookRotation();
+            return Quaternion.identity;
         }
 
         public void Teleport(Vector3 position)

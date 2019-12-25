@@ -96,9 +96,12 @@ namespace MultiplayerARPG
 
         protected void SetClipBasedOnWeapon(EquipWeapons equipWeapons)
         {
-            Item weaponItem = GameInstance.Singleton.DefaultWeaponItem;
-            if (equipWeapons.rightHand.NotEmptySlot() && equipWeapons.rightHand.GetWeaponItem() != null)
-                weaponItem = equipWeapons.rightHand.GetWeaponItem();
+            if (GameInstance.Singleton == null)
+                return;
+
+            Item weaponItem = equipWeapons.GetRightHandWeaponItem();
+            if (weaponItem == null)
+                weaponItem = GameInstance.Singleton.DefaultWeaponItem;
             WeaponAnimations weaponAnimations = default(WeaponAnimations);
             GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
             // Remove clips

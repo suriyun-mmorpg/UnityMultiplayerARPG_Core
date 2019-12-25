@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         private Vector2 tempMoveDirection;
         private Vector2 tempCurrentPosition;
         private Vector2 tempTargetDirection;
+        private Quaternion lookRotation;
 
         public override void EntityAwake()
         {
@@ -105,7 +106,7 @@ namespace MultiplayerARPG
             CacheEntity.RegisterNetFunction(StopMove);
             CacheEntity.RegisterNetFunction<byte>(NetFuncSetMovement);
             CacheEntity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
-            CacheEntity.RegisterNetFunction<sbyte, sbyte>(NetFuncUpdateDirection);
+            CacheEntity.RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -135,9 +136,9 @@ namespace MultiplayerARPG
             CacheEntity.ExtraMovementState = (ExtraMovementState)extraMovementState;
         }
 
-        protected void NetFuncUpdateDirection(sbyte x, sbyte y)
+        protected void NetFuncUpdateDirection(DirectionVector2 direction)
         {
-            CacheEntity.CurrentDirection2D = new Vector2((float)x / 100f, (float)y / 100f);
+            CacheEntity.CurrentDirection2D = direction;
         }
 
         public override void StopMove()
@@ -194,10 +195,15 @@ namespace MultiplayerARPG
                 CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
         }
 
-        public override void SetLookRotation(Vector3 eulerAngles)
+        public override void SetLookRotation(Quaternion rotation)
         {
-            // Do nothing, 2d characters will not rotates
-            UpdateCurrentDirection(Quaternion.Euler(eulerAngles) * Vector3.forward);
+            lookRotation = rotation;
+            UpdateCurrentDirection(lookRotation * Vector3.forward);
+        }
+
+        public override Quaternion GetLookRotation()
+        {
+            return lookRotation;
         }
 
         public override void Teleport(Vector3 position)
@@ -277,7 +283,7 @@ namespace MultiplayerARPG
                 CacheEntity.CurrentDirection2D = CacheEntity.LocalDirection2D;
 
             if (IsOwnerClient && CacheEntity.MovementSecure == MovementSecure.NotSecure)
-                CacheEntity.CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, (sbyte)(CacheEntity.LocalDirection2D.x * 100f), (sbyte)(CacheEntity.LocalDirection2D.y * 100f));
+                CacheEntity.CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, new DirectionVector2(CacheEntity.LocalDirection2D));
         }
     }
 }

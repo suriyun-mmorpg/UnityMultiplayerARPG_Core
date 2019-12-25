@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         [HideInInspector, System.NonSerialized]
         public bool isWandering;
 
-        [Header("Monster Character - Sync Fields")]
+        [Header("Monster Character Sync Fields")]
         [SerializeField]
         protected SyncFieldPackedUInt summonerObjectId = new SyncFieldPackedUInt();
         [SerializeField]

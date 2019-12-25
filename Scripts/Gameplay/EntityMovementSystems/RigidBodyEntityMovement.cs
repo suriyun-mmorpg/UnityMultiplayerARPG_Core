@@ -294,11 +294,12 @@ namespace MultiplayerARPG
                 CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
         }
 
-        public override void SetLookRotation(Vector3 eulerAngles)
+        public override void SetLookRotation(Quaternion rotation)
         {
             if (!CacheEntity.CanMove())
                 return;
 
+            Vector3 eulerAngles = rotation.eulerAngles;
             switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
@@ -312,6 +313,11 @@ namespace MultiplayerARPG
                         CacheTransform.eulerAngles = eulerAngles;
                     break;
             }
+        }
+
+        public override Quaternion GetLookRotation()
+        {
+            return CacheTransform.rotation;
         }
 
         public override void Teleport(Vector3 position)

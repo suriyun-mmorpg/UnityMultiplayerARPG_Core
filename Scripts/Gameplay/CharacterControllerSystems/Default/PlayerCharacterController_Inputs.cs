@@ -720,16 +720,17 @@ namespace MultiplayerARPG
                 return;
             if (destination != null)
                 targetLookDirection = (destination.Value - MovementTransform.position).normalized;
+
             if (Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection) > 0)
             {
                 // Update rotation when angle difference more than 1
                 tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
-                PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
+                PlayerCharacterEntity.SetLookRotation(tempLookAt);
             }
             else
             {
                 // Update temp look at to character's rotation
-                tempLookAt = MovementTransform.rotation;
+                tempLookAt = PlayerCharacterEntity.GetLookRotation();
             }
         }
 
