@@ -188,7 +188,7 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeyDamageAmount),
                     tempElement.Title,
                     entry.amount.min.ToBonusString(),
-                    entry.amount.max.ToBonusString());
+                    entry.amount.max.ToString("N0"));
             }
 
             // Armors
