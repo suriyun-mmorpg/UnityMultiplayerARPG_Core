@@ -57,13 +57,13 @@ namespace MultiplayerARPG
                     break;
                 case DimensionType.Dimension2D:
                     tempVector3 = MovementTransform.position;
-                    if (PlayerCharacterEntity.CurrentDirectionType.HasFlag(DirectionType2D.Down))
+                    if (PlayerCharacterEntity.DirectionType2D.HasFlag(DirectionType2D.Down))
                         tempVector3 += Vector3.down * CurrentBuildingEntity.characterForwardDistance;
-                    if (PlayerCharacterEntity.CurrentDirectionType.HasFlag(DirectionType2D.Up))
+                    if (PlayerCharacterEntity.DirectionType2D.HasFlag(DirectionType2D.Up))
                         tempVector3 += Vector3.up * CurrentBuildingEntity.characterForwardDistance;
-                    if (PlayerCharacterEntity.CurrentDirectionType.HasFlag(DirectionType2D.Left))
+                    if (PlayerCharacterEntity.DirectionType2D.HasFlag(DirectionType2D.Left))
                         tempVector3 += Vector3.left * CurrentBuildingEntity.characterForwardDistance;
-                    if (PlayerCharacterEntity.CurrentDirectionType.HasFlag(DirectionType2D.Right))
+                    if (PlayerCharacterEntity.DirectionType2D.HasFlag(DirectionType2D.Right))
                         tempVector3 += Vector3.right * CurrentBuildingEntity.characterForwardDistance;
                     CurrentBuildingEntity.buildingArea = null;
                     tempCount = Physics2D.LinecastNonAlloc(tempVector3, tempVector3, raycasts2D, CurrentGameInstance.GetBuildLayerMask());

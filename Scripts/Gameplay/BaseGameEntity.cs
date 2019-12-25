@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -50,33 +51,54 @@ namespace MultiplayerARPG
         }
 
         // Movement data
+        public MovementSecure MovementSecure { get; set; }
+
         [SerializeField]
         protected SyncFieldByte movementState = new SyncFieldByte();
+        public MovementState LocalMovementState { get; set; }
         public MovementState MovementState
         {
-            get { return (MovementState)movementState.Value; }
+            get
+            {
+                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                    return LocalMovementState;
+                return (MovementState)movementState.Value;
+            }
             set { movementState.Value = (byte)value; }
         }
 
         [SerializeField]
         protected SyncFieldByte extraMovementState = new SyncFieldByte();
+        public ExtraMovementState LocalExtraMovementState { get; set; }
         public ExtraMovementState ExtraMovementState
         {
-            get { return (ExtraMovementState)extraMovementState.Value; }
+            get
+            {
+                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                    return LocalExtraMovementState;
+                return (ExtraMovementState)extraMovementState.Value;
+            }
             set { extraMovementState.Value = (byte)value; }
         }
 
         [SerializeField]
-        protected SyncFieldDirectionVector2 currentDirection = new SyncFieldDirectionVector2();
-        public Vector2 CurrentDirection
+        [FormerlySerializedAs("currentDirection")]
+        protected SyncFieldDirectionVector2 currentDirection2D = new SyncFieldDirectionVector2();
+        public Vector2 LocalDirection2D { get; set; }
+        public Vector2 CurrentDirection2D
         {
-            get { return currentDirection.Value; }
-            set { currentDirection.Value = value; }
+            get
+            {
+                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                    return LocalDirection2D;
+                return currentDirection2D.Value;
+            }
+            set { currentDirection2D.Value = value; }
         }
 
-        public DirectionType2D CurrentDirectionType
+        public DirectionType2D DirectionType2D
         {
-            get { return GameplayUtils.GetDirectionTypeByVector2(CurrentDirection); }
+            get { return GameplayUtils.GetDirectionTypeByVector2(CurrentDirection2D); }
         }
 
         [SerializeField]
@@ -318,17 +340,19 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityUpdate()
         {
-            if (Model != null && Model is IMoveableModel)
-            {
-                // Update movement animation
-                (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, false);
-            }
-
             if (Movement != null && Movement.Enabled != (PassengingVehicleEntity == null))
             {
                 // Enable movement while not passenging any vehicle
                 Movement.Enabled = PassengingVehicleEntity == null;
+            }
+            if (IsClient)
+            {
+                if (Model != null && Model is IMoveableModel)
+                {
+                    // Update movement animation
+                    (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                    (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, DirectionType2D, IsUnderWater);
+                }
             }
         }
 
@@ -439,9 +463,9 @@ namespace MultiplayerARPG
             extraMovementState.deliveryMethod = DeliveryMethod.Sequenced;
             extraMovementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             extraMovementState.doNotSyncInitialDataImmediately = true;
-            currentDirection.deliveryMethod = DeliveryMethod.Sequenced;
-            currentDirection.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentDirection.doNotSyncInitialDataImmediately = true;
+            currentDirection2D.deliveryMethod = DeliveryMethod.Sequenced;
+            currentDirection2D.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentDirection2D.doNotSyncInitialDataImmediately = true;
             passengingVehicle.deliveryMethod = DeliveryMethod.ReliableOrdered;
             passengingVehicle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             passengingVehicle.doNotSyncInitialDataImmediately = true;

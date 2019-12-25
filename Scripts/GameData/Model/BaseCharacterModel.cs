@@ -76,6 +76,7 @@ namespace MultiplayerARPG
         public float moveAnimationSpeedMultiplier { get; protected set; }
         public MovementState movementState { get; protected set; }
         public ExtraMovementState extraMovementState { get; protected set; }
+        public DirectionType2D directionType2D { get; protected set; }
         public bool isUnderWater { get; protected set; }
 
         // Optimize garbage collector
@@ -107,7 +108,7 @@ namespace MultiplayerARPG
                 SetBuffs(previousModel.buffs);
                 SetIsDead(previousModel.isDead);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
-                SetMovementState(previousModel.movementState, previousModel.extraMovementState, previousModel.isUnderWater);
+                SetMovementState(previousModel.movementState, previousModel.extraMovementState, directionType2D, previousModel.isUnderWater);
             }
             else
             {
@@ -502,7 +503,7 @@ namespace MultiplayerARPG
             this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
-        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, bool isUnderWater)
+        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, DirectionType2D directionType2D, bool isUnderWater)
         {
             this.movementState = movementState;
             this.extraMovementState = extraMovementState;
@@ -514,7 +515,7 @@ namespace MultiplayerARPG
         {
             SetIsDead(false);
             SetMoveAnimationSpeedMultiplier(1f);
-            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, false);
+            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, DirectionType2D.Down, false);
         }
 
         /// <summary>

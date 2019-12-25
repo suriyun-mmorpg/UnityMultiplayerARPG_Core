@@ -14,30 +14,6 @@ namespace MultiplayerARPG
         [Header("Network Settings")]
         public MovementSecure movementSecure;
 
-        protected MovementState localMovementState = MovementState.None;
-        public MovementState MovementState
-        {
-            get
-            {
-                if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
-                    return localMovementState;
-                return CacheEntity.MovementState;
-            }
-            set { CacheEntity.MovementState = value; }
-        }
-
-        protected ExtraMovementState localExtraMovementState = ExtraMovementState.None;
-        public ExtraMovementState ExtraMovementState
-        {
-            get
-            {
-                if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
-                    return localExtraMovementState;
-                return CacheEntity.ExtraMovementState;
-            }
-            set { CacheEntity.ExtraMovementState = value; }
-        }
-
         private LiteNetLibTransform cacheNetTransform;
         public LiteNetLibTransform CacheNetTransform
         {
@@ -137,13 +113,13 @@ namespace MultiplayerARPG
         protected void NetFuncSetMovement(byte movementState)
         {
             // Set data at server and sync to clients later
-            MovementState = (MovementState)movementState;
+            CacheEntity.MovementState = (MovementState)movementState;
         }
 
         protected void NetFuncSetExtraMovement(byte extraMovementState)
         {
             // Set data at server and sync to clients later
-            ExtraMovementState = (ExtraMovementState)extraMovementState;
+            CacheEntity.ExtraMovementState = (ExtraMovementState)extraMovementState;
         }
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -179,10 +155,10 @@ namespace MultiplayerARPG
         public override void SetExtraMovement(ExtraMovementState extraMovementState)
         {
             // Set local movement state which will be used by owner client
-            localExtraMovementState = extraMovementState;
+            CacheEntity.LocalExtraMovementState = extraMovementState;
 
             if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
-                ExtraMovementState = extraMovementState;
+                CacheEntity.ExtraMovementState = extraMovementState;
 
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
@@ -237,10 +213,10 @@ namespace MultiplayerARPG
                 state |= MovementState.IsGrounded;
 
             // Set local movement state which will be used by owner client
-            localMovementState = state;
+            CacheEntity.LocalMovementState = state;
 
             if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
-                MovementState = state;
+                CacheEntity.MovementState = state;
 
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CacheEntity.CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);

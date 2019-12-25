@@ -259,7 +259,9 @@ namespace MultiplayerARPG
                 if (CastingSkillCountDown < 0)
                     CastingSkillCountDown = 0;
             }
-            // Update animation states at clients
+            // Set character model hide state
+            ModelManager.SetHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
+            // Update model animations
             if (IsClient)
             {
                 // Update is dead state
@@ -267,13 +269,8 @@ namespace MultiplayerARPG
                 // Update move speed multiplier
                 CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                 // Update movement animation
-                CharacterModel.SetMovementState(MovementState, ExtraMovementState, IsUnderWater);
-                // Update direction type if character model is character model 2D
-                if (CharacterModel is ICharacterModel2D)
-                {
-                    // Set current direction to character model 2D
-                    (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
-                }
+                CharacterModel.SetMovementState(MovementState, ExtraMovementState, DirectionType2D, IsUnderWater);
+                // Update FPS model
                 if (FpsModel != null)
                 {
                     // Update is dead state
@@ -281,11 +278,9 @@ namespace MultiplayerARPG
                     // Update move speed multiplier
                     FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                     // Update movement animation
-                    FpsModel.SetMovementState(MovementState, ExtraMovementState, IsUnderWater);
+                    FpsModel.SetMovementState(MovementState, ExtraMovementState, DirectionType2D, IsUnderWater);
                 }
             }
-            // Set character model hide state
-            ModelManager.SetHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
         }
 
         #region Relates Objects
@@ -349,7 +344,7 @@ namespace MultiplayerARPG
         {
             Transform transform = GetDamageTransform(damageType, isLeftHand);
             position = transform.position;
-            direction = CurrentDirection;
+            direction = CurrentDirection2D;
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(direction.y, direction.x) * (180 / Mathf.PI)) + 90);
         }
 
@@ -1083,7 +1078,7 @@ namespace MultiplayerARPG
         {
             float halfFov = fov * 0.5f;
             Vector2 targetDir = (position - CacheTransform.position).normalized;
-            float angle = Vector2.Angle(targetDir, CurrentDirection);
+            float angle = Vector2.Angle(targetDir, CurrentDirection2D);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
             return angle < halfFov;
         }

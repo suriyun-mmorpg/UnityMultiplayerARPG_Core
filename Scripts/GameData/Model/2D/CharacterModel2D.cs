@@ -8,9 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
-    public class CharacterModel2D :
-        BaseCharacterModelWithCacheAnims<WeaponAnimations2D, SkillAnimations2D>,
-        ICharacterModel2D
+    public class CharacterModel2D : BaseCharacterModelWithCacheAnims<WeaponAnimations2D, SkillAnimations2D>
     {
         public enum SampleAnimation
         {
@@ -41,8 +39,6 @@ namespace MultiplayerARPG
         public SampleAnimation sampleAnimation = SampleAnimation.Idle;
         public DirectionType2D sampleDirection = DirectionType2D.Down;
         public bool sampleAlwaysLoop = true;
-
-        public DirectionType2D CurrentDirectionType { get; set; }
 
         private AnimationClip2D playingAnim = null;
         private int currentFrame = 0;
@@ -176,7 +172,7 @@ namespace MultiplayerARPG
 
             if (isDead)
             {
-                Play(deadAnimation2D, CurrentDirectionType);
+                Play(deadAnimation2D, directionType2D);
             }
             else
             {
@@ -184,9 +180,9 @@ namespace MultiplayerARPG
                     movementState.HasFlag(MovementState.Backward) ||
                     movementState.HasFlag(MovementState.Right) ||
                     movementState.HasFlag(MovementState.Left))
-                    Play(moveAnimation2D, CurrentDirectionType);
+                    Play(moveAnimation2D, directionType2D);
                 else
-                    Play(idleAnimation2D, CurrentDirectionType);
+                    Play(idleAnimation2D, directionType2D);
             }
         }
 
@@ -243,7 +239,7 @@ namespace MultiplayerARPG
             ActionAnimation2D animation2D = GetActionAnimation(animActionType, dataId);
             if (animation2D != null)
             {
-                AnimationClip2D anim = animation2D.GetClipByDirection(CurrentDirectionType);
+                AnimationClip2D anim = animation2D.GetClipByDirection(directionType2D);
                 if (anim != null)
                 {
                     playingAction = true;
@@ -253,7 +249,7 @@ namespace MultiplayerARPG
                     // Waits by current transition + clip duration before end animation
                     Play(anim);
                     yield return new WaitForSecondsRealtime(anim.length / playSpeedMultiplier);
-                    Play(idleAnimation2D, CurrentDirectionType);
+                    Play(idleAnimation2D, directionType2D);
                     yield return new WaitForSecondsRealtime(animation2D.extraDuration / playSpeedMultiplier);
                     playingAction = false;
                 }
@@ -274,13 +270,13 @@ namespace MultiplayerARPG
 
             if (animation2D != null)
             {
-                AnimationClip2D anim = animation2D.GetClipByDirection(CurrentDirectionType);
+                AnimationClip2D anim = animation2D.GetClipByDirection(directionType2D);
                 if (anim != null)
                 {
                     playingAction = true;
                     Play(anim);
                     yield return new WaitForSecondsRealtime(duration);
-                    Play(idleAnimation2D, CurrentDirectionType);
+                    Play(idleAnimation2D, directionType2D);
                     playingAction = false;
                 }
             }
@@ -317,7 +313,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(directionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
@@ -333,7 +329,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(directionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
@@ -349,7 +345,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(directionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
@@ -365,7 +361,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(directionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
@@ -381,7 +377,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(directionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
