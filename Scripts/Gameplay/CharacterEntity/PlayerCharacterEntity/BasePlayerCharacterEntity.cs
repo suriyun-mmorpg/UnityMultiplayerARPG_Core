@@ -10,19 +10,19 @@ namespace MultiplayerARPG
         public NpcDialog CurrentNpcDialog { get; set; }
 
         [Header("Player Character Settings")]
-        [Tooltip("Default character title will be shown in create scene")]
+        [Tooltip("The title which will be shown in create scene")]
         [SerializeField]
-        private string characterTitle;
+        protected string characterTitle;
         [Tooltip("Character titles by language keys")]
         [SerializeField]
-        private LanguageData[] characterTitles;
+        protected LanguageData[] characterTitles;
         
         [Tooltip("This is list which used as choice of character classes when create character")]
         [SerializeField]
-        private PlayerCharacter[] playerCharacters;
+        protected PlayerCharacter[] playerCharacters;
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
-        private BasePlayerCharacterController controllerPrefab;
+        protected BasePlayerCharacterController controllerPrefab;
 
         public string CharacterTitle
         {
