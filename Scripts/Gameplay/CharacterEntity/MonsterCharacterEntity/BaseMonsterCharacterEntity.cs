@@ -12,12 +12,18 @@ namespace MultiplayerARPG
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
         [Header("Monster Character Settings")]
+        [Tooltip("The title which will override `Monster Character`'s title")]
         [SerializeField]
-        private MonsterCharacter monsterCharacter;
+        protected string characterTitle;
+        [Tooltip("Character titles by language keys")]
         [SerializeField]
-        private float destroyDelay = 2f;
+        protected LanguageData[] characterTitles;
         [SerializeField]
-        private float destroyRespawnDelay = 5f;
+        protected MonsterCharacter monsterCharacter;
+        [SerializeField]
+        protected float destroyDelay = 2f;
+        [SerializeField]
+        protected float destroyRespawnDelay = 5f;
 
         [Header("Monster Character Sync Fields")]
         [SerializeField]
@@ -25,14 +31,19 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldByte summonType = new SyncFieldByte();
 
+        public string CharacterTitle
+        {
+            get { return Language.GetText(characterTitles, characterTitle); }
+        }
+
         public override string Title
         {
             get
             {
                 // Return title (Can set in prefab) if it is not empty
-                if (!string.IsNullOrEmpty(base.Title))
-                    return base.Title;
-                return MonsterDatabase == null ? LanguageManager.GetUnknowTitle() : MonsterDatabase.Title;
+                if (!string.IsNullOrEmpty(CharacterTitle))
+                    return CharacterTitle;
+                return MonsterDatabase == null || string.IsNullOrEmpty(MonsterDatabase.Title) ? LanguageManager.GetUnknowTitle() : MonsterDatabase.Title;
             }
             set { }
         }
