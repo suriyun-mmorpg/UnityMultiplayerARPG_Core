@@ -86,6 +86,7 @@ namespace MultiplayerARPG
     public struct WeaponAnimations : IWeaponAnims
     {
         public WeaponType weaponType;
+
         [Header("Movements while standing")]
         public AnimationClip idleClip;
         public AnimationClip moveClip;
@@ -96,6 +97,9 @@ namespace MultiplayerARPG
         public AnimationClip moveForwardRightClip;
         public AnimationClip moveBackwardLeftClip;
         public AnimationClip moveBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float moveAnimSpeedRate;
+
         public AnimationClip sprintClip;
         public AnimationClip sprintBackwardClip;
         public AnimationClip sprintLeftClip;
@@ -104,6 +108,9 @@ namespace MultiplayerARPG
         public AnimationClip sprintForwardRightClip;
         public AnimationClip sprintBackwardLeftClip;
         public AnimationClip sprintBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float sprintAnimSpeedRate;
+
         [Header("Movements while crouching")]
         public AnimationClip crouchIdleClip;
         public AnimationClip crouchMoveClip;
@@ -114,6 +121,9 @@ namespace MultiplayerARPG
         public AnimationClip crouchMoveForwardRightClip;
         public AnimationClip crouchMoveBackwardLeftClip;
         public AnimationClip crouchMoveBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float crouchMoveAnimSpeedRate;
+
         [Header("Movements while crawling")]
         public AnimationClip crawlIdleClip;
         public AnimationClip crawlMoveClip;
@@ -124,6 +134,9 @@ namespace MultiplayerARPG
         public AnimationClip crawlMoveForwardRightClip;
         public AnimationClip crawlMoveBackwardLeftClip;
         public AnimationClip crawlMoveBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float crawlMoveAnimSpeedRate;
+
         [Header("Movements while swimming")]
         public AnimationClip swimIdleClip;
         public AnimationClip swimMoveClip;
@@ -134,19 +147,25 @@ namespace MultiplayerARPG
         public AnimationClip swimMoveForwardRightClip;
         public AnimationClip swimMoveBackwardLeftClip;
         public AnimationClip swimMoveBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float swimMoveAnimSpeedRate;
+
         [Header("Other movements")]
         public AnimationClip jumpClip;
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
         public AnimationClip deadClip;
+
         [Header("Attack movements")]
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] leftHandAttackAnimations;
+
         [Header("Reload(Gun) movements")]
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
+
         public WeaponType Data { get { return weaponType; } }
     }
 
@@ -174,6 +193,9 @@ namespace MultiplayerARPG
         public AnimationClip moveForwardRightClip;
         public AnimationClip moveBackwardLeftClip;
         public AnimationClip moveBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float moveAnimSpeedRate;
+
         public AnimationClip sprintClip;
         public AnimationClip sprintBackwardClip;
         public AnimationClip sprintLeftClip;
@@ -182,6 +204,9 @@ namespace MultiplayerARPG
         public AnimationClip sprintForwardRightClip;
         public AnimationClip sprintBackwardLeftClip;
         public AnimationClip sprintBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float sprintAnimSpeedRate;
+
         [Header("Movements while crouching")]
         public AnimationClip crouchIdleClip;
         public AnimationClip crouchMoveClip;
@@ -192,6 +217,9 @@ namespace MultiplayerARPG
         public AnimationClip crouchMoveForwardRightClip;
         public AnimationClip crouchMoveBackwardLeftClip;
         public AnimationClip crouchMoveBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float crouchMoveAnimSpeedRate;
+
         [Header("Movements while crawling")]
         public AnimationClip crawlIdleClip;
         public AnimationClip crawlMoveClip;
@@ -202,6 +230,9 @@ namespace MultiplayerARPG
         public AnimationClip crawlMoveForwardRightClip;
         public AnimationClip crawlMoveBackwardLeftClip;
         public AnimationClip crawlMoveBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float crawlMoveAnimSpeedRate;
+
         [Header("Movements while swimming")]
         public AnimationClip swimIdleClip;
         public AnimationClip swimMoveClip;
@@ -212,19 +243,25 @@ namespace MultiplayerARPG
         public AnimationClip swimMoveForwardRightClip;
         public AnimationClip swimMoveBackwardLeftClip;
         public AnimationClip swimMoveBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float swimMoveAnimSpeedRate;
+
         [Header("Other movements")]
         public AnimationClip jumpClip;
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
         public AnimationClip deadClip;
+
         [Header("Attack movements")]
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public ActionAnimation[] leftHandAttackAnimations;
+
         [Header("Reload(Gun) movements")]
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
+
         [Header("Skill movements")]
         public AnimationClip skillCastClip;
         public ActionAnimation skillActivateAnimation;

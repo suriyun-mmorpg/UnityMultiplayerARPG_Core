@@ -31,6 +31,8 @@ namespace MultiplayerARPG
         public static readonly int ANIM_MOVE_TYPE = Animator.StringToHash("MoveType");
 
         [Header("Settings")]
+        [Tooltip("The damping time for the `MoveSpeed` and `SideMoveSpeed` parameters. The higher the value the slower the parameter value changes.")]
+        public float movementDampingTme = 0.1f;
         public AnimatorControllerType controllerType;
 
         [Header("Relates Components")]
@@ -42,8 +44,6 @@ namespace MultiplayerARPG
         public int actionStateLayer;
         [Tooltip("Which layer in Animator controller that you use it to play cast skill animations, You can set this when animator controller type is `Custom`")]
         public int castSkillStateLayer;
-        [Tooltip("The damping time for the `MoveSpeed` and `SideMoveSpeed` parameters. The higher the value the slower the parameter value changes.")]
-        public float movementDampingTme = 0.1f;
 
         private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
@@ -57,6 +57,11 @@ namespace MultiplayerARPG
 
         // Private state validater
         private bool isSetupComponent;
+        private float moveAnimSpeedRate;
+        private float sprintAnimSpeedRate;
+        private float crouchMoveAnimSpeedRate;
+        private float crawlMoveAnimSpeedRate;
+        private float swimMoveAnimSpeedRate;
 
         protected override void Awake()
         {
@@ -187,6 +192,11 @@ namespace MultiplayerARPG
                 CacheAnimatorController[CLIP_FALL] = defaultAnimations.fallClip;
                 CacheAnimatorController[CLIP_HURT] = defaultAnimations.hurtClip;
                 CacheAnimatorController[CLIP_DEAD] = defaultAnimations.deadClip;
+                moveAnimSpeedRate = defaultAnimations.moveAnimSpeedRate > 0f ? defaultAnimations.moveAnimSpeedRate : 1f;
+                sprintAnimSpeedRate = defaultAnimations.sprintAnimSpeedRate > 0f ? defaultAnimations.sprintAnimSpeedRate : 1f;
+                crouchMoveAnimSpeedRate = defaultAnimations.crouchMoveAnimSpeedRate > 0f ? defaultAnimations.crouchMoveAnimSpeedRate : 1f;
+                crawlMoveAnimSpeedRate = defaultAnimations.crawlMoveAnimSpeedRate > 0f ? defaultAnimations.crawlMoveAnimSpeedRate : 1f;
+                swimMoveAnimSpeedRate = defaultAnimations.swimMoveAnimSpeedRate > 0f ? defaultAnimations.swimMoveAnimSpeedRate : 1f;
             }
             base.SetDefaultAnimations();
         }
@@ -257,6 +267,16 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_FALL] = weaponAnimations.fallClip != null ? weaponAnimations.fallClip : defaultAnimations.fallClip;
             CacheAnimatorController[CLIP_HURT] = weaponAnimations.hurtClip != null ? weaponAnimations.hurtClip : defaultAnimations.hurtClip;
             CacheAnimatorController[CLIP_DEAD] = weaponAnimations.deadClip != null ? weaponAnimations.deadClip : defaultAnimations.deadClip;
+            moveAnimSpeedRate = weaponAnimations.moveAnimSpeedRate > 0f ? weaponAnimations.moveAnimSpeedRate :
+                defaultAnimations.moveAnimSpeedRate > 0f ? defaultAnimations.moveAnimSpeedRate : 1f;
+            sprintAnimSpeedRate = weaponAnimations.sprintAnimSpeedRate > 0f ? weaponAnimations.sprintAnimSpeedRate :
+                defaultAnimations.sprintAnimSpeedRate > 0f ? defaultAnimations.sprintAnimSpeedRate : 1f;
+            crouchMoveAnimSpeedRate = weaponAnimations.crouchMoveAnimSpeedRate > 0f ? weaponAnimations.crouchMoveAnimSpeedRate :
+                defaultAnimations.crouchMoveAnimSpeedRate > 0f ? defaultAnimations.crouchMoveAnimSpeedRate : 1f;
+            crawlMoveAnimSpeedRate = weaponAnimations.crawlMoveAnimSpeedRate > 0f ? weaponAnimations.crawlMoveAnimSpeedRate :
+                defaultAnimations.crawlMoveAnimSpeedRate > 0f ? defaultAnimations.crawlMoveAnimSpeedRate : 1f;
+            swimMoveAnimSpeedRate = weaponAnimations.swimMoveAnimSpeedRate > 0f ? weaponAnimations.swimMoveAnimSpeedRate :
+                defaultAnimations.swimMoveAnimSpeedRate > 0f ? defaultAnimations.swimMoveAnimSpeedRate : 1f;
         }
 
         public override void PlayMoveAnimation()
@@ -276,30 +296,52 @@ namespace MultiplayerARPG
                     animator.SetBool(ANIM_IS_CASTING_SKILL, false);
             }
 
-            float moveSpeed = 0f;
-            float sideMoveSpeed = 0f;
+            float moveAnimationSpeedMultiplier = this.moveAnimationSpeedMultiplier;
+
+            // Set move speed based on inputs
+            int moveSpeed = 0;
             if (movementState.HasFlag(MovementState.Forward))
-                moveSpeed = 1f;
+                moveSpeed = 1;
             else if (movementState.HasFlag(MovementState.Backward))
-                moveSpeed = -1f;
+                moveSpeed = -1;
+
+            // Set side move speed based on inputs
+            int sideMoveSpeed = 0;
             if (movementState.HasFlag(MovementState.Right))
-                sideMoveSpeed = 1f;
+                sideMoveSpeed = 1;
             else if (movementState.HasFlag(MovementState.Left))
-                sideMoveSpeed = -1f;
+                sideMoveSpeed = -1;
 
             int moveType = 0;
-            switch (extraMovementState)
+            // Character is idle, so set move animation speed multiplier to 1
+            if (moveSpeed == 0 && sideMoveSpeed == 0)
             {
-                case ExtraMovementState.IsCrouching:
-                    moveType = 1;
-                    break;
-                case ExtraMovementState.IsCrawling:
-                    moveType = 2;
-                    break;
-                case ExtraMovementState.IsSprinting:
-                    moveSpeed *= 2f;
-                    sideMoveSpeed *= 2f;
-                    break;
+                moveAnimationSpeedMultiplier = 1f;
+            }
+            else
+            {
+                switch (extraMovementState)
+                {
+                    case ExtraMovementState.IsCrouching:
+                        moveType = 1;
+                        moveAnimationSpeedMultiplier *= crouchMoveAnimSpeedRate;
+                        break;
+                    case ExtraMovementState.IsCrawling:
+                        moveType = 2;
+                        moveAnimationSpeedMultiplier *= crawlMoveAnimSpeedRate;
+                        break;
+                    case ExtraMovementState.IsSprinting:
+                        moveSpeed *= 2;
+                        sideMoveSpeed *= 2;
+                        moveAnimationSpeedMultiplier *= sprintAnimSpeedRate;
+                        break;
+                    default:
+                        moveAnimationSpeedMultiplier *= moveAnimSpeedRate;
+                        break;
+                }
+
+                if (isUnderWater)
+                    moveAnimationSpeedMultiplier *= swimMoveAnimSpeedRate;
             }
 
             // Set animator parameters
