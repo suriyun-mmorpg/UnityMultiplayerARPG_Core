@@ -12,7 +12,8 @@ namespace MultiplayerARPG
 
         [Header("Damageable Settings")]
         [Tooltip("This is transform where combat texts will be instantiates from")]
-        public Transform combatTextTransform;
+        [SerializeField]
+        private Transform combatTextTransform;
         public Transform CombatTextTransform
         {
             get
@@ -24,7 +25,8 @@ namespace MultiplayerARPG
         }
 
         [Tooltip("This is transform for other entities to aim to this entity")]
-        public Transform opponentAimTransform;
+        [SerializeField]
+        private Transform opponentAimTransform;
         public Transform OpponentAimTransform
         {
             get
