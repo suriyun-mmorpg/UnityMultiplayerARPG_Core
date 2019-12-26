@@ -27,18 +27,59 @@ namespace MultiplayerARPG
             public LiteNetLibSyncList.Operation operation;
             public int index;
         }
-
-        #region Serialize data
+        
         [Header("Character Settings")]
         [Tooltip("When character attack with melee weapon, it will cast sphere from this transform to detect hit objects")]
-        public Transform meleeDamageTransform;
+        [SerializeField]
+        private Transform meleeDamageTransform;
+        public Transform MeleeDamageTransform
+        {
+            get
+            {
+                if (meleeDamageTransform == null)
+                    meleeDamageTransform = CacheTransform;
+                return meleeDamageTransform;
+            }
+        }
+
         [Tooltip("When character attack with range weapon, it will spawn missile damage entity from this transform")]
-        public Transform missileDamageTransform;
+        [SerializeField]
+        private Transform missileDamageTransform;
+        public Transform MissileDamageTransform
+        {
+            get
+            {
+                if (missileDamageTransform == null)
+                    missileDamageTransform = MeleeDamageTransform;
+                return missileDamageTransform;
+            }
+        }
+
         [Tooltip("Character UI will instantiates to this transform")]
-        public Transform characterUITransform;
+        [SerializeField]
+        private Transform characterUITransform;
+        public Transform CharacterUITransform
+        {
+            get
+            {
+                if (characterUITransform == null)
+                    characterUITransform = CacheTransform;
+                return characterUITransform;
+            }
+        }
+
         [Tooltip("Mini Map UI will instantiates to this transform")]
-        public Transform miniMapUITransform;
-        #endregion
+        [SerializeField]
+        private Transform miniMapUITransform;
+        public Transform MiniMapUITransform
+        {
+            get
+            {
+                if (miniMapUITransform == null)
+                    miniMapUITransform = CacheTransform;
+                return miniMapUITransform;
+            }
+        }
 
 #if UNITY_EDITOR
         [Header("Character Attack Debug")]
@@ -82,7 +123,7 @@ namespace MultiplayerARPG
         public int MaxStamina { get { return this.GetCaches().MaxStamina; } }
         public int MaxFood { get { return this.GetCaches().MaxFood; } }
         public int MaxWater { get { return this.GetCaches().MaxWater; } }
-        public override sealed float MoveAnimationSpeedMultiplier { get { return GetMoveSpeed() / this.GetCaches().BaseMoveSpeed; } }
+        public override sealed float MoveAnimationSpeedMultiplier { get { return GetMoveSpeed(ExtraMovementState.None, false) / this.GetCaches().BaseMoveSpeed; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
 
@@ -107,46 +148,6 @@ namespace MultiplayerARPG
         public BaseCharacterModel FpsModel
         {
             get { return ModelManager.FpsModel; }
-        }
-
-        public Transform MeleeDamageTransform
-        {
-            get
-            {
-                if (meleeDamageTransform == null)
-                    meleeDamageTransform = CacheTransform;
-                return meleeDamageTransform;
-            }
-        }
-
-        public Transform MissileDamageTransform
-        {
-            get
-            {
-                if (missileDamageTransform == null)
-                    missileDamageTransform = MeleeDamageTransform;
-                return missileDamageTransform;
-            }
-        }
-
-        public Transform CharacterUITransform
-        {
-            get
-            {
-                if (characterUITransform == null)
-                    characterUITransform = CacheTransform;
-                return characterUITransform;
-            }
-        }
-
-        public Transform MiniMapUITransform
-        {
-            get
-            {
-                if (miniMapUITransform == null)
-                    miniMapUITransform = CacheTransform;
-                return miniMapUITransform;
-            }
         }
 
         protected override void EntityAwake()
@@ -965,20 +966,20 @@ namespace MultiplayerARPG
             return atkSpeed;
         }
 
-        public override float GetMoveSpeed()
+        protected float GetMoveSpeed(ExtraMovementState extraMovementState, bool isUnderWater)
         {
             float moveSpeed = this.GetCaches().MoveSpeed;
 
             if (IsAttackingOrUsingSkill)
                 moveSpeed *= MoveSpeedRateWhileAttackOrUseSkill;
 
-            if (IsUnderWater)
+            if (isUnderWater)
             {
                 moveSpeed *= CurrentGameplayRule.GetSwimMoveSpeedRate(this);
             }
             else
             {
-                switch (ExtraMovementState)
+                switch (extraMovementState)
                 {
                     case ExtraMovementState.IsSprinting:
                         moveSpeed *= CurrentGameplayRule.GetSprintMoveSpeedRate(this);
@@ -993,6 +994,11 @@ namespace MultiplayerARPG
             }
 
             return moveSpeed;
+        }
+
+        public override float GetMoveSpeed()
+        {
+            return GetMoveSpeed(ExtraMovementState, IsUnderWater);
         }
 
         public override sealed bool CanMove()
