@@ -166,7 +166,7 @@ namespace MultiplayerARPG
 
         public bool RequestEnterWarp()
         {
-            if (!CanDoActions() || warpingPortal == null)
+            if (!CanDoActions() || WarpingPortal == null)
                 return false;
             CallNetFunction(NetFuncEnterWarp, FunctionReceivers.Server);
             return true;

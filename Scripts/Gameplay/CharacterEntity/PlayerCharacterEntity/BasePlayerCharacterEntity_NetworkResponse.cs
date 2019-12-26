@@ -146,9 +146,9 @@ namespace MultiplayerARPG
 
         protected void NetFuncEnterWarp()
         {
-            if (!CanDoActions() || warpingPortal == null)
+            if (!CanDoActions() || WarpingPortal == null)
                 return;
-            warpingPortal.EnterWarp(this);
+            WarpingPortal.EnterWarp(this);
         }
 
         protected void NetFuncBuild(short itemIndex, Vector3 position, Quaternion rotation, PackedUInt parentObjectId)
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
                 index >= nonEquipItems.Count)
                 return;
 
-            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.Shop)
+            if (CurrentNpcDialog == null || CurrentNpcDialog.type != NpcDialogType.Shop)
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];

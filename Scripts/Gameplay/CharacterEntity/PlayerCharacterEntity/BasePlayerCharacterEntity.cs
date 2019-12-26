@@ -6,10 +6,8 @@ namespace MultiplayerARPG
 {
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
-        [HideInInspector, System.NonSerialized]
-        public WarpPortalEntity warpingPortal;
-        [HideInInspector, System.NonSerialized]
-        public NpcDialog currentNpcDialog;
+        public WarpPortalEntity WarpingPortal { get; set; }
+        public NpcDialog CurrentNpcDialog { get; set; }
 
         [Header("Player Character Settings")]
         [Tooltip("This title will be shown in create scene")]
@@ -119,7 +117,7 @@ namespace MultiplayerARPG
             Exp = exp;
 
             base.Killed(lastAttacker);
-            currentNpcDialog = null;
+            CurrentNpcDialog = null;
         }
 
         public void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)

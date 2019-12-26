@@ -18,9 +18,9 @@ namespace MultiplayerARPG
             if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
                 return;
 
-            currentNpcDialog = npcEntity.StartDialog;
-            if (currentNpcDialog != null)
-                RequestShowNpcDialog(currentNpcDialog.DataId);
+            CurrentNpcDialog = npcEntity.StartDialog;
+            if (CurrentNpcDialog != null)
+                RequestShowNpcDialog(CurrentNpcDialog.DataId);
         }
 
         protected void NetFuncShowNpcDialog(int dataId)
@@ -43,14 +43,14 @@ namespace MultiplayerARPG
 
         protected void NetFuncSelectNpcDialogMenu(byte menuIndex)
         {
-            if (currentNpcDialog == null)
+            if (CurrentNpcDialog == null)
                 return;
 
-            currentNpcDialog = currentNpcDialog.GetNextDialog(this, menuIndex);
-            if (currentNpcDialog != null)
+            CurrentNpcDialog = CurrentNpcDialog.GetNextDialog(this, menuIndex);
+            if (CurrentNpcDialog != null)
             {
                 // Show Npc dialog on client
-                RequestShowNpcDialog(currentNpcDialog.DataId);
+                RequestShowNpcDialog(CurrentNpcDialog.DataId);
             }
             else
             {
@@ -61,9 +61,9 @@ namespace MultiplayerARPG
 
         protected void NetFuncBuyNpcItem(short itemIndex, short amount)
         {
-            if (currentNpcDialog == null)
+            if (CurrentNpcDialog == null)
                 return;
-            NpcSellItem[] sellItems = currentNpcDialog.sellItems;
+            NpcSellItem[] sellItems = CurrentNpcDialog.sellItems;
             if (sellItems == null || itemIndex >= sellItems.Length)
                 return;
             NpcSellItem sellItem = sellItems[itemIndex];
