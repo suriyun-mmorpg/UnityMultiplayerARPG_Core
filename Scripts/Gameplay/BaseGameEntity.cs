@@ -215,22 +215,22 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [FormerlySerializedAs("currentDirection")]
-        protected SyncFieldDirectionVector2 currentDirection2D = new SyncFieldDirectionVector2();
+        protected SyncFieldDirectionVector2 direction2D = new SyncFieldDirectionVector2();
         public Vector2 LocalDirection2D { get; set; }
-        public Vector2 CurrentDirection2D
+        public Vector2 Direction2D
         {
             get
             {
                 if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
                     return LocalDirection2D;
-                return currentDirection2D.Value;
+                return direction2D.Value;
             }
-            set { currentDirection2D.Value = value; }
+            set { direction2D.Value = value; }
         }
 
         public DirectionType2D DirectionType2D
         {
-            get { return GameplayUtils.GetDirectionTypeByVector2(CurrentDirection2D); }
+            get { return GameplayUtils.GetDirectionTypeByVector2(Direction2D); }
         }
         
         [SerializeField]
@@ -240,9 +240,7 @@ namespace MultiplayerARPG
             get { return passengingVehicle.Value; }
             set { passengingVehicle.Value = value; }
         }
-
-        public bool IsGrounded { get { return ActiveMovement == null ? true : ActiveMovement.IsGrounded; } }
-        public bool IsJumping { get { return ActiveMovement == null ? false : ActiveMovement.IsJumping; } }
+        
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         protected Vector3? teleportingPosition;
@@ -262,7 +260,10 @@ namespace MultiplayerARPG
             get { return BaseGameNetworkManager.Singleton; }
         }
 
-        public BaseGameEntity Entity { get { return this; } }
+        public BaseGameEntity Entity
+        {
+            get { return this; }
+        }
 
         protected IGameEntityComponent[] EntityComponents { get; private set; }
         
@@ -461,6 +462,9 @@ namespace MultiplayerARPG
             RegisterNetFunction<PackedUInt>(NetFuncEnterVehicle);
             RegisterNetFunction<PackedUInt, byte>(NetFuncEnterVehicleToSeat);
             RegisterNetFunction(NetFuncExitVehicle);
+            RegisterNetFunction<byte>(NetFuncSetMovement);
+            RegisterNetFunction<byte>(NetFuncSetExtraMovement);
+            RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
 
             // Setup entity movement here to make it able to register net elements / functions
             for (int i = 0; i < EntityComponents.Length; ++i)
@@ -490,9 +494,9 @@ namespace MultiplayerARPG
             extraMovementState.deliveryMethod = DeliveryMethod.Sequenced;
             extraMovementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             extraMovementState.doNotSyncInitialDataImmediately = true;
-            currentDirection2D.deliveryMethod = DeliveryMethod.Sequenced;
-            currentDirection2D.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentDirection2D.doNotSyncInitialDataImmediately = true;
+            direction2D.deliveryMethod = DeliveryMethod.Sequenced;
+            direction2D.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            direction2D.doNotSyncInitialDataImmediately = true;
             passengingVehicle.deliveryMethod = DeliveryMethod.ReliableOrdered;
             passengingVehicle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             passengingVehicle.doNotSyncInitialDataImmediately = true;
@@ -530,7 +534,26 @@ namespace MultiplayerARPG
 
         protected void NetFuncExitVehicle()
         {
+            // Call exit vehicle at server
             ExitVehicle();
+        }
+
+        protected void NetFuncSetMovement(byte movementState)
+        {
+            // Set data at server and sync to clients later
+            MovementState = (MovementState)movementState;
+        }
+
+        protected void NetFuncSetExtraMovement(byte extraMovementState)
+        {
+            // Set data at server and sync to clients later
+            ExtraMovementState = (ExtraMovementState)extraMovementState;
+        }
+
+        protected void NetFuncUpdateDirection(DirectionVector2 direction)
+        {
+            // Set data at server and sync to clients later
+            Direction2D = direction;
         }
         #endregion
 
@@ -568,6 +591,21 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public virtual bool CanSprint()
+        {
+            return false;
+        }
+
+        public virtual bool CanCrouch()
+        {
+            return false;
+        }
+
+        public virtual bool CanCrawl()
+        {
+            return false;
+        }
+
         public void StopMove()
         {
             if (ActiveMovement != null)
@@ -584,12 +622,6 @@ namespace MultiplayerARPG
         {
             if (ActiveMovement != null)
                 ActiveMovement.PointClickMovement(position);
-        }
-
-        public void SetExtraMovement(ExtraMovementState extraMovementState)
-        {
-            if (ActiveMovement != null)
-                ActiveMovement.SetExtraMovement(extraMovementState);
         }
 
         public void SetLookRotation(Quaternion rotation)
@@ -620,6 +652,66 @@ namespace MultiplayerARPG
             result = CacheTransform.position;
             if (ActiveMovement != null)
                 ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
+        }
+
+        public void SetMovement(MovementState movementState)
+        {
+            // Set local movement state which will be used by owner client
+            LocalMovementState = movementState;
+
+            if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
+                MovementState = movementState;
+
+            if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
+                CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)movementState);
+        }
+
+        public void SetExtraMovement(ExtraMovementState extraMovementState)
+        {
+            // Set local movement state which will be used by owner client
+            if (IsUnderWater)
+            {
+                // Extra movement states always none while under water
+                extraMovementState = ExtraMovementState.None;
+            }
+            else
+            {
+                switch (extraMovementState)
+                {
+                    case ExtraMovementState.IsSprinting:
+                        if (!ActiveMovement.Entity.CanSprint())
+                            extraMovementState = ExtraMovementState.None;
+                        break;
+                    case ExtraMovementState.IsCrouching:
+                        if (!ActiveMovement.Entity.CanCrouch())
+                            extraMovementState = ExtraMovementState.None;
+                        break;
+                    case ExtraMovementState.IsCrawling:
+                        if (!ActiveMovement.Entity.CanCrawl())
+                            extraMovementState = ExtraMovementState.None;
+                        break;
+                }
+            }
+            
+            LocalExtraMovementState = extraMovementState;
+
+            if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
+                ExtraMovementState = extraMovementState;
+
+            if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
+                CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
+        }
+
+        public void SetDirection2D(Vector2 direction)
+        {
+            // Set local movement state which will be used by owner client
+            LocalDirection2D = direction;
+
+            if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
+                Direction2D = direction;
+
+            if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
+                CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, new DirectionVector2(LocalDirection2D));
         }
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)

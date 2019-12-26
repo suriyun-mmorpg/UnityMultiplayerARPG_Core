@@ -6,18 +6,13 @@ namespace MultiplayerARPG
 {
     public abstract class BaseEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovement
     {
-        public bool CanMove()
-        {
-            return CacheEntity.CanMove();
-        }
-
+        public BaseGameEntity Entity { get { return CacheEntity; } }
         public virtual bool IsGrounded { get; protected set; }
         public virtual bool IsJumping { get; protected set; }
         public abstract float StoppingDistance { get; }
         public abstract void KeyMovement(Vector3 moveDirection, MovementState movementState);
         public abstract void PointClickMovement(Vector3 position);
         public abstract void StopMove();
-        public abstract void SetExtraMovement(ExtraMovementState extraMovementState);
         public abstract void SetLookRotation(Quaternion rotation);
         public abstract Quaternion GetLookRotation();
         public abstract void Teleport(Vector3 position);

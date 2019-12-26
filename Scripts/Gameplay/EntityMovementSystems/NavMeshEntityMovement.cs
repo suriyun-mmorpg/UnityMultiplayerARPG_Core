@@ -84,8 +84,6 @@ namespace MultiplayerARPG
             CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             CacheEntity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
             CacheEntity.RegisterNetFunction(StopMove);
-            CacheEntity.RegisterNetFunction<byte>(NetFuncSetMovement);
-            CacheEntity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -100,18 +98,6 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
             CacheTransform.eulerAngles = new Vector3(0, (float)yRotation, 0);
-        }
-
-        protected void NetFuncSetMovement(byte movementState)
-        {
-            // Set data at server and sync to clients later
-            CacheEntity.MovementState = (MovementState)movementState;
-        }
-
-        protected void NetFuncSetExtraMovement(byte extraMovementState)
-        {
-            // Set data at server and sync to clients later
-            CacheEntity.ExtraMovementState = (ExtraMovementState)extraMovementState;
         }
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -142,18 +128,6 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.updateRotation = false;
             CacheNavMeshAgent.isStopped = true;
             CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-        }
-
-        public override void SetExtraMovement(ExtraMovementState extraMovementState)
-        {
-            // Set local movement state which will be used by owner client
-            CacheEntity.LocalExtraMovementState = extraMovementState;
-
-            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
-                CacheEntity.ExtraMovementState = extraMovementState;
-
-            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
         }
 
         public override void SetLookRotation(Quaternion rotation)
@@ -202,22 +176,7 @@ namespace MultiplayerARPG
             if (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
                 return;
 
-            SetMovementState(CacheNavMeshAgent.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None);
-        }
-
-        public void SetMovementState(MovementState state)
-        {
-            if (IsGrounded)
-                state |= MovementState.IsGrounded;
-
-            // Set local movement state which will be used by owner client
-            CacheEntity.LocalMovementState = state;
-
-            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
-                CacheEntity.MovementState = state;
-
-            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CacheEntity.CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
+            CacheEntity.SetMovement((CacheNavMeshAgent.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
         }
 
         protected void SetMovePaths(Vector3 position)

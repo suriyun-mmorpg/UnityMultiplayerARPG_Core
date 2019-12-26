@@ -344,7 +344,7 @@ namespace MultiplayerARPG
         {
             Transform transform = GetDamageTransform(damageType, isLeftHand);
             position = transform.position;
-            direction = CurrentDirection2D;
+            direction = Direction2D;
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(direction.y, direction.x) * (180 / Mathf.PI)) + 90);
         }
 
@@ -970,6 +970,27 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public override sealed bool CanSprint()
+        {
+            if (IsUnderWater)
+                return false;
+            return CurrentStamina > 0;
+        }
+
+        public override sealed bool CanCrouch()
+        {
+            if (IsUnderWater)
+                return false;
+            return true;
+        }
+
+        public override sealed bool CanCrawl()
+        {
+            if (IsUnderWater)
+                return false;
+            return true;
+        }
+
         public bool CanAttack()
         {
             if (!CanDoActions())
@@ -1078,7 +1099,7 @@ namespace MultiplayerARPG
         {
             float halfFov = fov * 0.5f;
             Vector2 targetDir = (position - CacheTransform.position).normalized;
-            float angle = Vector2.Angle(targetDir, CurrentDirection2D);
+            float angle = Vector2.Angle(targetDir, Direction2D);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
             return angle < halfFov;
         }

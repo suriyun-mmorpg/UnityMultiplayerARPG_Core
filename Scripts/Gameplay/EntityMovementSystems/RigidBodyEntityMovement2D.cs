@@ -104,9 +104,6 @@ namespace MultiplayerARPG
             CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             CacheEntity.RegisterNetFunction<sbyte, sbyte>(NetFuncKeyMovement);
             CacheEntity.RegisterNetFunction(StopMove);
-            CacheEntity.RegisterNetFunction<byte>(NetFuncSetMovement);
-            CacheEntity.RegisterNetFunction<byte>(NetFuncSetExtraMovement);
-            CacheEntity.RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -122,23 +119,6 @@ namespace MultiplayerARPG
                 return;
             // Devide inputs to float value
             tempInputDirection = new Vector2((float)horizontalInput / 100f, (float)verticalInput / 100f);
-        }
-
-        protected void NetFuncSetMovement(byte movementState)
-        {
-            // Set data at server and sync to clients later
-            CacheEntity.MovementState = (MovementState)movementState;
-        }
-
-        protected void NetFuncSetExtraMovement(byte extraMovementState)
-        {
-            // Set data at server and sync to clients later
-            CacheEntity.ExtraMovementState = (ExtraMovementState)extraMovementState;
-        }
-
-        protected void NetFuncUpdateDirection(DirectionVector2 direction)
-        {
-            CacheEntity.CurrentDirection2D = direction;
         }
 
         public override void StopMove()
@@ -183,22 +163,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void SetExtraMovement(ExtraMovementState extraMovementState)
-        {
-            // Set local movement state which will be used by owner client
-            CacheEntity.LocalExtraMovementState = extraMovementState;
-
-            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
-                CacheEntity.ExtraMovementState = extraMovementState;
-
-            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CacheEntity.CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
-        }
-
         public override void SetLookRotation(Quaternion rotation)
         {
             lookRotation = rotation;
-            UpdateCurrentDirection(lookRotation * Vector3.forward);
+            CacheEntity.SetDirection2D(lookRotation * Vector3.forward);
         }
 
         public override Quaternion GetLookRotation()
@@ -246,7 +214,7 @@ namespace MultiplayerARPG
                     if (tempMoveDirectionMagnitude > 1)
                         tempMoveDirection = tempMoveDirection.normalized;
 
-                    UpdateCurrentDirection(tempMoveDirection);
+                    CacheEntity.SetDirection2D(tempMoveDirection);
                     CacheRigidbody2D.velocity = tempMoveDirection * CacheEntity.GetMoveSpeed();
                 }
                 else
@@ -256,34 +224,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            SetMovementState(CacheRigidbody2D.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None);
-        }
-
-        public void SetMovementState(MovementState state)
-        {
-            if (IsGrounded)
-                state |= MovementState.IsGrounded;
-
-            // Set local movement state which will be used by owner client
-            CacheEntity.LocalMovementState = state;
-
-            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
-                CacheEntity.MovementState = state;
-
-            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CacheEntity.CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
-        }
-
-        public void UpdateCurrentDirection(Vector2 direction)
-        {
-            if (direction.magnitude > 0f)
-                CacheEntity.LocalDirection2D = direction;
-
-            if (IsServer && CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative)
-                CacheEntity.CurrentDirection2D = CacheEntity.LocalDirection2D;
-
-            if (IsOwnerClient && CacheEntity.MovementSecure == MovementSecure.NotSecure)
-                CacheEntity.CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, new DirectionVector2(CacheEntity.LocalDirection2D));
+            CacheEntity.SetMovement((CacheRigidbody2D.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
         }
     }
 }
