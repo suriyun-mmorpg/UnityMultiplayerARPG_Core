@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         public int MaxStamina { get { return this.GetCaches().MaxStamina; } }
         public int MaxFood { get { return this.GetCaches().MaxFood; } }
         public int MaxWater { get { return this.GetCaches().MaxWater; } }
-        public override sealed float MoveAnimationSpeedMultiplier { get { return CurrentGameplayRule.GetMoveSpeed(this) / this.GetCaches().BaseMoveSpeed; } }
+        public override sealed float MoveAnimationSpeedMultiplier { get { return GetMoveSpeed() / this.GetCaches().BaseMoveSpeed; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
 
@@ -956,9 +956,43 @@ namespace MultiplayerARPG
             return !IsDead() && !IsPlayingActionAnimation() && !IsAttackingOrUsingSkill;
         }
 
-        public override sealed float GetMoveSpeed()
+        public float GetAttackSpeed()
         {
-            return CurrentGameplayRule.GetMoveSpeed(this);
+            float atkSpeed = this.GetCaches().AtkSpeed;
+            // Minimum attack speed is 0.1
+            if (atkSpeed <= 0.1f)
+                atkSpeed = 0.1f;
+            return atkSpeed;
+        }
+
+        public override float GetMoveSpeed()
+        {
+            float moveSpeed = this.GetCaches().MoveSpeed;
+
+            if (IsAttackingOrUsingSkill)
+                moveSpeed *= MoveSpeedRateWhileAttackOrUseSkill;
+
+            if (IsUnderWater)
+            {
+                moveSpeed *= CurrentGameplayRule.GetSwimMoveSpeedRate(this);
+            }
+            else
+            {
+                switch (ExtraMovementState)
+                {
+                    case ExtraMovementState.IsSprinting:
+                        moveSpeed *= CurrentGameplayRule.GetSprintMoveSpeedRate(this);
+                        break;
+                    case ExtraMovementState.IsCrouching:
+                        moveSpeed *= CurrentGameplayRule.GetCrouchMoveSpeedRate(this);
+                        break;
+                    case ExtraMovementState.IsCrawling:
+                        moveSpeed *= CurrentGameplayRule.GetCrawlMoveSpeedRate(this);
+                        break;
+                }
+            }
+
+            return moveSpeed;
         }
 
         public override sealed bool CanMove()
@@ -1245,7 +1279,7 @@ namespace MultiplayerARPG
         {
             if (animActionType == AnimActionType.AttackRightHand ||
                 animActionType == AnimActionType.AttackLeftHand)
-                return CurrentGameplayRule.GetAttackSpeed(this);
+                return GetAttackSpeed();
             return 1f;
         }
 

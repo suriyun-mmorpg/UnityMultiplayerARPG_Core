@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -15,7 +16,14 @@ namespace MultiplayerARPG
         [Header("Stamina/Sprint")]
         public float staminaRecoveryPerSeconds = 5;
         public float staminaDecreasePerSeconds = 5;
-        public float moveSpeedRateWhileSprint = 1.5f;
+        [FormerlySerializedAs("moveSpeedRateWhileSprint")]
+        public float moveSpeedRateWhileSprinting = 1.5f;
+        [Header("Crouch")]
+        public float moveSpeedRateWhileCrouching = 0.75f;
+        [Header("Crawl")]
+        public float moveSpeedRateWhileCrawling = 0.5f;
+        [Header("Swim")]
+        public float moveSpeedRateWhileSwimming = 0.75f;
         [Header("Hp/Mp/Food/Water")]
         public int hungryWhenFoodLowerThan = 40;
         public int thirstyWhenWaterLowerThan = 40;
@@ -205,26 +213,28 @@ namespace MultiplayerARPG
             return expLostPercentageWhenDeath;
         }
 
-        public override float GetMoveSpeed(BaseCharacterEntity character)
+        public override float GetSprintMoveSpeedRate(BaseGameEntity gameEntity)
         {
-            float moveSpeed = character.GetCaches().MoveSpeed;
-            if (character is BaseMonsterCharacterEntity &&
-                (character as BaseMonsterCharacterEntity).isWandering)
-                moveSpeed = (character as BaseMonsterCharacterEntity).MonsterDatabase.wanderMoveSpeed;
-            if (character.ExtraMovementState.HasFlag(ExtraMovementState.IsSprinting))
-                moveSpeed *= moveSpeedRateWhileSprint;
-            if (character.IsAttackingOrUsingSkill)
-                moveSpeed *= character.MoveSpeedRateWhileAttackOrUseSkill;
-            return moveSpeed;
+            // For some gameplay rule, move speed rate may difference for specific entiy type.
+            return moveSpeedRateWhileSprinting;
         }
 
-        public override float GetAttackSpeed(BaseCharacterEntity character)
+        public override float GetCrouchMoveSpeedRate(BaseGameEntity gameEntity)
         {
-            float atkSpeed = character.GetCaches().AtkSpeed;
-            // Minimum attack speed is 0.1
-            if (atkSpeed <= 0.1f)
-                atkSpeed = 0.1f;
-            return atkSpeed;
+            // For some gameplay rule, move speed rate may difference for specific entiy type.
+            return moveSpeedRateWhileCrouching;
+        }
+
+        public override float GetCrawlMoveSpeedRate(BaseGameEntity gameEntity)
+        {
+            // For some gameplay rule, move speed rate may difference for specific entiy type.
+            return moveSpeedRateWhileCrawling;
+        }
+
+        public override float GetSwimMoveSpeedRate(BaseGameEntity gameEntity)
+        {
+            // For some gameplay rule, move speed rate may difference for specific entiy type.
+            return moveSpeedRateWhileSwimming;
         }
 
         public override float GetTotalWeight(ICharacterData character)

@@ -192,13 +192,13 @@ namespace MultiplayerARPG
 
         public void SetDestination(Vector3 destination)
         {
-            CacheEntity.isWandering = false;
+            CacheEntity.IsWandering = false;
             CacheEntity.PointClickMovement(destination);
         }
 
         public void SetWanderDestination(Vector3 destination)
         {
-            CacheEntity.isWandering = true;
+            CacheEntity.IsWandering = true;
             CacheEntity.PointClickMovement(destination);
         }
 
@@ -207,9 +207,9 @@ namespace MultiplayerARPG
             // Random position around spawn point
             Vector3 randomPosition;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                randomPosition = CacheEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
-                randomPosition = CacheEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             // Random position around summoner
             if (CacheEntity.Summoner != null)
                 randomPosition = CacheEntity.Summoner.GetSummonPosition();
@@ -224,9 +224,9 @@ namespace MultiplayerARPG
             // Random position around spawn point
             Vector3 randomPosition;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                randomPosition = CacheEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
-                randomPosition = CacheEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             // Random position around summoner
             if (CacheEntity.Summoner != null)
                 randomPosition = CacheEntity.Summoner.GetSummonPosition();

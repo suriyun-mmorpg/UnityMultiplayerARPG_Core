@@ -18,8 +18,6 @@ namespace MultiplayerARPG
         private float destroyDelay = 2f;
         [SerializeField]
         private float destroyRespawnDelay = 5f;
-        [HideInInspector, System.NonSerialized]
-        public bool isWandering;
 
         [Header("Monster Character Sync Fields")]
         [SerializeField]
@@ -63,12 +61,13 @@ namespace MultiplayerARPG
         public SummonType SummonType { get { return (SummonType)summonType.Value; } protected set { summonType.Value = (byte)value; } }
         public bool IsSummoned { get { return SummonType != SummonType.None; } }
 
-        public MonsterSpawnArea spawnArea { get; protected set; }
-        public Vector3 spawnPosition { get; protected set; }
+        public MonsterSpawnArea SpawnArea { get; protected set; }
+        public Vector3 SpawnPosition { get; protected set; }
         public MonsterCharacter MonsterDatabase { get { return monsterCharacter; } }
         public override int DataId { get { return MonsterDatabase.DataId; } set { } }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
+        public bool IsWandering { get; set; }
 
         private readonly HashSet<uint> looters = new HashSet<uint>();
 
@@ -112,8 +111,8 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            if (spawnArea == null)
-                spawnPosition = CacheTransform.position;
+            if (SpawnArea == null)
+                SpawnPosition = CacheTransform.position;
 
             if (Level <= 0)
                 Level = MonsterDatabase.defaultLevel;
@@ -128,9 +127,9 @@ namespace MultiplayerARPG
 
         public void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
         {
-            this.spawnArea = spawnArea;
+            this.SpawnArea = spawnArea;
             FindGroundedPosition(spawnPosition, 512f, out spawnPosition);
-            this.spawnPosition = spawnPosition;
+            this.SpawnPosition = spawnPosition;
         }
 
         protected override void SetupNetElements()
@@ -175,6 +174,13 @@ namespace MultiplayerARPG
                 return;
             // Set target to attack
             SetTargetEntity(target);
+        }
+
+        public override float GetMoveSpeed()
+        {
+            if (IsWandering)
+                return MonsterDatabase.wanderMoveSpeed;
+            return base.GetMoveSpeed();
         }
 
         public override sealed bool IsAlly(BaseCharacterEntity characterEntity)
@@ -533,7 +539,7 @@ namespace MultiplayerARPG
 
             base.Respawn();
             StopMove();
-            Teleport(spawnPosition);
+            Teleport(SpawnPosition);
         }
 
         public void DestroyAndRespawn()
@@ -541,8 +547,8 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            if (spawnArea != null)
-                spawnArea.Spawn(DestroyDelay + DestroyRespawnDelay);
+            if (SpawnArea != null)
+                SpawnArea.Spawn(DestroyDelay + DestroyRespawnDelay);
             else
                 Manager.StartCoroutine(RespawnRoutine());
 
@@ -555,7 +561,7 @@ namespace MultiplayerARPG
             InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
-                spawnPosition,
+                SpawnPosition,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 

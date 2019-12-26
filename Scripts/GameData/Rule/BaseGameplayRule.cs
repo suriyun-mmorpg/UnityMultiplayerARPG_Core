@@ -21,8 +21,10 @@ namespace MultiplayerARPG
         public abstract float GetDecreasingFoodPerSeconds(BaseCharacterEntity character);
         public abstract float GetDecreasingWaterPerSeconds(BaseCharacterEntity character);
         public abstract float GetExpLostPercentageWhenDeath(BaseCharacterEntity character);
-        public abstract float GetMoveSpeed(BaseCharacterEntity character);
-        public abstract float GetAttackSpeed(BaseCharacterEntity character);
+        public abstract float GetSprintMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetCrouchMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetCrawlMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetSwimMoveSpeedRate(BaseGameEntity gameEntity);
         public abstract float GetTotalWeight(ICharacterData character);
         public abstract short GetTotalSlot(ICharacterData character);
         public abstract bool IsHungry(BaseCharacterEntity character);
