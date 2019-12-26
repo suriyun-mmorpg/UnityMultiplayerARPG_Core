@@ -160,11 +160,11 @@ namespace MultiplayerARPG
             CacheCharacterList.Generate(GetCreatableCharacters(), (index, characterEntity, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
-                PlayerCharacterDataByEntityId[characterEntity.EntityId] = characterEntity.playerCharacters;
+                PlayerCharacterDataByEntityId[characterEntity.EntityId] = characterEntity.PlayerCharacters;
                 // Prepare data
-                BaseCharacter playerCharacter = characterEntity.playerCharacters[0];
+                BaseCharacter playerCharacter = characterEntity.PlayerCharacters[0];
                 PlayerCharacterData playerCharacterData = new PlayerCharacterData();
-                playerCharacterData.SetNewPlayerCharacterData(characterEntity.characterTitle, playerCharacter.DataId, characterEntity.EntityId);
+                playerCharacterData.SetNewPlayerCharacterData(characterEntity.CharacterTitle, playerCharacter.DataId, characterEntity.EntityId);
                 // Hide all model, the first one will be shown later
                 BaseCharacterModel characterModel = playerCharacterData.InstantiateModel(characterModelContainer);
                 CharacterModelByEntityId[playerCharacterData.EntityId] = characterModel;

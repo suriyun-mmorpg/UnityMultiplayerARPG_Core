@@ -671,7 +671,7 @@ namespace MultiplayerARPG
                 {
                     BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
                     PlayerCharacterEntities[characterEntity.Identity.HashAssetId] = playerCharacterEntity;
-                    characters.AddRange(playerCharacterEntity.playerCharacters);
+                    characters.AddRange(playerCharacterEntity.PlayerCharacters);
                 }
                 else if (characterEntity is BaseMonsterCharacterEntity)
                 {
