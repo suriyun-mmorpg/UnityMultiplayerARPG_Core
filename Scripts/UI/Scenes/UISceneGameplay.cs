@@ -112,6 +112,9 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onUpdateQuests;
         public System.Action<BasePlayerCharacterEntity> onUpdateStorageItems;
 
+        private readonly Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>> spawningCombatTexts = new Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>>();
+        private readonly Dictionary<DamageableEntity, float> spawningCombatTextTimes = new Dictionary<DamageableEntity, float>();
+
         private void Awake()
         {
             Singleton = this;
@@ -197,6 +200,24 @@ namespace MultiplayerARPG
                 {
                     UIBase ui = toggleUi.ui;
                     ui.Toggle();
+                }
+            }
+
+            float currentTime = Time.unscaledTime;
+            KeyValuePair<CombatAmountType, int> combatTextData;
+            foreach (DamageableEntity damageableEntity in spawningCombatTexts.Keys)
+            {
+                if (damageableEntity == null || spawningCombatTexts[damageableEntity].Count == 0)
+                    continue;
+
+                if (!spawningCombatTextTimes.ContainsKey(damageableEntity))
+                    spawningCombatTextTimes[damageableEntity] = currentTime;
+
+                if (currentTime - spawningCombatTextTimes[damageableEntity] >= 0.1f)
+                {
+                    spawningCombatTextTimes[damageableEntity] = currentTime;
+                    combatTextData = spawningCombatTexts[damageableEntity].Dequeue();
+                    SpawnCombatText(damageableEntity.CombatTextTransform, combatTextData.Key, combatTextData.Value);
                 }
             }
         }
@@ -655,6 +676,16 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public void PrepareCombatText(DamageableEntity damageableEntity, CombatAmountType combatAmountType, int amount)
+        {
+            if (Vector3.Distance(BasePlayerCharacterController.OwningCharacter.CacheTransform.position, damageableEntity.CacheTransform.position) > GameInstance.Singleton.combatTextDistance)
+                return;
+
+            if (!spawningCombatTexts.ContainsKey(damageableEntity))
+                spawningCombatTexts[damageableEntity] = new Queue<KeyValuePair<CombatAmountType, int>>();
+            spawningCombatTexts[damageableEntity].Enqueue(new KeyValuePair<CombatAmountType, int>(combatAmountType, amount));
+        }
+
         public void SpawnCombatText(Transform followingTransform, CombatAmountType combatAmountType, int amount)
         {
             switch (combatAmountType)
@@ -691,13 +722,13 @@ namespace MultiplayerARPG
 
         public void SpawnCombatText(Transform followingTransform, UICombatText prefab, int amount)
         {
-            if (combatTextTransform != null && prefab != null)
-            {
-                UICombatText combatText = Instantiate(prefab, combatTextTransform);
-                combatText.transform.localScale = Vector3.one;
-                combatText.CacheObjectFollower.TargetObject = followingTransform;
-                combatText.Amount = amount;
-            }
+            if (combatTextTransform == null || prefab == null)
+                return;
+
+            UICombatText combatText = Instantiate(prefab, combatTextTransform);
+            combatText.transform.localScale = Vector3.one;
+            combatText.CacheObjectFollower.TargetObject = followingTransform;
+            combatText.Amount = amount;
         }
     }
 }

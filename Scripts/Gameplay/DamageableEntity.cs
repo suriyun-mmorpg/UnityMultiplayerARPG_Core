@@ -44,31 +44,14 @@ namespace MultiplayerARPG
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public abstract int MaxHp { get; }
         public float HpRate { get { return (float)CurrentHp / (float)MaxHp; } }
-
-        private readonly Queue<KeyValuePair<CombatAmountType, int>> spawningCombatTexts = new Queue<KeyValuePair<CombatAmountType, int>>();
-        KeyValuePair<CombatAmountType, int> tempCombatTextData;
-        private float tempTime;
-        private float lastSpawnCombatTextTime;
+        
+        // Temp data
         private GameEffect[] pendingHitEffects;
 
         public override void OnSetup()
         {
             base.OnSetup();
             RegisterNetFunction<byte, int>(NetFuncCombatAmount);
-        }
-
-        protected override void EntityLateUpdate()
-        {
-            base.EntityLateUpdate();
-            if (spawningCombatTexts.Count == 0 || UISceneGameplay.Singleton == null)
-                return;
-            tempTime = Time.time;
-            if (tempTime - lastSpawnCombatTextTime >= 0.1f)
-            {
-                lastSpawnCombatTextTime = tempTime;
-                tempCombatTextData = spawningCombatTexts.Dequeue();
-                UISceneGameplay.Singleton.SpawnCombatText(CombatTextTransform, tempCombatTextData.Key, tempCombatTextData.Value);
-            }
         }
 
         /// <summary>
@@ -78,8 +61,12 @@ namespace MultiplayerARPG
         /// <param name="amount"></param>
         protected void NetFuncCombatAmount(byte byteCombatAmountType, int amount)
         {
-            spawningCombatTexts.Enqueue(new KeyValuePair<CombatAmountType, int>((CombatAmountType)byteCombatAmountType, amount));
-            switch ((CombatAmountType)byteCombatAmountType)
+            if (!IsClient)
+                return;
+
+            CombatAmountType combatAmountType = (CombatAmountType)byteCombatAmountType;
+            UISceneGameplay.Singleton.PrepareCombatText(this, combatAmountType, amount);
+            switch (combatAmountType)
             {
                 case CombatAmountType.NormalDamage:
                 case CombatAmountType.CriticalDamage:
@@ -126,6 +113,9 @@ namespace MultiplayerARPG
 
         public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
         {
+            if (!IsClient)
+                return;
+
             GameEffect[] effects = CurrentGameInstance.DefaultDamageHitEffects;
             if (skill != null && skill.GetDamageHitEffects() != null && skill.GetDamageHitEffects().Length > 0)
             {

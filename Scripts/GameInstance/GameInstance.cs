@@ -125,6 +125,8 @@ namespace MultiplayerARPG
         public float buildDistance = 10f;
         [Tooltip("This is a distance that other players will receives local chat")]
         public float localChatDistance = 10f;
+        [Tooltip("This is a distance from controlling character that combat texts will instantiates")]
+        public float combatTextDistance = 20f;
         [Tooltip("Maximum number of equip weapon set")]
         [Range(1, 16)]
         public byte maxEquipWeaponSet = 2;
