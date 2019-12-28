@@ -57,6 +57,8 @@ namespace MultiplayerARPG
         private ResistanceIncremental[] adjustResistances;
         [System.NonSerialized]
         private ArmorIncremental[] adjustArmors;
+        [System.NonSerialized]
+        private DamageIncremental? adjustDamageAmount;
 
         [System.NonSerialized]
         private List<ItemDrop> cacheRandomItems;
@@ -85,7 +87,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (adjustStats.HasValue)
+                    if (!adjustStats.HasValue)
                     {
                         adjustStats = new CharacterStatsIncremental()
                         {
@@ -196,6 +198,34 @@ namespace MultiplayerARPG
                         }
                     }
                     return adjustArmors;
+                }
+            }
+        }
+
+        public DamageIncremental DamageAmount
+        {
+            get
+            {
+                // Adjust base stats by default level
+                if (defaultLevel <= 1)
+                {
+                    return damageAmount;
+                }
+                else
+                {
+                    if (!adjustDamageAmount.HasValue)
+                    {
+                        adjustDamageAmount = new DamageIncremental()
+                        {
+                            damageElement = damageAmount.damageElement,
+                            amount = new IncrementalMinMaxFloat()
+                            {
+                                baseAmount = damageAmount.amount.baseAmount + (damageAmount.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
+                                amountIncreaseEachLevel = damageAmount.amount.amountIncreaseEachLevel,
+                            }
+                        };
+                    }
+                    return adjustDamageAmount.Value;
                 }
             }
         }

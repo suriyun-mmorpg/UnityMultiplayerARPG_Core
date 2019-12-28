@@ -1035,7 +1035,7 @@ public static partial class CharacterDataExtension
         {
             BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
             isLeftHand = false;
-            return GameDataHelpers.MakeDamage(monsterCharacterEntity.MonsterDatabase.damageAmount, monsterCharacterEntity.Level, 1f, 0f);
+            return GameDataHelpers.MakeDamage(monsterCharacterEntity.MonsterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
         }
         else
         {
