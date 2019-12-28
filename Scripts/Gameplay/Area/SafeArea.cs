@@ -33,12 +33,12 @@ namespace MultiplayerARPG
 
         private void OnTriggerExit(Collider other)
         {
-            TriggerEnter(other.gameObject);
+            TriggerExit(other.gameObject);
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            TriggerEnter(other.gameObject);
+            TriggerExit(other.gameObject);
         }
 
         private void TriggerExit(GameObject other)
