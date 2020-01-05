@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (ReferenceEquals(cacheTransform, null))
+                if (cacheTransform == null)
                     cacheTransform = GetComponent<Transform>();
                 return cacheTransform;
             }
@@ -85,10 +85,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (ReferenceEquals(cameraTargetTransform, null))
+                if (cameraTargetTransform == null)
                     cameraTargetTransform = CacheTransform;
-
-                if (!ReferenceEquals(PassengingVehicleEntity, null))
+                if (PassengingVehicleEntity != null)
                 {
                     if (PassengingVehicleSeat.cameraTarget == VehicleSeatCameraTarget.Vehicle)
                     {
@@ -98,7 +97,6 @@ namespace MultiplayerARPG
                             return PassengingVehicleEntity.transform;
                     }
                 }
-
                 return cameraTargetTransform;
             }
         }
@@ -113,7 +111,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (ReferenceEquals(movement, null))
+                if (movement == null)
                     movement = GetComponent<BaseEntityMovement>();
                 return movement;
             }
@@ -124,7 +122,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (!ReferenceEquals(PassengingVehicleEntity, null))
+                if (PassengingVehicleEntity != null)
                 {
                     // Track movement position by vehicle entity
                     return PassengingVehicleEntity.transform;
@@ -139,7 +137,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if ((ReferenceEquals(passengingVehicleEntity, null) || dirtyVehicleObjectId != PassengingVehicle.objectId) && PassengingVehicle.objectId > 0)
+                if ((passengingVehicleEntity == null || dirtyVehicleObjectId != PassengingVehicle.objectId) && PassengingVehicle.objectId > 0)
                 {
                     dirtyVehicleObjectId = PassengingVehicle.objectId;
                     passengingVehicleEntity = null;
@@ -160,7 +158,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (ReferenceEquals(PassengingVehicleEntity, null))
+                if (PassengingVehicleEntity == null)
                     return null;
                 return PassengingVehicleEntity.VehicleType;
             }
@@ -170,8 +168,8 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (ReferenceEquals(PassengingVehicleEntity, null))
-                    return VehicleSeat.Empty;
+                if (PassengingVehicleEntity == null)
+                    return default(VehicleSeat);
                 return PassengingVehicleEntity.Seats[PassengingVehicle.seatIndex];
             }
         }
@@ -180,9 +178,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (ReferenceEquals(PassengingVehicleEntity, null))
-                    return Movement;
-                return PassengingVehicleEntity;
+                if (PassengingVehicleEntity != null)
+                    return PassengingVehicleEntity;
+                return Movement;
             }
         }
 
@@ -243,7 +241,7 @@ namespace MultiplayerARPG
             set { passengingVehicle.Value = value; }
         }
         
-        public float StoppingDistance { get { return ReferenceEquals(ActiveMovement, null) ? 0.1f : ActiveMovement.StoppingDistance; } }
+        public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         protected Vector3? teleportingPosition;
 
@@ -329,12 +327,12 @@ namespace MultiplayerARPG
         {
             foreach (GameObject ownerObject in ownerObjects)
             {
-                if (ReferenceEquals(ownerObject, null)) continue;
+                if (ownerObject == null) continue;
                 ownerObject.SetActive(IsOwnerClient);
             }
             foreach (GameObject nonOwnerObject in nonOwnerObjects)
             {
-                if (ReferenceEquals(nonOwnerObject, null)) continue;
+                if (nonOwnerObject == null) continue;
                 nonOwnerObject.SetActive(!IsOwnerClient);
             }
         }
@@ -370,14 +368,14 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityUpdate()
         {
-            if (!ReferenceEquals(Movement, null) && Movement.Enabled != ReferenceEquals(PassengingVehicleEntity, null))
+            if (Movement != null && Movement.Enabled != (PassengingVehicleEntity == null))
             {
                 // Enable movement while not passenging any vehicle
-                Movement.Enabled = ReferenceEquals(PassengingVehicleEntity, null);
+                Movement.Enabled = PassengingVehicleEntity == null;
             }
             if (IsClient)
             {
-                if (!ReferenceEquals(Model, null) && Model is IMoveableModel)
+                if (Model != null && Model is IMoveableModel)
                 {
                     // Update movement animation
                     (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
@@ -401,12 +399,12 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityLateUpdate()
         {
-            if (!ReferenceEquals(textTitle, null))
+            if (textTitle != null)
                 textTitle.text = Title;
-            if (!ReferenceEquals(textTitleB, null))
+            if (textTitleB != null)
                 textTitleB.text = TitleB;
 
-            if (!ReferenceEquals(PassengingVehicleEntity, null))
+            if (PassengingVehicleEntity != null)
             {
                 // Snap character to vehicle seat
                 CacheTransform.position = PassengingVehicleSeat.passengingTransform.position;
@@ -517,7 +515,7 @@ namespace MultiplayerARPG
             {
                 IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
                 byte seatIndex;
-                if (!ReferenceEquals(vehicleEntity, null) &&
+                if (vehicleEntity != null &&
                     vehicleEntity.GetAvailableSeat(out seatIndex))
                     EnterVehicle(vehicleEntity, seatIndex);
             }
@@ -529,7 +527,7 @@ namespace MultiplayerARPG
             if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
             {
                 IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
-                if (!ReferenceEquals(vehicleEntity, null))
+                if (vehicleEntity != null)
                     EnterVehicle(vehicleEntity, seatIndex);
             }
         }
@@ -610,38 +608,38 @@ namespace MultiplayerARPG
 
         public void StopMove()
         {
-            if (!ReferenceEquals(ActiveMovement, null))
+            if (ActiveMovement != null)
                 ActiveMovement.StopMove();
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState moveState)
         {
-            if (!ReferenceEquals(ActiveMovement, null))
+            if (ActiveMovement != null)
                 ActiveMovement.KeyMovement(moveDirection, moveState);
         }
 
         public void PointClickMovement(Vector3 position)
         {
-            if (!ReferenceEquals(ActiveMovement, null))
+            if (ActiveMovement != null)
                 ActiveMovement.PointClickMovement(position);
         }
 
         public void SetLookRotation(Quaternion rotation)
         {
-            if (!ReferenceEquals(ActiveMovement, null))
+            if (ActiveMovement != null)
                 ActiveMovement.SetLookRotation(rotation);
         }
 
         public Quaternion GetLookRotation()
         {
-            if (!ReferenceEquals(ActiveMovement, null))
+            if (ActiveMovement != null)
                 return ActiveMovement.GetLookRotation();
             return Quaternion.identity;
         }
 
         public void Teleport(Vector3 position)
         {
-            if (ReferenceEquals(ActiveMovement, null))
+            if (ActiveMovement == null)
             {
                 teleportingPosition = position;
                 return;
@@ -652,7 +650,7 @@ namespace MultiplayerARPG
         public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = CacheTransform.position;
-            if (!ReferenceEquals(ActiveMovement, null))
+            if (ActiveMovement != null)
                 ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
         }
 
@@ -718,7 +716,7 @@ namespace MultiplayerARPG
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
-            if (!IsServer || ReferenceEquals(vehicle, null) || PassengingVehicle.objectId > 0 || !vehicle.IsSeatAvailable(seatIndex))
+            if (!IsServer || vehicle == null || PassengingVehicle.objectId > 0 || !vehicle.IsSeatAvailable(seatIndex))
                 return false;
 
             // Set passenger to vehicle
@@ -742,20 +740,20 @@ namespace MultiplayerARPG
         protected Vector3 ExitVehicle()
         {
             Vector3 exitPosition = CacheTransform.position;
-            if (!IsServer || ReferenceEquals(PassengingVehicleEntity, null))
+            if (!IsServer || PassengingVehicleEntity == null)
                 return exitPosition;
 
             uint vehicleObjectId = PassengingVehicleEntity.ObjectId;
             bool isDestroying = false;
 
-            if (!ReferenceEquals(PassengingVehicleEntity, null))
+            if (PassengingVehicleEntity != null)
             {
                 // Remove this from vehicle
                 PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
                 isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicle.seatIndex);
 
                 exitPosition = PassengingVehicleEntity.transform.position;
-                if (!ReferenceEquals(PassengingVehicleSeat.exitTransform, null))
+                if (PassengingVehicleSeat.exitTransform != null)
                     exitPosition = PassengingVehicleSeat.exitTransform.position;
 
                 // Clear passenging vehicle data
