@@ -66,17 +66,8 @@ namespace MultiplayerARPG
         {
             get { return model; }
         }
-
-        private Transform cacheTransform;
-        public Transform CacheTransform
-        {
-            get
-            {
-                if (cacheTransform == null)
-                    cacheTransform = GetComponent<Transform>();
-                return cacheTransform;
-            }
-        }
+        
+        public Transform CacheTransform { get; private set; }
 
         [Tooltip("Transform for position which camera will look at")]
         [SerializeField]
@@ -85,8 +76,6 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (cameraTargetTransform == null)
-                    cameraTargetTransform = CacheTransform;
                 if (PassengingVehicleEntity != null)
                 {
                     if (PassengingVehicleSeat.cameraTarget == VehicleSeatCameraTarget.Vehicle)
@@ -105,18 +94,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private MovementSecure movementSecure;
         public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
-
-        private BaseEntityMovement movement;
-        public BaseEntityMovement Movement
-        {
-            get
-            {
-                if (movement == null)
-                    movement = GetComponent<BaseEntityMovement>();
-                return movement;
-            }
-            set { movement = value; }
-        }
+        
+        public BaseEntityMovement Movement { get; private set; }
 
         public Transform MovementTransform
         {
@@ -169,7 +148,7 @@ namespace MultiplayerARPG
             get
             {
                 if (PassengingVehicleEntity == null)
-                    return default(VehicleSeat);
+                    return VehicleSeat.Empty;
                 return PassengingVehicleEntity.Seats[PassengingVehicle.seatIndex];
             }
         }
@@ -300,6 +279,18 @@ namespace MultiplayerARPG
 
             EntityAwake();
             this.InvokeInstanceDevExtMethods("Awake");
+        }
+
+        /// <summary>
+        /// Override this function to initial required components
+        /// </summary>
+        public virtual void InitialRequiredComponents()
+        {
+            // Cache components
+            CacheTransform = GetComponent<Transform>();
+            if (cameraTargetTransform == null)
+                cameraTargetTransform = CacheTransform;
+            Movement = GetComponent<BaseEntityMovement>();
         }
 
         protected virtual void EntityAwake() { }
@@ -501,11 +492,6 @@ namespace MultiplayerARPG
             passengingVehicle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             passengingVehicle.doNotSyncInitialDataImmediately = true;
         }
-
-        /// <summary>
-        /// Override this function to initial required components
-        /// </summary>
-        public virtual void InitialRequiredComponents() { }
 
         #region Net Functions
         protected void NetFuncEnterVehicle(PackedUInt objectId)

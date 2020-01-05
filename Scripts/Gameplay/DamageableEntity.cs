@@ -16,12 +16,7 @@ namespace MultiplayerARPG
         private Transform combatTextTransform;
         public Transform CombatTextTransform
         {
-            get
-            {
-                if (combatTextTransform == null)
-                    combatTextTransform = CacheTransform;
-                return combatTextTransform;
-            }
+            get { return combatTextTransform; }
         }
 
         [Tooltip("This is transform for other entities to aim to this entity")]
@@ -29,12 +24,7 @@ namespace MultiplayerARPG
         private Transform opponentAimTransform;
         public Transform OpponentAimTransform
         {
-            get
-            {
-                if (opponentAimTransform == null)
-                    opponentAimTransform = CombatTextTransform;
-                return opponentAimTransform;
-            }
+            get { return opponentAimTransform; }
         }
 
         [Header("Damageable Sync Fields")]
@@ -47,6 +37,16 @@ namespace MultiplayerARPG
         
         // Temp data
         private GameEffect[] pendingHitEffects;
+
+        public override void InitialRequiredComponents()
+        {
+            base.InitialRequiredComponents();
+            // Cache components
+            if (combatTextTransform == null)
+                combatTextTransform = CacheTransform;
+            if (opponentAimTransform == null)
+                opponentAimTransform = CombatTextTransform;
+        }
 
         public override void OnSetup()
         {

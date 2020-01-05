@@ -34,12 +34,7 @@ namespace MultiplayerARPG
         private Transform meleeDamageTransform;
         public Transform MeleeDamageTransform
         {
-            get
-            {
-                if (meleeDamageTransform == null)
-                    meleeDamageTransform = CacheTransform;
-                return meleeDamageTransform;
-            }
+            get { return meleeDamageTransform; }
         }
 
         [Tooltip("When character attack with range weapon, it will spawn missile damage entity from this transform")]
@@ -47,12 +42,7 @@ namespace MultiplayerARPG
         private Transform missileDamageTransform;
         public Transform MissileDamageTransform
         {
-            get
-            {
-                if (missileDamageTransform == null)
-                    missileDamageTransform = MeleeDamageTransform;
-                return missileDamageTransform;
-            }
+            get { return missileDamageTransform; }
         }
 
         [Tooltip("Character UI will instantiates to this transform")]
@@ -60,12 +50,7 @@ namespace MultiplayerARPG
         private Transform characterUITransform;
         public Transform CharacterUITransform
         {
-            get
-            {
-                if (characterUITransform == null)
-                    characterUITransform = CacheTransform;
-                return characterUITransform;
-            }
+            get { return characterUITransform; }
         }
 
         [Tooltip("Mini Map UI will instantiates to this transform")]
@@ -73,12 +58,7 @@ namespace MultiplayerARPG
         private Transform miniMapUITransform;
         public Transform MiniMapUITransform
         {
-            get
-            {
-                if (miniMapUITransform == null)
-                    miniMapUITransform = CacheTransform;
-                return miniMapUITransform;
-            }
+            get { return miniMapUITransform; }
         }
 
 #if UNITY_EDITOR
@@ -126,19 +106,8 @@ namespace MultiplayerARPG
         public override sealed float MoveAnimationSpeedMultiplier { get { return GetMoveSpeed(ExtraMovementState.None, false) / this.GetCaches().BaseMoveSpeed; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
-
-        private CharacterModelManager modelManager;
-        public CharacterModelManager ModelManager
-        {
-            get
-            {
-                if (modelManager == null)
-                    modelManager = GetComponent<CharacterModelManager>();
-                if (modelManager == null)
-                    modelManager = gameObject.AddComponent<CharacterModelManager>();
-                return modelManager;
-            }
-        }
+        
+        public CharacterModelManager ModelManager { get; private set; }
 
         public BaseCharacterModel CharacterModel
         {
@@ -148,6 +117,24 @@ namespace MultiplayerARPG
         public BaseCharacterModel FpsModel
         {
             get { return ModelManager.FpsModel; }
+        }
+
+        public override void InitialRequiredComponents()
+        {
+            base.InitialRequiredComponents();
+            // Cache components
+            if (meleeDamageTransform == null)
+                meleeDamageTransform = CacheTransform;
+            if (missileDamageTransform == null)
+                missileDamageTransform = MeleeDamageTransform;
+            if (characterUITransform == null)
+                characterUITransform = CacheTransform;
+            if (miniMapUITransform == null)
+                miniMapUITransform = CacheTransform;
+            if (ModelManager == null)
+                ModelManager = GetComponent<CharacterModelManager>();
+            if (ModelManager == null)
+                ModelManager = gameObject.AddComponent<CharacterModelManager>();
         }
 
         protected override void EntityAwake()
@@ -163,6 +150,10 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
+            if (ModelManager == null)
+                ModelManager = GetComponent<CharacterModelManager>();
+            if (ModelManager == null)
+                ModelManager = gameObject.AddComponent<CharacterModelManager>();
             if (model != ModelManager.ActiveModel)
             {
                 model = ModelManager.ActiveModel;
