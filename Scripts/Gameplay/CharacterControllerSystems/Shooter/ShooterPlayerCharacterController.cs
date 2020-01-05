@@ -380,7 +380,7 @@ namespace MultiplayerARPG
         private void UpdateTarget_BuildingMode()
         {
             // Clear area before next find
-            CurrentBuildingEntity.buildingArea = null;
+            CurrentBuildingEntity.BuildingArea = null;
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + CurrentGameInstance.buildDistance);
             // Raycast from camera position to center of screen
@@ -412,7 +412,7 @@ namespace MultiplayerARPG
                         continue;
                     }
 
-                    CurrentBuildingEntity.buildingArea = buildingArea;
+                    CurrentBuildingEntity.BuildingArea = buildingArea;
                     if (buildingArea.snapBuildingObject)
                     {
                         hasSnapBuildPosition = true;
@@ -424,7 +424,7 @@ namespace MultiplayerARPG
             if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > CurrentGameInstance.buildDistance)
             {
                 // Mark as unable to build when the building is far from character
-                CurrentBuildingEntity.buildingArea = null;
+                CurrentBuildingEntity.BuildingArea = null;
             }
 
             if (!hasSnapBuildPosition)

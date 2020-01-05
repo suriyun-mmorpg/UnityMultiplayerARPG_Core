@@ -50,7 +50,7 @@ namespace MultiplayerARPG
                 case DimensionType.Dimension3D:
                     tempVector3 = MovementTransform.position + (MovementTransform.forward * CurrentBuildingEntity.characterForwardDistance);
                     CurrentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(MovementTransform.eulerAngles);
-                    CurrentBuildingEntity.buildingArea = null;
+                    CurrentBuildingEntity.BuildingArea = null;
                     tempCount = Physics.RaycastNonAlloc(new Ray(tempVector3 + (Vector3.up * 2.5f), Vector3.down), raycasts, 5f, CurrentGameInstance.GetBuildLayerMask());
                     if (!LoopSetBuildingArea(tempCount))
                         CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                         tempVector3 += Vector3.left * CurrentBuildingEntity.characterForwardDistance;
                     if (PlayerCharacterEntity.DirectionType2D.HasFlag(DirectionType2D.Right))
                         tempVector3 += Vector3.right * CurrentBuildingEntity.characterForwardDistance;
-                    CurrentBuildingEntity.buildingArea = null;
+                    CurrentBuildingEntity.BuildingArea = null;
                     tempCount = Physics2D.LinecastNonAlloc(tempVector3, tempVector3, raycasts2D, CurrentGameInstance.GetBuildLayerMask());
                     if (!LoopSetBuildingArea(tempCount))
                         CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                     continue;
 
                 CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
-                CurrentBuildingEntity.buildingArea = buildingArea;
+                CurrentBuildingEntity.BuildingArea = buildingArea;
                 if (buildingArea.snapBuildingObject)
                     return true;
                 nonSnapBuildingArea = buildingArea;
