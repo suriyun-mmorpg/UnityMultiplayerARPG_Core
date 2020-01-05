@@ -25,8 +25,8 @@ namespace MultiplayerARPG
 
         protected override void Awake()
         {
-            SetupComponent();
             base.Awake();
+            SetupComponent();
         }
 
         private void SetupComponent()

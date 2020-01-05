@@ -13,8 +13,9 @@ namespace MultiplayerARPG
         private float lastAppliedTime;
         private readonly Dictionary<uint, IDamageableEntity> receivingDamageEntities = new Dictionary<uint, IDamageableEntity>();
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             gameObject.layer = 2;   // Ignore raycast
         }
 

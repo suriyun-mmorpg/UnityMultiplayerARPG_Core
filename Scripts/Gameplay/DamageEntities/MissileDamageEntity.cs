@@ -17,36 +17,20 @@ namespace MultiplayerARPG
         protected float missileSpeed;
         protected bool isExploded;
         protected IDamageableEntity lockingTarget;
-
-        private Rigidbody cacheRigidbody;
-        public Rigidbody CacheRigidbody
-        {
-            get
-            {
-                if (cacheRigidbody == null)
-                    cacheRigidbody = GetComponent<Rigidbody>();
-                return cacheRigidbody;
-            }
-        }
-
-        private Rigidbody2D cacheRigidbody2D;
-        public Rigidbody2D CacheRigidbody2D
-        {
-            get
-            {
-                if (cacheRigidbody2D == null)
-                    cacheRigidbody2D = GetComponent<Rigidbody2D>();
-                return cacheRigidbody2D;
-            }
-        }
+        
+        public Rigidbody CacheRigidbody { get; private set; }
+        public Rigidbody2D CacheRigidbody2D { get; private set; }
 
         private float launchTime;
         private float missileDuration;
         private bool destroying;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             gameObject.layer = 2;   // Ignore raycast
+            CacheRigidbody = GetComponent<Rigidbody>();
+            CacheRigidbody2D = GetComponent<Rigidbody2D>();
         }
 
         public void Setup(

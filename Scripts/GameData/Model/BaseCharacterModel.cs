@@ -19,16 +19,6 @@ namespace MultiplayerARPG
         [InspectorButton("SetEquipmentContainersBySetters")]
         public bool setEquipmentContainersBySetters;
 
-        private Transform cacheTransform;
-        public Transform CacheTransform
-        {
-            get
-            {
-                if (cacheTransform == null)
-                    cacheTransform = GetComponent<Transform>();
-                return cacheTransform;
-            }
-        }
         private Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers = null;
         /// <summary>
         /// Dictionary[equipSocket(String), container(EquipmentModelContainer)]

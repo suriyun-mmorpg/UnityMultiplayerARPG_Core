@@ -21,6 +21,8 @@ namespace MultiplayerARPG
         public EffectContainer[] effectContainers;
         [InspectorButton("SetEffectContainersBySetters")]
         public bool setEffectContainersBySetters;
+        
+        public Transform CacheTransform { get; private set; }
 
         private Dictionary<string, EffectContainer> cacheEffectContainers = null;
         /// <summary>
@@ -46,7 +48,10 @@ namespace MultiplayerARPG
         // Optimize garbage collector
         private GameEffect tempGameEffect;
 
-        protected virtual void Awake() { }
+        protected virtual void Awake()
+        {
+            CacheTransform = transform;
+        }
 
         protected virtual void OnValidate() { }
 

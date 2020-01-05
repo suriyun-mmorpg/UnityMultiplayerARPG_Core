@@ -216,32 +216,22 @@ namespace MultiplayerARPG
 
         public BaseGameplayRule GameplayRule
         {
-            get
-            {
-                if (gameplayRule == null)
-                    gameplayRule = ScriptableObject.CreateInstance<SimpleGameplayRule>();
-                return gameplayRule;
-            }
+            get { return gameplayRule; }
         }
 
         public BaseGameDatabase GameDatabase
         {
-            get
-            {
-                if (gameDatabase == null)
-                    gameDatabase = ScriptableObject.CreateInstance<ResourcesFolderGameDatabase>();
-                return gameDatabase;
-            }
+            get { return gameDatabase; }
         }
 
         public NetworkSetting NetworkSetting
         {
-            get
-            {
-                if (networkSetting == null)
-                    networkSetting = ScriptableObject.CreateInstance<NetworkSetting>();
-                return networkSetting;
-            }
+            get { return networkSetting; }
+        }
+
+        public SocialSystemSetting SocialSystemSetting
+        {
+            get { return socialSystemSetting; }
         }
 
         public UISceneGameplay UISceneGameplayPrefab
@@ -268,83 +258,18 @@ namespace MultiplayerARPG
                     expTree = value;
             }
         }
-
-        private ArmorType cacheDefaultArmorType;
-        public ArmorType DefaultArmorType
-        {
-            get
-            {
-                if (cacheDefaultArmorType == null)
-                {
-                    cacheDefaultArmorType = ScriptableObject.CreateInstance<ArmorType>();
-                    cacheDefaultArmorType.name = GameDataConst.UNKNOW_ARMOR_TYPE_ID;
-                    cacheDefaultArmorType.title = GameDataConst.UNKNOW_ARMOR_TYPE_TITLE;
-                }
-                return cacheDefaultArmorType;
-            }
-        }
-
-        private WeaponType cacheDefaultWeaponType;
-        public WeaponType DefaultWeaponType
-        {
-            get
-            {
-                if (cacheDefaultWeaponType == null)
-                {
-                    cacheDefaultWeaponType = ScriptableObject.CreateInstance<WeaponType>();
-                    cacheDefaultWeaponType.name = GameDataConst.UNKNOW_WEAPON_TYPE_ID;
-                    cacheDefaultWeaponType.title = GameDataConst.UNKNOW_WEAPON_TYPE_TITLE;
-                    cacheDefaultWeaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
-                    cacheDefaultWeaponType.damageInfo = new DamageInfo();
-                }
-                return cacheDefaultWeaponType;
-            }
-        }
+        
+        public ArmorType DefaultArmorType { get; private set; }
+        public WeaponType DefaultWeaponType { get; private set; }
 
         public Item DefaultWeaponItem
         {
-            get
-            {
-                if (defaultWeaponItem == null)
-                {
-                    defaultWeaponItem = ScriptableObject.CreateInstance<Item>();
-                    defaultWeaponItem.name = GameDataConst.DEFAULT_WEAPON_ID;
-                    defaultWeaponItem.title = GameDataConst.DEFAULT_WEAPON_TITLE;
-                    defaultWeaponItem.itemType = ItemType.Weapon;
-                    defaultWeaponItem.weaponType = DefaultWeaponType;
-                    // Default damage amount
-                    IncrementalMinMaxFloat damageAmountMinMax = new IncrementalMinMaxFloat();
-                    damageAmountMinMax.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
-                    damageAmountMinMax.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
-                    DamageIncremental damageAmount = new DamageIncremental()
-                    {
-                        amount = damageAmountMinMax,
-                    };
-                    // Default harvest damage amount
-                    IncrementalMinMaxFloat harvestDamageAmount = new IncrementalMinMaxFloat();
-                    harvestDamageAmount.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
-                    harvestDamageAmount.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
-                    // Set damage amount
-                    defaultWeaponItem.damageAmount = damageAmount;
-                    defaultWeaponItem.harvestDamageAmount = harvestDamageAmount;
-                }
-                return defaultWeaponItem;
-            }
+            get { return defaultWeaponItem; }
         }
 
         public DamageElement DefaultDamageElement
         {
-            get
-            {
-                if (defaultDamageElement == null)
-                {
-                    defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
-                    defaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
-                    defaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
-                    defaultDamageElement.damageHitEffects = DefaultDamageHitEffects;
-                }
-                return defaultDamageElement;
-            }
+            get { return defaultDamageElement; }
         }
 
         public GameEffect[] DefaultDamageHitEffects
@@ -356,37 +281,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public SocialSystemSetting SocialSystemSetting
-        {
-            get
-            {
-                if (socialSystemSetting == null)
-                    socialSystemSetting = ScriptableObject.CreateInstance<SocialSystemSetting>();
-                return socialSystemSetting;
-            }
-        }
-
         public bool HasNewCharacterSetting
         {
             get { return newCharacterSetting != null; }
         }
-
-        private HashSet<int> cacheNonTargetLayersValues;
-        public HashSet<int> NonTargetLayersValues
-        {
-            get
-            {
-                if (cacheNonTargetLayersValues == null)
-                {
-                    cacheNonTargetLayersValues = new HashSet<int>();
-                    foreach (UnityLayer layer in nonTargetingLayers)
-                    {
-                        cacheNonTargetLayersValues.Add(layer.LayerIndex);
-                    }
-                }
-                return cacheNonTargetLayersValues;
-            }
-        }
+        
+        public HashSet<int> NonTargetLayersValues { get; private set; }
         #endregion
 
         protected virtual void Awake()
@@ -402,6 +302,73 @@ namespace MultiplayerARPG
             Singleton = this;
 
             InputManager.useMobileInputOnNonMobile = useMobileInEditor && Application.isEditor;
+
+            DefaultArmorType = ScriptableObject.CreateInstance<ArmorType>();
+            DefaultArmorType.name = GameDataConst.UNKNOW_ARMOR_TYPE_ID;
+            DefaultArmorType.title = GameDataConst.UNKNOW_ARMOR_TYPE_TITLE;
+
+            DefaultWeaponType = ScriptableObject.CreateInstance<WeaponType>();
+            DefaultWeaponType.name = GameDataConst.UNKNOW_WEAPON_TYPE_ID;
+            DefaultWeaponType.title = GameDataConst.UNKNOW_WEAPON_TYPE_TITLE;
+            DefaultWeaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
+            DefaultWeaponType.damageInfo = new DamageInfo();
+
+            // Setup default weapon item if not existed
+            if (defaultWeaponItem == null)
+            {
+                defaultWeaponItem = ScriptableObject.CreateInstance<Item>();
+                defaultWeaponItem.name = GameDataConst.DEFAULT_WEAPON_ID;
+                defaultWeaponItem.title = GameDataConst.DEFAULT_WEAPON_TITLE;
+                defaultWeaponItem.itemType = ItemType.Weapon;
+                defaultWeaponItem.weaponType = DefaultWeaponType;
+                // Default damage amount
+                IncrementalMinMaxFloat damageAmountMinMax = new IncrementalMinMaxFloat();
+                damageAmountMinMax.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
+                damageAmountMinMax.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
+                DamageIncremental damageAmount = new DamageIncremental()
+                {
+                    amount = damageAmountMinMax,
+                };
+                // Default harvest damage amount
+                IncrementalMinMaxFloat harvestDamageAmount = new IncrementalMinMaxFloat();
+                harvestDamageAmount.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
+                harvestDamageAmount.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
+                // Set damage amount
+                defaultWeaponItem.damageAmount = damageAmount;
+                defaultWeaponItem.harvestDamageAmount = harvestDamageAmount;
+            }
+
+            // Setup default damage element if not existed
+            if (defaultDamageElement == null)
+            {
+                defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
+                defaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
+                defaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
+                defaultDamageElement.damageHitEffects = DefaultDamageHitEffects;
+            }
+            
+            // Setup gameplay rule if not existed
+            if (gameplayRule == null)
+                gameplayRule = ScriptableObject.CreateInstance<SimpleGameplayRule>();
+
+            // Setup game database if not existed
+            if (gameDatabase == null)
+                gameDatabase = ScriptableObject.CreateInstance<ResourcesFolderGameDatabase>();
+
+            // Setup network setting if not existed
+            if (networkSetting == null)
+                networkSetting = ScriptableObject.CreateInstance<NetworkSetting>();
+
+            // Setup social system setting if not existed
+            if (socialSystemSetting == null)
+                socialSystemSetting = ScriptableObject.CreateInstance<SocialSystemSetting>();
+
+            // Setup non target layers
+            NonTargetLayersValues = new HashSet<int>();
+            foreach (UnityLayer layer in nonTargetingLayers)
+            {
+                NonTargetLayersValues.Add(layer.LayerIndex);
+            }
 
             // Load game data
             Attributes.Clear();

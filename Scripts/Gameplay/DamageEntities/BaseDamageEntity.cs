@@ -35,16 +35,12 @@ namespace MultiplayerARPG
         {
             get { return CurrentGameManager.IsClient; }
         }
+        
+        public Transform CacheTransform { get; private set; }
 
-        private Transform cacheTransform;
-        public Transform CacheTransform
+        protected virtual void Awake()
         {
-            get
-            {
-                if (cacheTransform == null)
-                    cacheTransform = GetComponent<Transform>();
-                return cacheTransform;
-            }
+            CacheTransform = transform;
         }
 
         public virtual void Setup(

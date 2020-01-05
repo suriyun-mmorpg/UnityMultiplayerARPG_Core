@@ -111,8 +111,8 @@ namespace MultiplayerARPG
 
         protected override void Awake()
         {
-            SetupComponent();
             base.Awake();
+            SetupComponent();
         }
 
         protected override void OnValidate()
