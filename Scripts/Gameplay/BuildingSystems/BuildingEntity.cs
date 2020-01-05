@@ -24,8 +24,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Use this as reference for area to build this object while in build mode
         /// </summary>
-        [HideInInspector, System.NonSerialized]
-        public BuildingArea buildingArea;
+        public BuildingArea BuildingArea { get; set; }
 
         [Header("Save Data")]
         [SerializeField]
@@ -158,10 +157,10 @@ namespace MultiplayerARPG
             Profiler.BeginSample("BuildingEntity - Update");
             if (isBuildMode)
             {
-                if (buildingArea != null && buildingArea.snapBuildingObject)
+                if (BuildingArea != null && BuildingArea.snapBuildingObject)
                 {
-                    CacheTransform.position = buildingArea.transform.position;
-                    CacheTransform.rotation = buildingArea.transform.rotation;
+                    CacheTransform.position = BuildingArea.transform.position;
+                    CacheTransform.rotation = BuildingArea.transform.rotation;
                 }
                 bool canBuild = CanBuild();
                 foreach (BuildingMaterial buildingMaterial in buildingMaterials)
@@ -174,9 +173,9 @@ namespace MultiplayerARPG
 
         public bool CanBuild()
         {
-            if (buildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
+            if (BuildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
                 return false;
-            return buildingTypes.Contains(buildingArea.buildingType);
+            return buildingTypes.Contains(BuildingArea.buildingType);
         }
 
         protected override void OnValidate()
