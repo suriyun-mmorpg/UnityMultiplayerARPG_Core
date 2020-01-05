@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (combatTextTransform == null)
+                if (ReferenceEquals(combatTextTransform, null))
                     combatTextTransform = CacheTransform;
                 return combatTextTransform;
             }
@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (opponentAimTransform == null)
+                if (ReferenceEquals(opponentAimTransform, null))
                     opponentAimTransform = CombatTextTransform;
                 return opponentAimTransform;
             }

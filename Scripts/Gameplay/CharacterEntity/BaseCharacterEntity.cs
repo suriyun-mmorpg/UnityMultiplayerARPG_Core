@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (meleeDamageTransform == null)
+                if (ReferenceEquals(meleeDamageTransform, null))
                     meleeDamageTransform = CacheTransform;
                 return meleeDamageTransform;
             }
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (missileDamageTransform == null)
+                if (ReferenceEquals(missileDamageTransform, null))
                     missileDamageTransform = MeleeDamageTransform;
                 return missileDamageTransform;
             }
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (characterUITransform == null)
+                if (ReferenceEquals(characterUITransform, null))
                     characterUITransform = CacheTransform;
                 return characterUITransform;
             }
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (miniMapUITransform == null)
+                if (ReferenceEquals(miniMapUITransform, null))
                     miniMapUITransform = CacheTransform;
                 return miniMapUITransform;
             }
@@ -132,9 +132,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (modelManager == null)
+                if (ReferenceEquals(modelManager, null))
                     modelManager = GetComponent<CharacterModelManager>();
-                if (modelManager == null)
+                if (ReferenceEquals(modelManager, null))
                     modelManager = gameObject.AddComponent<CharacterModelManager>();
                 return modelManager;
             }
@@ -163,7 +163,7 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (model != ModelManager.ActiveModel)
+            if (!ReferenceEquals(model, ModelManager.ActiveModel))
             {
                 model = ModelManager.ActiveModel;
                 EditorUtility.SetDirty(this);
@@ -210,7 +210,7 @@ namespace MultiplayerARPG
 
             tempEnableMovement = true;
 
-            if (PassengingVehicleEntity != null)
+            if (!ReferenceEquals(PassengingVehicleEntity, null))
                 tempEnableMovement = false;
 
             if (RespawnGroundedCheckCountDown <= 0)
@@ -246,7 +246,7 @@ namespace MultiplayerARPG
             }
 
             // Enabling movement
-            if (Movement != null && Movement.Enabled != tempEnableMovement)
+            if (!ReferenceEquals(Movement, null) && Movement.Enabled != tempEnableMovement)
                 Movement.Enabled = tempEnableMovement;
 
             // Update character model handler based on passenging vehicle
@@ -272,7 +272,7 @@ namespace MultiplayerARPG
                 // Update movement animation
                 CharacterModel.SetMovementState(MovementState, ExtraMovementState, DirectionType2D, IsUnderWater);
                 // Update FPS model
-                if (FpsModel != null)
+                if (!ReferenceEquals(FpsModel, null))
                 {
                     // Update is dead state
                     FpsModel.SetIsDead(IsDead());
@@ -287,9 +287,9 @@ namespace MultiplayerARPG
         #region Relates Objects
         public virtual void InstantiateUI(UICharacterEntity prefab)
         {
-            if (prefab == null)
+            if (ReferenceEquals(prefab, null))
                 return;
-            if (uiCharacterEntity != null)
+            if (!ReferenceEquals(uiCharacterEntity, null))
                 Destroy(uiCharacterEntity.gameObject);
             uiCharacterEntity = Instantiate(prefab, CharacterUITransform);
             uiCharacterEntity.transform.localPosition = Vector3.zero;
@@ -371,7 +371,7 @@ namespace MultiplayerARPG
                 case DamageType.Raycast:
                     if (ModelManager.IsFpsMode)
                     {
-                        if (FpsModel != null)
+                        if (!ReferenceEquals(FpsModel, null))
                         {
                             // Spawn bullets from fps model
                             transform = isLeftHand ? FpsModel.GetLeftHandMissileDamageTransform() : FpsModel.GetRightHandMissileDamageTransform();
@@ -383,7 +383,7 @@ namespace MultiplayerARPG
                         transform = isLeftHand ? CharacterModel.GetLeftHandMissileDamageTransform() : CharacterModel.GetRightHandMissileDamageTransform();
                     }
 
-                    if (transform == null)
+                    if (ReferenceEquals(transform, null))
                     {
                         // Still no missile transform, use default missile transform
                         transform = MissileDamageTransform;
@@ -579,7 +579,7 @@ namespace MultiplayerARPG
             base.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
 
             BaseCharacterEntity attackerCharacter = null;
-            if (attacker != null)
+            if (!ReferenceEquals(attacker, null))
                 attackerCharacter = attacker.Entity as BaseCharacterEntity;
 
             // Notify enemy spotted when received damage from enemy
@@ -590,7 +590,7 @@ namespace MultiplayerARPG
 
             bool isCritical = false;
             bool isBlocked = false;
-            if (attackerCharacter != null)
+            if (!ReferenceEquals(attackerCharacter, null))
             {
                 // Calculate chance to critical
                 isCritical = Random.value <= CurrentGameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
@@ -620,7 +620,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (attackerCharacter != null)
+            if (!ReferenceEquals(attackerCharacter, null))
             {
                 // If critical occurs
                 if (isCritical)
@@ -703,10 +703,10 @@ namespace MultiplayerARPG
         public bool TryGetTargetEntity<T>(out T entity) where T : class
         {
             entity = null;
-            if (targetEntity == null)
+            if (ReferenceEquals(targetEntity, null))
                 return false;
             entity = targetEntity as T;
-            return entity != null;
+            return !ReferenceEquals(entity, null);
         }
         #endregion
 
@@ -825,7 +825,7 @@ namespace MultiplayerARPG
                         {
                             tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                            if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
+                            if (ReferenceEquals(tempDamageableEntity, null) || ReferenceEquals(tempDamageableEntity.Entity, this) ||
                                 tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this) ||
                                 !IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                             {
@@ -843,7 +843,7 @@ namespace MultiplayerARPG
                             }
                         }
                         // Only 1 target will receives damages
-                        if (damageTakenTarget != null)
+                        if (!ReferenceEquals(damageTakenTarget, null))
                         {
                             // Pass all receive damage condition, then apply damages
                             if (IsServer)
@@ -863,7 +863,7 @@ namespace MultiplayerARPG
                         {
                             tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                            if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
+                            if (ReferenceEquals(tempDamageableEntity, null) || ReferenceEquals(tempDamageableEntity.Entity, this) ||
                                 tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(this) ||
                                 !IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                             {
@@ -881,7 +881,7 @@ namespace MultiplayerARPG
                 case DamageType.Missile:
                     // Spawn missile damage entity, it will move to target then apply damage when hit
                     // Instantiates on both client and server (damage applies at server)
-                    if (damageInfo.missileDamageEntity != null)
+                    if (!ReferenceEquals(damageInfo.missileDamageEntity, null))
                     {
                         MissileDamageEntity missileDamageEntity = Instantiate(damageInfo.missileDamageEntity, damagePosition, damageRotation);
                         if (damageInfo.hitOnlySelectedTarget)
@@ -910,7 +910,7 @@ namespace MultiplayerARPG
                             if (distance < minDistance)
                                 minDistance = distance;
                             tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
-                            if (tempDamageableEntity != null)
+                            if (!ReferenceEquals(tempDamageableEntity, null))
                             {
                                 if (tempDamageableEntity.Entity == this)
                                     continue;
@@ -932,7 +932,7 @@ namespace MultiplayerARPG
                         } // End of for...loop (raycast result)
                     }
                     // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                    if (IsClient && damageInfo.projectileEffect != null)
+                    if (IsClient && !ReferenceEquals(damageInfo.projectileEffect, null))
                     {
                         Instantiate(damageInfo.projectileEffect, damagePosition, damageRotation)
                             .Setup(minDistance, damageInfo.missileSpeed);
@@ -1037,7 +1037,7 @@ namespace MultiplayerARPG
                 return false;
             if (this.GetCaches().DisallowAttack)
                 return false;
-            if (PassengingVehicleEntity != null &&
+            if (!ReferenceEquals(PassengingVehicleEntity, null) &&
                 !PassengingVehicleSeat.canAttack)
                 return false;
             return true;
@@ -1049,7 +1049,7 @@ namespace MultiplayerARPG
                 return false;
             if (this.GetCaches().DisallowUseSkill)
                 return false;
-            if (PassengingVehicleEntity != null &&
+            if (!ReferenceEquals(PassengingVehicleEntity, null) &&
                 !PassengingVehicleSeat.canUseSkill)
                 return false;
             return true;
@@ -1217,7 +1217,7 @@ namespace MultiplayerARPG
 
         private bool IsCharacterWhichLookingFor(BaseCharacterEntity characterEntity, bool findForAlive, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov, float fov)
         {
-            if (characterEntity == null || characterEntity == this)
+            if (ReferenceEquals(characterEntity, null) || ReferenceEquals(characterEntity, this))
                 return false;
             if (findForAlive && characterEntity.IsDead())
                 return false;
@@ -1316,7 +1316,7 @@ namespace MultiplayerARPG
         {
             foreach (CharacterSummon summon in Summons)
             {
-                if (summon.CacheEntity == null)
+                if (ReferenceEquals(summon.CacheEntity, null))
                     continue;
                 summon.CacheEntity.NotifyEnemySpotted(this, enemy);
             }
@@ -1349,7 +1349,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (attacker == null || attacker.Entity == null)
+            if (ReferenceEquals(attacker, null) || ReferenceEquals(attacker.Entity, null))
             {
                 // If attacker is unknow entity, can receive damages
                 return true;
