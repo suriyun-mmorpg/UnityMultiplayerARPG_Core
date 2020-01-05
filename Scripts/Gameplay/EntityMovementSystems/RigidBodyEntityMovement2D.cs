@@ -15,32 +15,9 @@ namespace MultiplayerARPG
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
         #endregion
-
-        private LiteNetLibTransform cacheNetTransform;
-        public LiteNetLibTransform CacheNetTransform
-        {
-            get
-            {
-                if (cacheNetTransform == null)
-                    cacheNetTransform = GetComponent<LiteNetLibTransform>();
-                if (cacheNetTransform == null)
-                    cacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
-                return cacheNetTransform;
-            }
-        }
-
-        private Rigidbody2D cacheRigidbody2D;
-        public Rigidbody2D CacheRigidbody2D
-        {
-            get
-            {
-                if (cacheRigidbody2D == null)
-                    cacheRigidbody2D = GetComponent<Rigidbody2D>();
-                if (cacheRigidbody2D == null)
-                    cacheRigidbody2D = gameObject.AddComponent<Rigidbody2D>();
-                return cacheRigidbody2D;
-            }
-        }
+        
+        public LiteNetLibTransform CacheNetTransform { get; private set; }
+        public Rigidbody2D CacheRigidbody2D { get; private set; }
 
         public override float StoppingDistance
         {
@@ -70,6 +47,15 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
+            // Prepare network transform component
+            CacheNetTransform = GetComponent<LiteNetLibTransform>();
+            if (CacheNetTransform == null)
+                CacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
+            // Prepare rigidbody component
+            CacheRigidbody2D = GetComponent<Rigidbody2D>();
+            if (CacheRigidbody2D == null)
+                CacheRigidbody2D = gameObject.AddComponent<Rigidbody2D>();
+            // Setup
             CacheRigidbody2D.gravityScale = 0;
             StopMove();
         }

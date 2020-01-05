@@ -32,58 +32,11 @@ namespace MultiplayerARPG
         public bool useRootMotionForAirMovement;
         public bool useRootMotionForJump;
         public bool useRootMotionForFall;
-
-        private Animator cacheAnimator;
-        public Animator CacheAnimator
-        {
-            get
-            {
-                if (cacheAnimator == null)
-                    cacheAnimator = GetComponent<Animator>();
-                if (cacheAnimator == null)
-                    cacheAnimator = gameObject.AddComponent<Animator>();
-                return cacheAnimator;
-            }
-        }
-
-        private LiteNetLibTransform cacheNetTransform;
-        public LiteNetLibTransform CacheNetTransform
-        {
-            get
-            {
-                if (cacheNetTransform == null)
-                    cacheNetTransform = GetComponent<LiteNetLibTransform>();
-                if (cacheNetTransform == null)
-                    cacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
-                return cacheNetTransform;
-            }
-        }
-
-        private Rigidbody cacheRigidbody;
-        public Rigidbody CacheRigidbody
-        {
-            get
-            {
-                if (cacheRigidbody == null)
-                    cacheRigidbody = GetComponent<Rigidbody>();
-                if (cacheRigidbody == null)
-                    cacheRigidbody = gameObject.AddComponent<Rigidbody>();
-                return cacheRigidbody;
-            }
-        }
-
-        private CapsuleCollider cacheCapsuleCollider;
-        public CapsuleCollider CacheCapsuleCollider
-        {
-            get
-            {
-                if (cacheCapsuleCollider == null)
-                    cacheCapsuleCollider = GetComponent<CapsuleCollider>();
-                if (cacheCapsuleCollider == null)
-                    cacheCapsuleCollider = gameObject.AddComponent<CapsuleCollider>();
-                return cacheCapsuleCollider;
-            }
-        }
+        
+        public Animator CacheAnimator { get; private set; }
+        public LiteNetLibTransform CacheNetTransform { get; private set; }
+        public Rigidbody CacheRigidbody { get; private set; }
+        public CapsuleCollider CacheCapsuleCollider { get; private set; }
 
         public override float StoppingDistance
         {
@@ -109,6 +62,21 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
+            // Prepare animator component
+            CacheAnimator = GetComponent<Animator>();
+            // Prepare network transform component
+            CacheNetTransform = GetComponent<LiteNetLibTransform>();
+            if (CacheNetTransform == null)
+                CacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
+            // Prepare rigidbody component
+            CacheRigidbody = GetComponent<Rigidbody>();
+            if (CacheRigidbody == null)
+                CacheRigidbody = gameObject.AddComponent<Rigidbody>();
+            // Prepare collider component
+            CacheCapsuleCollider = GetComponent<CapsuleCollider>();
+            if (CacheCapsuleCollider == null)
+                CacheCapsuleCollider = gameObject.AddComponent<CapsuleCollider>();
+            // Setup
             CacheRigidbody.useGravity = false;
             StopMove();
         }
@@ -127,6 +95,9 @@ namespace MultiplayerARPG
 
         protected void OnAnimatorMove()
         {
+            if (!CacheAnimator)
+                return;
+
             if (!CacheEntity.MovementState.HasFlag(MovementState.Forward) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Backward) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Left) &&
@@ -139,9 +110,9 @@ namespace MultiplayerARPG
             }
 
             if (CacheEntity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForMovement)
-                cacheAnimator.ApplyBuiltinRootMotion();
+                CacheAnimator.ApplyBuiltinRootMotion();
             if (!CacheEntity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForAirMovement)
-                cacheAnimator.ApplyBuiltinRootMotion();
+                CacheAnimator.ApplyBuiltinRootMotion();
         }
 
         public override void EntityOnSetup()

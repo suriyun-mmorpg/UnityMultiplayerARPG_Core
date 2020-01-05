@@ -17,13 +17,17 @@ namespace MultiplayerARPG
     public abstract class BaseGameEntityComponent<T> : MonoBehaviour, IGameEntityComponent
         where T : BaseGameEntity
     {
+        private bool isFoundEntity;
         private T cacheEntity;
         public T CacheEntity
         {
             get
             {
-                if (cacheEntity == null)
+                if (!isFoundEntity)
+                {
                     cacheEntity = GetComponent<T>();
+                    isFoundEntity = cacheEntity != null;
+                }
                 return cacheEntity;
             }
         }

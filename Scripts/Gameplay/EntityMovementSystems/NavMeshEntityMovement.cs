@@ -1,5 +1,4 @@
-﻿using LiteNetLib;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,31 +10,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public class NavMeshEntityMovement : BaseEntityMovement
     {
-        private LiteNetLibTransform cacheNetTransform;
-        public LiteNetLibTransform CacheNetTransform
-        {
-            get
-            {
-                if (cacheNetTransform == null)
-                    cacheNetTransform = GetComponent<LiteNetLibTransform>();
-                if (cacheNetTransform == null)
-                    cacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
-                return cacheNetTransform;
-            }
-        }
-
-        private NavMeshAgent cacheNavMeshAgent;
-        public NavMeshAgent CacheNavMeshAgent
-        {
-            get
-            {
-                if (cacheNavMeshAgent == null)
-                    cacheNavMeshAgent = GetComponent<NavMeshAgent>();
-                if (cacheNavMeshAgent == null)
-                    cacheNavMeshAgent = gameObject.AddComponent<NavMeshAgent>();
-                return cacheNavMeshAgent;
-            }
-        }
+        public LiteNetLibTransform CacheNetTransform { get; private set; }
+        public NavMeshAgent CacheNavMeshAgent { get; private set; }
 
         public sealed override bool IsGrounded
         {
@@ -52,6 +28,19 @@ namespace MultiplayerARPG
         public override float StoppingDistance
         {
             get { return CacheNavMeshAgent.stoppingDistance; }
+        }
+
+        public override void EntityAwake()
+        {
+            base.EntityAwake();
+            // Prepare network transform component
+            CacheNetTransform = GetComponent<LiteNetLibTransform>();
+            if (CacheNetTransform == null)
+                CacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
+            // Prepare nav mesh agent component
+            CacheNavMeshAgent = GetComponent<NavMeshAgent>();
+            if (CacheNavMeshAgent == null)
+                CacheNavMeshAgent = gameObject.AddComponent<NavMeshAgent>();
         }
 
         public override void ComponentOnEnable()
