@@ -16,8 +16,6 @@ namespace MultiplayerARPG
         public HarvestableCollectType collectType;
         [Tooltip("Radius to detect other entities to avoid spawn this harvestable nearby other entities")]
         public float colliderDetectionRadius = 2f;
-        [HideInInspector]
-        public float destroyHideDelay = 2f;
         public float destroyDelay = 2f;
         public float destroyRespawnDelay = 5f;
         public UnityEvent onHarvestableDestroy;
@@ -32,34 +30,12 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.harvestableTag;
             gameObject.layer = CurrentGameInstance.harvestableLayer;
-            MigrateFields();
         }
 
         protected override void EntityStart()
         {
             base.EntityStart();
             InitStats();
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-#if UNITY_EDITOR
-            if (MigrateFields())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateFields()
-        {
-            bool hasChanges = false;
-            if (destroyHideDelay > 0)
-            {
-                destroyDelay = destroyHideDelay;
-                destroyHideDelay = -1;
-                hasChanges = true;
-            }
-            return hasChanges;
         }
 
         private void InitStats()
