@@ -43,18 +43,15 @@ namespace MultiplayerARPG
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
         private bool isInstantiateSceneObjects;
+        
+        public LiteNetLibDiscovery CacheDiscovery { get; private set; }
 
-        private LiteNetLibDiscovery cacheDiscovery;
-        public LiteNetLibDiscovery CacheDiscovery
+        protected override void Awake()
         {
-            get
-            {
-                if (cacheDiscovery == null)
-                    cacheDiscovery = GetComponent<LiteNetLibDiscovery>();
-                if (cacheDiscovery == null)
-                    cacheDiscovery = gameObject.AddComponent<LiteNetLibDiscovery>();
-                return cacheDiscovery;
-            }
+            base.Awake();
+            CacheDiscovery = GetComponent<LiteNetLibDiscovery>();
+            if (CacheDiscovery == null)
+                CacheDiscovery = gameObject.AddComponent<LiteNetLibDiscovery>();
         }
 
         public void StartGame()
