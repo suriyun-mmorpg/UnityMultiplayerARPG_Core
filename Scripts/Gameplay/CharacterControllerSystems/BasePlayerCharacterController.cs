@@ -288,11 +288,7 @@ namespace MultiplayerARPG
         protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (CacheUISceneGameplay != null)
-            {
-                if (operation != LiteNetLibSyncList.Operation.Set &&
-                    operation != LiteNetLibSyncList.Operation.Dirty)
-                    CacheUISceneGameplay.UpdateCharacter();
-            }
+                CacheUISceneGameplay.UpdateCharacter();
         }
 
         protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
