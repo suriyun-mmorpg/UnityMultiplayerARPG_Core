@@ -14,7 +14,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         private BaseCharacterModel mainModel;
-        public BaseCharacterModel MainModel { get; private set; }
+        public BaseCharacterModel MainModel { get { return mainModel; } }
 
         [SerializeField]
         private BaseCharacterModel fpsModelPrefab;
@@ -67,6 +67,8 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
+            if (mainModel == null)
+                mainModel = GetComponent<BaseCharacterModel>();
             SetupModelManager();
         }
 
@@ -79,8 +81,6 @@ namespace MultiplayerARPG
         private bool SetupModelManager()
         {
             bool hasChanges = false;
-            if (mainModel == null)
-                mainModel = GetComponent<BaseCharacterModel>();
 
             if (mainModel != null && mainModel.ModelManager != this)
             {
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
 
         private void SwitchModel(BaseCharacterModel nextModel)
         {
-            if (nextModel == ActiveModel) return;
+            if (ActiveModel != null && nextModel == ActiveModel) return;
             BaseCharacterModel previousModel = ActiveModel;
             ActiveModel = nextModel;
             ActiveModel.SwitchModel(previousModel);
