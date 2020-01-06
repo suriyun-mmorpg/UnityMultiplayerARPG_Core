@@ -122,11 +122,9 @@ namespace MultiplayerARPG
                     passengingVehicleEntity = null;
                     LiteNetLibIdentity identity;
                     if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(PassengingVehicle.objectId, out identity))
-                    {
                         passengingVehicleEntity = identity.GetComponent<IVehicleEntity>();
-                    }
                 }
-                // Clear current vehicle
+                // Clear current vehicle, if not existed
                 if (PassengingVehicle.objectId == 0)
                     passengingVehicleEntity = null;
                 return passengingVehicleEntity;
@@ -137,9 +135,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (PassengingVehicleEntity == null)
-                    return null;
-                return PassengingVehicleEntity.VehicleType;
+                if (PassengingVehicleEntity != null)
+                    return PassengingVehicleEntity.VehicleType;
+                return null;
             }
         }
 
@@ -147,9 +145,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (PassengingVehicleEntity == null)
-                    return VehicleSeat.Empty;
-                return PassengingVehicleEntity.Seats[PassengingVehicle.seatIndex];
+                if (PassengingVehicleEntity != null)
+                    return PassengingVehicleEntity.Seats[PassengingVehicle.seatIndex];
+                return VehicleSeat.Empty;
             }
         }
 
@@ -171,6 +169,8 @@ namespace MultiplayerARPG
         {
             get
             {
+                if (PassengingVehicleEntity != null)
+                    return (PassengingVehicleEntity as IGameEntity).Entity.MovementState;
                 if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
                     return LocalMovementState;
                 return (MovementState)movementState.Value;
@@ -185,6 +185,8 @@ namespace MultiplayerARPG
         {
             get
             {
+                if (PassengingVehicleEntity != null)
+                    return (PassengingVehicleEntity as IGameEntity).Entity.ExtraMovementState;
                 if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
                     return LocalExtraMovementState;
                 return (ExtraMovementState)extraMovementState.Value;
@@ -200,6 +202,8 @@ namespace MultiplayerARPG
         {
             get
             {
+                if (PassengingVehicleEntity != null)
+                    return (PassengingVehicleEntity as IGameEntity).Entity.Direction2D;
                 if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
                     return LocalDirection2D;
                 return direction2D.Value;
@@ -222,6 +226,7 @@ namespace MultiplayerARPG
         
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
+        public virtual bool MuteFootstepSound { get { return false; } }
         protected Vector3? teleportingPosition;
 
         public GameInstance CurrentGameInstance
@@ -359,11 +364,16 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityUpdate()
         {
-            if (Movement != null && Movement.Enabled != (PassengingVehicleEntity == null))
+            bool tempEnableMovement = PassengingVehicleEntity == null;
+            // Enable movement or not
+            if (Movement.Enabled != tempEnableMovement)
             {
+                if (!tempEnableMovement)
+                    Movement.StopMove();
                 // Enable movement while not passenging any vehicle
-                Movement.Enabled = PassengingVehicleEntity == null;
+                Movement.Enabled = tempEnableMovement;
             }
+
             if (IsClient)
             {
                 if (Model != null && Model is IMoveableModel)
@@ -707,10 +717,6 @@ namespace MultiplayerARPG
 
             // Set passenger to vehicle
             vehicle.SetPassenger(seatIndex, this);
-
-            // Character when enter vehicle should stop movement, and set movement state to is grounded
-            Movement.StopMove();
-            MovementState = MovementState.IsGrounded;
 
             // Set mount info
             PassengingVehicle passengingVehicle = new PassengingVehicle()

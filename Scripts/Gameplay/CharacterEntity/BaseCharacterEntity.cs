@@ -95,7 +95,6 @@ namespace MultiplayerARPG
         protected Collider[] overlapColliders_ForFindFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected Collider2D[] overlapColliders2D_ForFindFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected GameObject tempGameObject;
-        protected bool tempEnableMovement;
         #endregion
 
         public override sealed int MaxHp { get { return this.GetCaches().MaxHp; } }
@@ -104,6 +103,7 @@ namespace MultiplayerARPG
         public int MaxFood { get { return this.GetCaches().MaxFood; } }
         public int MaxWater { get { return this.GetCaches().MaxWater; } }
         public override sealed float MoveAnimationSpeedMultiplier { get { return GetMoveSpeed(ExtraMovementState.None, false) / this.GetCaches().BaseMoveSpeed; } }
+        public override sealed bool MuteFootstepSound { get { return this.GetCaches().MuteFootstepSound; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
         
@@ -135,6 +135,7 @@ namespace MultiplayerARPG
                 ModelManager = GetComponent<CharacterModelManager>();
             if (ModelManager == null)
                 ModelManager = gameObject.AddComponent<CharacterModelManager>();
+            HitBoxes = GetComponentsInChildren<CharacterHitBox>();
         }
 
         protected override void EntityAwake()
@@ -143,7 +144,6 @@ namespace MultiplayerARPG
             gameObject.layer = CurrentGameInstance.characterLayer;
             animActionType = AnimActionType.None;
             isRecaching = true;
-            HitBoxes = GetComponentsInChildren<CharacterHitBox>();
         }
 
         protected override void OnValidate()
@@ -199,11 +199,7 @@ namespace MultiplayerARPG
         {
             MakeCaches();
 
-            tempEnableMovement = true;
-
-            if (PassengingVehicleEntity != null)
-                tempEnableMovement = false;
-
+            bool tempEnableMovement = PassengingVehicleEntity == null;
             if (RespawnGroundedCheckCountDown <= 0)
             {
                 // Killing character when it fall below dead Y
@@ -236,9 +232,14 @@ namespace MultiplayerARPG
                 ExitVehicle();
             }
 
-            // Enabling movement
-            if (Movement != null && Movement.Enabled != tempEnableMovement)
+            // Enable movement or not
+            if (Movement.Enabled != tempEnableMovement)
+            {
+                if (!tempEnableMovement)
+                    Movement.StopMove();
+                // Enable movement while not passenging any vehicle
                 Movement.Enabled = tempEnableMovement;
+            }
 
             // Update character model handler based on passenging vehicle
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicle.seatIndex);
