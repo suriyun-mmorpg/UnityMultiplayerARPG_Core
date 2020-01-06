@@ -364,14 +364,17 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityUpdate()
         {
-            bool tempEnableMovement = PassengingVehicleEntity == null;
-            // Enable movement or not
-            if (Movement.Enabled != tempEnableMovement)
+            if (Movement != null)
             {
-                if (!tempEnableMovement)
-                    Movement.StopMove();
-                // Enable movement while not passenging any vehicle
-                Movement.Enabled = tempEnableMovement;
+                bool tempEnableMovement = PassengingVehicleEntity == null;
+                // Enable movement or not
+                if (Movement.Enabled != tempEnableMovement)
+                {
+                    if (!tempEnableMovement)
+                        Movement.StopMove();
+                    // Enable movement while not passenging any vehicle
+                    Movement.Enabled = tempEnableMovement;
+                }
             }
 
             if (IsClient)

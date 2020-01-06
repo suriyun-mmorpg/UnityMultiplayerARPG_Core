@@ -9,12 +9,24 @@ namespace MultiplayerARPG
 {
     public class GameEntityModel : MonoBehaviour
     {
+        [System.Flags]
+        public enum EVisibleState : byte
+        {
+            Visible,
+            Invisible,
+            Fps
+        }
+
         [Tooltip("These object will be deactivated while hidding")]
         public GameObject[] hiddingObjects;
         [Tooltip("These renderers will be disabled while hidding")]
         public Renderer[] hiddingRenderers;
+        [Tooltip("These object will be deactivated while view mode is FPS")]
+        public GameObject[] fpsHiddingObjects;
+        [Tooltip("These renderers will be disabled while view mode is FPS")]
+        public Renderer[] fpsHiddingRenderers;
 
-        public bool IsHide { get; protected set; }
+        public EVisibleState VisibleState { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
         [Header("Effect Containers")]
@@ -84,26 +96,84 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetHide(bool isHide)
+        public void SetVisibleState(EVisibleState visibleState)
         {
-            if (IsHide == isHide)
+            if (VisibleState == visibleState)
                 return;
-            IsHide = isHide;
-            if (hiddingObjects != null && hiddingObjects.Length > 0)
+            VisibleState = visibleState;
+            int i = 0;
+            switch (VisibleState)
             {
-                foreach (GameObject hiddingObject in hiddingObjects)
-                {
-                    if (hiddingObject.activeSelf != !IsHide)
-                        hiddingObject.SetActive(!IsHide);
-                }
-            }
-            if (hiddingRenderers != null && hiddingRenderers.Length > 0)
-            {
-                foreach (Renderer hiddingRenderer in hiddingRenderers)
-                {
-                    if (hiddingRenderer.enabled != !IsHide)
-                        hiddingRenderer.enabled = !IsHide;
-                }
+                case EVisibleState.Visible:
+                    if (hiddingObjects != null && hiddingObjects.Length > 0)
+                    {
+                        for (i = 0; i < hiddingObjects.Length; ++i)
+                        {
+                            if (!hiddingObjects[i].activeSelf)
+                                hiddingObjects[i].SetActive(true);
+                        }
+                    }
+                    if (hiddingRenderers != null && hiddingRenderers.Length > 0)
+                    {
+                        for (i = 0; i < hiddingRenderers.Length; ++i)
+                        {
+                            if (!hiddingRenderers[i].enabled)
+                                hiddingRenderers[i].enabled = true;
+                        }
+                    }
+                    break;
+                case EVisibleState.Invisible:
+                    if (hiddingObjects != null && hiddingObjects.Length > 0)
+                    {
+                        for (i = 0; i < hiddingObjects.Length; ++i)
+                        {
+                            if (hiddingObjects[i].activeSelf)
+                                hiddingObjects[i].SetActive(false);
+                        }
+                    }
+                    if (hiddingRenderers != null && hiddingRenderers.Length > 0)
+                    {
+                        for (i = 0; i < hiddingRenderers.Length; ++i)
+                        {
+                            if (hiddingRenderers[i].enabled)
+                                hiddingRenderers[i].enabled = false;
+                        }
+                    }
+                    break;
+                case EVisibleState.Fps:
+                    if (hiddingObjects != null && hiddingObjects.Length > 0)
+                    {
+                        for (i = 0; i < hiddingObjects.Length; ++i)
+                        {
+                            if (!hiddingObjects[i].activeSelf)
+                                hiddingObjects[i].SetActive(true);
+                        }
+                    }
+                    if (hiddingRenderers != null && hiddingRenderers.Length > 0)
+                    {
+                        for (i = 0; i < hiddingRenderers.Length; ++i)
+                        {
+                            if (!hiddingRenderers[i].enabled)
+                                hiddingRenderers[i].enabled = true;
+                        }
+                    }
+                    if (fpsHiddingObjects != null && fpsHiddingObjects.Length > 0)
+                    {
+                        for (i = 0; i < fpsHiddingObjects.Length; ++i)
+                        {
+                            if (fpsHiddingObjects[i].activeSelf)
+                                fpsHiddingObjects[i].SetActive(false);
+                        }
+                    }
+                    if (fpsHiddingRenderers != null && fpsHiddingRenderers.Length > 0)
+                    {
+                        for (i = 0; i < fpsHiddingRenderers.Length; ++i)
+                        {
+                            if (fpsHiddingRenderers[i].enabled)
+                                fpsHiddingRenderers[i].enabled = false;
+                        }
+                    }
+                    break;
             }
         }
 

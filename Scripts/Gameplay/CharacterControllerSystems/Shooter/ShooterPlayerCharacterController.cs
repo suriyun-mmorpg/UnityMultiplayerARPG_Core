@@ -1129,7 +1129,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
             CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
             CacheGameplayCameraControls.enableWallHitSpring = ViewMode == ControllerViewMode.Tps ? true : false;
-            PlayerCharacterEntity.ModelManager.SetFpsMode(viewMode == ControllerViewMode.Fps);
+            PlayerCharacterEntity.ModelManager.SetIsFps(viewMode == ControllerViewMode.Fps);
         }
 
         public bool IsInFront(Vector3 position)

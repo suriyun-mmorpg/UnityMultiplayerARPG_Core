@@ -40,8 +40,26 @@ namespace MultiplayerARPG
                 return cacheVehicleModels;
             }
         }
-        
-        public BaseCharacterModel ActiveModel { get; private set; }
+
+        private bool isSetupActiveModel;
+        private BaseCharacterModel activeModel;
+        public BaseCharacterModel ActiveModel
+        {
+            get
+            {
+                if (!isSetupActiveModel)
+                {
+                    // Check for main model
+                    if (mainModel == null)
+                        mainModel = GetComponent<BaseCharacterModel>();
+                    // Clear active model to make sure it will initialize correctly
+                    activeModel = null;
+                    SwitchModel(MainModel);
+                    isSetupActiveModel = true;
+                }
+                return activeModel;
+            }
+        }
 
         public bool IsHide
         {
@@ -55,27 +73,15 @@ namespace MultiplayerARPG
                 return false;
             }
         }
+        public bool IsFps { get; private set; }
 
-        public bool IsFpsMode
-        {
-            get; private set;
-        }
-
-        private Dictionary<byte, bool> hideStates = new Dictionary<byte, bool>();
+        private readonly Dictionary<byte, bool> hideStates = new Dictionary<byte, bool>();
         private int dirtyVehicleDataId;
         private byte dirtySeatIndex;
 
         public override void EntityAwake()
         {
-            if (mainModel == null)
-                mainModel = GetComponent<BaseCharacterModel>();
             SetupModelManager();
-        }
-
-        public override void EntityStart()
-        {
-            ActiveModel = null;
-            SwitchModel(MainModel);
         }
 
         private bool SetupModelManager()
@@ -158,27 +164,38 @@ namespace MultiplayerARPG
 
         private void SwitchModel(BaseCharacterModel nextModel)
         {
-            if (ActiveModel != null && nextModel == ActiveModel) return;
-            BaseCharacterModel previousModel = ActiveModel;
-            ActiveModel = nextModel;
-            ActiveModel.SwitchModel(previousModel);
+            if (activeModel != null && nextModel == activeModel) return;
+            BaseCharacterModel previousModel = activeModel;
+            activeModel = nextModel;
+            activeModel.SwitchModel(previousModel);
         }
 
-        public void SetHide(byte setter, bool isHide)
+        public void SetIsHide(byte setter, bool isHide)
         {
             hideStates[setter] = isHide;
-            SetFpsMode(IsFpsMode);
+            UpdateVisibleState();
         }
 
-        public void SetFpsMode(bool isFpsMode)
+        public void SetIsFps(bool isFps)
         {
-            IsFpsMode = isFpsMode;
-            MainModel.SetHide(IsFpsMode || IsHide);
+            if (IsFps == isFps)
+                return;
+            IsFps = isFps;
+            UpdateVisibleState();
+        }
+
+        public void UpdateVisibleState()
+        {
+            GameEntityModel.EVisibleState mainModelVisibleState = GameEntityModel.EVisibleState.Visible;
+            if (IsFps)
+                mainModelVisibleState = GameEntityModel.EVisibleState.Fps;
+            if (IsHide)
+                mainModelVisibleState = GameEntityModel.EVisibleState.Invisible;
+            // Set visible state to main model
+            MainModel.SetVisibleState(mainModelVisibleState);
+            // FPS model will hide when it's not fps mode
             if (FpsModel != null)
-            {
-                // FPS model will hide when it's not fps mode
-                FpsModel.SetHide(!IsFpsMode || IsHide);
-            }
+                FpsModel.SetVisibleState(IsFps ? GameEntityModel.EVisibleState.Visible : GameEntityModel.EVisibleState.Invisible);
         }
 
         public BaseCharacterModel InstantiateFpsModel(Transform container)

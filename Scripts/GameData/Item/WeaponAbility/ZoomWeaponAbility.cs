@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                 shooterController.ViewMode = preActivateViewMode;
 
             // Hidding character model while activate
-            shooterController.PlayerCharacterEntity.ModelManager.SetHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, isActive);
+            shooterController.PlayerCharacterEntity.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, isActive);
 
             return state;
         }

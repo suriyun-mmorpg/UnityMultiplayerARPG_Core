@@ -131,8 +131,7 @@ namespace MultiplayerARPG
                 characterUITransform = CacheTransform;
             if (miniMapUITransform == null)
                 miniMapUITransform = CacheTransform;
-            if (ModelManager == null)
-                ModelManager = GetComponent<CharacterModelManager>();
+            ModelManager = GetComponent<CharacterModelManager>();
             if (ModelManager == null)
                 ModelManager = gameObject.AddComponent<CharacterModelManager>();
             HitBoxes = GetComponentsInChildren<CharacterHitBox>();
@@ -150,8 +149,7 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (ModelManager == null)
-                ModelManager = GetComponent<CharacterModelManager>();
+            ModelManager = GetComponent<CharacterModelManager>();
             if (ModelManager == null)
                 ModelManager = gameObject.AddComponent<CharacterModelManager>();
             if (model != ModelManager.ActiveModel)
@@ -253,7 +251,7 @@ namespace MultiplayerARPG
                     CastingSkillCountDown = 0;
             }
             // Set character model hide state
-            ModelManager.SetHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
+            ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
             // Update model animations
             if (IsClient)
             {
@@ -361,7 +359,7 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Missile:
                 case DamageType.Raycast:
-                    if (ModelManager.IsFpsMode)
+                    if (ModelManager.IsFps)
                     {
                         if (FpsModel != null)
                         {
