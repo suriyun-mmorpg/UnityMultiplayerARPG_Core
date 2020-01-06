@@ -31,8 +31,10 @@ namespace MultiplayerARPG
         public static BasePlayerCharacterController Singleton { get; protected set; }
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
 
-        public FollowCameraControls gameplayCameraPrefab;
-        public FollowCameraControls minimapCameraPrefab;
+        [SerializeField]
+        private FollowCameraControls gameplayCameraPrefab;
+        [SerializeField]
+        private FollowCameraControls minimapCameraPrefab;
 
         public System.Action<BasePlayerCharacterController> onSetup;
         public System.Action<BasePlayerCharacterController> onDesetup;
@@ -229,7 +231,7 @@ namespace MultiplayerARPG
         #region Sync data changes callback
         protected void OnIdChange(string id)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateSkills();
@@ -240,7 +242,7 @@ namespace MultiplayerARPG
 
         protected void OnEquipWeaponSetChange(byte equipWeaponSet)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
@@ -252,7 +254,7 @@ namespace MultiplayerARPG
 
         protected void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
@@ -264,13 +266,13 @@ namespace MultiplayerARPG
 
         protected void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateCharacter();
         }
 
         protected void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateSkills();
@@ -279,27 +281,23 @@ namespace MultiplayerARPG
 
         protected void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateSummons();
         }
 
         protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
             {
-                if (operation == LiteNetLibSyncList.Operation.Add ||
-                    operation == LiteNetLibSyncList.Operation.RemoveAt ||
-                    operation == LiteNetLibSyncList.Operation.RemoveFirst ||
-                    operation == LiteNetLibSyncList.Operation.RemoveLast ||
-                    operation == LiteNetLibSyncList.Operation.Insert ||
-                    operation == LiteNetLibSyncList.Operation.Clear)
+                if (operation != LiteNetLibSyncList.Operation.Set &&
+                    operation != LiteNetLibSyncList.Operation.Dirty)
                     CacheUISceneGameplay.UpdateCharacter();
             }
         }
 
         protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
@@ -310,7 +308,7 @@ namespace MultiplayerARPG
 
         protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateNonEquipItems();
@@ -321,19 +319,19 @@ namespace MultiplayerARPG
 
         protected void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateHotkeys();
         }
 
         protected void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateQuests();
         }
 
         protected void OnStorageItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateStorageItems();
         }
         #endregion
