@@ -114,6 +114,8 @@ namespace MultiplayerARPG
                     uiBuff.Data = new UIBuffData(buff, Data.level);
                 }
             }
+
+            buffRemainsDuration = CharacterBuff.buffRemainsDuration;
         }
     }
 }
