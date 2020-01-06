@@ -14,20 +14,12 @@ namespace MultiplayerARPG
 
         [SerializeField]
         private BaseCharacterModel mainModel;
-        public BaseCharacterModel MainModel
-        {
-            get
-            {
-                if (mainModel == null)
-                    mainModel = GetComponent<BaseCharacterModel>();
-                return mainModel;
-            }
-        }
+        public BaseCharacterModel MainModel { get; private set; }
 
         [SerializeField]
         private BaseCharacterModel fpsModelPrefab;
         public BaseCharacterModel FpsModel { get; private set; }
-        
+
         [SerializeField]
         private VehicleCharacterModel[] vehicleModels;
 
@@ -48,20 +40,8 @@ namespace MultiplayerARPG
                 return cacheVehicleModels;
             }
         }
-
-        private BaseCharacterModel activeModel;
-        public BaseCharacterModel ActiveModel
-        {
-            get
-            {
-                if (activeModel == null)
-                {
-                    activeModel = MainModel;
-                    activeModel.SwitchModel(null);
-                }
-                return activeModel;
-            }
-        }
+        
+        public BaseCharacterModel ActiveModel { get; private set; }
 
         public bool IsHide
         {
@@ -92,13 +72,16 @@ namespace MultiplayerARPG
 
         public override void EntityStart()
         {
-            activeModel = null;
+            ActiveModel = null;
             SwitchModel(MainModel);
         }
 
         private bool SetupModelManager()
         {
             bool hasChanges = false;
+            if (mainModel == null)
+                mainModel = GetComponent<BaseCharacterModel>();
+
             if (mainModel != null && mainModel.ModelManager != this)
             {
                 mainModel.ModelManager = this;
@@ -175,10 +158,10 @@ namespace MultiplayerARPG
 
         private void SwitchModel(BaseCharacterModel nextModel)
         {
-            if (nextModel == activeModel) return;
-            BaseCharacterModel previousModel = activeModel;
-            activeModel = nextModel;
-            activeModel.SwitchModel(previousModel);
+            if (nextModel == ActiveModel) return;
+            BaseCharacterModel previousModel = ActiveModel;
+            ActiveModel = nextModel;
+            ActiveModel.SwitchModel(previousModel);
         }
 
         public void SetHide(byte setter, bool isHide)
