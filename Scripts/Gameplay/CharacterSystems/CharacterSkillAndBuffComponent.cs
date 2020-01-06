@@ -83,10 +83,11 @@ namespace MultiplayerARPG
                 // Removing buffs if it should
                 count = CacheEntity.Buffs.Count;
                 CharacterBuff buff;
+                float duration;
                 for (int i = count - 1; i >= 0; --i)
                 {
                     buff = CacheEntity.Buffs[i];
-                    float duration = buff.GetDuration();
+                    duration = buff.GetDuration();
                     if (buff.ShouldRemove())
                         CacheEntity.Buffs.RemoveAt(i);
                     else
