@@ -52,15 +52,13 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
-            if (capsuleCollider == null)
-                capsuleCollider = GetComponent<CapsuleCollider>();
+            capsuleCollider = GetComponent<CapsuleCollider>();
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (capsuleCollider == null)
-                capsuleCollider = GetComponent<CapsuleCollider>();
+            capsuleCollider = GetComponent<CapsuleCollider>();
             ApplyingSettings(ref standSettings);
             ApplyingSettings(ref crouchSettings);
             ApplyingSettings(ref crawlSettings);
