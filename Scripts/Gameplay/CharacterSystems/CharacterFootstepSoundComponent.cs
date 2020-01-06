@@ -87,8 +87,6 @@ namespace MultiplayerARPG
             }
 
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
-            if (CacheEntity is BaseCharacterEntity)
-                audioSource.mute = audioSource.mute || (CacheEntity as BaseCharacterEntity).GetCaches().MuteFootstepSound;
 
             if (CacheEntity.IsUnderWater)
             {
@@ -136,6 +134,14 @@ namespace MultiplayerARPG
         public void PlaySound()
         {
             if (audioSource == null)
+                return;
+
+            // Don't play sound while muting footstep sound
+            if (CacheEntity.MuteFootstepSound)
+                return;
+
+            // Don't play sound while passenging vehicle
+            if (CacheEntity.PassengingVehicleEntity != null)
                 return;
 
             audioSource.clip = currentFootstepSettings.soundData.GetRandomedAudioClip();
