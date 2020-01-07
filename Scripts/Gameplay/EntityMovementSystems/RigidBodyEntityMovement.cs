@@ -18,13 +18,10 @@ namespace MultiplayerARPG
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
-        public float gravityRate = 1f;
         public float backwardMoveSpeedRate = 0.75f;
         public float groundCheckDistance = 0.1f; // distance for checking if the controller is grounded ( 0.01f seems to work best for this )
-        public float groundCheckDistanceWhileJump = 0.01f;
-        public float stickToGroundHelperDistance = 0.5f; // stops the character
-        [Tooltip("set it to 0.1 or more if you get stuck in wall")]
-        public float shellOffset = 0f;
+        public float groundCheckDistanceWhileJump = 0.01f; // distance for checking if the controller is grounded while jumping
+        public float stickToGroundHelperDistance = 0.5f; // distance for checking if the controller is grounded while moving on slopes
         public bool useNavMeshForKeyMovement;
 
         [Header("Root Motion Settings")]
@@ -338,15 +335,14 @@ namespace MultiplayerARPG
 
         private void StickToGroundHelper()
         {
-            float radius = CacheCapsuleCollider.radius * (1.0f - shellOffset);
-            radius = radius * transform.localScale.z;
-            float maxDistance = ((CacheCapsuleCollider.height / 2f) - CacheCapsuleCollider.radius) + stickToGroundHelperDistance;
-            maxDistance = maxDistance * transform.localScale.y;
-            float centerY = CacheCapsuleCollider.center.y;
-            centerY = centerY * transform.localScale.y;
+            float maxDistance = CacheCapsuleCollider.bounds.extents.y + stickToGroundHelperDistance;
             RaycastHit hitInfo;
-            if (Physics.SphereCast(transform.position + Vector3.up * centerY, radius, Vector3.down, out hitInfo,
-                maxDistance, GetGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore))
+            if (Physics.BoxCast(CacheCapsuleCollider.bounds.center + Vector3.up * CacheCapsuleCollider.bounds.extents.y,
+                CacheCapsuleCollider.bounds.extents,
+                Vector3.down, out hitInfo,
+                CacheTransform.rotation, maxDistance,
+                GetGroundDetectionLayerMask(),
+                QueryTriggerInteraction.Ignore))
             {
                 if (Mathf.Abs(Vector3.Angle(hitInfo.normal, Vector3.up)) < 85f)
                 {
@@ -358,19 +354,14 @@ namespace MultiplayerARPG
         private void GroundCheck()
         {
             previouslyGrounded = IsGrounded;
-            float radius = CacheCapsuleCollider.radius * (1.0f - shellOffset);
-            radius = radius * transform.localScale.z;
-            float maxDistance = ((CacheCapsuleCollider.height / 2f) - CacheCapsuleCollider.radius);
-            if (applyingJump)
-                maxDistance += groundCheckDistanceWhileJump;
-            else
-                maxDistance += groundCheckDistance;
-            maxDistance = maxDistance * transform.localScale.y;
-            float centerY = CacheCapsuleCollider.center.y;
-            centerY = centerY * transform.localScale.y;
+            float maxDistance = CacheCapsuleCollider.bounds.extents.y + (applyingJump ? groundCheckDistanceWhileJump : groundCheckDistance);
             RaycastHit hitInfo;
-            if (Physics.SphereCast(transform.position + Vector3.up * centerY, radius, Vector3.down, out hitInfo,
-                maxDistance, GetGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore))
+            if (Physics.BoxCast(CacheCapsuleCollider.bounds.center + Vector3.up * CacheCapsuleCollider.bounds.extents.y,
+                CacheCapsuleCollider.bounds.extents,
+                Vector3.down, out hitInfo,
+                CacheTransform.rotation, maxDistance,
+                GetGroundDetectionLayerMask(),
+                QueryTriggerInteraction.Ignore))
             {
                 IsGrounded = true;
                 groundContactNormal = hitInfo.normal;
