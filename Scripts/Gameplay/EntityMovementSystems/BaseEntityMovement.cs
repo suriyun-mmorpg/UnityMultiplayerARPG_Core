@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [DisallowMultipleComponent]
     public abstract class BaseEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovement
     {
         public BaseGameEntity Entity { get { return CacheEntity; } }
