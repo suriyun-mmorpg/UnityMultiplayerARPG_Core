@@ -313,36 +313,32 @@ namespace MultiplayerARPG
                 sideMoveSpeed = -1;
 
             int moveType = 0;
+            switch (extraMovementState)
+            {
+                case ExtraMovementState.IsCrouching:
+                    moveType = 1;
+                    moveAnimationSpeedMultiplier *= crouchMoveAnimSpeedRate;
+                    break;
+                case ExtraMovementState.IsCrawling:
+                    moveType = 2;
+                    moveAnimationSpeedMultiplier *= crawlMoveAnimSpeedRate;
+                    break;
+                case ExtraMovementState.IsSprinting:
+                    moveSpeed *= 2;
+                    sideMoveSpeed *= 2;
+                    moveAnimationSpeedMultiplier *= sprintAnimSpeedRate;
+                    break;
+                default:
+                    moveAnimationSpeedMultiplier *= moveAnimSpeedRate;
+                    break;
+            }
+
+            if (isUnderWater)
+                moveAnimationSpeedMultiplier *= swimMoveAnimSpeedRate;
+
             // Character is idle, so set move animation speed multiplier to 1
             if (moveSpeed == 0 && sideMoveSpeed == 0)
-            {
                 moveAnimationSpeedMultiplier = 1f;
-            }
-            else
-            {
-                switch (extraMovementState)
-                {
-                    case ExtraMovementState.IsCrouching:
-                        moveType = 1;
-                        moveAnimationSpeedMultiplier *= crouchMoveAnimSpeedRate;
-                        break;
-                    case ExtraMovementState.IsCrawling:
-                        moveType = 2;
-                        moveAnimationSpeedMultiplier *= crawlMoveAnimSpeedRate;
-                        break;
-                    case ExtraMovementState.IsSprinting:
-                        moveSpeed *= 2;
-                        sideMoveSpeed *= 2;
-                        moveAnimationSpeedMultiplier *= sprintAnimSpeedRate;
-                        break;
-                    default:
-                        moveAnimationSpeedMultiplier *= moveAnimSpeedRate;
-                        break;
-                }
-
-                if (isUnderWater)
-                    moveAnimationSpeedMultiplier *= swimMoveAnimSpeedRate;
-            }
 
             // Set animator parameters
             float deltaTime = animator.updateMode == AnimatorUpdateMode.AnimatePhysics ? Time.fixedDeltaTime : Time.deltaTime;
