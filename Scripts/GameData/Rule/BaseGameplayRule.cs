@@ -48,5 +48,6 @@ namespace MultiplayerARPG
         public abstract Reward MakeMonsterReward(MonsterCharacter monster);
         public abstract Reward MakeQuestReward(Quest quest);
         public abstract float GetRecoveryUpdateDuration();
+        public abstract void ApplyFallDamage(BaseCharacterEntity character, Vector3 lastGroundedPosition);
     }
 }

@@ -19,11 +19,11 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("moveSpeedRateWhileSprint")]
         public float moveSpeedRateWhileSprinting = 1.5f;
         [Header("Crouch")]
-        public float moveSpeedRateWhileCrouching = 0.75f;
+        public float moveSpeedRateWhileCrouching = 0.35f;
         [Header("Crawl")]
-        public float moveSpeedRateWhileCrawling = 0.5f;
+        public float moveSpeedRateWhileCrawling = 0.15f;
         [Header("Swim")]
-        public float moveSpeedRateWhileSwimming = 0.75f;
+        public float moveSpeedRateWhileSwimming = 0.5f;
         [Header("Hp/Mp/Food/Water")]
         public int hungryWhenFoodLowerThan = 40;
         public int thirstyWhenWaterLowerThan = 40;
@@ -54,6 +54,11 @@ namespace MultiplayerARPG
         public float missDecreaseWeaponDurability = 0f;
         public float missDecreaseShieldDurability = 0;
         public float missDecreaseArmorDurability = 0f;
+        [Header("Fall Damage")]
+        [Tooltip("Character will receive damage 1% of Max Hp, when fall distance = min distance")]
+        public float fallDamageMinDistance = 5;
+        [Tooltip("Character will receive damage 100% of Max Hp, when fall distance >= max distance")]
+        public float fallDamageMaxDistance = 20;
 
         public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
@@ -605,6 +610,21 @@ namespace MultiplayerARPG
         public override float GetRecoveryUpdateDuration()
         {
             return 1f;
+        }
+
+        public override void ApplyFallDamage(BaseCharacterEntity character, Vector3 lastGroundedPosition)
+        {
+            int damage = 0;
+            if (character.CacheTransform.position.y >= lastGroundedPosition.y)
+                return;
+            float dist = character.CacheTransform.position.y - lastGroundedPosition.y;
+            if (dist < fallDamageMinDistance)
+                return;
+            damage = character.MaxHp * (int)(100 * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
+            if (damage <= 0)
+                return;
+            character.CurrentHp -= damage;
+            character.ReceivedDamage(null, CombatAmountType.NormalDamage, damage);
         }
     }
 }

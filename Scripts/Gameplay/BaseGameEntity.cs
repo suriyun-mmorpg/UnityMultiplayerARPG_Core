@@ -225,10 +225,15 @@ namespace MultiplayerARPG
             set { passengingVehicle.Value = value; }
         }
         
+        public bool IsGrounded { get { return ActiveMovement == null ? true : ActiveMovement.IsGrounded; } }
+        public bool IsJumping { get { return ActiveMovement == null ? false : ActiveMovement.IsJumping; } }
+        public bool IsUnderWater { get { return ActiveMovement == null ? false : ActiveMovement.IsUnderWater; } }
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
         protected Vector3? teleportingPosition;
+        protected bool lastGrounded;
+        protected Vector3 lastGroundedPosition;
 
         public GameInstance CurrentGameInstance
         {
@@ -255,8 +260,6 @@ namespace MultiplayerARPG
         #region Enter Area States
         // This will be TRUE when this character enter to safe area
         public bool IsInSafeArea { get; set; }
-        // This will be TRUE when this character enter to water area
-        public bool IsUnderWater { get; set; }
         #endregion
 
         #region Events
@@ -363,8 +366,13 @@ namespace MultiplayerARPG
             if (onUpdate != null)
                 onUpdate.Invoke();
         }
+
         protected virtual void EntityUpdate()
         {
+            lastGrounded = IsGrounded || PassengingVehicleEntity != null;
+            if (lastGrounded)
+                lastGroundedPosition = CacheTransform.position;
+
             if (Movement != null)
             {
                 bool tempEnableMovement = PassengingVehicleEntity == null;
@@ -645,6 +653,8 @@ namespace MultiplayerARPG
                 return;
             }
             ActiveMovement.Teleport(position);
+            lastGrounded = true;
+            lastGroundedPosition = position;
         }
 
         public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)

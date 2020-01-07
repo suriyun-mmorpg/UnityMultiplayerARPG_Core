@@ -197,6 +197,15 @@ namespace MultiplayerARPG
         {
             MakeCaches();
 
+            if (!lastGrounded && IsGrounded && PassengingVehicleEntity == null)
+            {
+                // Apply fall damage when not passenging vehicle
+                CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
+            }
+            lastGrounded = IsGrounded || PassengingVehicleEntity != null;
+            if (lastGrounded)
+                lastGroundedPosition = CacheTransform.position;
+
             bool tempEnableMovement = PassengingVehicleEntity == null;
             if (RespawnGroundedCheckCountDown <= 0)
             {

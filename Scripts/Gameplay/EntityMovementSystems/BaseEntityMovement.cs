@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public BaseGameEntity Entity { get { return CacheEntity; } }
         public virtual bool IsGrounded { get; protected set; }
         public virtual bool IsJumping { get; protected set; }
+        public virtual bool IsUnderWater { get; protected set; }
         public abstract float StoppingDistance { get; }
         public abstract void KeyMovement(Vector3 moveDirection, MovementState movementState);
         public abstract void PointClickMovement(Vector3 position);
