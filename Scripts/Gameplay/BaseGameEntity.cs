@@ -8,6 +8,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(LiteNetLibIdentity))]
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
