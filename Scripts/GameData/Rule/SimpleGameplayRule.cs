@@ -614,15 +614,12 @@ namespace MultiplayerARPG
 
         public override void ApplyFallDamage(BaseCharacterEntity character, Vector3 lastGroundedPosition)
         {
-            int damage = 0;
             if (character.CacheTransform.position.y >= lastGroundedPosition.y)
                 return;
             float dist = character.CacheTransform.position.y - lastGroundedPosition.y;
             if (dist < fallDamageMinDistance)
                 return;
-            damage = character.MaxHp * (int)(100 * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
-            if (damage <= 0)
-                return;
+            int damage = character.MaxHp * (int)(100 * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
             character.CurrentHp -= damage;
             character.ReceivedDamage(null, CombatAmountType.NormalDamage, damage);
         }
