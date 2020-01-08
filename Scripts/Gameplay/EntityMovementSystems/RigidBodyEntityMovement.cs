@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         public float stickToGroundHelperDistance = 0.5f; // distance for checking if the controller is grounded while moving on slopes
         [Range(0.1f, 1f)]
         public float underWaterThreshold = 0.75f;
+        public bool autoSwimToSurface;
         public bool useNavMeshForKeyMovement;
 
         [Header("Root Motion Settings")]
@@ -137,17 +138,17 @@ namespace MultiplayerARPG
             // Register Network functions
             CacheEntity.RegisterNetFunction(NetFuncTriggerJump);
             CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            CacheEntity.RegisterNetFunction<sbyte, sbyte, byte>(NetFuncKeyMovement);
+            CacheEntity.RegisterNetFunction<DirectionVector3, byte>(NetFuncKeyMovement);
             CacheEntity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
             CacheEntity.RegisterNetFunction(StopMove);
         }
 
-        protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput, byte movementState)
+        protected void NetFuncKeyMovement(DirectionVector3 inputDirection, byte movementState)
         {
             if (!CacheEntity.CanMove())
                 return;
             // Devide inputs to float value
-            tempInputDirection = new Vector3((float)horizontalInput / 100f, 0, (float)verticalInput / 100f);
+            tempInputDirection = inputDirection;
             tempMovementState = (MovementState)movementState;
             if (!isJumping)
                 isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
@@ -216,7 +217,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(moveDirection.x * 100), (sbyte)(moveDirection.z * 100), (byte)movementState);
+                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector3(moveDirection), (byte)movementState);
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
@@ -422,7 +423,7 @@ namespace MultiplayerARPG
                 isJumping = false;
             }
 
-            if (isUnderWater)
+            if (isUnderWater && autoSwimToSurface)
             {
                 tempMoveDirection.y = 0f;
                 // Move up to surface while under water
