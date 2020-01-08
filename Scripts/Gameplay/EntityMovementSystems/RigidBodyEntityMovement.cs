@@ -63,7 +63,6 @@ namespace MultiplayerARPG
         private Vector3 groundContactNormal;
         private float tempTargetDistance;
         private bool previouslyGrounded;
-        private bool previouslyUnderWater;
         private bool applyingJump;
 
         public override void EntityAwake()
@@ -369,13 +368,9 @@ namespace MultiplayerARPG
                 isUnderWater = false;
                 return;
             }
-            previouslyUnderWater = isUnderWater;
             float footToSurfaceDist = waterCollider.bounds.max.y - CacheCapsuleCollider.bounds.min.y;
             float currentThreshold = footToSurfaceDist / (CacheCapsuleCollider.bounds.max.y - CacheCapsuleCollider.bounds.min.y);
-            if (isGrounded)
-                isUnderWater = currentThreshold >= underWaterThreshold;
-            else if (previouslyUnderWater)
-                isUnderWater = true;
+            isUnderWater = currentThreshold >= underWaterThreshold;
         }
 
         private void GroundCheck()
@@ -437,7 +432,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (currentThreshold <= underWaterThreshold)
+                    if (tempMoveDirection.y > 0f && currentThreshold <= underWaterThreshold)
                         tempMoveDirection.y = 0f;
                 }
             }
