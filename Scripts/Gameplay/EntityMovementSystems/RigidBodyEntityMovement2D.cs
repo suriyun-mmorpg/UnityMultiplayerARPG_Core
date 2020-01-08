@@ -24,18 +24,6 @@ namespace MultiplayerARPG
             get { return stoppingDistance; }
         }
 
-        public override bool IsGrounded
-        {
-            get { return true; }
-            protected set { }
-        }
-
-        public override bool IsJumping
-        {
-            get { return false; }
-            protected set { }
-        }
-
         protected Vector2? currentDestination;
 
         private float tempMoveDirectionMagnitude;

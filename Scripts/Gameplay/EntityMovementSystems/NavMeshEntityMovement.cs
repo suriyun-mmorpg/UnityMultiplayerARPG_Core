@@ -13,18 +13,6 @@ namespace MultiplayerARPG
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public NavMeshAgent CacheNavMeshAgent { get; private set; }
 
-        public sealed override bool IsGrounded
-        {
-            get { return true; }
-            protected set { }
-        }
-
-        public sealed override bool IsJumping
-        {
-            get { return false; }
-            protected set { }
-        }
-
         public override float StoppingDistance
         {
             get { return CacheNavMeshAgent.stoppingDistance; }
