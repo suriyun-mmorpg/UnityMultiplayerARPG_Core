@@ -9,7 +9,8 @@
         Left = 1 << 2,
         Right = 1 << 3,
         IsGrounded = 1 << 4,
-        IsJump = 1 << 5,
+        IsUnderWater = 1 << 5,
+        IsJump = 1 << 6,
     }
 
     [System.Flags]

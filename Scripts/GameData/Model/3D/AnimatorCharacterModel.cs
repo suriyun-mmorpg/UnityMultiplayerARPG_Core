@@ -333,7 +333,7 @@ namespace MultiplayerARPG
                     break;
             }
 
-            if (isUnderWater)
+            if (movementState.HasFlag(MovementState.IsUnderWater))
                 moveAnimationSpeedMultiplier *= swimMoveAnimSpeedRate;
 
             // Character is idle, so set move animation speed multiplier to 1
@@ -346,8 +346,8 @@ namespace MultiplayerARPG
             animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : sideMoveSpeed, movementDampingTme, deltaTime);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);
             animator.SetBool(ANIM_IS_DEAD, isDead);
-            animator.SetBool(ANIM_IS_GROUNDED, !isUnderWater && movementState.HasFlag(MovementState.IsGrounded));
-            animator.SetBool(ANIM_IS_UNDER_WATER, isUnderWater);
+            animator.SetBool(ANIM_IS_GROUNDED, !movementState.HasFlag(MovementState.IsUnderWater) && movementState.HasFlag(MovementState.IsGrounded));
+            animator.SetBool(ANIM_IS_UNDER_WATER, movementState.HasFlag(MovementState.IsUnderWater));
             animator.SetInteger(ANIM_MOVE_TYPE, moveType);
         }
 

@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterModelManager))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
-    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IGameEntity
+    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData
     {
         public const float ACTION_DELAY = 0.2f;
         public const float COMBATANT_MESSAGE_DELAY = 1f;
@@ -102,7 +102,7 @@ namespace MultiplayerARPG
         public int MaxStamina { get { return this.GetCaches().MaxStamina; } }
         public int MaxFood { get { return this.GetCaches().MaxFood; } }
         public int MaxWater { get { return this.GetCaches().MaxWater; } }
-        public override sealed float MoveAnimationSpeedMultiplier { get { return GetMoveSpeed(ExtraMovementState.None, false) / this.GetCaches().BaseMoveSpeed; } }
+        public override sealed float MoveAnimationSpeedMultiplier { get { return GetMoveSpeed(MovementState, ExtraMovementState.None) / this.GetCaches().BaseMoveSpeed; } }
         public override sealed bool MuteFootstepSound { get { return this.GetCaches().MuteFootstepSound; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
@@ -197,12 +197,12 @@ namespace MultiplayerARPG
         {
             MakeCaches();
 
-            if (!lastGrounded && IsGrounded && PassengingVehicleEntity == null)
+            if (!lastGrounded && MovementState.HasFlag(MovementState.IsGrounded))
             {
                 // Apply fall damage when not passenging vehicle
                 CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
             }
-            lastGrounded = IsGrounded || PassengingVehicleEntity != null;
+            lastGrounded = MovementState.HasFlag(MovementState.IsGrounded);
             if (lastGrounded)
                 lastGroundedPosition = CacheTransform.position;
 
@@ -269,7 +269,7 @@ namespace MultiplayerARPG
                 // Update move speed multiplier
                 CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                 // Update movement animation
-                CharacterModel.SetMovementState(MovementState, ExtraMovementState, DirectionType2D, IsUnderWater);
+                CharacterModel.SetMovementState(MovementState, ExtraMovementState, DirectionType2D);
                 // Update FPS model
                 if (FpsModel != null)
                 {
@@ -278,7 +278,7 @@ namespace MultiplayerARPG
                     // Update move speed multiplier
                     FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                     // Update movement animation
-                    FpsModel.SetMovementState(MovementState, ExtraMovementState, DirectionType2D, IsUnderWater);
+                    FpsModel.SetMovementState(MovementState, ExtraMovementState, DirectionType2D);
                 }
             }
         }
@@ -965,14 +965,14 @@ namespace MultiplayerARPG
             return atkSpeed;
         }
 
-        protected float GetMoveSpeed(ExtraMovementState extraMovementState, bool isUnderWater)
+        protected float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
             float moveSpeed = this.GetCaches().MoveSpeed;
 
             if (IsAttackingOrUsingSkill)
                 moveSpeed *= MoveSpeedRateWhileAttackOrUseSkill;
 
-            if (isUnderWater)
+            if (movementState.HasFlag(MovementState.IsUnderWater))
             {
                 moveSpeed *= CurrentGameplayRule.GetSwimMoveSpeedRate(this);
             }
@@ -997,7 +997,7 @@ namespace MultiplayerARPG
 
         public override float GetMoveSpeed()
         {
-            return GetMoveSpeed(ExtraMovementState, IsUnderWater);
+            return GetMoveSpeed(MovementState, ExtraMovementState);
         }
 
         public override sealed bool CanMove()
@@ -1011,21 +1011,21 @@ namespace MultiplayerARPG
 
         public override sealed bool CanSprint()
         {
-            if (IsUnderWater)
+            if (!MovementState.HasFlag(MovementState.IsGrounded) || MovementState.HasFlag(MovementState.IsUnderWater))
                 return false;
             return CurrentStamina > 0;
         }
 
         public override sealed bool CanCrouch()
         {
-            if (IsUnderWater)
+            if (!MovementState.HasFlag(MovementState.IsGrounded) || MovementState.HasFlag(MovementState.IsUnderWater))
                 return false;
             return true;
         }
 
         public override sealed bool CanCrawl()
         {
-            if (IsUnderWater)
+            if (!MovementState.HasFlag(MovementState.IsGrounded) || MovementState.HasFlag(MovementState.IsUnderWater))
                 return false;
             return true;
         }

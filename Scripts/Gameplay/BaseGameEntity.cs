@@ -224,10 +224,7 @@ namespace MultiplayerARPG
             get { return passengingVehicle.Value; }
             set { passengingVehicle.Value = value; }
         }
-        
-        public bool IsGrounded { get { return ActiveMovement == null ? true : ActiveMovement.IsGrounded; } }
-        public bool IsJumping { get { return ActiveMovement == null ? false : ActiveMovement.IsJumping; } }
-        public bool IsUnderWater { get { return ActiveMovement == null ? false : ActiveMovement.IsUnderWater; } }
+
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
@@ -369,7 +366,7 @@ namespace MultiplayerARPG
 
         protected virtual void EntityUpdate()
         {
-            lastGrounded = IsGrounded || PassengingVehicleEntity != null;
+            lastGrounded = MovementState.HasFlag(MovementState.IsGrounded);
             if (lastGrounded)
                 lastGroundedPosition = CacheTransform.position;
 
@@ -392,7 +389,7 @@ namespace MultiplayerARPG
                 {
                     // Update movement animation
                     (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                    (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, DirectionType2D, IsUnderWater);
+                    (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, DirectionType2D);
                 }
             }
         }
@@ -679,7 +676,7 @@ namespace MultiplayerARPG
         public void SetExtraMovement(ExtraMovementState extraMovementState)
         {
             // Set local movement state which will be used by owner client
-            if (IsUnderWater)
+            if (MovementState.HasFlag(MovementState.IsUnderWater))
             {
                 // Extra movement states always none while under water
                 extraMovementState = ExtraMovementState.None;

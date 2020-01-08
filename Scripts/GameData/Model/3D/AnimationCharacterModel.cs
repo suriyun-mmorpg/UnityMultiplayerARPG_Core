@@ -264,7 +264,7 @@ namespace MultiplayerARPG
                 if (legacyAnimation.GetClip(CLIP_CAST_SKILL) != null && legacyAnimation.IsPlaying(CLIP_CAST_SKILL))
                     return;
 
-                if (isUnderWater)
+                if (movementState.HasFlag(MovementState.IsUnderWater))
                 {
                     CrossFadeMoveAnimaton(CLIP_SWIM_IDLE, CLIP_SWIM_MOVE, CLIP_SWIM_MOVE_BACKWARD, CLIP_SWIM_MOVE_LEFT, CLIP_SWIM_MOVE_RIGHT,
                         CLIP_SWIM_MOVE_FORWARD_LEFT, CLIP_SWIM_MOVE_FORWARD_RIGHT, CLIP_SWIM_MOVE_BACKWARD_LEFT, CLIP_SWIM_MOVE_BACKWARD_RIGHT);
