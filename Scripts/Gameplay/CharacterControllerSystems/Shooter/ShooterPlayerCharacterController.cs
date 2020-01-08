@@ -21,6 +21,13 @@ namespace MultiplayerARPG
             Fps,
         }
 
+        public enum ExtraMoveActiveMode
+        {
+            None,
+            Toggle,
+            Hold
+        }
+
         public enum TurningState
         {
             None,
@@ -33,6 +40,12 @@ namespace MultiplayerARPG
         private ControllerMode mode;
         [SerializeField]
         private ControllerViewMode viewMode;
+        [SerializeField]
+        private ExtraMoveActiveMode sprintActiveMode;
+        [SerializeField]
+        private ExtraMoveActiveMode crouchActiveMode;
+        [SerializeField]
+        private ExtraMoveActiveMode crawlActiveMode;
         [SerializeField]
         private float angularSpeed = 800f;
         [Range(0, 1f)]
@@ -182,6 +195,9 @@ namespace MultiplayerARPG
         Item leftHandWeapon;
         MovementState movementState;
         ExtraMovementState extraMovementState;
+        bool toggleSprintOn;
+        bool toggleCrouchOn;
+        bool toggleCrawlOn;
         public BaseWeaponAbility WeaponAbility { get; private set; }
         public WeaponAbilityState WeaponAbilityState { get; private set; }
 
@@ -364,17 +380,46 @@ namespace MultiplayerARPG
             if (InputManager.GetButtonDown("Jump"))
                 movementState |= MovementState.IsJump;
 
-            // If sprinting add is sprinting state
-            if (InputManager.GetButton("Sprint"))
+            DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn);
+            DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn);
+            DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn);
+
+            if (toggleSprintOn)
+            {
                 extraMovementState = ExtraMovementState.IsSprinting;
-            else if (InputManager.GetButton("Crouch"))
+                toggleCrouchOn = false;
+                toggleCrawlOn = false;
+            }
+            else if (toggleCrouchOn)
+            {
                 extraMovementState = ExtraMovementState.IsCrouching;
-            else if (InputManager.GetButton("Crawl"))
+                toggleSprintOn = false;
+                toggleCrawlOn = false;
+            }
+            else if (toggleCrawlOn)
+            {
                 extraMovementState = ExtraMovementState.IsCrawling;
+                toggleSprintOn = false;
+                toggleCrouchOn = false;
+            }
 
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
             PlayerCharacterEntity.SetExtraMovement(extraMovementState);
             UpdateLookAtTarget();
+        }
+
+        private void DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
+        {
+            switch (activeMode)
+            {
+                case ExtraMoveActiveMode.Hold:
+                    state = InputManager.GetButton(key);
+                    break;
+                case ExtraMoveActiveMode.Toggle:
+                    if (InputManager.GetButtonDown(key))
+                        state = !state;
+                    break;
+            }
         }
 
         private void UpdateTarget_BuildingMode()
@@ -545,7 +590,8 @@ namespace MultiplayerARPG
 
         private void UpdateMovementInputs()
         {
-            PlayerCharacterEntity.Pitch = CacheGameplayCameraControls.CacheCameraTransform.eulerAngles.x;
+            float pitch = CacheGameplayCameraControls.CacheCameraTransform.eulerAngles.x;
+            PlayerCharacterEntity.Pitch = pitch;
 
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
@@ -554,6 +600,12 @@ namespace MultiplayerARPG
             inputH = InputManager.GetAxis("Horizontal", raw);
             moveDirection += cameraForward * inputV;
             moveDirection += cameraRight * inputH;
+            if (moveDirection.magnitude > 0f)
+            {
+                if (pitch > 180f)
+                    pitch -= 360f;
+                moveDirection.y = -pitch / 90f;
+            }
             // Set movement state by inputs
             switch (Mode)
             {
@@ -561,6 +613,7 @@ namespace MultiplayerARPG
                     if (inputV > 0.5f || inputV < -0.5f || inputH > 0.5f || inputH < -0.5f)
                         movementState = MovementState.Forward;
                     moveLookDirection = moveDirection;
+                    moveLookDirection.y = 0f;
                     break;
                 case ControllerMode.Combat:
                     if (inputV > 0.5f)
@@ -583,7 +636,7 @@ namespace MultiplayerARPG
             }
 
             // normalize input if it exceeds 1 in combined length:
-            if (moveDirection.sqrMagnitude > 1)
+            if (moveDirection.magnitude > 1)
                 moveDirection.Normalize();
         }
 
@@ -823,20 +876,6 @@ namespace MultiplayerARPG
             CurrentCrosshairSize = sizeDelta;
             // Set crosshair size
             crosshairRect.sizeDelta = new Vector2(Mathf.Clamp(CurrentCrosshairSize.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(CurrentCrosshairSize.y, setting.minSpread, setting.maxSpread));
-        }
-
-        public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
-        {
-            Vector3 moveDirection = Vector3.zero;
-            Vector3 forward = Camera.main.transform.forward;
-            Vector3 right = Camera.main.transform.right;
-            forward.y = 0f;
-            right.y = 0f;
-            forward.Normalize();
-            right.Normalize();
-            moveDirection += forward * verticalInput;
-            moveDirection += right * horizontalInput;
-            return moveDirection;
         }
 
         protected void UpdateLookAtTarget()

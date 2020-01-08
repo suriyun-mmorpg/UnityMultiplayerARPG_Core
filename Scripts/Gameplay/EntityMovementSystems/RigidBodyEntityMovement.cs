@@ -423,14 +423,23 @@ namespace MultiplayerARPG
                 isJumping = false;
             }
 
-            if (isUnderWater && autoSwimToSurface)
+            if (isUnderWater)
             {
-                tempMoveDirection.y = 0f;
                 // Move up to surface while under water
                 float footToSurfaceDist = waterCollider.bounds.max.y - CacheCapsuleCollider.bounds.min.y;
                 float currentThreshold = footToSurfaceDist / (CacheCapsuleCollider.bounds.max.y - CacheCapsuleCollider.bounds.min.y);
-                if (currentThreshold > underWaterThreshold)
-                    tempMoveDirection.y = 1f;
+                if (autoSwimToSurface)
+                {
+                    if (currentThreshold > underWaterThreshold)
+                        tempMoveDirection.y = 1f;
+                    else
+                        tempMoveDirection.y = 0f;
+                }
+                else
+                {
+                    if (currentThreshold <= underWaterThreshold)
+                        tempMoveDirection.y = 0f;
+                }
             }
 
             if (tempMoveDirection.magnitude > 0f)
