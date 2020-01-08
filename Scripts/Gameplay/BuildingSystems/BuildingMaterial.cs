@@ -163,9 +163,9 @@ namespace MultiplayerARPG
 
         public bool ValidateTriggerLayer(GameObject gameObject)
         {
-            return !(gameObject.layer == 1 /* TransparentFX */ ||
-                gameObject.layer == 2 /* IgnoreRaycast */ ||
-                gameObject.layer == 4 /* Water */);
+            return !(gameObject.layer == PhysicLayers.TransparentFX ||
+                gameObject.layer == PhysicLayers.IgnoreRaycast ||
+                gameObject.layer == PhysicLayers.Water);
         }
 
         public bool IsDead()

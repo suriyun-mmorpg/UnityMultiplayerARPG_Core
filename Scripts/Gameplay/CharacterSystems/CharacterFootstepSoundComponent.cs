@@ -88,7 +88,7 @@ namespace MultiplayerARPG
 
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 
-            if (CacheEntity.IsUnderWater)
+            if (CacheEntity.MovementState.HasFlag(MovementState.IsUnderWater))
             {
                 currentFootstepSettings = swimFootstepSettings;
             }

@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            gameObject.layer = 2;   // Ignore raycast
+            gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
         private void Start()

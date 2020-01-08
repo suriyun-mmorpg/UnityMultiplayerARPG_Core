@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            gameObject.layer = 2;   // Ignore raycast
+            gameObject.layer = PhysicLayers.IgnoreRaycast;
             CacheRigidbody = GetComponent<Rigidbody>();
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
         }
@@ -147,9 +147,10 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // Don't hits: TransparentFX, IgnoreRaycast, character, item
-            if (other.layer != 1 &&
-                other.layer != 2 &&
+            // Don't hits: TransparentFX, IgnoreRaycast, Water, character, item
+            if (other.layer != PhysicLayers.TransparentFX &&
+                other.layer != PhysicLayers.IgnoreRaycast &&
+                other.layer != PhysicLayers.Water &&
                 other.layer != CurrentGameInstance.characterLayer &&
                 other.layer != CurrentGameInstance.itemDropLayer &&
                 !CurrentGameInstance.NonTargetLayersValues.Contains(other.layer))

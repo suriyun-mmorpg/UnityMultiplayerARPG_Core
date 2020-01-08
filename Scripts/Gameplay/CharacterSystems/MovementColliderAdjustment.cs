@@ -140,7 +140,7 @@ namespace MultiplayerARPG
             if (capsuleCollider == null)
                 return;
 
-            if (CacheEntity.IsUnderWater)
+            if (CacheEntity.MovementState.HasFlag(MovementState.IsUnderWater))
             {
                 Apply(swimSettings);
             }

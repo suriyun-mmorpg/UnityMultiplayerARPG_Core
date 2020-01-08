@@ -42,8 +42,7 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            // Set layer to ignore raycast
-            gameObject.layer = 2;
+            gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
         private void Start()

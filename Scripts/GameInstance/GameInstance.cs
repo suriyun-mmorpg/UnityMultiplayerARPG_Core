@@ -485,9 +485,9 @@ namespace MultiplayerARPG
                     layerMask = layerMask | nonTargetingLayer.Mask;
                 }
             }
-            layerMask = layerMask | 1 << 1;  // TransparentFX
-            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
-            layerMask = layerMask | 1 << 4;  // Water
+            layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
+            layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
+            layerMask = layerMask | 1 << PhysicLayers.Water;
             return ~layerMask;
         }
 
@@ -511,9 +511,9 @@ namespace MultiplayerARPG
         public int GetBuildLayerMask()
         {
             int layerMask = 0;
-            layerMask = layerMask | 1 << 1;  // TransparentFX
-            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
-            layerMask = layerMask | 1 << 4;  // Water
+            layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
+            layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
+            layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | characterLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
@@ -527,9 +527,9 @@ namespace MultiplayerARPG
         public int GetItemDropGroundDetectionLayerMask()
         {
             int layerMask = 0;
-            layerMask = layerMask | 1 << 1;  // TransparentFX
-            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
-            layerMask = layerMask | 1 << 4;  // Water
+            layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
+            layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
+            layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | characterLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             return ~layerMask;
@@ -542,9 +542,9 @@ namespace MultiplayerARPG
         public int GetMonsterSpawnGroundDetectionLayerMask()
         {
             int layerMask = 0;
-            layerMask = layerMask | 1 << 1;  // TransparentFX
-            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
-            layerMask = layerMask | 1 << 4;  // Water
+            layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
+            layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
+            layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | buildingLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
             return ~layerMask;
@@ -557,9 +557,9 @@ namespace MultiplayerARPG
         public int GetHarvestableSpawnGroundDetectionLayerMask()
         {
             int layerMask = 0;
-            layerMask = layerMask | 1 << 1;  // TransparentFX
-            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
-            layerMask = layerMask | 1 << 4;  // Water
+            layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
+            layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
+            layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | characterLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             layerMask = layerMask | buildingLayer.Mask;
