@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             }
             // Register Network functions
             CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            CacheEntity.RegisterNetFunction<sbyte, sbyte>(NetFuncKeyMovement);
+            CacheEntity.RegisterNetFunction<DirectionVector2>(NetFuncKeyMovement);
             CacheEntity.RegisterNetFunction(StopMove);
         }
 
@@ -87,12 +87,12 @@ namespace MultiplayerARPG
             currentDestination = position;
         }
 
-        protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput)
+        protected void NetFuncKeyMovement(DirectionVector2 direction)
         {
             if (!CacheEntity.CanMove())
                 return;
             // Devide inputs to float value
-            tempInputDirection = new Vector2((float)horizontalInput / 100f, (float)verticalInput / 100f);
+            tempInputDirection = direction;
         }
 
         public override void StopMove()
@@ -113,7 +113,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(moveDirection.x * 100), (sbyte)(moveDirection.y * 100));
+                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector2(moveDirection));
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
