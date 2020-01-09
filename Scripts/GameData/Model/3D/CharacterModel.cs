@@ -694,6 +694,12 @@ namespace MultiplayerARPG
                 CrossFadeLegacyAnimation(CLIP_HURT, legacyAnimationData.hurtClipFadeLength, WrapMode.Once);
                 return;
             }
+            StartCoroutine(PlayHitAnimationRoutine());
+        }
+
+        IEnumerator PlayHitAnimationRoutine()
+        {
+            yield return null;
             animator.ResetTrigger(ANIM_HURT);
             animator.SetTrigger(ANIM_HURT);
         }
@@ -705,6 +711,12 @@ namespace MultiplayerARPG
                 CrossFadeLegacyAnimation(CLIP_JUMP, legacyAnimationData.jumpClipFadeLength, WrapMode.Once);
                 return;
             }
+            StartCoroutine(PlayJumpAnimationRoutine());
+        }
+
+        IEnumerator PlayJumpAnimationRoutine()
+        {
+            yield return null;
             animator.ResetTrigger(ANIM_JUMP);
             animator.SetTrigger(ANIM_JUMP);
         }

@@ -410,12 +410,24 @@ namespace MultiplayerARPG
 
         public override void PlayHitAnimation()
         {
+            StartCoroutine(PlayHitAnimationRoutine());
+        }
+
+        IEnumerator PlayHitAnimationRoutine()
+        {
+            yield return null;
             animator.ResetTrigger(ANIM_HURT);
             animator.SetTrigger(ANIM_HURT);
         }
 
         public override void PlayJumpAnimation()
         {
+            StartCoroutine(PlayJumpAnimationRoutine());
+        }
+
+        IEnumerator PlayJumpAnimationRoutine()
+        {
+            yield return null;
             animator.ResetTrigger(ANIM_JUMP);
             animator.SetTrigger(ANIM_JUMP);
         }
