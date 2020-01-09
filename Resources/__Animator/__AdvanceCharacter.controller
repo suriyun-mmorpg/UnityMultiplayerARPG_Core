@@ -750,6 +750,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 2
     m_ConditionEvent: DoAction
     m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: IsCastingSkill
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1102156242239243076}
   m_Solo: 0
