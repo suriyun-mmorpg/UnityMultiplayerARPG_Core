@@ -9,9 +9,11 @@ namespace MultiplayerARPG
 {
     public abstract class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel
     {
-        public CharacterModelManager ModelManager { get; set; }
-        public bool IsMainModel { get { return ModelManager != null && ModelManager.MainModel == this; } }
-        public bool IsFpsModel { get { return ModelManager != null && ModelManager.FpsModel == this; } }
+        [SerializeField]
+        private CharacterModelManager modelManager;
+        public CharacterModelManager ModelManager { get { return modelManager; } }
+        public bool IsMainModel { get { return !ModelManager || ModelManager.MainModel == this; } }
+        public bool IsFpsModel { get { return !ModelManager || ModelManager.FpsModel == this; } }
         public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
 
         [Header("Equipment Containers")]
@@ -74,12 +76,38 @@ namespace MultiplayerARPG
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            SetupModelManager();
+        }
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+#if UNITY_EDITOR
+            if (SetupModelManager())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool SetupModelManager()
+        {
+            bool hasChanges = false;
+            if (!modelManager)
+            {
+                modelManager = GetComponentInParent<CharacterModelManager>();
+                hasChanges = modelManager;
+            }
+            return hasChanges;
+        }
+
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
             DestroyCacheModels();
             DestroyCacheEffects();
 
-            if (ModelManager != null && !IsMainOrFpsModel)
+            if (ModelManager && !IsMainOrFpsModel)
             {
                 // Sub-model will use some data same as main model
                 hiddingObjects = ModelManager.MainModel.hiddingObjects;

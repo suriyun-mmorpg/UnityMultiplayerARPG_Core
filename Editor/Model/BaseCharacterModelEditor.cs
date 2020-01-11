@@ -10,6 +10,8 @@ namespace MultiplayerARPG
         {
             ShowOnBool("IsMainOrFpsModel", true, "hiddingObjects");
             ShowOnBool("IsMainOrFpsModel", true, "hiddingRenderers");
+            ShowOnBool("IsMainOrFpsModel", true, "fpsHiddingObjects");
+            ShowOnBool("IsMainOrFpsModel", true, "fpsHiddingRenderers");
             ShowOnBool("IsMainOrFpsModel", true, "effectContainers");
             ShowOnBool("IsMainOrFpsModel", true, "setEffectContainersBySetters");
             ShowOnBool("IsMainOrFpsModel", true, "equipmentContainers");

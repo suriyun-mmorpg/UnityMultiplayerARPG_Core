@@ -81,55 +81,29 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
-            SetupModelManager();
+            SetupMainModel();
         }
 
-        private bool SetupModelManager()
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (SetupMainModel())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool SetupMainModel()
         {
             bool hasChanges = false;
-
-            if (mainModel != null && mainModel.ModelManager != this)
+            if (!mainModel)
             {
-                mainModel.ModelManager = this;
-                hasChanges = true;
-            }
-
-            if (vehicleModels != null && vehicleModels.Length > 0)
-            {
-                foreach (VehicleCharacterModel vehicleModel in vehicleModels)
-                {
-                    if (vehicleModel.modelsForEachSeats == null || vehicleModel.modelsForEachSeats.Length == 0) continue;
-                    foreach (BaseCharacterModel modelsForEachSeat in vehicleModel.modelsForEachSeats)
-                    {
-                        if (modelsForEachSeat == null) continue;
-                        if (modelsForEachSeat.ModelManager != this)
-                        {
-                            modelsForEachSeat.ModelManager = this;
-                            hasChanges = true;
-                        }
-                    }
-                }
+                mainModel = GetComponent<BaseCharacterModel>();
+                if (!mainModel)
+                    Debug.LogError("Can't find main model for [" + this + "]");
+                hasChanges = mainModel;
             }
             return hasChanges;
         }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            bool hasChanges = false;
-            if (mainModel == null)
-            {
-                mainModel = GetComponent<BaseCharacterModel>();
-                hasChanges = true;
-            }
-
-            if (SetupModelManager())
-                hasChanges = true;
-
-            if (hasChanges)
-                EditorUtility.SetDirty(this);
-        }
-#endif
 
         public void UpdatePassengingVehicle(VehicleType vehicleType, byte seatIndex)
         {
