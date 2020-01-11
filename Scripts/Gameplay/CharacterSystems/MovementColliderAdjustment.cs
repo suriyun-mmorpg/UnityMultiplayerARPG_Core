@@ -30,22 +30,30 @@ namespace MultiplayerARPG
         [SerializeField]
         private Settings standSettings = new Settings()
         {
+#if UNITY_EDITOR
             gizmosColor = Color.blue
+#endif
         };
         [SerializeField]
         private Settings crouchSettings = new Settings()
         {
+#if UNITY_EDITOR
             gizmosColor = Color.magenta
+#endif
         };
         [SerializeField]
         private Settings crawlSettings = new Settings()
         {
+#if UNITY_EDITOR
             gizmosColor = Color.red
+#endif
         };
         [SerializeField]
         private Settings swimSettings = new Settings()
         {
+#if UNITY_EDITOR
             gizmosColor = Color.yellow
+#endif
         };
 
         private CapsuleCollider capsuleCollider;
