@@ -1,0 +1,133 @@
+﻿using UnityEngine;
+using System.Collections;
+
+namespace MultiplayerARPG
+{
+    public class MovementTransformAdjustment : BaseGameEntityComponent<BaseGameEntity>
+    {
+        [System.Serializable]
+        public struct Settings
+        {
+            public Vector3 localPosition;
+#if UNITY_EDITOR
+            public bool drawGizmos;
+            public Color gizmosColor;
+            [Header("Editor Tools")]
+            public bool applyToTransform;
+#endif
+        }
+
+        [SerializeField]
+        private Transform targetTransform;
+        [SerializeField]
+        private float translateSpeed = 5f;
+        [SerializeField]
+        private Settings standSettings = new Settings()
+        {
+#if UNITY_EDITOR
+            gizmosColor = Color.blue
+#endif
+        };
+        [SerializeField]
+        private Settings crouchSettings = new Settings()
+        {
+#if UNITY_EDITOR
+            gizmosColor = Color.magenta
+#endif
+        };
+        [SerializeField]
+        private Settings crawlSettings = new Settings()
+        {
+#if UNITY_EDITOR
+            gizmosColor = Color.red
+#endif
+        };
+        [SerializeField]
+        private Settings swimSettings = new Settings()
+        {
+#if UNITY_EDITOR
+            gizmosColor = Color.yellow
+#endif
+        };
+
+        private Vector3 targetPosition;
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (targetTransform == null)
+            {
+                Debug.LogError("[" + this + "] `Target Transform` is empty");
+                return;
+            }
+            ApplyingSettings(ref standSettings);
+            ApplyingSettings(ref crouchSettings);
+            ApplyingSettings(ref crawlSettings);
+            ApplyingSettings(ref swimSettings);
+        }
+
+        private void ApplyingSettings(ref Settings settings)
+        {
+            if (settings.applyToTransform)
+            {
+                Apply(settings);
+                settings.applyToTransform = false;
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            DrawGizmos(standSettings);
+            DrawGizmos(crouchSettings);
+            DrawGizmos(crawlSettings);
+            DrawGizmos(swimSettings);
+        }
+
+        private void DrawGizmos(Settings settings)
+        {
+            if (!settings.drawGizmos)
+                return;
+            Gizmos.color = settings.gizmosColor;
+            Gizmos.DrawWireSphere(targetTransform.parent.position + settings.localPosition, 0.1f);
+        }
+#endif
+
+        public override void EntityUpdate()
+        {
+            base.EntityUpdate();
+
+            targetTransform.localPosition = Vector3.MoveTowards(targetTransform.localPosition, targetPosition, translateSpeed * Time.deltaTime);
+        }
+
+        public override void EntityLateUpdate()
+        {
+            if (targetTransform == null)
+                return;
+
+            if (CacheEntity.MovementState.HasFlag(MovementState.IsUnderWater))
+            {
+                Apply(swimSettings);
+            }
+            else
+            {
+                switch (CacheEntity.ExtraMovementState)
+                {
+                    case ExtraMovementState.IsCrouching:
+                        Apply(crouchSettings);
+                        break;
+                    case ExtraMovementState.IsCrawling:
+                        Apply(crawlSettings);
+                        break;
+                    default:
+                        Apply(standSettings);
+                        break;
+                }
+            }
+        }
+
+        private void Apply(Settings settings)
+        {
+            targetPosition = settings.localPosition;
+        }
+    }
+}
