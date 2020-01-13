@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -29,81 +32,141 @@ namespace MultiplayerARPG
             SetupComponent();
         }
 
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+#if UNITY_EDITOR
+            bool hasChanges = false;
+            if (legacyAnimation == null)
+            {
+                legacyAnimation = GetComponentInChildren<Animation>();
+                if (legacyAnimation != null)
+                    hasChanges = true;
+            }
+            if (legacyAnimation == null)
+                Debug.LogError("[" + this + "] `Legacy Animation` is empty");
+            if (hasChanges)
+            {
+                isSetupComponent = false;
+                SetupComponent();
+                EditorUtility.SetDirty(this);
+            }
+#endif
+        }
+
         private void SetupComponent()
         {
             if (isSetupComponent)
                 return;
             isSetupComponent = true;
+            SetDefaultAnimations();
+        }
+
+        public override void SetDefaultAnimations()
+        {
+            SetupClips(defaultAnimations.idleClip,
+                defaultAnimations.moveClip,
+                defaultAnimations.moveBackwardClip,
+                defaultAnimations.moveLeftClip,
+                defaultAnimations.moveRightClip,
+                defaultAnimations.moveForwardLeftClip,
+                defaultAnimations.moveForwardRightClip,
+                defaultAnimations.moveBackwardLeftClip,
+                defaultAnimations.moveBackwardRightClip,
+                defaultAnimations.sprintClip,
+                defaultAnimations.sprintBackwardClip,
+                defaultAnimations.sprintLeftClip,
+                defaultAnimations.sprintRightClip,
+                defaultAnimations.sprintForwardLeftClip,
+                defaultAnimations.sprintForwardRightClip,
+                defaultAnimations.sprintBackwardLeftClip,
+                defaultAnimations.sprintBackwardRightClip,
+                defaultAnimations.crouchIdleClip,
+                defaultAnimations.crouchMoveClip,
+                defaultAnimations.crouchMoveBackwardClip,
+                defaultAnimations.crouchMoveLeftClip,
+                defaultAnimations.crouchMoveRightClip,
+                defaultAnimations.crouchMoveForwardLeftClip,
+                defaultAnimations.crouchMoveForwardRightClip,
+                defaultAnimations.crouchMoveBackwardLeftClip,
+                defaultAnimations.crouchMoveBackwardRightClip,
+                defaultAnimations.crawlIdleClip,
+                defaultAnimations.crawlMoveClip,
+                defaultAnimations.crawlMoveBackwardClip,
+                defaultAnimations.crawlMoveLeftClip,
+                defaultAnimations.crawlMoveRightClip,
+                defaultAnimations.crawlMoveForwardLeftClip,
+                defaultAnimations.crawlMoveForwardRightClip,
+                defaultAnimations.crawlMoveBackwardLeftClip,
+                defaultAnimations.crawlMoveBackwardRightClip,
+                defaultAnimations.swimIdleClip,
+                defaultAnimations.swimMoveClip,
+                defaultAnimations.swimMoveBackwardClip,
+                defaultAnimations.swimMoveLeftClip,
+                defaultAnimations.swimMoveRightClip,
+                defaultAnimations.swimMoveForwardLeftClip,
+                defaultAnimations.swimMoveForwardRightClip,
+                defaultAnimations.swimMoveBackwardLeftClip,
+                defaultAnimations.swimMoveBackwardRightClip,
+                defaultAnimations.jumpClip,
+                defaultAnimations.fallClip,
+                defaultAnimations.hurtClip,
+                defaultAnimations.deadClip);
+            base.SetDefaultAnimations();
+        }
+
+        private void SetupClips(
+                AnimationClip idleClip,
+                AnimationClip moveClip,
+                AnimationClip moveBackwardClip,
+                AnimationClip moveLeftClip,
+                AnimationClip moveRightClip,
+                AnimationClip moveForwardLeftClip,
+                AnimationClip moveForwardRightClip,
+                AnimationClip moveBackwardLeftClip,
+                AnimationClip moveBackwardRightClip,
+                AnimationClip sprintClip,
+                AnimationClip sprintBackwardClip,
+                AnimationClip sprintLeftClip,
+                AnimationClip sprintRightClip,
+                AnimationClip sprintForwardLeftClip,
+                AnimationClip sprintForwardRightClip,
+                AnimationClip sprintBackwardLeftClip,
+                AnimationClip sprintBackwardRightClip,
+                AnimationClip crouchIdleClip,
+                AnimationClip crouchMoveClip,
+                AnimationClip crouchMoveBackwardClip,
+                AnimationClip crouchMoveLeftClip,
+                AnimationClip crouchMoveRightClip,
+                AnimationClip crouchMoveForwardLeftClip,
+                AnimationClip crouchMoveForwardRightClip,
+                AnimationClip crouchMoveBackwardLeftClip,
+                AnimationClip crouchMoveBackwardRightClip,
+                AnimationClip crawlIdleClip,
+                AnimationClip crawlMoveClip,
+                AnimationClip crawlMoveBackwardClip,
+                AnimationClip crawlMoveLeftClip,
+                AnimationClip crawlMoveRightClip,
+                AnimationClip crawlMoveForwardLeftClip,
+                AnimationClip crawlMoveForwardRightClip,
+                AnimationClip crawlMoveBackwardLeftClip,
+                AnimationClip crawlMoveBackwardRightClip,
+                AnimationClip swimIdleClip,
+                AnimationClip swimMoveClip,
+                AnimationClip swimMoveBackwardClip,
+                AnimationClip swimMoveLeftClip,
+                AnimationClip swimMoveRightClip,
+                AnimationClip swimMoveForwardLeftClip,
+                AnimationClip swimMoveForwardRightClip,
+                AnimationClip swimMoveBackwardLeftClip,
+                AnimationClip swimMoveBackwardRightClip,
+                AnimationClip jumpClip,
+                AnimationClip fallClip,
+                AnimationClip hurtClip,
+                AnimationClip deadClip)
+        {
             if (legacyAnimation == null)
-                legacyAnimation = GetComponentInChildren<Animation>();
-            legacyAnimation.AddClip(defaultAnimations.idleClip, CLIP_IDLE);
-            legacyAnimation.AddClip(defaultAnimations.moveClip, CLIP_MOVE);
-            legacyAnimation.AddClip(defaultAnimations.moveBackwardClip, CLIP_MOVE_BACKWARD);
-            legacyAnimation.AddClip(defaultAnimations.moveLeftClip, CLIP_MOVE_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.moveRightClip, CLIP_MOVE_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.moveForwardLeftClip, CLIP_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.moveForwardRightClip, CLIP_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.moveBackwardLeftClip, CLIP_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.moveBackwardRightClip, CLIP_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.sprintClip, CLIP_SPRINT);
-            legacyAnimation.AddClip(defaultAnimations.sprintBackwardClip, CLIP_SPRINT_BACKWARD);
-            legacyAnimation.AddClip(defaultAnimations.sprintLeftClip, CLIP_SPRINT_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.sprintRightClip, CLIP_SPRINT_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.sprintForwardLeftClip, CLIP_SPRINT_FORWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.sprintForwardRightClip, CLIP_SPRINT_FORWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.sprintBackwardLeftClip, CLIP_SPRINT_BACKWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.sprintBackwardRightClip, CLIP_SPRINT_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.crouchIdleClip, CLIP_CROUCH_IDLE);
-            legacyAnimation.AddClip(defaultAnimations.crouchMoveClip, CLIP_CROUCH_MOVE);
-            legacyAnimation.AddClip(defaultAnimations.crouchMoveBackwardClip, CLIP_CROUCH_MOVE_BACKWARD);
-            legacyAnimation.AddClip(defaultAnimations.crouchMoveLeftClip, CLIP_CROUCH_MOVE_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.crouchMoveRightClip, CLIP_CROUCH_MOVE_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.crouchMoveForwardLeftClip, CLIP_CROUCH_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.crouchMoveForwardRightClip, CLIP_CROUCH_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.crouchMoveBackwardLeftClip, CLIP_CROUCH_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.crouchMoveBackwardRightClip, CLIP_CROUCH_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.crawlIdleClip, CLIP_CRAWL_IDLE);
-            legacyAnimation.AddClip(defaultAnimations.crawlMoveClip, CLIP_CRAWL_MOVE);
-            legacyAnimation.AddClip(defaultAnimations.crawlMoveBackwardClip, CLIP_CRAWL_MOVE_BACKWARD);
-            legacyAnimation.AddClip(defaultAnimations.crawlMoveLeftClip, CLIP_CRAWL_MOVE_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.crawlMoveRightClip, CLIP_CRAWL_MOVE_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.crawlMoveForwardLeftClip, CLIP_CRAWL_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.crawlMoveForwardRightClip, CLIP_CRAWL_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.crawlMoveBackwardLeftClip, CLIP_CRAWL_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.crawlMoveBackwardRightClip, CLIP_CRAWL_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.swimIdleClip, CLIP_SWIM_IDLE);
-            legacyAnimation.AddClip(defaultAnimations.swimMoveClip, CLIP_SWIM_MOVE);
-            legacyAnimation.AddClip(defaultAnimations.swimMoveBackwardClip, CLIP_SWIM_MOVE_BACKWARD);
-            legacyAnimation.AddClip(defaultAnimations.swimMoveLeftClip, CLIP_SWIM_MOVE_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.swimMoveRightClip, CLIP_SWIM_MOVE_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.swimMoveForwardLeftClip, CLIP_SWIM_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.swimMoveForwardRightClip, CLIP_SWIM_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.swimMoveBackwardLeftClip, CLIP_SWIM_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(defaultAnimations.swimMoveBackwardRightClip, CLIP_SWIM_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(defaultAnimations.jumpClip, CLIP_JUMP);
-            legacyAnimation.AddClip(defaultAnimations.fallClip, CLIP_FALL);
-            legacyAnimation.AddClip(defaultAnimations.hurtClip, CLIP_HURT);
-            legacyAnimation.AddClip(defaultAnimations.deadClip, CLIP_DEAD);
-            CrossFadeLegacyAnimation(CLIP_IDLE, 0f, WrapMode.Loop);
-        }
-
-        public override void SetEquipWeapons(EquipWeapons equipWeapons)
-        {
-            base.SetEquipWeapons(equipWeapons);
-            SetupComponent();
-            SetClipBasedOnWeapon(equipWeapons);
-        }
-
-        protected void SetClipBasedOnWeapon(EquipWeapons equipWeapons)
-        {
-            if (GameInstance.Singleton == null)
                 return;
-
-            Item weaponItem = equipWeapons.GetRightHandWeaponItem();
-            if (weaponItem == null)
-                weaponItem = GameInstance.Singleton.DefaultWeaponItem;
-            WeaponAnimations weaponAnimations = default(WeaponAnimations);
-            GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
             // Remove clips
             if (legacyAnimation.GetClip(CLIP_IDLE) != null)
                 legacyAnimation.RemoveClip(CLIP_IDLE);
@@ -202,55 +265,123 @@ namespace MultiplayerARPG
             if (legacyAnimation.GetClip(CLIP_DEAD) != null)
                 legacyAnimation.RemoveClip(CLIP_DEAD);
             // Setup generic clips
-            legacyAnimation.AddClip(weaponAnimations.idleClip != null ? weaponAnimations.idleClip : defaultAnimations.idleClip, CLIP_IDLE);
-            legacyAnimation.AddClip(weaponAnimations.moveClip != null ? weaponAnimations.moveClip : defaultAnimations.moveClip, CLIP_MOVE);
-            legacyAnimation.AddClip(weaponAnimations.moveBackwardClip != null ? weaponAnimations.moveBackwardClip : defaultAnimations.moveBackwardClip, CLIP_MOVE_BACKWARD);
-            legacyAnimation.AddClip(weaponAnimations.moveLeftClip != null ? weaponAnimations.moveLeftClip : defaultAnimations.moveLeftClip, CLIP_MOVE_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.moveRightClip != null ? weaponAnimations.moveRightClip : defaultAnimations.moveRightClip, CLIP_MOVE_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.moveForwardLeftClip != null ? weaponAnimations.moveForwardLeftClip : defaultAnimations.moveForwardLeftClip, CLIP_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.moveForwardRightClip != null ? weaponAnimations.moveForwardRightClip : defaultAnimations.moveForwardRightClip, CLIP_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.moveBackwardLeftClip != null ? weaponAnimations.moveBackwardLeftClip : defaultAnimations.moveBackwardLeftClip, CLIP_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.moveBackwardRightClip != null ? weaponAnimations.moveBackwardRightClip : defaultAnimations.moveBackwardRightClip, CLIP_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.sprintClip != null ? weaponAnimations.sprintClip : defaultAnimations.sprintClip, CLIP_SPRINT);
-            legacyAnimation.AddClip(weaponAnimations.sprintBackwardClip != null ? weaponAnimations.sprintBackwardClip : defaultAnimations.sprintBackwardClip, CLIP_SPRINT_BACKWARD);
-            legacyAnimation.AddClip(weaponAnimations.sprintLeftClip != null ? weaponAnimations.sprintLeftClip : defaultAnimations.sprintLeftClip, CLIP_SPRINT_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.sprintRightClip != null ? weaponAnimations.sprintRightClip : defaultAnimations.sprintRightClip, CLIP_SPRINT_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.sprintForwardLeftClip != null ? weaponAnimations.sprintForwardLeftClip : defaultAnimations.sprintForwardLeftClip, CLIP_SPRINT_FORWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.sprintForwardRightClip != null ? weaponAnimations.sprintForwardRightClip : defaultAnimations.sprintForwardRightClip, CLIP_SPRINT_FORWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.sprintBackwardLeftClip != null ? weaponAnimations.sprintBackwardLeftClip : defaultAnimations.sprintBackwardLeftClip, CLIP_SPRINT_BACKWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.sprintBackwardRightClip != null ? weaponAnimations.sprintBackwardRightClip : defaultAnimations.sprintBackwardRightClip, CLIP_SPRINT_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.crouchIdleClip != null ? weaponAnimations.crouchIdleClip : defaultAnimations.crouchIdleClip, CLIP_CROUCH_IDLE);
-            legacyAnimation.AddClip(weaponAnimations.crouchMoveClip != null ? weaponAnimations.crouchMoveClip : defaultAnimations.crouchMoveClip, CLIP_CROUCH_MOVE);
-            legacyAnimation.AddClip(weaponAnimations.crouchMoveBackwardClip != null ? weaponAnimations.crouchMoveBackwardClip : defaultAnimations.crouchMoveBackwardClip, CLIP_CROUCH_MOVE_BACKWARD);
-            legacyAnimation.AddClip(weaponAnimations.crouchMoveLeftClip != null ? weaponAnimations.crouchMoveLeftClip : defaultAnimations.crouchMoveLeftClip, CLIP_CROUCH_MOVE_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.crouchMoveRightClip != null ? weaponAnimations.crouchMoveRightClip : defaultAnimations.crouchMoveRightClip, CLIP_CROUCH_MOVE_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.crouchMoveForwardLeftClip != null ? weaponAnimations.crouchMoveForwardLeftClip : defaultAnimations.crouchMoveForwardLeftClip, CLIP_CROUCH_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.crouchMoveForwardRightClip != null ? weaponAnimations.crouchMoveForwardRightClip : defaultAnimations.crouchMoveForwardRightClip, CLIP_CROUCH_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.crouchMoveBackwardLeftClip != null ? weaponAnimations.crouchMoveBackwardLeftClip : defaultAnimations.crouchMoveBackwardLeftClip, CLIP_CROUCH_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.crouchMoveBackwardRightClip != null ? weaponAnimations.crouchMoveBackwardRightClip : defaultAnimations.crouchMoveBackwardRightClip, CLIP_CROUCH_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.crawlIdleClip != null ? weaponAnimations.crawlIdleClip : defaultAnimations.crawlIdleClip, CLIP_CRAWL_IDLE);
-            legacyAnimation.AddClip(weaponAnimations.crawlMoveClip != null ? weaponAnimations.crawlMoveClip : defaultAnimations.crawlMoveClip, CLIP_CRAWL_MOVE);
-            legacyAnimation.AddClip(weaponAnimations.crawlMoveBackwardClip != null ? weaponAnimations.crawlMoveBackwardClip : defaultAnimations.crawlMoveBackwardClip, CLIP_CRAWL_MOVE_BACKWARD);
-            legacyAnimation.AddClip(weaponAnimations.crawlMoveLeftClip != null ? weaponAnimations.crawlMoveLeftClip : defaultAnimations.crawlMoveLeftClip, CLIP_CRAWL_MOVE_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.crawlMoveRightClip != null ? weaponAnimations.crawlMoveRightClip : defaultAnimations.crawlMoveRightClip, CLIP_CRAWL_MOVE_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.crawlMoveForwardLeftClip != null ? weaponAnimations.crawlMoveForwardLeftClip : defaultAnimations.crawlMoveForwardLeftClip, CLIP_CRAWL_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.crawlMoveForwardRightClip != null ? weaponAnimations.crawlMoveForwardRightClip : defaultAnimations.crawlMoveForwardRightClip, CLIP_CRAWL_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.crawlMoveBackwardLeftClip != null ? weaponAnimations.crawlMoveBackwardLeftClip : defaultAnimations.crawlMoveBackwardLeftClip, CLIP_CRAWL_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.crawlMoveBackwardRightClip != null ? weaponAnimations.crawlMoveBackwardRightClip : defaultAnimations.crawlMoveBackwardRightClip, CLIP_CRAWL_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.swimIdleClip != null ? weaponAnimations.swimIdleClip : defaultAnimations.swimIdleClip, CLIP_SWIM_IDLE);
-            legacyAnimation.AddClip(weaponAnimations.swimMoveClip != null ? weaponAnimations.swimMoveClip : defaultAnimations.swimMoveClip, CLIP_SWIM_MOVE);
-            legacyAnimation.AddClip(weaponAnimations.swimMoveBackwardClip != null ? weaponAnimations.swimMoveBackwardClip : defaultAnimations.swimMoveBackwardClip, CLIP_SWIM_MOVE_BACKWARD);
-            legacyAnimation.AddClip(weaponAnimations.swimMoveLeftClip != null ? weaponAnimations.swimMoveLeftClip : defaultAnimations.swimMoveLeftClip, CLIP_SWIM_MOVE_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.swimMoveRightClip != null ? weaponAnimations.swimMoveRightClip : defaultAnimations.swimMoveRightClip, CLIP_SWIM_MOVE_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.swimMoveForwardLeftClip != null ? weaponAnimations.swimMoveForwardLeftClip : defaultAnimations.swimMoveForwardLeftClip, CLIP_SWIM_MOVE_FORWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.swimMoveForwardRightClip != null ? weaponAnimations.swimMoveForwardRightClip : defaultAnimations.swimMoveForwardRightClip, CLIP_SWIM_MOVE_FORWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.swimMoveBackwardLeftClip != null ? weaponAnimations.swimMoveBackwardLeftClip : defaultAnimations.swimMoveBackwardLeftClip, CLIP_SWIM_MOVE_BACKWARD_LEFT);
-            legacyAnimation.AddClip(weaponAnimations.swimMoveBackwardRightClip != null ? weaponAnimations.swimMoveBackwardRightClip : defaultAnimations.swimMoveBackwardRightClip, CLIP_SWIM_MOVE_BACKWARD_RIGHT);
-            legacyAnimation.AddClip(weaponAnimations.jumpClip != null ? weaponAnimations.jumpClip : defaultAnimations.jumpClip, CLIP_JUMP);
-            legacyAnimation.AddClip(weaponAnimations.fallClip != null ? weaponAnimations.fallClip : defaultAnimations.fallClip, CLIP_FALL);
-            legacyAnimation.AddClip(weaponAnimations.hurtClip != null ? weaponAnimations.hurtClip : defaultAnimations.hurtClip, CLIP_HURT);
-            legacyAnimation.AddClip(weaponAnimations.deadClip != null ? weaponAnimations.deadClip : defaultAnimations.deadClip, CLIP_DEAD);
-            CrossFadeLegacyAnimation(CLIP_IDLE, 0, WrapMode.Loop);
+            legacyAnimation.AddClip(idleClip != null ? idleClip : defaultAnimations.idleClip, CLIP_IDLE);
+            legacyAnimation.AddClip(moveClip != null ? moveClip : defaultAnimations.moveClip, CLIP_MOVE);
+            legacyAnimation.AddClip(moveBackwardClip != null ? moveBackwardClip : defaultAnimations.moveBackwardClip, CLIP_MOVE_BACKWARD);
+            legacyAnimation.AddClip(moveLeftClip != null ? moveLeftClip : defaultAnimations.moveLeftClip, CLIP_MOVE_LEFT);
+            legacyAnimation.AddClip(moveRightClip != null ? moveRightClip : defaultAnimations.moveRightClip, CLIP_MOVE_RIGHT);
+            legacyAnimation.AddClip(moveForwardLeftClip != null ? moveForwardLeftClip : defaultAnimations.moveForwardLeftClip, CLIP_MOVE_FORWARD_LEFT);
+            legacyAnimation.AddClip(moveForwardRightClip != null ? moveForwardRightClip : defaultAnimations.moveForwardRightClip, CLIP_MOVE_FORWARD_RIGHT);
+            legacyAnimation.AddClip(moveBackwardLeftClip != null ? moveBackwardLeftClip : defaultAnimations.moveBackwardLeftClip, CLIP_MOVE_BACKWARD_LEFT);
+            legacyAnimation.AddClip(moveBackwardRightClip != null ? moveBackwardRightClip : defaultAnimations.moveBackwardRightClip, CLIP_MOVE_BACKWARD_RIGHT);
+            legacyAnimation.AddClip(sprintClip != null ? sprintClip : defaultAnimations.sprintClip, CLIP_SPRINT);
+            legacyAnimation.AddClip(sprintBackwardClip != null ? sprintBackwardClip : defaultAnimations.sprintBackwardClip, CLIP_SPRINT_BACKWARD);
+            legacyAnimation.AddClip(sprintLeftClip != null ? sprintLeftClip : defaultAnimations.sprintLeftClip, CLIP_SPRINT_LEFT);
+            legacyAnimation.AddClip(sprintRightClip != null ? sprintRightClip : defaultAnimations.sprintRightClip, CLIP_SPRINT_RIGHT);
+            legacyAnimation.AddClip(sprintForwardLeftClip != null ? sprintForwardLeftClip : defaultAnimations.sprintForwardLeftClip, CLIP_SPRINT_FORWARD_LEFT);
+            legacyAnimation.AddClip(sprintForwardRightClip != null ? sprintForwardRightClip : defaultAnimations.sprintForwardRightClip, CLIP_SPRINT_FORWARD_RIGHT);
+            legacyAnimation.AddClip(sprintBackwardLeftClip != null ? sprintBackwardLeftClip : defaultAnimations.sprintBackwardLeftClip, CLIP_SPRINT_BACKWARD_LEFT);
+            legacyAnimation.AddClip(sprintBackwardRightClip != null ? sprintBackwardRightClip : defaultAnimations.sprintBackwardRightClip, CLIP_SPRINT_BACKWARD_RIGHT);
+            legacyAnimation.AddClip(crouchIdleClip != null ? crouchIdleClip : defaultAnimations.crouchIdleClip, CLIP_CROUCH_IDLE);
+            legacyAnimation.AddClip(crouchMoveClip != null ? crouchMoveClip : defaultAnimations.crouchMoveClip, CLIP_CROUCH_MOVE);
+            legacyAnimation.AddClip(crouchMoveBackwardClip != null ? crouchMoveBackwardClip : defaultAnimations.crouchMoveBackwardClip, CLIP_CROUCH_MOVE_BACKWARD);
+            legacyAnimation.AddClip(crouchMoveLeftClip != null ? crouchMoveLeftClip : defaultAnimations.crouchMoveLeftClip, CLIP_CROUCH_MOVE_LEFT);
+            legacyAnimation.AddClip(crouchMoveRightClip != null ? crouchMoveRightClip : defaultAnimations.crouchMoveRightClip, CLIP_CROUCH_MOVE_RIGHT);
+            legacyAnimation.AddClip(crouchMoveForwardLeftClip != null ? crouchMoveForwardLeftClip : defaultAnimations.crouchMoveForwardLeftClip, CLIP_CROUCH_MOVE_FORWARD_LEFT);
+            legacyAnimation.AddClip(crouchMoveForwardRightClip != null ? crouchMoveForwardRightClip : defaultAnimations.crouchMoveForwardRightClip, CLIP_CROUCH_MOVE_FORWARD_RIGHT);
+            legacyAnimation.AddClip(crouchMoveBackwardLeftClip != null ? crouchMoveBackwardLeftClip : defaultAnimations.crouchMoveBackwardLeftClip, CLIP_CROUCH_MOVE_BACKWARD_LEFT);
+            legacyAnimation.AddClip(crouchMoveBackwardRightClip != null ? crouchMoveBackwardRightClip : defaultAnimations.crouchMoveBackwardRightClip, CLIP_CROUCH_MOVE_BACKWARD_RIGHT);
+            legacyAnimation.AddClip(crawlIdleClip != null ? crawlIdleClip : defaultAnimations.crawlIdleClip, CLIP_CRAWL_IDLE);
+            legacyAnimation.AddClip(crawlMoveClip != null ? crawlMoveClip : defaultAnimations.crawlMoveClip, CLIP_CRAWL_MOVE);
+            legacyAnimation.AddClip(crawlMoveBackwardClip != null ? crawlMoveBackwardClip : defaultAnimations.crawlMoveBackwardClip, CLIP_CRAWL_MOVE_BACKWARD);
+            legacyAnimation.AddClip(crawlMoveLeftClip != null ? crawlMoveLeftClip : defaultAnimations.crawlMoveLeftClip, CLIP_CRAWL_MOVE_LEFT);
+            legacyAnimation.AddClip(crawlMoveRightClip != null ? crawlMoveRightClip : defaultAnimations.crawlMoveRightClip, CLIP_CRAWL_MOVE_RIGHT);
+            legacyAnimation.AddClip(crawlMoveForwardLeftClip != null ? crawlMoveForwardLeftClip : defaultAnimations.crawlMoveForwardLeftClip, CLIP_CRAWL_MOVE_FORWARD_LEFT);
+            legacyAnimation.AddClip(crawlMoveForwardRightClip != null ? crawlMoveForwardRightClip : defaultAnimations.crawlMoveForwardRightClip, CLIP_CRAWL_MOVE_FORWARD_RIGHT);
+            legacyAnimation.AddClip(crawlMoveBackwardLeftClip != null ? crawlMoveBackwardLeftClip : defaultAnimations.crawlMoveBackwardLeftClip, CLIP_CRAWL_MOVE_BACKWARD_LEFT);
+            legacyAnimation.AddClip(crawlMoveBackwardRightClip != null ? crawlMoveBackwardRightClip : defaultAnimations.crawlMoveBackwardRightClip, CLIP_CRAWL_MOVE_BACKWARD_RIGHT);
+            legacyAnimation.AddClip(swimIdleClip != null ? swimIdleClip : defaultAnimations.swimIdleClip, CLIP_SWIM_IDLE);
+            legacyAnimation.AddClip(swimMoveClip != null ? swimMoveClip : defaultAnimations.swimMoveClip, CLIP_SWIM_MOVE);
+            legacyAnimation.AddClip(swimMoveBackwardClip != null ? swimMoveBackwardClip : defaultAnimations.swimMoveBackwardClip, CLIP_SWIM_MOVE_BACKWARD);
+            legacyAnimation.AddClip(swimMoveLeftClip != null ? swimMoveLeftClip : defaultAnimations.swimMoveLeftClip, CLIP_SWIM_MOVE_LEFT);
+            legacyAnimation.AddClip(swimMoveRightClip != null ? swimMoveRightClip : defaultAnimations.swimMoveRightClip, CLIP_SWIM_MOVE_RIGHT);
+            legacyAnimation.AddClip(swimMoveForwardLeftClip != null ? swimMoveForwardLeftClip : defaultAnimations.swimMoveForwardLeftClip, CLIP_SWIM_MOVE_FORWARD_LEFT);
+            legacyAnimation.AddClip(swimMoveForwardRightClip != null ? swimMoveForwardRightClip : defaultAnimations.swimMoveForwardRightClip, CLIP_SWIM_MOVE_FORWARD_RIGHT);
+            legacyAnimation.AddClip(swimMoveBackwardLeftClip != null ? swimMoveBackwardLeftClip : defaultAnimations.swimMoveBackwardLeftClip, CLIP_SWIM_MOVE_BACKWARD_LEFT);
+            legacyAnimation.AddClip(swimMoveBackwardRightClip != null ? swimMoveBackwardRightClip : defaultAnimations.swimMoveBackwardRightClip, CLIP_SWIM_MOVE_BACKWARD_RIGHT);
+            legacyAnimation.AddClip(jumpClip != null ? jumpClip : defaultAnimations.jumpClip, CLIP_JUMP);
+            legacyAnimation.AddClip(fallClip != null ? fallClip : defaultAnimations.fallClip, CLIP_FALL);
+            legacyAnimation.AddClip(hurtClip != null ? hurtClip : defaultAnimations.hurtClip, CLIP_HURT);
+            legacyAnimation.AddClip(deadClip != null ? deadClip : defaultAnimations.deadClip, CLIP_DEAD);
+            CrossFadeLegacyAnimation(CLIP_IDLE, 0f, WrapMode.Loop);
+        }
+
+        public override void SetEquipWeapons(EquipWeapons equipWeapons)
+        {
+            base.SetEquipWeapons(equipWeapons);
+            SetupComponent();
+            SetClipBasedOnWeapon(equipWeapons);
+        }
+
+        protected void SetClipBasedOnWeapon(EquipWeapons equipWeapons)
+        {
+            if (GameInstance.Singleton == null)
+                return;
+
+            Item weaponItem = equipWeapons.GetRightHandWeaponItem();
+            if (weaponItem == null)
+                weaponItem = GameInstance.Singleton.DefaultWeaponItem;
+            WeaponAnimations weaponAnimations = default(WeaponAnimations);
+            GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
+
+            SetupClips(weaponAnimations.idleClip,
+                weaponAnimations.moveClip,
+                weaponAnimations.moveBackwardClip,
+                weaponAnimations.moveLeftClip,
+                weaponAnimations.moveRightClip,
+                weaponAnimations.moveForwardLeftClip,
+                weaponAnimations.moveForwardRightClip,
+                weaponAnimations.moveBackwardLeftClip,
+                weaponAnimations.moveBackwardRightClip,
+                weaponAnimations.sprintClip,
+                weaponAnimations.sprintBackwardClip,
+                weaponAnimations.sprintLeftClip,
+                weaponAnimations.sprintRightClip,
+                weaponAnimations.sprintForwardLeftClip,
+                weaponAnimations.sprintForwardRightClip,
+                weaponAnimations.sprintBackwardLeftClip,
+                weaponAnimations.sprintBackwardRightClip,
+                weaponAnimations.crouchIdleClip,
+                weaponAnimations.crouchMoveClip,
+                weaponAnimations.crouchMoveBackwardClip,
+                weaponAnimations.crouchMoveLeftClip,
+                weaponAnimations.crouchMoveRightClip,
+                weaponAnimations.crouchMoveForwardLeftClip,
+                weaponAnimations.crouchMoveForwardRightClip,
+                weaponAnimations.crouchMoveBackwardLeftClip,
+                weaponAnimations.crouchMoveBackwardRightClip,
+                weaponAnimations.crawlIdleClip,
+                weaponAnimations.crawlMoveClip,
+                weaponAnimations.crawlMoveBackwardClip,
+                weaponAnimations.crawlMoveLeftClip,
+                weaponAnimations.crawlMoveRightClip,
+                weaponAnimations.crawlMoveForwardLeftClip,
+                weaponAnimations.crawlMoveForwardRightClip,
+                weaponAnimations.crawlMoveBackwardLeftClip,
+                weaponAnimations.crawlMoveBackwardRightClip,
+                weaponAnimations.swimIdleClip,
+                weaponAnimations.swimMoveClip,
+                weaponAnimations.swimMoveBackwardClip,
+                weaponAnimations.swimMoveLeftClip,
+                weaponAnimations.swimMoveRightClip,
+                weaponAnimations.swimMoveForwardLeftClip,
+                weaponAnimations.swimMoveForwardRightClip,
+                weaponAnimations.swimMoveBackwardLeftClip,
+                weaponAnimations.swimMoveBackwardRightClip,
+                weaponAnimations.jumpClip,
+                weaponAnimations.fallClip,
+                weaponAnimations.hurtClip,
+                weaponAnimations.deadClip);
         }
 
         public override void PlayMoveAnimation()

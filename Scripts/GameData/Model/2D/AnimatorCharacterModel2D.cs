@@ -96,15 +96,7 @@ namespace MultiplayerARPG
         [Tooltip("You can set this when animator controller type is `Custom`")]
         public RuntimeAnimatorController animatorController;
 
-        private AnimatorOverrideController cacheAnimatorController;
-        public AnimatorOverrideController CacheAnimatorController
-        {
-            get
-            {
-                SetupComponent();
-                return cacheAnimatorController;
-            }
-        }
+        public AnimatorOverrideController CacheAnimatorController { get; private set; }
 
         // Private state validater
         private bool isSetupComponent;
@@ -120,6 +112,13 @@ namespace MultiplayerARPG
             base.OnValidate();
 #if UNITY_EDITOR
             bool hasChanges = false;
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>();
+                if (animator != null)
+                    hasChanges = true;
+            }
+
             RuntimeAnimatorController changingAnimatorController;
             switch (controllerType)
             {
@@ -142,8 +141,16 @@ namespace MultiplayerARPG
                     }
                     break;
             }
+            if (animator == null)
+                Debug.LogError("[" + this + "] `Animator` is empty");
+            if (animatorController == null)
+                Debug.LogError("[" + this + "] `Animator Controller` is empty");
             if (hasChanges)
+            {
+                isSetupComponent = false;
+                SetupComponent();
                 EditorUtility.SetDirty(this);
+            }
 #endif
         }
 
@@ -151,43 +158,49 @@ namespace MultiplayerARPG
         {
             if (isSetupComponent)
                 return;
-            // Set setup state to avoid it trying to setup again later
             isSetupComponent = true;
-            if (cacheAnimatorController == null)
-                cacheAnimatorController = new AnimatorOverrideController(animatorController);
+            if (CacheAnimatorController == null)
+                CacheAnimatorController = new AnimatorOverrideController(animatorController);
             // Use override controller as animator
-            if (animator == null)
-                animator = GetComponentInChildren<Animator>();
-            if (animator != null && animator.runtimeAnimatorController != cacheAnimatorController)
-                animator.runtimeAnimatorController = cacheAnimatorController;
+            if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
+                animator.runtimeAnimatorController = CacheAnimatorController;
+            SetDefaultAnimations();
+        }
+
+        public override void SetDefaultAnimations()
+        {
             // Set default clips
-            // Idle
-            CacheAnimatorController[CLIP_IDLE_DOWN] = idleAnimation2D.down;
-            CacheAnimatorController[CLIP_IDLE_UP] = idleAnimation2D.up;
-            CacheAnimatorController[CLIP_IDLE_LEFT] = idleAnimation2D.left;
-            CacheAnimatorController[CLIP_IDLE_RIGHT] = idleAnimation2D.right;
-            CacheAnimatorController[CLIP_IDLE_DOWN_LEFT] = idleAnimation2D.downLeft;
-            CacheAnimatorController[CLIP_IDLE_DOWN_RIGHT] = idleAnimation2D.downRight;
-            CacheAnimatorController[CLIP_IDLE_UP_LEFT] = idleAnimation2D.upLeft;
-            CacheAnimatorController[CLIP_IDLE_UP_RIGHT] = idleAnimation2D.upRight;
-            // Move
-            CacheAnimatorController[CLIP_MOVE_DOWN] = moveAnimation2D.down;
-            CacheAnimatorController[CLIP_MOVE_UP] = moveAnimation2D.up;
-            CacheAnimatorController[CLIP_MOVE_LEFT] = moveAnimation2D.left;
-            CacheAnimatorController[CLIP_MOVE_RIGHT] = moveAnimation2D.right;
-            CacheAnimatorController[CLIP_MOVE_DOWN_LEFT] = moveAnimation2D.downLeft;
-            CacheAnimatorController[CLIP_MOVE_DOWN_RIGHT] = moveAnimation2D.downRight;
-            CacheAnimatorController[CLIP_MOVE_UP_LEFT] = moveAnimation2D.upLeft;
-            CacheAnimatorController[CLIP_MOVE_UP_RIGHT] = moveAnimation2D.upRight;
-            // Dead
-            CacheAnimatorController[CLIP_DEAD_DOWN] = deadAnimation2D.down;
-            CacheAnimatorController[CLIP_DEAD_UP] = deadAnimation2D.up;
-            CacheAnimatorController[CLIP_DEAD_LEFT] = deadAnimation2D.left;
-            CacheAnimatorController[CLIP_DEAD_RIGHT] = deadAnimation2D.right;
-            CacheAnimatorController[CLIP_DEAD_DOWN_LEFT] = deadAnimation2D.downLeft;
-            CacheAnimatorController[CLIP_DEAD_DOWN_RIGHT] = deadAnimation2D.downRight;
-            CacheAnimatorController[CLIP_DEAD_UP_LEFT] = deadAnimation2D.upLeft;
-            CacheAnimatorController[CLIP_DEAD_UP_RIGHT] = deadAnimation2D.upRight;
+            if (CacheAnimatorController != null)
+            {
+                // Idle
+                CacheAnimatorController[CLIP_IDLE_DOWN] = idleAnimation2D.down;
+                CacheAnimatorController[CLIP_IDLE_UP] = idleAnimation2D.up;
+                CacheAnimatorController[CLIP_IDLE_LEFT] = idleAnimation2D.left;
+                CacheAnimatorController[CLIP_IDLE_RIGHT] = idleAnimation2D.right;
+                CacheAnimatorController[CLIP_IDLE_DOWN_LEFT] = idleAnimation2D.downLeft;
+                CacheAnimatorController[CLIP_IDLE_DOWN_RIGHT] = idleAnimation2D.downRight;
+                CacheAnimatorController[CLIP_IDLE_UP_LEFT] = idleAnimation2D.upLeft;
+                CacheAnimatorController[CLIP_IDLE_UP_RIGHT] = idleAnimation2D.upRight;
+                // Move
+                CacheAnimatorController[CLIP_MOVE_DOWN] = moveAnimation2D.down;
+                CacheAnimatorController[CLIP_MOVE_UP] = moveAnimation2D.up;
+                CacheAnimatorController[CLIP_MOVE_LEFT] = moveAnimation2D.left;
+                CacheAnimatorController[CLIP_MOVE_RIGHT] = moveAnimation2D.right;
+                CacheAnimatorController[CLIP_MOVE_DOWN_LEFT] = moveAnimation2D.downLeft;
+                CacheAnimatorController[CLIP_MOVE_DOWN_RIGHT] = moveAnimation2D.downRight;
+                CacheAnimatorController[CLIP_MOVE_UP_LEFT] = moveAnimation2D.upLeft;
+                CacheAnimatorController[CLIP_MOVE_UP_RIGHT] = moveAnimation2D.upRight;
+                // Dead
+                CacheAnimatorController[CLIP_DEAD_DOWN] = deadAnimation2D.down;
+                CacheAnimatorController[CLIP_DEAD_UP] = deadAnimation2D.up;
+                CacheAnimatorController[CLIP_DEAD_LEFT] = deadAnimation2D.left;
+                CacheAnimatorController[CLIP_DEAD_RIGHT] = deadAnimation2D.right;
+                CacheAnimatorController[CLIP_DEAD_DOWN_LEFT] = deadAnimation2D.downLeft;
+                CacheAnimatorController[CLIP_DEAD_DOWN_RIGHT] = deadAnimation2D.downRight;
+                CacheAnimatorController[CLIP_DEAD_UP_LEFT] = deadAnimation2D.upLeft;
+                CacheAnimatorController[CLIP_DEAD_UP_RIGHT] = deadAnimation2D.upRight;
+            }
+            base.SetDefaultAnimations();
         }
 
         public override void PlayMoveAnimation()
