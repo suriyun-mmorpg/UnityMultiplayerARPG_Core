@@ -17,15 +17,11 @@ public class UIFollowWorldObject : MonoBehaviour
         }
     }
 
-    private UIFollowWorldPosition cachePositionFollower;
-    public UIFollowWorldPosition CachePositionFollower
+    public UIFollowWorldPosition CachePositionFollower { get; private set; }
+
+    private void OnEnable()
     {
-        get
-        {
-            if (cachePositionFollower == null)
-                cachePositionFollower = GetComponent<UIFollowWorldPosition>();
-            return cachePositionFollower;
-        }
+        CachePositionFollower = GetComponent<UIFollowWorldPosition>();
     }
 
     private void Update()

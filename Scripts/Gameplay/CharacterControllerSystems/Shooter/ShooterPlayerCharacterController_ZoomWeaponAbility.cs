@@ -7,6 +7,7 @@ namespace MultiplayerARPG
 {
     public partial class ShooterPlayerCharacterController
     {
+        [Header("Zoom Weapon Ability Settings")]
         [SerializeField]
         public Image zoomCrosshairImage;
 

@@ -494,7 +494,6 @@ namespace MultiplayerARPG
                         CacheRigidbody.AddForce(new Vector3(0f, CalculateJumpVerticalSpeed(), 0f), ForceMode.Impulse);
                     }
                     applyingJump = true;
-                    isGrounded = false;
                 }
 
                 if (!applyingJump &&

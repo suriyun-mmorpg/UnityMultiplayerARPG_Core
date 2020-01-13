@@ -90,6 +90,12 @@ namespace MultiplayerARPG
                 return cameraTargetTransform;
             }
         }
+        [SerializeField]
+        private Transform fpsCameraTargetTransform;
+        public Transform FpsCameraTargetTransform
+        {
+            get { return fpsCameraTargetTransform; }
+        }
 
         [Header("Entity Movement Settings")]
         [SerializeField]
@@ -293,9 +299,11 @@ namespace MultiplayerARPG
         public virtual void InitialRequiredComponents()
         {
             // Cache components
-            CacheTransform = GetComponent<Transform>();
+            CacheTransform = transform;
             if (cameraTargetTransform == null)
                 cameraTargetTransform = CacheTransform;
+            if (fpsCameraTargetTransform == null)
+                fpsCameraTargetTransform = CacheTransform;
             Movement = GetComponent<BaseEntityMovement>();
         }
 

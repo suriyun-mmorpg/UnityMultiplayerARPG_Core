@@ -271,7 +271,7 @@ namespace MultiplayerARPG
                 // Update movement animation
                 CharacterModel.SetMovementState(MovementState, ExtraMovementState, DirectionType2D);
                 // Update FPS model
-                if (FpsModel != null)
+                if (FpsModel && FpsModel.gameObject.activeSelf)
                 {
                     // Update is dead state
                     FpsModel.SetIsDead(IsDead());
@@ -370,7 +370,7 @@ namespace MultiplayerARPG
                 case DamageType.Raycast:
                     if (ModelManager.IsFps)
                     {
-                        if (FpsModel != null)
+                        if (FpsModel && FpsModel.gameObject.activeSelf)
                         {
                             // Spawn bullets from fps model
                             transform = isLeftHand ? FpsModel.GetLeftHandMissileDamageTransform() : FpsModel.GetRightHandMissileDamageTransform();

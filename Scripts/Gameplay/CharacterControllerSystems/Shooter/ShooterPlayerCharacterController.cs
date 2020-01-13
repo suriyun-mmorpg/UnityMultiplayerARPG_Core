@@ -39,6 +39,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private ControllerMode mode;
         [SerializeField]
+        private bool canSwitchViewMode;
+        [SerializeField]
         private ControllerViewMode viewMode;
         [SerializeField]
         private ExtraMoveActiveMode sprintActiveMode;
@@ -69,14 +71,22 @@ namespace MultiplayerARPG
         private Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
         [SerializeField]
         private float tpsFov = 60f;
+        [SerializeField]
+        private float tpsNearClipPlane = 0.3f;
+        [SerializeField]
+        private float tpsFarClipPlane = 1000f;
 
         [Header("FPS Settings")]
         [SerializeField]
         private float fpsZoomDistance = 0f;
         [SerializeField]
-        private Vector3 fpsTargetOffset = new Vector3(0f, 1.25f, 0f);
+        private Vector3 fpsTargetOffset = new Vector3(0f, 0f, 0f);
         [SerializeField]
-        private float fpsFov = 60f;
+        private float fpsFov = 40f;
+        [SerializeField]
+        private float fpsNearClipPlane = 0.01f;
+        [SerializeField]
+        private float fpsFarClipPlane = 1000f;
 
         public bool IsBlockController { get; protected set; }
 
@@ -101,52 +111,37 @@ namespace MultiplayerARPG
 
         public float CameraZoomDistance
         {
-            get
-            {
-                if (ViewMode == ControllerViewMode.Tps)
-                    return tpsZoomDistance;
-                return fpsZoomDistance;
-            }
+            get { return ViewMode == ControllerViewMode.Tps ? tpsZoomDistance : fpsZoomDistance; }
         }
 
         public float CameraMinZoomDistance
         {
-            get
-            {
-                if (ViewMode == ControllerViewMode.Tps)
-                    return tpsMinZoomDistance;
-                return fpsZoomDistance;
-            }
+            get { return ViewMode == ControllerViewMode.Tps ? tpsMinZoomDistance : fpsZoomDistance; }
         }
 
         public float CameraMaxZoomDistance
         {
-            get
-            {
-                if (ViewMode == ControllerViewMode.Tps)
-                    return tpsMaxZoomDistance;
-                return fpsZoomDistance;
-            }
+            get { return ViewMode == ControllerViewMode.Tps ? tpsMaxZoomDistance : fpsZoomDistance; }
         }
 
         public Vector3 CameraTargetOffset
         {
-            get
-            {
-                if (ViewMode == ControllerViewMode.Tps)
-                    return tpsTargetOffset;
-                return fpsTargetOffset;
-            }
+            get { return ViewMode == ControllerViewMode.Tps ? tpsTargetOffset : fpsTargetOffset; }
         }
 
         public float CameraFov
         {
-            get
-            {
-                if (ViewMode == ControllerViewMode.Tps)
-                    return tpsFov;
-                return fpsFov;
-            }
+            get { return ViewMode == ControllerViewMode.Tps ? tpsFov : fpsFov; }
+        }
+
+        public float CameraNearClipPlane
+        {
+            get { return ViewMode == ControllerViewMode.Tps ? tpsNearClipPlane : fpsNearClipPlane; }
+        }
+
+        public float CameraFarClipPlane
+        {
+            get { return ViewMode == ControllerViewMode.Tps ? tpsFarClipPlane : fpsFarClipPlane; }
         }
 
         // Temp data
@@ -198,6 +193,7 @@ namespace MultiplayerARPG
         bool toggleSprintOn;
         bool toggleCrouchOn;
         bool toggleCrawlOn;
+        ControllerViewMode? viewModeBeforeDead;
         public BaseWeaponAbility WeaponAbility { get; private set; }
         public WeaponAbilityState WeaponAbilityState { get; private set; }
 
@@ -222,6 +218,7 @@ namespace MultiplayerARPG
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
             characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraControls.CacheCameraTransform);
+            characterEntity.ModelManager.SetIsFps(ViewMode == ControllerViewMode.Fps);
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -287,11 +284,30 @@ namespace MultiplayerARPG
                 return;
 
             base.Update();
+
+            if (PlayerCharacterEntity.IsDead())
+            {
+                // Set view mode to TPS when character dead
+                if (!viewModeBeforeDead.HasValue)
+                    viewModeBeforeDead = ViewMode;
+                ViewMode = ControllerViewMode.Tps;
+            }
+            else
+            {
+                // Set view mode to view mode before dead when character alive
+                if (viewModeBeforeDead.HasValue)
+                {
+                    ViewMode = viewModeBeforeDead.Value;
+                    viewModeBeforeDead = null;
+                }
+            }
+
             if (dirtyViewMode != viewMode)
             {
                 dirtyViewMode = viewMode;
                 UpdateCameraSettings();
             }
+            CacheGameplayCameraControls.target = ViewMode == ControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
 
             tempDeltaTime = Time.deltaTime;
             calculatedTurnDuration += tempDeltaTime;
@@ -380,23 +396,19 @@ namespace MultiplayerARPG
             if (InputManager.GetButtonDown("Jump"))
                 movementState |= MovementState.IsJump;
 
-            DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn);
-            DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn);
-            DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn);
-
-            if (toggleSprintOn)
+            if (DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn))
             {
                 extraMovementState = ExtraMovementState.IsSprinting;
                 toggleCrouchOn = false;
                 toggleCrawlOn = false;
             }
-            else if (toggleCrouchOn)
+            else if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
             {
                 extraMovementState = ExtraMovementState.IsCrouching;
                 toggleSprintOn = false;
                 toggleCrawlOn = false;
             }
-            else if (toggleCrawlOn)
+            else if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
             {
                 extraMovementState = ExtraMovementState.IsCrawling;
                 toggleSprintOn = false;
@@ -406,9 +418,33 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
             PlayerCharacterEntity.SetExtraMovement(extraMovementState);
             UpdateLookAtTarget();
+
+            if (canSwitchViewMode && InputManager.GetButtonDown("SwitchViewMode"))
+            {
+                switch (ViewMode)
+                {
+                    case ControllerViewMode.Tps:
+                        ViewMode = ControllerViewMode.Fps;
+                        break;
+                    case ControllerViewMode.Fps:
+                        ViewMode = ControllerViewMode.Tps;
+                        break;
+                }
+            }
         }
 
-        private void DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
+        private void LateUpdate()
+        {
+            if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsUnderWater))
+            {
+                // Clear toggled sprint, crouch and crawl
+                toggleSprintOn = false;
+                toggleCrouchOn = false;
+                toggleCrawlOn = false;
+            }
+        }
+
+        private bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
         {
             switch (activeMode)
             {
@@ -420,6 +456,7 @@ namespace MultiplayerARPG
                         state = !state;
                     break;
             }
+            return state;
         }
 
         private void UpdateTarget_BuildingMode()
@@ -1163,11 +1200,13 @@ namespace MultiplayerARPG
         public void UpdateCameraSettings()
         {
             CacheGameplayCameraControls.CacheCamera.fieldOfView = CameraFov;
+            CacheGameplayCameraControls.CacheCamera.nearClipPlane = CameraNearClipPlane;
+            CacheGameplayCameraControls.CacheCamera.farClipPlane = CameraFarClipPlane;
             CacheGameplayCameraControls.targetOffset = CameraTargetOffset;
             CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
             CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
             CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
-            CacheGameplayCameraControls.enableWallHitSpring = ViewMode == ControllerViewMode.Tps ? true : false;
+            CacheGameplayCameraControls.enableWallHitSpring = viewMode == ControllerViewMode.Tps ? true : false;
             PlayerCharacterEntity.ModelManager.SetIsFps(viewMode == ControllerViewMode.Fps);
         }
 

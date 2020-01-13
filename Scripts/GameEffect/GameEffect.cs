@@ -16,17 +16,8 @@ namespace MultiplayerARPG
         public float lifeTime;
         public DestroyMode destroyMode;
         public Transform followingTarget;
-
-        private Transform cacheTransform;
-        public Transform CacheTransform
-        {
-            get
-            {
-                if (cacheTransform == null)
-                    cacheTransform = GetComponent<Transform>();
-                return cacheTransform;
-            }
-        }
+        
+        public Transform CacheTransform { get; private set; }
 
         public AudioClip[] randomSoundEffects;
         private float volume;
@@ -34,6 +25,11 @@ namespace MultiplayerARPG
         private AudioSource[] audioSources;
         private float destroyTime;
         private bool isStarted;
+
+        private void Awake()
+        {
+            CacheTransform = transform;
+        }
 
         private void Start()
         {

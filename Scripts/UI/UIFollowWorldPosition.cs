@@ -21,47 +21,28 @@ public class UIFollowWorldPosition : MonoBehaviour
     private UIFollowWorldPositionJob followJob;
     private JobHandle followJobHandle;
 
-    public Camera CacheTargetCamera
-    {
-        get
-        {
-            if (targetCamera == null)
-                targetCamera = Camera.main;
-            return targetCamera;
-        }
-    }
+    public RectTransform CacheTransform { get; private set; }
+    public Transform CacheCameraTransform { get; private set; }
 
-    private Transform cacheTargetCamera;
-    public Transform CacheCameraTransform
+    private bool SetupCamera()
     {
-        get
+        if (targetCamera == null)
         {
-            if (cacheTargetCamera == null)
-                cacheTargetCamera = CacheTargetCamera == null ? null : CacheTargetCamera.transform;
-            return cacheTargetCamera;
+            targetCamera = Camera.main;
+            if (targetCamera != null)
+            {
+                CacheCameraTransform = targetCamera.transform;
+                CacheTransform.position = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
+            }
         }
-    }
-
-    private RectTransform cacheTransform;
-    public RectTransform CacheTransform
-    {
-        get
-        {
-            if (cacheTransform == null)
-                cacheTransform = GetComponent<RectTransform>();
-            return cacheTransform;
-        }
-    }
-
-    private void Start()
-    {
-        CacheTransform.position = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
+        return targetCamera != null;
     }
 
     private void OnEnable()
     {
+        CacheTransform = GetComponent<RectTransform>();
+        SetupCamera();
         followJobTransforms = new TransformAccessArray(new Transform[] { CacheTransform });
-        CacheTransform.position = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
     }
 
     private void OnDisable()
@@ -72,16 +53,16 @@ public class UIFollowWorldPosition : MonoBehaviour
 
     private void Update()
     {
-        if (CacheTargetCamera == null)
+        followJobHandle.Complete();
+
+        if (!SetupCamera())
             return;
 
-        followJobHandle.Complete();
-        
         // Find wanted position only when it needed
         if (!oldTargetPosition.Equals(targetPosition) ||
             !CacheCameraTransform.position.Equals(oldCameraPosition) ||
             !CacheCameraTransform.rotation.Equals(oldCameraRotation))
-            wantedPosition = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
+            wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
 
         oldTargetPosition = targetPosition;
         oldCameraPosition = CacheCameraTransform.position;

@@ -6,16 +6,7 @@ namespace MultiplayerARPG
 {
     public class NearbyEntityDetector : MonoBehaviour
     {
-        private Transform cacheTransform;
-        public Transform CacheTransform
-        {
-            get
-            {
-                if (cacheTransform == null)
-                    cacheTransform = GetComponent<Transform>();
-                return cacheTransform;
-            }
-        }
+        public Transform CacheTransform { get; private set; }
 
         public float detectingRadius;
         public bool findPlayer;
@@ -42,6 +33,7 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
+            CacheTransform = transform;
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 

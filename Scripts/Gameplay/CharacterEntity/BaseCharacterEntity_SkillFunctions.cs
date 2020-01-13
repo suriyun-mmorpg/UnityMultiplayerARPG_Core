@@ -117,7 +117,7 @@ namespace MultiplayerARPG
             CastingSkillDuration = CastingSkillCountDown = 0;
             CharacterModel.StopActionAnimation();
             CharacterModel.StopSkillCastAnimation();
-            if (FpsModel != null)
+            if (FpsModel && FpsModel.gameObject.activeSelf)
             {
                 FpsModel.StopActionAnimation();
                 FpsModel.StopSkillCastAnimation();
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
                     CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
                     // Play casting animation
                     CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
-                    if (FpsModel)
+                    if (FpsModel && FpsModel.gameObject.activeSelf)
                     {
                         // Play special effect
                         FpsModel.InstantiateEffect(skill.GetSkillCastEffect());
@@ -199,7 +199,7 @@ namespace MultiplayerARPG
                 if (IsClient)
                 {
                     CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
-                    if (FpsModel)
+                    if (FpsModel && FpsModel.gameObject.activeSelf)
                         FpsModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
                 }
 
@@ -216,7 +216,7 @@ namespace MultiplayerARPG
                     if (IsClient)
                     {
                         CharacterModel.PlayWeaponLaunchEffect(animActionType);
-                        if (FpsModel != null)
+                        if (FpsModel && FpsModel.gameObject.activeSelf)
                             FpsModel.PlayWeaponLaunchEffect(animActionType);
                     }
 

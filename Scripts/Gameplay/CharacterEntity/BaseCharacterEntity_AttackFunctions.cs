@@ -160,7 +160,7 @@ namespace MultiplayerARPG
             {
                 // Play animation
                 CharacterModel.PlayActionAnimation(animActionType, reloadingWeaponItem.WeaponType.DataId, 0);
-                if (FpsModel != null)
+                if (FpsModel && FpsModel.gameObject.activeSelf)
                     FpsModel.PlayActionAnimation(animActionType, reloadingWeaponItem.WeaponType.DataId, 0);
             }
 
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
             {
                 // Play animation
                 CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
-                if (FpsModel != null)
+                if (FpsModel && FpsModel.gameObject.activeSelf)
                     FpsModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
             }
 
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
                 {
                     // Play weapon launch special effects
                     CharacterModel.PlayWeaponLaunchEffect(animActionType);
-                    if (FpsModel != null)
+                    if (FpsModel && FpsModel.gameObject.activeSelf)
                         FpsModel.PlayWeaponLaunchEffect(animActionType);
                 }
 

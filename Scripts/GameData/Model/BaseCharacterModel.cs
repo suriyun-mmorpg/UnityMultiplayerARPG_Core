@@ -164,6 +164,9 @@ namespace MultiplayerARPG
                     setter.ApplyToCharacterModel(this);
                 }
             }
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
+#endif
         }
 
         private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)

@@ -18,6 +18,9 @@ namespace MultiplayerARPG
 
         [SerializeField]
         private BaseCharacterModel fpsModelPrefab;
+        [SerializeField]
+        [Tooltip("Offsets from fps model container (Camera's transform)")]
+        private Vector3 fpsModelOffsets;
         public BaseCharacterModel FpsModel { get; private set; }
 
         [SerializeField]
@@ -169,7 +172,7 @@ namespace MultiplayerARPG
             MainModel.SetVisibleState(mainModelVisibleState);
             // FPS model will hide when it's not fps mode
             if (FpsModel != null)
-                FpsModel.SetVisibleState(IsFps ? GameEntityModel.EVisibleState.Visible : GameEntityModel.EVisibleState.Invisible);
+                FpsModel.gameObject.SetActive(IsFps);
         }
 
         public BaseCharacterModel InstantiateFpsModel(Transform container)
@@ -177,8 +180,10 @@ namespace MultiplayerARPG
             if (fpsModelPrefab == null)
                 return null;
             FpsModel = Instantiate(fpsModelPrefab, container);
-            FpsModel.transform.localPosition = Vector3.zero;
+            FpsModel.transform.localPosition = fpsModelOffsets;
             FpsModel.transform.localRotation = Quaternion.identity;
+            FpsModel.SetEquipItems(MainModel.equipItems);
+            FpsModel.SetEquipWeapons(MainModel.equipWeapons);
             return FpsModel;
         }
     }

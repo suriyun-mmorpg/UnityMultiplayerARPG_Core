@@ -6,7 +6,6 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [ExecuteInEditMode]
     public class CharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations>
     {
         // Animator variables
@@ -130,14 +129,9 @@ namespace MultiplayerARPG
         private bool isSetupComponent;
         private bool isPlayingActionAnimation;
 
-        private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
         {
-            get
-            {
-                SetupComponent();
-                return cacheAnimatorController;
-            }
+            get; private set;
         }
 
         protected override void Awake()
@@ -150,23 +144,37 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (animatorType == AnimatorType.Animator &&
-                CacheAnimatorController != null)
+            bool hasChanges = false;
+            switch (animatorType)
             {
-                SetupGenericClips_Animator(
-                    defaultAnimatorData.idleClip,
-                    defaultAnimatorData.moveClip,
-                    defaultAnimatorData.moveBackwardClip,
-                    defaultAnimatorData.moveLeftClip,
-                    defaultAnimatorData.moveRightClip,
-                    defaultAnimatorData.moveForwardLeftClip,
-                    defaultAnimatorData.moveForwardRightClip,
-                    defaultAnimatorData.moveBackwardLeftClip,
-                    defaultAnimatorData.moveBackwardRightClip,
-                    defaultAnimatorData.jumpClip,
-                    defaultAnimatorData.fallClip,
-                    defaultAnimatorData.hurtClip,
-                    defaultAnimatorData.deadClip);
+                case AnimatorType.Animator:
+                    if (animator == null)
+                    {
+                        animator = GetComponentInChildren<Animator>();
+                        if (animator != null)
+                            hasChanges = true;
+                    }
+                    if (animator == null)
+                        Debug.LogError("[" + this + "] `Animator` is empty");
+                    if (animatorController == null)
+                        Debug.LogError("[" + this + "] `Animator Controller` is empty");
+                    break;
+                case AnimatorType.LegacyAnimtion:
+                    if (legacyAnimation == null)
+                    {
+                        legacyAnimation = GetComponentInChildren<Animation>();
+                        if (legacyAnimation != null)
+                            hasChanges = true;
+                    }
+                    if (legacyAnimation == null)
+                        Debug.LogError("[" + this + "] `Legacy Animation` is empty");
+                    break;
+            }
+            if (hasChanges)
+            {
+                isSetupComponent = false;
+                SetupComponent();
+                EditorUtility.SetDirty(this);
             }
 #endif
         }
@@ -179,9 +187,9 @@ namespace MultiplayerARPG
             switch (animatorType)
             {
                 case AnimatorType.Animator:
-                    if (cacheAnimatorController == null)
+                    if (CacheAnimatorController == null)
                     {
-                        cacheAnimatorController = new AnimatorOverrideController(animatorController);
+                        CacheAnimatorController = new AnimatorOverrideController(animatorController);
                         defaultIdleClipName = defaultAnimatorData.idleClip != null ? defaultAnimatorData.idleClip.name : string.Empty;
                         defaultMoveClipName = defaultAnimatorData.moveClip != null ? defaultAnimatorData.moveClip.name : string.Empty;
                         defaultMoveBackwardClipName = defaultAnimatorData.moveBackwardClip != null ? defaultAnimatorData.moveBackwardClip.name : string.Empty;
@@ -197,16 +205,26 @@ namespace MultiplayerARPG
                         defaultDeadClipName = defaultAnimatorData.deadClip != null ? defaultAnimatorData.deadClip.name : string.Empty;
                         defaultActionClipName = defaultAnimatorData.actionClip != null ? defaultAnimatorData.actionClip.name : string.Empty;
                         defaultCastSkillClipName = defaultAnimatorData.castSkillClip != null ? defaultAnimatorData.castSkillClip.name : string.Empty;
+                        // Setup generic clips
+                        SetupGenericClips_Animator(
+                            defaultAnimatorData.idleClip,
+                            defaultAnimatorData.moveClip,
+                            defaultAnimatorData.moveBackwardClip,
+                            defaultAnimatorData.moveLeftClip,
+                            defaultAnimatorData.moveRightClip,
+                            defaultAnimatorData.moveForwardLeftClip,
+                            defaultAnimatorData.moveForwardRightClip,
+                            defaultAnimatorData.moveBackwardLeftClip,
+                            defaultAnimatorData.moveBackwardRightClip,
+                            defaultAnimatorData.jumpClip,
+                            defaultAnimatorData.fallClip,
+                            defaultAnimatorData.hurtClip,
+                            defaultAnimatorData.deadClip);
                     }
-                    // Use override controller as animator
-                    if (animator == null)
-                        animator = GetComponentInChildren<Animator>();
-                    if (animator != null && animator.runtimeAnimatorController != cacheAnimatorController)
-                        animator.runtimeAnimatorController = cacheAnimatorController;
+                    if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
+                        animator.runtimeAnimatorController = CacheAnimatorController;
                     break;
                 case AnimatorType.LegacyAnimtion:
-                    if (legacyAnimation == null)
-                        legacyAnimation = GetComponentInChildren<Animation>();
                     legacyAnimation.AddClip(legacyAnimationData.idleClip, CLIP_IDLE);
                     legacyAnimation.AddClip(legacyAnimationData.moveClip, CLIP_MOVE);
                     legacyAnimation.AddClip(legacyAnimationData.moveBackwardClip, CLIP_MOVE_BACKWARD);

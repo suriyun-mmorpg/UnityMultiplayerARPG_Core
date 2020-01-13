@@ -290,7 +290,7 @@ namespace MultiplayerARPG
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             CharacterModel.SetEquipWeapons(EquipWeapons);
-            if (FpsModel != null)
+            if (FpsModel)
                 FpsModel.SetEquipWeapons(EquipWeapons);
 
             if (onEquipWeaponSetChange != null)
@@ -324,7 +324,7 @@ namespace MultiplayerARPG
             };
 
             CharacterModel.SetEquipWeapons(EquipWeapons);
-            if (FpsModel != null)
+            if (FpsModel)
                 FpsModel.SetEquipWeapons(EquipWeapons);
         }
 
@@ -397,7 +397,7 @@ namespace MultiplayerARPG
         protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             CharacterModel.SetBuffs(buffs);
-            if (FpsModel != null)
+            if (FpsModel)
                 FpsModel.SetBuffs(buffs);
 
             buffsRecachingState = new SyncListRecachingState()
@@ -416,7 +416,7 @@ namespace MultiplayerARPG
         protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             CharacterModel.SetEquipItems(equipItems);
-            if (FpsModel != null)
+            if (FpsModel)
                 FpsModel.SetEquipItems(equipItems);
 
             equipItemsRecachingState = new SyncListRecachingState()
