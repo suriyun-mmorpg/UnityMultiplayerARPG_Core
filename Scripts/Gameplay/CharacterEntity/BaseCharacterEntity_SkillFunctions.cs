@@ -205,7 +205,7 @@ namespace MultiplayerARPG
 
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
-                for (int hitIndex = 0; hitIndex < triggerDurations.Length && remainsDuration > 0f; ++hitIndex)
+                for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
                     // Play special effects after trigger duration
                     tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
@@ -226,6 +226,12 @@ namespace MultiplayerARPG
 
                     // Apply skill buffs, summons and attack damages
                     skill.ApplySkill(this, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+
+                    if (remainsDuration <= 0f)
+                    {
+                        // Stop trigger animations loop
+                        break;
+                    }
                 }
 
                 if (remainsDuration > 0f)
