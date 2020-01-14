@@ -616,12 +616,17 @@ namespace MultiplayerARPG
         {
             if (character.CacheTransform.position.y >= lastGroundedPosition.y)
                 return;
-            float dist = character.CacheTransform.position.y - lastGroundedPosition.y;
+            float dist = lastGroundedPosition.y - character.CacheTransform.position.y;
             if (dist < fallDamageMinDistance)
                 return;
-            int damage = character.MaxHp * (int)(100 * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
+            int damage = (int)(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
             character.CurrentHp -= damage;
             character.ReceivedDamage(null, CombatAmountType.NormalDamage, damage);
+            if (character.IsDead())
+            {
+                // Dead by itself, so causer is itself
+                character.ValidateRecovery(character);
+            }
         }
     }
 }
