@@ -196,7 +196,6 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             MakeCaches();
-
             if (!lastGrounded && MovementState.HasFlag(MovementState.IsGrounded))
             {
                 // Apply fall damage when not passenging vehicle

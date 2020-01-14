@@ -41,7 +41,8 @@ namespace MultiplayerARPG
                 recoveryData.decreasingWater += updatingTime * CurrentGameplayRule.GetDecreasingWaterPerSeconds(CacheEntity);
 
                 recoveryData = recoveryData.Apply(CacheEntity, CacheEntity);
-                CacheEntity.ValidateRecovery(CacheEntity);
+                // Dead by illness, so no causer
+                CacheEntity.ValidateRecovery();
                 updatingTime = 0;
             }
 

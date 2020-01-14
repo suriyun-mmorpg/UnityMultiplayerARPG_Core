@@ -154,6 +154,7 @@ namespace MultiplayerARPG
                         else
                             nonApplierRecoveryBuff = recoveryData;
 
+                        // Causer is the entity whom applied buffs to this entity
                         CacheEntity.ValidateRecovery(buff.BuffApplier);
                     }
                 }

@@ -70,6 +70,7 @@ namespace MultiplayerARPG
                     recoveryData.decreasingWater += tempAmount;
 
                 recoveryData = recoveryData.Apply(this, buffApplier);
+                // Causer is the entity whom applied buffs to this entity
                 ValidateRecovery(buffApplier);
             }
 
