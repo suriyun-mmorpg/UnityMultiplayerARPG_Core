@@ -98,8 +98,7 @@ namespace MultiplayerARPG
         public static float GetEffectivenessDamage(this Item weaponItem, ICharacterData character)
         {
             if (weaponItem == null ||
-                !weaponItem.IsWeapon() ||
-                character == null)
+                !weaponItem.IsWeapon())
                 return 0f;
             return GameDataHelpers.GetEffectivenessDamage(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
         }
