@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         
         public Transform CacheTransform { get; private set; }
 
-        [Tooltip("Transform for position which camera will look at")]
+        [Tooltip("Transform for position which camera will look at and follow while playing in TPS view mode")]
         [SerializeField]
         private Transform cameraTargetTransform;
         public Transform CameraTargetTransform
@@ -90,6 +90,7 @@ namespace MultiplayerARPG
                 return cameraTargetTransform;
             }
         }
+        [Tooltip("Transform for position which camera will look at and follow while playing in FPS view mode")]
         [SerializeField]
         private Transform fpsCameraTargetTransform;
         public Transform FpsCameraTargetTransform
