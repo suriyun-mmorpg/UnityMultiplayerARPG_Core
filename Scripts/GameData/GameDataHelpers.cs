@@ -831,7 +831,7 @@ namespace MultiplayerARPG
             float damageEffectiveness = 0f;
             if (effectivenessAttributes != null && character != null)
             {
-                Dictionary<Attribute, float> characterAttributes = character.GetAttributes();
+                Dictionary<Attribute, float> characterAttributes = character.GetCaches().Attributes;
                 foreach (Attribute attribute in characterAttributes.Keys)
                 {
                     if (attribute != null && effectivenessAttributes.ContainsKey(attribute))
