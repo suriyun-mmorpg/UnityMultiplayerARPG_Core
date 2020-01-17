@@ -33,8 +33,7 @@ namespace MultiplayerARPG
         public WeaponAnimations2D[] weaponAnimations2D;
         [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillAnimations2D[] skillAnimations2D;
-
-        public float magnitudeToPlayMoveClip = 0.1f;
+        
         [Header("Sample 2D Animations")]
         public SampleAnimation sampleAnimation = SampleAnimation.Idle;
         public DirectionType2D sampleDirection = DirectionType2D.Down;
