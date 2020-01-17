@@ -90,7 +90,10 @@ namespace MultiplayerARPG
                         {
                             SetTarget(EnemyEntityDetector.characters[findingEnemyIndex], TargetActionType.Attack);
                             if (SelectedEntity != null)
-                                targetLookDirection = (SelectedEntity.CacheTransform.position - MovementTransform.position).normalized;
+                            {
+                                targetLookDirection = SelectedEntity.CacheTransform.position - MovementTransform.position;
+                                targetLookDirection.Normalize();
+                            }
                         }
                     }
                 }
@@ -353,6 +356,7 @@ namespace MultiplayerARPG
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
+            moveDirection.Normalize();
 
             if (moveDirection.sqrMagnitude > 0f)
             {
@@ -373,7 +377,7 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 destination = null;
                 ClearTarget();
-                targetLookDirection = moveDirection.normalized;
+                targetLookDirection = moveDirection;
             }
             // Always forward
             MovementState movementState = MovementState.Forward;
@@ -547,13 +551,14 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-                
+
                 if (FindTarget(targetCharacter.gameObject, attackDistance, CurrentGameInstance.characterLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
                     // Set direction to turn character to target
-                    targetLookDirection = (targetCharacter.CacheTransform.position - MovementTransform.position).normalized;
+                    targetLookDirection = targetCharacter.CacheTransform.position - MovementTransform.position;
+                    targetLookDirection.Normalize();
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetCharacter.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
@@ -583,13 +588,14 @@ namespace MultiplayerARPG
                 float castDistance = 0f;
                 float castFov = 0f;
                 GetUseSkillDistanceAndFov(out castDistance, out castFov);
-                
+
                 if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= castDistance)
                 {
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
                     // Set direction to turn character to target
-                    targetLookDirection = (targetCharacter.CacheTransform.position - MovementTransform.position).normalized;
+                    targetLookDirection = targetCharacter.CacheTransform.position - MovementTransform.position;
+                    targetLookDirection.Normalize();
                     if (targetCharacter == PlayerCharacterEntity || PlayerCharacterEntity.IsPositionInFov(castFov, targetCharacter.CacheTransform.position))
                     {
                         if (queueUsingSkill.skill != null)
@@ -687,13 +693,14 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-                
+
                 if (FindTarget(targetHarvestable.gameObject, attackDistance, CurrentGameInstance.harvestableLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
                     // Set direction to turn character to target
-                    targetLookDirection = (targetHarvestable.CacheTransform.position - MovementTransform.position).normalized;
+                    targetLookDirection = targetHarvestable.CacheTransform.position - MovementTransform.position;
+                    targetLookDirection.Normalize();
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
                     {
                         if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetHarvestable.OpponentAimTransform.position))
@@ -711,15 +718,19 @@ namespace MultiplayerARPG
                 return;
             Vector3 targetPosition = entity.CacheTransform.position;
             PlayerCharacterEntity.PointClickMovement(targetPosition);
-            targetLookDirection = (targetPosition - MovementTransform.position).normalized;
+            targetLookDirection = targetPosition - MovementTransform.position;
+            targetLookDirection.Normalize();
         }
 
         public void UpdateLookAtTarget()
         {
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
-            if (destination != null)
-                targetLookDirection = (destination.Value - MovementTransform.position).normalized;
+            if (destination.HasValue)
+            {
+                targetLookDirection = destination.Value - MovementTransform.position;
+                targetLookDirection.Normalize();
+            }
 
             if (Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection) > 0)
             {

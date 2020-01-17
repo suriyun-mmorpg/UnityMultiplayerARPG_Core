@@ -672,9 +672,7 @@ namespace MultiplayerARPG
                 targetLookDirection = cameraForward;
             }
 
-            // normalize input if it exceeds 1 in combined length:
-            if (moveDirection.sqrMagnitude > 1)
-                moveDirection.Normalize();
+            moveDirection.Normalize();
         }
 
         private void UpdateInputs_BuildingMode()

@@ -1135,25 +1135,24 @@ namespace MultiplayerARPG
 
         protected bool IsPositionInFov2D(float fov, Vector3 position, Vector3 forward)
         {
-            float halfFov = fov * 0.5f;
-            Vector2 targetDir = (position - CacheTransform.position).normalized;
+            Vector2 targetDir = position - CacheTransform.position;
+            targetDir.Normalize();
             float angle = Vector2.Angle(targetDir, Direction2D);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
-            return angle < halfFov;
+            return angle < fov * 0.5f;
         }
 
         protected bool IsPositionInFov3D(float fov, Vector3 position, Vector3 forward)
         {
-            float halfFov = fov * 0.5f;
             // This is unsigned angle, so angle found from this function is 0 - 180
             // if position forward from character this value will be 180
             // so just find for angle > 180 - halfFov
-            Vector3 targetDir = (position - CacheTransform.position).normalized;
+            Vector3 targetDir = position - CacheTransform.position;
             targetDir.y = 0;
             forward.y = 0;
             targetDir.Normalize();
             forward.Normalize();
-            return Vector3.Angle(targetDir, forward) < halfFov;
+            return Vector3.Angle(targetDir, forward) < fov * 0.5f;
         }
 
         public List<T> FindCharacters<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)

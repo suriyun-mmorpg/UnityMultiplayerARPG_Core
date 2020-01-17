@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         public bool useRootMotionForAirMovement;
         public bool useRootMotionForJump;
         public bool useRootMotionForFall;
-        
+
         public Animator CacheAnimator { get; private set; }
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public Rigidbody CacheRigidbody { get; private set; }
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
         private bool isUnderWater;
         private bool isJumping;
         private Collider waterCollider;
-        
+
         // Optimize garbage collector
         private MovementState tempMovementState;
         private Vector3 tempInputDirection;
@@ -312,7 +312,8 @@ namespace MultiplayerARPG
                 tempTargetPosition.y = 0;
                 tempCurrentPosition = CacheTransform.position;
                 tempCurrentPosition.y = 0;
-                tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
+                tempMoveDirection = tempTargetPosition - tempCurrentPosition;
+                tempMoveDirection.Normalize();
                 tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                 if (tempTargetDistance < StoppingDistance)
                 {
@@ -329,7 +330,7 @@ namespace MultiplayerARPG
 
             UpdateMovement();
 
-            tempMovementState = CacheRigidbody.velocity.sqrMagnitude > 0 ? tempMovementState : MovementState.None;
+            tempMovementState = CacheRigidbody.velocity.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
             if (isUnderWater)
                 tempMovementState |= MovementState.IsUnderWater;
             if (isGrounded)
@@ -439,12 +440,13 @@ namespace MultiplayerARPG
 
             if (tempMoveDirection.sqrMagnitude > 0f)
             {
-                tempMoveDirection = tempMoveDirection.normalized;
+                tempMoveDirection.Normalize();
 
                 if (!isUnderWater)
                 {
                     // always move along the camera forward as it is the direction that it being aimed at
-                    tempMoveDirection = Vector3.ProjectOnPlane(tempMoveDirection, groundContactNormal).normalized;
+                    tempMoveDirection = Vector3.ProjectOnPlane(tempMoveDirection, groundContactNormal);
+                    tempMoveDirection.Normalize();
                 }
 
                 float currentTargetSpeed = CacheEntity.GetMoveSpeed();
@@ -514,7 +516,7 @@ namespace MultiplayerARPG
             }
             isJumping = false;
         }
-        
+
         protected void SetMovePaths(Vector3 position, bool useNavMesh)
         {
             if (useNavMesh)
