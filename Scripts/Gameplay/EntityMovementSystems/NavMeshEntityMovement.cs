@@ -79,7 +79,7 @@ namespace MultiplayerARPG
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (moveDirection.magnitude > 0.5f)
+            if (moveDirection.sqrMagnitude > 0.25f)
                 PointClickMovement(CacheTransform.position + moveDirection);
         }
 

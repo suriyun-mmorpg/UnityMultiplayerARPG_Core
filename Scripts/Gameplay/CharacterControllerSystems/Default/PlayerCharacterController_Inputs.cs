@@ -158,7 +158,7 @@ namespace MultiplayerARPG
             }
             // Read inputs
             isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
-            isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
+            isMouseDragDetected = (Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE_SQUARED;
             isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
             isMouseHoldAndNotDrag = !isMouseDragDetected && isMouseHoldDetected;
             if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
@@ -354,7 +354,7 @@ namespace MultiplayerARPG
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
 
-            if (moveDirection.magnitude != 0f)
+            if (moveDirection.sqrMagnitude > 0f)
             {
                 HideNpcDialogs();
                 ClearQueueUsingSkill();
@@ -368,7 +368,7 @@ namespace MultiplayerARPG
                 UpdateWASDAttack();
 
             // Move
-            if (moveDirection.magnitude != 0f)
+            if (moveDirection.sqrMagnitude > 0f)
             {
                 PlayerCharacterEntity.StopMove();
                 destination = null;

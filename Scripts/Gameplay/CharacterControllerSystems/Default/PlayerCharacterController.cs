@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         protected delegate void VoidAction();
         protected delegate bool BoolAction();
 
-        public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
+        public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
         public float angularSpeed = 800f;
         public PlayerCharacterControllerMode controllerMode;

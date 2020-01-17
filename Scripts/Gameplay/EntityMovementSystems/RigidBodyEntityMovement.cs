@@ -205,7 +205,7 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
 
-            if (useNavMeshForKeyMovement && moveDirection.magnitude > 0.5f)
+            if (useNavMeshForKeyMovement && moveDirection.sqrMagnitude > 0.25f)
             {
                 PointClickMovement(CacheTransform.position + moveDirection);
                 return;
@@ -499,7 +499,7 @@ namespace MultiplayerARPG
                 if (!applyingJump &&
                     Mathf.Abs(tempMoveDirection.x) < float.Epsilon &&
                     Mathf.Abs(tempMoveDirection.z) < float.Epsilon &&
-                    CacheRigidbody.velocity.magnitude < 1f)
+                    CacheRigidbody.velocity.sqrMagnitude < 1f)
                 {
                     CacheRigidbody.Sleep();
                 }

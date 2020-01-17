@@ -386,7 +386,7 @@ namespace MultiplayerARPG
                 UpdateInputs_BattleMode();
 
             // Hide Npc UIs when move
-            if (moveDirection.magnitude != 0f)
+            if (moveDirection.sqrMagnitude > 0f)
             {
                 HideNpcDialogs();
                 PlayerCharacterEntity.StopMove();
@@ -637,7 +637,7 @@ namespace MultiplayerARPG
             inputH = InputManager.GetAxis("Horizontal", raw);
             moveDirection += cameraForward * inputV;
             moveDirection += cameraRight * inputH;
-            if (moveDirection.magnitude > 0f)
+            if (moveDirection.sqrMagnitude > 0f)
             {
                 if (pitch > 180f)
                     pitch -= 360f;
@@ -673,7 +673,7 @@ namespace MultiplayerARPG
             }
 
             // normalize input if it exceeds 1 in combined length:
-            if (moveDirection.magnitude > 1)
+            if (moveDirection.sqrMagnitude > 1)
                 moveDirection.Normalize();
         }
 
@@ -699,7 +699,7 @@ namespace MultiplayerARPG
             else
             {
                 // Update move direction
-                if (moveDirection.magnitude != 0f && ViewMode == ControllerViewMode.Tps)
+                if (moveDirection.sqrMagnitude > 0f && ViewMode == ControllerViewMode.Tps)
                     targetLookDirection = moveLookDirection;
             }
         }
@@ -845,7 +845,7 @@ namespace MultiplayerARPG
             else
             {
                 // Update move direction
-                if (moveDirection.magnitude != 0f && ViewMode == ControllerViewMode.Tps)
+                if (moveDirection.sqrMagnitude > 0f && ViewMode == ControllerViewMode.Tps)
                     targetLookDirection = moveLookDirection;
             }
 

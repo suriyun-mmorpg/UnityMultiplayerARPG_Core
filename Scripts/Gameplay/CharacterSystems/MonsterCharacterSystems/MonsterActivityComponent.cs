@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                 CacheEntity.StopMove();
                 // Lookat target then do something when it's in range
                 Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
-                if (lookAtDirection.magnitude > 0)
+                if (lookAtDirection.sqrMagnitude > 0)
                 {
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                     {
