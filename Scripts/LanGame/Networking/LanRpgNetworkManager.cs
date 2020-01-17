@@ -99,9 +99,9 @@ namespace MultiplayerARPG
             CacheDiscovery.StopServer();
         }
 
-        protected override void Update()
+        protected override void LateUpdate()
         {
-            base.Update();
+            base.LateUpdate();
             float tempUnscaledTime = Time.unscaledTime;
             if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
             {

@@ -101,9 +101,9 @@ namespace MultiplayerARPG
             base.Awake();
         }
 
-        protected override void Update()
+        protected override void LateUpdate()
         {
-            base.Update();
+            base.LateUpdate();
             float tempUnscaledTime = Time.unscaledTime;
             if (tempUnscaledTime - lastUpdateOnlineCharacterTime > UPDATE_ONLINE_CHARACTER_DURATION)
             {
