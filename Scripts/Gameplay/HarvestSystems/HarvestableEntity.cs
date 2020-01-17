@@ -155,7 +155,7 @@ namespace MultiplayerARPG
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.magenta;
-            Gizmos.DrawWireSphere(CacheTransform.position, colliderDetectionRadius);
+            Gizmos.DrawWireSphere(transform.position, colliderDetectionRadius);
         }
     }
 }
