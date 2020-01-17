@@ -179,11 +179,11 @@ namespace MultiplayerARPG
             if (CacheEntity.CanMove())
             {
                 // If move by WASD keys, set move direction to input direction
-                if (tempInputDirection.magnitude != 0f)
+                if (tempInputDirection.magnitude > 0.5f)
                     tempMoveDirection = tempInputDirection;
 
                 tempMoveDirectionMagnitude = tempMoveDirection.magnitude;
-                if (tempMoveDirectionMagnitude != 0f)
+                if (tempMoveDirectionMagnitude > 0f)
                 {
                     if (tempMoveDirectionMagnitude > 1)
                         tempMoveDirection = tempMoveDirection.normalized;
@@ -198,7 +198,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            CacheEntity.SetMovement((CacheRigidbody2D.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            CacheEntity.SetMovement((CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
         }
     }
 }

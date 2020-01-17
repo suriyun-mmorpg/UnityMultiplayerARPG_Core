@@ -153,7 +153,7 @@ namespace MultiplayerARPG
             if (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
                 return;
 
-            CacheEntity.SetMovement((CacheNavMeshAgent.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            CacheEntity.SetMovement((CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
         }
 
         protected void SetMovePaths(Vector3 position)

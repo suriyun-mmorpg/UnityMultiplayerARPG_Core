@@ -329,7 +329,7 @@ namespace MultiplayerARPG
 
             UpdateMovement();
 
-            tempMovementState = CacheRigidbody.velocity.magnitude > 0 ? tempMovementState : MovementState.None;
+            tempMovementState = CacheRigidbody.velocity.sqrMagnitude > 0 ? tempMovementState : MovementState.None;
             if (isUnderWater)
                 tempMovementState |= MovementState.IsUnderWater;
             if (isGrounded)
@@ -409,7 +409,7 @@ namespace MultiplayerARPG
             GroundCheck();
 
             // If move by WASD keys, set move direction to input direction
-            if (tempInputDirection.magnitude > 0f)
+            if (tempInputDirection.sqrMagnitude > 0f)
                 tempMoveDirection = tempInputDirection;
 
             if (!CacheEntity.CanMove())
@@ -437,7 +437,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (tempMoveDirection.magnitude > 0f)
+            if (tempMoveDirection.sqrMagnitude > 0f)
             {
                 tempMoveDirection = tempMoveDirection.normalized;
 
