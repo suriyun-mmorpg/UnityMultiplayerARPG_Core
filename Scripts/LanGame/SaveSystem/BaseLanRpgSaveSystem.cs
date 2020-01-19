@@ -6,12 +6,11 @@ namespace MultiplayerARPG
 {
     public abstract class BaseLanRpgSaveSystem : ScriptableObject
     {
-        public abstract void OnServerStart(BaseGameNetworkManager manager);
-        public abstract void OnServerOnlineSceneLoaded(BaseGameNetworkManager manager, IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems);
-        public abstract void SaveWorld(BaseGameNetworkManager manager, IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities);
-        public abstract void SaveStorage(BaseGameNetworkManager manager, IPlayerCharacterData hostPlayerCharacterData, Dictionary<StorageId, List<CharacterItem>> storageItems);
-        public abstract void SaveCharacter(BaseGameNetworkManager manager, IPlayerCharacterData playerCharacterData);
-        public abstract void SaveCreatingCharacter(IPlayerCharacterData playerCharacterData);
+        public abstract void OnServerStart();
+        public abstract void OnServerOnlineSceneLoaded(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems);
+        public abstract void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities);
+        public abstract void SaveStorage(IPlayerCharacterData hostPlayerCharacterData, Dictionary<StorageId, List<CharacterItem>> storageItems);
+        public abstract void SaveCharacter(IPlayerCharacterData playerCharacterData);
         public abstract List<PlayerCharacterData> LoadCharacters();
     }
 }

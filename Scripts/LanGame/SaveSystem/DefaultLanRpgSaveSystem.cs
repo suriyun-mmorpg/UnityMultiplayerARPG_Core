@@ -11,19 +11,19 @@ namespace MultiplayerARPG
         private readonly StorageSaveData storageSaveData = new StorageSaveData();
         private bool isReadyToSave;
 
-        public override void OnServerStart(BaseGameNetworkManager manager)
+        public override void OnServerStart()
         {
             isReadyToSave = false;
         }
 
-        public override void OnServerOnlineSceneLoaded(BaseGameNetworkManager manager, IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
+        public override void OnServerOnlineSceneLoaded(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
         {
-            manager.StartCoroutine(OnServerOnlineSceneLoadedRoutine(manager, hostPlayerCharacterData, buildingEntities, storageItems));
+            BaseGameNetworkManager.Singleton.StartCoroutine(OnServerOnlineSceneLoadedRoutine(hostPlayerCharacterData, buildingEntities, storageItems));
         }
 
-        private IEnumerator OnServerOnlineSceneLoadedRoutine(BaseGameNetworkManager manager, IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
+        private IEnumerator OnServerOnlineSceneLoadedRoutine(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
         {
-            while (!manager.IsReadyToInstantiateObjects())
+            while (!BaseGameNetworkManager.Singleton.IsReadyToInstantiateObjects())
             {
                 yield return null;
             }
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             yield return null;
             foreach (BuildingSaveData building in worldSaveData.buildings)
             {
-                manager.CreateBuildingEntity(building, true);
+                BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
             }
             // Load storage data
             storageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
@@ -56,12 +56,7 @@ namespace MultiplayerARPG
             isReadyToSave = true;
         }
 
-        public override void SaveCharacter(BaseGameNetworkManager manager, IPlayerCharacterData playerCharacterData)
-        {
-            playerCharacterData.SavePersistentCharacterData();
-        }
-
-        public override void SaveCreatingCharacter(IPlayerCharacterData playerCharacterData)
+        public override void SaveCharacter(IPlayerCharacterData playerCharacterData)
         {
             playerCharacterData.SavePersistentCharacterData();
         }
@@ -71,7 +66,7 @@ namespace MultiplayerARPG
             return PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
         }
 
-        public override void SaveStorage(BaseGameNetworkManager manager, IPlayerCharacterData hostPlayerCharacterData, Dictionary<StorageId, List<CharacterItem>> storageItems)
+        public override void SaveStorage(IPlayerCharacterData hostPlayerCharacterData, Dictionary<StorageId, List<CharacterItem>> storageItems)
         {
             if (!isReadyToSave)
                 return;
@@ -92,7 +87,7 @@ namespace MultiplayerARPG
             storageSaveData.SavePersistentData(hostPlayerCharacterData.Id);
         }
 
-        public override void SaveWorld(BaseGameNetworkManager manager, IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities)
+        public override void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities)
         {
             if (!isReadyToSave)
                 return;

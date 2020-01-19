@@ -106,11 +106,11 @@ namespace MultiplayerARPG
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null && IsClientConnected)
                 {
-                    SaveSystem.SaveCharacter(this, owningCharacter);
+                    SaveSystem.SaveCharacter(owningCharacter);
                     if (IsServer)
                     {
-                        SaveSystem.SaveWorld(this, owningCharacter, buildingEntities);
-                        SaveSystem.SaveStorage(this, owningCharacter, storageItems);
+                        SaveSystem.SaveWorld(owningCharacter, buildingEntities);
+                        SaveSystem.SaveStorage(owningCharacter, storageItems);
                     }
                 }
                 Profiler.EndSample();
@@ -242,8 +242,8 @@ namespace MultiplayerARPG
             {
                 // Save data before warp
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-                SaveSystem.SaveWorld(this, owningCharacter, buildingEntities);
-                SaveSystem.SaveStorage(this, owningCharacter, storageItems);
+                SaveSystem.SaveWorld(owningCharacter, buildingEntities);
+                SaveSystem.SaveStorage(owningCharacter, storageItems);
                 buildingEntities.Clear();
                 storageItems.Clear();
                 SetMapInfo(mapInfo);
@@ -253,7 +253,7 @@ namespace MultiplayerARPG
                     selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
                     selectedCharacter.CurrentMapName = mapInfo.Id;
                     selectedCharacter.CurrentPosition = position;
-                    SaveSystem.SaveCharacter(this, selectedCharacter);
+                    SaveSystem.SaveCharacter(selectedCharacter);
                 }
                 // Unregister all players characters to register later after map changed
                 foreach (LiteNetLibPlayer player in GetPlayers())
@@ -759,13 +759,13 @@ namespace MultiplayerARPG
         public override void OnStartServer()
         {
             base.OnStartServer();
-            SaveSystem.OnServerStart(this);
+            SaveSystem.OnServerStart();
         }
 
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
-            SaveSystem.OnServerOnlineSceneLoaded(this, selectedCharacter, buildingEntities, storageItems);
+            SaveSystem.OnServerOnlineSceneLoaded(selectedCharacter, buildingEntities, storageItems);
         }
         #endregion
     }
