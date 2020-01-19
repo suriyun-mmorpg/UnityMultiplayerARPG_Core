@@ -218,11 +218,6 @@ namespace MultiplayerARPG
             }
             set { direction2D.Value = value; }
         }
-
-        public DirectionType2D DirectionType2D
-        {
-            get { return GameplayUtils.GetDirectionTypeByVector2(Direction2D); }
-        }
         
         [SerializeField]
         protected SyncFieldPassengingVehicle passengingVehicle = new SyncFieldPassengingVehicle();
@@ -398,7 +393,7 @@ namespace MultiplayerARPG
                 {
                     // Update movement animation
                     (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                    (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, DirectionType2D);
+                    (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, Direction2D);
                 }
             }
         }

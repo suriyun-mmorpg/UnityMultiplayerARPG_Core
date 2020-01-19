@@ -85,7 +85,6 @@ namespace MultiplayerARPG
         public AnimatorWeaponAnimations2D[] weaponAnimations2D;
         [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public AnimatorSkillAnimations2D[] skillAnimations2D;
-        public float magnitudeToPlayMoveClip = 0.1f;
 
         [Header("Settings")]
         public AnimatorControllerType controllerType;
@@ -97,6 +96,7 @@ namespace MultiplayerARPG
         public RuntimeAnimatorController animatorController;
 
         public AnimatorOverrideController CacheAnimatorController { get; private set; }
+        public DirectionType2D DirectionType2D { get { return GameplayUtils.GetDirectionTypeByVector2(direction2D); } }
 
         // Private state validater
         private bool isSetupComponent;
@@ -229,6 +229,11 @@ namespace MultiplayerARPG
             // Set animator parameters
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);
+            if (moveSpeed > 0)
+            {
+                animator.SetFloat(ANIM_DIRECTION_X, direction2D.x);
+                animator.SetFloat(ANIM_DIRECTION_Y, direction2D.y);
+            }
             animator.SetBool(ANIM_IS_DEAD, isDead);
         }
 
@@ -293,7 +298,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_ACTION_UP_LEFT] = animation2D.upLeft;
             CacheAnimatorController[CLIP_ACTION_UP_RIGHT] = animation2D.upRight;
             yield return 0;
-            AnimationClip clip = animation2D.GetClipByDirection(directionType2D);
+            AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
             AudioClip audioClip = animation2D.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
@@ -371,7 +376,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip clip = animation2D.GetClipByDirection(directionType2D);
+            AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
@@ -387,7 +392,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip clip = animation2D.GetClipByDirection(directionType2D);
+            AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
@@ -403,7 +408,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip clip = animation2D.GetClipByDirection(directionType2D);
+            AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
@@ -419,7 +424,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip clip = animation2D.GetClipByDirection(directionType2D);
+            AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);
@@ -435,7 +440,7 @@ namespace MultiplayerARPG
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip clip = animation2D.GetClipByDirection(directionType2D);
+            AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
             if (clip == null) return false;
             triggerDurations = animation2D.GetTriggerDurations(clip.length);
             totalDuration = animation2D.GetTotalDuration(clip.length);

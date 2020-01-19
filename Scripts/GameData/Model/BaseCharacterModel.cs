@@ -68,7 +68,7 @@ namespace MultiplayerARPG
         public float moveAnimationSpeedMultiplier { get; protected set; }
         public MovementState movementState { get; protected set; }
         public ExtraMovementState extraMovementState { get; protected set; }
-        public DirectionType2D directionType2D { get; protected set; }
+        public Vector2 direction2D { get; protected set; }
 
         // Optimize garbage collector
         protected readonly List<string> tempAddingKeys = new List<string>();
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                 SetBuffs(previousModel.buffs);
                 SetIsDead(previousModel.isDead);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
-                SetMovementState(previousModel.movementState, previousModel.extraMovementState, directionType2D);
+                SetMovementState(previousModel.movementState, previousModel.extraMovementState, direction2D);
             }
             else
             {
@@ -523,11 +523,11 @@ namespace MultiplayerARPG
             this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
-        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, DirectionType2D directionType2D)
+        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, Vector2 direction2D)
         {
             this.movementState = movementState;
             this.extraMovementState = extraMovementState;
-            this.directionType2D = directionType2D;
+            this.direction2D = direction2D;
             PlayMoveAnimation();
         }
 
@@ -535,7 +535,7 @@ namespace MultiplayerARPG
         {
             SetIsDead(false);
             SetMoveAnimationSpeedMultiplier(1f);
-            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, DirectionType2D.Down);
+            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, Vector2.down);
         }
 
         /// <summary>
