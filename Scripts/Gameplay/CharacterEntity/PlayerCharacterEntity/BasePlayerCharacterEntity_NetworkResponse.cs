@@ -131,11 +131,11 @@ namespace MultiplayerARPG
             Respawn();
         }
 
-        protected void NetFuncAssignHotkey(string hotkeyId, byte type, string relateId)
+        protected void NetFuncAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
         {
             CharacterHotkey characterHotkey = new CharacterHotkey();
             characterHotkey.hotkeyId = hotkeyId;
-            characterHotkey.type = (HotkeyType)type;
+            characterHotkey.type = type;
             characterHotkey.relateId = relateId;
             int hotkeyIndex = this.IndexOfHotkey(hotkeyId);
             if (hotkeyIndex >= 0)
@@ -212,10 +212,10 @@ namespace MultiplayerARPG
                 OpenStorage(StorageType.Building, buildingEntity.Id);
         }
 
-        protected void NetFuncShowStorage(byte byteStorageType, short weightLimit, short slotLimit)
+        protected void NetFuncShowStorage(StorageType storageType, short weightLimit, short slotLimit)
         {
             if (onShowStorage != null)
-                onShowStorage.Invoke((StorageType)byteStorageType, weightLimit, slotLimit);
+                onShowStorage.Invoke(storageType, weightLimit, slotLimit);
         }
 
         protected void NetFuncSellItem(short index, short amount)
@@ -236,13 +236,13 @@ namespace MultiplayerARPG
                 CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
         }
 
-        protected void NetFuncRefineItem(byte byteInventoryType, short index)
+        protected void NetFuncRefineItem(InventoryType inventoryType, short index)
         {
             if (IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
-            switch ((InventoryType)byteInventoryType)
+            switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
                     Item.RefineNonEquipItem(this, index, out gameMessageType);
@@ -263,13 +263,13 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncEnhanceSocketItem(byte byteInventoryType, short index, int enhancerId)
+        protected void NetFuncEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
         {
             if (IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
-            switch ((InventoryType)byteInventoryType)
+            switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
                     Item.EnhanceSocketNonEquipItem(this, index, enhancerId, out gameMessageType);
@@ -290,13 +290,13 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncRepairItem(byte byteInventoryType, short index)
+        protected void NetFuncRepairItem(InventoryType inventoryType, short index)
         {
             if (IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
-            switch ((InventoryType)byteInventoryType)
+            switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
                     Item.RepairNonEquipItem(this, index, out gameMessageType);
@@ -483,16 +483,16 @@ namespace MultiplayerARPG
             StopDealing();
         }
 
-        protected void NetFuncUpdateDealingState(byte byteDealingState)
+        protected void NetFuncUpdateDealingState(DealingState dealingState)
         {
             if (onUpdateDealingState != null)
-                onUpdateDealingState.Invoke((DealingState)byteDealingState);
+                onUpdateDealingState.Invoke(dealingState);
         }
 
-        protected void NetFuncUpdateAnotherDealingState(byte byteDealingState)
+        protected void NetFuncUpdateAnotherDealingState(DealingState dealingState)
         {
             if (onUpdateAnotherDealingState != null)
-                onUpdateAnotherDealingState.Invoke((DealingState)byteDealingState);
+                onUpdateAnotherDealingState.Invoke(dealingState);
         }
 
         protected void NetFuncUpdateDealingGold(int gold)
@@ -822,7 +822,7 @@ namespace MultiplayerARPG
                 CurrentGameManager.CloseStorage(this);
                 currentStorageId = storageId;
                 CurrentGameManager.OpenStorage(this);
-                CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)storageType, storage.weightLimit, storage.slotLimit);
+                CallNetFunction(NetFuncShowStorage, ConnectionId, storageType, storage.weightLimit, storage.slotLimit);
             }
         }
     }

@@ -62,7 +62,7 @@ namespace MultiplayerARPG
         {
             if (IndexOfData < 0 || SelectedEnhancerId == 0)
                 return;
-            OwningCharacter.RequestEnhanceSocketItem((byte)InventoryType, (short)IndexOfData, SelectedEnhancerId);
+            OwningCharacter.RequestEnhanceSocketItem(InventoryType, (short)IndexOfData, SelectedEnhancerId);
         }
 	}
 }

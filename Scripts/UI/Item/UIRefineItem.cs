@@ -155,7 +155,7 @@ namespace MultiplayerARPG
         {
             if (IndexOfData < 0)
                 return;
-            OwningCharacter.RequestRefineItem((byte)InventoryType, (short)IndexOfData);
+            OwningCharacter.RequestRefineItem(InventoryType, (short)IndexOfData);
         }
     }
 }

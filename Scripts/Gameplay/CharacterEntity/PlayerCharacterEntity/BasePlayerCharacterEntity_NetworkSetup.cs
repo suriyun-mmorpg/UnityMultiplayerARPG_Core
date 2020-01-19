@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<int>(NetFuncAddGuildSkill);
             RegisterNetFunction<int>(NetFuncUseGuildSkill);
             RegisterNetFunction(NetFuncRespawn);
-            RegisterNetFunction<string, byte, string>(NetFuncAssignHotkey);
+            RegisterNetFunction<string, HotkeyType, string>(NetFuncAssignHotkey);
             RegisterNetFunction<PackedUInt>(NetFuncNpcActivate);
             RegisterNetFunction<int>(NetFuncShowNpcDialog);
             RegisterNetFunction(NetFuncShowNpcRefine);
@@ -76,9 +76,9 @@ namespace MultiplayerARPG
             RegisterNetFunction<short, Vector3, Quaternion, PackedUInt>(NetFuncBuild);
             RegisterNetFunction<PackedUInt>(NetFuncDestroyBuilding);
             RegisterNetFunction<short, short>(NetFuncSellItem);
-            RegisterNetFunction<byte, short>(NetFuncRefineItem);
-            RegisterNetFunction<byte, short, int>(NetFuncEnhanceSocketItem);
-            RegisterNetFunction<byte, short>(NetFuncRepairItem);
+            RegisterNetFunction<InventoryType, short>(NetFuncRefineItem);
+            RegisterNetFunction<InventoryType, short, int>(NetFuncEnhanceSocketItem);
+            RegisterNetFunction<InventoryType, short>(NetFuncRepairItem);
             RegisterNetFunction<PackedUInt>(NetFuncSendDealingRequest);
             RegisterNetFunction<PackedUInt>(NetFuncReceiveDealingRequest);
             RegisterNetFunction(NetFuncAcceptDealingRequest);
@@ -89,8 +89,8 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncLockDealing);
             RegisterNetFunction(NetFuncConfirmDealing);
             RegisterNetFunction(NetFuncCancelDealing);
-            RegisterNetFunction<byte>(NetFuncUpdateDealingState);
-            RegisterNetFunction<byte>(NetFuncUpdateAnotherDealingState);
+            RegisterNetFunction<DealingState>(NetFuncUpdateDealingState);
+            RegisterNetFunction<DealingState>(NetFuncUpdateAnotherDealingState);
             RegisterNetFunction<int>(NetFuncUpdateDealingGold);
             RegisterNetFunction<int>(NetFuncUpdateAnotherDealingGold);
             RegisterNetFunction<DealingCharacterItems>(NetFuncUpdateDealingItems);
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncDeclineGuildInvitation);
             RegisterNetFunction<string>(NetFuncKickFromGuild);
             RegisterNetFunction(NetFuncLeaveGuild);
-            RegisterNetFunction<byte, short, short>(NetFuncShowStorage);
+            RegisterNetFunction<StorageType, short, short>(NetFuncShowStorage);
             RegisterNetFunction<short, short, short>(NetFuncMoveItemToStorage);
             RegisterNetFunction<short, short, short>(NetFuncMoveItemFromStorage);
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeStorageItem);

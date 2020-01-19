@@ -120,7 +120,7 @@ namespace MultiplayerARPG
 
         public bool RequestAssignHotkey(string hotkeyId, HotkeyType type, string id)
         {
-            CallNetFunction(NetFuncAssignHotkey, FunctionReceivers.Server, hotkeyId, (byte)type, id);
+            CallNetFunction(NetFuncAssignHotkey, FunctionReceivers.Server, hotkeyId, type, id);
             return true;
         }
 
@@ -197,27 +197,27 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestRefineItem(byte byteInventoryType, short index)
+        public bool RequestRefineItem(InventoryType inventoryType, short index)
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncRefineItem, FunctionReceivers.Server, byteInventoryType, index);
+            CallNetFunction(NetFuncRefineItem, FunctionReceivers.Server, inventoryType, index);
             return true;
         }
 
-        public bool RequestEnhanceSocketItem(byte byteInventoryType, short index, int enhancerId)
+        public bool RequestEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncEnhanceSocketItem, FunctionReceivers.Server, byteInventoryType, index, enhancerId);
+            CallNetFunction(NetFuncEnhanceSocketItem, FunctionReceivers.Server, inventoryType, index, enhancerId);
             return true;
         }
 
-        public bool RequestRepairItem(byte byteInventoryType, short index)
+        public bool RequestRepairItem(InventoryType inventoryType, short index)
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncRepairItem, FunctionReceivers.Server, byteInventoryType, index);
+            CallNetFunction(NetFuncRepairItem, FunctionReceivers.Server, inventoryType, index);
             return true;
         }
 
@@ -283,13 +283,13 @@ namespace MultiplayerARPG
 
         public bool RequestUpdateDealingState(DealingState state)
         {
-            CallNetFunction(NetFuncUpdateDealingState, ConnectionId, (byte)state);
+            CallNetFunction(NetFuncUpdateDealingState, ConnectionId, state);
             return true;
         }
 
         public bool RequestUpdateAnotherDealingState(DealingState state)
         {
-            CallNetFunction(NetFuncUpdateAnotherDealingState, ConnectionId, (byte)state);
+            CallNetFunction(NetFuncUpdateAnotherDealingState, ConnectionId, state);
             return true;
         }
 
