@@ -887,6 +887,8 @@ namespace MultiplayerARPG
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;
                 buildingEntity.CurrentHp = saveData.CurrentHp;
+                buildingEntity.IsLocked = saveData.IsLocked;
+                buildingEntity.LockPassword = saveData.LockPassword;
                 buildingEntity.CreatorId = saveData.CreatorId;
                 buildingEntity.CreatorName = saveData.CreatorName;
                 Assets.NetworkSpawn(spawnObj);

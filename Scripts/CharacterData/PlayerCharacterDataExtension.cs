@@ -329,12 +329,13 @@ public static partial class PlayerCharacterDataExtension
         string path = Application.persistentDataPath;
         string[] files = Directory.GetFiles(path, "*.sav");
         Debug.Log("Characters loading from: " + path);
+        PlayerCharacterData characterData;
         foreach (string file in files)
         {
             // If filename is empty or this is not character save, skip it
             if (file.Length <= 4 || file.Contains("_world_") || file.Contains("_storage"))
                 continue;
-            PlayerCharacterData characterData = new PlayerCharacterData();
+            characterData = new PlayerCharacterData();
             result.Add(characterData.LoadPersistentCharacterData(file));
         }
         Debug.Log("Characters loaded from: " + path);

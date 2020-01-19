@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             // Remove all cached data
             PlayerCharacterDataById.Clear();
             // Show list of created characters
-            List<PlayerCharacterData> selectableCharacters = PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
+            List<PlayerCharacterData> selectableCharacters = GameInstance.Singleton.SaveSystem.LoadCharacters();
             for (int i = selectableCharacters.Count - 1; i >= 0; --i)
             {
                 PlayerCharacterData selectableCharacter = selectableCharacters[i];

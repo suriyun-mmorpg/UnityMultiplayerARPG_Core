@@ -32,6 +32,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private DimensionType dimensionType;
         [SerializeField]
+        private BaseLanRpgSaveSystem saveSystem;
+        [SerializeField]
         private BaseGameplayRule gameplayRule;
         [SerializeField]
         private NetworkSetting networkSetting;
@@ -214,6 +216,11 @@ namespace MultiplayerARPG
             get { return inventorySystem == InventorySystem.LimitSlots; }
         }
 
+        public BaseLanRpgSaveSystem SaveSystem
+        {
+            get { return saveSystem; }
+        }
+
         public BaseGameplayRule GameplayRule
         {
             get { return gameplayRule; }
@@ -346,10 +353,14 @@ namespace MultiplayerARPG
                 defaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
                 defaultDamageElement.damageHitEffects = DefaultDamageHitEffects;
             }
+
+            // Setup save system if not existed
+            if (saveSystem == null)
+                saveSystem = ScriptableObject.CreateInstance<DefaultLanRpgSaveSystem>();
             
             // Setup gameplay rule if not existed
             if (gameplayRule == null)
-                gameplayRule = ScriptableObject.CreateInstance<SimpleGameplayRule>();
+                gameplayRule = ScriptableObject.CreateInstance<DefaultGameplayRule>();
 
             // Setup game database if not existed
             if (gameDatabase == null)

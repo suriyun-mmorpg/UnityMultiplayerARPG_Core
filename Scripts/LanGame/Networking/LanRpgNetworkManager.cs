@@ -28,7 +28,6 @@ namespace MultiplayerARPG
             public long connectionId;
             public PlayerCharacterData playerCharacterData;
         }
-
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
@@ -37,14 +36,12 @@ namespace MultiplayerARPG
         private int nextPartyId = 1;
         private int nextGuildId = 1;
         private Vector3? teleportPosition;
-        private readonly WorldSaveData worldSaveData = new WorldSaveData();
-        private readonly StorageSaveData storageSaveData = new StorageSaveData();
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
-        private bool isInstantiateSceneObjects;
         
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
+        public BaseLanRpgSaveSystem SaveSystem { get { return GameInstance.Singleton.SaveSystem; } }
 
         protected override void Awake()
         {
@@ -109,11 +106,11 @@ namespace MultiplayerARPG
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null && IsClientConnected)
                 {
-                    owningCharacter.SavePersistentCharacterData();
+                    SaveSystem.SaveCharacter(this, owningCharacter);
                     if (IsServer)
                     {
-                        SaveWorld();
-                        SaveStorage();
+                        SaveSystem.SaveWorld(this, owningCharacter, buildingEntities);
+                        SaveSystem.SaveStorage(this, owningCharacter, storageItems);
                     }
                 }
                 Profiler.EndSample();
@@ -222,52 +219,6 @@ namespace MultiplayerARPG
             RegisterPlayerCharacter(playerCharacterEntity);
         }
 
-        private void SaveWorld()
-        {
-            if (!isInstantiateSceneObjects)
-                return;
-            // Save building entities / Tree / Rocks
-            BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
-            worldSaveData.buildings.Clear();
-            foreach (BuildingEntity buildingEntity in buildingEntities.Values)
-            {
-                if (buildingEntity == null) continue;
-                worldSaveData.buildings.Add(new BuildingSaveData()
-                {
-                    Id = buildingEntity.Id,
-                    ParentId = buildingEntity.ParentId,
-                    DataId = buildingEntity.DataId,
-                    Position = buildingEntity.Position,
-                    Rotation = buildingEntity.Rotation,
-                    CurrentHp = buildingEntity.CurrentHp,
-                    CreatorId = buildingEntity.CreatorId,
-                    CreatorName = buildingEntity.CreatorName,
-                });
-            }
-            worldSaveData.SavePersistentData(playerCharacterEntity.Id, CurrentMapInfo.Id);
-        }
-
-        private void SaveStorage()
-        {
-            if (!isInstantiateSceneObjects)
-                return;
-            BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
-            storageSaveData.storageItems.Clear();
-            foreach (StorageId key in storageItems.Keys)
-            {
-                foreach (CharacterItem item in storageItems[key])
-                {
-                    storageSaveData.storageItems.Add(new StorageCharacterItem()
-                    {
-                        storageType = key.storageType,
-                        storageOwnerId = key.storageOwnerId,
-                        characterItem = item,
-                    });
-                }
-            }
-            storageSaveData.SavePersistentData(playerCharacterEntity.Id);
-        }
-
         protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
@@ -290,19 +241,19 @@ namespace MultiplayerARPG
                 mapInfo.IsSceneSet())
             {
                 // Save data before warp
-                SaveWorld();
-                SaveStorage();
+                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                SaveSystem.SaveWorld(this, owningCharacter, buildingEntities);
+                SaveSystem.SaveStorage(this, owningCharacter, storageItems);
                 buildingEntities.Clear();
                 storageItems.Clear();
                 SetMapInfo(mapInfo);
                 teleportPosition = position;
-                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null)
                 {
                     selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
                     selectedCharacter.CurrentMapName = mapInfo.Id;
                     selectedCharacter.CurrentPosition = position;
-                    selectedCharacter.SavePersistentCharacterData();
+                    SaveSystem.SaveCharacter(this, selectedCharacter);
                 }
                 // Unregister all players characters to register later after map changed
                 foreach (LiteNetLibPlayer player in GetPlayers())
@@ -805,43 +756,16 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            SaveSystem.OnServerStart(this);
+        }
+
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
-            isInstantiateSceneObjects = false;
-            StartCoroutine(OnServerOnlineSceneLoadedRoutine());
-        }
-
-        private IEnumerator OnServerOnlineSceneLoadedRoutine()
-        {
-            while (!IsReadyToInstantiateObjects())
-            {
-                yield return null;
-            }
-            // Load and Spawn buildings
-            worldSaveData.LoadPersistentData(selectedCharacter.Id, CurrentMapInfo.Id);
-            yield return null;
-            foreach (BuildingSaveData building in worldSaveData.buildings)
-            {
-                CreateBuildingEntity(building, true);
-            }
-            // Load storage data
-            storageSaveData.LoadPersistentData(selectedCharacter.Id);
-            yield return null;
-            foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
-            {
-                StorageId storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
-                if (!storageItems.ContainsKey(storageId))
-                    storageItems[storageId] = new List<CharacterItem>();
-                storageItems[storageId].Add(storageItem.characterItem);
-            }
-            // Spawn harvestables
-            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
-            {
-                harvestableSpawnArea.SpawnAll();
-            }
-            isInstantiateSceneObjects = true;
+            SaveSystem.OnServerOnlineSceneLoaded(this, selectedCharacter, buildingEntities, storageItems);
         }
         #endregion
     }
