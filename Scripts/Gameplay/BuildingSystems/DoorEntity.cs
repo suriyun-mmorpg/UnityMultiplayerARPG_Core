@@ -10,6 +10,7 @@ namespace MultiplayerARPG
     public class DoorEntity : BuildingEntity
     {
         [Header("Door data")]
+        public bool lockable;
         public UnityEvent onInitialOpen;
         public UnityEvent onInitialClose;
         public UnityEvent onOpen;
@@ -17,6 +18,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldBool isOpen = new SyncFieldBool();
         public override bool Activatable { get { return true; } }
+        public override bool Lockable { get { return lockable; } }
 
         public bool IsOpen
         {

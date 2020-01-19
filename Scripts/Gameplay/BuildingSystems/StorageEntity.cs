@@ -11,6 +11,7 @@ namespace MultiplayerARPG
     {
         [Header("Storage data")]
         public Storage storage;
+        public bool lockable;
         public UnityEvent onInitialOpen;
         public UnityEvent onInitialClose;
         public UnityEvent onOpen;
@@ -19,6 +20,7 @@ namespace MultiplayerARPG
         protected SyncFieldBool isOpen = new SyncFieldBool();
         private bool dirtyIsOpen;
         public override bool Activatable { get { return true; } }
+        public override bool Lockable { get { return lockable; } }
 
         public override void OnSetup()
         {

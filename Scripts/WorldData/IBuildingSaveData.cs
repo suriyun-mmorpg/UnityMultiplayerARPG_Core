@@ -6,6 +6,8 @@ public interface IBuildingSaveData
     string ParentId { get; set; }
     int DataId { get; set; }
     int CurrentHp { get; set; }
+    bool IsLocked { get; set; }
+    string LockPassword { get; set; }
     Vector3 Position { get; set; }
     Quaternion Rotation { get; set; }
     string CreatorId { get; set; }

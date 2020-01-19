@@ -32,6 +32,10 @@ namespace MultiplayerARPG
         [SerializeField]
         private SyncFieldString parentId = new SyncFieldString();
         [SerializeField]
+        private SyncFieldBool isLocked = new SyncFieldBool();
+        [SerializeField]
+        private SyncFieldString lockPassword = new SyncFieldString();
+        [SerializeField]
         private SyncFieldString creatorId = new SyncFieldString();
         [SerializeField]
         private SyncFieldString creatorName = new SyncFieldString();
@@ -48,6 +52,18 @@ namespace MultiplayerARPG
         {
             get { return parentId; }
             set { parentId.Value = value; }
+        }
+
+        public bool IsLocked
+        {
+            get { return isLocked; }
+            set { isLocked.Value = value; }
+        }
+
+        public string LockPassword
+        {
+            get { return lockPassword; }
+            set { lockPassword.Value = value; }
         }
 
         public Vector3 Position
@@ -81,7 +97,8 @@ namespace MultiplayerARPG
         }
 
         public virtual bool Activatable { get { return false; } }
-        public bool isBuildMode { get; private set; }
+        public virtual bool Lockable { get { return false; } }
+        public bool IsBuildMode { get; private set; }
 
         private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
         private readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
@@ -155,7 +172,7 @@ namespace MultiplayerARPG
         {
             base.EntityUpdate();
             Profiler.BeginSample("BuildingEntity - Update");
-            if (isBuildMode)
+            if (IsBuildMode)
             {
                 if (BuildingArea != null && BuildingArea.snapBuildingObject)
                 {
@@ -243,7 +260,7 @@ namespace MultiplayerARPG
                 rigidbody.isKinematic = true;
                 rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
             }
-            isBuildMode = true;
+            IsBuildMode = true;
         }
 
         public void TriggerEnterEntity(BaseGameEntity networkEntity)

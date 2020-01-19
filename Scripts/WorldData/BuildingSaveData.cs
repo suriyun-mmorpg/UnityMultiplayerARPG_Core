@@ -9,6 +9,8 @@ public struct BuildingSaveData : IBuildingSaveData
     public string parentId;
     public int dataId;
     public int currentHp;
+    public bool isLocked;
+    public string lockPassword;
     public Vector3 position;
     public Quaternion rotation;
     public string creatorId;
@@ -36,6 +38,18 @@ public struct BuildingSaveData : IBuildingSaveData
     {
         get { return currentHp; }
         set { currentHp = value; }
+    }
+
+    public bool IsLocked
+    {
+        get { return isLocked; }
+        set { isLocked = value; }
+    }
+
+    public string LockPassword
+    {
+        get { return lockPassword; }
+        set { lockPassword = value; }
     }
 
     public Vector3 Position

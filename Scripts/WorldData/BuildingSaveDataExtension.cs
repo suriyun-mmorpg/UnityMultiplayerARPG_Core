@@ -19,6 +19,8 @@
         to.CurrentHp = from.CurrentHp;
         to.Position = from.Position;
         to.Rotation = from.Rotation;
+        to.IsLocked = from.IsLocked;
+        to.LockPassword = from.LockPassword;
         to.CreatorId = from.CreatorId;
         to.CreatorName = from.CreatorName;
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);

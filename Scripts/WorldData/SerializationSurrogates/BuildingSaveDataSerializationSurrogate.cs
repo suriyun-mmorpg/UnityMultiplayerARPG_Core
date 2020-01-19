@@ -14,6 +14,8 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         info.AddValue("currentHp", data.currentHp);
         info.AddValue("position", data.position);
         info.AddValue("rotation", data.rotation);
+        info.AddValue("isLocked", data.isLocked);
+        info.AddValue("lockPassword", data.lockPassword);
         info.AddValue("creatorId", data.creatorId);
         info.AddValue("creatorName", data.creatorName);
     }
@@ -27,6 +29,8 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         data.currentHp = info.GetInt32("currentHp");
         data.position = (Vector3)info.GetValue("position", typeof(Vector3));
         data.rotation = (Quaternion)info.GetValue("rotation", typeof(Quaternion));
+        data.isLocked = info.GetBoolean("isLocked");
+        data.lockPassword = info.GetString("lockPassword");
         data.creatorId = info.GetString("creatorId");
         data.creatorName = info.GetString("creatorName");
         obj = data;
