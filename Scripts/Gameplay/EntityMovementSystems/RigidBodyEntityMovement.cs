@@ -137,18 +137,19 @@ namespace MultiplayerARPG
             // Register Network functions
             CacheEntity.RegisterNetFunction(NetFuncTriggerJump);
             CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            CacheEntity.RegisterNetFunction<DirectionVector3, byte>(NetFuncKeyMovement);
+            CacheEntity.RegisterNetFunction<DirectionVector3, MovementState>(NetFuncKeyMovement);
             CacheEntity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
             CacheEntity.RegisterNetFunction(StopMove);
         }
 
-        protected void NetFuncKeyMovement(DirectionVector3 inputDirection, byte movementState)
+        protected void NetFuncKeyMovement(DirectionVector3 inputDirection, MovementState movementState)
         {
             if (!CacheEntity.CanMove())
                 return;
-            // Devide inputs to float value
             tempInputDirection = inputDirection;
-            tempMovementState = (MovementState)movementState;
+            tempMovementState = movementState;
+            if (tempInputDirection.sqrMagnitude > 0)
+                navPaths = null;
             if (!isJumping)
                 isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
         }
@@ -216,11 +217,13 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector3(moveDirection), (byte)movementState);
+                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector3(moveDirection), movementState);
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
                     tempMovementState = movementState;
+                    if (tempInputDirection.sqrMagnitude > 0)
+                        navPaths = null;
                     if (!isJumping)
                         isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
                     break;

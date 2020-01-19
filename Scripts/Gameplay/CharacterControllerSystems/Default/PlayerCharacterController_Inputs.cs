@@ -374,7 +374,6 @@ namespace MultiplayerARPG
             // Move
             if (moveDirection.sqrMagnitude > 0f)
             {
-                PlayerCharacterEntity.StopMove();
                 destination = null;
                 ClearTarget();
                 targetLookDirection = moveDirection;
@@ -389,7 +388,6 @@ namespace MultiplayerARPG
         protected void UpdateWASDAttack()
         {
             destination = null;
-            PlayerCharacterEntity.StopMove();
             BaseCharacterEntity targetEntity;
 
             if (TryGetSelectedTargetAsAttackingEntity(out targetEntity))
@@ -436,7 +434,6 @@ namespace MultiplayerARPG
         protected void UpdateWASDPendingSkill(BaseSkill skill, short skillLevel)
         {
             destination = null;
-            PlayerCharacterEntity.StopMove();
             BaseCharacterEntity targetEntity;
 
             if (skill.IsAttack())

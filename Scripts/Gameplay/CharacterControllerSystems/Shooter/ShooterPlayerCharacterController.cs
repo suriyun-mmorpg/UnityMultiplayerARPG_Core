@@ -387,10 +387,7 @@ namespace MultiplayerARPG
 
             // Hide Npc UIs when move
             if (moveDirection.sqrMagnitude > 0f)
-            {
                 HideNpcDialogs();
-                PlayerCharacterEntity.StopMove();
-            }
 
             // If jumping add jump state
             if (InputManager.GetButtonDown("Jump"))
@@ -1007,8 +1004,7 @@ namespace MultiplayerARPG
             if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null ||
                 !PlayerCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return;
-
-            PlayerCharacterEntity.StopMove();
+            
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
 
@@ -1044,7 +1040,6 @@ namespace MultiplayerARPG
             {
                 if (item.IsSkill())
                 {
-                    PlayerCharacterEntity.StopMove();
                     SetQueueUsingSkill(aimPosition, item.skillLevel.skill, item.skillLevel.level, (short)itemIndex);
                 }
                 else
@@ -1054,7 +1049,6 @@ namespace MultiplayerARPG
             }
             else if (item.IsBuilding())
             {
-                PlayerCharacterEntity.StopMove();
                 buildingItemIndex = itemIndex;
                 CurrentBuildingEntity = Instantiate(item.buildingEntity);
                 CurrentBuildingEntity.SetupAsBuildMode();
