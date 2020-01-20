@@ -963,9 +963,9 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_FRIEND_REMOVE.ToString(), "Remove Friend");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString(), "You want to remove {0} from friend list?");
             // UI Password Dialogs
-            Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString(), "Enter {0} password");
+            Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString(), "Enter password");
             Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
-            Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString(), "Set {0} password");
+            Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString(), "Set password");
             Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
             // Format - Character Stats Rate
             Texts.Add(UIFormatKeys.UI_FORMAT_HP_RATE.ToString(), "Hp: {0}%");
