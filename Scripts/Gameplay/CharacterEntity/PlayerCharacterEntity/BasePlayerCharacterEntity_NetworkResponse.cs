@@ -192,7 +192,8 @@ namespace MultiplayerARPG
                 return;
 
             // TODO: For now only creator can destroy building
-            if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id))
+            if (buildingEntity != null &&
+                buildingEntity.IsCreator(this))
                 CurrentGameManager.DestroyBuildingEntity(buildingEntity.Id);
         }
 
@@ -204,10 +205,8 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity = null;
             if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
                 return;
-
-            // TODO: For now only creator can open storage
+            
             if (buildingEntity != null &&
-                buildingEntity.CreatorId.Equals(Id) &&
                 buildingEntity is StorageEntity)
                 OpenStorage(StorageType.Building, buildingEntity.Id);
         }
@@ -703,17 +702,29 @@ namespace MultiplayerARPG
             CurrentGameManager.WithdrawGuildGold(this, amount);
         }
 
-        protected void NetFuncOpenStorage(PackedUInt objectId)
+        protected void NetFuncOpenStorage(PackedUInt objectId, string password)
         {
             if (!CanDoActions())
                 return;
 
             StorageEntity storageEntity = null;
             if (!this.TryGetEntityByObjectId(objectId, out storageEntity))
+            {
+                // Can't find the storage
                 return;
+            }
 
             if (Vector3.Distance(CacheTransform.position, storageEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            {
+                // Too far from the storage
                 return;
+            }
+
+            if (storageEntity.Lockable && storageEntity.IsLocked && !storageEntity.LockPassword.Equals(password))
+            {
+                // Wrong password
+                return;
+            }
 
             OpenStorage(StorageType.Building, storageEntity.Id);
         }
@@ -726,19 +737,52 @@ namespace MultiplayerARPG
         #endregion
 
         #region Building Entities
-        protected void NetFuncToggleDoor(PackedUInt objectId)
+        protected void NetFuncOpenDoor(PackedUInt objectId, string password)
         {
             if (!CanDoActions())
                 return;
 
             DoorEntity doorEntity = null;
             if (!this.TryGetEntityByObjectId(objectId, out doorEntity))
+            {
+                // Can't find the door
                 return;
+            }
 
             if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            {
+                // Too far from the door
+                return;
+            }
+
+            if (doorEntity.Lockable && doorEntity.IsLocked && !doorEntity.LockPassword.Equals(password))
+            {
+                // Wrong password
+                return;
+            }
+
+            doorEntity.IsOpen = true;
+        }
+
+        protected void NetFuncCloseDoor(PackedUInt objectId)
+        {
+            if (!CanDoActions())
                 return;
 
-            doorEntity.IsOpen = !doorEntity.IsOpen;
+            DoorEntity doorEntity = null;
+            if (!this.TryGetEntityByObjectId(objectId, out doorEntity))
+            {
+                // Can't find the door
+                return;
+            }
+
+            if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            {
+                // Too far from the door
+                return;
+            }
+
+            doorEntity.IsOpen = false;
         }
 
         protected void NetFuncCraftItemByWorkbench(PackedUInt objectId, int dataId)
@@ -748,10 +792,16 @@ namespace MultiplayerARPG
 
             WorkbenchEntity workbenchEntity = null;
             if (!this.TryGetEntityByObjectId(objectId, out workbenchEntity))
+            {
+                // Can't find the workbench
                 return;
+            }
 
             if (Vector3.Distance(CacheTransform.position, workbenchEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            {
+                // Too far from the workbench
                 return;
+            }
 
             workbenchEntity.CraftItem(this, dataId);
         }

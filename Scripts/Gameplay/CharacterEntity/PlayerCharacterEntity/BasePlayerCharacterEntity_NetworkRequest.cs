@@ -479,9 +479,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestOpenStorage(uint objectId)
+        public bool RequestOpenStorage(uint objectId, string password)
         {
-            CallNetFunction(NetFuncOpenStorage, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(NetFuncOpenStorage, FunctionReceivers.Server, new PackedUInt(objectId), password);
             return true;
         }
 
@@ -491,9 +491,15 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestToggleDoor(uint objectId)
+        public bool RequestOpenDoor(uint objectId, string password)
         {
-            CallNetFunction(NetFuncToggleDoor, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(NetFuncOpenDoor, FunctionReceivers.Server, new PackedUInt(objectId), password);
+            return true;
+        }
+
+        public bool RequestCloseDoor(uint objectId)
+        {
+            CallNetFunction(NetFuncCloseDoor, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 

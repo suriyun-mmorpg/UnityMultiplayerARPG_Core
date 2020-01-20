@@ -123,9 +123,10 @@ namespace MultiplayerARPG
             RegisterNetFunction<int>(NetFuncWithdrawGold);
             RegisterNetFunction<int>(NetFuncDepositGuildGold);
             RegisterNetFunction<int>(NetFuncWithdrawGuildGold);
-            RegisterNetFunction<PackedUInt>(NetFuncOpenStorage);
+            RegisterNetFunction<PackedUInt, string>(NetFuncOpenStorage);
             RegisterNetFunction(NetFuncCloseStorage);
-            RegisterNetFunction<PackedUInt>(NetFuncToggleDoor);
+            RegisterNetFunction<PackedUInt, string>(NetFuncOpenDoor);
+            RegisterNetFunction<PackedUInt>(NetFuncCloseDoor);
             RegisterNetFunction<PackedUInt, int>(NetFuncCraftItemByWorkbench);
             RegisterNetFunction<string>(NetFuncFindCharacters);
             RegisterNetFunction<string>(NetFuncAddFriend);
