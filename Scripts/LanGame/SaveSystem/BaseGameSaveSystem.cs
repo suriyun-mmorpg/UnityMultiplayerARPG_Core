@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseLanRpgSaveSystem : ScriptableObject
+    public abstract class BaseGameSaveSystem : ScriptableObject
     {
         public abstract void OnServerStart();
         public abstract void OnServerOnlineSceneLoaded(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems);

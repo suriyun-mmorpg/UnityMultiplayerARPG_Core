@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Default Lan Rpg Save System", menuName = "Create Offline Save System/Default Lan Rpg Save System", order = -2499)]
-    public class DefaultLanRpgSaveSystem : BaseLanRpgSaveSystem
+    [CreateAssetMenu(fileName = "Default Game Save System", menuName = "Create Game Save System/Default Game Save System", order = -2499)]
+    public class DefaultGameSaveSystem : BaseGameSaveSystem
     {
         private readonly WorldSaveData worldSaveData = new WorldSaveData();
         private readonly StorageSaveData storageSaveData = new StorageSaveData();

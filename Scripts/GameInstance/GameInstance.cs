@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private DimensionType dimensionType;
         [SerializeField]
-        private BaseLanRpgSaveSystem saveSystem;
+        private BaseGameSaveSystem saveSystem;
         [SerializeField]
         private BaseGameplayRule gameplayRule;
         [SerializeField]
@@ -216,7 +216,7 @@ namespace MultiplayerARPG
             get { return inventorySystem == InventorySystem.LimitSlots; }
         }
 
-        public BaseLanRpgSaveSystem SaveSystem
+        public BaseGameSaveSystem SaveSystem
         {
             get { return saveSystem; }
         }
@@ -356,7 +356,7 @@ namespace MultiplayerARPG
 
             // Setup save system if not existed
             if (saveSystem == null)
-                saveSystem = ScriptableObject.CreateInstance<DefaultLanRpgSaveSystem>();
+                saveSystem = ScriptableObject.CreateInstance<DefaultGameSaveSystem>();
             
             // Setup gameplay rule if not existed
             if (gameplayRule == null)

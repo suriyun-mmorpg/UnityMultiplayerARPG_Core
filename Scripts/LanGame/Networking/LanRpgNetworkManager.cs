@@ -41,7 +41,7 @@ namespace MultiplayerARPG
         private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
         
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
-        public BaseLanRpgSaveSystem SaveSystem { get { return GameInstance.Singleton.SaveSystem; } }
+        public BaseGameSaveSystem SaveSystem { get { return GameInstance.Singleton.SaveSystem; } }
 
         protected override void Awake()
         {
