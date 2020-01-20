@@ -2,15 +2,30 @@
 {
     public partial class UIConstructBuilding : UIBase
     {
+        public BasePlayerCharacterController Controller { get { return BasePlayerCharacterController.Singleton; } }
+        public TextWrapper textTitle;
+
+        public override void Show()
+        {
+            if (Controller.ConstructingBuildingEntity == null)
+            {
+                // Don't show
+                return;
+            }
+            base.Show();
+            if (textTitle != null)
+                textTitle.text = Controller.ConstructingBuildingEntity.Title;
+        }
+
         public void OnClickConfirmBuild()
         {
-            BasePlayerCharacterController.Singleton.ConfirmBuild();
+            Controller.ConfirmBuild();
             Hide();
         }
 
         public void OnClickCancelBuild()
         {
-            BasePlayerCharacterController.Singleton.CancelBuild();
+            Controller.CancelBuild();
             Hide();
         }
     }
