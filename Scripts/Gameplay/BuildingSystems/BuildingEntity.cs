@@ -34,8 +34,6 @@ namespace MultiplayerARPG
         [SerializeField]
         private SyncFieldBool isLocked = new SyncFieldBool();
         [SerializeField]
-        private SyncFieldString lockPassword = new SyncFieldString();
-        [SerializeField]
         private SyncFieldString creatorId = new SyncFieldString();
         [SerializeField]
         private SyncFieldString creatorName = new SyncFieldString();
@@ -62,8 +60,8 @@ namespace MultiplayerARPG
 
         public string LockPassword
         {
-            get { return lockPassword; }
-            set { lockPassword.Value = value; }
+            get;
+            set;
         }
 
         public Vector3 Position
@@ -314,6 +312,11 @@ namespace MultiplayerARPG
                     child.NetworkDestroy();
                 }
             }
+        }
+
+        public bool IsCreator(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return CreatorId.Equals(playerCharacterEntity.Id);
         }
     }
 }
