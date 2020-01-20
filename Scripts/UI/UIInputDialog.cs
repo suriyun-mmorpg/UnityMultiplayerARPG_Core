@@ -20,7 +20,7 @@ public class UIInputDialog : UIBase
     private float floatDefaultAmount;
     private float? floatMinAmount;
     private float? floatMaxAmount;
-    
+
     public string Title
     {
         get
@@ -189,11 +189,6 @@ public class UIInputDialog : UIBase
     {
         switch (contentType)
         {
-            case InputField.ContentType.Standard:
-                string text = InputFieldText;
-                if (onConfirmText != null)
-                    onConfirmText.Invoke(text);
-                break;
             case InputField.ContentType.IntegerNumber:
                 int intAmount = int.Parse(InputFieldText);
                 if (onConfirmInteger != null)
@@ -203,6 +198,11 @@ public class UIInputDialog : UIBase
                 float floatAmount = float.Parse(InputFieldText);
                 if (onConfirmDecimal != null)
                     onConfirmDecimal.Invoke(floatAmount);
+                break;
+            default:
+                string text = InputFieldText;
+                if (onConfirmText != null)
+                    onConfirmText.Invoke(text);
                 break;
         }
         Hide();
