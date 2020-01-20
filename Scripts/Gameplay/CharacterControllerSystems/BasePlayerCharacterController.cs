@@ -374,7 +374,7 @@ namespace MultiplayerARPG
                 return;
             uint objectId = TargetBuildingEntity.ObjectId;
             UISceneGlobal.Singleton.ShowPasswordDialog(
-                LanguageManager.GetText(string.Format(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString(), TargetBuildingEntity.Title)),
+                LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString()),
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                 (password) =>
                 {
@@ -472,7 +472,15 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.uiBuildingCraftItems.Hide();
         }
 
-        protected void ActivateBuilding(BuildingEntity buildingEntity)
+        public void ActivateBuilding()
+        {
+            if (TargetBuildingEntity == null)
+                return;
+            ActivateBuilding(TargetBuildingEntity);
+            DeselectBuilding();
+        }
+
+        public void ActivateBuilding(BuildingEntity buildingEntity)
         {
             uint objectId = buildingEntity.ObjectId;
             if (buildingEntity is DoorEntity)
@@ -486,7 +494,7 @@ namespace MultiplayerARPG
                     else
                     {
                         UISceneGlobal.Singleton.ShowPasswordDialog(
-                            LanguageManager.GetText(string.Format(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString(), buildingEntity.Title)),
+                            LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()),
                             LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                             (password) =>
                             {
@@ -509,7 +517,7 @@ namespace MultiplayerARPG
                 else
                 {
                     UISceneGlobal.Singleton.ShowPasswordDialog(
-                            LanguageManager.GetText(string.Format(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString(), buildingEntity.Title)),
+                            LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()),
                             LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                         (password) =>
                         {
