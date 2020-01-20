@@ -83,6 +83,25 @@ public class InputFieldWrapper : MonoBehaviour
         }
     }
 
+    public virtual int characterLimit
+    {
+        get
+        {
+            if (unityInputField != null) return unityInputField.characterLimit;
+#if USE_TEXT_MESH_PRO
+            if (textMeshInputField != null) return textMeshInputField.characterLimit;
+#endif
+            return 0;
+        }
+        set
+        {
+            if (unityInputField != null) unityInputField.characterLimit = value;
+#if USE_TEXT_MESH_PRO
+            if (textMeshInputField != null) textMeshInputField.characterLimit = value;
+#endif
+        }
+    }
+
     public virtual InputField.ContentType contentType
     {
         get
