@@ -839,9 +839,8 @@ namespace MultiplayerARPG
                     if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
                     {
                         storageEntity = buildingEntity as StorageEntity;
-                        if (storageEntity == null)
-                            return false;
-                        if (!playerCharacterEntity.Id.Equals(storageEntity.CreatorId))
+                        if (storageEntity == null ||
+                            !storageEntity.IsCreator(playerCharacterEntity))
                             return false;
                     }
                     break;
