@@ -835,12 +835,10 @@ namespace MultiplayerARPG
                     break;
                 case StorageType.Building:
                     BuildingEntity buildingEntity;
-                    StorageEntity storageEntity;
                     if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
                     {
-                        storageEntity = buildingEntity as StorageEntity;
-                        if (storageEntity == null ||
-                            !storageEntity.IsCreator(playerCharacterEntity))
+                        if (!(buildingEntity is StorageEntity) ||
+                            !buildingEntity.IsCreator(playerCharacterEntity))
                             return false;
                     }
                     break;

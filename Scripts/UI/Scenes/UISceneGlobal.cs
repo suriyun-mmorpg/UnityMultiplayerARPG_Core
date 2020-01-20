@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -8,6 +9,7 @@ namespace MultiplayerARPG
         public static UISceneGlobal Singleton { get; private set; }
         public UIMessageDialog uiMessageDialog;
         public UIInputDialog uiInputDialog;
+        public UIInputDialog uiPasswordDialog;
 
         private void Awake()
         {
@@ -18,6 +20,8 @@ namespace MultiplayerARPG
             }
             Singleton = this;
             DontDestroyOnLoad(gameObject);
+            if (uiPasswordDialog == null)
+                uiPasswordDialog = uiInputDialog;
         }
 
         public void ShowMessageDialog(string title,
@@ -46,12 +50,16 @@ namespace MultiplayerARPG
         public void ShowInputDialog(string title,
             string description,
             System.Action<string> onConfirmText,
-            string defaultText = "")
+            string defaultText = "",
+            InputField.ContentType contentType = InputField.ContentType.Standard,
+            int characterLimit = 0)
         {
             uiInputDialog.Show(title,
                 description,
                 onConfirmText,
-                defaultText);
+                defaultText,
+                contentType,
+                characterLimit);
         }
 
         public void ShowInputDialog(string title,
@@ -82,6 +90,21 @@ namespace MultiplayerARPG
                 minAmount,
                 maxAmount,
                 defaultAmount);
+        }
+
+        public void ShowPasswordDialog(string title,
+            string description,
+            System.Action<string> onConfirmText,
+            string defaultText = "",
+            InputField.ContentType contentType = InputField.ContentType.Standard,
+            int characterLimit = 0)
+        {
+            uiPasswordDialog.Show(title,
+                description,
+                onConfirmText,
+                defaultText,
+                contentType,
+                characterLimit);
         }
 
         public void ShowDisconnectDialog(DisconnectInfo disconnectInfo)

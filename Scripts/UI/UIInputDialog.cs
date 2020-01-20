@@ -13,6 +13,7 @@ public class UIInputDialog : UIBase
     private System.Action<int> onConfirmInteger;
     private System.Action<float> onConfirmDecimal;
     private InputField.ContentType contentType;
+    private int characterLimit;
     private int intDefaultAmount;
     private int? intMinAmount;
     private int? intMaxAmount;
@@ -59,7 +60,10 @@ public class UIInputDialog : UIBase
     public override void Show()
     {
         if (uiInputField != null)
+        {
             uiInputField.contentType = contentType;
+            uiInputField.characterLimit = characterLimit;
+        }
         if (buttonConfirm != null)
         {
             buttonConfirm.onClick.RemoveListener(OnClickConfirm);
@@ -71,12 +75,15 @@ public class UIInputDialog : UIBase
     public void Show(string title,
         string description,
         System.Action<string> onConfirmText,
-        string defaultText = "")
+        string defaultText = "",
+        InputField.ContentType contentType = InputField.ContentType.Standard,
+        int characterLimit = 0)
     {
         Title = title;
         Description = description;
         InputFieldText = defaultText;
-        contentType = InputField.ContentType.Standard;
+        this.contentType = contentType;
+        this.characterLimit = characterLimit;
         this.onConfirmText = onConfirmText;
         Show();
     }
@@ -111,6 +118,7 @@ public class UIInputDialog : UIBase
             uiInputField.onValueChanged.AddListener(ValidateIntAmount);
         }
         contentType = InputField.ContentType.IntegerNumber;
+        characterLimit = 0;
         this.onConfirmInteger = onConfirmInteger;
         Show();
     }
@@ -158,6 +166,7 @@ public class UIInputDialog : UIBase
             uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
         }
         contentType = InputField.ContentType.DecimalNumber;
+        characterLimit = 0;
         this.onConfirmDecimal = onConfirmDecimal;
         Show();
     }

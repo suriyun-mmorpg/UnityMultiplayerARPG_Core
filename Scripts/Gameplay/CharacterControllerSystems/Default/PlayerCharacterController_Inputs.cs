@@ -22,7 +22,7 @@ namespace MultiplayerARPG
                 return;
 
             // If it's building something, don't allow to activate NPC/Warp/Pickup Item
-            if (CurrentBuildingEntity == null)
+            if (ConstructingBuildingEntity == null)
             {
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
         public virtual void UpdatePointClickInput()
         {
             // If it's building something, not allow point click movement
-            if (CurrentBuildingEntity != null)
+            if (ConstructingBuildingEntity != null)
                 return;
 
             // If it's aiming skills, not allow point click movement
@@ -188,7 +188,7 @@ namespace MultiplayerARPG
                 {
                     tempTransform = GetRaycastTransform(tempCounter);
                     // When holding on target, or already enter edit building mode
-                    if (isMouseHoldAndNotDrag || IsEditingBuilding)
+                    if (isMouseHoldAndNotDrag)
                     {
                         targetBuilding = null;
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
@@ -196,8 +196,8 @@ namespace MultiplayerARPG
                             targetBuilding = tempBuildingMaterial.buildingEntity;
                         if (targetBuilding && !targetBuilding.IsDead())
                         {
-                            IsEditingBuilding = true;
                             SetTarget(targetBuilding, TargetActionType.Undefined);
+                            IsEditingBuilding = true;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -253,8 +253,8 @@ namespace MultiplayerARPG
                         else if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
                         {
                             // Found activating entity as building entity
-                            IsEditingBuilding = false;
                             SetTarget(targetBuilding, TargetActionType.Undefined);
+                            IsEditingBuilding = false;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -345,6 +345,12 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.SetTargetEntity(null);
             targetPosition = null;
             targetActionType = TargetActionType.Undefined;
+        }
+
+        public override void DeselectBuilding()
+        {
+            base.DeselectBuilding();
+            ClearTarget();
         }
 
         public virtual void UpdateWASDInput()
@@ -491,25 +497,7 @@ namespace MultiplayerARPG
 
         public void UpdateBuilding()
         {
-            // Current building UI
-            UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
-            if (uiCurrentBuilding != null)
-            {
-                if (uiCurrentBuilding.IsVisible() && ActiveBuildingEntity == null)
-                    uiCurrentBuilding.Hide();
-            }
-
-            // Construct building UI
-            UIConstructBuilding uiConstructBuilding = CacheUISceneGameplay.uiConstructBuilding;
-            if (uiConstructBuilding != null)
-            {
-                if (uiConstructBuilding.IsVisible() && CurrentBuildingEntity == null)
-                    uiConstructBuilding.Hide();
-                if (!uiConstructBuilding.IsVisible() && CurrentBuildingEntity != null)
-                    uiConstructBuilding.Show();
-            }
-
-            if (CurrentBuildingEntity == null)
+            if (ConstructingBuildingEntity == null)
                 return;
 
             bool isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
@@ -650,31 +638,19 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetBuilding))
             {
-                UICurrentBuilding uiCurrentBuilding = null;
-                if (CacheUISceneGameplay != null)
-                    uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
                 if (Vector3.Distance(MovementTransform.position, targetBuilding.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
                 {
                     PlayerCharacterEntity.StopMove();
-                    if (IsEditingBuilding)
+                    if (!IsEditingBuilding)
                     {
-                        // If it's build mode, show destroy menu
-                        if (uiCurrentBuilding != null && !uiCurrentBuilding.IsVisible())
-                            uiCurrentBuilding.Show();
-                    }
-                    else
-                    {
-                        // If it's not build mode, try to activate it
                         ActivateBuilding(targetBuilding);
                         ClearTarget();
                     }
+                    else
+                        ShowCurrentBuildingDialog();
                 }
                 else
-                {
                     UpdateTargetEntityPosition(targetBuilding);
-                    if (uiCurrentBuilding != null && uiCurrentBuilding.IsVisible())
-                        uiCurrentBuilding.Hide();
-                }
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetHarvestable))
             {
@@ -749,7 +725,7 @@ namespace MultiplayerARPG
 
             CancelBuild();
             buildingItemIndex = -1;
-            CurrentBuildingEntity = null;
+            ConstructingBuildingEntity = null;
             ClearQueueUsingSkill();
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
@@ -899,10 +875,11 @@ namespace MultiplayerARPG
                 destination = null;
                 PlayerCharacterEntity.StopMove();
                 buildingItemIndex = itemIndex;
-                CurrentBuildingEntity = Instantiate(item.buildingEntity);
-                CurrentBuildingEntity.SetupAsBuildMode();
-                CurrentBuildingEntity.CacheTransform.parent = null;
+                ConstructingBuildingEntity = Instantiate(item.buildingEntity);
+                ConstructingBuildingEntity.SetupAsBuildMode();
+                ConstructingBuildingEntity.CacheTransform.parent = null;
                 FindAndSetBuildingAreaFromCharacterDirection();
+                ShowConstructBuildingDialog();
             }
         }
     }

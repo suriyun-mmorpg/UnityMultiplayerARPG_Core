@@ -183,12 +183,12 @@ namespace MultiplayerARPG
                     case GuildSkillType.Active:
                         uiTextSkillType.text = string.Format(
                             LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UITextKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
+                            LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
                         break;
                     case GuildSkillType.Passive:
                         uiTextSkillType.text = string.Format(
                             LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UITextKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
+                            LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
                         break;
                 }
             }

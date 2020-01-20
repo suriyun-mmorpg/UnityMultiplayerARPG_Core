@@ -201,7 +201,7 @@ namespace MultiplayerARPG
         {
             base.Awake();
             buildingItemIndex = -1;
-            CurrentBuildingEntity = null;
+            ConstructingBuildingEntity = null;
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -312,21 +312,9 @@ namespace MultiplayerARPG
             tempDeltaTime = Time.deltaTime;
             calculatedTurnDuration += tempDeltaTime;
 
-            // Hide construction UI
-            if (CurrentBuildingEntity == null)
-            {
-                if (CacheUISceneGameplay.uiConstructBuilding.IsVisible())
-                    CacheUISceneGameplay.uiConstructBuilding.Hide();
-            }
-            if (ActiveBuildingEntity == null)
-            {
-                if (CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
-                    CacheUISceneGameplay.uiCurrentBuilding.Hide();
-            }
-
             IsBlockController = CacheUISceneGameplay.IsBlockController();
-            // Lock cursor when not show UIs
 
+            // Lock cursor when not show UIs
             if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
             {
                 // Control camera by touch-screen
@@ -373,14 +361,14 @@ namespace MultiplayerARPG
             cameraForward.Normalize();
             cameraRight.Normalize();
 
-            if (CurrentBuildingEntity != null)
+            if (ConstructingBuildingEntity != null)
                 UpdateTarget_BuildingMode();
             else
                 UpdateTarget_BattleMode();
 
             UpdateMovementInputs();
 
-            if (CurrentBuildingEntity != null)
+            if (ConstructingBuildingEntity != null)
                 UpdateInputs_BuildingMode();
             else
                 UpdateInputs_BattleMode();
@@ -459,7 +447,7 @@ namespace MultiplayerARPG
         private void UpdateTarget_BuildingMode()
         {
             // Clear area before next find
-            CurrentBuildingEntity.BuildingArea = null;
+            ConstructingBuildingEntity.BuildingArea = null;
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + CurrentGameInstance.buildDistance);
             // Raycast from camera position to center of screen
@@ -471,7 +459,7 @@ namespace MultiplayerARPG
             {
                 tempHitInfo = raycasts[tempCounter];
                 tempEntity = tempHitInfo.collider.GetComponentInParent<BuildingEntity>();
-                if (tempEntity != null && tempEntity == CurrentBuildingEntity)
+                if (tempEntity != null && tempEntity == ConstructingBuildingEntity)
                 {
                     // Skip because it's raycast to the building that you are going to build
                     continue;
@@ -484,14 +472,14 @@ namespace MultiplayerARPG
                     aimPosition = tempHitInfo.point;
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
                     if (buildingArea == null ||
-                        (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity) ||
-                        !CurrentBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
+                        (buildingArea.buildingEntity != null && buildingArea.buildingEntity == ConstructingBuildingEntity) ||
+                        !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                     {
                         // Skip because this area is not allowed to build the building that you are going to build
                         continue;
                     }
 
-                    CurrentBuildingEntity.BuildingArea = buildingArea;
+                    ConstructingBuildingEntity.BuildingArea = buildingArea;
                     if (buildingArea.snapBuildingObject)
                     {
                         hasSnapBuildPosition = true;
@@ -503,17 +491,17 @@ namespace MultiplayerARPG
             if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > CurrentGameInstance.buildDistance)
             {
                 // Mark as unable to build when the building is far from character
-                CurrentBuildingEntity.BuildingArea = null;
+                ConstructingBuildingEntity.BuildingArea = null;
             }
 
             if (!hasSnapBuildPosition)
             {
                 // There is no snap build position, set building rotation by camera look direction
-                CurrentBuildingEntity.CacheTransform.position = aimPosition;
+                ConstructingBuildingEntity.CacheTransform.position = aimPosition;
                 // Rotate to camera
                 Vector3 direction = (aimPosition - CacheGameplayCameraControls.CacheCameraTransform.position).normalized;
                 direction.y = 0;
-                CurrentBuildingEntity.transform.rotation = Quaternion.LookRotation(direction);
+                ConstructingBuildingEntity.transform.rotation = Quaternion.LookRotation(direction);
             }
         }
 
@@ -524,7 +512,7 @@ namespace MultiplayerARPG
             float attackFov = 90f;
             // Calculating aim distance, also read attack inputs here
             // Attack inputs will be used to calculate attack distance
-            if (CurrentBuildingEntity == null)
+            if (ConstructingBuildingEntity == null)
             {
                 // Attack with right hand weapon
                 tempPressAttackRight = GetPrimaryAttackButton();
@@ -682,8 +670,7 @@ namespace MultiplayerARPG
                 if (showConfirmConstructionUI)
                 {
                     // Show confirm UI
-                    if (!CacheUISceneGameplay.uiConstructBuilding.IsVisible())
-                        CacheUISceneGameplay.uiConstructBuilding.Show();
+                    ShowConstructBuildingDialog();
                 }
                 else
                 {
@@ -981,7 +968,7 @@ namespace MultiplayerARPG
 
             CancelBuild();
             buildingItemIndex = -1;
-            CurrentBuildingEntity = null;
+            ConstructingBuildingEntity = null;
             ClearQueueUsingSkill();
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
@@ -1050,9 +1037,9 @@ namespace MultiplayerARPG
             else if (item.IsBuilding())
             {
                 buildingItemIndex = itemIndex;
-                CurrentBuildingEntity = Instantiate(item.buildingEntity);
-                CurrentBuildingEntity.SetupAsBuildMode();
-                CurrentBuildingEntity.CacheTransform.parent = null;
+                ConstructingBuildingEntity = Instantiate(item.buildingEntity);
+                ConstructingBuildingEntity.SetupAsBuildMode();
+                ConstructingBuildingEntity.CacheTransform.parent = null;
             }
         }
 

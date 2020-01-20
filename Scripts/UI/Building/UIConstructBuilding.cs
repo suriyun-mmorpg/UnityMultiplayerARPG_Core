@@ -4,16 +4,14 @@
     {
         public void OnClickConfirmBuild()
         {
-            BasePlayerCharacterController controller = BasePlayerCharacterController.Singleton;
-            if (controller != null)
-                controller.ConfirmBuild();
+            BasePlayerCharacterController.Singleton.ConfirmBuild();
+            Hide();
         }
 
         public void OnClickCancelBuild()
         {
-            BasePlayerCharacterController controller = BasePlayerCharacterController.Singleton;
-            if (controller != null)
-                controller.CancelBuild();
+            BasePlayerCharacterController.Singleton.CancelBuild();
+            Hide();
         }
     }
 }

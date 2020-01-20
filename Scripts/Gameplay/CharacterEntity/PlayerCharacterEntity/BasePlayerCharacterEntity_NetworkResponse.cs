@@ -189,12 +189,24 @@ namespace MultiplayerARPG
 
             BuildingEntity buildingEntity = null;
             if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            {
+                // Can't find the building
                 return;
+            }
 
-            // TODO: For now only creator can destroy building
-            if (buildingEntity != null &&
-                buildingEntity.IsCreator(this))
-                CurrentGameManager.DestroyBuildingEntity(buildingEntity.Id);
+            if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + buildingEntity.characterForwardDistance)
+            {
+                // Too far from the building
+                return;
+            }
+
+            if (!buildingEntity.IsCreator(this))
+            {
+                // Character is not the creator
+                return;
+            }
+
+            CurrentGameManager.DestroyBuildingEntity(buildingEntity.Id);
         }
 
         protected void NetFuncOpenBuildingStorage(PackedUInt objectId)
@@ -714,7 +726,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, storageEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, storageEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + storageEntity.characterForwardDistance)
             {
                 // Too far from the storage
                 return;
@@ -749,7 +761,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + doorEntity.characterForwardDistance)
             {
                 // Too far from the door
                 return;
@@ -776,7 +788,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + doorEntity.characterForwardDistance)
             {
                 // Too far from the door
                 return;
@@ -797,7 +809,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, workbenchEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, workbenchEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + workbenchEntity.characterForwardDistance)
             {
                 // Too far from the workbench
                 return;
@@ -826,6 +838,108 @@ namespace MultiplayerARPG
         protected void NetFuncGetFriends()
         {
             CurrentGameManager.GetFriends(this);
+        }
+        #endregion
+
+        #region Building Locking
+        protected void NetFuncSetBuildingPassword(PackedUInt objectId, string password)
+        {
+            if (!CanDoActions())
+                return;
+
+            BuildingEntity buildingEntity = null;
+            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            {
+                // Can't find the building
+                return;
+            }
+            
+            if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + buildingEntity.characterForwardDistance)
+            {
+                // Too far from the building
+                return;
+            }
+
+            if (!buildingEntity.IsCreator(this))
+            {
+                // Character is not the creator
+                return;
+            }
+
+            if (!buildingEntity.Lockable)
+            {
+                // It's not lockable building
+                return;
+            }
+
+            buildingEntity.LockPassword = password;
+            buildingEntity.IsLocked = true;
+        }
+
+        protected void NetFuncLockBuilding(PackedUInt objectId)
+        {
+            if (!CanDoActions())
+                return;
+
+            BuildingEntity buildingEntity = null;
+            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            {
+                // Can't find the building
+                return;
+            }
+
+            if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + buildingEntity.characterForwardDistance)
+            {
+                // Too far from the building
+                return;
+            }
+
+            if (!buildingEntity.IsCreator(this))
+            {
+                // Character is not the creator
+                return;
+            }
+
+            if (!buildingEntity.Lockable)
+            {
+                // It's not lockable building
+                return;
+            }
+
+            buildingEntity.IsLocked = true;
+        }
+
+        protected void NetFuncUnlockBuilding(PackedUInt objectId)
+        {
+            if (!CanDoActions())
+                return;
+
+            BuildingEntity buildingEntity = null;
+            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            {
+                // Can't find the building
+                return;
+            }
+
+            if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + buildingEntity.characterForwardDistance)
+            {
+                // Too far from the building
+                return;
+            }
+
+            if (!buildingEntity.IsCreator(this))
+            {
+                // Character is not the creator
+                return;
+            }
+
+            if (!buildingEntity.Lockable)
+            {
+                // It's not lockable building
+                return;
+            }
+
+            buildingEntity.IsLocked = false;
         }
         #endregion
 

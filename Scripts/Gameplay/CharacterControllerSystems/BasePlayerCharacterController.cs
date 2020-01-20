@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using LiteNetLibManager;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -76,17 +77,15 @@ namespace MultiplayerARPG
         protected int buildingItemIndex;
         public BaseGameEntity SelectedEntity { get; protected set; }
         public BaseGameEntity TargetEntity { get; protected set; }
-        public BuildingEntity CurrentBuildingEntity { get; protected set; }
-        public BuildingEntity ActiveBuildingEntity
+        public BuildingEntity ConstructingBuildingEntity { get; protected set; }
+        public BuildingEntity TargetBuildingEntity
         {
             get
             {
-                BuildingEntity building = TargetEntity as BuildingEntity;
-                if (building != null)
-                    return building;
+                if (TargetEntity is BuildingEntity)
+                    return TargetEntity as BuildingEntity;
                 return null;
             }
-            set { TargetEntity = value; }
         }
         public bool IsEditingBuilding { get; protected set; }
         protected UsingSkillData queueUsingSkill;
@@ -331,81 +330,192 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateStorageItems();
         }
         #endregion
-        
-        public void ConfirmBuild()
+
+        public virtual void ConfirmBuild()
         {
-            if (CurrentBuildingEntity != null)
+            if (ConstructingBuildingEntity == null)
+                return;
+            if (ConstructingBuildingEntity.CanBuild())
             {
-                if (CurrentBuildingEntity.CanBuild())
+                uint parentObjectId = 0;
+                if (ConstructingBuildingEntity.BuildingArea != null)
+                    parentObjectId = ConstructingBuildingEntity.BuildingArea.EntityObjectId;
+                PlayerCharacterEntity.RequestBuild((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
+            }
+            Destroy(ConstructingBuildingEntity.gameObject);
+            ConstructingBuildingEntity = null;
+        }
+
+        public virtual void CancelBuild()
+        {
+            if (ConstructingBuildingEntity == null)
+                return;
+            Destroy(ConstructingBuildingEntity.gameObject);
+            ConstructingBuildingEntity = null;
+        }
+
+        public virtual void DeselectBuilding()
+        {
+            IsEditingBuilding = false;
+            TargetEntity = null;
+        }
+
+        public virtual void DestroyBuilding()
+        {
+            if (TargetBuildingEntity == null)
+                return;
+            PlayerCharacterEntity.RequestDestroyBuilding(TargetBuildingEntity.ObjectId);
+            DeselectBuilding();
+        }
+
+        public virtual void SetBuildingPassword()
+        {
+            if (TargetBuildingEntity == null)
+                return;
+            uint objectId = TargetBuildingEntity.ObjectId;
+            UISceneGlobal.Singleton.ShowPasswordDialog(
+                LanguageManager.GetText(string.Format(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString(), TargetBuildingEntity.Title)),
+                LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString()),
+                (password) =>
                 {
-                    uint parentObjectId = 0;
-                    if (CurrentBuildingEntity.BuildingArea != null)
-                        parentObjectId = CurrentBuildingEntity.BuildingArea.EntityObjectId;
-                    PlayerCharacterEntity.RequestBuild((short)buildingItemIndex, CurrentBuildingEntity.CacheTransform.position, CurrentBuildingEntity.CacheTransform.rotation, parentObjectId);
-                }
-                Destroy(CurrentBuildingEntity.gameObject);
+                    PlayerCharacterEntity.RequestSetBuildingPassword(objectId, password);
+                }, string.Empty, InputField.ContentType.Pin, 6);
+            DeselectBuilding();
+        }
+
+        public virtual void LockBuilding()
+        {
+            if (TargetBuildingEntity == null)
+                return;
+            PlayerCharacterEntity.RequestLockBuilding(TargetBuildingEntity.ObjectId);
+            DeselectBuilding();
+        }
+
+        public virtual void UnlockBuilding()
+        {
+            if (TargetBuildingEntity == null)
+                return;
+            PlayerCharacterEntity.RequestUnlockBuilding(TargetBuildingEntity.ObjectId);
+            DeselectBuilding();
+        }
+
+        protected void ShowConstructBuildingDialog()
+        {
+            HideConstructBuildingDialog();
+            if (ConstructingBuildingEntity == null)
+                return;
+            if (!CacheUISceneGameplay.uiConstructBuilding.IsVisible())
+                CacheUISceneGameplay.uiConstructBuilding.Show();
+        }
+
+        protected void HideConstructBuildingDialog()
+        {
+            if (CacheUISceneGameplay.uiConstructBuilding.IsVisible())
+                CacheUISceneGameplay.uiConstructBuilding.Hide();
+        }
+
+        protected void ShowCurrentBuildingDialog()
+        {
+            HideCurrentBuildingDialog();
+            if (TargetBuildingEntity == null)
+                return;
+            if (TargetBuildingEntity is DoorEntity)
+            {
+                if (!CacheUISceneGameplay.uiCurrentDoor.IsVisible())
+                    CacheUISceneGameplay.uiCurrentDoor.Show();
+            }
+            else if (TargetBuildingEntity is StorageEntity)
+            {
+                if (!CacheUISceneGameplay.uiCurrentStorage.IsVisible())
+                    CacheUISceneGameplay.uiCurrentStorage.Show();
+            }
+            else if (TargetBuildingEntity is WorkbenchEntity)
+            {
+                if (!CacheUISceneGameplay.uiCurrentWorkbench.IsVisible())
+                    CacheUISceneGameplay.uiCurrentWorkbench.Show();
+            }
+            else
+            {
+                if (!CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
+                    CacheUISceneGameplay.uiCurrentBuilding.Show();
             }
         }
 
-        public void CancelBuild()
+        protected void HideCurrentBuildingDialog()
         {
-            if (CurrentBuildingEntity != null)
-                Destroy(CurrentBuildingEntity.gameObject);
-        }
-
-        public void DestroyBuilding()
-        {
-            if (ActiveBuildingEntity == null)
-                return;
-            PlayerCharacterEntity.RequestDestroyBuilding(ActiveBuildingEntity.ObjectId);
-            ActiveBuildingEntity = null;
-            IsEditingBuilding = false;
-        }
-
-        public void DeselectBuilding()
-        {
-            if (ActiveBuildingEntity == null)
-                return;
-            ActiveBuildingEntity = null;
-            IsEditingBuilding = false;
+            if (CacheUISceneGameplay.uiCurrentDoor.IsVisible())
+                CacheUISceneGameplay.uiCurrentDoor.Hide();
+            if (CacheUISceneGameplay.uiCurrentStorage.IsVisible())
+                CacheUISceneGameplay.uiCurrentStorage.Hide();
+            if (CacheUISceneGameplay.uiCurrentWorkbench.IsVisible())
+                CacheUISceneGameplay.uiCurrentWorkbench.Hide();
+            if (CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
+                CacheUISceneGameplay.uiCurrentBuilding.Hide();
         }
 
         protected void HideNpcDialogs()
         {
-            if (CacheUISceneGameplay != null)
-            {
-                if (CacheUISceneGameplay.uiNpcDialog != null &&
-                    CacheUISceneGameplay.uiNpcDialog.IsVisible())
-                    CacheUISceneGameplay.uiNpcDialog.Hide();
-
-                if (CacheUISceneGameplay.uiPlayerStorageItems != null &&
-                    CacheUISceneGameplay.uiPlayerStorageItems.IsVisible())
-                    CacheUISceneGameplay.uiPlayerStorageItems.Hide();
-
-                if (CacheUISceneGameplay.uiGuildStorageItems != null &&
-                    CacheUISceneGameplay.uiGuildStorageItems.IsVisible())
-                    CacheUISceneGameplay.uiGuildStorageItems.Hide();
-
-                if (CacheUISceneGameplay.uiBuildingStorageItems != null &&
-                    CacheUISceneGameplay.uiBuildingStorageItems.IsVisible())
-                    CacheUISceneGameplay.uiBuildingStorageItems.Hide();
-
-                if (CacheUISceneGameplay.uiBuildingCraftItems != null &&
-                    CacheUISceneGameplay.uiBuildingCraftItems.IsVisible())
-                    CacheUISceneGameplay.uiBuildingCraftItems.Hide();
-            }
+            if (CacheUISceneGameplay.uiNpcDialog != null &&
+                CacheUISceneGameplay.uiNpcDialog.IsVisible())
+                CacheUISceneGameplay.uiNpcDialog.Hide();
+            if (CacheUISceneGameplay.uiPlayerStorageItems != null &&
+                CacheUISceneGameplay.uiPlayerStorageItems.IsVisible())
+                CacheUISceneGameplay.uiPlayerStorageItems.Hide();
+            if (CacheUISceneGameplay.uiGuildStorageItems != null &&
+                CacheUISceneGameplay.uiGuildStorageItems.IsVisible())
+                CacheUISceneGameplay.uiGuildStorageItems.Hide();
+            if (CacheUISceneGameplay.uiBuildingStorageItems != null &&
+                CacheUISceneGameplay.uiBuildingStorageItems.IsVisible())
+                CacheUISceneGameplay.uiBuildingStorageItems.Hide();
+            if (CacheUISceneGameplay.uiBuildingCraftItems != null &&
+                CacheUISceneGameplay.uiBuildingCraftItems.IsVisible())
+                CacheUISceneGameplay.uiBuildingCraftItems.Hide();
         }
-        
+
         protected void ActivateBuilding(BuildingEntity buildingEntity)
         {
+            uint objectId = buildingEntity.ObjectId;
             if (buildingEntity is DoorEntity)
             {
-                OwningCharacter.RequestToggleDoor(buildingEntity.ObjectId);
+                if (!(buildingEntity as DoorEntity).IsOpen)
+                {
+                    if (!buildingEntity.Lockable || !buildingEntity.IsLocked)
+                    {
+                        OwningCharacter.RequestOpenDoor(objectId, string.Empty);
+                    }
+                    else
+                    {
+                        UISceneGlobal.Singleton.ShowPasswordDialog(
+                            LanguageManager.GetText(string.Format(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString(), buildingEntity.Title)),
+                            LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
+                            (password) =>
+                            {
+                                OwningCharacter.RequestOpenDoor(objectId, password);
+                            }, string.Empty, InputField.ContentType.Pin, 6);
+                    }
+                }
+                else
+                {
+                    OwningCharacter.RequestCloseDoor(objectId);
+                }
             }
 
             if (buildingEntity is StorageEntity)
             {
-                OwningCharacter.RequestOpenStorage(buildingEntity.ObjectId);
+                if (!buildingEntity.Lockable || !buildingEntity.IsLocked)
+                {
+                    OwningCharacter.RequestOpenStorage(objectId, string.Empty);
+                }
+                else
+                {
+                    UISceneGlobal.Singleton.ShowPasswordDialog(
+                            LanguageManager.GetText(string.Format(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString(), buildingEntity.Title)),
+                            LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
+                        (password) =>
+                        {
+                            OwningCharacter.RequestOpenStorage(objectId, password);
+                        }, string.Empty, InputField.ContentType.Pin, 6);
+                }
             }
 
             if (buildingEntity is WorkbenchEntity)

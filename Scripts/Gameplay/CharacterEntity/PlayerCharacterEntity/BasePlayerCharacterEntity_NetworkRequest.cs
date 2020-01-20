@@ -532,5 +532,23 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncGetFriends, FunctionReceivers.Server);
             return true;
         }
+
+        public bool RequestSetBuildingPassword(uint objectId, string password)
+        {
+            CallNetFunction(NetFuncSetBuildingPassword, FunctionReceivers.Server, new PackedUInt(objectId), password);
+            return true;
+        }
+
+        public bool RequestLockBuilding(uint objectId)
+        {
+            CallNetFunction(NetFuncLockBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
+        }
+
+        public bool RequestUnlockBuilding(uint objectId)
+        {
+            CallNetFunction(NetFuncUnlockBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
+        }
     }
 }

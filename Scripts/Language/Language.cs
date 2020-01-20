@@ -108,7 +108,16 @@ namespace MultiplayerARPG
         // Item Amount Title
         UI_LABEL_UNLIMIT_WEIGHT,
         UI_LABEL_UNLIMIT_SLOT,
-        // Item Type Title
+        // Enter Building Password
+        UI_ENTER_BUILDING_PASSWORD,
+        UI_ENTER_BUILDING_PASSWORD_DESCRIPTION,
+        // Enter Building Password
+        UI_SET_BUILDING_PASSWORD,
+        UI_SET_BUILDING_PASSWORD_DESCRIPTION,
+    }
+
+    public enum UIItemTypeKeys : byte
+    {
         UI_ITEM_TYPE_JUNK,
         UI_ITEM_TYPE_SHIELD,
         UI_ITEM_TYPE_POTION,
@@ -118,7 +127,10 @@ namespace MultiplayerARPG
         UI_ITEM_TYPE_SOCKET_ENHANCER,
         UI_ITEM_TYPE_MOUNT,
         UI_ITEM_TYPE_SKILL,
-        // Skill Type Titles
+    }
+
+    public enum UISkillTypeKeys : byte
+    {
         UI_SKILL_TYPE_ACTIVE,
         UI_SKILL_TYPE_PASSIVE,
         UI_SKILL_TYPE_CRAFT_ITEM,
@@ -768,9 +780,9 @@ namespace MultiplayerARPG
             // Format - Skill
             Texts.Add(UIFormatKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION.ToString(), "Cooldown: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_SKILL_TYPE.ToString(), "Skill Type: {0}");
-            Texts.Add(UITextKeys.UI_SKILL_TYPE_ACTIVE.ToString(), "Active");
-            Texts.Add(UITextKeys.UI_SKILL_TYPE_PASSIVE.ToString(), "Passive");
-            Texts.Add(UITextKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString(), "Craft Item");
+            Texts.Add(UISkillTypeKeys.UI_SKILL_TYPE_ACTIVE.ToString(), "Active");
+            Texts.Add(UISkillTypeKeys.UI_SKILL_TYPE_PASSIVE.ToString(), "Passive");
+            Texts.Add(UISkillTypeKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString(), "Craft Item");
             // Format - Buff
             Texts.Add(UIFormatKeys.UI_FORMAT_BUFF_DURATION.ToString(), "Duration: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_HP.ToString(), "Recovery Hp: {0}");
@@ -782,15 +794,15 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_REFINE_LEVEL.ToString(), "+{0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL.ToString(), "{0} +{1}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_TYPE.ToString(), "Item Type: {0}");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_JUNK.ToString(), "Junk");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_SHIELD.ToString(), "Shield");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_POTION.ToString(), "Potion");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_AMMO.ToString(), "Ammo");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_BUILDING.ToString(), "Building");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_PET.ToString(), "Pet");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString(), "Socket Enhancer");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_MOUNT.ToString(), "Mount");
-            Texts.Add(UITextKeys.UI_ITEM_TYPE_SKILL.ToString(), "Skill");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_JUNK.ToString(), "Junk");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_SHIELD.ToString(), "Shield");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_POTION.ToString(), "Potion");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_AMMO.ToString(), "Ammo");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_BUILDING.ToString(), "Building");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_PET.ToString(), "Pet");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString(), "Socket Enhancer");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_MOUNT.ToString(), "Mount");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_SKILL.ToString(), "Skill");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_RARITY.ToString(), "Rarity: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_STACK.ToString(), "{0}/{1}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_DURABILITY.ToString(), "Durability: {0}");
@@ -950,6 +962,11 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString(), "You want to add {0} to friend list?");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVE.ToString(), "Remove Friend");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString(), "You want to remove {0} from friend list?");
+            // UI Password Dialogs
+            Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString(), "Enter {0} password");
+            Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
+            Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString(), "Set {0} password");
+            Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
             // Format - Character Stats Rate
             Texts.Add(UIFormatKeys.UI_FORMAT_HP_RATE.ToString(), "Hp: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_MP_RATE.ToString(), "Mp: {0}%");

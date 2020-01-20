@@ -303,7 +303,7 @@ namespace MultiplayerARPG
                         case ItemType.Junk:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_JUNK.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_JUNK.ToString()));
                             break;
                         case ItemType.Armor:
                             uiTextItemType.text = string.Format(
@@ -318,7 +318,7 @@ namespace MultiplayerARPG
                         case ItemType.Shield:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SHIELD.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SHIELD.ToString()));
                             break;
                         case ItemType.Potion:
                         case ItemType.AttributeIncrease:
@@ -327,37 +327,37 @@ namespace MultiplayerARPG
                         case ItemType.SkillReset:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_POTION.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_POTION.ToString()));
                             break;
                         case ItemType.Ammo:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_AMMO.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_AMMO.ToString()));
                             break;
                         case ItemType.Building:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_BUILDING.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_BUILDING.ToString()));
                             break;
                         case ItemType.Pet:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_PET.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_PET.ToString()));
                             break;
                         case ItemType.SocketEnhancer:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString()));
                             break;
                         case ItemType.Mount:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_MOUNT.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_MOUNT.ToString()));
                             break;
                         case ItemType.Skill:
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
-                                LanguageManager.GetText(UITextKeys.UI_ITEM_TYPE_SKILL.ToString()));
+                                LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SKILL.ToString()));
                             break;
                     }
                 }

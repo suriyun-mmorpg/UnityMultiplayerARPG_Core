@@ -80,7 +80,7 @@ namespace MultiplayerARPG
             buildingItemIndex = -1;
             findingEnemyIndex = -1;
             isLeftHandAttacking = false;
-            CurrentBuildingEntity = null;
+            ConstructingBuildingEntity = null;
             
             if (targetObjectPrefab != null)
             {

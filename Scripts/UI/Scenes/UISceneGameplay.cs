@@ -68,6 +68,9 @@ namespace MultiplayerARPG
         public UIEnhanceSocketItem uiEnhanceSocketItem;
         public UIConstructBuilding uiConstructBuilding;
         public UICurrentBuilding uiCurrentBuilding;
+        public UICurrentBuilding uiCurrentDoor;
+        public UICurrentBuilding uiCurrentStorage;
+        public UICurrentBuilding uiCurrentWorkbench;
         public UIPlayerActivateMenu uiPlayerActivateMenu;
         public UIDealingRequest uiDealingRequest;
         public UIDealing uiDealing;
@@ -118,6 +121,12 @@ namespace MultiplayerARPG
         private void Awake()
         {
             Singleton = this;
+            if (uiCurrentDoor == null)
+                uiCurrentDoor = uiCurrentBuilding;
+            if (uiCurrentStorage == null)
+                uiCurrentStorage = uiCurrentBuilding;
+            if (uiCurrentWorkbench == null)
+                uiCurrentWorkbench = uiCurrentBuilding;
             MigrateNewUIs();
         }
 
