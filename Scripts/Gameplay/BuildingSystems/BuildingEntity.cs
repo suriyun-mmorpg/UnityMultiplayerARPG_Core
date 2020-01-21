@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Tilemaps;
 using LiteNetLibManager;
+using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -18,6 +19,10 @@ namespace MultiplayerARPG
         public List<string> buildingTypes;
         public float characterForwardDistance = 4;
         public int maxHp = 100;
+        public List<ItemAmount> droppingItems;
+        [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
+        public float destroyDelay = 2f;
+        public UnityEvent onBuildingDestroy;
 
         public override int MaxHp { get { return maxHp; } }
 
@@ -141,7 +146,14 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
+            RegisterNetFunction(NetFuncOnBuildingDestroy);
             parentId.onChange += OnParentIdChange;
+        }
+
+        private void NetFuncOnBuildingDestroy()
+        {
+            if (onBuildingDestroy != null)
+                onBuildingDestroy.Invoke();
         }
 
         protected override void EntityOnDestroy()
@@ -224,12 +236,24 @@ namespace MultiplayerARPG
             // Apply damages
             int totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
-
             ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
 
             // If current hp <= 0, character dead
             if (IsDead())
-                NetworkDestroy();
+            {
+                CurrentHp = 0;
+                CallNetFunction(NetFuncOnBuildingDestroy, FunctionReceivers.All);
+                if (droppingItems != null && droppingItems.Count > 0)
+                {
+                    foreach (ItemAmount droppingItem in droppingItems)
+                    {
+                        if (droppingItem.item == null || droppingItem.amount == 0)
+                            continue;
+                        ItemDropEntity.DropItem(this, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new uint[0]);
+                    }
+                }
+                NetworkDestroy(destroyDelay);
+            }
         }
 
         public void SetupAsBuildMode()
