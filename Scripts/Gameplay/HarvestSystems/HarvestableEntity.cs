@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         public HarvestableCollectType collectType;
         [Tooltip("Radius to detect other entities to avoid spawn this harvestable nearby other entities")]
         public float colliderDetectionRadius = 2f;
+        [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onHarvestableDestroy` event before it's going to be destroyed from the game.")]
         public float destroyDelay = 2f;
         public float destroyRespawnDelay = 5f;
         public UnityEvent onHarvestableDestroy;
