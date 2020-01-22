@@ -298,52 +298,64 @@ namespace MultiplayerARPG
                 }
             }
 
-            try
-            {
-                checked
-                {
-                    character.Exp += exp;
-                }
-            }
-            catch (System.OverflowException)
-            {
-                character.Exp = int.MaxValue;
-            }
-
             int nextLevelExp = character.GetNextLevelExp();
-            while (nextLevelExp > 0 && character.Exp >= nextLevelExp)
+            if (nextLevelExp > 0)
             {
-                character.Exp = character.Exp - nextLevelExp;
-                ++character.Level;
-                nextLevelExp = character.GetNextLevelExp();
-                if (playerCharacter != null)
+                // Increasing level if character not reached max level yet
+                try
                 {
-                    try
+                    checked
                     {
-                        checked
-                        {
-                            playerCharacter.StatPoint += increaseStatPointEachLevel;
-                        }
-                    }
-                    catch (System.OverflowException)
-                    {
-                        playerCharacter.StatPoint = short.MaxValue;
-                    }
-
-                    try
-                    {
-                        checked
-                        {
-                            playerCharacter.SkillPoint += increaseSkillPointEachLevel;
-                        }
-                    }
-                    catch (System.OverflowException)
-                    {
-                        playerCharacter.SkillPoint = short.MaxValue;
+                        character.Exp += exp;
                     }
                 }
-                isLevelUp = true;
+                catch (System.OverflowException)
+                {
+                    character.Exp = int.MaxValue;
+                }
+
+                while (nextLevelExp > 0 && character.Exp >= nextLevelExp)
+                {
+                    character.Exp = character.Exp - nextLevelExp;
+                    ++character.Level;
+                    nextLevelExp = character.GetNextLevelExp();
+                    if (playerCharacter != null)
+                    {
+                        try
+                        {
+                            checked
+                            {
+                                playerCharacter.StatPoint += increaseStatPointEachLevel;
+                            }
+                        }
+                        catch (System.OverflowException)
+                        {
+                            playerCharacter.StatPoint = short.MaxValue;
+                        }
+
+                        try
+                        {
+                            checked
+                            {
+                                playerCharacter.SkillPoint += increaseSkillPointEachLevel;
+                            }
+                        }
+                        catch (System.OverflowException)
+                        {
+                            playerCharacter.SkillPoint = short.MaxValue;
+                        }
+                    }
+                    isLevelUp = true;
+                }
+
             }
+
+            if (nextLevelExp <= 0)
+            {
+                // Don't collect exp if character reached max level
+                character.Exp = 0;
+            }
+
             return isLevelUp;
         }
 
