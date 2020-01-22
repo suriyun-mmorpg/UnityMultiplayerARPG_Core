@@ -65,18 +65,24 @@ namespace MultiplayerARPG
 
         public void DestroyEffect()
         {
-            foreach (ParticleSystem particle in particles)
+            if (particles != null && particles.Length > 0)
             {
-                if (particle == null)
-                    continue;
-                ParticleSystem.MainModule mainEmitter = particle.main;
-                mainEmitter.loop = false;
+                foreach (ParticleSystem particle in particles)
+                {
+                    if (!particle)
+                        continue;
+                    ParticleSystem.MainModule mainEmitter = particle.main;
+                    mainEmitter.loop = false;
+                }
             }
-            foreach (AudioSource audioSource in audioSources)
+            if (audioSources != null && audioSources.Length > 0)
             {
-                if (audioSource == null)
-                    continue;
-                audioSource.loop = false;
+                foreach (AudioSource audioSource in audioSources)
+                {
+                    if (!audioSource)
+                        continue;
+                    audioSource.loop = false;
+                }
             }
             destroyTime = Time.time + lifeTime;
         }
@@ -114,21 +120,21 @@ namespace MultiplayerARPG
                     AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, volume);
             }
             // Play particles
-            if (particles != null)
+            if (particles != null && particles.Length > 0)
             {
                 foreach (ParticleSystem particle in particles)
                 {
-                    if (particle == null)
+                    if (!particle)
                         continue;
                     particle.Play();
                 }
             }
             // Play audio sources
-            if (audioSources != null)
+            if (audioSources != null && audioSources.Length > 0)
             {
                 foreach (AudioSource audioSource in audioSources)
                 {
-                    if (audioSource == null)
+                    if (!audioSource)
                         continue;
                     audioSource.volume = volume;
                     audioSource.Play();
