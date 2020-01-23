@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         private RectTransform hotkeyCancelArea;
         private Vector2 hotkeyAxes;
         private bool hotkeyCancel;
+        public bool Interactable { get { return CacheHotkey.IsAssigned(); } }
         public bool IsDragging { get; private set; }
         public Vector3? AimPosition { get; private set; }
 
@@ -34,8 +35,10 @@ namespace MultiplayerARPG
             hotkeyCancelArea = CacheHotkey.UICharacterHotkeys.hotkeyCancelArea;
         }
 
-        private void Update()
+        public void UpdateEvent()
         {
+            joystick.Interactable = Interactable;
+
             if (!IsDragging && joystick.IsDragging)
             {
                 CacheHotkey.UICharacterHotkeys.SetUsingHotkey(CacheHotkey);

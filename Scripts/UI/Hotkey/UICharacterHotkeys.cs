@@ -159,8 +159,18 @@ namespace MultiplayerARPG
         /// </summary>
         private void UpdateHotkeyMobileInputs()
         {
+            bool isAnyHotkeyJoyStickDragging = false;
+            foreach (UICharacterHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
+            {
+                if (!hotkeyJoystick)
+                    continue;
+                hotkeyJoystick.UpdateEvent();
+                if (hotkeyJoystick.IsDragging)
+                    isAnyHotkeyJoyStickDragging = true;
+            }
+
             if (hotkeyCancelArea != null)
-                hotkeyCancelArea.gameObject.SetActive(IsAnyHotkeyJoyStickDragging());
+                hotkeyCancelArea.gameObject.SetActive(isAnyHotkeyJoyStickDragging);
         }
 
         public void FinishHotkeyAimControls(bool hotkeyCancel)
@@ -189,7 +199,10 @@ namespace MultiplayerARPG
         {
             foreach (UICharacterHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
             {
-                if (hotkeyJoystick.IsDragging) return true;
+                if (!hotkeyJoystick)
+                    continue;
+                if (hotkeyJoystick.IsDragging)
+                    return true;
             }
             return false;
         }

@@ -168,6 +168,9 @@ namespace MultiplayerARPG
             }
         }
 
+        /// <summary>
+        /// NOTE: This event should be call by PC UIs only
+        /// </summary>
         public void OnClickUse()
         {
             if (UICharacterHotkeys.UsingHotkey != null)
@@ -215,6 +218,13 @@ namespace MultiplayerARPG
                 UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().GetSkillType()))
                 return true;
             return false;
+        }
+
+        public bool IsAssigned()
+        {
+            // Just check visibility because it will be hidden if skill or item can't be found
+            return (uiCharacterSkill && uiCharacterSkill.IsVisible()) ||
+                (uiCharacterItem && uiCharacterItem.IsVisible());
         }
     }
 }
