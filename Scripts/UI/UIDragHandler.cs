@@ -7,41 +7,10 @@ using UnityEngine.UI;
 public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public Transform rootTransform;
-
-    private Canvas cacheCanvas;
-    public Canvas CacheCanvas
-    {
-        get
-        {
-            if (cacheCanvas == null)
-            {
-                cacheCanvas = GetComponentInParent<Canvas>();
-                // Find root canvas, will use it to set as parent while dragging
-                if (cacheCanvas != null)
-                    cacheCanvas = cacheCanvas.rootCanvas;
-            }
-            return cacheCanvas;
-        }
-    }
-
-    private List<Graphic> cacheGraphics;
-    public List<Graphic> CacheGraphics
-    {
-        get
-        {
-            if (cacheGraphics == null)
-            {
-                cacheGraphics = new List<Graphic>();
-                Graphic[] graphics = rootTransform.GetComponentsInChildren<Graphic>();
-                foreach (Graphic graphic in graphics)
-                {
-                    if (graphic.raycastTarget)
-                        cacheGraphics.Add(graphic);
-                }
-            }
-            return cacheGraphics;
-        }
-    }
+    
+    public Canvas CacheCanvas { get; private set; }
+    
+    public List<Graphic> CacheGraphics { get; private set; }
 
     public virtual bool CanDrag { get { return true; } }
 
@@ -53,11 +22,24 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private Vector3 defaultLocalPosition;
     private Vector3 defaultLocalScale;
     private Button attachedButton;
-
+    
     protected virtual void Start()
     {
         if (rootTransform == null)
             rootTransform = transform;
+
+        CacheCanvas = GetComponentInParent<Canvas>();
+        // Find root canvas, will use it to set as parent while dragging
+        if (CacheCanvas != null)
+            CacheCanvas = CacheCanvas.rootCanvas;
+
+        CacheGraphics = new List<Graphic>();
+        Graphic[] graphics = rootTransform.GetComponentsInChildren<Graphic>();
+        foreach (Graphic graphic in graphics)
+        {
+            if (graphic.raycastTarget)
+                CacheGraphics.Add(graphic);
+        }
     }
 
     public virtual void OnBeginDrag(PointerEventData eventData)
