@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public int indexOfData { get; protected set; }
         public string hotkeyId { get { return Data.hotkeyId; } }
         public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
-        public UICharacterHotkeys uiCharacterHotkeys { get; private set; }
+        public UICharacterHotkeys UICharacterHotkeys { get; private set; }
 
         [FormerlySerializedAs("uiAssigner")]
         public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
         public void Setup(UICharacterHotkeys uiCharacterHotkeys, UICharacterHotkeyAssigner uiCharacterHotkeyAssigner, CharacterHotkey data, int indexOfData)
         {
-            this.uiCharacterHotkeys = uiCharacterHotkeys;
+            this.UICharacterHotkeys = uiCharacterHotkeys;
             if (this.uiCharacterHotkeyAssigner == null)
                 this.uiCharacterHotkeyAssigner = uiCharacterHotkeyAssigner;
             this.indexOfData = indexOfData;
@@ -56,16 +56,16 @@ namespace MultiplayerARPG
             hotkeySkill = null;
             hotkeySkillLevel = 0;
 
-            if (uiCharacterSkill == null && uiCharacterHotkeys != null && uiCharacterHotkeys.uiCharacterSkillPrefab != null)
+            if (uiCharacterSkill == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterSkillPrefab != null)
             {
-                uiCharacterSkill = Instantiate(uiCharacterHotkeys.uiCharacterSkillPrefab, transform);
+                uiCharacterSkill = Instantiate(UICharacterHotkeys.uiCharacterSkillPrefab, transform);
                 GenericUtils.SetAndStretchToParentSize(uiCharacterSkill.transform as RectTransform, transform as RectTransform);
                 uiCharacterSkill.transform.SetAsFirstSibling();
             }
 
-            if (uiCharacterItem == null && uiCharacterHotkeys != null && uiCharacterHotkeys.uiCharacterItemPrefab != null)
+            if (uiCharacterItem == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterItemPrefab != null)
             {
-                uiCharacterItem = Instantiate(uiCharacterHotkeys.uiCharacterItemPrefab, transform);
+                uiCharacterItem = Instantiate(UICharacterHotkeys.uiCharacterItemPrefab, transform);
                 GenericUtils.SetAndStretchToParentSize(uiCharacterItem.transform as RectTransform, transform as RectTransform);
                 uiCharacterItem.transform.SetAsFirstSibling();
             }
@@ -174,17 +174,17 @@ namespace MultiplayerARPG
             {
                 if (UICharacterHotkeys.UsingHotkey == this)
                 {
-                    uiCharacterHotkeys.SetUsingHotkey(null);
+                    UICharacterHotkeys.SetUsingHotkey(null);
                     return;
                 }
-                uiCharacterHotkeys.SetUsingHotkey(null);
+                UICharacterHotkeys.SetUsingHotkey(null);
             }
 
             if (hotkeySkill != null && hotkeySkillLevel > 0 &&
                 hotkeySkill.GetSkillType() == SkillType.Active &&
                 hotkeySkill.HasCustomAimControls())
             {
-                uiCharacterHotkeys.SetUsingHotkey(this);
+                UICharacterHotkeys.SetUsingHotkey(this);
             }
             else
             {
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
         {
             if (characterItem.IsEmpty() || characterItem.IsEmptySlot())
                 return false;
-            if (uiCharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().itemType))
+            if (UICharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().itemType))
                 return true;
             return false;
         }
@@ -212,7 +212,7 @@ namespace MultiplayerARPG
             if (characterSkill.IsEmpty())
                 return false;
             if (characterSkill.GetSkill().IsAvailable(OwningCharacter) &&
-                uiCharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().GetSkillType()))
+                UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().GetSkillType()))
                 return true;
             return false;
         }

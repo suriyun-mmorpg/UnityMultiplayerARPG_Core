@@ -19,15 +19,12 @@ namespace MultiplayerARPG
 
         [Header("Mobile Touch Controls")]
         [FormerlySerializedAs("hotkeyMovementJoyStick")]
-        public MobileMovementJoystick hotkeyAimJoyStick;
+        [FormerlySerializedAs("hotkeyAimJoyStick")]
+        public MobileMovementJoystick hotkeyAimJoyStickPrefab;
         public RectTransform hotkeyCancelArea;
         public static UICharacterHotkey UsingHotkey { get; private set; }
         public static Vector3? HotkeyAimPosition { get; private set; }
-        private Vector2 hotkeyAxes;
-        private CanvasGroup hotkeyAimJoyStickGroup;
-        private CanvasGroup hotkeyCancelAreaGroup;
-        public bool hotkeyCancel { get; private set; }
-        public bool hotkeyStartDragged { get; private set; }
+        private readonly List<UICharacterHotkeyJoystickEventHandler> hotkeyJoysticks = new List<UICharacterHotkeyJoystickEventHandler>();
 
         private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys;
         public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
@@ -86,21 +83,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Start()
+        protected override void Awake()
         {
-            if (hotkeyAimJoyStick != null)
-            {
-                hotkeyAimJoyStickGroup = hotkeyAimJoyStick.GetComponent<CanvasGroup>();
-                if (hotkeyAimJoyStickGroup == null)
-                    hotkeyAimJoyStickGroup = hotkeyAimJoyStick.gameObject.AddComponent<CanvasGroup>();
-            }
-
-            if (hotkeyCancelArea != null)
-            {
-                hotkeyCancelAreaGroup = hotkeyCancelArea.GetComponent<CanvasGroup>();
-                if (hotkeyCancelAreaGroup == null)
-                    hotkeyCancelAreaGroup = hotkeyCancelArea.gameObject.AddComponent<CanvasGroup>();
-            }
+            base.Awake();
+            // Deactivate this because this variable used to be in-scene object variable
+            // but now it is a variable for a prefab.
+            if (hotkeyAimJoyStickPrefab != null)
+                hotkeyAimJoyStickPrefab.gameObject.SetActive(false);
         }
 
         private void Update()
@@ -108,7 +97,7 @@ namespace MultiplayerARPG
             if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
                 UpdateHotkeyMobileInputs();
             else
-                UpdateHotkeyPCInputs();
+                UpdateHotkeyInputs();
         }
 
         public override void Hide()
@@ -140,102 +129,69 @@ namespace MultiplayerARPG
         #region Mobile Controls
         public void SetUsingHotkey(UICharacterHotkey hotkey)
         {
+            if (IsAnyHotkeyJoyStickDragging())
+                return;
             // Cancel old using hotkey
             if (UsingHotkey != null)
             {
                 UsingHotkey.FinishAimControls();
                 UsingHotkey = null;
-                hotkeyStartDragged = false;
                 HotkeyAimPosition = null;
-                hotkeyStartDragged = false;
             }
-
-            if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
-            {
-                // Setup for mobile inputs
-                if (hotkeyStartDragged)
-                    return;
-                // Set axis and key
-                hotkeyAimJoyStick.axisXName = HOTKEY_AXIS_X;
-                hotkeyAimJoyStick.axisYName = HOTKEY_AXIS_Y;
-                // Set joystick position to the same position with hotkey button
-                if (hotkey != null)
-                    hotkeyAimJoyStick.transform.position = hotkey.transform.position;
-            }
-
             UsingHotkey = hotkey;
         }
 
-        private void UpdateHotkeyPCInputs()
+        /// <summary>
+        /// Update hotkey input for PC devices
+        /// </summary>
+        private void UpdateHotkeyInputs()
         {
             if (UsingHotkey == null)
                 return;
 
             HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
             if (Input.GetMouseButtonDown(0))
-            {
-                UsingHotkey.FinishAimControls();
-                UsingHotkey.Use(HotkeyAimPosition);
-                UsingHotkey = null;
-                HotkeyAimPosition = null;
-            }
+                FinishHotkeyAimControls(false);
         }
 
+        /// <summary>
+        /// Update hotkey input for Mobile devices
+        /// </summary>
         private void UpdateHotkeyMobileInputs()
         {
-            // No joy stick set, return
-            if (hotkeyAimJoyStick == null)
-                return;
-
-            if (hotkeyAimJoyStickGroup != null)
-                hotkeyAimJoyStickGroup.alpha = hotkeyStartDragged ? 1 : 0;
-
-            if (hotkeyCancelAreaGroup != null)
-                hotkeyCancelAreaGroup.alpha = hotkeyStartDragged ? 1 : 0;
-
-            if (hotkeyAimJoyStick != null)
-                hotkeyAimJoyStick.gameObject.SetActive(UsingHotkey != null);
-
             if (hotkeyCancelArea != null)
-                hotkeyCancelArea.gameObject.SetActive(UsingHotkey != null);
+                hotkeyCancelArea.gameObject.SetActive(IsAnyHotkeyJoyStickDragging());
+        }
 
+        public void FinishHotkeyAimControls(bool hotkeyCancel)
+        {
             if (UsingHotkey == null)
                 return;
 
-            hotkeyAxes = new Vector2(InputManager.GetAxis(HOTKEY_AXIS_X, false), InputManager.GetAxis(HOTKEY_AXIS_Y, false));
-            hotkeyCancel = false;
-
-            if (hotkeyCancelArea != null)
+            UsingHotkey.FinishAimControls();
+            if (!hotkeyCancel)
             {
-                Vector3 localMousePosition = hotkeyCancelArea.InverseTransformPoint(hotkeyAimJoyStick.CurrentPosition);
-                if (hotkeyCancelArea.rect.Contains(localMousePosition))
-                {
-                    hotkeyCancel = true;
-                }
+                // Use hotkey
+                UsingHotkey.Use(HotkeyAimPosition);
             }
 
-            if (!hotkeyStartDragged && hotkeyAimJoyStick.IsDragging)
-            {
-                hotkeyStartDragged = true;
-            }
+            UsingHotkey = null;
+            HotkeyAimPosition = null;
+        }
 
-            if (hotkeyStartDragged && hotkeyAimJoyStick.IsDragging)
-            {
-                HotkeyAimPosition = UsingHotkey.UpdateAimControls(hotkeyAxes);
-            }
+        public void RegisterHotkeyJoystick(UICharacterHotkeyJoystickEventHandler hotkeyJoystick)
+        {
+            if (!hotkeyJoysticks.Contains(hotkeyJoystick))
+                hotkeyJoysticks.Add(hotkeyJoystick);
+        }
 
-            if (hotkeyStartDragged && !hotkeyAimJoyStick.IsDragging)
+        public bool IsAnyHotkeyJoyStickDragging()
+        {
+            foreach (UICharacterHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
             {
-                UsingHotkey.FinishAimControls();
-                if (!hotkeyCancel)
-                {
-                    // Use hotkey
-                    UsingHotkey.Use(HotkeyAimPosition);
-                }
-                UsingHotkey = null;
-                hotkeyStartDragged = false;
-                HotkeyAimPosition = null;
+                if (hotkeyJoystick.IsDragging) return true;
             }
+            return false;
         }
         #endregion
     }
