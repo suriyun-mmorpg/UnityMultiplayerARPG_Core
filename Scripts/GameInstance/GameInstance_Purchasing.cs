@@ -69,7 +69,7 @@ namespace MultiplayerARPG
                     var productCatalogItem = cashPackage.ProductCatalogItem;
                     if (productCatalogItem == null)
                         continue;
-                    
+
                     Debug.Log("[" + TAG_INIT + "]: Adding product " + productCatalogItem.id + " type " + productCatalogItem.type.ToString());
                     if (productCatalogItem.allStoreIDs.Count > 0)
                     {
@@ -153,7 +153,9 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.RequestCashPackageBuyValidation(dataId, args.purchasedProduct.receipt, ResponseCashPackageBuyValidation);
             }
             else
-                PurchaseResult(false, "Package not found");
+            {
+                PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND.ToString()));
+            }
 
             // Return a flag indicating whether this product has completely been received, or if the application needs 
             // to be reminded of this purchase at next app launch. Use PurchaseProcessingResult.Pending when still 
@@ -171,20 +173,16 @@ namespace MultiplayerARPG
                     switch (castedMessage.error)
                     {
                         case ResponseCashPackageBuyValidationMessage.Error.UserNotFound:
-                            errorMessage = "User not found";
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());
                             break;
                         case ResponseCashPackageBuyValidationMessage.Error.PackageNotFound:
-                            errorMessage = "Package not found";
-                            break;
-                        case ResponseCashPackageBuyValidationMessage.Error.Invalid:
-                            errorMessage = "Invalid";
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND.ToString());
                             break;
                     }
                     PurchaseResult(false, errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
-                    PurchaseResult(false, "Connection timeout");
+                    PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     CashPackage package;
@@ -194,7 +192,9 @@ namespace MultiplayerARPG
                         PurchaseResult(true);
                     }
                     else
-                        PurchaseResult(false, "Package not found");
+                    {
+                        PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND.ToString()));
+                    }
                     break;
             }
         }
@@ -203,7 +203,35 @@ namespace MultiplayerARPG
         {
             // A product purchase attempt did not succeed. Check failureReason for more detail. Consider sharing 
             // this reason with the user to guide their troubleshooting actions.
-            var errorMessage = "[" + TAG_PURCHASE + "]: FAIL. Product: " + product.definition.storeSpecificId + ", PurchaseFailureReason: " + failureReason;
+            Debug.LogError("[" + TAG_PURCHASE + "]: FAIL. Product: " + product.definition.storeSpecificId + ", PurchaseFailureReason: " + failureReason);
+            string errorMessage = string.Empty;
+            switch (failureReason)
+            {
+                case PurchaseFailureReason.PurchasingUnavailable:
+                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_PURCHASING_UNAVAILABLE.ToString());
+                    break;
+                case PurchaseFailureReason.ExistingPurchasePending:
+                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_EXISTING_PURCHASE_PENDING.ToString());
+                    break;
+                case PurchaseFailureReason.ProductUnavailable:
+                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_PRODUCT_UNAVAILABLE.ToString());
+                    break;
+                case PurchaseFailureReason.SignatureInvalid:
+                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_SIGNATURE_INVALID.ToString());
+                    break;
+                case PurchaseFailureReason.UserCancelled:
+                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_USER_CANCELLED.ToString());
+                    break;
+                case PurchaseFailureReason.PaymentDeclined:
+                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_PAYMENT_DECLINED.ToString());
+                    break;
+                case PurchaseFailureReason.DuplicateTransaction:
+                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_DUPLICATE_TRANSACTION.ToString());
+                    break;
+                default:
+                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_UNKNOW.ToString());
+                    break;
+            }
             PurchaseResult(false, errorMessage);
         }
 #endif
@@ -217,8 +245,8 @@ namespace MultiplayerARPG
             if (!IsPurchasingInitialized())
             {
                 // ... report the situation and stop restoring. Consider either waiting longer, or retrying initialization.
-                var errorMessage = "[" + TAG_PURCHASE + "]: FAIL. Not initialized.";
-                PurchaseResult(false, errorMessage);
+                Debug.LogError("[" + TAG_PURCHASE + "]: FAIL. Not initialized.");
+                PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_NOT_INITIALIZED.ToString()));
                 return;
             }
 
@@ -230,8 +258,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                var errorMessage = "[" + TAG_PURCHASE + "]: FAIL. Not purchasing product, either is not found or is not available for purchase.";
-                PurchaseResult(false, errorMessage);
+                Debug.LogError("[" + TAG_PURCHASE + "]: FAIL. Not purchasing product, either is not found or is not available for purchase.");
+                PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_PRODUCT_UNAVAILABLE.ToString()));
             }
 #else
             Debug.LogWarning("Cannot purchase product, Unity Purchasing is not enabled.");
@@ -242,8 +270,6 @@ namespace MultiplayerARPG
         #region Callback Events
         private static void PurchaseResult(bool success, string errorMessage = "")
         {
-            if (!success)
-                Debug.LogError(errorMessage);
             if (PurchaseCallback != null)
             {
                 PurchaseCallback(success, errorMessage);

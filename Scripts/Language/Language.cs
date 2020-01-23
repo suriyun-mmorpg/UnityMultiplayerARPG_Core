@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         UI_ERROR_CONNECTION_TIMEOUT,
         UI_ERROR_USER_NOT_FOUND,
         UI_ERROR_ITEM_NOT_FOUND,
+        UI_ERROR_CASH_PACKAGE_NOT_FOUND,
         UI_ERROR_NOT_ENOUGH_GOLD,
         UI_ERROR_NOT_ENOUGH_CASH,
         UI_ERROR_NOT_LOGGED_IN,
@@ -114,6 +115,16 @@ namespace MultiplayerARPG
         // Enter Building Password
         UI_SET_BUILDING_PASSWORD,
         UI_SET_BUILDING_PASSWORD_DESCRIPTION,
+        // IAP Error
+        UI_ERROR_IAP_NOT_INITIALIZED,
+        UI_ERROR_IAP_PURCHASING_UNAVAILABLE,
+        UI_ERROR_IAP_EXISTING_PURCHASE_PENDING,
+        UI_ERROR_IAP_PRODUCT_UNAVAILABLE,
+        UI_ERROR_IAP_SIGNATURE_INVALID,
+        UI_ERROR_IAP_USER_CANCELLED,
+        UI_ERROR_IAP_PAYMENT_DECLINED,
+        UI_ERROR_IAP_DUPLICATE_TRANSACTION,
+        UI_ERROR_IAP_UNKNOW,
     }
 
     public enum UIItemTypeKeys : byte
@@ -880,6 +891,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString(), "Connection timeout");
             Texts.Add(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString(), "User not found");
             Texts.Add(UITextKeys.UI_ERROR_ITEM_NOT_FOUND.ToString(), "Item not found");
+            Texts.Add(UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND.ToString(), "Cash package not found");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString(), "Not enough gold");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString(), "Not enough cash");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_DATA.ToString(), "Invalid data");
@@ -967,6 +979,16 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
             Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString(), "Set password");
             Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
+            // Error - IAP
+            Texts.Add(UITextKeys.UI_ERROR_IAP_NOT_INITIALIZED.ToString(), "In-App Purchasing system not initialized yet");
+            Texts.Add(UITextKeys.UI_ERROR_IAP_PURCHASING_UNAVAILABLE.ToString(), "Purchasing is unavailable");
+            Texts.Add(UITextKeys.UI_ERROR_IAP_EXISTING_PURCHASE_PENDING.ToString(), "Existing purchase pending");
+            Texts.Add(UITextKeys.UI_ERROR_IAP_PRODUCT_UNAVAILABLE.ToString(), "Product is unavailable");
+            Texts.Add(UITextKeys.UI_ERROR_IAP_SIGNATURE_INVALID.ToString(), "Invalid signature");
+            Texts.Add(UITextKeys.UI_ERROR_IAP_USER_CANCELLED.ToString(), "Purchase was cancelled");
+            Texts.Add(UITextKeys.UI_ERROR_IAP_PAYMENT_DECLINED.ToString(), "Payment was declined");
+            Texts.Add(UITextKeys.UI_ERROR_IAP_DUPLICATE_TRANSACTION.ToString(), "Duplicate transaction");
+            Texts.Add(UITextKeys.UI_ERROR_IAP_UNKNOW.ToString(), "Unknow");
             // Format - Character Stats Rate
             Texts.Add(UIFormatKeys.UI_FORMAT_HP_RATE.ToString(), "Hp: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_MP_RATE.ToString(), "Mp: {0}%");
