@@ -11,7 +11,6 @@ namespace MultiplayerARPG
             NotAvailable,
             UserNotFound,
             PackageNotFound,
-            Invalid,
         }
         public Error error;
         public int dataId;
