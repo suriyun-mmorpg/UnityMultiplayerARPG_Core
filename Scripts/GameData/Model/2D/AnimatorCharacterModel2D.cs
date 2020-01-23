@@ -95,6 +95,15 @@ namespace MultiplayerARPG
         [Tooltip("You can set this when animator controller type is `Custom`")]
         public RuntimeAnimatorController animatorController;
 
+#if UNITY_EDITOR
+        [Header("Animation Test Tool")]
+        public AnimActionType testAnimActionType;
+        public WeaponType testWeaponType;
+        public BaseSkill testSkill;
+        [InspectorButton("SetAnimatorClipsForTest")]
+        public bool setAnimatorClipsForTest;
+#endif
+
         public AnimatorOverrideController CacheAnimatorController { get; private set; }
         public DirectionType2D DirectionType2D { get { return GameplayUtils.GetDirectionTypeByVector2(direction2D); } }
 
@@ -463,5 +472,69 @@ namespace MultiplayerARPG
         {
             return skillAnimations2D;
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Set Animator Clips For Test")]
+        public void SetAnimatorClipsForTest()
+        {
+            SetupComponent();
+
+            int testActionAnimDataId = 0;
+            int testCastSkillAnimDataId = 0;
+            switch (testAnimActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                case AnimActionType.AttackLeftHand:
+                    if (testWeaponType != null)
+                        testActionAnimDataId = testWeaponType.DataId;
+                    break;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    if (testSkill != null)
+                    {
+                        testActionAnimDataId = testSkill.DataId;
+                        testCastSkillAnimDataId = testSkill.DataId;
+                    }
+                    break;
+                case AnimActionType.ReloadRightHand:
+                case AnimActionType.ReloadLeftHand:
+                    if (testWeaponType != null)
+                        testActionAnimDataId = testWeaponType.DataId;
+                    break;
+            }
+
+            // Movement animation clips
+            SetDefaultAnimations();
+
+            // Set animation clip
+            AnimatorCharacterAnimation2D animation2D;
+            AnimatorSkillAnimations2D skillAnimations2D;
+
+            // Action animation clips
+            animation2D = GetActionAnimation(testAnimActionType, testActionAnimDataId);
+            CacheAnimatorController[CLIP_ACTION_DOWN] = animation2D.down;
+            CacheAnimatorController[CLIP_ACTION_UP] = animation2D.up;
+            CacheAnimatorController[CLIP_ACTION_LEFT] = animation2D.left;
+            CacheAnimatorController[CLIP_ACTION_RIGHT] = animation2D.right;
+            CacheAnimatorController[CLIP_ACTION_DOWN_LEFT] = animation2D.downLeft;
+            CacheAnimatorController[CLIP_ACTION_DOWN_RIGHT] = animation2D.downRight;
+            CacheAnimatorController[CLIP_ACTION_UP_LEFT] = animation2D.upLeft;
+            CacheAnimatorController[CLIP_ACTION_UP_RIGHT] = animation2D.upRight;
+
+            // Skill animation clips
+            if (!GetAnims().CacheSkillAnimations.TryGetValue(testCastSkillAnimDataId, out skillAnimations2D))
+                animation2D = defaultSkillActivateAnimation2D;
+            else
+                animation2D = skillAnimations2D.castAnimation;
+            CacheAnimatorController[CLIP_CAST_SKILL_DOWN] = animation2D.down;
+            CacheAnimatorController[CLIP_CAST_SKILL_UP] = animation2D.up;
+            CacheAnimatorController[CLIP_CAST_SKILL_LEFT] = animation2D.left;
+            CacheAnimatorController[CLIP_CAST_SKILL_RIGHT] = animation2D.right;
+            CacheAnimatorController[CLIP_CAST_SKILL_DOWN_LEFT] = animation2D.downLeft;
+            CacheAnimatorController[CLIP_CAST_SKILL_DOWN_RIGHT] = animation2D.downRight;
+            CacheAnimatorController[CLIP_CAST_SKILL_UP_LEFT] = animation2D.upLeft;
+            CacheAnimatorController[CLIP_CAST_SKILL_UP_RIGHT] = animation2D.upRight;
+        }
+#endif
     }
 }

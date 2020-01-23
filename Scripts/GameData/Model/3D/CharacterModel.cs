@@ -107,6 +107,16 @@ namespace MultiplayerARPG
         public WeaponAnimations[] weaponAnimations;
         [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillAnimations[] skillAnimations;
+        
+#if UNITY_EDITOR
+        [Header("Animation Test Tool")]
+        public AnimActionType testAnimActionType;
+        public WeaponType testWeaponType;
+        public BaseSkill testSkill;
+        public int testAttackAnimIndex;
+        [InspectorButton("SetAnimatorClipsForTest")]
+        public bool setAnimatorClipsForTest;
+#endif
 
         // Temp data
         private string defaultIdleClipName;
@@ -258,8 +268,14 @@ namespace MultiplayerARPG
             Item weaponItem = equipWeapons.GetRightHandWeaponItem();
             if (weaponItem == null)
                 weaponItem = GameInstance.Singleton.DefaultWeaponItem;
+
+            SetClipBasedOnWeaponType(weaponItem.WeaponType);
+        }
+
+        protected void SetClipBasedOnWeaponType(WeaponType weaponType)
+        {
             WeaponAnimations weaponAnimations;
-            if (GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations))
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(weaponType.DataId, out weaponAnimations))
             {
                 switch (animatorType)
                 {
@@ -953,6 +969,60 @@ namespace MultiplayerARPG
         }
 #endif
         #endregion
+
+#if UNITY_EDITOR
+        [ContextMenu("Set Animator Clips For Test")]
+        public void SetAnimatorClipsForTest()
+        {
+            SetupComponent();
+
+            int testActionAnimDataId = 0;
+            int testCastSkillAnimDataId = 0;
+            switch (testAnimActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                case AnimActionType.AttackLeftHand:
+                    if (testWeaponType != null)
+                        testActionAnimDataId = testWeaponType.DataId;
+                    break;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    if (testSkill != null)
+                    {
+                        testActionAnimDataId = testSkill.DataId;
+                        testCastSkillAnimDataId = testSkill.DataId;
+                    }
+                    break;
+                case AnimActionType.ReloadRightHand:
+                case AnimActionType.ReloadLeftHand:
+                    if (testWeaponType != null)
+                        testActionAnimDataId = testWeaponType.DataId;
+                    break;
+            }
+
+            // Movement animation clips
+            SetDefaultAnimations();
+            if (testWeaponType != null)
+                SetClipBasedOnWeaponType(testWeaponType);
+
+            try
+            {
+                // Action animation clips
+                ActionAnimation tempActionAnimation = GetActionAnimation(testAnimActionType, testActionAnimDataId, testAttackAnimIndex);
+                CacheAnimatorController[defaultAnimatorData.actionClip.name] = tempActionAnimation.clip;
+
+                // Skill animation clips
+                AnimationClip castClip = GetSkillCastClip(testCastSkillAnimDataId);
+                CacheAnimatorController[defaultAnimatorData.castSkillClip.name] = castClip;
+
+                Debug.Log("[CharacterModel] Animation Clips already set to animator controller, you can test an animations in Animation tab");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("[CharacterModel] " + ex.Message);
+            }
+        }
+#endif
     }
 
     [System.Serializable]
