@@ -23,32 +23,12 @@ public class UIBase : MonoBehaviour
             return root;
         }
     }
+    
+    public Canvas CacheRootCanvas { get; private set; }
+    
+    public GraphicRaycaster CacheGraphicRaycaster { get; private set; }
 
-    private Canvas cacheRootCanvas;
-    public Canvas CacheRootCanvas
-    {
-        get
-        {
-            if (cacheRootCanvas == null)
-                cacheRootCanvas = CacheRoot.GetComponent<Canvas>();
-            if (cacheRootCanvas == null)
-                cacheRootCanvas = CacheRoot.AddComponent<Canvas>();
-            return cacheRootCanvas;
-        }
-    }
-
-    private GraphicRaycaster cacheGraphicRaycaster;
-    public GraphicRaycaster CacheGraphicRaycaster
-    {
-        get
-        {
-            if (cacheGraphicRaycaster == null)
-                cacheGraphicRaycaster = CacheRoot.GetComponent<GraphicRaycaster>();
-            if (cacheGraphicRaycaster == null)
-                cacheGraphicRaycaster = CacheRoot.AddComponent<GraphicRaycaster>();
-            return cacheGraphicRaycaster;
-        }
-    }
+    public bool AlreadyCachedComponents { get; private set; }
 
     protected virtual void Awake()
     {
@@ -62,14 +42,33 @@ public class UIBase : MonoBehaviour
             Show();
     }
 
+    protected virtual void CacheComponents()
+    {
+        if (AlreadyCachedComponents)
+            return;
+
+        if (root == null)
+            root = gameObject;
+        CacheRootCanvas = CacheRoot.GetComponent<Canvas>();
+        if (CacheRootCanvas == null)
+            CacheRootCanvas = CacheRoot.AddComponent<Canvas>();
+        CacheGraphicRaycaster = CacheRoot.GetComponent<GraphicRaycaster>();
+        if (CacheGraphicRaycaster == null)
+            CacheGraphicRaycaster = CacheRoot.AddComponent<GraphicRaycaster>();
+
+        AlreadyCachedComponents = true;
+    }
+
     public virtual bool IsVisible()
     {
+        CacheComponents();
         return CacheRoot.activeSelf && CacheRootCanvas.enabled;
     }
 
     public virtual void Show()
     {
         isAwaken = true;
+        CacheComponents();
         CacheRootCanvas.enabled = true;
         CacheGraphicRaycaster.enabled = true;
         if (!CacheRoot.activeSelf)
@@ -83,6 +82,7 @@ public class UIBase : MonoBehaviour
     public virtual void Hide()
     {
         isAwaken = true;
+        CacheComponents();
         CacheRootCanvas.enabled = false;
         CacheGraphicRaycaster.enabled = false;
         CacheRoot.SetActive(false);

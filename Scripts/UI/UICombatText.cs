@@ -12,35 +12,10 @@ namespace MultiplayerARPG
         public float lifeTime = 2f;
         public string format = "{0}";
         public bool showPositiveSign;
-
-        private UIFollowWorldObject cacheObjectFollower;
-        public UIFollowWorldObject CacheObjectFollower
-        {
-            get
-            {
-                if (cacheObjectFollower == null)
-                    cacheObjectFollower = GetComponent<UIFollowWorldObject>();
-                return cacheObjectFollower;
-            }
-        }
-
-        private TextWrapper cacheText;
-        public TextWrapper CacheText
-        {
-            get
-            {
-                if (cacheText == null)
-                {
-                    cacheText = GetComponent<TextWrapper>();
-                    if (cacheText == null)
-                    {
-                        cacheText = gameObject.AddComponent<TextWrapper>();
-                        cacheText.unityText = GetComponent<Text>();
-                    }
-                }
-                return cacheText;
-            }
-        }
+        
+        public UIFollowWorldObject CacheObjectFollower { get; private set; }
+        
+        public TextWrapper CacheText { get; private set; }
 
         private int amount;
         public int Amount
@@ -49,14 +24,32 @@ namespace MultiplayerARPG
             set
             {
                 amount = value;
-                string positiveSign = showPositiveSign && amount > 0 ? "+" : "";
-                CacheText.text = string.Format(format, (positiveSign + amount.ToString("N0")));
+                CacheText.text = string.Format(format, (showPositiveSign && amount > 0 ? "+" : string.Empty) + amount.ToString("N0"));
             }
         }
 
+        public bool AlreadyCachedComponents { get; private set; }
+
         private void Awake()
         {
+            CacheComponents();
             Destroy(gameObject, lifeTime);
+        }
+
+        private void CacheComponents()
+        {
+            if (AlreadyCachedComponents)
+                return;
+
+            CacheObjectFollower = GetComponent<UIFollowWorldObject>();
+            CacheText = GetComponent<TextWrapper>();
+            if (CacheText == null)
+            {
+                CacheText = gameObject.AddComponent<TextWrapper>();
+                CacheText.unityText = GetComponent<Text>();
+            }
+
+            AlreadyCachedComponents = true;
         }
     }
 }
