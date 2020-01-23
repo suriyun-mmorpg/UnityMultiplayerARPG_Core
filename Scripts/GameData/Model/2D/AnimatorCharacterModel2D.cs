@@ -534,6 +534,8 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_CAST_SKILL_DOWN_RIGHT] = animation2D.downRight;
             CacheAnimatorController[CLIP_CAST_SKILL_UP_LEFT] = animation2D.upLeft;
             CacheAnimatorController[CLIP_CAST_SKILL_UP_RIGHT] = animation2D.upRight;
+
+            Debug.Log("[AnimatorCharacterModel2D] Animation Clips already set to animator controller, you can test an animations in Animation tab");
         }
 #endif
     }
