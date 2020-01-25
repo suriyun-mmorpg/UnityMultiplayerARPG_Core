@@ -39,6 +39,12 @@ public abstract class UISelectionEntry<T> : UIBase
         lastUpdateTime = Time.unscaledTime;
     }
 
+    protected virtual void OnEnable()
+    {
+        UpdateUI();
+        lastUpdateTime = Time.unscaledTime;
+    }
+
     protected virtual void Update()
     {
         tempUpdateTime = Time.unscaledTime;
