@@ -36,6 +36,8 @@ namespace MultiplayerARPG
             UseSkill,
         }
 
+        public const float ACTIVATE_KEY_HOLD_DURATION = 1f;
+
         [SerializeField]
         private ControllerMode mode;
         [SerializeField]
@@ -167,10 +169,14 @@ namespace MultiplayerARPG
         bool tempPressAttackLeft;
         bool tempPressWeaponAbility;
         bool tempPressActivate;
+        bool tempReleaseActivate;
         bool tempPressPickupItem;
         bool tempPressReload;
         bool tempPressExitVehicle;
         bool tempPressSwitchEquipWeaponSet;
+        bool tempHoldActivate;
+        bool tempHoldedActivate;
+        float activateKeyHoldedTime;
         bool isLeftHandAttacking;
         GameObject tempGameObject;
         BasePlayerCharacterEntity targetPlayer;
@@ -346,6 +352,7 @@ namespace MultiplayerARPG
             if (IsBlockController || GenericUtils.IsFocusInputField())
             {
                 mustReleaseFireKey = false;
+                
                 PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
                 DeactivateWeaponAbility();
                 return;
@@ -703,29 +710,42 @@ namespace MultiplayerARPG
                     mustReleaseFireKey = false;
             }
 
+            tempHoldActivate = activateKeyHoldedTime >= ACTIVATE_KEY_HOLD_DURATION && !tempHoldedActivate;
+            if (tempHoldActivate && !tempHoldedActivate)
+                tempHoldedActivate = true;
             tempPressActivate = InputManager.GetButtonDown("Activate");
+            tempReleaseActivate = InputManager.GetButtonUp("Activate");
             tempPressPickupItem = InputManager.GetButtonDown("PickUpItem");
             tempPressReload = InputManager.GetButtonDown("Reload");
             tempPressExitVehicle = InputManager.GetButtonDown("ExitVehicle");
             tempPressSwitchEquipWeaponSet = InputManager.GetButtonDown("SwitchEquipWeaponSet");
             if (queueUsingSkill.skill != null || 
                 tempPressAttackRight || 
-                tempPressAttackLeft || 
-                tempPressActivate || 
-                PlayerCharacterEntity.IsPlayingActionAnimation())
+                tempPressAttackLeft ||
+                tempPressActivate ||
+                tempReleaseActivate ||
+                tempHoldActivate)
             {
                 // Find forward character / npc / building / warp entity from camera center
                 targetPlayer = null;
                 targetNpc = null;
                 targetBuilding = null;
-                if (tempPressActivate && !tempPressAttackRight && !tempPressAttackLeft)
+                if (!tempPressAttackRight && !tempPressAttackLeft)
                 {
-                    if (SelectedEntity is BasePlayerCharacterEntity)
-                        targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
-                    if (SelectedEntity is NpcEntity)
-                        targetNpc = SelectedEntity as NpcEntity;
-                    if (SelectedEntity is BuildingEntity)
-                        targetBuilding = SelectedEntity as BuildingEntity;
+                    if (tempHoldActivate)
+                    {
+                        if (SelectedEntity is BuildingEntity)
+                            targetBuilding = SelectedEntity as BuildingEntity;
+                    }
+                    else if (tempReleaseActivate)
+                    {
+                        if (SelectedEntity is BasePlayerCharacterEntity)
+                            targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
+                        if (SelectedEntity is NpcEntity)
+                            targetNpc = SelectedEntity as NpcEntity;
+                        if (SelectedEntity is BuildingEntity)
+                            targetBuilding = SelectedEntity as BuildingEntity;
+                    }
                 }
                 // While attacking turn character to camera forward
                 tempCalculateAngle = Vector3.Angle(MovementTransform.forward, cameraForward);
@@ -748,6 +768,10 @@ namespace MultiplayerARPG
                         turningState = TurningState.Attack;
                     }
                     else if (tempPressActivate)
+                    {
+                        turningState = TurningState.None;
+                    }
+                    else if (tempReleaseActivate && !tempHoldActivate)
                     {
                         turningState = TurningState.Activate;
                     }
@@ -777,7 +801,11 @@ namespace MultiplayerARPG
                         Attack(isLeftHandAttacking, aimPosition);
                         isDoingAction = true;
                     }
-                    else if (tempPressActivate)
+                    else if (tempHoldActivate)
+                    {
+                        HoldActivate();
+                    }
+                    else if (tempReleaseActivate)
                     {
                         Activate();
                     }
@@ -841,6 +869,15 @@ namespace MultiplayerARPG
             {
                 // The weapon's fire mode is single fire, so player have to release fire key for next fire
                 mustReleaseFireKey = true;
+            }
+
+            // Player release activate key, so reset hold state
+            if (InputManager.GetButton("Activate"))
+                activateKeyHoldedTime += Time.unscaledDeltaTime;
+            else
+            {
+                activateKeyHoldedTime = 0;
+                tempHoldedActivate = false;
             }
 
             // Auto reload
@@ -1084,6 +1121,15 @@ namespace MultiplayerARPG
 
             WeaponAbility.OnPreDeactivate();
             WeaponAbilityState = WeaponAbilityState.Deactivating;
+        }
+
+        public void HoldActivate()
+        {
+            if (targetBuilding != null)
+            {
+                TargetEntity = targetBuilding;
+                ShowCurrentBuildingDialog();
+            }
         }
 
         public void Activate()
