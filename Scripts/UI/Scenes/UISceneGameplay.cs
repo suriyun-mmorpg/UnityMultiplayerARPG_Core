@@ -678,10 +678,18 @@ namespace MultiplayerARPG
             {
                 foreach (UIBase ui in blockControllerUIs)
                 {
+                    if (!ui)
+                        continue;
                     if (ui.IsVisible())
                         return true;
                 }
             }
+
+            if (UISceneGlobal.Singleton.uiMessageDialog.IsVisible() ||
+                UISceneGlobal.Singleton.uiInputDialog.IsVisible() ||
+                UISceneGlobal.Singleton.uiPasswordDialog.IsVisible())
+                return true;
+
             return false;
         }
 
