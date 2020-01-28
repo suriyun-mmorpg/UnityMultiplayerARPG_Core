@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseVehicleEntity : BaseGameEntity, IVehicleEntity
+    public class VehicleEntity : BaseGameEntity, IVehicleEntity
     {
         [SerializeField]
         private VehicleType vehicleType;
@@ -31,7 +31,7 @@ namespace MultiplayerARPG
 
         private readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
 
-        public abstract bool IsDestroyWhenDriverExit { get; }
+        public virtual bool IsDestroyWhenDriverExit { get { return false; } }
 
         protected override sealed void EntityAwake()
         {

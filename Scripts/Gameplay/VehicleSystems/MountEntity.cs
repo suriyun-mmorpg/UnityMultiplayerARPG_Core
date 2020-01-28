@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class MountEntity : BaseVehicleEntity
+    public class MountEntity : VehicleEntity
     {
         public override sealed bool IsDestroyWhenDriverExit
         {
