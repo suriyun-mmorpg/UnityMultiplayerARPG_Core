@@ -36,8 +36,6 @@ namespace MultiplayerARPG
             UseSkill,
         }
 
-        public const float ACTIVATE_KEY_HOLD_DURATION = 1f;
-
         [SerializeField]
         private ControllerMode mode;
         [SerializeField]
