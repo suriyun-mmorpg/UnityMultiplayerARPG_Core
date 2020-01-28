@@ -61,11 +61,15 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter(Collider other)
         {
+            if (other.isTrigger)
+                return;
             TriggerEnter(other.gameObject);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            if (other.isTrigger)
+                return;
             TriggerEnter(other.gameObject);
         }
 

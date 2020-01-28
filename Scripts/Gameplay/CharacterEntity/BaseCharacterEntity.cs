@@ -821,6 +821,12 @@ namespace MultiplayerARPG
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
+                            if (GetOverlapObjectIsTrigger_ForAttackFunctions(tempLoopCounter))
+                            {
+                                // Skip colliders which turned on `isTrigger`
+                                continue;
+                            }
+
                             tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
                             if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
@@ -859,6 +865,12 @@ namespace MultiplayerARPG
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
+                            if (GetOverlapObjectIsTrigger_ForAttackFunctions(tempLoopCounter))
+                            {
+                                // Skip colliders which turned on `isTrigger`
+                                continue;
+                            }
+
                             tempGameObject = GetOverlapObject_ForAttackFunctions(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
                             if (tempDamageableEntity == null || tempDamageableEntity.Entity == this ||
@@ -904,13 +916,20 @@ namespace MultiplayerARPG
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
                         {
+                            if (GetRaycastObjectIsTrigger_ForAttackFunctions(tempLoopCounter))
+                            {
+                                // Skip colliders which turned on `isTrigger`
+                                continue;
+                            }
+
                             tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance);
                             if (distance < minDistance)
                                 minDistance = distance;
+
                             tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
                             if (tempDamageableEntity != null)
                             {
-                                if (tempDamageableEntity.Entity == this)
+                                if (tempDamageableEntity.ObjectId == ObjectId)
                                     continue;
 
                                 // Target receives damages
@@ -1093,6 +1112,13 @@ namespace MultiplayerARPG
             return raycasts_ForAttackFunctions[index].transform;
         }
 
+        public bool GetRaycastObjectIsTrigger_ForAttackFunctions(int index)
+        {
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                return raycasts2D_ForAttackFunctions[index].collider.isTrigger;
+            return raycasts_ForAttackFunctions[index].collider.isTrigger;
+        }
+
         public int OverlapObjects_ForAttackFunctions(Vector3 position, float distance, int layerMask)
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
@@ -1107,6 +1133,13 @@ namespace MultiplayerARPG
             return overlapColliders_ForAttackFunctions[index].gameObject;
         }
 
+        public bool GetOverlapObjectIsTrigger_ForAttackFunctions(int index)
+        {
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                return overlapColliders2D_ForAttackFunctions[index].isTrigger;
+            return overlapColliders_ForAttackFunctions[index].isTrigger;
+        }
+
         public int OverlapObjects_ForFindFunctions(Vector3 position, float distance, int layerMask)
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
@@ -1119,6 +1152,13 @@ namespace MultiplayerARPG
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return overlapColliders2D_ForFindFunctions[index].gameObject;
             return overlapColliders_ForFindFunctions[index].gameObject;
+        }
+
+        public bool GetOverlapObjectIsTrigger_ForFindFunctions(int index)
+        {
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                return overlapColliders2D_ForFindFunctions[index].isTrigger;
+            return overlapColliders_ForFindFunctions[index].isTrigger;
         }
 
         public bool IsPositionInFov(float fov, Vector3 position)
