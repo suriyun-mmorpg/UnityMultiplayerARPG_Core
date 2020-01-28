@@ -107,8 +107,7 @@ namespace MultiplayerARPG
         private readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
         private readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
         private readonly List<BuildingEntity> children = new List<BuildingEntity>();
-        private BuildingMaterial[] buildingMaterials;
-        private BuildingArea[] buildingAreas;
+        private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
 
         protected override void EntityAwake()
         {
@@ -121,26 +120,12 @@ namespace MultiplayerARPG
 
             if (!string.IsNullOrEmpty(buildingType) && !buildingTypes.Contains(buildingType))
                 buildingTypes.Add(buildingType);
+        }
 
-            buildingMaterials = GetComponentsInChildren<BuildingMaterial>(true);
-            if (buildingMaterials != null && buildingMaterials.Length > 0)
-            {
-                foreach (BuildingMaterial material in buildingMaterials)
-                {
-                    material.buildingEntity = this;
-                    material.gameObject.tag = CurrentGameInstance.buildingTag;
-                    material.gameObject.layer = CurrentGameInstance.buildingLayer;
-                }
-            }
-
-            buildingAreas = GetComponentsInChildren<BuildingArea>(true);
-            if (buildingAreas != null && buildingAreas.Length > 0)
-            {
-                foreach (BuildingArea area in buildingAreas)
-                {
-                    area.buildingEntity = this;
-                }
-            }
+        public void RegisterMaterial(BuildingMaterial material)
+        {
+            if (!buildingMaterials.Contains(material))
+                buildingMaterials.Add(material);
         }
 
         public override void OnSetup()
@@ -192,6 +177,7 @@ namespace MultiplayerARPG
                 bool canBuild = CanBuild();
                 foreach (BuildingMaterial buildingMaterial in buildingMaterials)
                 {
+                    if (!buildingMaterial) continue;
                     buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
                 }
             }
@@ -300,8 +286,8 @@ namespace MultiplayerARPG
         public void TriggerEnterBuildingMaterial(BuildingMaterial buildingMaterial)
         {
             if (buildingMaterial != null &&
-                buildingMaterial.buildingEntity != null &&
-                buildingMaterial.buildingEntity != this &&
+                buildingMaterial.entity != null &&
+                buildingMaterial.entity != this &&
                 !triggerMaterials.Contains(buildingMaterial))
                 triggerMaterials.Add(buildingMaterial);
         }

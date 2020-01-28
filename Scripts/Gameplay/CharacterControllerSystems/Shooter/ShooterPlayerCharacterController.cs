@@ -146,6 +146,12 @@ namespace MultiplayerARPG
             get { return ViewMode == ControllerViewMode.Tps ? tpsFarClipPlane : fpsFarClipPlane; }
         }
 
+        // Input data
+        InputStateManager activateInput;
+        InputStateManager pickupItemInput;
+        InputStateManager reloadInput;
+        InputStateManager exitVehicleInput;
+        InputStateManager switchEquipWeaponSetInput;
         // Temp data
         ControllerViewMode dirtyViewMode;
         BuildingMaterial tempBuildingMaterial;
@@ -168,15 +174,6 @@ namespace MultiplayerARPG
         bool tempPressAttackRight;
         bool tempPressAttackLeft;
         bool tempPressWeaponAbility;
-        bool tempPressActivate;
-        bool tempReleaseActivate;
-        bool tempPressPickupItem;
-        bool tempPressReload;
-        bool tempPressExitVehicle;
-        bool tempPressSwitchEquipWeaponSet;
-        bool tempHoldActivate;
-        bool tempHoldedActivate;
-        float activateKeyHoldedTime;
         bool isLeftHandAttacking;
         GameObject tempGameObject;
         BasePlayerCharacterEntity targetPlayer;
@@ -208,6 +205,11 @@ namespace MultiplayerARPG
             base.Awake();
             buildingItemIndex = -1;
             ConstructingBuildingEntity = null;
+            activateInput = new InputStateManager("Activate");
+            pickupItemInput = new InputStateManager("PickUpItem");
+            reloadInput = new InputStateManager("Reload");
+            exitVehicleInput = new InputStateManager("ExitVehicle");
+            switchEquipWeaponSetInput = new InputStateManager("SwitchEquipWeaponSet");
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -315,9 +317,18 @@ namespace MultiplayerARPG
             }
             CacheGameplayCameraControls.target = ViewMode == ControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
 
+            // Set temp data
             tempDeltaTime = Time.deltaTime;
             calculatedTurnDuration += tempDeltaTime;
 
+            // Update inputs
+            activateInput.OnUpdate(tempDeltaTime);
+            pickupItemInput.OnUpdate(tempDeltaTime);
+            reloadInput.OnUpdate(tempDeltaTime);
+            exitVehicleInput.OnUpdate(tempDeltaTime);
+            switchEquipWeaponSetInput.OnUpdate(tempDeltaTime);
+
+            // Check is any UIs block controller or not?
             IsBlockController = CacheUISceneGameplay.IsBlockController();
 
             // Lock cursor when not show UIs
@@ -352,7 +363,7 @@ namespace MultiplayerARPG
             if (IsBlockController || GenericUtils.IsFocusInputField())
             {
                 mustReleaseFireKey = false;
-                
+
                 PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
                 DeactivateWeaponAbility();
                 return;
@@ -434,6 +445,12 @@ namespace MultiplayerARPG
                 toggleCrouchOn = false;
                 toggleCrawlOn = false;
             }
+            // Update inputs
+            activateInput.OnLateUpdate();
+            pickupItemInput.OnLateUpdate();
+            reloadInput.OnLateUpdate();
+            exitVehicleInput.OnLateUpdate();
+            switchEquipWeaponSetInput.OnLateUpdate();
         }
 
         private bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
@@ -458,19 +475,12 @@ namespace MultiplayerARPG
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + CurrentGameInstance.buildDistance);
             // Raycast from camera position to center of screen
-            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.AllLayers);
+            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, CurrentGameInstance.GetBuildLayerMask());
             float tempDistance;
-            BuildingArea buildingArea = null;
-            bool hasSnapBuildPosition = false;
+            BuildingArea buildingArea;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
-                tempEntity = tempHitInfo.collider.GetComponentInParent<BuildingEntity>();
-                if (tempEntity != null && tempEntity == ConstructingBuildingEntity)
-                {
-                    // Skip because it's raycast to the building that you are going to build
-                    continue;
-                }
 
                 // Set aim position
                 tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
@@ -479,19 +489,24 @@ namespace MultiplayerARPG
                     aimPosition = tempHitInfo.point;
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
                     if (buildingArea == null ||
-                        (buildingArea.buildingEntity != null && buildingArea.buildingEntity == ConstructingBuildingEntity) ||
+                        (buildingArea.Entity && buildingArea.ObjectId == ConstructingBuildingEntity.ObjectId) ||
                         !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                     {
                         // Skip because this area is not allowed to build the building that you are going to build
                         continue;
                     }
-
+                    
                     ConstructingBuildingEntity.BuildingArea = buildingArea;
-                    if (buildingArea.snapBuildingObject)
+                    if (!buildingArea.snapBuildingObject)
                     {
-                        hasSnapBuildPosition = true;
-                        break;
+                        // There is no snap build position, set building rotation by camera look direction
+                        ConstructingBuildingEntity.CacheTransform.position = aimPosition;
+                        // Rotate to camera
+                        Vector3 direction = (aimPosition - CacheGameplayCameraControls.CacheCameraTransform.position).normalized;
+                        direction.y = 0;
+                        ConstructingBuildingEntity.CacheTransform.rotation = Quaternion.LookRotation(direction);
                     }
+                    break;
                 }
             }
 
@@ -499,16 +514,6 @@ namespace MultiplayerARPG
             {
                 // Mark as unable to build when the building is far from character
                 ConstructingBuildingEntity.BuildingArea = null;
-            }
-
-            if (!hasSnapBuildPosition)
-            {
-                // There is no snap build position, set building rotation by camera look direction
-                ConstructingBuildingEntity.CacheTransform.position = aimPosition;
-                // Rotate to camera
-                Vector3 direction = (aimPosition - CacheGameplayCameraControls.CacheCameraTransform.position).normalized;
-                direction.y = 0;
-                ConstructingBuildingEntity.transform.rotation = Quaternion.LookRotation(direction);
             }
         }
 
@@ -580,7 +585,7 @@ namespace MultiplayerARPG
                     if (tempDamageableEntity.Entity is BaseCharacterEntity &&
                         (tempDamageableEntity.Entity as BaseCharacterEntity).GetCaches().IsHide)
                         continue;
-                    
+
                     // Entity is in front of character, so this is target
                     if (IsInFront(tempHitInfo.point))
                     {
@@ -710,21 +715,12 @@ namespace MultiplayerARPG
                     mustReleaseFireKey = false;
             }
 
-            tempHoldActivate = activateKeyHoldedTime >= ACTIVATE_KEY_HOLD_DURATION && !tempHoldedActivate;
-            if (tempHoldActivate && !tempHoldedActivate)
-                tempHoldedActivate = true;
-            tempPressActivate = InputManager.GetButtonDown("Activate");
-            tempReleaseActivate = InputManager.GetButtonUp("Activate");
-            tempPressPickupItem = InputManager.GetButtonDown("PickUpItem");
-            tempPressReload = InputManager.GetButtonDown("Reload");
-            tempPressExitVehicle = InputManager.GetButtonDown("ExitVehicle");
-            tempPressSwitchEquipWeaponSet = InputManager.GetButtonDown("SwitchEquipWeaponSet");
-            if (queueUsingSkill.skill != null || 
-                tempPressAttackRight || 
+            if (queueUsingSkill.skill != null ||
+                tempPressAttackRight ||
                 tempPressAttackLeft ||
-                tempPressActivate ||
-                tempReleaseActivate ||
-                tempHoldActivate)
+                activateInput.IsPress ||
+                activateInput.IsRelease ||
+                activateInput.IsHold)
             {
                 // Find forward character / npc / building / warp entity from camera center
                 targetPlayer = null;
@@ -732,12 +728,12 @@ namespace MultiplayerARPG
                 targetBuilding = null;
                 if (!tempPressAttackRight && !tempPressAttackLeft)
                 {
-                    if (tempHoldActivate)
+                    if (activateInput.IsHold)
                     {
                         if (SelectedEntity is BuildingEntity)
                             targetBuilding = SelectedEntity as BuildingEntity;
                     }
-                    else if (tempReleaseActivate)
+                    else if (activateInput.IsRelease)
                     {
                         if (SelectedEntity is BasePlayerCharacterEntity)
                             targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
@@ -767,11 +763,11 @@ namespace MultiplayerARPG
                     {
                         turningState = TurningState.Attack;
                     }
-                    else if (tempPressActivate)
+                    else if (activateInput.IsPress)
                     {
                         turningState = TurningState.None;
                     }
-                    else if (tempReleaseActivate && !tempHoldActivate)
+                    else if (activateInput.IsRelease)
                     {
                         turningState = TurningState.Activate;
                     }
@@ -801,11 +797,11 @@ namespace MultiplayerARPG
                         Attack(isLeftHandAttacking, aimPosition);
                         isDoingAction = true;
                     }
-                    else if (tempHoldActivate)
+                    else if (activateInput.IsHold)
                     {
                         HoldActivate();
                     }
-                    else if (tempReleaseActivate)
+                    else if (activateInput.IsRelease)
                     {
                         Activate();
                     }
@@ -831,23 +827,23 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            else if (tempPressPickupItem)
+            else if (pickupItemInput.IsPress)
             {
                 // Find for item to pick up
                 if (SelectedEntity != null && SelectedEntity is ItemDropEntity)
                     PlayerCharacterEntity.RequestPickupItem((SelectedEntity as ItemDropEntity).ObjectId);
             }
-            else if (tempPressReload)
+            else if (reloadInput.IsPress)
             {
                 // Reload ammo when press the button
                 ReloadAmmo();
             }
-            else if (tempPressExitVehicle)
+            else if (exitVehicleInput.IsPress)
             {
                 // Exit vehicle
                 PlayerCharacterEntity.RequestExitVehicle();
             }
-            else if (tempPressSwitchEquipWeaponSet)
+            else if (switchEquipWeaponSetInput.IsPress)
             {
                 // Switch equip weapon set
                 PlayerCharacterEntity.RequestSwitchEquipWeaponSet((byte)(PlayerCharacterEntity.EquipWeaponSet + 1));
@@ -871,17 +867,8 @@ namespace MultiplayerARPG
                 mustReleaseFireKey = true;
             }
 
-            // Player release activate key, so reset hold state
-            if (InputManager.GetButton("Activate"))
-                activateKeyHoldedTime += Time.unscaledDeltaTime;
-            else
-            {
-                activateKeyHoldedTime = 0;
-                tempHoldedActivate = false;
-            }
-
             // Auto reload
-            if (!tempPressAttackRight && !tempPressAttackLeft && !tempPressReload &&
+            if (!tempPressAttackRight && !tempPressAttackLeft && !reloadInput.IsPress &&
                 (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
                 PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoEmpty()))
             {
@@ -1028,7 +1015,7 @@ namespace MultiplayerARPG
             if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null ||
                 !PlayerCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return;
-            
+
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
 

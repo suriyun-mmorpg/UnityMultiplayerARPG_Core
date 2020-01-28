@@ -18,6 +18,13 @@ public static class PhysicUtils
         return count;
     }
 
+    public static int SortedLinecastNonAlloc2D(Vector2 start, Vector2 end, RaycastHit2D[] hits, int layerMask)
+    {
+        int count = Physics2D.LinecastNonAlloc(start, end, hits, layerMask);
+        System.Array.Sort(hits, 0, count, new RaycastHitComparer());
+        return count;
+    }
+
     public struct RaycastHitComparer : IComparer<RaycastHit>, IComparer<RaycastHit2D>
     {
         public int Compare(RaycastHit x, RaycastHit y)

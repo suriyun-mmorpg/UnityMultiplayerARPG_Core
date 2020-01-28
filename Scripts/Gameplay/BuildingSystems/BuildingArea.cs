@@ -1,20 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class BuildingArea : MonoBehaviour
+    public class BuildingArea : MonoBehaviour, IGameEntity
     {
+        public BuildingEntity entity;
         public string buildingType;
         public bool snapBuildingObject;
-
-        [HideInInspector, System.NonSerialized]
-        public BuildingEntity buildingEntity;
-
-        public uint EntityObjectId
+        
+        public uint ObjectId
         {
-            get { return buildingEntity == null ? 0 : buildingEntity.ObjectId; }
+            get { return Entity == null ? 0 : Entity.ObjectId; }
+        }
+
+        public BaseGameEntity Entity
+        {
+            get { return entity == null ? null : entity.Entity; }
+        }
+        
+        private void Start()
+        {
+            if (entity == null)
+                entity = GetComponentInParent<BuildingEntity>();
         }
     }
 }

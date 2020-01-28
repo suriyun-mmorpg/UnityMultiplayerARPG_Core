@@ -192,8 +192,8 @@ namespace MultiplayerARPG
                     {
                         targetBuilding = null;
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        if (tempBuildingMaterial != null && tempBuildingMaterial.buildingEntity != null)
-                            targetBuilding = tempBuildingMaterial.buildingEntity;
+                        if (tempBuildingMaterial != null && tempBuildingMaterial.entity != null)
+                            targetBuilding = tempBuildingMaterial.entity;
                         if (targetBuilding && !targetBuilding.IsDead())
                         {
                             SetTarget(targetBuilding, TargetActionType.Undefined);
@@ -212,8 +212,8 @@ namespace MultiplayerARPG
                         targetHarvestable = tempTransform.GetComponent<HarvestableEntity>();
                         targetBuilding = null;
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        if (tempBuildingMaterial != null && tempBuildingMaterial.buildingEntity != null)
-                            targetBuilding = tempBuildingMaterial.buildingEntity;
+                        if (tempBuildingMaterial != null && tempBuildingMaterial.entity != null)
+                            targetBuilding = tempBuildingMaterial.entity;
                         lastNpcObjectId = 0;
                         if (targetPlayer != null && !targetPlayer.GetCaches().IsHide)
                         {
