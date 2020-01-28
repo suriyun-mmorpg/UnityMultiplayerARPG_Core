@@ -108,6 +108,7 @@ namespace MultiplayerARPG
         private readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
         private readonly List<BuildingEntity> children = new List<BuildingEntity>();
         private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
+        private bool parentFound;
 
         protected override void EntityAwake()
         {
@@ -120,6 +121,21 @@ namespace MultiplayerARPG
 
             if (!string.IsNullOrEmpty(buildingType) && !buildingTypes.Contains(buildingType))
                 buildingTypes.Add(buildingType);
+        }
+
+        protected override void EntityLateUpdate()
+        {
+            base.EntityLateUpdate();
+            // Setup parent which when it's destroying it will destroy children (chain destroy)
+            if (IsServer && !parentFound)
+            {
+                BuildingEntity parent;
+                if (CurrentGameManager.TryGetBuildingEntity(ParentId, out parent))
+                {
+                    parentFound = true;
+                    parent.AddChildren(this);
+                }
+            }
         }
 
         public void RegisterMaterial(BuildingMaterial material)
@@ -149,12 +165,7 @@ namespace MultiplayerARPG
 
         private void OnParentIdChange(bool isInitial, string parentId)
         {
-            if (IsServer)
-            {
-                BuildingEntity parent;
-                if (CurrentGameManager.TryGetBuildingEntity(id, out parent))
-                    parent.AddChildren(this);
-            }
+            parentFound = false;
         }
 
         public void AddChildren(BuildingEntity buildingEntity)
@@ -226,20 +237,23 @@ namespace MultiplayerARPG
 
             // If current hp <= 0, character dead
             if (IsDead())
+                Destroy();
+        }
+
+        public void Destroy()
+        {
+            CurrentHp = 0;
+            CallNetFunction(NetFuncOnBuildingDestroy, FunctionReceivers.All);
+            if (droppingItems != null && droppingItems.Count > 0)
             {
-                CurrentHp = 0;
-                CallNetFunction(NetFuncOnBuildingDestroy, FunctionReceivers.All);
-                if (droppingItems != null && droppingItems.Count > 0)
+                foreach (ItemAmount droppingItem in droppingItems)
                 {
-                    foreach (ItemAmount droppingItem in droppingItems)
-                    {
-                        if (droppingItem.item == null || droppingItem.amount == 0)
-                            continue;
-                        ItemDropEntity.DropItem(this, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new uint[0]);
-                    }
+                    if (droppingItem.item == null || droppingItem.amount == 0)
+                        continue;
+                    ItemDropEntity.DropItem(this, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new uint[0]);
                 }
-                NetworkDestroy(destroyDelay);
             }
+            NetworkDestroy(destroyDelay);
         }
 
         public void SetupAsBuildMode()
@@ -319,8 +333,9 @@ namespace MultiplayerARPG
                 foreach (BuildingEntity child in children)
                 {
                     if (child == null) continue;
-                    child.NetworkDestroy();
+                    child.Destroy();
                 }
+                children.Clear();
             }
         }
 

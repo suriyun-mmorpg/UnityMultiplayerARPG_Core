@@ -903,7 +903,7 @@ namespace MultiplayerARPG
             BuildingEntity entity;
             if (buildingEntities.TryGetValue(id, out entity))
             {
-                entity.NetworkDestroy();
+                entity.Destroy();
                 buildingEntities.Remove(id);
             }
         }
