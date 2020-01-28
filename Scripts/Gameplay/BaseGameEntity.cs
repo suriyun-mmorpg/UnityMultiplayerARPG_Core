@@ -453,7 +453,8 @@ namespace MultiplayerARPG
         protected virtual void EntityOnDestroy()
         {
             // Exit vehicle when destroy
-            ExitVehicle();
+            if (IsServer)
+                ExitVehicle();
         }
 
         protected virtual void OnValidate()
@@ -753,7 +754,8 @@ namespace MultiplayerARPG
             Vector3 exitPosition = CacheTransform.position;
             if (!IsServer || PassengingVehicleEntity == null)
                 return exitPosition;
-            
+
+            BaseGameEntity vehicleEntity = PassengingVehicleEntity.Entity;
             bool isDriver = PassengingVehicleEntity.IsDriver(PassengingVehicle.seatIndex);
             bool isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicle.seatIndex);
 
@@ -764,7 +766,8 @@ namespace MultiplayerARPG
             // Remove this from vehicle
             PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
 
-            exitPosition = PassengingVehicleEntity.GetTransform().position;
+            Vector3 vehiclePosition = PassengingVehicleEntity.GetTransform().position;
+            exitPosition = vehiclePosition;
             if (PassengingVehicleSeat.exitTransform != null)
                 exitPosition = PassengingVehicleSeat.exitTransform.position;
 
@@ -777,9 +780,17 @@ namespace MultiplayerARPG
             // Teleport to exit transform
             Teleport(exitPosition);
 
-            // Destroy mount entity
             if (isDestroying)
-                PassengingVehicleEntity.Entity.NetworkDestroy();
+            {
+                // Destroy vehicle entity
+                vehicleEntity.NetworkDestroy();
+            }
+            else if (isDriver)
+            {
+                // Just exit vehicle entity
+                vehicleEntity.StopMove();
+                vehicleEntity.Teleport(vehiclePosition);
+            }
 
             return exitPosition;
         }
