@@ -4,11 +4,22 @@ using UnityEngine;
 
 public static class PhysicUtils
 {
+
+    public static int SortedRaycastNonAlloc2D(Ray2D ray, RaycastHit2D[] hits, float distance, int layerMask)
+    {
+        return SortedRaycastNonAlloc2D(ray.origin, ray.direction, hits, distance, layerMask);
+    }
+
     public static int SortedRaycastNonAlloc2D(Vector3 origin, Vector3 direction, RaycastHit2D[] hits, float distance, int layerMask)
     {
         int count = Physics2D.RaycastNonAlloc(origin, direction, hits, distance, layerMask);
         System.Array.Sort(hits, 0, count, new RaycastHitComparer());
         return count;
+    }
+
+    public static int SortedRaycastNonAlloc3D(Ray ray, RaycastHit[] hits, float distance, int layerMask)
+    {
+        return SortedRaycastNonAlloc3D(ray.origin, ray.direction, hits, distance, layerMask);
     }
 
     public static int SortedRaycastNonAlloc3D(Vector3 origin, Vector3 direction, RaycastHit[] hits, float distance, int layerMask)
