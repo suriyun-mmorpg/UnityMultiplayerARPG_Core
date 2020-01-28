@@ -17,9 +17,9 @@ namespace MultiplayerARPG
         {
             worldPointFor2D = Vector3.zero;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                return Physics.RaycastNonAlloc(Camera.main.ScreenPointToRay(Input.mousePosition), raycasts, 100f, CurrentGameInstance.GetTargetLayerMask());
+                return PhysicUtils.SortedRaycastNonAlloc3D(Camera.main.ScreenPointToRay(Input.mousePosition), raycasts, 100f, CurrentGameInstance.GetTargetLayerMask());
             worldPointFor2D = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            return Physics2D.LinecastNonAlloc(worldPointFor2D, worldPointFor2D, raycasts2D, CurrentGameInstance.GetTargetLayerMask());
+            return PhysicUtils.SortedLinecastNonAlloc2D(worldPointFor2D, worldPointFor2D, raycasts2D, CurrentGameInstance.GetTargetLayerMask());
         }
 
         public void FindAndSetBuildingAreaFromMousePosition()
@@ -29,11 +29,11 @@ namespace MultiplayerARPG
             switch (CurrentGameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    tempCount = Physics.RaycastNonAlloc(Camera.main.ScreenPointToRay(Input.mousePosition), raycasts, 100f, CurrentGameInstance.GetBuildLayerMask());
+                    tempCount = PhysicUtils.SortedRaycastNonAlloc3D(Camera.main.ScreenPointToRay(Input.mousePosition), raycasts, 100f, CurrentGameInstance.GetBuildLayerMask());
                     break;
                 case DimensionType.Dimension2D:
                     tempVector3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    tempCount = Physics2D.LinecastNonAlloc(tempVector3, tempVector3, raycasts2D, CurrentGameInstance.GetBuildLayerMask());
+                    tempCount = PhysicUtils.SortedLinecastNonAlloc2D(tempVector3, tempVector3, raycasts2D, CurrentGameInstance.GetBuildLayerMask());
                     break;
             }
             LoopSetBuildingArea(tempCount);
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
                     tempVector3 = MovementTransform.position + (MovementTransform.forward * ConstructingBuildingEntity.characterForwardDistance);
                     ConstructingBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(MovementTransform.eulerAngles);
                     ConstructingBuildingEntity.BuildingArea = null;
-                    tempCount = PhysicUtils.SortedRaycastNonAlloc3D(tempVector3 + (Vector3.up * 2.5f), Vector3.down, raycasts, 5f, CurrentGameInstance.GetBuildLayerMask());
+                    tempCount = PhysicUtils.SortedRaycastNonAlloc3D(tempVector3 + (Vector3.up * 2.5f), Vector3.down, raycasts, 100f, CurrentGameInstance.GetBuildLayerMask());
                     if (!LoopSetBuildingArea(tempCount))
                         ConstructingBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
                     break;
