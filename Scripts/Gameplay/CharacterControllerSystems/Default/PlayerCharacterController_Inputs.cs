@@ -184,7 +184,7 @@ namespace MultiplayerARPG
                 // If mouse up while cursor point to target (character, item, npc and so on)
                 bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI;
                 int tempCount = FindClickObjects(out tempVector3);
-                for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                for (int tempCounter = tempCount - 1; tempCounter >= 0; --tempCounter)
                 {
                     tempTransform = GetRaycastTransform(tempCounter);
                     // When holding on target, or already enter edit building mode
