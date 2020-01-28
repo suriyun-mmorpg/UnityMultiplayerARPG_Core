@@ -126,7 +126,6 @@ namespace MultiplayerARPG
             {
                 entity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
                 entity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
-                entity.TriggerEnterTilemap(other.GetComponent<TilemapCollider2D>());
             }
         }
 
@@ -136,7 +135,6 @@ namespace MultiplayerARPG
             {
                 entity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
                 entity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
-                entity.TriggerExitTilemap(other.GetComponent<TilemapCollider2D>());
             }
         }
 
