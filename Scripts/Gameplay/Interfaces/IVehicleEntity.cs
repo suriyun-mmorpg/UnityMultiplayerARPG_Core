@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IVehicleEntity : IGameEntity, IEntityMovement
+    public interface IVehicleEntity : IEntityMovement
     {
         VehicleType VehicleType { get; }
         List<VehicleSeat> Seats { get; }

@@ -130,7 +130,7 @@ namespace MultiplayerARPG
             if (destroying)
                 return;
 
-            if (attacker != null && attacker.Entity.gameObject == other)
+            if (attacker != null && attacker.GetGameObject() == other)
                 return;
 
             IDamageableEntity target = null;
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
         {
             target = null;
 
-            if (attacker != null && attacker.Entity.gameObject == other)
+            if (attacker != null && attacker.GetGameObject() == other)
                 return false;
 
             target = other.GetComponent<IDamageableEntity>();

@@ -2,9 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    public interface IEntityMovement
+    public interface IEntityMovement : IGameEntity
     {
-        BaseGameEntity Entity { get; }
         float StoppingDistance { get; }
         void StopMove();
         void KeyMovement(Vector3 moveDirection, MovementState movementState);

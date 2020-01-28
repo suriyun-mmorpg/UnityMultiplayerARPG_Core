@@ -488,7 +488,7 @@ namespace MultiplayerARPG
                     aimPosition = tempHitInfo.point;
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
                     if (buildingArea == null ||
-                        (buildingArea.Entity && buildingArea.ObjectId == ConstructingBuildingEntity.ObjectId) ||
+                        (buildingArea.Entity && buildingArea.GetObjectId() == ConstructingBuildingEntity.ObjectId) ||
                         !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                     {
                         // Skip because this area is not allowed to build the building that you are going to build
@@ -577,7 +577,7 @@ namespace MultiplayerARPG
                     tempEntity = tempDamageableEntity.Entity;
 
                     // Target must be damageable, not player character entity, within aim distance and alive
-                    if (tempDamageableEntity.ObjectId == PlayerCharacterEntity.ObjectId)
+                    if (tempDamageableEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
                         continue;
 
                     // Target must not hidding
@@ -835,7 +835,7 @@ namespace MultiplayerARPG
             {
                 // Find for item to pick up
                 if (SelectedEntity != null && SelectedEntity is ItemDropEntity)
-                    PlayerCharacterEntity.RequestPickupItem((SelectedEntity as ItemDropEntity).ObjectId);
+                    PlayerCharacterEntity.RequestPickupItem(SelectedEntity.ObjectId);
             }
             else if (reloadInput.IsPress)
             {

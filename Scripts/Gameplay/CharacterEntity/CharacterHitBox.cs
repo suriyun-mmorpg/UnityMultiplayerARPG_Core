@@ -8,8 +8,7 @@ namespace MultiplayerARPG
     {
         public BaseCharacterEntity characterEntity;
         public float damageRate = 1f;
-
-        public uint ObjectId { get { return characterEntity.ObjectId; } }
+        
         public int CurrentHp { get { return characterEntity.CurrentHp; } set { characterEntity.CurrentHp = value; } }
         public Transform OpponentAimTransform { get { return characterEntity.OpponentAimTransform; } }
         public BaseGameEntity Entity { get { return characterEntity; } }
