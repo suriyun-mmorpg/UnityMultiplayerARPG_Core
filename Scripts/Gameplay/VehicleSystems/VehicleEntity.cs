@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -30,6 +31,9 @@ namespace MultiplayerARPG
             get { return seats; }
         }
 
+        [SerializeField]
+        private SyncListPackedUInt syncPassengerIds = new SyncListPackedUInt();
+
         private readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
 
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
@@ -40,6 +44,31 @@ namespace MultiplayerARPG
             gameObject.layer = CurrentGameInstance.characterLayer;
         }
 
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            syncPassengerIds.onOperation = (op, index) =>
+            {
+                LiteNetLibIdentity identity;
+                if (index < syncPassengerIds.Count)
+                {
+                    // Add passenger entity to dictionary if the id > 0
+                    if (syncPassengerIds[index] == 0)
+                        passengers.Remove((byte)index);
+                    else if (Manager.Assets.TryGetSpawnedObject(syncPassengerIds[index], out identity))
+                        passengers[(byte)index] = identity.GetComponent<BaseGameEntity>();
+                }
+            };
+            if (IsServer)
+            {
+                // Prepare passengers data
+                while (syncPassengerIds.Count < Seats.Count)
+                {
+                    syncPassengerIds.Add(0);
+                }
+            }
+        }
+        
         public override sealed float GetMoveSpeed()
         {
             if (moveSpeedType == VehicleMoveSpeedType.FixedMovedSpeed)
@@ -65,24 +94,33 @@ namespace MultiplayerARPG
 
         public void SetPassenger(byte seatIndex, BaseGameEntity gameEntity)
         {
-            if (!passengers.ContainsKey(seatIndex))
-                passengers.Add(seatIndex, gameEntity);
+            if (!IsServer)
+                return;
+            syncPassengerIds[seatIndex] = gameEntity.ObjectId;
         }
 
         public bool RemovePassenger(byte seatIndex)
         {
-            return passengers.Remove(seatIndex);
+            if (!IsServer)
+                return false;
+            if (seatIndex < syncPassengerIds.Count)
+            {
+                syncPassengerIds[seatIndex] = 0;
+                return true;
+            }
+            return false;
         }
 
         public bool IsSeatAvailable(byte seatIndex)
         {
-            return !passengers.ContainsKey(seatIndex);
+            return seatIndex < syncPassengerIds.Count && syncPassengerIds[seatIndex] == 0;
         }
 
         public bool GetAvailableSeat(out byte seatIndex)
         {
             seatIndex = 0;
-            for (byte i = 0; i < (byte)Seats.Count; ++i)
+            byte count = (byte)Seats.Count;
+            for (byte i = 0; i < count; ++i)
             {
                 if (IsSeatAvailable(i))
                 {
