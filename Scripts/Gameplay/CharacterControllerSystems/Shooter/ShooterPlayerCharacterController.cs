@@ -718,9 +718,11 @@ namespace MultiplayerARPG
                 tempPressAttackLeft ||
                 activateInput.IsPress ||
                 activateInput.IsRelease ||
-                activateInput.IsHold)
+                activateInput.IsHold ||
+                PlayerCharacterEntity.IsPlayingActionAnimation())
             {
                 // Find forward character / npc / building / warp entity from camera center
+                // Check is character playing action animation to turn character forwarding to aim position
                 targetPlayer = null;
                 targetNpc = null;
                 targetBuilding = null;
