@@ -36,6 +36,9 @@ namespace MultiplayerARPG
                     targetBuilding = null;
                     if (ActivatableEntityDetector.buildings.Count > 0)
                         targetBuilding = ActivatableEntityDetector.buildings[0];
+                    targetVehicle = null;
+                    if (ActivatableEntityDetector.vehicles.Count > 0)
+                        targetVehicle = ActivatableEntityDetector.vehicles[0];
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null && CacheUISceneGameplay != null)
                     {
@@ -54,6 +57,11 @@ namespace MultiplayerARPG
                         // Use building
                         SelectedEntity = targetBuilding;
                         ActivateBuilding(targetBuilding);
+                    }
+                    else if (targetVehicle != null)
+                    {
+                        // Enter vehicle
+                        PlayerCharacterEntity.RequestEnterVehicle(targetVehicle.ObjectId);
                     }
                     else
                     {
@@ -214,36 +222,37 @@ namespace MultiplayerARPG
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
                         if (tempBuildingMaterial != null && tempBuildingMaterial.entity != null)
                             targetBuilding = tempBuildingMaterial.entity;
+                        targetVehicle = tempTransform.GetComponent<VehicleEntity>();
                         lastNpcObjectId = 0;
-                        if (targetPlayer != null && !targetPlayer.GetCaches().IsHide)
+                        if (targetPlayer && !targetPlayer.GetCaches().IsHide)
                         {
                             // Found activating entity as player character entity
                             SetTarget(targetPlayer, TargetActionType.Attack);
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetMonster != null && !targetMonster.GetCaches().IsHide)
+                        else if (targetMonster && !targetMonster.GetCaches().IsHide)
                         {
                             // Found activating entity as monster character entity
                             SetTarget(targetMonster, TargetActionType.Attack);
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetNpc != null)
+                        else if (targetNpc)
                         {
                             // Found activating entity as npc entity
                             SetTarget(targetNpc, TargetActionType.Undefined);
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetItemDrop != null)
+                        else if (targetItemDrop)
                         {
                             // Found activating entity as item drop entity
                             SetTarget(targetItemDrop, TargetActionType.Undefined);
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetHarvestable != null && !targetHarvestable.IsDead())
+                        else if (targetHarvestable && !targetHarvestable.IsDead())
                         {
                             // Found activating entity as harvestable entity
                             SetTarget(targetHarvestable, TargetActionType.Undefined);
@@ -255,6 +264,13 @@ namespace MultiplayerARPG
                             // Found activating entity as building entity
                             SetTarget(targetBuilding, TargetActionType.Undefined);
                             IsEditingBuilding = false;
+                            tempHasMapPosition = false;
+                            break;
+                        }
+                        else if (targetVehicle)
+                        {
+                            // Found activating entity as vehicle entity
+                            SetTarget(targetVehicle, TargetActionType.Undefined);
                             tempHasMapPosition = false;
                             break;
                         }
@@ -682,6 +698,17 @@ namespace MultiplayerARPG
                 }
                 else
                     UpdateTargetEntityPosition(targetHarvestable);
+            }
+            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetVehicle))
+            {
+                if (Vector3.Distance(MovementTransform.position, targetVehicle.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
+                {
+                    PlayerCharacterEntity.RequestEnterVehicle(targetVehicle.ObjectId);
+                    PlayerCharacterEntity.StopMove();
+                    ClearTarget();
+                }
+                else
+                    UpdateTargetEntityPosition(targetVehicle);
             }
         }
 

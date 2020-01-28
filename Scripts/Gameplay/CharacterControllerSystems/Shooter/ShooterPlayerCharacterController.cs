@@ -177,6 +177,7 @@ namespace MultiplayerARPG
         BasePlayerCharacterEntity targetPlayer;
         NpcEntity targetNpc;
         BuildingEntity targetBuilding;
+        VehicleEntity targetVehicle;
         RaycastHit[] raycasts = new RaycastHit[RAYCAST_COLLIDER_SIZE];
         Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
         RaycastHit tempHitInfo;
@@ -726,6 +727,7 @@ namespace MultiplayerARPG
                 targetPlayer = null;
                 targetNpc = null;
                 targetBuilding = null;
+                targetVehicle = null;
                 if (!tempPressAttackRight && !tempPressAttackLeft)
                 {
                     if (activateInput.IsHold)
@@ -741,6 +743,8 @@ namespace MultiplayerARPG
                             targetNpc = SelectedEntity as NpcEntity;
                         if (SelectedEntity is BuildingEntity)
                             targetBuilding = SelectedEntity as BuildingEntity;
+                        if (SelectedEntity is VehicleEntity)
+                            targetVehicle = SelectedEntity as VehicleEntity;
                     }
                 }
                 // While attacking turn character to camera forward
@@ -1128,6 +1132,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
             else if (targetBuilding != null)
                 ActivateBuilding(targetBuilding);
+            else if (targetVehicle != null)
+                PlayerCharacterEntity.RequestEnterVehicle(targetVehicle.ObjectId);
         }
 
         public void UseSkill(bool isLeftHand, Vector3 defaultAimPosition)

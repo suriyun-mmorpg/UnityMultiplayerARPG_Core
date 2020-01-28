@@ -61,6 +61,7 @@ namespace MultiplayerARPG
         public UIBaseGameEntity uiTargetItemDrop;
         public UIDamageableEntity uiTargetBuilding;
         public UIDamageableEntity uiTargetHarvestable;
+        public UIBaseGameEntity uiTargetVehicle;
 
         [Header("Other UIs")]
         public UINpcDialog uiNpcDialog;
@@ -389,6 +390,7 @@ namespace MultiplayerARPG
                 SetTargetItemDrop(null);
                 SetTargetBuilding(null);
                 SetTargetHarvestable(null);
+                SetTargetVehicle(null);
                 return;
             }
 
@@ -402,6 +404,8 @@ namespace MultiplayerARPG
                 SetTargetBuilding(entity as BuildingEntity);
             if (entity is HarvestableEntity)
                 SetTargetHarvestable(entity as HarvestableEntity);
+            if (entity is VehicleEntity)
+                SetTargetVehicle(entity as VehicleEntity);
         }
 
         protected void SetTargetCharacter(BaseCharacterEntity character)
@@ -477,6 +481,21 @@ namespace MultiplayerARPG
 
             uiTargetHarvestable.Data = harvestable;
             uiTargetHarvestable.Show();
+        }
+
+        protected void SetTargetVehicle(VehicleEntity vehicle)
+        {
+            if (uiTargetVehicle == null)
+                return;
+
+            if (vehicle == null)
+            {
+                uiTargetVehicle.Hide();
+                return;
+            }
+
+            uiTargetVehicle.Data = vehicle;
+            uiTargetVehicle.Show();
         }
 
         public void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter)

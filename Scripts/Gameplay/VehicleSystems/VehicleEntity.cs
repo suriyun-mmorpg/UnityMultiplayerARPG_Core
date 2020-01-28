@@ -6,6 +6,7 @@ namespace MultiplayerARPG
 {
     public class VehicleEntity : BaseGameEntity, IVehicleEntity
     {
+        [Header("Vehicle Settings")]
         [SerializeField]
         private VehicleType vehicleType;
         public VehicleType VehicleType { get { return vehicleType; } }

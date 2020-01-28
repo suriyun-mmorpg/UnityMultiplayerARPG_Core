@@ -20,12 +20,14 @@ namespace MultiplayerARPG
         public bool findBuilding;
         public bool findOnlyAliveBuildings;
         public bool findOnlyActivatableBuildings;
+        public bool findVehicle;
         public readonly List<BaseCharacterEntity> characters = new List<BaseCharacterEntity>();
         public readonly List<BasePlayerCharacterEntity> players = new List<BasePlayerCharacterEntity>();
         public readonly List<BaseMonsterCharacterEntity> monsters = new List<BaseMonsterCharacterEntity>();
         public readonly List<NpcEntity> npcs = new List<NpcEntity>();
         public readonly List<ItemDropEntity> itemDrops = new List<ItemDropEntity>();
         public readonly List<BuildingEntity> buildings = new List<BuildingEntity>();
+        public readonly List<VehicleEntity> vehicles = new List<VehicleEntity>();
         private readonly HashSet<Collider> excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> excludeCollider2Ds = new HashSet<Collider2D>();
         private SphereCollider cacheCollider;
@@ -78,6 +80,7 @@ namespace MultiplayerARPG
             SortNearestEntity(npcs);
             SortNearestEntity(itemDrops);
             SortNearestEntity(buildings);
+            SortNearestEntity(vehicles);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -117,7 +120,8 @@ namespace MultiplayerARPG
             NpcEntity npc = null;
             ItemDropEntity itemDrop = null;
             BuildingEntity building = null;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building);
+            VehicleEntity vehicle = null;
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle);
 
             if (player != null)
             {
@@ -147,6 +151,12 @@ namespace MultiplayerARPG
                     buildings.Add(building);
                 return true;
             }
+            if (vehicle != null)
+            {
+                if (!vehicles.Contains(vehicle))
+                    vehicles.Add(vehicle);
+                return true;
+            }
             if (itemDrop != null)
             {
                 if (!itemDrops.Contains(itemDrop))
@@ -163,7 +173,8 @@ namespace MultiplayerARPG
             NpcEntity npc = null;
             ItemDropEntity itemDrop = null;
             BuildingEntity building = null;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, false);
+            VehicleEntity vehicle = null;
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, false);
 
             if (player != null)
                 return characters.Remove(player) && players.Remove(player);
@@ -175,6 +186,8 @@ namespace MultiplayerARPG
                 return itemDrops.Remove(itemDrop);
             if (building != null)
                 return buildings.Remove(building);
+            if (vehicle != null)
+                return vehicles.Remove(vehicle);
             return false;
         }
 
@@ -184,6 +197,7 @@ namespace MultiplayerARPG
             out NpcEntity npc,
             out ItemDropEntity itemDrop,
             out BuildingEntity building,
+            out VehicleEntity vehicle,
             bool findWithAdvanceOptions = true)
         {
             player = null;
@@ -236,6 +250,10 @@ namespace MultiplayerARPG
                         building = null;
                 }
             }
+
+            vehicle = null;
+            if (findVehicle)
+                vehicle = other.GetComponent<VehicleEntity>();
         }
 
         private void SortNearestEntity<T>(List<T> entities) where T : BaseGameEntity

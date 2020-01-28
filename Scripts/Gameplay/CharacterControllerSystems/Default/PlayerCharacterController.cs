@@ -65,6 +65,7 @@ namespace MultiplayerARPG
         protected NpcEntity targetNpc;
         protected ItemDropEntity targetItemDrop;
         protected BuildingEntity targetBuilding;
+        protected VehicleEntity targetVehicle;
         protected HarvestableEntity targetHarvestable;
         protected Quaternion tempLookAt;
         protected Vector3 targetLookDirection;
@@ -98,6 +99,7 @@ namespace MultiplayerARPG
             ActivatableEntityDetector.findBuilding = true;
             ActivatableEntityDetector.findOnlyAliveBuildings = true;
             ActivatableEntityDetector.findOnlyActivatableBuildings = true;
+            ActivatableEntityDetector.findVehicle = true;
             // This entity detector will be find item drop entities to use when pressed pickup key
             tempGameObject = new GameObject("_ItemDropEntityDetector");
             ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
