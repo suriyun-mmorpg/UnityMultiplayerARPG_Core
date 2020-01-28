@@ -30,7 +30,7 @@ namespace MultiplayerARPG
     {
         protected override bool IsValueChanged(PassengingVehicle newValue)
         {
-            return true;
+            return Value.objectId != newValue.objectId || Value.seatIndex != newValue.seatIndex;
         }
     }
 }
