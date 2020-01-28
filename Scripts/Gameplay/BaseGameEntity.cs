@@ -66,7 +66,8 @@ namespace MultiplayerARPG
         {
             get { return model; }
         }
-        
+
+        public Transform CacheGameObject { get; private set; }
         public Transform CacheTransform { get; private set; }
 
         [Tooltip("Transform for position which camera will look at and follow while playing in TPS view mode")]
@@ -83,7 +84,7 @@ namespace MultiplayerARPG
                         if (PassengingVehicleEntity is BaseGameEntity)
                             return (PassengingVehicleEntity as BaseGameEntity).CameraTargetTransform;
                         else
-                            return PassengingVehicleEntity.transform;
+                            return PassengingVehicleEntity.GetTransform();
                     }
                 }
                 return cameraTargetTransform;
@@ -101,7 +102,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private MovementSecure movementSecure;
         public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
-        
+
         public BaseEntityMovement Movement { get; private set; }
 
         public Transform MovementTransform
@@ -111,7 +112,7 @@ namespace MultiplayerARPG
                 if (PassengingVehicleEntity != null)
                 {
                     // Track movement position by vehicle entity
-                    return PassengingVehicleEntity.transform;
+                    return PassengingVehicleEntity.GetTransform();
                 }
                 return CacheTransform;
             }
@@ -217,7 +218,7 @@ namespace MultiplayerARPG
             }
             set { direction2D.Value = value; }
         }
-        
+
         [SerializeField]
         protected SyncFieldPassengingVehicle passengingVehicle = new SyncFieldPassengingVehicle();
         public PassengingVehicle PassengingVehicle
@@ -254,7 +255,7 @@ namespace MultiplayerARPG
         }
 
         protected IGameEntityComponent[] EntityComponents { get; private set; }
-        
+
         #region Enter Area States
         // This will be TRUE when this character enter to safe area
         public bool IsInSafeArea { get; set; }
@@ -702,7 +703,7 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            
+
             LocalExtraMovementState = extraMovementState;
 
             if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
@@ -729,13 +730,17 @@ namespace MultiplayerARPG
             if (!IsServer || vehicle == null || PassengingVehicle.objectId > 0 || !vehicle.IsSeatAvailable(seatIndex))
                 return false;
 
+            // Change object owner to driver
+            if (vehicle.IsDriver(seatIndex))
+                Manager.Assets.SetObjectOwner(vehicle.GetObjectId(), ConnectionId);
+
             // Set passenger to vehicle
             vehicle.SetPassenger(seatIndex, this);
 
             // Set mount info
             PassengingVehicle passengingVehicle = new PassengingVehicle()
             {
-                objectId = vehicle.ObjectId,
+                objectId = vehicle.GetObjectId(),
                 seatIndex = seatIndex,
             };
             PassengingVehicle = passengingVehicle;
@@ -748,48 +753,33 @@ namespace MultiplayerARPG
             Vector3 exitPosition = CacheTransform.position;
             if (!IsServer || PassengingVehicleEntity == null)
                 return exitPosition;
+            
+            bool isDriver = PassengingVehicleEntity.IsDriver(PassengingVehicle.seatIndex);
+            bool isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicle.seatIndex);
 
-            uint vehicleObjectId = PassengingVehicleEntity.ObjectId;
-            bool isDestroying = false;
+            // Clear object owner from driver
+            if (PassengingVehicleEntity.IsDriver(PassengingVehicle.seatIndex))
+                Manager.Assets.SetObjectOwner(PassengingVehicleEntity.GetObjectId(), -1);
 
-            if (PassengingVehicleEntity != null)
-            {
-                // Remove this from vehicle
-                PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
-                isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicle.seatIndex);
+            // Remove this from vehicle
+            PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
 
-                exitPosition = PassengingVehicleEntity.transform.position;
-                if (PassengingVehicleSeat.exitTransform != null)
-                    exitPosition = PassengingVehicleSeat.exitTransform.position;
+            exitPosition = PassengingVehicleEntity.GetTransform().position;
+            if (PassengingVehicleSeat.exitTransform != null)
+                exitPosition = PassengingVehicleSeat.exitTransform.position;
 
-                // Clear passenging vehicle data
-                PassengingVehicle passengingVehicle = PassengingVehicle;
-                passengingVehicle.objectId = 0;
-                passengingVehicle.seatIndex = 0;
-                PassengingVehicle = passengingVehicle;
+            // Clear passenging vehicle data
+            PassengingVehicle = default(PassengingVehicle);
 
-                // Clear vehicle entity before teleport
-                passengingVehicleEntity = null;
+            // Clear vehicle entity before teleport
+            passengingVehicleEntity = null;
 
-                // Teleport to exit transform
-                Teleport(exitPosition);
-            }
-            else
-            {
-                // Not passenging vehicle, just clear data
-                PassengingVehicle passengingVehicle = PassengingVehicle;
-                passengingVehicle.objectId = 0;
-                passengingVehicle.seatIndex = 0;
-                PassengingVehicle = passengingVehicle;
-            }
+            // Teleport to exit transform
+            Teleport(exitPosition);
 
             // Destroy mount entity
             if (isDestroying)
-            {
-                LiteNetLibIdentity identity;
-                if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(vehicleObjectId, out identity))
-                    identity.NetworkDestroy();
-            }
+                PassengingVehicleEntity.Entity.NetworkDestroy();
 
             return exitPosition;
         }

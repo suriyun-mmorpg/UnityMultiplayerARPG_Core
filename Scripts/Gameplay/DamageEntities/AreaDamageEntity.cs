@@ -75,17 +75,17 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
-            if (attacker != null && attacker.Entity.gameObject == other)
+            if (attacker != null && attacker.GetGameObject() == other)
                 return;
 
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
             if (target == null)
                 return;
 
-            if (receivingDamageEntities.ContainsKey(target.ObjectId))
+            if (receivingDamageEntities.ContainsKey(target.GetObjectId()))
                 return;
 
-            receivingDamageEntities.Add(target.ObjectId, target);
+            receivingDamageEntities.Add(target.GetObjectId(), target);
         }
 
         private void OnTriggerExit(Collider other)
@@ -100,17 +100,17 @@ namespace MultiplayerARPG
 
         private void TriggerExit(GameObject other)
         {
-            if (attacker != null && attacker.Entity.gameObject == other)
+            if (attacker != null && attacker.GetGameObject() == other)
                 return;
 
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
             if (target == null)
                 return;
 
-            if (!receivingDamageEntities.ContainsKey(target.ObjectId))
+            if (!receivingDamageEntities.ContainsKey(target.GetObjectId()))
                 return;
 
-            receivingDamageEntities.Remove(target.ObjectId);
+            receivingDamageEntities.Remove(target.GetObjectId());
         }
     }
 }
