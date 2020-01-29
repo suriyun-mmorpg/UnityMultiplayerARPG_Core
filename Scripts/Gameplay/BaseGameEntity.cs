@@ -66,8 +66,7 @@ namespace MultiplayerARPG
         {
             get { return model; }
         }
-
-        public Transform CacheGameObject { get; private set; }
+        
         public Transform CacheTransform { get; private set; }
 
         [Tooltip("Transform for position which camera will look at and follow while playing in TPS view mode")]
