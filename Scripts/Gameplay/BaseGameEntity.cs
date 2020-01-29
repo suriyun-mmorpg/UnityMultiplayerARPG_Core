@@ -80,12 +80,7 @@ namespace MultiplayerARPG
                 if (PassengingVehicleEntity != null)
                 {
                     if (PassengingVehicleSeat.cameraTarget == VehicleSeatCameraTarget.Vehicle)
-                    {
-                        if (PassengingVehicleEntity is BaseGameEntity)
-                            return (PassengingVehicleEntity as BaseGameEntity).CameraTargetTransform;
-                        else
-                            return PassengingVehicleEntity.GetTransform();
-                    }
+                        return PassengingVehicleEntity.Entity.CameraTargetTransform;
                 }
                 return cameraTargetTransform;
             }
