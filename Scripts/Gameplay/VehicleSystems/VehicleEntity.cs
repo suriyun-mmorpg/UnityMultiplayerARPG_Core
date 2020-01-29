@@ -64,7 +64,7 @@ namespace MultiplayerARPG
             };
             if (IsServer)
             {
-                // Prepare passengers data
+                // Prepare passengers data, add data at server then it wil be synced to clients
                 while (syncPassengerIds.Count < Seats.Count)
                 {
                     syncPassengerIds.Add(0);

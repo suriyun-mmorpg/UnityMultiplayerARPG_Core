@@ -31,6 +31,23 @@ namespace MultiplayerARPG
                 CacheNavMeshAgent = gameObject.AddComponent<NavMeshAgent>();
         }
 
+        public override void EntityLateUpdate()
+        {
+            base.EntityLateUpdate();
+            // Setup network components
+            switch (CacheEntity.MovementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    CacheNetTransform.ownerClientCanSendTransform = false;
+                    CacheNetTransform.ownerClientNotInterpolate = false;
+                    break;
+                case MovementSecure.NotSecure:
+                    CacheNetTransform.ownerClientCanSendTransform = true;
+                    CacheNetTransform.ownerClientNotInterpolate = true;
+                    break;
+            }
+        }
+
         public override void ComponentOnEnable()
         {
             CacheNetTransform.enabled = true;
@@ -45,18 +62,6 @@ namespace MultiplayerARPG
 
         public override void EntityOnSetup()
         {
-            // Setup network components
-            switch (CacheEntity.MovementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    CacheNetTransform.ownerClientCanSendTransform = false;
-                    CacheNetTransform.ownerClientNotInterpolate = false;
-                    break;
-                case MovementSecure.NotSecure:
-                    CacheNetTransform.ownerClientCanSendTransform = true;
-                    CacheNetTransform.ownerClientNotInterpolate = true;
-                    break;
-            }
             // Register Network functions
             CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             CacheEntity.RegisterNetFunction<short>(NetFuncUpdateYRotation);

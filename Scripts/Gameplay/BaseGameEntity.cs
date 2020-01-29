@@ -112,19 +112,21 @@ namespace MultiplayerARPG
             }
         }
 
-        private uint dirtyVehicleObjectId;
+        private bool foundPassengingVehicleEntity;
         private IVehicleEntity passengingVehicleEntity;
         public IVehicleEntity PassengingVehicleEntity
         {
             get
             {
-                if ((passengingVehicleEntity == null || dirtyVehicleObjectId != PassengingVehicle.objectId) && PassengingVehicle.objectId > 0)
+                if (!foundPassengingVehicleEntity && PassengingVehicle.objectId > 0)
                 {
-                    dirtyVehicleObjectId = PassengingVehicle.objectId;
                     passengingVehicleEntity = null;
                     LiteNetLibIdentity identity;
                     if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(PassengingVehicle.objectId, out identity))
+                    {
+                        foundPassengingVehicleEntity = true;
                         passengingVehicleEntity = identity.GetComponent<IVehicleEntity>();
+                    }
                 }
                 // Clear current vehicle, if not existed
                 if (PassengingVehicle.objectId == 0)
@@ -441,6 +443,8 @@ namespace MultiplayerARPG
             {
                 EntityComponents[i].EntityOnDestroy();
             }
+            // Remove sync field events
+            passengingVehicle.onChange -= OnPassengingVehicleChange;
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
@@ -467,10 +471,13 @@ namespace MultiplayerARPG
 
             SetupNetElements();
 
+            // Remove sync field events
+            passengingVehicle.onChange += OnPassengingVehicleChange;
             // Register network functions
             RegisterNetFunction<PackedUInt>(NetFuncEnterVehicle);
             RegisterNetFunction<PackedUInt, byte>(NetFuncEnterVehicleToSeat);
             RegisterNetFunction(NetFuncExitVehicle);
+            RegisterNetFunction(NetFuncExitVehicleResponse);
             RegisterNetFunction<MovementState>(NetFuncSetMovement);
             RegisterNetFunction<ExtraMovementState>(NetFuncSetExtraMovement);
             RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
@@ -511,9 +518,16 @@ namespace MultiplayerARPG
             passengingVehicle.doNotSyncInitialDataImmediately = true;
         }
 
+        protected void OnPassengingVehicleChange(bool isInitial, PassengingVehicle passengingVehicle)
+        {
+            // Set `foundPassengingVehicleEntity` to `True` if `objectId` is `0` so it will not find `PassengingVehicleEntity`
+            foundPassengingVehicleEntity = passengingVehicle.objectId == 0;
+        }
+
         #region Net Functions
         protected void NetFuncEnterVehicle(PackedUInt objectId)
         {
+            // Call this function at server
             LiteNetLibIdentity identity;
             if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
             {
@@ -527,6 +541,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncEnterVehicleToSeat(PackedUInt objectId, byte seatIndex)
         {
+            // Call this function at server
             LiteNetLibIdentity identity;
             if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
             {
@@ -538,8 +553,15 @@ namespace MultiplayerARPG
 
         protected void NetFuncExitVehicle()
         {
-            // Call exit vehicle at server
+            // Call this function at server
             ExitVehicle();
+        }
+
+        protected void NetFuncExitVehicleResponse()
+        {
+            // Call this function at client
+            foundPassengingVehicleEntity = true;
+            passengingVehicleEntity = null;
         }
 
         protected void NetFuncSetMovement(MovementState movementState)
@@ -768,8 +790,8 @@ namespace MultiplayerARPG
             // Clear passenging vehicle data
             PassengingVehicle = default(PassengingVehicle);
 
-            // Clear vehicle entity before teleport
-            passengingVehicleEntity = null;
+            // Clear vehicle entity at clients
+            CallNetFunction(NetFuncExitVehicleResponse, FunctionReceivers.All);
 
             // Teleport to exit transform
             Teleport(exitPosition);
@@ -783,7 +805,6 @@ namespace MultiplayerARPG
             {
                 // Just exit vehicle entity
                 vehicleEntity.StopMove();
-                vehicleEntity.Teleport(vehiclePosition);
             }
 
             return exitPosition;
