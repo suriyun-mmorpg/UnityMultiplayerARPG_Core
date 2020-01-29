@@ -37,11 +37,14 @@ namespace MultiplayerARPG
         private readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
 
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
+        public virtual bool HasDriver { get { return passengers.ContainsKey(0); } }
+        private MovementSecure defaultMovementSecure;
 
         protected override sealed void EntityAwake()
         {
             base.EntityAwake();
             gameObject.layer = CurrentGameInstance.characterLayer;
+            defaultMovementSecure = MovementSecure;
         }
 
         public override void OnSetup()
@@ -68,7 +71,22 @@ namespace MultiplayerARPG
                 }
             }
         }
-        
+
+        protected override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            if (HasDriver)
+            {
+                // Client will control movement
+                MovementSecure = defaultMovementSecure;
+            }
+            else
+            {
+                // Server will control movement
+                MovementSecure = MovementSecure.ServerAuthoritative;
+            }
+        }
+
         public override sealed float GetMoveSpeed()
         {
             if (moveSpeedType == VehicleMoveSpeedType.FixedMovedSpeed)
