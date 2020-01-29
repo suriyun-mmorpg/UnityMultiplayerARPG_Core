@@ -477,8 +477,8 @@ namespace MultiplayerARPG
             RegisterNetFunction<PackedUInt>(NetFuncEnterVehicle);
             RegisterNetFunction<PackedUInt, byte>(NetFuncEnterVehicleToSeat);
             RegisterNetFunction(NetFuncExitVehicle);
-            RegisterNetFunction<byte>(NetFuncSetMovement);
-            RegisterNetFunction<byte>(NetFuncSetExtraMovement);
+            RegisterNetFunction<MovementState>(NetFuncSetMovement);
+            RegisterNetFunction<ExtraMovementState>(NetFuncSetExtraMovement);
             RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
 
             // Setup entity movement here to make it able to register net elements / functions
@@ -548,16 +548,16 @@ namespace MultiplayerARPG
             ExitVehicle();
         }
 
-        protected void NetFuncSetMovement(byte movementState)
+        protected void NetFuncSetMovement(MovementState movementState)
         {
             // Set data at server and sync to clients later
-            MovementState = (MovementState)movementState;
+            MovementState = movementState;
         }
 
-        protected void NetFuncSetExtraMovement(byte extraMovementState)
+        protected void NetFuncSetExtraMovement(ExtraMovementState extraMovementState)
         {
             // Set data at server and sync to clients later
-            ExtraMovementState = (ExtraMovementState)extraMovementState;
+            ExtraMovementState = extraMovementState;
         }
 
         protected void NetFuncUpdateDirection(DirectionVector2 direction)
@@ -675,7 +675,7 @@ namespace MultiplayerARPG
                 MovementState = movementState;
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)movementState);
+                CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, movementState);
         }
 
         public void SetExtraMovement(ExtraMovementState extraMovementState)
@@ -711,7 +711,7 @@ namespace MultiplayerARPG
                 ExtraMovementState = extraMovementState;
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)extraMovementState);
+                CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, extraMovementState);
         }
 
         public void SetDirection2D(Vector2 direction)
