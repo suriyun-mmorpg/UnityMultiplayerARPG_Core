@@ -937,19 +937,25 @@ namespace MultiplayerARPG
                         Vector3 point;
                         Vector3 normal;
                         float distance;
-                        Transform tempHitTransform;
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
                         {
-                            tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance);
+                            tempGameObject = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance).gameObject;
+
+                            // Skip layers
+                            if (tempGameObject.layer == PhysicLayers.TransparentFX ||
+                                tempGameObject.layer == PhysicLayers.IgnoreRaycast ||
+                                tempGameObject.layer == PhysicLayers.Water)
+                                return;
+
                             // Skip unhittable entities
-                            if (tempHitTransform.GetComponent<IUnHittable>() != null)
+                            if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
 
                             if (distance < minDistance)
                                 minDistance = distance;
 
-                            tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
+                            tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
                             // Hit wall... so break the loop
                             if (tempDamageableEntity == null)
                                 break;

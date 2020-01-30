@@ -113,21 +113,25 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.GetComponent<IUnHittable>() != null)
-                return;
             TriggerEnter(other.gameObject);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.GetComponent<IUnHittable>() != null)
-                return;
             TriggerEnter(other.gameObject);
         }
 
         private void TriggerEnter(GameObject other)
         {
             if (destroying)
+                return;
+
+            if (other.layer == PhysicLayers.TransparentFX ||
+                other.layer == PhysicLayers.IgnoreRaycast ||
+                other.layer == PhysicLayers.Water)
+                return;
+
+            if (other.GetComponent<IUnHittable>() != null)
                 return;
 
             if (attacker != null && attacker.GetGameObject() == other)
@@ -151,11 +155,8 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // Don't hits: TransparentFX, IgnoreRaycast, Water, character, item
-            if (other.layer != PhysicLayers.TransparentFX &&
-                other.layer != PhysicLayers.IgnoreRaycast &&
-                other.layer != PhysicLayers.Water &&
-                other.layer != CurrentGameInstance.characterLayer &&
+            // Hit walls or grounds → Explode
+            if (other.layer != CurrentGameInstance.characterLayer &&
                 other.layer != CurrentGameInstance.itemDropLayer &&
                 !CurrentGameInstance.NonTargetLayersValues.Contains(other.layer))
             {
