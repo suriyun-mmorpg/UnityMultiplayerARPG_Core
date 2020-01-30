@@ -5,6 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    // TODO: Derived from damageable entity
     public class VehicleEntity : BaseGameEntity, IVehicleEntity
     {
         [Header("Vehicle Settings")]
