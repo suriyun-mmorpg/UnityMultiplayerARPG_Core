@@ -107,14 +107,14 @@ public class CharacterSkillUsage : INetSerializableWithElement
     public void Serialize(NetDataWriter writer)
     {
         writer.Put((byte)type);
-        writer.Put(dataId);
+        writer.PutPackedInt(dataId);
         writer.Put(coolDownRemainsDuration);
     }
 
     public void Deserialize(NetDataReader reader)
     {
         type = (SkillUsageType)reader.GetByte();
-        dataId = reader.GetInt();
+        dataId = reader.GetPackedInt();
         coolDownRemainsDuration = reader.GetFloat();
     }
 }

@@ -192,14 +192,14 @@ public class CharacterSkill : INetSerializableWithElement
 
     public void Serialize(NetDataWriter writer)
     {
-        writer.Put(dataId);
-        writer.Put(level);
+        writer.PutPackedInt(dataId);
+        writer.PutPackedShort(level);
     }
 
     public void Deserialize(NetDataReader reader)
     {
-        dataId = reader.GetInt();
-        level = reader.GetShort();
+        dataId = reader.GetPackedInt();
+        level = reader.GetPackedShort();
     }
 }
 

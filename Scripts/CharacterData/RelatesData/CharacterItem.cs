@@ -557,9 +557,9 @@ public class CharacterItem : INetSerializableWithElement
             writer.Put(id);
         }
 
-        writer.Put(dataId);
-        writer.Put(level);
-        writer.Put(amount);
+        writer.PutPackedInt(dataId);
+        writer.PutPackedShort(level);
+        writer.PutPackedShort(amount);
         writer.Put(equipSlotIndex);
 
         if (isOwnerClient)
@@ -573,13 +573,13 @@ public class CharacterItem : INetSerializableWithElement
             if (isOwnerClient)
             {
                 writer.Put(durability);
-                writer.Put(exp);
+                writer.PutPackedInt(exp);
             }
 
             if (GetWeaponItem() != null)
             {
                 // Only weapons have an ammo
-                writer.Put(ammo);
+                writer.PutPackedShort(ammo);
             }
 
             byte socketCount = (byte)Sockets.Count;
@@ -588,7 +588,7 @@ public class CharacterItem : INetSerializableWithElement
             {
                 foreach (int socketDataId in Sockets)
                 {
-                    writer.Put(socketDataId);
+                    writer.PutPackedInt(socketDataId);
                 }
             }
         }
@@ -597,7 +597,7 @@ public class CharacterItem : INetSerializableWithElement
         {
             if (isOwnerClient)
             {
-                writer.Put(exp);
+                writer.PutPackedInt(exp);
             }
         }
     }
@@ -610,9 +610,9 @@ public class CharacterItem : INetSerializableWithElement
             id = reader.GetString();
         }
 
-        dataId = reader.GetInt();
-        level = reader.GetShort();
-        amount = reader.GetShort();
+        dataId = reader.GetPackedInt();
+        level = reader.GetPackedShort();
+        amount = reader.GetPackedShort();
         equipSlotIndex = reader.GetByte();
 
         if (isOwnerClient)
@@ -626,20 +626,20 @@ public class CharacterItem : INetSerializableWithElement
             if (isOwnerClient)
             {
                 durability = reader.GetFloat();
-                exp = reader.GetInt();
+                exp = reader.GetPackedInt();
             }
 
             if (GetWeaponItem() != null)
             {
                 // Only weapons have an ammo
-                ammo = reader.GetShort();
+                ammo = reader.GetPackedShort();
             }
 
             byte socketCount = reader.GetByte();
             Sockets.Clear();
             for (byte i = 0; i < socketCount; ++i)
             {
-                Sockets.Add(reader.GetInt());
+                Sockets.Add(reader.GetPackedInt());
             }
         }
 
@@ -647,7 +647,7 @@ public class CharacterItem : INetSerializableWithElement
         {
             if (isOwnerClient)
             {
-                exp = reader.GetInt();
+                exp = reader.GetPackedInt();
             }
         }
     }

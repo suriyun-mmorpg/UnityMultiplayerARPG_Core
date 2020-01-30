@@ -120,7 +120,7 @@ public class CharacterQuest : INetSerializable
 
     public void Serialize(NetDataWriter writer)
     {
-        writer.Put(dataId);
+        writer.PutPackedInt(dataId);
         writer.Put(isComplete);
         byte killMonsterCount = (byte)KilledMonsters.Count;
         writer.Put(killMonsterCount);
@@ -128,21 +128,21 @@ public class CharacterQuest : INetSerializable
         {
             foreach (KeyValuePair<int, int> killedMonster in KilledMonsters)
             {
-                writer.Put(killedMonster.Key);
-                writer.Put(killedMonster.Value);
+                writer.PutPackedInt(killedMonster.Key);
+                writer.PutPackedInt(killedMonster.Value);
             }
         }
     }
 
     public void Deserialize(NetDataReader reader)
     {
-        dataId = reader.GetInt();
+        dataId = reader.GetPackedInt();
         isComplete = reader.GetBool();
         int killMonsterCount = reader.GetByte();
         KilledMonsters.Clear();
         for (int i = 0; i < killMonsterCount; ++i)
         {
-            KilledMonsters.Add(reader.GetInt(), reader.GetInt());
+            KilledMonsters.Add(reader.GetPackedInt(), reader.GetPackedInt());
         }
     }
 }

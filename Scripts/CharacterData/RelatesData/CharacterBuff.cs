@@ -275,16 +275,16 @@ public class CharacterBuff : INetSerializableWithElement
     public void Serialize(NetDataWriter writer)
     {
         writer.Put((byte)type);
-        writer.Put(dataId);
-        writer.Put(level);
+        writer.PutPackedInt(dataId);
+        writer.PutPackedShort(level);
         writer.Put(buffRemainsDuration);
     }
 
     public void Deserialize(NetDataReader reader)
     {
         type = (BuffType)reader.GetByte();
-        dataId = reader.GetInt();
-        level = reader.GetShort();
+        dataId = reader.GetPackedInt();
+        level = reader.GetPackedShort();
         buffRemainsDuration = reader.GetFloat();
     }
 }

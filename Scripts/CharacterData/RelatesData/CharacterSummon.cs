@@ -181,10 +181,10 @@ public class CharacterSummon : INetSerializableWithElement
                     break;
             }
             writer.PutPackedUInt(objectId);
-            writer.Put(level);
-            writer.Put(exp);
-            writer.Put(currentHp);
-            writer.Put(currentMp);
+            writer.PutPackedShort(level);
+            writer.PutPackedInt(exp);
+            writer.PutPackedInt(currentHp);
+            writer.PutPackedInt(currentMp);
 }
     }
 
@@ -201,10 +201,10 @@ public class CharacterSummon : INetSerializableWithElement
                     break;
             }
             objectId = reader.GetPackedUInt();
-            level = reader.GetShort();
-            exp = reader.GetInt();
-            currentHp = reader.GetInt();
-            currentMp = reader.GetInt();
+            level = reader.GetPackedShort();
+            exp = reader.GetPackedInt();
+            currentHp = reader.GetPackedInt();
+            currentMp = reader.GetPackedInt();
         }
     }
 }

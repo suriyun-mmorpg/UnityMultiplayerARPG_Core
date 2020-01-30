@@ -49,14 +49,14 @@ public class CharacterAttribute : INetSerializableWithElement
 
     public void Serialize(NetDataWriter writer)
     {
-        writer.Put(dataId);
-        writer.Put(amount);
+        writer.PutPackedInt(dataId);
+        writer.PutPackedShort(amount);
     }
 
     public void Deserialize(NetDataReader reader)
     {
-        dataId = reader.GetInt();
-        amount = reader.GetShort();
+        dataId = reader.GetPackedInt();
+        amount = reader.GetPackedShort();
     }
 }
 
