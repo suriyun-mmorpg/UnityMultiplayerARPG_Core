@@ -742,7 +742,7 @@ namespace MultiplayerARPG
                 CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, new DirectionVector2(LocalDirection2D));
         }
 
-        protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
+        protected virtual bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
             if (!IsServer || vehicle == null || PassengingVehicle.objectId > 0 || !vehicle.IsSeatAvailable(seatIndex))
                 return false;
@@ -765,7 +765,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected Vector3 ExitVehicle()
+        protected virtual Vector3 ExitVehicle()
         {
             Vector3 exitPosition = CacheTransform.position;
             if (!IsServer || PassengingVehicleEntity == null)
