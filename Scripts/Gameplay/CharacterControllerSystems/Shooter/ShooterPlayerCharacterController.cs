@@ -6,9 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class ShooterPlayerCharacterController : BasePlayerCharacterController
     {
-        public const int RAYCAST_COLLIDER_SIZE = 32;
-        public const int OVERLAP_COLLIDER_SIZE = 32;
-
         public enum ControllerMode
         {
             Adventure,
@@ -178,8 +175,8 @@ namespace MultiplayerARPG
         NpcEntity targetNpc;
         BuildingEntity targetBuilding;
         VehicleEntity targetVehicle;
-        RaycastHit[] raycasts = new RaycastHit[RAYCAST_COLLIDER_SIZE];
-        Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
+        RaycastHit[] raycasts = new RaycastHit[512];
+        Collider[] overlapColliders = new Collider[512];
         RaycastHit tempHitInfo;
         Vector3 aimPosition;
         // Crosshair

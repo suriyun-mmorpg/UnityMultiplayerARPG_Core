@@ -6,12 +6,10 @@ namespace MultiplayerARPG
 {
     public partial class PlayerCharacterController
     {
-        public const int RAYCAST_COLLIDER_SIZE = 32;
-        public const int OVERLAP_COLLIDER_SIZE = 32;
-        protected RaycastHit[] raycasts = new RaycastHit[RAYCAST_COLLIDER_SIZE];
-        protected Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
-        protected RaycastHit2D[] raycasts2D = new RaycastHit2D[RAYCAST_COLLIDER_SIZE];
-        protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
+        protected RaycastHit[] raycasts = new RaycastHit[512];
+        protected Collider[] overlapColliders = new Collider[512];
+        protected RaycastHit2D[] raycasts2D = new RaycastHit2D[512];
+        protected Collider2D[] overlapColliders2D = new Collider2D[512];
 
         public int FindClickObjects(out Vector3 worldPointFor2D)
         {
