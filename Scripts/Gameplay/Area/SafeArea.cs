@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class SafeArea : MonoBehaviour
+    public class SafeArea : MonoBehaviour, IUnHittable
     {
         private void Awake()
         {

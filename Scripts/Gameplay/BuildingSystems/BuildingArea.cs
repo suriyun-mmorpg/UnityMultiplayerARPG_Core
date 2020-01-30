@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class BuildingArea : MonoBehaviour, IGameEntity
+    public class BuildingArea : MonoBehaviour, IGameEntity, IUnHittable
     {
         public BuildingEntity entity;
         public string buildingType;
