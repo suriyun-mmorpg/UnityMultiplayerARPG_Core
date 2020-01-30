@@ -197,7 +197,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
-        public static readonly Dictionary<int, MountEntity> MountEntities = new Dictionary<int, MountEntity>();
+        public static readonly Dictionary<int, VehicleEntity> MountEntities = new Dictionary<int, VehicleEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
@@ -663,11 +663,11 @@ namespace MultiplayerARPG
             AddCharacters(characters);
         }
 
-        public static void AddMountEntities(IEnumerable<MountEntity> mountEntities)
+        public static void AddMountEntities(IEnumerable<VehicleEntity> mountEntities)
         {
             if (mountEntities == null)
                 return;
-            foreach (MountEntity mountEntity in mountEntities)
+            foreach (VehicleEntity mountEntity in mountEntities)
             {
                 if (mountEntity == null || MountEntities.ContainsKey(mountEntity.Identity.HashAssetId))
                     continue;

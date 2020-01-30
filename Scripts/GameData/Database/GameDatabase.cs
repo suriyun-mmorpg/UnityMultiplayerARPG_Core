@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         public GuildSkill[] guildSkills;
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
-        public MountEntity[] mountEntities;
+        public VehicleEntity[] mountEntities;
         public MapInfo[] mapInfos;
         public Faction[] factions;
         

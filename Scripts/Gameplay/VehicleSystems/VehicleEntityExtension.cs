@@ -14,7 +14,7 @@ namespace MultiplayerARPG
 
         public static bool IsDestroyWhenExit(this IVehicleEntity vehicleEntity, byte seatIndex)
         {
-            return vehicleEntity.IsDriver(seatIndex) && vehicleEntity.IsDestroyWhenDriverExit;
+            return vehicleEntity.IsDriver(seatIndex) && !vehicleEntity.Entity.IsSceneObject;
         }
     }
 }

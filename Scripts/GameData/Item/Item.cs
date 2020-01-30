@@ -121,7 +121,7 @@ namespace MultiplayerARPG
         public EquipmentBonus socketEnhanceEffect;
 
         [Header("Mount Configs")]
-        public MountEntity mountEntity;
+        public VehicleEntity mountEntity;
 
         [Header("Attribute Configs")]
         public AttributeAmount attributeAmount;
@@ -188,7 +188,7 @@ namespace MultiplayerARPG
             // Add pet entity
             GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { petEntity });
             // Add mount entity
-            GameInstance.AddMountEntities(new MountEntity[] { mountEntity });
+            GameInstance.AddMountEntities(new VehicleEntity[] { mountEntity });
             // Add skills
             List<SkillLevel> skillLevels = new List<SkillLevel>();
             if (increaseSkillLevels != null && increaseSkillLevels.Length > 0)

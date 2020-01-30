@@ -332,7 +332,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { summon.monsterEntity });
-            GameInstance.AddMountEntities(new MountEntity[] { mount.mountEntity });
+            GameInstance.AddMountEntities(new VehicleEntity[] { mount.mountEntity });
             GameInstance.AddItems(new Item[] { itemCraft.CraftingItem });
         }
     }

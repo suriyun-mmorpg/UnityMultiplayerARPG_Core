@@ -8,6 +8,6 @@ namespace MultiplayerARPG
     public partial struct SkillMount
     {
         [Tooltip("Leave `Mount Entity` to NULL to not summon mount entity")]
-        public MountEntity mountEntity;
+        public VehicleEntity mountEntity;
     }
 }

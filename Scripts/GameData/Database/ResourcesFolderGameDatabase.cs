@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             MapInfo[] mapInfos = Resources.LoadAll<MapInfo>("");
             Faction[] factions = Resources.LoadAll<Faction>("");
             BaseCharacterEntity[] characterEntities = Resources.LoadAll<BaseCharacterEntity>("");
-            MountEntity[] mountEntities = Resources.LoadAll<MountEntity>("");
+            VehicleEntity[] mountEntities = Resources.LoadAll<VehicleEntity>("");
 
             GameInstance.AddAttributes(attributes);
             GameInstance.AddItems(items);
