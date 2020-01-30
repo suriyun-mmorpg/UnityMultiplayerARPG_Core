@@ -165,7 +165,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (PassengingVehicleEntity != null)
+                if (PassengingVehicleEntity != null &&
+                    !PassengingVehicleEntity.Entity.IsSceneObject &&
+                    !PassengingVehicleEntity.IsDriver(PassengingVehicle.seatIndex))
                     return PassengingVehicleEntity.Entity.Identity.HashAssetId;
                 return 0;
             }
