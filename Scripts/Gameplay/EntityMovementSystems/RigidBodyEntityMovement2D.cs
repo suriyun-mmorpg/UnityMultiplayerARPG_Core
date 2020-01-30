@@ -98,6 +98,8 @@ namespace MultiplayerARPG
                 return;
             // Devide inputs to float value
             tempInputDirection = direction;
+            if (tempInputDirection.sqrMagnitude > 0)
+                currentDestination = null;
         }
 
         public override void StopMove()
@@ -122,6 +124,8 @@ namespace MultiplayerARPG
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
+                    if (tempInputDirection.sqrMagnitude > 0)
+                        currentDestination = null;
                     break;
             }
         }
