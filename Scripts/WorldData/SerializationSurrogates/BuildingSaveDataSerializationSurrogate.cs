@@ -35,6 +35,7 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
             data.isLocked = info.GetBoolean("isLocked");
         }
         catch { }
+        // TODO: Backward compatible, this will be removed in future version
         try
         {
             data.lockPassword = info.GetString("lockPassword");
