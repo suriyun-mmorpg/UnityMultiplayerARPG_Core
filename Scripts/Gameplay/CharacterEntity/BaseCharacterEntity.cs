@@ -16,9 +16,6 @@ namespace MultiplayerARPG
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float MOUNT_DELAY = 1f;
-        public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 16;
-        public const int RAYCAST_SIZE_FOR_ATTACK = 8;
-        public const int OVERLAP_COLLIDER_SIZE_FOR_FIND = 32;
 
         protected struct SyncListRecachingState
         {
@@ -88,13 +85,12 @@ namespace MultiplayerARPG
         #endregion
 
         #region Temp data
-        protected Collider[] overlapColliders_ForAttackFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_ATTACK];
-        protected Collider2D[] overlapColliders2D_ForAttackFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_ATTACK];
-        protected RaycastHit[] raycasts_ForAttackFunctions = new RaycastHit[RAYCAST_SIZE_FOR_ATTACK];
-        protected RaycastHit2D[] raycasts2D_ForAttackFunctions = new RaycastHit2D[RAYCAST_SIZE_FOR_ATTACK];
-        protected Collider[] overlapColliders_ForFindFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_FIND];
-        protected Collider2D[] overlapColliders2D_ForFindFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_FIND];
-        protected GameObject tempGameObject;
+        protected Collider[] overlapColliders_ForAttackFunctions;
+        protected Collider2D[] overlapColliders2D_ForAttackFunctions;
+        protected RaycastHit[] raycasts_ForAttackFunctions;
+        protected RaycastHit2D[] raycasts2D_ForAttackFunctions;
+        protected Collider[] overlapColliders_ForFindFunctions;
+        protected Collider2D[] overlapColliders2D_ForFindFunctions;
         #endregion
 
         public override sealed int MaxHp { get { return this.GetCaches().MaxHp; } }
@@ -141,6 +137,18 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.layer = CurrentGameInstance.characterLayer;
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+            {
+                overlapColliders2D_ForAttackFunctions = new Collider2D[512];
+                raycasts2D_ForAttackFunctions = new RaycastHit2D[512];
+                overlapColliders2D_ForFindFunctions = new Collider2D[512];
+            }
+            else
+            {
+                overlapColliders_ForAttackFunctions = new Collider[512];
+                raycasts_ForAttackFunctions = new RaycastHit[512];
+                overlapColliders_ForFindFunctions = new Collider[512];
+            }
             animActionType = AnimActionType.None;
             isRecaching = true;
         }
@@ -806,6 +814,7 @@ namespace MultiplayerARPG
             debugDamagePosition = damagePosition;
             debugDamageRotation = damageRotation;
 #endif
+            GameObject tempGameObject;
             HashSet<uint> hitObjectIds = new HashSet<uint>();
             switch (damageInfo.damageType)
             {
@@ -1217,7 +1226,8 @@ namespace MultiplayerARPG
             List<T> result = new List<T>();
             int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
             if (tempOverlapSize == 0)
-                return null;
+                return result;
+            GameObject tempGameObject;
             T tempEntity;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
@@ -1242,6 +1252,7 @@ namespace MultiplayerARPG
             int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
             if (tempOverlapSize == 0)
                 return null;
+            GameObject tempGameObject;
             float tempDistance;
             T tempEntity;
             float nearestDistance = float.MaxValue;
