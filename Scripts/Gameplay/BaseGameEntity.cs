@@ -782,8 +782,8 @@ namespace MultiplayerARPG
             // Remove this from vehicle
             PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
 
-            Vector3 vehiclePosition = PassengingVehicleEntity.GetTransform().position;
-            exitPosition = vehiclePosition;
+            Transform vehicleTransform = PassengingVehicleEntity.GetTransform();
+            exitPosition = vehicleTransform != null ? vehicleTransform.position : CacheTransform.position;
             if (PassengingVehicleSeat.exitTransform != null)
                 exitPosition = PassengingVehicleSeat.exitTransform.position;
 
