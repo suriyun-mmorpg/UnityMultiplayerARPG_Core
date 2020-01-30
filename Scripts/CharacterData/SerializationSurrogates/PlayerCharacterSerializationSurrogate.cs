@@ -41,6 +41,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         info.AddValue("currentPosition", data.CurrentPosition);
         info.AddValue("respawnMapName", data.RespawnMapName);
         info.AddValue("respawnPosition", data.RespawnPosition);
+        info.AddValue("mountDataId", data.MountDataId);
         info.AddValue("lastUpdate", data.LastUpdate);
         info.AddListValue("hotkeys", data.Hotkeys);
         info.AddListValue("quests", data.Quests);
@@ -99,6 +100,12 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         data.CurrentPosition = (Vector3)info.GetValue("currentPosition", typeof(Vector3));
         data.RespawnMapName = info.GetString("respawnMapName");
         data.RespawnPosition = (Vector3)info.GetValue("respawnPosition", typeof(Vector3));
+        // TODO: Backward compatible, this will be removed in future version
+        try
+        {
+            data.MountDataId = info.GetInt32("mountDataId");
+        }
+        catch { }
         data.LastUpdate = info.GetInt32("lastUpdate");
         data.Hotkeys = info.GetListValue<CharacterHotkey>("hotkeys");
         data.Quests = info.GetListValue<CharacterQuest>("quests");

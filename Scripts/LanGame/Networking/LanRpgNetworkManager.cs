@@ -205,6 +205,10 @@ namespace MultiplayerARPG
                 playerCharacterEntity.Summons[i] = summon;
             }
 
+            // Summon saved mount entity
+            if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
+                playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
+
             // Force make caches, to calculate current stats to fill empty slots items
             playerCharacterEntity.ForceMakeCaches();
             playerCharacterEntity.FillEmptySlots();
