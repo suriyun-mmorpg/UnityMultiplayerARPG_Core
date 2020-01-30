@@ -197,7 +197,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
-        public static readonly Dictionary<int, VehicleEntity> MountEntities = new Dictionary<int, VehicleEntity>();
+        public static readonly Dictionary<int, VehicleEntity> VehicleEntities = new Dictionary<int, VehicleEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
@@ -663,15 +663,15 @@ namespace MultiplayerARPG
             AddCharacters(characters);
         }
 
-        public static void AddMountEntities(IEnumerable<VehicleEntity> mountEntities)
+        public static void AddVehicleEntities(IEnumerable<VehicleEntity> vehicleEntities)
         {
-            if (mountEntities == null)
+            if (vehicleEntities == null)
                 return;
-            foreach (VehicleEntity mountEntity in mountEntities)
+            foreach (VehicleEntity vehicleEntity in vehicleEntities)
             {
-                if (mountEntity == null || MountEntities.ContainsKey(mountEntity.Identity.HashAssetId))
+                if (vehicleEntity == null || VehicleEntities.ContainsKey(vehicleEntity.Identity.HashAssetId))
                     continue;
-                MountEntities[mountEntity.Identity.HashAssetId] = mountEntity;
+                VehicleEntities[vehicleEntity.Identity.HashAssetId] = vehicleEntity;
             }
         }
 

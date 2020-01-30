@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -14,7 +14,8 @@ namespace MultiplayerARPG
         public GuildSkill[] guildSkills;
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
-        public VehicleEntity[] mountEntities;
+        [FormerlySerializedAs("mountEntities")]
+        public VehicleEntity[] vehicleEntities;
         public MapInfo[] mapInfos;
         public Faction[] factions;
         
@@ -25,7 +26,7 @@ namespace MultiplayerARPG
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
-            GameInstance.AddMountEntities(mountEntities);
+            GameInstance.AddVehicleEntities(vehicleEntities);
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddFactions(factions);
             // Tell game instance that data loaded

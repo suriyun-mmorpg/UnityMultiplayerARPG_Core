@@ -696,7 +696,7 @@ namespace MultiplayerARPG
             {
                 spawnablePrefabs.Add(entry.Identity);
             }
-            foreach (VehicleEntity entry in GameInstance.MountEntities.Values)
+            foreach (VehicleEntity entry in GameInstance.VehicleEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);
             }

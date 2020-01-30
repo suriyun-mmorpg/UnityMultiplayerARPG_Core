@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -188,7 +189,7 @@ namespace MultiplayerARPG
             // Add pet entity
             GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { petEntity });
             // Add mount entity
-            GameInstance.AddMountEntities(new VehicleEntity[] { mountEntity });
+            GameInstance.AddVehicleEntities(new VehicleEntity[] { mountEntity });
             // Add skills
             List<SkillLevel> skillLevels = new List<SkillLevel>();
             if (increaseSkillLevels != null && increaseSkillLevels.Length > 0)
