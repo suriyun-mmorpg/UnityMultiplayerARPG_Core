@@ -30,6 +30,10 @@ namespace MultiplayerARPG
         protected SyncFieldInt guildId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldBool isWarping = new SyncFieldBool();
+        [SerializeField]
+        protected SyncFieldString respawnMapName = new SyncFieldString();
+        [SerializeField]
+        protected SyncFieldVector3 respawnPosition = new SyncFieldVector3();
         [Header("Player Character Sync Lists")]
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -155,8 +159,18 @@ namespace MultiplayerARPG
             get { return CurrentGameManager.GetCurrentPosition(this); }
             set { CurrentGameManager.SetCurrentPosition(this, value); }
         }
-        public string RespawnMapName { get; set; }
-        public Vector3 RespawnPosition { get; set; }
+        public string RespawnMapName { get { return respawnMapName.Value; } set { respawnMapName.Value = value; } }
+        public Vector3 RespawnPosition { get { return respawnPosition.Value; } set { respawnPosition.Value = value; } }
+        public int MountDataId
+        {
+            get
+            {
+                if (PassengingVehicleEntity != null)
+                    return PassengingVehicleEntity.Entity.Identity.HashAssetId;
+                return 0;
+            }
+            set { }
+        }
         public int LastUpdate { get; set; }
 
         public IList<CharacterHotkey> Hotkeys

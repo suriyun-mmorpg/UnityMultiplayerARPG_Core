@@ -19,6 +19,7 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     private Vector3 currentPosition;
     private string respawnMapName;
     private Vector3 respawnPosition;
+    private int mountDataId;
     private int lastUpdate;
     private List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
     private List<CharacterQuest> quests = new List<CharacterQuest>();
@@ -37,6 +38,7 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
     public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
     public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
+    public int MountDataId { get { return mountDataId; } set { mountDataId = value; } }
     public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
 
     public IList<CharacterHotkey> Hotkeys

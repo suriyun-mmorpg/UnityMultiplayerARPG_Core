@@ -55,6 +55,7 @@ public partial interface IPlayerCharacterData : ICharacterData
     /// </summary>
     string RespawnMapName { get; set; }
     Vector3 RespawnPosition { get; set; }
+    int MountDataId { get; set; }
     int LastUpdate { get; set; }
     IList<CharacterHotkey> Hotkeys { get; set; }
     IList<CharacterQuest> Quests { get; set; }
