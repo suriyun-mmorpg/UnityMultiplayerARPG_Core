@@ -32,6 +32,10 @@ namespace MultiplayerARPG
             guildId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isWarping.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            respawnMapName.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            respawnMapName.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            respawnPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             // Sync lists
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
