@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private SyncListPackedUInt syncPassengerIds = new SyncListPackedUInt();
+        private SyncListUInt syncPassengerIds = new SyncListUInt();
 
         private readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
 
