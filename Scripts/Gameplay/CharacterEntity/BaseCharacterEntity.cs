@@ -1238,6 +1238,8 @@ namespace MultiplayerARPG
                 tempEntity = tempGameObject.GetComponent<T>();
                 if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral, findInFov, fov))
                     continue;
+                if (result.Contains(tempEntity))
+                    continue;
                 result.Add(tempEntity);
             }
             return result;
