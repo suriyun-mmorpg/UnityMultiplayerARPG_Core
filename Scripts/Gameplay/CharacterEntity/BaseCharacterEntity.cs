@@ -865,11 +865,10 @@ namespace MultiplayerARPG
                         if (damageTakenTarget != null)
                         {
                             // Pass all receive damage condition, then apply damages
-                            if (IsServer)
-                                damageTakenTarget.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
-
                             if (IsClient)
                                 damageTakenTarget.PlayHitEffects(damageAmounts.Keys, skill);
+                            if (IsServer)
+                                damageTakenTarget.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                         }
                     }
                     else
@@ -905,11 +904,10 @@ namespace MultiplayerARPG
                                 continue;
 
                             // Target receives damages
-                            if (IsServer)
-                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
-
                             if (IsClient)
                                 tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
+                            if (IsServer)
+                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                         }
                     }
                     break;
@@ -972,11 +970,10 @@ namespace MultiplayerARPG
                                 continue;
 
                             // Target receives damages
-                            if (IsServer)
-                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
-
                             if (IsClient)
                                 tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
+                            if (IsServer)
+                                tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
                         } // End of for...loop (raycast result)
                     }
                     // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect

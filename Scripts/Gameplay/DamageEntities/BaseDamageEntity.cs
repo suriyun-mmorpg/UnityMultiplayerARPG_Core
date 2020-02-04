@@ -61,10 +61,10 @@ namespace MultiplayerARPG
         {
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
                 return;
-            if (IsServer)
-                target.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
             if (IsClient)
                 target.PlayHitEffects(damageAmounts.Keys, skill);
+            if (IsServer)
+                target.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
         }
     }
 }
