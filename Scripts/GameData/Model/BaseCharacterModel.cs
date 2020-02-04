@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -69,6 +70,11 @@ namespace MultiplayerARPG
         public MovementState movementState { get; protected set; }
         public ExtraMovementState extraMovementState { get; protected set; }
         public Vector2 direction2D { get; protected set; }
+
+        // Equipped items changes checker
+        protected string dirtyEquipWeapons;
+        protected string dirtyEquipItems;
+        protected readonly StringBuilder tempDirtyEquipItems = new StringBuilder();
 
         // Optimize garbage collector
         protected readonly List<string> tempAddingKeys = new List<string>();
@@ -225,11 +231,26 @@ namespace MultiplayerARPG
             Item leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
 
             // Clear equipped item models
+            tempDirtyEquipItems.Clear();
             tempAddingKeys.Clear();
-            if (rightHandItem != null)
+            if (rightHandItem)
+            {
+                tempDirtyEquipItems.Append("_0:").Append(equipWeapons.rightHand.dataId).Append(":").Append(equipWeapons.rightHand.level);
                 tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-            if (leftHandItem != null)
+            }
+            if (leftHandItem)
+            {
+                tempDirtyEquipItems.Append("_1:").Append(equipWeapons.leftHand.dataId).Append(":").Append(equipWeapons.leftHand.level);
                 tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
+            }
+
+            if (tempDirtyEquipItems.ToString().Equals(dirtyEquipWeapons))
+            {
+                // No data changes, so skip it
+                return;
+            }
+            // Set dirty equip weapons for check changes later
+            dirtyEquipWeapons = tempDirtyEquipItems.ToString();
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheModels.Keys);
@@ -242,11 +263,11 @@ namespace MultiplayerARPG
                     DestroyCacheModel(equipPosition);
             }
 
-            if (rightHandItem != null && rightHandItem.IsWeapon())
+            if (rightHandItem && rightHandItem.IsWeapon())
                 InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandItem.DataId, equipWeapons.rightHand.level, rightHandItem.equipmentModels, out rightHandEquipmentEntity);
-            if (leftHandItem != null && leftHandItem.IsWeapon())
+            if (leftHandItem && leftHandItem.IsWeapon())
                 InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, leftHandItem.subEquipmentModels, out leftHandEquipmentEntity);
-            if (leftHandItem != null && leftHandItem.IsShield())
+            if (leftHandItem && leftHandItem.IsShield())
                 InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, leftHandItem.equipmentModels, out leftHandEquipmentEntity);
         }
 
@@ -255,16 +276,27 @@ namespace MultiplayerARPG
             this.equipItems = equipItems;
             Item armorItem;
             // Clear equipped item models
+            tempDirtyEquipItems.Clear();
             tempAddingKeys.Clear();
             if (equipItems != null)
             {
                 foreach (CharacterItem equipItem in equipItems)
                 {
                     armorItem = equipItem.GetArmorItem();
-                    if (armorItem != null)
-                        tempAddingKeys.Add(armorItem.EquipPosition);
+                    if (!armorItem)
+                        continue;
+                    tempAddingKeys.Add(armorItem.EquipPosition);
+                    tempDirtyEquipItems.Append("_1:").Append(equipItem.dataId).Append(":").Append(equipItem.level);
                 }
             }
+
+            if (tempDirtyEquipItems.ToString().Equals(dirtyEquipItems))
+            {
+                // No data changes, so skip it
+                return;
+            }
+            // Set dirty equip items for check changes later
+            dirtyEquipItems = tempDirtyEquipItems.ToString();
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheModels.Keys);
@@ -283,7 +315,7 @@ namespace MultiplayerARPG
                 foreach (CharacterItem equipItem in equipItems)
                 {
                     armorItem = equipItem.GetArmorItem();
-                    if (armorItem == null)
+                    if (!armorItem)
                         continue;
                     if (tempAddingKeys.Contains(armorItem.EquipPosition))
                         InstantiateEquipModel(armorItem.EquipPosition, armorItem.DataId, equipItem.level, armorItem.equipmentModels, out tempEquipmentEntity);
