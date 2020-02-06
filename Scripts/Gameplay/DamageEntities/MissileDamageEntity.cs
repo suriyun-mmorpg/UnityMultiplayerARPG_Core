@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             this.skill = skill;
             this.lockingTarget = lockingTarget;
             launchTime = Time.unscaledTime;
-            missileDuration = missileDistance / missileSpeed;
+            missileDuration = (missileDistance / missileSpeed) + 0.25f;
         }
 
         private void Update()
@@ -133,10 +133,10 @@ namespace MultiplayerARPG
 
             if (other.GetComponent<IUnHittable>() != null)
                 return;
-
+            
             if (attacker != null && attacker.GetGameObject() == other)
                 return;
-
+            
             IDamageableEntity target = null;
             if (FindTargetEntity(other, out target))
             {
