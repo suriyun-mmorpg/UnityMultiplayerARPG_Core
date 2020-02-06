@@ -879,10 +879,9 @@ namespace MultiplayerARPG
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
-            BuildingEntity prefab;
-            if (GameInstance.BuildingEntities.TryGetValue(saveData.DataId, out prefab))
+            if (GameInstance.BuildingEntities.ContainsKey(saveData.DataId))
             {
-                GameObject spawnObj = Instantiate(prefab.gameObject, saveData.position, saveData.Rotation);
+                GameObject spawnObj = Instantiate(GameInstance.BuildingEntities[saveData.DataId].gameObject, saveData.position, saveData.Rotation);
                 BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;
@@ -900,24 +899,28 @@ namespace MultiplayerARPG
 
         public virtual void DestroyBuildingEntity(string id)
         {
-            BuildingEntity entity;
-            if (buildingEntities.TryGetValue(id, out entity))
+            if (buildingEntities.ContainsKey(id))
             {
-                entity.Destroy();
+                buildingEntities[id].Destroy();
                 buildingEntities.Remove(id);
             }
         }
 
-        public bool TryGetBuildingEntity(string id, out BuildingEntity entity)
+        public bool TryGetBuildingEntity<T>(string id, out T entity) where T : BuildingEntity
         {
-            return buildingEntities.TryGetValue(id, out entity);
+            entity = null;
+            if (buildingEntities.ContainsKey(id))
+            {
+                entity = buildingEntities[id] as T;
+                return entity;
+            }
+            return false;
         }
 
         public void SetMapInfo(string mapId)
         {
-            MapInfo tempMapInfo;
-            if (GameInstance.MapInfos.TryGetValue(mapId, out tempMapInfo))
-                SetMapInfo(tempMapInfo);
+            if (GameInstance.MapInfos.ContainsKey(mapId))
+                SetMapInfo(GameInstance.MapInfos[mapId]);
         }
 
         public void SetMapInfo(MapInfo mapInfo)

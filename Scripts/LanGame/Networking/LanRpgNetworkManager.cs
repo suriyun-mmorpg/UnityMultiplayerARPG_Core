@@ -5,6 +5,7 @@ using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine.Profiling;
+using System;
 
 namespace MultiplayerARPG
 {
@@ -572,6 +573,50 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex] = nonEquipItem;
                 playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
             }
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
+        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
+        {
+            if (addingItem.IsEmptySlot())
+            {
+                if (callback != null)
+                    callback.Invoke(false);
+                return;
+            }
+
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
+            List<CharacterItem> storageItemList = storageItems[storageId];
+            // Prepare storage data
+            Storage storage = GetStorage(storageId);
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Increase item to storage
+            bool increaseResult = storageItemList.IncreaseItems(addingItem);
+            if (callback != null)
+                callback.Invoke(increaseResult);
+            // Update slots
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
+        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        {
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
+            List<CharacterItem> storageItemList = storageItems[storageId];
+            // Prepare storage data
+            Storage storage = GetStorage(storageId);
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Increase item to storage
+            Dictionary<CharacterItem, short> decreaseItems;
+            bool decreaseResult = storageItemList.DecreaseItems(dataId, amount, out decreaseItems);
+            if (callback != null)
+                callback.Invoke(decreaseResult, decreaseItems);
+            // Update slots
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }

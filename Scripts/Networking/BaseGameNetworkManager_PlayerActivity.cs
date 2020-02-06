@@ -811,10 +811,9 @@ namespace MultiplayerARPG
                     storage = CurrentGameInstance.guildStorage;
                     break;
                 case StorageType.Building:
-                    BuildingEntity buildingEntity;
-                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity) &&
-                        buildingEntity is StorageEntity)
-                        storage = (buildingEntity as StorageEntity).storage;
+                    StorageEntity buildingEntity;
+                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
+                        storage = buildingEntity.storage;
                     break;
             }
             return storage;
@@ -834,13 +833,10 @@ namespace MultiplayerARPG
                         return false;
                     break;
                 case StorageType.Building:
-                    BuildingEntity buildingEntity;
-                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
-                    {
-                        if (!(buildingEntity is StorageEntity) ||
-                            !buildingEntity.IsCreator(playerCharacterEntity))
-                            return false;
-                    }
+                    StorageEntity buildingEntity;
+                    if (!TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity) ||
+                        !buildingEntity.IsCreator(playerCharacterEntity))
+                        return false;
                     break;
             }
             return true;
@@ -892,6 +888,23 @@ namespace MultiplayerARPG
         /// <param name="amount">Amount of item</param>
         /// <param name="nonEquipIndex">Index of inventory</param>
         public abstract void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="playerCharacterEntity"></param>
+        /// <param name="storageId"></param>
+        /// <param name="addingItem"></param>
+        public abstract void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, System.Action<bool> callback);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="storageId"></param>
+        /// <param name="dataId"></param>
+        /// <param name="amount"></param>
+        /// <param name="decreaseItems"></param>
+        public abstract void DecreaseStorageItems(StorageId storageId, int dataId, short amount, System.Action<bool, Dictionary<CharacterItem, short>> callback);
 
         /// <summary>
         /// Swap or merge storage item
