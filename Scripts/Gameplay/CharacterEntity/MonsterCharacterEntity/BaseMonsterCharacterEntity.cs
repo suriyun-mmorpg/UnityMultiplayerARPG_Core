@@ -27,7 +27,7 @@ namespace MultiplayerARPG
 
         [Header("Monster Character Sync Fields")]
         [SerializeField]
-        protected SyncFieldPackedUInt summonerObjectId = new SyncFieldPackedUInt();
+        protected SyncFieldUInt summonerObjectId = new SyncFieldUInt();
         [SerializeField]
         protected SyncFieldByte summonType = new SyncFieldByte();
 
@@ -175,7 +175,7 @@ namespace MultiplayerARPG
             InitStats();
         }
 
-        public virtual void SetAttackTarget(BaseCharacterEntity target)
+        public void SetAttackTarget(BaseCharacterEntity target)
         {
             if (target == null || target.IsDead())
                 return;

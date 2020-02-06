@@ -506,9 +506,11 @@ namespace MultiplayerARPG
             // Movement data
             movementState.deliveryMethod = DeliveryMethod.Sequenced;
             movementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            movementState.alwaysSync = true;
             movementState.doNotSyncInitialDataImmediately = true;
             extraMovementState.deliveryMethod = DeliveryMethod.Sequenced;
             extraMovementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            extraMovementState.alwaysSync = true;
             extraMovementState.doNotSyncInitialDataImmediately = true;
             direction2D.deliveryMethod = DeliveryMethod.Sequenced;
             direction2D.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;

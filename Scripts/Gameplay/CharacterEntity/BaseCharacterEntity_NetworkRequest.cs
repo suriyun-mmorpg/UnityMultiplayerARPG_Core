@@ -30,11 +30,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAttack(bool isLeftHand, Vector3 aimPosition)
+        public bool RequestAttack(bool isLeftHand)
         {
             if (!ValidateRequestAttack(isLeftHand))
                 return false;
-            CallNetFunction(NetFuncAttack, FunctionReceivers.Server, isLeftHand, aimPosition);
+            CallNetFunction(NetFuncAttack, FunctionReceivers.Server, isLeftHand);
             return true;
         }
 
@@ -70,6 +70,11 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool RequestUseSkill(short index, bool isLeftHand)
+        {
+            return RequestUseSkill(index, isLeftHand, GetDefaultAttackAimPosition(isLeftHand));
+        }
+
         public bool RequestUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
             if (!ValidateRequestUseSKill(dataId, isLeftHand))
@@ -78,11 +83,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestPlayAttackAnimation(bool isLeftHand, byte animationIndex, Vector3 aimPosition)
+        public bool RequestPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayAttack, FunctionReceivers.All, isLeftHand, animationIndex, aimPosition);
+            CallNetFunction(NetFuncPlayAttack, FunctionReceivers.All, isLeftHand, animationIndex);
             return true;
         }
 

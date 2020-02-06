@@ -27,6 +27,8 @@ namespace MultiplayerARPG
         protected SyncFieldByte equipWeaponSet = new SyncFieldByte();
         [SerializeField]
         protected SyncFieldByte pitch = new SyncFieldByte();
+        [SerializeField]
+        protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
         [Header("Character Sync Lists")]
         [SerializeField]
         protected SyncListEquipWeapons selectableWeaponSets = new SyncListEquipWeapons();
@@ -57,7 +59,7 @@ namespace MultiplayerARPG
         public System.Action<int> onCurrentWaterChange;
         public System.Action<byte> onEquipWeaponSetChange;
         public System.Action<byte> onPitchChange;
-        public System.Action<bool> onIsHiddingChange;
+        public System.Action<uint> onTargetEntityIdChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
@@ -305,6 +307,17 @@ namespace MultiplayerARPG
         {
             if (onPitchChange != null)
                 onPitchChange.Invoke(pitch);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when target entity id changes
+        /// </summary>
+        /// <param name="isInitial"></param>
+        /// <param name="targetEntityId"></param>
+        protected virtual void OnTargetEntityIdChange(bool isInitial, uint targetEntityId)
+        {
+            if (onTargetEntityIdChange != null)
+                onTargetEntityIdChange.Invoke(targetEntityId);
         }
         #endregion
 

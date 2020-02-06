@@ -166,7 +166,7 @@ namespace MultiplayerARPG
                 if (queueSkill == null)
                 {
                     // Attack when no queue skill
-                    CacheEntity.RequestAttack(false, tempTargetEnemy.OpponentAimTransform.position);
+                    CacheEntity.RequestAttack(false);
                 }
             }
             else

@@ -36,6 +36,14 @@ namespace MultiplayerARPG
             respawnMapName.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             respawnPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
             respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            hasAimPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            hasAimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+            aimPosition.deliveryMethod = DeliveryMethod.Sequenced;
+            aimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+            pitch.deliveryMethod = DeliveryMethod.Sequenced;
+            pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+            targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             // Sync lists
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
@@ -61,7 +69,6 @@ namespace MultiplayerARPG
             quests.onOperation += OnQuestsOperation;
             storageItems.onOperation += OnStorageItemsOperation;
             // Register Network functions
-            RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
             RegisterNetFunction<short>(NetFuncUseItem);
             RegisterNetFunction<short, bool, Vector3>(NetFuncUseSkillItem);
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeItem);

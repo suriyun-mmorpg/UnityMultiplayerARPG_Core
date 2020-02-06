@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -124,7 +125,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected IEnumerator UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3 aimPosition)
+        protected async void UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3 aimPosition)
         {
             // Update skill usage states at server only
             if (IsServer)
@@ -189,7 +190,7 @@ namespace MultiplayerARPG
                     }
                 }
                 // Wait until end of cast duration
-                yield return new WaitForSeconds(CastingSkillDuration);
+                await Task.Delay((int)(CastingSkillDuration * 1000f));
             }
 
             // Continue skill activating action or not?
@@ -210,7 +211,7 @@ namespace MultiplayerARPG
                     // Play special effects after trigger duration
                     tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
-                    yield return new WaitForSecondsRealtime(tempTriggerDuration / playSpeedMultiplier);
+                    await Task.Delay((int)(tempTriggerDuration / playSpeedMultiplier * 1000f));
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -237,7 +238,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    yield return new WaitForSecondsRealtime(remainsDuration / playSpeedMultiplier);
+                    await Task.Delay((int)(remainsDuration / playSpeedMultiplier * 1000f));
                 }
             }
 

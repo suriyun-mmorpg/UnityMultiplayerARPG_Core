@@ -432,7 +432,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // No nearby target, so attack immediately
-                    if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, GetDefaultAttackAimPosition()))
+                    if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
                         isLeftHandAttacking = !isLeftHandAttacking;
                 }
             }
@@ -448,7 +448,7 @@ namespace MultiplayerARPG
                     true,
                     PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking));
                 // Not lock target, so not finding target and attack immediately
-                if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, GetDefaultAttackAimPosition()))
+                if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
                     isLeftHandAttacking = !isLeftHandAttacking;
             }
         }
@@ -553,7 +553,7 @@ namespace MultiplayerARPG
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
 
-                if (FindTarget(targetCharacter.gameObject, attackDistance, CurrentGameInstance.characterLayer.Mask))
+                if (IsTargetInAttackDistance(targetCharacter, attackDistance, CurrentGameInstance.characterLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -572,7 +572,7 @@ namespace MultiplayerARPG
                             }
                             return;
                         }
-                        else if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetCharacter.OpponentAimTransform.position))
+                        else if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
                         {
                             // Change attacking hand after attack requested
                             isLeftHandAttacking = !isLeftHandAttacking;
@@ -683,7 +683,7 @@ namespace MultiplayerARPG
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
 
-                if (FindTarget(targetHarvestable.gameObject, attackDistance, CurrentGameInstance.harvestableLayer.Mask))
+                if (IsTargetInAttackDistance(targetHarvestable, attackDistance, CurrentGameInstance.harvestableLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -692,7 +692,7 @@ namespace MultiplayerARPG
                     targetLookDirection.Normalize();
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
                     {
-                        if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetHarvestable.OpponentAimTransform.position))
+                        if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
                             isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
@@ -778,7 +778,7 @@ namespace MultiplayerARPG
                 return;
 
             // Set aim position to use immediately (don't add to queue)
-            Vector3 useSkillAimPosition = aimPosition.HasValue ? aimPosition.Value : GetDefaultAttackAimPosition();
+            Vector3 useSkillAimPosition = aimPosition.HasValue ? aimPosition.Value : PlayerCharacterEntity.GetDefaultAttackAimPosition(isLeftHandAttacking);
             UseSkill(
                 skill,
                 skillLevel,
@@ -883,7 +883,7 @@ namespace MultiplayerARPG
                 if (item.IsSkill())
                 {
                     // Set aim position to use immediately (don't add to queue)
-                    Vector3 useSkillAimPosition = aimPosition.HasValue ? aimPosition.Value : GetDefaultAttackAimPosition();
+                    Vector3 useSkillAimPosition = aimPosition.HasValue ? aimPosition.Value : PlayerCharacterEntity.GetDefaultAttackAimPosition(isLeftHandAttacking);
                     BaseSkill skill = item.skillLevel.skill;
                     short skillLevel = item.skillLevel.level;
                     UseSkill(

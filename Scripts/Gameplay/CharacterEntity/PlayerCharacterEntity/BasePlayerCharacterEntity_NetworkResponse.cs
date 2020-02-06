@@ -20,16 +20,6 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
         public System.Action<StorageType, short, short> onShowStorage;
 
-        protected void NetFuncSetTargetEntity(PackedUInt objectId)
-        {
-            if (objectId == 0)
-                SetTargetEntity(null);
-            BaseGameEntity tempEntity;
-            if (!this.TryGetEntityByObjectId(objectId, out tempEntity))
-                return;
-            SetTargetEntity(tempEntity);
-        }
-
         protected void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (!CanDoActions() ||

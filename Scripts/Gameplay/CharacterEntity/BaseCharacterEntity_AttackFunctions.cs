@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -8,6 +9,40 @@ namespace MultiplayerARPG
     public partial class BaseCharacterEntity
     {
         public event AttackRoutineDelegate onAttackRoutine;
+
+        /// <summary>
+        /// This will be `TRUE` if it's allowing to change aim position instead of using default aim position (character's forward)
+        /// So it should be `TRUE` while player's controller is shooter controller
+        /// </summary>
+        public virtual bool HasAimPosition { get; set; }
+
+        /// <summary>
+        /// This will be used if `HasAimPosition` is `TRUE` to change default aim position to this value
+        /// </summary>
+        public virtual Vector3 AimPosition { get; set; }
+
+        public Vector3 GetDefaultAttackAimPosition(bool isLeftHand)
+        {
+            return GetDefaultAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand).damageType, isLeftHand);
+        }
+
+        public virtual Vector3 GetDefaultAttackAimPosition(DamageType damageType, bool isLeftHand)
+        {
+            // No aim position set, set aim position to forward direction
+            BaseGameEntity targetEntity = GetTargetEntity();
+            if (targetEntity)
+            {
+                if (targetEntity is DamageableEntity)
+                {
+                    return (targetEntity as DamageableEntity).OpponentAimTransform.position;
+                }
+                else
+                {
+                    return targetEntity.CacheTransform.position;
+                }
+            }
+            return GetDamageTransform(damageType, isLeftHand).position + CacheTransform.forward;
+        }
 
         public virtual void GetAttackingData(
             ref bool isLeftHand,
@@ -135,7 +170,7 @@ namespace MultiplayerARPG
             RequestPlayReloadAnimation(isLeftHand);
         }
     
-        protected IEnumerator ReloadRoutine(bool isLeftHand)
+        protected async void ReloadRoutine(bool isLeftHand)
         {
             animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;
             CharacterItem reloadingWeapon = isLeftHand ? EquipWeapons.leftHand : EquipWeapons.rightHand;
@@ -167,7 +202,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < triggerDurations.Length; ++i)
             {
                 // Wait until triggger before reload ammo
-                yield return new WaitForSecondsRealtime(triggerDurations[i]);
+                await Task.Delay((int)(triggerDurations[i] * 1000f));
 
                 // Prepare data
                 EquipWeapons equipWeapons = EquipWeapons;
@@ -181,7 +216,7 @@ namespace MultiplayerARPG
                         equipWeapons.rightHand = reloadingWeapon;
                     EquipWeapons = equipWeapons;
                 }
-                yield return new WaitForSecondsRealtime(totalDuration - triggerDurations[i]);
+                await Task.Delay((int)((totalDuration - triggerDurations[i]) * 1000f));
             }
             animActionType = AnimActionType.None;
             IsAttackingOrUsingSkill = false;
@@ -190,7 +225,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected virtual void NetFuncAttack(bool isLeftHand, Vector3 aimPosition)
+        protected virtual void NetFuncAttack(bool isLeftHand)
         {
             if (!CanAttack())
                 return;
@@ -224,10 +259,10 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex, aimPosition);
+            RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex);
         }
 
-        protected IEnumerator AttackRoutine(bool isLeftHand, byte animationIndex, Vector3 aimPosition)
+        protected async void AttackRoutine(bool isLeftHand, byte animationIndex)
         {
             // Prepare requires data and get weapon data
             int animationDataId;
@@ -251,6 +286,11 @@ namespace MultiplayerARPG
             // Prepare requires data and get damages data
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamageAmounts(ref isLeftHand);
+
+            // Get aim position by character's forward
+            Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);
+            if (HasAimPosition)
+                aimPosition = AimPosition;
 
             // Set doing action state at clients and server
             IsAttackingOrUsingSkill = true;
@@ -277,7 +317,7 @@ namespace MultiplayerARPG
                 // Play special effects after trigger duration
                 tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                 remainsDuration -= tempTriggerDuration;
-                yield return new WaitForSecondsRealtime(tempTriggerDuration / playSpeedMultiplier);
+                await Task.Delay((int)(tempTriggerDuration / playSpeedMultiplier * 1000f));
 
                 // Special effects will plays on clients only
                 if (IsClient)
@@ -324,7 +364,7 @@ namespace MultiplayerARPG
             if (remainsDuration > 0f)
             {
                 // Wait until animation ends to stop actions
-                yield return new WaitForSecondsRealtime(remainsDuration / playSpeedMultiplier);
+                await Task.Delay((int)(remainsDuration / playSpeedMultiplier * 1000f));
             }
 
             // Set doing action state to none at clients and server

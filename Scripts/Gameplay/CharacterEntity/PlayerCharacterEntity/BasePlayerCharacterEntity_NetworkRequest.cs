@@ -5,13 +5,6 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public override void SetTargetEntity(BaseGameEntity entity)
-        {
-            if (IsOwnerClient && !IsServer)
-                CallNetFunction(NetFuncSetTargetEntity, FunctionReceivers.Server, new PackedUInt(entity == null ? 0 : entity.ObjectId));
-            base.SetTargetEntity(entity);
-        }
-
         public bool RequestUseItem(short index)
         {
             if (!CanUseItem())
@@ -61,7 +54,12 @@ namespace MultiplayerARPG
 
             return true;
         }
-        
+
+        public bool RequestUseSkillItem(short index, bool isLeftHand)
+        {
+            return RequestUseSkillItem(index, isLeftHand, GetDefaultAttackAimPosition(isLeftHand));
+        }
+
         public bool RequestUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
         {
             if (!ValidateRequestUseSkillItem(index, isLeftHand))

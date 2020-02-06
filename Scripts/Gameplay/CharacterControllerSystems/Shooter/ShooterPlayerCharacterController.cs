@@ -178,6 +178,7 @@ namespace MultiplayerARPG
         RaycastHit[] raycasts = new RaycastHit[512];
         Collider[] overlapColliders = new Collider[512];
         RaycastHit tempHitInfo;
+        float pitch;
         Vector3 aimPosition;
         // Crosshair
         public Vector2 CurrentCrosshairSize { get; private set; }
@@ -375,13 +376,20 @@ namespace MultiplayerARPG
             cameraForward.Normalize();
             cameraRight.Normalize();
 
+            // Update look target and aim position
             if (ConstructingBuildingEntity != null)
                 UpdateTarget_BuildingMode();
             else
                 UpdateTarget_BattleMode();
 
+            // Update movement and camera pitch
             UpdateMovementInputs();
 
+            // Update aim position
+            PlayerCharacterEntity.HasAimPosition = true;
+            PlayerCharacterEntity.AimPosition = aimPosition;
+
+            // Update input
             if (ConstructingBuildingEntity != null)
                 UpdateInputs_BuildingMode();
             else
@@ -620,7 +628,9 @@ namespace MultiplayerARPG
 
         private void UpdateMovementInputs()
         {
-            float pitch = CacheGameplayCameraControls.CacheCameraTransform.eulerAngles.x;
+            pitch = CacheGameplayCameraControls.CacheCameraTransform.eulerAngles.x;
+
+            // Update charcter pitch
             PlayerCharacterEntity.Pitch = pitch;
 
             // If mobile platforms, don't receive input raw to make it smooth
@@ -795,7 +805,7 @@ namespace MultiplayerARPG
                     }
                     else if (tempPressAttackRight || tempPressAttackLeft)
                     {
-                        Attack(isLeftHandAttacking, aimPosition);
+                        Attack(isLeftHandAttacking);
                         isDoingAction = true;
                     }
                     else if (activateInput.IsHold)
@@ -951,7 +961,7 @@ namespace MultiplayerARPG
                         switch (turningState)
                         {
                             case TurningState.Attack:
-                                Attack(isLeftHandAttacking, aimPosition);
+                                Attack(isLeftHandAttacking);
                                 break;
                             case TurningState.Activate:
                                 Activate();
@@ -1068,9 +1078,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Attack(bool isLeftHand, Vector3 aimPosition)
+        public void Attack(bool isLeftHand)
         {
-            PlayerCharacterEntity.RequestAttack(isLeftHand, aimPosition);
+            PlayerCharacterEntity.RequestAttack(isLeftHand);
         }
 
         public void ActivateWeaponAbility()

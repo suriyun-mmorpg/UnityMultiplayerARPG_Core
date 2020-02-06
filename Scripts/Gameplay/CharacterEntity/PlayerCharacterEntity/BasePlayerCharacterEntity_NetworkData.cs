@@ -29,11 +29,15 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
         [SerializeField]
-        protected SyncFieldBool isWarping = new SyncFieldBool();
-        [SerializeField]
         protected SyncFieldString respawnMapName = new SyncFieldString();
         [SerializeField]
         protected SyncFieldVector3 respawnPosition = new SyncFieldVector3();
+        [SerializeField]
+        protected SyncFieldBool isWarping = new SyncFieldBool();
+        [SerializeField]
+        protected SyncFieldBool hasAimPosition = new SyncFieldBool();
+        [SerializeField]
+        protected SyncFieldVector3 aimPosition = new SyncFieldVector3();
         [Header("Player Character Sync Lists")]
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -148,7 +152,6 @@ namespace MultiplayerARPG
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
         public string GuildName { get { return syncTitleB.Value; } set { syncTitleB.Value = value; } }
-        public bool IsWarping { get { return isWarping.Value; } set { isWarping.Value = value; } }
         public byte GuildRole { get; set; }
         public int SharedGuildExp { get; set; }
         public string UserId { get; set; }
@@ -161,6 +164,9 @@ namespace MultiplayerARPG
         }
         public string RespawnMapName { get { return respawnMapName.Value; } set { respawnMapName.Value = value; } }
         public Vector3 RespawnPosition { get { return respawnPosition.Value; } set { respawnPosition.Value = value; } }
+        public bool IsWarping { get { return isWarping.Value; } set { isWarping.Value = value; } }
+        public override bool HasAimPosition { get { return hasAimPosition.Value; } set { hasAimPosition.Value = value; } }
+        public override Vector3 AimPosition { get { return aimPosition.Value; } set { aimPosition.Value = value; } }
         public int MountDataId
         {
             get

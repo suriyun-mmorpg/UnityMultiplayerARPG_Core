@@ -28,7 +28,9 @@ namespace MultiplayerARPG
             equipWeaponSet.deliveryMethod = DeliveryMethod.ReliableOrdered;
             equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
-            pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+            pitch.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
             selectableWeaponSets.forOwnerOnly = false;
             attributes.forOwnerOnly = false;
@@ -53,6 +55,7 @@ namespace MultiplayerARPG
             currentWater.onChange += OnCurrentWaterChange;
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
             pitch.onChange += OnPitchChange;
+            targetEntityId.onChange += OnTargetEntityIdChange;
             // On list changes events
             selectableWeaponSets.onOperation += OnSelectableWeaponSetsOperation;
             attributes.onOperation += OnAttributesOperation;
@@ -63,9 +66,9 @@ namespace MultiplayerARPG
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summons.onOperation += OnSummonsOperation;
             // Register Network functions
-            RegisterNetFunction<bool, Vector3>(NetFuncAttack);
+            RegisterNetFunction<bool>(NetFuncAttack);
             RegisterNetFunction<int, bool, Vector3>(NetFuncUseSkill);
-            RegisterNetFunction<bool, byte, Vector3>(NetFuncPlayAttack);
+            RegisterNetFunction<bool, byte>(NetFuncPlayAttack);
             RegisterNetFunction<bool, byte, int, short, Vector3>(NetFuncPlayUseSkill);
             RegisterNetFunction<bool>(NetFuncPlayReload);
             RegisterNetFunction(NetFuncSkillCastingInterrupted);
@@ -95,6 +98,8 @@ namespace MultiplayerARPG
             currentFood.onChange -= OnCurrentFoodChange;
             currentWater.onChange -= OnCurrentWaterChange;
             equipWeaponSet.onChange -= OnEquipWeaponSetChange;
+            pitch.onChange -= OnPitchChange;
+            targetEntityId.onChange -= OnTargetEntityIdChange;
             // On list changes events
             selectableWeaponSets.onOperation -= OnSelectableWeaponSetsOperation;
             attributes.onOperation -= OnAttributesOperation;

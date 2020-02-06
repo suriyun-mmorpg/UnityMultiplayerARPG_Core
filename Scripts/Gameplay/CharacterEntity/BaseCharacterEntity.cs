@@ -67,7 +67,6 @@ namespace MultiplayerARPG
 
         #region Protected data
         protected UICharacterEntity uiCharacterEntity;
-        protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
         protected short reloadingAmmoAmount;
@@ -363,6 +362,11 @@ namespace MultiplayerARPG
             Vector3 forwardStagger = forwardRotation * stagger;
             direction = aimPosition + forwardStagger - position;
             rotation = Quaternion.LookRotation(direction);
+        }
+
+        public Transform GetDamageTransform(bool isLeftHand)
+        {
+            return GetDamageTransform(this.GetWeaponDamageInfo(ref isLeftHand).damageType, isLeftHand);
         }
 
         public Transform GetDamageTransform(DamageType damageType, bool isLeftHand)
@@ -696,22 +700,30 @@ namespace MultiplayerARPG
         #endregion
 
         #region Target Entity Getter/Setter
-        public virtual void SetTargetEntity(BaseGameEntity entity)
+        public void SetTargetEntity(BaseGameEntity entity)
         {
-            targetEntity = entity;
+            if (entity == null)
+            {
+                targetEntityId.Value = 0;
+                return;
+            }
+            targetEntityId.Value = entity.ObjectId;
         }
 
-        public virtual BaseGameEntity GetTargetEntity()
+        public BaseGameEntity GetTargetEntity()
         {
-            return targetEntity;
+            BaseGameEntity entity;
+            if (targetEntityId.Value == 0 || !Manager.Assets.TryGetSpawnedObject(targetEntityId.Value, out entity))
+                return null;
+            return entity;
         }
 
         public bool TryGetTargetEntity<T>(out T entity) where T : class
         {
             entity = null;
-            if (targetEntity == null)
+            if (GetTargetEntity() == null)
                 return false;
-            entity = targetEntity as T;
+            entity = GetTargetEntity() as T;
             return entity != null;
         }
         #endregion
@@ -858,6 +870,7 @@ namespace MultiplayerARPG
                             if (hasSelectedTarget && selectedTarget.GetObjectId() == tempDamageableEntity.GetObjectId())
                             {
                                 // This is selected target, so this is character which must receives damages
+                                damageTakenTarget = tempDamageableEntity;
                                 break;
                             }
                         }

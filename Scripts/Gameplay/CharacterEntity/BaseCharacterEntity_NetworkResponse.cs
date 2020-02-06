@@ -10,12 +10,9 @@ namespace MultiplayerARPG
         public System.Action onRespawn;
         public System.Action onLevelUp;
 
-        protected void NetFuncPlayAttack(bool isLeftHand, byte animationIndex, Vector3 aimPosition)
+        protected void NetFuncPlayAttack(bool isLeftHand, byte animationIndex)
         {
-            StartCoroutine(AttackRoutine(
-                isLeftHand,
-                animationIndex,
-                aimPosition));
+            AttackRoutine(isLeftHand, animationIndex);
         }
 
         protected void NetFuncPlayUseSkill(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
@@ -23,12 +20,7 @@ namespace MultiplayerARPG
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
             {
-                StartCoroutine(UseSkillRoutine(
-                    isLeftHand,
-                    animationIndex,
-                    skill,
-                    skillLevel,
-                    aimPosition));
+                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, aimPosition);
             }
             else
             {
@@ -39,7 +31,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncPlayReload(bool isLeftHand)
         {
-            StartCoroutine(ReloadRoutine(isLeftHand));
+            ReloadRoutine(isLeftHand);
         }
 
         /// <summary>

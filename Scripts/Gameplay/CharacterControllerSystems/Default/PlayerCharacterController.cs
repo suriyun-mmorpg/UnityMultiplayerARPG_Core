@@ -46,7 +46,7 @@ namespace MultiplayerARPG
         protected float mouseDownTime;
         protected bool isMouseDragOrHoldOrOverUI;
         protected uint lastNpcObjectId;
-        
+
         public GameObject CacheTargetObject { get; protected set; }
 
         protected Vector3? targetPosition;
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             findingEnemyIndex = -1;
             isLeftHandAttacking = false;
             ConstructingBuildingEntity = null;
-            
+
             if (targetObjectPrefab != null)
             {
                 // Set parent transform to root for the best performance
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
         {
             attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHand);
             attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHand);
-            
+
             if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
             {
                 // If skill is attack skill, set distance and fov by skill
@@ -314,20 +314,23 @@ namespace MultiplayerARPG
 
                 bool canUseSkill = false;
                 if (queueUsingSkill.itemIndex >= 0)
-                    PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition());
+                {
+                    if (queueUsingSkill.aimPosition.HasValue)
+                        PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.Value);
+                    else
+                        PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand);
+                }
                 else
-                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition.HasValue ? queueUsingSkill.aimPosition.Value : GetDefaultAttackAimPosition());
+                {
+                    if (queueUsingSkill.aimPosition.HasValue)
+                        PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.Value);
+                    else
+                        PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.itemIndex, isLeftHand);
+                }
                 ClearQueueUsingSkill();
                 return canUseSkill;
             }
             return false;
-        }
-
-        public Vector3 GetDefaultAttackAimPosition()
-        {
-            // No aim position set, set aim position to forward direction
-            Transform damageTransform = PlayerCharacterEntity.GetDamageTransform(PlayerCharacterEntity.GetAvailableWeapon(ref isLeftHandAttacking).GetWeaponItem().WeaponType.damageInfo.damageType, isLeftHandAttacking);
-            return damageTransform.position + PlayerCharacterEntity.CacheTransform.forward;
         }
     }
 }
