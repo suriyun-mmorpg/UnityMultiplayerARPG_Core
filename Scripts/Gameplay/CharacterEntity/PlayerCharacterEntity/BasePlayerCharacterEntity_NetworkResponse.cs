@@ -260,21 +260,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            List<ItemAmount> returningItems = new List<ItemAmount>(item.dismantleReturnItems);
-            if (nonEquipItem.Sockets.Count > 0)
-            {
-                Item socketItem;
-                for (int i = 0; i < nonEquipItem.Sockets.Count; ++i)
-                {
-                    if (!GameInstance.Items.TryGetValue(nonEquipItem.Sockets[i], out socketItem))
-                        continue;
-                    returningItems.Add(new ItemAmount()
-                    {
-                        item = socketItem,
-                        amount = 1,
-                    });
-                }
-            }
+            List<ItemAmount> returningItems = Item.GetDismantleReturnItems(nonEquipItem);
 
             if (tempNonEquipItems.IncreasingItemsWillOverwhelming(
                 returningItems,

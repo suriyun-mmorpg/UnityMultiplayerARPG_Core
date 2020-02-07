@@ -107,8 +107,7 @@ namespace MultiplayerARPG
         {
             if (canRefineItemByOwnerCharacter)
                 return;
-
-            DeactivateAllButtons();
+            
             if (buttonRefine)
                 buttonRefine.gameObject.SetActive(true);
         }
@@ -117,8 +116,7 @@ namespace MultiplayerARPG
         {
             if (canRefineItemByOwnerCharacter)
                 return;
-
-            DeactivateAllButtons();
+            
             if (buttonRefine)
                 buttonRefine.gameObject.SetActive(false);
         }
@@ -127,8 +125,7 @@ namespace MultiplayerARPG
         {
             if (canDismantleItemByOwnerCharacter)
                 return;
-
-            DeactivateAllButtons();
+            
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(true);
         }
@@ -137,8 +134,7 @@ namespace MultiplayerARPG
         {
             if (canDismantleItemByOwnerCharacter)
                 return;
-
-            DeactivateAllButtons();
+            
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(false);
         }

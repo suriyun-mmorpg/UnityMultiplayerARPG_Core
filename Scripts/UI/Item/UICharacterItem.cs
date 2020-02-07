@@ -128,6 +128,8 @@ namespace MultiplayerARPG
         public UnityEvent onNpcSellItemDialogDisappear;
         public UnityEvent onRefineItemDialogAppear;
         public UnityEvent onRefineItemDialogDisappear;
+        public UnityEvent onDismantleItemDialogAppear;
+        public UnityEvent onDismantleItemDialogDisappear;
         public UnityEvent onEnhanceSocketItemDialogAppear;
         public UnityEvent onEnhanceSocketItemDialogDisappear;
         public UnityEvent onStorageDialogAppear;
@@ -146,6 +148,7 @@ namespace MultiplayerARPG
 
         private bool isSellItemDialogAppeared;
         private bool isRefineItemDialogAppeared;
+        private bool isDismantleItemDialogAppeared;
         private bool isEnhanceSocketItemDialogAppeared;
         private bool isStorageDialogAppeared;
         private bool isDealingStateEntered;
@@ -203,7 +206,8 @@ namespace MultiplayerARPG
                 return;
 
             UpdateShopUIVisibility(false);
-            UpdateRefineUIVisibility(false);
+            UpdateRefineItemUIVisibility(false);
+            UpdateDismantleItemUIVisibility(false);
             UpdateEnhanceSocketUIVisibility(false);
             UpdateStorageUIVisibility(false);
             UpdateDealingState(false);
@@ -759,7 +763,8 @@ namespace MultiplayerARPG
                 }
             }
             UpdateShopUIVisibility(true);
-            UpdateRefineUIVisibility(true);
+            UpdateRefineItemUIVisibility(true);
+            UpdateDismantleItemUIVisibility(true);
             UpdateEnhanceSocketUIVisibility(true);
             UpdateStorageUIVisibility(true);
             UpdateDealingState(true);
@@ -803,7 +808,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateRefineUIVisibility(bool initData)
+        private void UpdateRefineItemUIVisibility(bool initData)
         {
             if (!IsOwningCharacter())
             {
@@ -836,6 +841,43 @@ namespace MultiplayerARPG
                     isRefineItemDialogAppeared = false;
                     if (onRefineItemDialogDisappear != null)
                         onRefineItemDialogDisappear.Invoke();
+                }
+            }
+        }
+
+        private void UpdateDismantleItemUIVisibility(bool initData)
+        {
+            if (!IsOwningCharacter())
+            {
+                if (initData || isDismantleItemDialogAppeared)
+                {
+                    isDismantleItemDialogAppeared = false;
+                    if (onDismantleItemDialogDisappear != null)
+                        onDismantleItemDialogDisappear.Invoke();
+                }
+                return;
+            }
+            // Check visible item dialog
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
+            if (uiGameplay.uiDismantleItem != null &&
+                uiGameplay.uiDismantleItem.IsVisible() &&
+                Data.characterItem.GetEquipmentItem() != null &&
+                InventoryType == InventoryType.NonEquipItems)
+            {
+                if (initData || !isDismantleItemDialogAppeared)
+                {
+                    isDismantleItemDialogAppeared = true;
+                    if (onDismantleItemDialogAppear != null)
+                        onDismantleItemDialogAppear.Invoke();
+                }
+            }
+            else
+            {
+                if (initData || isDismantleItemDialogAppeared)
+                {
+                    isDismantleItemDialogAppeared = false;
+                    if (onDismantleItemDialogDisappear != null)
+                        onDismantleItemDialogDisappear.Invoke();
                 }
             }
         }
@@ -1134,6 +1176,29 @@ namespace MultiplayerARPG
             {
                 uiGameplay.uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
                 uiGameplay.uiRefineItem.Show();
+                if (selectionManager != null)
+                    selectionManager.DeselectSelectedUI();
+            }
+        }
+        #endregion
+
+        #region Set Dismantle Item Functions
+        public void OnClickSetDismantleItem()
+        {
+            // Only items in inventory will be able to dismantle
+            if (InventoryType != InventoryType.NonEquipItems)
+                return;
+
+            // Only owning character can dismantle item
+            if (!IsOwningCharacter())
+                return;
+
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
+            if (uiGameplay.uiDismantleItem != null &&
+                CharacterItem.GetEquipmentItem() != null)
+            {
+                uiGameplay.uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
+                uiGameplay.uiDismantleItem.Show();
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }

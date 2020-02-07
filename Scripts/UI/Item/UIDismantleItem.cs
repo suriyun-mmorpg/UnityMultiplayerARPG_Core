@@ -6,9 +6,62 @@ namespace MultiplayerARPG
 {
     public partial class UIDismantleItem : BaseUICharacterItemByIndex
     {
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Return Gold Amount}")]
+        public UILocaleKeySetting formatKeyReturnGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
+
+        [Header("UI Elements for UI Dismantle Item")]
+        public UIItemAmounts uiReturnItems;
+        public TextWrapper uiTextReturnGold;
+
         public void OnUpdateCharacterItems()
         {
+            if (!IsVisible())
+                return;
 
+            if (uiCharacterItem != null)
+            {
+                if (CharacterItem.IsEmptySlot())
+                {
+                    uiCharacterItem.Hide();
+                }
+                else
+                {
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), base.OwningCharacter, IndexOfData);
+                    uiCharacterItem.Show();
+                }
+            }
+
+            List<ItemAmount> returningItems = Item.GetDismantleReturnItems(CharacterItem);
+            if (uiReturnItems != null)
+            {
+                if (CharacterItem.IsEmptySlot() || returningItems.Count == 0)
+                {
+                    uiReturnItems.Hide();
+                }
+                else
+                {
+                    uiReturnItems.showAsRequirement = true;
+                    uiReturnItems.Show();
+                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems.ToArray(), new Dictionary<Item, short>()); ;
+                }
+            }
+
+            if (uiTextReturnGold != null)
+            {
+                if (CharacterItem.IsEmptySlot())
+                {
+                    uiTextReturnGold.text = string.Format(
+                            LanguageManager.GetText(formatKeyReturnGold),
+                            "0");
+                }
+                else
+                {
+                    uiTextReturnGold.text = string.Format(
+                            LanguageManager.GetText(formatKeyReturnGold),
+                            CharacterItem.GetItem().dismantleReturnGold.ToString("N0"));
+                }
+            }
         }
 
         public override void Show()
@@ -23,11 +76,11 @@ namespace MultiplayerARPG
             Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
         }
 
-        public void OnClickRefine()
+        public void OnClickDismantle()
         {
-            if (IndexOfData < 0)
+            if (InventoryType != InventoryType.NonEquipItems || IndexOfData < 0)
                 return;
-            OwningCharacter.RequestRefineItem(InventoryType, (short)IndexOfData);
+            OwningCharacter.RequestDismantleItem((short)IndexOfData);
         }
     }
 }

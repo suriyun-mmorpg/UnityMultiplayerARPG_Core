@@ -53,27 +53,23 @@ namespace MultiplayerARPG
             if (!IsVisible())
                 return;
 
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-
             if (uiCharacterItem != null)
             {
-                if (CharacterItem == null)
+                if (CharacterItem.IsEmptySlot())
                 {
-                    // Hide if item is null
                     uiCharacterItem.Hide();
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), base.OwningCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }
 
             if (uiRequireItemAmounts != null)
             {
-                if (!CanRefine)
+                if (!CanRefine || RefineLevel.CacheRequireItems.Count == 0)
                 {
-                    // Hide if item is null
                     uiRequireItemAmounts.Hide();
                 }
                 else
@@ -96,8 +92,8 @@ namespace MultiplayerARPG
                 else
                 {
                     int currentAmount = 0;
-                    if (owningCharacter != null)
-                        currentAmount = owningCharacter.Gold;
+                    if (OwningCharacter != null)
+                        currentAmount = OwningCharacter.Gold;
                     uiTextRequireGold.text = string.Format(
                         currentAmount >= RefineLevel.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
@@ -122,6 +118,7 @@ namespace MultiplayerARPG
                         (RefineLevel.SuccessRate * 100).ToString("N2"));
                 }
             }
+
             if (uiTextRefiningLevel != null)
             {
                 if (!CanRefine)
