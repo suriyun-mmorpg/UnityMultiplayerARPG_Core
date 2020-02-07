@@ -50,6 +50,8 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Warp.ToString(), cacheNpcDialog.GetMemberName(a => a.warpCancelDialog));
             // Refine Item
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.RefineItem.ToString(), cacheNpcDialog.GetMemberName(a => a.refineItemCancelDialog));
+            // Dismantle Item
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.DismantleItem.ToString(), cacheNpcDialog.GetMemberName(a => a.dismantleItemCancelDialog));
             // Storage
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.PlayerStorage.ToString(), cacheNpcDialog.GetMemberName(a => a.storageCancelDialog));
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.GuildStorage.ToString(), cacheNpcDialog.GetMemberName(a => a.storageCancelDialog));
