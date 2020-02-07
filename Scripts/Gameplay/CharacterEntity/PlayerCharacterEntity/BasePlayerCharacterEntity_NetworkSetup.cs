@@ -87,6 +87,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<short, Vector3, Quaternion, PackedUInt>(NetFuncBuild);
             RegisterNetFunction<PackedUInt>(NetFuncDestroyBuilding);
             RegisterNetFunction<short, short>(NetFuncSellItem);
+            RegisterNetFunction<short>(NetFuncDismantleItem);
             RegisterNetFunction<InventoryType, short>(NetFuncRefineItem);
             RegisterNetFunction<InventoryType, short, int>(NetFuncEnhanceSocketItem);
             RegisterNetFunction<InventoryType, short>(NetFuncRepairItem);

@@ -195,6 +195,15 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool RequestDismantleItem(short nonEquipIndex)
+        {
+            if (IsDead() ||
+                nonEquipIndex >= NonEquipItems.Count)
+                return false;
+            CallNetFunction(NetFuncDismantleItem, FunctionReceivers.Server, nonEquipIndex);
+            return true;
+        }
+
         public bool RequestRefineItem(InventoryType inventoryType, short index)
         {
             if (IsDead())

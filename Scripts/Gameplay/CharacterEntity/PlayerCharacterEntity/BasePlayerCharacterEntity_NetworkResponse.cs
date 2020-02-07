@@ -237,6 +237,62 @@ namespace MultiplayerARPG
                 CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
         }
 
+        protected void NetFuncDismantleItem(short index)
+        {
+            if (IsDead() ||
+                index >= nonEquipItems.Count)
+                return;
+
+            CharacterItem nonEquipItem = nonEquipItems[index];
+            if (nonEquipItem.IsEmptySlot())
+                return;
+
+            Item item = nonEquipItems[index].GetItem();
+            if (item == null)
+                return;
+
+            // Simulate data before applies
+            List<CharacterItem> tempNonEquipItems = new List<CharacterItem>(nonEquipItems);
+            if (!tempNonEquipItems.DecreaseItemsByIndex(index, tempNonEquipItems[index].amount))
+            {
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
+                return;
+            }
+
+            List<ItemAmount> returningItems = new List<ItemAmount>(item.dismantleReturnItems);
+            if (nonEquipItem.Sockets.Count > 0)
+            {
+                Item socketItem;
+                for (int i = 0; i < nonEquipItem.Sockets.Count; ++i)
+                {
+                    if (!GameInstance.Items.TryGetValue(nonEquipItem.Sockets[i], out socketItem))
+                        continue;
+                    returningItems.Add(new ItemAmount()
+                    {
+                        item = socketItem,
+                        amount = 1,
+                    });
+                }
+            }
+
+            if (tempNonEquipItems.IncreasingItemsWillOverwhelming(
+                returningItems,
+                true,
+                this.GetCaches().Stats.weightLimit,
+                CurrentGameInstance.GameplayRule.GetTotalWeight(this),
+                CurrentGameInstance.IsLimitInventorySlot,
+                CurrentGameInstance.GameplayRule.GetTotalSlot(this)))
+            {
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                return;
+            }
+
+            // Applies simulates data
+            this.DecreaseItemsByIndex(index, nonEquipItem.amount);
+            this.IncreaseItems(returningItems);
+            Gold += item.dismantleReturnGold;
+        }
+
         protected void NetFuncRefineItem(InventoryType inventoryType, short index)
         {
             if (IsDead())

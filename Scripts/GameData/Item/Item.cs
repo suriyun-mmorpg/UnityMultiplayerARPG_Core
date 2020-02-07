@@ -46,6 +46,10 @@ namespace MultiplayerARPG
         [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
         public float lockDuration;
 
+        [Header("Dismantle Configs")]
+        public int dismantleReturnGold;
+        public ItemAmount[] dismantleReturnItems;
+
         [Header("Equipment Configs")]
         public EquipmentRequirement requirement;
         public EquipmentSet equipmentSet;
