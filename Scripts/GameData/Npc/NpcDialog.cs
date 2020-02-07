@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         RefineItem,
         PlayerStorage,
         GuildStorage,
+        DismantleItem,
     }
 
     [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog", order = -4798)]
@@ -86,6 +87,9 @@ namespace MultiplayerARPG
         // Refine Item
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog refineItemCancelDialog;
+        // Refine Item
+        [Output(connectionType = ConnectionType.Override)]
+        public NpcDialog dismantleItemCancelDialog;
         // Storage
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog storageCancelDialog;
@@ -289,10 +293,21 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.RequestShowNpcRefine();
+                            characterEntity.RequestShowNpcRefineItem();
                             return null;
                         case CANCEL_MENU_INDEX:
                             nextDialog = refineItemCancelDialog;
+                            break;
+                    }
+                    break;
+                case NpcDialogType.DismantleItem:
+                    switch (menuIndex)
+                    {
+                        case CONFIRM_MENU_INDEX:
+                            characterEntity.RequestShowNpcDismantleItem();
+                            return null;
+                        case CANCEL_MENU_INDEX:
+                            nextDialog = dismantleItemCancelDialog;
                             break;
                     }
                     break;

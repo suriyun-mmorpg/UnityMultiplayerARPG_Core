@@ -30,15 +30,26 @@ namespace MultiplayerARPG
                 onShowNpcDialog.Invoke(dataId);
         }
 
-        protected void NetFuncShowNpcRefine()
+        protected void NetFuncShowNpcRefineItem()
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
                 onShowNpcDialog.Invoke(0);
 
             // Show refine dialog
-            if (onShowNpcRefine != null)
-                onShowNpcRefine.Invoke();
+            if (onShowNpcRefineItem != null)
+                onShowNpcRefineItem.Invoke();
+        }
+
+        protected void NetFuncShowNpcDismantleItem()
+        {
+            // Hide npc dialog
+            if (onShowNpcDialog != null)
+                onShowNpcDialog.Invoke(0);
+
+            // Show dismantle dialog
+            if (onShowNpcDismantleItem != null)
+                onShowNpcDismantleItem.Invoke();
         }
 
         protected void NetFuncSelectNpcDialogMenu(byte menuIndex)

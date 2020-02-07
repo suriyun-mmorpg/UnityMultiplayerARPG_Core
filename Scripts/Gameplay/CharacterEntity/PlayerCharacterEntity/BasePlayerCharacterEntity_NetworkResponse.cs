@@ -7,7 +7,8 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         public System.Action<int> onShowNpcDialog;
-        public System.Action onShowNpcRefine;
+        public System.Action onShowNpcRefineItem;
+        public System.Action onShowNpcDismantleItem;
         public System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
         public System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
         public System.Action<DealingState> onUpdateDealingState;

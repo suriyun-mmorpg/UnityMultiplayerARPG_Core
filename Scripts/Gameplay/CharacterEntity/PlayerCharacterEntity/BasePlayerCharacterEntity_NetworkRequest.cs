@@ -138,11 +138,19 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestShowNpcRefine()
+        public bool RequestShowNpcRefineItem()
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncShowNpcRefine, ConnectionId);
+            CallNetFunction(NetFuncShowNpcRefineItem, ConnectionId);
+            return true;
+        }
+
+        public bool RequestShowNpcDismantleItem()
+        {
+            if (IsDead())
+                return false;
+            CallNetFunction(NetFuncShowNpcDismantleItem, ConnectionId);
             return true;
         }
 

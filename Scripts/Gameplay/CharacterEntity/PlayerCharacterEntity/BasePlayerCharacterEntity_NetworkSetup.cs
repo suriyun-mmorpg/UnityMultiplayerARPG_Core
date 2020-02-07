@@ -80,7 +80,8 @@ namespace MultiplayerARPG
             RegisterNetFunction<string, HotkeyType, string>(NetFuncAssignHotkey);
             RegisterNetFunction<PackedUInt>(NetFuncNpcActivate);
             RegisterNetFunction<int>(NetFuncShowNpcDialog);
-            RegisterNetFunction(NetFuncShowNpcRefine);
+            RegisterNetFunction(NetFuncShowNpcRefineItem);
+            RegisterNetFunction(NetFuncShowNpcDismantleItem);
             RegisterNetFunction<byte>(NetFuncSelectNpcDialogMenu);
             RegisterNetFunction<short, short>(NetFuncBuyNpcItem);
             RegisterNetFunction(NetFuncEnterWarp);

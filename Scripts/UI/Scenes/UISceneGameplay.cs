@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         [Header("Other UIs")]
         public UINpcDialog uiNpcDialog;
         public UIRefineItem uiRefineItem;
+        public UIDismantleItem uiDismentleItem;
         public UIEnhanceSocketItem uiEnhanceSocketItem;
         public UIConstructBuilding uiConstructBuilding;
         public UICurrentBuilding uiCurrentBuilding;
@@ -260,6 +261,8 @@ namespace MultiplayerARPG
             }
             if (uiRefineItem != null)
                 uiRefineItem.OnUpdateCharacterItems();
+            if (uiDismentleItem != null)
+                uiDismentleItem.OnUpdateCharacterItems();
             if (uiEnhanceSocketItem != null)
                 uiEnhanceSocketItem.OnUpdateCharacterItems();
             if (onUpdateEquipItems != null)
@@ -291,6 +294,8 @@ namespace MultiplayerARPG
             }
             if (uiRefineItem != null)
                 uiRefineItem.OnUpdateCharacterItems();
+            if (uiDismentleItem != null)
+                uiDismentleItem.OnUpdateCharacterItems();
             if (uiEnhanceSocketItem != null)
                 uiEnhanceSocketItem.OnUpdateCharacterItems();
             if (onUpdateNonEquipItems != null)
@@ -541,12 +546,20 @@ namespace MultiplayerARPG
             uiNpcDialog.Show();
         }
 
-        public void OnShowNpcRefine()
+        public void OnShowNpcRefineItem()
         {
             if (uiRefineItem == null)
                 return;
 
             uiRefineItem.Show();
+        }
+
+        public void OnShowNpcDismantleItem()
+        {
+            if (uiDismentleItem == null)
+                return;
+
+            uiDismentleItem.Show();
         }
 
         public void OnShowDealingRequest(BasePlayerCharacterEntity playerCharacter)

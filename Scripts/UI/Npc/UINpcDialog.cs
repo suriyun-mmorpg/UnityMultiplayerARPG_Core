@@ -120,6 +120,22 @@ namespace MultiplayerARPG
             get { return Language.GetText(messageRefineItemCancelTitles, messageRefineItemCancel); }
         }
 
+        [Header("Dismantle Item Confirm Menu Title")]
+        public string messageDismantleItemConfirm = "Dismantle Item";
+        public LanguageData[] messageDismantleItemConfirmTitles;
+        public string MessageDismantleItemConfirm
+        {
+            get { return Language.GetText(messageDismantleItemConfirmTitles, messageDismantleItemConfirm); }
+        }
+
+        [Header("Dismantle Item Cancel Menu Title")]
+        public string messageDismantleItemCancel = "Cancel";
+        public LanguageData[] messageDismantleItemCancelTitles;
+        public string MessageDismantleItemCancel
+        {
+            get { return Language.GetText(messageDismantleItemCancelTitles, messageDismantleItemCancel); }
+        }
+
         [Header("Open Player Storage Confirm Menu Title")]
         public string messagePlayerStorageConfirm = "Open Storage";
         public LanguageData[] messagePlayerStorageConfirmTitles;
@@ -160,6 +176,7 @@ namespace MultiplayerARPG
         public UnityEvent onSwitchToSaveRespawnPointDialog;
         public UnityEvent onSwitchToWarpDialog;
         public UnityEvent onSwitchToRefineItemDialog;
+        public UnityEvent onSwitchToDismantleItemDialog;
         public UnityEvent onSwitchToPlayerStorageDialog;
         public UnityEvent onSwitchToGuildStorageDialog;
 
@@ -215,6 +232,8 @@ namespace MultiplayerARPG
             Item craftingItem = null;
             List<NpcSellItem> sellItems = new List<NpcSellItem>();
             List<UINpcDialogMenuAction> menuActions = new List<UINpcDialogMenuAction>();
+            UINpcDialogMenuAction confirmMenuAction;
+            UINpcDialogMenuAction cancelMenuAction;
             switch (Data.type)
             {
                 case NpcDialogType.Normal:
@@ -287,14 +306,14 @@ namespace MultiplayerARPG
                         craftingItem = Data.itemCraft.CraftingItem;
                         if (craftingItem != null)
                         {
-                            UINpcDialogMenuAction startMenuAction = new UINpcDialogMenuAction();
-                            UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
-                            startMenuAction.title = MessageCraftItemConfirm;
-                            startMenuAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
+                            confirmMenuAction = new UINpcDialogMenuAction();
+                            cancelMenuAction = new UINpcDialogMenuAction();
+                            confirmMenuAction.title = MessageCraftItemConfirm;
+                            confirmMenuAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
                             cancelMenuAction.title = MessageCraftItemCancel;
                             cancelMenuAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
                             uiCraftItem.SetupForNpc(Data.itemCraft);
-                            menuActions.Add(startMenuAction);
+                            menuActions.Add(confirmMenuAction);
                             menuActions.Add(cancelMenuAction);
                         }
                     }
@@ -302,38 +321,50 @@ namespace MultiplayerARPG
                 case NpcDialogType.SaveRespawnPoint:
                     if (onSwitchToSaveRespawnPointDialog != null)
                         onSwitchToSaveRespawnPointDialog.Invoke();
-                    UINpcDialogMenuAction saveRespawnPointConfirmAction = new UINpcDialogMenuAction();
-                    UINpcDialogMenuAction saveRespawnPointCancelAction = new UINpcDialogMenuAction();
-                    saveRespawnPointConfirmAction.title = MessageSaveRespawnPointConfirm;
-                    saveRespawnPointConfirmAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
-                    saveRespawnPointCancelAction.title = MessageSaveRespawnPointCancel;
-                    saveRespawnPointCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
-                    menuActions.Add(saveRespawnPointConfirmAction);
-                    menuActions.Add(saveRespawnPointCancelAction);
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = MessageSaveRespawnPointConfirm;
+                    confirmMenuAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = MessageSaveRespawnPointCancel;
+                    cancelMenuAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
                     break;
                 case NpcDialogType.Warp:
                     if (onSwitchToWarpDialog != null)
                         onSwitchToWarpDialog.Invoke();
-                    UINpcDialogMenuAction warpConfirmAction = new UINpcDialogMenuAction();
-                    UINpcDialogMenuAction warpCancelAction = new UINpcDialogMenuAction();
-                    warpConfirmAction.title = MessageWarpConfirm;
-                    warpConfirmAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
-                    warpCancelAction.title = MessageWarpCancel;
-                    warpCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
-                    menuActions.Add(warpConfirmAction);
-                    menuActions.Add(warpCancelAction);
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = MessageWarpConfirm;
+                    confirmMenuAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = MessageWarpCancel;
+                    cancelMenuAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
                     break;
                 case NpcDialogType.RefineItem:
                     if (onSwitchToRefineItemDialog != null)
                         onSwitchToRefineItemDialog.Invoke();
-                    UINpcDialogMenuAction refineItemConfirmAction = new UINpcDialogMenuAction();
-                    UINpcDialogMenuAction refineItemCancelAction = new UINpcDialogMenuAction();
-                    refineItemConfirmAction.title = MessageRefineItemConfirm;
-                    refineItemConfirmAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
-                    refineItemCancelAction.title = MessageRefineItemCancel;
-                    refineItemCancelAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
-                    menuActions.Add(refineItemConfirmAction);
-                    menuActions.Add(refineItemCancelAction);
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = MessageRefineItemConfirm;
+                    confirmMenuAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = MessageRefineItemCancel;
+                    cancelMenuAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
+                    break;
+                case NpcDialogType.DismantleItem:
+                    if (onSwitchToDismantleItemDialog != null)
+                        onSwitchToDismantleItemDialog.Invoke();
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = MessageDismantleItemConfirm;
+                    confirmMenuAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = MessageDismantleItemCancel;
+                    cancelMenuAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
                     break;
                 case NpcDialogType.PlayerStorage:
                     if (onSwitchToPlayerStorageDialog != null)
