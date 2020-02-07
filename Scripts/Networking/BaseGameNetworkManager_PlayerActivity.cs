@@ -895,7 +895,7 @@ namespace MultiplayerARPG
         /// <param name="playerCharacterEntity"></param>
         /// <param name="storageId"></param>
         /// <param name="addingItem"></param>
-        public abstract void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, System.Action<bool> callback);
+        public abstract void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, System.Action<bool> callback, int minSlotIndex = 0);
 
         /// <summary>
         /// 

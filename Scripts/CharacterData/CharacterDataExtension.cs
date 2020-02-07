@@ -745,10 +745,13 @@ public static partial class CharacterDataExtension
     #endregion
 
     #region Increase Items
-    public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem addingItem)
+    public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem addingItem, int minSlotIndex = 0)
     {
         // If item not valid
         if (addingItem.IsEmptySlot()) return false;
+
+        if (minSlotIndex < 0)
+            minSlotIndex = 0;
 
         Item itemData = addingItem.GetItem();
         short amount = addingItem.amount;
@@ -758,7 +761,7 @@ public static partial class CharacterDataExtension
         Dictionary<int, CharacterItem> changes = new Dictionary<int, CharacterItem>();
         // Loop to all slots to add amount to any slots that item amount not max in stack
         CharacterItem tempNonEquipItem;
-        for (int i = 0; i < itemList.Count; ++i)
+        for (int i = minSlotIndex; i < itemList.Count; ++i)
         {
             tempNonEquipItem = itemList[i];
             if (tempNonEquipItem.IsEmptySlot())
@@ -840,9 +843,9 @@ public static partial class CharacterDataExtension
         return true;
     }
 
-    public static bool IncreaseItems(this ICharacterData data, CharacterItem addingItem)
+    public static bool IncreaseItems(this ICharacterData data, CharacterItem addingItem, int minSlotIndex = 0)
     {
-        if (data.NonEquipItems.IncreaseItems(addingItem))
+        if (data.NonEquipItems.IncreaseItems(addingItem, minSlotIndex))
         {
             data.FillEmptySlots();
             return true;
@@ -850,12 +853,12 @@ public static partial class CharacterDataExtension
         return false;
     }
 
-    public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems)
+    public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, int minSlotIndex = 0)
     {
         foreach (ItemAmount increasingItem in increasingItems)
         {
             if (!increasingItem.item) continue;
-            data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount));
+            data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount), minSlotIndex);
         }
         data.FillEmptySlots();
     }

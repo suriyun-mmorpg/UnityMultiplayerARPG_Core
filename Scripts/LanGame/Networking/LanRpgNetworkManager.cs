@@ -577,7 +577,7 @@ namespace MultiplayerARPG
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
+        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
         {
             if (addingItem.IsEmptySlot())
             {
@@ -594,7 +594,7 @@ namespace MultiplayerARPG
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
-            bool increaseResult = storageItemList.IncreaseItems(addingItem);
+            bool increaseResult = storageItemList.IncreaseItems(addingItem, minSlotIndex);
             if (callback != null)
                 callback.Invoke(increaseResult);
             // Update slots
