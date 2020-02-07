@@ -5,9 +5,12 @@ namespace MultiplayerARPG
 {
     public class ButtonsActivatorForUICharacterItem : MonoBehaviour
     {
+        public bool canRefineItemByOwnerCharacter;
+        public bool canDismantleItemByOwnerCharacter;
         public Button buttonEquip;
         public Button buttonUnEquip;
         public Button buttonRefine;
+        public Button buttonDismantle;
         public Button buttonSocketEnhance;
         public Button buttonSell;
         public Button buttonOffer;
@@ -22,6 +25,10 @@ namespace MultiplayerARPG
             ui.onSetUnEquippedData.AddListener(OnSetUnEquippedData);
             ui.onSetUnEquippableData.AddListener(OnSetUnEquippableData);
             ui.onSetStorageItemData.AddListener(OnSetStorageItemData);
+            ui.onRefineItemDialogAppear.AddListener(OnRefineItemDialogAppear);
+            ui.onRefineItemDialogDisappear.AddListener(OnRefineItemDialogDisappear);
+            ui.onDismantleItemDialogAppear.AddListener(OnDismantleItemDialogAppear);
+            ui.onDismantleItemDialogDisappear.AddListener(OnDismantleItemDialogDisappear);
             ui.onNpcSellItemDialogAppear.AddListener(OnNpcSellItemDialogAppear);
             ui.onNpcSellItemDialogDisappear.AddListener(OnNpcSellItemDialogDisappear);
             ui.onStorageDialogAppear.AddListener(OnStorageDialogAppear);
@@ -34,74 +41,142 @@ namespace MultiplayerARPG
 
         public void DeactivateAllButtons()
         {
-            buttonEquip.gameObject.SetActive(false);
-            buttonUnEquip.gameObject.SetActive(false);
-            buttonRefine.gameObject.SetActive(false);
-            buttonSocketEnhance.gameObject.SetActive(false);
-            buttonSell.gameObject.SetActive(false);
-            buttonOffer.gameObject.SetActive(false);
-            buttonMoveToStorage.gameObject.SetActive(false);
-            buttonMoveFromStorage.gameObject.SetActive(false);
-            buttonDrop.gameObject.SetActive(false);
+            if (buttonEquip)
+                buttonEquip.gameObject.SetActive(false);
+            if (buttonUnEquip)
+                buttonUnEquip.gameObject.SetActive(false);
+            if (buttonRefine)
+                buttonRefine.gameObject.SetActive(false);
+            if (buttonDismantle)
+                buttonDismantle.gameObject.SetActive(false);
+            if (buttonSocketEnhance)
+                buttonSocketEnhance.gameObject.SetActive(false);
+            if (buttonSell)
+                buttonSell.gameObject.SetActive(false);
+            if (buttonOffer)
+                buttonOffer.gameObject.SetActive(false);
+            if (buttonMoveToStorage)
+                buttonMoveToStorage.gameObject.SetActive(false);
+            if (buttonMoveFromStorage)
+                buttonMoveFromStorage.gameObject.SetActive(false);
+            if (buttonDrop)
+                buttonDrop.gameObject.SetActive(false);
         }
 
         public void OnSetEquippedData()
         {
             DeactivateAllButtons();
-            buttonUnEquip.gameObject.SetActive(true);
-            buttonRefine.gameObject.SetActive(true);
-            buttonSocketEnhance.gameObject.SetActive(true);
+            if (buttonUnEquip)
+                buttonUnEquip.gameObject.SetActive(true);
+            if (buttonRefine)
+                buttonRefine.gameObject.SetActive(canRefineItemByOwnerCharacter);
+            if (buttonSocketEnhance)
+                buttonSocketEnhance.gameObject.SetActive(true);
         }
 
         public void OnSetUnEquippedData()
         {
             DeactivateAllButtons();
-            buttonEquip.gameObject.SetActive(true);
-            buttonRefine.gameObject.SetActive(true);
-            buttonSocketEnhance.gameObject.SetActive(true);
-            buttonDrop.gameObject.SetActive(true);
+            if (buttonEquip)
+                buttonEquip.gameObject.SetActive(true);
+            if (buttonRefine)
+                buttonRefine.gameObject.SetActive(canRefineItemByOwnerCharacter);
+            if (buttonDismantle)
+                buttonDismantle.gameObject.SetActive(canDismantleItemByOwnerCharacter);
+            if (buttonSocketEnhance)
+                buttonSocketEnhance.gameObject.SetActive(true);
+            if (buttonDrop)
+                buttonDrop.gameObject.SetActive(true);
         }
 
         public void OnSetUnEquippableData()
         {
             DeactivateAllButtons();
-            buttonDrop.gameObject.SetActive(true);
+            if (buttonDrop)
+                buttonDrop.gameObject.SetActive(true);
         }
 
         public void OnSetStorageItemData()
         {
             DeactivateAllButtons();
-            buttonMoveFromStorage.gameObject.SetActive(true);
+            if (buttonMoveFromStorage)
+                buttonMoveFromStorage.gameObject.SetActive(true);
+        }
+
+        public void OnRefineItemDialogAppear()
+        {
+            if (canRefineItemByOwnerCharacter)
+                return;
+
+            DeactivateAllButtons();
+            if (buttonRefine)
+                buttonRefine.gameObject.SetActive(true);
+        }
+
+        public void OnRefineItemDialogDisappear()
+        {
+            if (canRefineItemByOwnerCharacter)
+                return;
+
+            DeactivateAllButtons();
+            if (buttonRefine)
+                buttonRefine.gameObject.SetActive(false);
+        }
+
+        public void OnDismantleItemDialogAppear()
+        {
+            if (canDismantleItemByOwnerCharacter)
+                return;
+
+            DeactivateAllButtons();
+            if (buttonDismantle)
+                buttonDismantle.gameObject.SetActive(true);
+        }
+
+        public void OnDismantleItemDialogDisappear()
+        {
+            if (canDismantleItemByOwnerCharacter)
+                return;
+
+            DeactivateAllButtons();
+            if (buttonDismantle)
+                buttonDismantle.gameObject.SetActive(false);
         }
 
         public void OnNpcSellItemDialogAppear()
         {
-            buttonSell.gameObject.SetActive(true);
+            if (buttonSell)
+                buttonSell.gameObject.SetActive(true);
         }
 
         public void OnNpcSellItemDialogDisappear()
         {
-            buttonSell.gameObject.SetActive(false);
+            if (buttonSell)
+                buttonSell.gameObject.SetActive(false);
         }
 
         public void OnStorageDialogAppear()
         {
-            buttonMoveToStorage.gameObject.SetActive(true);
+            if (buttonMoveToStorage)
+                buttonMoveToStorage.gameObject.SetActive(true);
         }
 
         public void OnStorageDialogDisappear()
         {
-            buttonMoveToStorage.gameObject.SetActive(false);
+            if (buttonMoveToStorage)
+                buttonMoveToStorage.gameObject.SetActive(false);
         }
 
         public void OnEnterDealingState()
         {
-            buttonOffer.gameObject.SetActive(true);
+            if (buttonOffer)
+                buttonOffer.gameObject.SetActive(true);
         }
 
         public void OnExitDealingState()
         {
-            buttonOffer.gameObject.SetActive(false);
+            if (buttonOffer)
+                buttonOffer.gameObject.SetActive(false);
         }
     }
 }
