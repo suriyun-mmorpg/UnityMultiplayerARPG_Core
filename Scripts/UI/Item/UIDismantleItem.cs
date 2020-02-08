@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiReturnItems.showAsRequirement = true;
+                    uiReturnItems.showAsRequirement = false;
                     uiReturnItems.Show();
                     uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems.ToArray(), new Dictionary<Item, short>()); ;
                 }
