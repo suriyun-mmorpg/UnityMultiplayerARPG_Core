@@ -754,6 +754,7 @@ namespace MultiplayerARPG
                 if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
                     continue;
                 BuildingEntities[buildingEntity.DataId] = buildingEntity;
+                buildingEntity.PrepareRelatesData();
             }
         }
 

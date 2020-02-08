@@ -343,5 +343,10 @@ namespace MultiplayerARPG
         {
             return CreatorId.Equals(playerCharacterEntity.Id);
         }
+
+        public virtual void PrepareRelatesData()
+        {
+
+        }
     }
 }

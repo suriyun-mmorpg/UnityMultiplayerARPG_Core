@@ -41,5 +41,22 @@ namespace MultiplayerARPG
             else
                 itemCraft.CraftItem(playerCharacterEntity);
         }
+
+        public override void PrepareRelatesData()
+        {
+            if (CacheItemCrafts.Count > 0)
+            {
+                List<Item> items = new List<Item>();
+                foreach (ItemCraft itemCraft in CacheItemCrafts.Values)
+                {
+                    items.Add(itemCraft.CraftingItem);
+                    foreach (Item item in itemCraft.CacheCraftRequirements.Keys)
+                    {
+                        items.Add(item);
+                    }
+                }
+                GameInstance.AddItems(items);
+            }
+        }
     }
 }
