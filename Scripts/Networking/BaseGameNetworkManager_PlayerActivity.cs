@@ -922,6 +922,13 @@ namespace MultiplayerARPG
         public abstract bool IsStorageEntityOpen(StorageEntity storageEntity);
 
         /// <summary>
+        /// Get items from storage entity
+        /// </summary>
+        /// <param name="storageEntity"></param>
+        /// <returns></returns>
+        public abstract List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity);
+
+        /// <summary>
         /// Deposit gold
         /// </summary>
         /// <param name="playerCharacterEntity">Character who deposit gold</param>
