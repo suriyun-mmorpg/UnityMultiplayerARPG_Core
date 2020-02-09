@@ -105,12 +105,11 @@ namespace MultiplayerARPG
         #endregion
 
         #region Storage System
-        protected StorageId currentStorageId = StorageId.Empty;
+        /// <summary>
+        /// This value will be used by server only to define character using storage state
+        /// </summary>
+        public StorageId CurrentStorageId { get; protected set; }
         protected SyncListCharacterItem storageItems = new SyncListCharacterItem();
-        public StorageId CurrentStorageId
-        {
-            get { return currentStorageId; }
-        }
 
         public IList<CharacterItem> StorageItems
         {

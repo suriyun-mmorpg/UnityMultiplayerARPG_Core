@@ -128,7 +128,7 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncDeclineGuildInvitation);
             RegisterNetFunction<string>(NetFuncKickFromGuild);
             RegisterNetFunction(NetFuncLeaveGuild);
-            RegisterNetFunction<StorageType, short, short>(NetFuncShowStorage);
+            RegisterNetFunction<StorageType, uint, short, short>(NetFuncShowStorage);
             RegisterNetFunction<short, short, short>(NetFuncMoveItemToStorage);
             RegisterNetFunction<short, short, short>(NetFuncMoveItemFromStorage);
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeStorageItem);
@@ -140,6 +140,8 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncCloseStorage);
             RegisterNetFunction<PackedUInt, string>(NetFuncOpenDoor);
             RegisterNetFunction<PackedUInt>(NetFuncCloseDoor);
+            RegisterNetFunction<PackedUInt>(NetFuncTurnOnCampFire);
+            RegisterNetFunction<PackedUInt>(NetFuncTurnOffCampFire);
             RegisterNetFunction<PackedUInt, int>(NetFuncCraftItemByWorkbench);
             RegisterNetFunction<string>(NetFuncFindCharacters);
             RegisterNetFunction<string>(NetFuncAddFriend);

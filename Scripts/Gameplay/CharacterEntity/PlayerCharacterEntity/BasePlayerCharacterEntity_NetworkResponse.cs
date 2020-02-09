@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
         public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
         public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
-        public System.Action<StorageType, short, short> onShowStorage;
+        public System.Action<StorageType, uint, short, short> onShowStorage;
 
         protected void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
         {
@@ -208,16 +208,15 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity = null;
             if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
                 return;
-            
-            if (buildingEntity != null &&
-                buildingEntity is StorageEntity)
-                OpenStorage(StorageType.Building, buildingEntity.Id);
+
+            if (buildingEntity != null && buildingEntity is StorageEntity)
+                OpenStorage(StorageType.Building, buildingEntity as StorageEntity);
         }
 
-        protected void NetFuncShowStorage(StorageType storageType, short weightLimit, short slotLimit)
+        protected void NetFuncShowStorage(StorageType type, uint objectId, short weightLimit, short slotLimit)
         {
             if (onShowStorage != null)
-                onShowStorage.Invoke(storageType, weightLimit, slotLimit);
+                onShowStorage.Invoke(type, objectId, weightLimit, slotLimit);
         }
 
         protected void NetFuncSellItem(short index, short amount)
@@ -703,7 +702,7 @@ namespace MultiplayerARPG
                 nonEquipIndex >= nonEquipItems.Count)
                 return;
 
-            CurrentGameManager.MoveItemToStorage(this, currentStorageId, nonEquipIndex, amount, storageItemIndex);
+            CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, nonEquipIndex, amount, storageItemIndex);
         }
 
         protected void NetFuncMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
@@ -712,7 +711,7 @@ namespace MultiplayerARPG
                 storageItemIndex >= storageItems.Count)
                 return;
 
-            CurrentGameManager.MoveItemFromStorage(this, currentStorageId, storageItemIndex, amount, nonEquipIndex);
+            CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, nonEquipIndex);
         }
 
         protected void NetFuncSwapOrMergeStorageItem(short fromIndex, short toIndex)
@@ -722,7 +721,7 @@ namespace MultiplayerARPG
                 toIndex >= storageItems.Count)
                 return;
 
-            CurrentGameManager.SwapOrMergeStorageItem(this, currentStorageId, fromIndex, toIndex);
+            CurrentGameManager.SwapOrMergeStorageItem(this, CurrentStorageId, fromIndex, toIndex);
         }
         #endregion
 
@@ -771,13 +770,13 @@ namespace MultiplayerARPG
                 return;
             }
 
-            OpenStorage(StorageType.Building, storageEntity.Id);
+            OpenStorage(StorageType.Building, storageEntity);
         }
 
         protected void NetFuncCloseStorage()
         {
             CurrentGameManager.CloseStorage(this);
-            currentStorageId = StorageId.Empty;
+            CurrentStorageId = StorageId.Empty;
         }
         #endregion
 
@@ -828,6 +827,48 @@ namespace MultiplayerARPG
             }
 
             doorEntity.IsOpen = false;
+        }
+
+        protected void NetFuncTurnOnCampFire(PackedUInt objectId)
+        {
+            if (!CanDoActions())
+                return;
+
+            CampFireEntity campfireEntity = null;
+            if (!this.TryGetEntityByObjectId(objectId, out campfireEntity))
+            {
+                // Can't find the door
+                return;
+            }
+
+            if (Vector3.Distance(CacheTransform.position, campfireEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + campfireEntity.characterForwardDistance)
+            {
+                // Too far from the door
+                return;
+            }
+
+            campfireEntity.TurnOn();
+        }
+
+        protected void NetFuncTurnOffCampFire(PackedUInt objectId)
+        {
+            if (!CanDoActions())
+                return;
+
+            CampFireEntity campfireEntity = null;
+            if (!this.TryGetEntityByObjectId(objectId, out campfireEntity))
+            {
+                // Can't find the door
+                return;
+            }
+
+            if (Vector3.Distance(CacheTransform.position, campfireEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + campfireEntity.characterForwardDistance)
+            {
+                // Too far from the door
+                return;
+            }
+
+            campfireEntity.TurnOff();
         }
 
         protected void NetFuncCraftItemByWorkbench(PackedUInt objectId, int dataId)
@@ -886,7 +927,7 @@ namespace MultiplayerARPG
                 // Can't find the building
                 return;
             }
-            
+
             if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + buildingEntity.characterForwardDistance)
             {
                 // Too far from the building
@@ -1005,21 +1046,39 @@ namespace MultiplayerARPG
             DealingCharacter = null;
         }
 
-        public void OpenStorage(StorageType storageType, string ownerId)
+        public void OpenStorage(StorageType type, BaseGameEntity targetEntity)
         {
-            StorageId storageId = new StorageId(storageType, ownerId);
+            string ownerId = Id;
+            switch (type)
+            {
+                case StorageType.Guild:
+                    if (GuildId <= 0)
+                        return;
+                    ownerId = GuildId.ToString();
+                    break;
+                case StorageType.Building:
+                    if (!(targetEntity is BuildingEntity))
+                        return;
+                    ownerId = (targetEntity as BuildingEntity).Id;
+                    break;
+                case StorageType.None:
+                    return;
+            }
+
+            StorageId storageId = new StorageId(type, ownerId);
             if (!CurrentGameManager.CanAccessStorage(this, storageId))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
+
             Storage storage = CurrentGameManager.GetStorage(storageId);
-            if (!currentStorageId.Equals(storageId))
+            if (!CurrentStorageId.Equals(storageId))
             {
                 CurrentGameManager.CloseStorage(this);
-                currentStorageId = storageId;
+                CurrentStorageId = storageId;
                 CurrentGameManager.OpenStorage(this);
-                CallNetFunction(NetFuncShowStorage, ConnectionId, storageType, storage.weightLimit, storage.slotLimit);
+                CallNetFunction(NetFuncShowStorage, ConnectionId, type, targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
             }
         }
     }

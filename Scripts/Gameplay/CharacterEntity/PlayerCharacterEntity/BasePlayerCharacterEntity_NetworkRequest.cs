@@ -20,7 +20,7 @@ namespace MultiplayerARPG
 
             if (index >= nonEquipItems.Count)
                 return false;
-            
+
             if (nonEquipItems[index].IsLock())
                 return false;
 
@@ -515,6 +515,18 @@ namespace MultiplayerARPG
         public bool RequestCloseDoor(uint objectId)
         {
             CallNetFunction(NetFuncCloseDoor, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
+        }
+
+        public bool RequestTurnOnCampFire(uint objectId)
+        {
+            CallNetFunction(NetFuncTurnOnCampFire, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
+        }
+
+        public bool RequestTurnOffCampFire(uint objectId)
+        {
+            CallNetFunction(NetFuncTurnOffCampFire, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 

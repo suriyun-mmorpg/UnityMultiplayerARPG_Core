@@ -936,7 +936,8 @@ namespace MultiplayerARPG
             bool isAnyStorageVisible =
                 (uiGameplay.uiPlayerStorageItems != null && uiGameplay.uiPlayerStorageItems.IsVisible()) ||
                 (uiGameplay.uiGuildStorageItems != null && uiGameplay.uiGuildStorageItems.IsVisible()) ||
-                (uiGameplay.uiBuildingStorageItems != null && uiGameplay.uiBuildingStorageItems.IsVisible());
+                (uiGameplay.uiBuildingStorageItems != null && uiGameplay.uiBuildingStorageItems.IsVisible() ||
+                (uiGameplay.uiBuildingCampfireItems != null && uiGameplay.uiBuildingCampfireItems.IsVisible()));
             if (isAnyStorageVisible &&
                 InventoryType == InventoryType.NonEquipItems)
             {

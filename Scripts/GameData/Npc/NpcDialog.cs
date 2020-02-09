@@ -315,7 +315,7 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.OpenStorage(StorageType.Player, characterEntity.UserId);
+                            characterEntity.OpenStorage(StorageType.Player, null);
                             return null;
                         case CANCEL_MENU_INDEX:
                             nextDialog = storageCancelDialog;
@@ -326,7 +326,7 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.OpenStorage(StorageType.Guild, characterEntity.GuildId.ToString());
+                            characterEntity.OpenStorage(StorageType.Guild, null);
                             return null;
                         case CANCEL_MENU_INDEX:
                             nextDialog = storageCancelDialog;

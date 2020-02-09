@@ -17,11 +17,25 @@ namespace MultiplayerARPG
         public UnityEvent onTurnOff;
         [SerializeField]
         protected SyncFieldBool isTurnOn = new SyncFieldBool();
+        [SerializeField]
+        protected SyncFieldFloat turnOnElapsed = new SyncFieldFloat();
+
+        public bool IsTurnOn
+        {
+            get { return isTurnOn.Value; }
+            set { isTurnOn.Value = value; }
+        }
+
+        public float TurnOnElapsed
+        {
+            get { return turnOnElapsed.Value; }
+            set { turnOnElapsed.Value = value; }
+        }
 
         private float tempDeltaTime;
-        protected readonly Dictionary<int, float> convertElapsed = new Dictionary<int, float>();
+        protected readonly Dictionary<int, float> convertRemainsDuration = new Dictionary<int, float>();
 
-        protected Dictionary<int, ConvertItem> cacheFuelItems = new Dictionary<int, ConvertItem>();
+        protected Dictionary<int, ConvertItem> cacheFuelItems;
         public Dictionary<int, ConvertItem> CacheFuelItems
         {
             get
@@ -42,7 +56,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected Dictionary<int, ConvertItem> cacheConvertItems = new Dictionary<int, ConvertItem>();
+        protected Dictionary<int, ConvertItem> cacheConvertItems;
         public Dictionary<int, ConvertItem> CacheConvertItems
         {
             get
@@ -67,14 +81,15 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             isTurnOn.onChange += OnIsTurnOnChange;
-            RegisterNetFunction(NetFuncTurnOn);
-            RegisterNetFunction(NetFuncTurnOff);
         }
 
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
             isTurnOn.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isTurnOn.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            turnOnElapsed.deliveryMethod = DeliveryMethod.Sequenced;
+            turnOnElapsed.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
         protected override void EntityOnDestroy()
@@ -107,18 +122,23 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            if (!isTurnOn.Value)
+            if (!IsTurnOn)
             {
-                if (convertElapsed.Count > 0)
-                    convertElapsed.Clear();
+                if (convertRemainsDuration.Count > 0)
+                    convertRemainsDuration.Clear();
                 return;
             }
 
             if (!CanTurnOn())
-                isTurnOn.Value = false;
+            {
+                IsTurnOn = false;
+                TurnOnElapsed = 0f;
+                return;
+            }
 
             // Consume fuel and convert item
             tempDeltaTime = Time.unscaledDeltaTime;
+            TurnOnElapsed += tempDeltaTime;
 
             ConvertItem convertData;
             List<CharacterItem> items = new List<CharacterItem>(CurrentGameManager.GetStorageEntityItems(this));
@@ -128,21 +148,21 @@ namespace MultiplayerARPG
                     continue;
 
                 convertData = CacheConvertItems[item.dataId];
-                if (convertData.item.amount > item.amount)
+                if (item.amount < convertData.item.amount)
                 {
-                    if (convertElapsed.ContainsKey(item.dataId))
-                        convertElapsed.Remove(item.dataId);
+                    if (convertRemainsDuration.ContainsKey(item.dataId))
+                        convertRemainsDuration.Remove(item.dataId);
                     continue;
                 }
 
-                if (!convertElapsed.ContainsKey(item.dataId))
-                    convertElapsed.Add(item.dataId, convertData.convertInterval);
+                if (!convertRemainsDuration.ContainsKey(item.dataId))
+                    convertRemainsDuration.Add(item.dataId, convertData.convertInterval);
 
-                convertElapsed[item.dataId] -= tempDeltaTime;
+                convertRemainsDuration[item.dataId] -= tempDeltaTime;
 
-                if (convertElapsed[item.dataId] <= 0f)
+                if (convertRemainsDuration[item.dataId] <= 0f)
                 {
-                    convertElapsed[item.dataId] = convertData.convertInterval;
+                    convertRemainsDuration[item.dataId] = convertData.convertInterval;
                     ConvertItem(convertData);
                 }
             }
@@ -159,29 +179,27 @@ namespace MultiplayerARPG
                 CharacterItem convertedItem = CharacterItem.Create(tempItemAmount.item.DataId, 1, tempItemAmount.amount);
                 CurrentGameManager.IncreaseStorageItems(storageId, convertedItem, (success) =>
                 {
-                    ItemDropEntity.DropItem(this, convertedItem, new uint[0]);
+                    if (!success)
+                    {
+                        // Cannot add item to storage, so drop to ground
+                        ItemDropEntity.DropItem(this, convertedItem, new uint[0]);
+                    }
                 });
             }
         }
 
-        protected void NetFuncTurnOn()
+        public void TurnOn()
         {
-            isTurnOn.Value = true;
+            if (!CanTurnOn())
+                return;
+            IsTurnOn = true;
+            TurnOnElapsed = 0f;
         }
 
-        protected void NetFuncTurnOff()
+        public void TurnOff()
         {
-            isTurnOn.Value = false;
-        }
-
-        public void RequestTurnOn()
-        {
-            CallNetFunction(NetFuncTurnOn, FunctionReceivers.Server);
-        }
-
-        public void RequestTurnOff()
-        {
-            CallNetFunction(NetFuncTurnOff, FunctionReceivers.Server);
+            IsTurnOn = false;
+            TurnOnElapsed = 0f;
         }
 
         public bool CanTurnOn()
@@ -195,10 +213,12 @@ namespace MultiplayerARPG
             foreach (CharacterItem item in items)
             {
                 if (CacheFuelItems.ContainsKey(item.dataId) &&
-                    CacheFuelItems[item.dataId].item.amount <= item.amount)
+                    item.amount >= CacheFuelItems[item.dataId].item.amount)
+                {
                     return true;
+                }
             }
-            return true;
+            return false;
         }
 
         public override void PrepareRelatesData()

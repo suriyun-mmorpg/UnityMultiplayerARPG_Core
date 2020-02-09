@@ -81,6 +81,7 @@ namespace MultiplayerARPG
         public UIStorageItems uiPlayerStorageItems;
         public UIStorageItems uiGuildStorageItems;
         public UIStorageItems uiBuildingStorageItems;
+        public UICampfireItems uiBuildingCampfireItems;
         public UICraftItems uiBuildingCraftItems;
         public UIBase uiIsWarping;
 
@@ -376,6 +377,8 @@ namespace MultiplayerARPG
                 uiGuildStorageItems.UpdateData();
             if (uiBuildingStorageItems != null)
                 uiBuildingStorageItems.UpdateData();
+            if (uiBuildingCampfireItems != null)
+                uiBuildingCampfireItems.UpdateData();
 
             if (onUpdateStorageItems != null)
                 onUpdateStorageItems.Invoke(BasePlayerCharacterController.OwningCharacter);
@@ -636,7 +639,7 @@ namespace MultiplayerARPG
             uiGuildInvitation.Show();
         }
 
-        public void OnShowStorage(StorageType storageType, short weightLimit, short slotLimit)
+        public void OnShowStorage(StorageType storageType, uint objectId, short weightLimit, short slotLimit)
         {
             // Hide all of storage UIs
             if (uiPlayerStorageItems != null)
@@ -645,28 +648,45 @@ namespace MultiplayerARPG
                 uiGuildStorageItems.Hide();
             if (uiBuildingStorageItems != null)
                 uiBuildingStorageItems.Hide();
+            if (uiBuildingCampfireItems != null)
+                uiBuildingCampfireItems.Hide();
             // Show only selected storage type
             switch (storageType)
             {
                 case StorageType.Player:
                     if (uiPlayerStorageItems != null)
                     {
-                        uiPlayerStorageItems.Show(storageType, weightLimit, slotLimit);
+                        uiPlayerStorageItems.Show(storageType, null, weightLimit, slotLimit);
                         uiPlayerStorageItems.UpdateData();
                     }
                     break;
                 case StorageType.Guild:
                     if (uiGuildStorageItems != null)
                     {
-                        uiGuildStorageItems.Show(storageType, weightLimit, slotLimit);
+                        uiGuildStorageItems.Show(storageType, null, weightLimit, slotLimit);
                         uiGuildStorageItems.UpdateData();
                     }
                     break;
                 case StorageType.Building:
-                    if (uiBuildingStorageItems != null)
+                    BuildingEntity buildingEntity;
+                    if (!BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out buildingEntity))
+                        return;
+
+                    if (buildingEntity is CampFireEntity)
                     {
-                        uiBuildingStorageItems.Show(storageType, weightLimit, slotLimit);
-                        uiBuildingStorageItems.UpdateData();
+                        if (uiBuildingCampfireItems != null)
+                        {
+                            uiBuildingCampfireItems.Show(storageType, buildingEntity, weightLimit, slotLimit);
+                            uiBuildingCampfireItems.UpdateData();
+                        }
+                    }
+                    else if (buildingEntity is StorageEntity)
+                    {
+                        if (uiBuildingStorageItems != null)
+                        {
+                            uiBuildingStorageItems.Show(storageType, buildingEntity, weightLimit, slotLimit);
+                            uiBuildingStorageItems.UpdateData();
+                        }
                     }
                     break;
             }

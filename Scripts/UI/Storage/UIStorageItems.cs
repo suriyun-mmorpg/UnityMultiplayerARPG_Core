@@ -49,6 +49,7 @@ namespace MultiplayerARPG
         }
 
         public StorageType storageType { get; private set; }
+        public BaseGameEntity targetEntity { get; private set; }
         public short weightLimit { get; private set; }
         public short slotLimit { get; private set; }
         public float totalWeight { get; private set; }
@@ -63,9 +64,10 @@ namespace MultiplayerARPG
             base.Show();
         }
 
-        public void Show(StorageType storageType, short weightLimit, short slotLimit)
+        public void Show(StorageType storageType, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
         {
             this.storageType = storageType;
+            this.targetEntity = targetEntity;
             this.weightLimit = weightLimit;
             this.slotLimit = slotLimit;
             Show();
@@ -78,6 +80,7 @@ namespace MultiplayerARPG
                 BasePlayerCharacterController.OwningCharacter.RequestCloseStorage();
             // Clear data
             storageType = StorageType.None;
+            targetEntity = null;
             weightLimit = 0;
             slotLimit = 0;
             // Hide
@@ -106,7 +109,7 @@ namespace MultiplayerARPG
                 uiItemDialog.Hide();
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (uiTextWeightLimit != null)
             {
