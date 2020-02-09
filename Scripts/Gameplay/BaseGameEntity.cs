@@ -568,14 +568,34 @@ namespace MultiplayerARPG
 
         protected void NetFuncSetMovement(MovementState movementState)
         {
-            // Set data at server and sync to clients later
-            MovementState = movementState;
+            switch (MovementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    SetMovement(movementState);
+                    break;
+                default:
+                    // This net function called by owning client while movement secure is not secure
+                    // So just set movement state at server to sync this state to every clients
+                    // following owner clinet's state
+                    MovementState = movementState;
+                    break;
+            }
         }
 
         protected void NetFuncSetExtraMovement(ExtraMovementState extraMovementState)
         {
-            // Set data at server and sync to clients later
-            ExtraMovementState = extraMovementState;
+            switch (MovementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    SetExtraMovement(extraMovementState);
+                    break;
+                default:
+                    // This net function called by owning client while movement secure is not secure
+                    // So just set extra movement state at server to sync this state to every clients
+                    // following owner clinet's state
+                    ExtraMovementState = extraMovementState;
+                    break;
+            }
         }
 
         protected void NetFuncUpdateDirection(DirectionVector2 direction)
@@ -692,6 +712,9 @@ namespace MultiplayerARPG
             if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
                 MovementState = movementState;
 
+            if (MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient)
+                CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, movementState);
+
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, movementState);
         }
@@ -727,6 +750,9 @@ namespace MultiplayerARPG
 
             if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
                 ExtraMovementState = extraMovementState;
+
+            if (MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient)
+                CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, extraMovementState);
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, extraMovementState);
