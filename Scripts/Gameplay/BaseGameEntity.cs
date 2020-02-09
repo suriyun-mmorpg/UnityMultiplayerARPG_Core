@@ -709,11 +709,13 @@ namespace MultiplayerARPG
             // Set local movement state which will be used by owner client
             LocalMovementState = movementState;
 
-            if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
-                MovementState = movementState;
-
-            if (MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient)
-                CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, movementState);
+            if (MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                if (IsServer)
+                    MovementState = movementState;
+                else if (IsOwnerClient)
+                    CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, movementState);
+            }
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CallNetFunction(NetFuncSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, movementState);
@@ -748,11 +750,13 @@ namespace MultiplayerARPG
 
             LocalExtraMovementState = extraMovementState;
 
-            if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
-                ExtraMovementState = extraMovementState;
-
-            if (MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient)
-                CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, extraMovementState);
+            if (MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                if (IsServer)
+                    ExtraMovementState = extraMovementState;
+                else if (IsOwnerClient)
+                    CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, extraMovementState);
+            }
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 CallNetFunction(NetFuncSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, extraMovementState);
