@@ -79,6 +79,7 @@ namespace MultiplayerARPG
                 gameMessageType = GameMessage.Type.NotEnoughSocketEnchaner;
                 return;
             }
+            character.FillEmptySlots();
             enhancingItem.Sockets.Add(enhancerId);
             onEnhanceSocket.Invoke(enhancingItem);
         }
