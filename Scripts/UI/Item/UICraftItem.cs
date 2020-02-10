@@ -20,24 +20,12 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRequireGold;
 
         public CrafterType CrafterType { get; private set; }
-        public uint BuildingObjectId { get; private set; }
+        public BaseGameEntity TargetEntity { get; private set; }
 
-        public void SetupForCharacter(ItemCraft data)
+        public void Setup(CrafterType crafterType, BaseGameEntity targetEntity, ItemCraft data)
         {
-            CrafterType = CrafterType.Character;
-            Data = data;
-        }
-
-        public void SetupForNpc(ItemCraft data)
-        {
-            CrafterType = CrafterType.Npc;
-            Data = data;
-        }
-
-        public void SetupForWorkbench(uint objectId, ItemCraft data)
-        {
-            CrafterType = CrafterType.Workbench;
-            BuildingObjectId = objectId;
+            CrafterType = crafterType;
+            TargetEntity = targetEntity;
             Data = data;
         }
 
@@ -106,7 +94,7 @@ namespace MultiplayerARPG
             if (OwningCharacter != null && CraftingItem != null)
             {
                 if (CrafterType == CrafterType.Workbench)
-                    OwningCharacter.RequestCraftItemByWorkbench(BuildingObjectId, CraftingItem.DataId);
+                    OwningCharacter.RequestCraftItemByWorkbench(TargetEntity.ObjectId, CraftingItem.DataId);
             }
         }
     }

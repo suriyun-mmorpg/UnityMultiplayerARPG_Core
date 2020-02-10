@@ -6,9 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class UICraftItems : UIBase
     {
-        public CrafterType CrafterType { get; private set; }
-        public uint BuildingObjectId { get; private set; }
-
         public UICraftItem uiCraftItemDialog;
         public UICraftItem uiCraftItemPrefab;
         public Transform uiCraftItemContainer;
@@ -42,6 +39,9 @@ namespace MultiplayerARPG
             }
         }
 
+        public CrafterType CrafterType { get; private set; }
+        public BaseGameEntity TargetEntity { get; private set; }
+
         public override void Show()
         {
             CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCraftItem);
@@ -51,6 +51,33 @@ namespace MultiplayerARPG
             if (uiCraftItemDialog != null)
                 uiCraftItemDialog.onHide.AddListener(OnItemDialogHide);
             base.Show();
+        }
+
+        public void Show(CrafterType crafterType, BaseGameEntity targetEntity)
+        {
+            CrafterType = crafterType;
+            TargetEntity = targetEntity;
+            switch (crafterType)
+            {
+                case CrafterType.Character:
+                    BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                    List<ItemCraft> itemCrafts = new List<ItemCraft>();
+                    foreach (CharacterSkill characterSkill in owningCharacter.Skills)
+                    {
+                        if (characterSkill == null ||
+                            characterSkill.GetSkill() == null ||
+                            characterSkill.GetSkill().GetSkillType() != SkillType.CraftItem)
+                            continue;
+                        itemCrafts.Add(characterSkill.GetSkill().GetItemCraft());
+                    }
+                    UpdateData(itemCrafts);
+                    break;
+                case CrafterType.Workbench:
+                    if (targetEntity is WorkbenchEntity)
+                        UpdateData((targetEntity as WorkbenchEntity).itemCrafts);
+                    break;
+            }
+            Show();
         }
 
         public override void Hide()
@@ -71,18 +98,7 @@ namespace MultiplayerARPG
             if (uiCraftItemDialog != null)
             {
                 uiCraftItemDialog.selectionManager = CacheItemSelectionManager;
-                switch (CrafterType)
-                {
-                    case CrafterType.Character:
-                        uiCraftItemDialog.SetupForCharacter(ui.Data);
-                        break;
-                    case CrafterType.Npc:
-                        uiCraftItemDialog.SetupForNpc(ui.Data);
-                        break;
-                    case CrafterType.Workbench:
-                        uiCraftItemDialog.SetupForWorkbench(BuildingObjectId, ui.Data);
-                        break;
-                }
+                uiCraftItemDialog.Setup(CrafterType, TargetEntity, ui.Data);
                 uiCraftItemDialog.Show();
             }
         }
@@ -97,29 +113,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public void UpdateDataForCharacter()
-        {
-            CrafterType = CrafterType.Character;
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            List<ItemCraft> itemCrafts = new List<ItemCraft>();
-            foreach (CharacterSkill characterSkill in owningCharacter.Skills)
-            {
-                if (characterSkill == null ||
-                    characterSkill.GetSkill() == null ||
-                    characterSkill.GetSkill().GetSkillType() != SkillType.CraftItem)
-                    continue;
-                itemCrafts.Add(characterSkill.GetSkill().GetItemCraft());
-            }
-            UpdateData(itemCrafts);
-        }
-
-        public void UpdateDataForWorkbench(WorkbenchEntity workbenchEntity)
-        {
-            CrafterType = CrafterType.Workbench;
-            BuildingObjectId = workbenchEntity.ObjectId;
-            UpdateData(workbenchEntity.itemCrafts);
-        }
-
         protected void UpdateData(IList<ItemCraft> itemCrafts)
         {
             int selectedIdx = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.IndexOf(CacheItemSelectionManager.SelectedUI) : -1;
@@ -130,18 +123,7 @@ namespace MultiplayerARPG
             CacheItemList.Generate(itemCrafts, (index, craftItem, ui) =>
             {
                 tempUiCraftItem = ui.GetComponent<UICraftItem>();
-                switch (CrafterType)
-                {
-                    case CrafterType.Character:
-                        tempUiCraftItem.SetupForCharacter(craftItem);
-                        break;
-                    case CrafterType.Npc:
-                        tempUiCraftItem.SetupForNpc(craftItem);
-                        break;
-                    case CrafterType.Workbench:
-                        tempUiCraftItem.SetupForWorkbench(BuildingObjectId, craftItem);
-                        break;
-                }
+                tempUiCraftItem.Setup(CrafterType, TargetEntity, craftItem);
                 tempUiCraftItem.Show();
                 CacheItemSelectionManager.Add(tempUiCraftItem);
                 if (selectedIdx == index)

@@ -312,7 +312,7 @@ namespace MultiplayerARPG
                             confirmMenuAction.menuIndex = NpcDialog.CONFIRM_MENU_INDEX;
                             cancelMenuAction.title = MessageCraftItemCancel;
                             cancelMenuAction.menuIndex = NpcDialog.CANCEL_MENU_INDEX;
-                            uiCraftItem.SetupForNpc(Data.itemCraft);
+                            uiCraftItem.Setup(CrafterType.Npc, null, Data.itemCraft);
                             menuActions.Add(confirmMenuAction);
                             menuActions.Add(cancelMenuAction);
                         }
