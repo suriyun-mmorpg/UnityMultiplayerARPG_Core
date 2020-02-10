@@ -113,7 +113,8 @@ namespace MultiplayerARPG
             CacheQuestList.Generate(character.Quests, (index, characterQuest, ui) =>
             {
                 tempUiCharacterQuest = ui.GetComponent<UICharacterQuest>();
-                if (!HideCompleteQuest || !characterQuest.isComplete)
+                if (GameInstance.Quests.ContainsKey(characterQuest.dataId) && 
+                    (!HideCompleteQuest || !characterQuest.isComplete))
                 {
                     tempUiCharacterQuest.Setup(characterQuest, character, index);
                     tempUiCharacterQuest.Show();
