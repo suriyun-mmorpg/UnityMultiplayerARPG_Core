@@ -99,7 +99,10 @@ namespace MultiplayerARPG
                     if (attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
                         droppingToGround = true;
                     if (!droppingToGround)
+                    {
                         attackerCharacter.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
+                        attackerCharacter.FillEmptySlots();
+                    }
                     attackerCharacter.RewardExp(new Reward() { exp = totalDamage * harvestable.expPerDamage }, 1, RewardGivenType.Harvestable);
                 }
                 else
