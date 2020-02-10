@@ -80,6 +80,7 @@ namespace MultiplayerARPG
                     if (craftRequirement.item != null && craftRequirement.amount > 0)
                         character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
                 }
+                character.FillEmptySlots();
                 // Decrease required gold
                 GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenCraftItem(character, this);
             }
