@@ -16,8 +16,8 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
-            if (targetEntity)
-                campFireEntity = targetEntity as CampFireEntity;
+            if (TargetEntity)
+                campFireEntity = TargetEntity as CampFireEntity;
         }
 
         protected override void Update()
@@ -48,12 +48,12 @@ namespace MultiplayerARPG
 
         public void OnClickTurnOn()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestTurnOnCampFire(targetEntity.ObjectId);
+            BasePlayerCharacterController.OwningCharacter.RequestTurnOnCampFire(TargetEntity.ObjectId);
         }
 
         public void OnClickTurnOff()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestTurnOffCampFire(targetEntity.ObjectId);
+            BasePlayerCharacterController.OwningCharacter.RequestTurnOffCampFire(TargetEntity.ObjectId);
         }
     }
 }

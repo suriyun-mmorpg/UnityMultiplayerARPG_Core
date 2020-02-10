@@ -48,12 +48,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public StorageType storageType { get; private set; }
-        public BaseGameEntity targetEntity { get; private set; }
-        public short weightLimit { get; private set; }
-        public short slotLimit { get; private set; }
-        public float totalWeight { get; private set; }
-        public short usedSlots { get; private set; }
+        public StorageType StorageType { get; private set; }
+        public BaseGameEntity TargetEntity { get; private set; }
+        public short WeightLimit { get; private set; }
+        public short SlotLimit { get; private set; }
+        public float TotalWeight { get; private set; }
+        public short UsedSlots { get; private set; }
 
         public override void Show()
         {
@@ -66,23 +66,23 @@ namespace MultiplayerARPG
 
         public void Show(StorageType storageType, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
         {
-            this.storageType = storageType;
-            this.targetEntity = targetEntity;
-            this.weightLimit = weightLimit;
-            this.slotLimit = slotLimit;
+            StorageType = storageType;
+            TargetEntity = targetEntity;
+            WeightLimit = weightLimit;
+            SlotLimit = slotLimit;
             Show();
         }
 
         public override void Hide()
         {
             // Close storage
-            if (storageType != StorageType.None)
+            if (StorageType != StorageType.None)
                 BasePlayerCharacterController.OwningCharacter.RequestCloseStorage();
             // Clear data
-            storageType = StorageType.None;
-            targetEntity = null;
-            weightLimit = 0;
-            slotLimit = 0;
+            StorageType = StorageType.None;
+            TargetEntity = null;
+            WeightLimit = 0;
+            SlotLimit = 0;
             // Hide
             CacheCharacterItemSelectionManager.DeselectSelectedUI();
             base.Hide();
@@ -113,31 +113,31 @@ namespace MultiplayerARPG
         {
             if (uiTextWeightLimit != null)
             {
-                if (weightLimit <= 0)
+                if (WeightLimit <= 0)
                     uiTextWeightLimit.text = LanguageManager.GetText(UITextKeys.UI_LABEL_UNLIMIT_WEIGHT.ToString());
                 else
-                    uiTextWeightLimit.text = string.Format(LanguageManager.GetText(formatKeyWeightLimit), totalWeight.ToString("N2"), weightLimit.ToString("N2"));
+                    uiTextWeightLimit.text = string.Format(LanguageManager.GetText(formatKeyWeightLimit), TotalWeight.ToString("N2"), WeightLimit.ToString("N2"));
             }
 
             if (uiTextSlotLimit != null)
             {
-                if (slotLimit <= 0)
+                if (SlotLimit <= 0)
                     uiTextSlotLimit.text = LanguageManager.GetText(UITextKeys.UI_LABEL_UNLIMIT_SLOT.ToString());
                 else
-                    uiTextSlotLimit.text = string.Format(LanguageManager.GetText(formatKeySlotLimit), usedSlots.ToString("N0"), slotLimit.ToString("N0"));
+                    uiTextSlotLimit.text = string.Format(LanguageManager.GetText(formatKeySlotLimit), UsedSlots.ToString("N0"), SlotLimit.ToString("N0"));
             }
         }
 
         public void UpdateData()
         {
-            if (storageType == StorageType.None)
+            if (StorageType == StorageType.None)
                 return;
 
             int selectedIdx = CacheCharacterItemSelectionManager.SelectedUI != null ? CacheCharacterItemSelectionManager.IndexOf(CacheCharacterItemSelectionManager.SelectedUI) : -1;
             CacheCharacterItemSelectionManager.DeselectSelectedUI();
             CacheCharacterItemSelectionManager.Clear();
-            totalWeight = 0;
-            usedSlots = 0;
+            TotalWeight = 0;
+            UsedSlots = 0;
             IList<CharacterItem> characterItems = BasePlayerCharacterController.OwningCharacter.StorageItems;
             UICharacterItem tempUiCharacterItem;
             CacheCharacterItemList.Generate(characterItems, (index, characterItem, ui) =>
@@ -147,8 +147,8 @@ namespace MultiplayerARPG
                 tempUiCharacterItem.Show();
                 if (characterItem.NotEmptySlot())
                 {
-                    totalWeight += characterItem.GetItem().weight * characterItem.amount;
-                    usedSlots++;
+                    TotalWeight += characterItem.GetItem().weight * characterItem.amount;
+                    UsedSlots++;
                 }
                 UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
