@@ -282,7 +282,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiCraftItem.SetupForCharacter(Skill.GetItemCraft());
+                    uiCraftItem.Setup(CrafterType.Character, null, Skill.GetItemCraft());
                     uiCraftItem.Show();
                 }
             }
