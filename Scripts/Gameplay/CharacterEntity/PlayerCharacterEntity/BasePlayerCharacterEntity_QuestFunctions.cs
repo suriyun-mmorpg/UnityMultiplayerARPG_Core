@@ -69,6 +69,7 @@ namespace MultiplayerARPG
                         this.IncreaseItems(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount));
                 }
             }
+            this.FillEmptySlots();
             // Add exp
             RewardExp(reward, 1f, RewardGivenType.Quest);
             // Add currency
