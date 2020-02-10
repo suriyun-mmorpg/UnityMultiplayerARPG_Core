@@ -203,6 +203,7 @@ namespace MultiplayerARPG
                 }
             }
             this.FillEmptySlots();
+            DealingCharacter.FillEmptySlots();
             Gold -= DealingGold;
             DealingCharacter.Gold += DealingGold;
         }
