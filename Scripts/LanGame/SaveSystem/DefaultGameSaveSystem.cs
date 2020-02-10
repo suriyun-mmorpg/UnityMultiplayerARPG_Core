@@ -18,6 +18,7 @@ namespace MultiplayerARPG
 
         public override void OnServerOnlineSceneLoaded(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
         {
+            isReadyToSave = false;
             BaseGameNetworkManager.Singleton.StartCoroutine(OnServerOnlineSceneLoadedRoutine(hostPlayerCharacterData, buildingEntities, storageItems));
         }
 
@@ -70,7 +71,7 @@ namespace MultiplayerARPG
         {
             if (!isReadyToSave)
                 return;
-
+            
             storageSaveData.storageItems.Clear();
             foreach (StorageId key in storageItems.Keys)
             {
