@@ -1079,7 +1079,7 @@ namespace MultiplayerARPG
                 CurrentGameManager.CloseStorage(this);
                 CurrentStorageId = storageId;
                 CurrentGameManager.OpenStorage(this);
-                CallNetFunction(NetFuncShowStorage, ConnectionId, type, targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
+                CallNetFunction(NetFuncShowStorage, ConnectionId, type, targetEntity == null ? 0 : targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
             }
         }
     }

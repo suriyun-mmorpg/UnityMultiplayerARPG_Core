@@ -73,7 +73,7 @@ namespace MultiplayerARPG
                     UpdateData(itemCrafts);
                     break;
                 case CrafterType.Workbench:
-                    if (targetEntity is WorkbenchEntity)
+                    if (targetEntity && targetEntity is WorkbenchEntity)
                         UpdateData((targetEntity as WorkbenchEntity).itemCrafts);
                     break;
             }
