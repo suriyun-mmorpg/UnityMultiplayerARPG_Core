@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using System.Text;
 
 namespace MultiplayerARPG
 {
@@ -202,6 +203,11 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        // Equipped items changes checker
+        protected string dirtyEquipWeapons;
+        protected string dirtyEquipItems;
+        protected readonly StringBuilder tempDirtyEquipItems = new StringBuilder();
+
         #region Sync data changes callback
         /// <summary>
         /// Override this to do stuffs when id changes
@@ -291,10 +297,7 @@ namespace MultiplayerARPG
         /// <param name="equipWeaponSet"></param>
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
-            CharacterModel.SetEquipWeapons(EquipWeapons);
-            if (FpsModel)
-                FpsModel.SetEquipWeapons(EquipWeapons);
-
+            SetEquipWeaponsModels();
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
         }
@@ -329,16 +332,13 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         protected virtual void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
+            SetEquipWeaponsModels();
             selectableWeaponSetsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
                 operation = operation,
                 index = index
             };
-
-            CharacterModel.SetEquipWeapons(EquipWeapons);
-            if (FpsModel)
-                FpsModel.SetEquipWeapons(EquipWeapons);
         }
 
         /// <summary>
@@ -428,10 +428,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            CharacterModel.SetEquipItems(equipItems);
-            if (FpsModel)
-                FpsModel.SetEquipItems(equipItems);
-
+            SetEquipItemsModels();
             equipItemsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
@@ -470,5 +467,47 @@ namespace MultiplayerARPG
             };
         }
         #endregion
+
+        protected void SetEquipWeaponsModels()
+        {
+            tempDirtyEquipItems.Clear();
+            if (EquipWeapons.GetRightHandEquipmentItem())
+                tempDirtyEquipItems.Append(0).Append(EquipWeapons.rightHand.dataId).Append(":").Append(EquipWeapons.rightHand.level);
+            if (EquipWeapons.GetLeftHandEquipmentItem())
+                tempDirtyEquipItems.Append(1).Append(EquipWeapons.leftHand.dataId).Append(":").Append(EquipWeapons.leftHand.level);
+
+            if (!tempDirtyEquipItems.ToString().Equals(dirtyEquipWeapons))
+            {
+                CharacterModel.SetEquipWeapons(EquipWeapons);
+                if (FpsModel)
+                    FpsModel.SetEquipWeapons(EquipWeapons);
+                // Set dirty equip weapons for check changes later
+                dirtyEquipWeapons = tempDirtyEquipItems.ToString();
+            }
+        }
+
+        protected void SetEquipItemsModels()
+        {
+            tempDirtyEquipItems.Clear();
+            if (EquipItems != null)
+            {
+                Item armorItem;
+                for (int i = 0; i < EquipItems.Count; ++i)
+                {
+                    armorItem = EquipItems[i].GetArmorItem();
+                    if (!armorItem) continue;
+                    tempDirtyEquipItems.Append(i).Append(":").Append(EquipItems[i].dataId).Append(":").Append(EquipItems[i].level);
+                }
+            }
+
+            if (!tempDirtyEquipItems.ToString().Equals(dirtyEquipItems))
+            {
+                CharacterModel.SetEquipItems(equipItems);
+                if (FpsModel)
+                    FpsModel.SetEquipItems(equipItems);
+                // Set dirty equip items for check changes later
+                dirtyEquipItems = tempDirtyEquipItems.ToString();
+            }
+        }
     }
 }
