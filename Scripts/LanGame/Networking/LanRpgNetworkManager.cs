@@ -574,6 +574,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            playerCharacterEntity.FillEmptySlots();
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
