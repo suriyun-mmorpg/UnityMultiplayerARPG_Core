@@ -66,6 +66,7 @@ namespace MultiplayerARPG
             }
             if (!this.IncreasingItemsWillOverwhelming(itemDropData.dataId, itemDropData.amount) && this.IncreaseItems(itemDropData))
             {
+                this.FillEmptySlots();
                 itemDropEntity.MarkAsPickedUp();
                 itemDropEntity.NetworkDestroy();
             }
