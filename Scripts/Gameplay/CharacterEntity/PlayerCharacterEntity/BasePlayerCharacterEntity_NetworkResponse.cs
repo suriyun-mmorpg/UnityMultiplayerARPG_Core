@@ -276,6 +276,7 @@ namespace MultiplayerARPG
             // Applies simulates data
             this.DecreaseItemsByIndex(index, nonEquipItem.amount);
             this.IncreaseItems(returningItems);
+            this.FillEmptySlots();
             Gold += item.dismantleReturnGold;
         }
 
