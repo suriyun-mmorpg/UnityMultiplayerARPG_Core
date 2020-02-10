@@ -91,6 +91,7 @@ namespace MultiplayerARPG
             }
             CurrentGameplayRule.DecreaseCurrenciesWhenBuyItem(this, sellItem, amount);
             this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
+            this.FillEmptySlots();
         }
     }
 }
