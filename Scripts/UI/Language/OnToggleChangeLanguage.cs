@@ -9,12 +9,12 @@ namespace MultiplayerARPG
     public class OnToggleChangeLanguage : MonoBehaviour
     {
         public string languageKey;
-
-        private void Awake()
+        
+        private void Start()
         {
             Toggle toggle = GetComponent<Toggle>();
-            toggle.onValueChanged.AddListener(OnToggle);
             toggle.isOn = LanguageManager.CurrentLanguageKey.Equals(languageKey);
+            toggle.onValueChanged.AddListener(OnToggle);
         }
 
         public void OnToggle(bool selected)

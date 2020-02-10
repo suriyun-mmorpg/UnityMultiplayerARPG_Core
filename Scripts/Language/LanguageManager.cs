@@ -98,6 +98,7 @@ namespace MultiplayerARPG
             currentLanguageKey = languageKey;
             texts = Languages[languageKey];
             PlayerPrefs.SetString(currentPlayerPrefsKey, currentLanguageKey);
+            PlayerPrefs.Save();
         }
 
         public static string GetText(string key, string defaultValue = "")
