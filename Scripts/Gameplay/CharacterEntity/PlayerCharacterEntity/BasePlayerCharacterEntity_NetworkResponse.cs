@@ -1049,7 +1049,7 @@ namespace MultiplayerARPG
 
         public void OpenStorage(StorageType type, BaseGameEntity targetEntity)
         {
-            string ownerId = Id;
+            string ownerId = UserId;
             switch (type)
             {
                 case StorageType.Guild:
