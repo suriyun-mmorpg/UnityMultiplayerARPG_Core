@@ -118,7 +118,7 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null && Level < GuildSkill.maxLevel &&
+            if (owningCharacter && GuildSkill && Level < GuildSkill.maxLevel &&
                 BaseGameNetworkManager.ClientGuild != null &&
                 BaseGameNetworkManager.ClientGuild.IsLeader(owningCharacter) &&
                 BaseGameNetworkManager.ClientGuild.skillPoint > 0)
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
                 onUnableToLevelUp.Invoke();
             }
 
-            if (owningCharacter != null && Level > 1 &&
+            if (owningCharacter && GuildSkill && Level > 1 &&
                 GuildSkill.GetSkillType() == GuildSkillType.Active)
             {
                 onAbleToUse.Invoke();
