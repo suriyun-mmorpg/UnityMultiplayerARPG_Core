@@ -873,6 +873,8 @@ namespace MultiplayerARPG
                                 damageTakenTarget = tempDamageableEntity;
                                 break;
                             }
+                            // Set damage taken targetit will be used in-case it can't find selected target
+                            damageTakenTarget = tempDamageableEntity;
                         }
                         // Only 1 target will receives damages
                         if (damageTakenTarget != null)
@@ -1163,8 +1165,8 @@ namespace MultiplayerARPG
         public int OverlapObjects_ForAttackFunctions(Vector3 position, float distance, int layerMask)
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return Physics2D.OverlapCircleNonAlloc(position, distance, overlapColliders2D_ForAttackFunctions, layerMask);
-            return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders_ForAttackFunctions, layerMask);
+                return PhysicUtils.SortedOverlapCircleNonAlloc(position, distance, overlapColliders2D_ForAttackFunctions, layerMask);
+            return PhysicUtils.SortedOverlapSphereNonAlloc(position, distance, overlapColliders_ForAttackFunctions, layerMask);
         }
 
         public GameObject GetOverlapObject_ForAttackFunctions(int index)
