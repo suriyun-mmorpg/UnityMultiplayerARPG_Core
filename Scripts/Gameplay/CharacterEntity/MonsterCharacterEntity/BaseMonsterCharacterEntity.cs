@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                 // Return title (Can set in prefab) if it is not empty
                 if (!string.IsNullOrEmpty(CharacterTitle))
                     return CharacterTitle;
-                return MonsterDatabase == null || string.IsNullOrEmpty(MonsterDatabase.Title) ? LanguageManager.GetUnknowTitle() : MonsterDatabase.Title;
+                return !MonsterDatabase || string.IsNullOrEmpty(MonsterDatabase.Title) ? LanguageManager.GetUnknowTitle() : MonsterDatabase.Title;
             }
             set { }
         }
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             if (IsSummoned)
             {
-                if (Summoner != null)
+                if (Summoner)
                 {
                     if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > CurrentGameInstance.maxFollowSummonerDistance)
                     {
@@ -605,7 +605,7 @@ namespace MultiplayerARPG
 
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
         {
-            if ((Summoner != null && Summoner == ally) ||
+            if ((Summoner && Summoner == ally) ||
                 MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }

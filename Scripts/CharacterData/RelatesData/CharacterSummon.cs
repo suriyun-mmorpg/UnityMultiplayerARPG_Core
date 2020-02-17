@@ -44,12 +44,8 @@ public class CharacterSummon : INetSerializableWithElement
     {
         get
         {
-            if (cacheEntity == null)
-            {
-                LiteNetLibIdentity identity;
-                if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
-                    cacheEntity = identity.GetComponent<BaseMonsterCharacterEntity>();
-            }
+            if (!cacheEntity)
+                BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out cacheEntity);
             return cacheEntity;
         }
     }
@@ -106,8 +102,9 @@ public class CharacterSummon : INetSerializableWithElement
     {
         if (GetPrefab() == null)
             return;
-        GameObject spawnObj = Object.Instantiate(GetPrefab().gameObject, summoner.GetSummonPosition(), summoner.GetSummonRotation());
-        cacheEntity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj).GetComponent<BaseMonsterCharacterEntity>();
+        cacheEntity = BaseGameNetworkManager.Singleton.Assets
+            .NetworkSpawn(Object.Instantiate(GetPrefab().gameObject, summoner.GetSummonPosition(), summoner.GetSummonRotation()))
+            .GetComponent<BaseMonsterCharacterEntity>();
         CacheEntity.Summon(summoner, type, summonLevel);
         objectId = CacheEntity.ObjectId;
         summonRemainsDuration = duration;
@@ -133,20 +130,20 @@ public class CharacterSummon : INetSerializableWithElement
         {
             CharacterItem newItem = CharacterItem.Create(dataId, Level, 1);
             newItem.exp = Exp;
-            if (CacheEntity == null || CacheEntity.CurrentHp <= 0)
+            if (CacheEntity && CacheEntity.CurrentHp <= 0)
                 newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
             else
                 newItem.Lock(GameInstance.Singleton.petUnSummonLockDuration);
             summoner.AddOrSetNonEquipItems(newItem);
         }
 
-        if (CacheEntity != null)
+        if (CacheEntity)
             CacheEntity.UnSummon();
     }
 
     public bool ShouldRemove()
     {
-        return CacheEntity == null || CacheEntity.CurrentHp <= 0 || (type == SummonType.Skill && summonRemainsDuration <= 0f);
+        return (CacheEntity && CacheEntity.CurrentHp <= 0) || (type == SummonType.Skill && summonRemainsDuration <= 0f);
     }
 
     public void Update(float deltaTime)
