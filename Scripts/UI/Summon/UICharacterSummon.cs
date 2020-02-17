@@ -32,6 +32,7 @@ namespace MultiplayerARPG
 
         protected readonly Dictionary<uint, CharacterSummon> stackingEntries = new Dictionary<uint, CharacterSummon>();
         protected float summonRemainsDuration;
+        private BaseGameData tempSummonData;
 
         private void OnDisable()
         {
@@ -70,16 +71,17 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            BaseGameData summonData = null;
+            tempSummonData = null;
+
             switch (Data.type)
             {
                 case SummonType.Skill:
                     onTypeIsSkill.Invoke();
-                    summonData = Data.GetSkill();
+                    tempSummonData = Data.GetSkill();
                     break;
                 case SummonType.Pet:
                     onTypeIsPet.Invoke();
-                    summonData = Data.GetPetItem();
+                    tempSummonData = Data.GetPetItem();
                     break;
             }
 
@@ -87,19 +89,19 @@ namespace MultiplayerARPG
             {
                 uiTextTitle.text = string.Format(
                     LanguageManager.GetText(formatKeyTitle),
-                    summonData == null ? LanguageManager.GetUnknowTitle() : summonData.Title);
+                    !tempSummonData ? LanguageManager.GetUnknowTitle() : tempSummonData.Title);
             }
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = summonData == null ? null : summonData.icon;
-                imageIcon.gameObject.SetActive(iconSprite != null);
+                Sprite iconSprite = !tempSummonData ? null : tempSummonData.icon;
+                imageIcon.gameObject.SetActive(iconSprite);
                 imageIcon.sprite = iconSprite;
             }
 
             if (uiCharacter != null)
             {
-                if (summonData == null)
+                if (!tempSummonData || !Data.CacheEntity)
                     uiCharacter.Hide();
                 else
                 {
