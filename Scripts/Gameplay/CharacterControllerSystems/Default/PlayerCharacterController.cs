@@ -26,6 +26,7 @@ namespace MultiplayerARPG
 
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
+
         public float angularSpeed = 800f;
         public PlayerCharacterControllerMode controllerMode;
         [Tooltip("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
@@ -35,12 +36,13 @@ namespace MultiplayerARPG
         [Tooltip("Set this to TRUE to move to target immediately when clicked on target, if this is FALSE it will not move to target immediately")]
         public bool pointClickSetTargetImmediately;
         public GameObject targetObjectPrefab;
+
         [Header("Building Settings")]
         public bool buildGridSnap;
         public float buildGridSize = 4f;
         public bool buildRotationSnap;
-        public bool isSprinting;
 
+        protected bool isSprinting;
         protected Vector3? destination;
         protected Vector3 mouseDownPosition;
         protected float mouseDownTime;
@@ -48,9 +50,9 @@ namespace MultiplayerARPG
         protected uint lastNpcObjectId;
 
         public GameObject CacheTargetObject { get; protected set; }
-
         protected Vector3? targetPosition;
         protected TargetActionType targetActionType;
+
         // Optimizing garbage collection
         protected bool getMouseUp;
         protected bool getMouseDown;
@@ -288,8 +290,8 @@ namespace MultiplayerARPG
             switch (CurrentGameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    Vector3 forward = Camera.main.transform.forward;
-                    Vector3 right = Camera.main.transform.right;
+                    Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
+                    Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
                     forward.y = 0f;
                     right.y = 0f;
                     forward.Normalize();
