@@ -135,14 +135,12 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            Profiler.BeginSample("UIDealing - Update UI");
             // In case that another character is exit or move so far hide the dialog
             if (Data == null)
             {
                 Hide();
                 return;
             }
-            Profiler.EndSample();
         }
 
         protected override void UpdateData()

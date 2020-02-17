@@ -201,17 +201,14 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            Profiler.BeginSample("UICharacterItem - Update UI");
             if (!IsOwningCharacter() || !IsVisible())
                 return;
-
             UpdateShopUIVisibility(false);
             UpdateRefineItemUIVisibility(false);
             UpdateDismantleItemUIVisibility(false);
             UpdateEnhanceSocketUIVisibility(false);
             UpdateStorageUIVisibility(false);
             UpdateDealingState(false);
-            Profiler.EndSample();
         }
 
         protected override void UpdateData()

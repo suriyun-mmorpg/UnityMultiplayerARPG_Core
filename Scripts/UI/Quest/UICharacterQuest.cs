@@ -74,9 +74,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            Profiler.BeginSample("UICharacterQuest - Update UI");
             Quest quest = !Data.IsEmpty() ? Data.GetQuest() : null;
-
             if (quest != null && showQuestTaskList)
             {
                 UIQuestTask tempUiQuestTask;
@@ -89,7 +87,6 @@ namespace MultiplayerARPG
                     tempUiQuestTask.Show();
                 });
             }
-            Profiler.EndSample();
         }
 
         protected override void UpdateData()
