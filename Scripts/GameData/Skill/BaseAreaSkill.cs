@@ -47,11 +47,9 @@ namespace MultiplayerARPG
 
         public override Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel)
         {
-            if (BasePlayerCharacterController.Singleton is PlayerCharacterController)
-                return AreaSkillControls.UpdateAimControls(aimAxes, this, skillLevel, CacheTargetObject);
             if (BasePlayerCharacterController.Singleton is ShooterPlayerCharacterController)
                 return AreaSkillControls.UpdateAimControls_Shooter(aimAxes, this, skillLevel, CacheTargetObject);
-            return BasePlayerCharacterController.OwningCharacter.CacheTransform.position;
+            return AreaSkillControls.UpdateAimControls(aimAxes, this, skillLevel, CacheTargetObject);
         }
 
         public override void FinishAimControls()
