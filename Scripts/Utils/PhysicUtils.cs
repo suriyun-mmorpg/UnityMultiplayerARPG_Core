@@ -4,6 +4,19 @@ using UnityEngine;
 
 public static class PhysicUtils
 {
+    public static int SortedOverlapCircleNonAlloc(Vector3 position, float distance, Collider2D[] colliders, int layerMask)
+    {
+        int count = Physics2D.OverlapCircleNonAlloc(position, distance, colliders, layerMask);
+        System.Array.Sort(colliders, 0, count, new ColliderComparer(position));
+        return count;
+    }
+
+    public static int SortedOverlapSphereNonAlloc(Vector3 position, float distance, Collider[] colliders, int layerMask)
+    {
+        int count = Physics.OverlapSphereNonAlloc(position, distance, colliders, layerMask);
+        System.Array.Sort(colliders, 0, count, new ColliderComparer(position));
+        return count;
+    }
 
     public static int SortedRaycastNonAlloc2D(Ray2D ray, RaycastHit2D[] hits, float distance, int layerMask)
     {
@@ -34,6 +47,27 @@ public static class PhysicUtils
         int count = Physics2D.LinecastNonAlloc(start, end, hits, layerMask);
         System.Array.Sort(hits, 0, count, new RaycastHitComparer());
         return count;
+    }
+
+    public struct ColliderComparer : IComparer<Collider>, IComparer<Collider2D>
+    {
+        private Vector3 position;
+        public ColliderComparer(Vector3 position)
+        {
+            this.position = position;
+        }
+
+        public int Compare(Collider x, Collider y)
+        {
+            return Vector3.Distance(position, x.transform.position)
+                .CompareTo(Vector3.Distance(position, y.transform.position));
+        }
+
+        public int Compare(Collider2D x, Collider2D y)
+        {
+            return Vector3.Distance(position, x.transform.position)
+                .CompareTo(Vector3.Distance(position, y.transform.position));
+        }
     }
 
     public struct RaycastHitComparer : IComparer<RaycastHit>, IComparer<RaycastHit2D>
