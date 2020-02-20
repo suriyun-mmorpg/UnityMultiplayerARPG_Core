@@ -15,8 +15,8 @@ namespace MultiplayerARPG
         {
             worldPointFor2D = Vector3.zero;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                return SortedRaycastNonAlloc(Camera.main.ScreenPointToRay(Input.mousePosition), 100f, CurrentGameInstance.GetTargetLayerMask());
-            worldPointFor2D = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                return PhysicUtils.SortedRaycastNonAlloc3D(CacheGameplayCamera.ScreenPointToRay(InputManager.MousePosition()), raycasts, 100f, CurrentGameInstance.GetTargetLayerMask());
+            worldPointFor2D = CacheGameplayCamera.ScreenToWorldPoint(InputManager.MousePosition());
             return PhysicUtils.SortedLinecastNonAlloc2D(worldPointFor2D, worldPointFor2D, raycasts2D, CurrentGameInstance.GetTargetLayerMask());
         }
 
@@ -27,10 +27,10 @@ namespace MultiplayerARPG
             switch (CurrentGameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    tempCount = SortedRaycastNonAlloc(Camera.main.ScreenPointToRay(Input.mousePosition), 100f, CurrentGameInstance.GetBuildLayerMask());
+                    tempCount = PhysicUtils.SortedRaycastNonAlloc3D(CacheGameplayCamera.ScreenPointToRay(InputManager.MousePosition()), raycasts, 100f, CurrentGameInstance.GetBuildLayerMask());
                     break;
                 case DimensionType.Dimension2D:
-                    tempVector3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    tempVector3 = CacheGameplayCamera.ScreenToWorldPoint(InputManager.MousePosition());
                     tempCount = PhysicUtils.SortedLinecastNonAlloc2D(tempVector3, tempVector3, raycasts2D, CurrentGameInstance.GetBuildLayerMask());
                     break;
             }
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                     tempVector3 = MovementTransform.position + (MovementTransform.forward * ConstructingBuildingEntity.characterForwardDistance);
                     ConstructingBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(MovementTransform.eulerAngles);
                     ConstructingBuildingEntity.BuildingArea = null;
-                    tempCount = SortedRaycastNonAlloc(tempVector3 + (Vector3.up * 2.5f), Vector3.down, 100f, CurrentGameInstance.GetBuildLayerMask());
+                    tempCount = PhysicUtils.SortedRaycastNonAlloc3D(tempVector3 + (Vector3.up * 2.5f), Vector3.down, raycasts, 100f, CurrentGameInstance.GetBuildLayerMask());
                     if (!LoopSetBuildingArea(tempCount))
                         ConstructingBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
                     break;
@@ -105,18 +105,6 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public int SortedRaycastNonAlloc(Ray ray, float maxDistance, int layerMask)
-        {
-            return SortedRaycastNonAlloc(ray.origin, ray.direction, maxDistance, layerMask);
-        }
-
-        public int SortedRaycastNonAlloc(Vector3 origin, Vector3 direction, float maxDistance, int layerMask)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                return PhysicUtils.SortedRaycastNonAlloc3D(origin, direction, raycasts, maxDistance, layerMask);
-            return PhysicUtils.SortedRaycastNonAlloc2D(origin, direction, raycasts2D, maxDistance, layerMask);
-        }
-
         public Transform GetRaycastTransform(int index)
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
@@ -158,7 +146,7 @@ namespace MultiplayerARPG
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 IDamageableEntity damageableEntity;
-                int tempCount = SortedRaycastNonAlloc(damageTransform.position, target.GetTransform().position - damageTransform.position, attackDistance, layerMask);
+                int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(damageTransform.position, target.GetTransform().position - damageTransform.position, raycasts, attackDistance, layerMask);
                 for (int i = 0; i < tempCount; ++i)
                 {
                     if (GetRaycastTransform(i) == target.GetTransform())
@@ -171,7 +159,7 @@ namespace MultiplayerARPG
             else
             {
                 IDamageableEntity damageableEntity;
-                int tempCount = SortedRaycastNonAlloc(damageTransform.position, target.GetTransform().position - damageTransform.position, attackDistance, layerMask);
+                int tempCount = PhysicUtils.SortedRaycastNonAlloc2D(damageTransform.position, target.GetTransform().position - damageTransform.position, raycasts2D, attackDistance, layerMask);
                 for (int i = 0; i < tempCount; ++i)
                 {
                     if (GetRaycastTransform(i) == target.GetTransform())

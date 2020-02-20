@@ -46,7 +46,7 @@ namespace MultiplayerARPG
             if (state == WeaponAbilityState.Deactivating)
             {
                 zoomInterpTime += deltaTime * ZOOM_SPEED;
-                shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView = Mathf.Lerp(shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView, shooterController.CameraFov, zoomInterpTime);
+                shooterController.CacheGameplayCamera.fieldOfView = Mathf.Lerp(shooterController.CacheGameplayCamera.fieldOfView, shooterController.CameraFov, zoomInterpTime);
                 if (zoomInterpTime >= 1f)
                 {
                     zoomInterpTime = 0;
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             else if (state == WeaponAbilityState.Activating)
             {
                 zoomInterpTime += deltaTime * ZOOM_SPEED;
-                shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView = Mathf.Lerp(shooterController.CacheGameplayCameraControls.CacheCamera.fieldOfView, zoomingFov, zoomInterpTime);
+                shooterController.CacheGameplayCamera.fieldOfView = Mathf.Lerp(shooterController.CacheGameplayCamera.fieldOfView, zoomingFov, zoomInterpTime);
                 if (zoomInterpTime >= 1f)
                 {
                     zoomInterpTime = 0;

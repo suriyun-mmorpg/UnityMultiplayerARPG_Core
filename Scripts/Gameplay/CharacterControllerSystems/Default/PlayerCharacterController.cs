@@ -290,8 +290,8 @@ namespace MultiplayerARPG
             switch (CurrentGameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
-                    Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
+                    Vector3 forward = CacheGameplayCameraTransform.forward;
+                    Vector3 right = CacheGameplayCameraTransform.right;
                     forward.y = 0f;
                     right.y = 0f;
                     forward.Normalize();

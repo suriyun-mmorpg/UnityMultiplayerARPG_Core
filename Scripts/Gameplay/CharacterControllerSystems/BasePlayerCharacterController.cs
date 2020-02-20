@@ -72,6 +72,10 @@ namespace MultiplayerARPG
 
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
+        public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
+        public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
+        public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
+        public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
         public UISceneGameplay CacheUISceneGameplay { get; protected set; }
         public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;

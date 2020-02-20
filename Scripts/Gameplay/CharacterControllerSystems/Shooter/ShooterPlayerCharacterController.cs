@@ -222,7 +222,7 @@ namespace MultiplayerARPG
 
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
-            characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraControls.CacheCameraTransform);
+            characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraTransform);
             characterEntity.ModelManager.SetIsFps(ViewMode == ControllerViewMode.Fps);
         }
 
@@ -367,10 +367,10 @@ namespace MultiplayerARPG
             }
 
             // Prepare variables to find nearest raycasted hit point
-            centerRay = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            centerRay = CacheGameplayCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             centerRayToCharacterDist = Vector3.Distance(centerRay.origin, MovementTransform.position);
-            cameraForward = CacheGameplayCameraControls.CacheCameraTransform.forward;
-            cameraRight = CacheGameplayCameraControls.CacheCameraTransform.right;
+            cameraForward = CacheGameplayCameraTransform.forward;
+            cameraRight = CacheGameplayCameraTransform.right;
             cameraForward.y = 0f;
             cameraRight.y = 0f;
             cameraForward.Normalize();
@@ -487,7 +487,7 @@ namespace MultiplayerARPG
                 tempHitInfo = raycasts[tempCounter];
 
                 // Set aim position
-                tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
+                tempDistance = Vector3.Distance(CacheGameplayCameraTransform.position, tempHitInfo.point);
                 if (IsInFront(tempHitInfo.point))
                 {
                     aimPosition = tempHitInfo.point;
@@ -506,7 +506,7 @@ namespace MultiplayerARPG
                         // There is no snap build position, set building rotation by camera look direction
                         ConstructingBuildingEntity.CacheTransform.position = aimPosition;
                         // Rotate to camera
-                        Vector3 direction = (aimPosition - CacheGameplayCameraControls.CacheCameraTransform.position).normalized;
+                        Vector3 direction = (aimPosition - CacheGameplayCameraTransform.position).normalized;
                         direction.y = 0;
                         ConstructingBuildingEntity.CacheTransform.rotation = Quaternion.LookRotation(direction);
                     }
@@ -628,7 +628,7 @@ namespace MultiplayerARPG
 
         private void UpdateMovementInputs()
         {
-            pitch = CacheGameplayCameraControls.CacheCameraTransform.eulerAngles.x;
+            pitch = CacheGameplayCameraTransform.eulerAngles.x;
 
             // Update charcter pitch
             PlayerCharacterEntity.Pitch = pitch;
@@ -1224,9 +1224,9 @@ namespace MultiplayerARPG
 
         public void UpdateCameraSettings()
         {
-            CacheGameplayCameraControls.CacheCamera.fieldOfView = CameraFov;
-            CacheGameplayCameraControls.CacheCamera.nearClipPlane = CameraNearClipPlane;
-            CacheGameplayCameraControls.CacheCamera.farClipPlane = CameraFarClipPlane;
+            CacheGameplayCamera.fieldOfView = CameraFov;
+            CacheGameplayCamera.nearClipPlane = CameraNearClipPlane;
+            CacheGameplayCamera.farClipPlane = CameraFarClipPlane;
             CacheGameplayCameraControls.targetOffset = CameraTargetOffset;
             CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
             CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
