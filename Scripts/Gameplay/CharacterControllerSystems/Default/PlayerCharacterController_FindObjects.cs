@@ -82,12 +82,13 @@ namespace MultiplayerARPG
             BuildingArea buildingArea;
             Transform tempTransform;
             Vector3 tempVector3;
+            Vector3 tempOffset;
             for (int tempCounter = 0; tempCounter < count; ++tempCounter)
             {
                 tempTransform = GetRaycastTransform(tempCounter);
                 tempVector3 = GetRaycastPoint(tempCounter);
-                if (Vector3.Distance(tempVector3, MovementTransform.position) > CurrentGameInstance.buildDistance)
-                    return false;
+                tempOffset = tempVector3 - MovementTransform.position;
+                tempVector3 = MovementTransform.position + Vector3.ClampMagnitude(tempOffset, CurrentGameInstance.buildDistance);
 
                 buildingArea = tempTransform.GetComponent<BuildingArea>();
                 if (buildingArea == null ||
