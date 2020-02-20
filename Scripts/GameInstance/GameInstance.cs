@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
@@ -298,7 +299,7 @@ namespace MultiplayerARPG
 
         protected virtual void Awake()
         {
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null ? 30 : -1;
             Application.runInBackground = true;
             if (Singleton != null)
             {
