@@ -227,7 +227,7 @@ namespace MultiplayerARPG
 
             if (uiTextSummon != null)
             {
-                if (Skill == null || Skill.GetSkillType() != SkillType.Active || Skill.GetSummon().monsterEntity == null)
+                if (Skill == null || !Skill.IsActive() || Skill.GetSummon().monsterEntity == null)
                 {
                     uiTextSummon.gameObject.SetActive(false);
                 }
@@ -246,7 +246,7 @@ namespace MultiplayerARPG
 
             if (uiTextMount != null)
             {
-                if (Skill == null || Skill.GetSkillType() != SkillType.Active || Skill.GetMount().mountEntity == null)
+                if (Skill == null || !Skill.IsActive() || Skill.GetMount().mountEntity == null)
                 {
                     uiTextMount.gameObject.SetActive(false);
                 }
@@ -261,7 +261,7 @@ namespace MultiplayerARPG
 
             if (uiCraftItem != null)
             {
-                if (Skill == null || Skill.GetSkillType() != SkillType.CraftItem)
+                if (Skill == null || !Skill.IsCraftItem())
                 {
                     uiCraftItem.Hide();
                 }

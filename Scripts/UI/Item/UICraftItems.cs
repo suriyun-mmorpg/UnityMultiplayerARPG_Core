@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                     {
                         if (characterSkill == null ||
                             characterSkill.GetSkill() == null ||
-                            characterSkill.GetSkill().GetSkillType() != SkillType.CraftItem)
+                            !characterSkill.GetSkill().IsCraftItem())
                             continue;
                         itemCrafts.Add(characterSkill.GetSkill().GetItemCraft());
                     }

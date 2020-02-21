@@ -115,7 +115,7 @@ namespace MultiplayerARPG
                         filterCategories.Contains(skillLevel.Key.category))
                     {
                         if (filterSkillTypes == null || filterSkillTypes.Count == 0 ||
-                            filterSkillTypes.Contains(skillLevel.Key.GetSkillType()))
+                            filterSkillTypes.Contains(skillLevel.Key.SkillType))
                         {
                             tempSkill = skillLevel.Key;
                             tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);

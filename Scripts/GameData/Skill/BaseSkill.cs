@@ -12,18 +12,12 @@ namespace MultiplayerARPG
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while using this skill")]
         public float moveSpeedRateWhileUsingSkill = 0f;
-
-        [HideInInspector]
-        [System.Obsolete("`GameEffectCollection` is deprecated and will be removed in future version")]
-        public GameEffectCollection castEffects;
+        
         [Header("Casting Effects")]
         public GameEffect[] skillCastEffects;
         public IncrementalFloat castDuration;
         public bool canBeInterruptedWhileCasting;
-
-        [HideInInspector]
-        [System.Obsolete("`GameEffectCollection` is deprecated and will be removed in future version")]
-        public GameEffectCollection hitEffects;
+        
         [Header("Casted Effects")]
         public GameEffect[] damageHitEffects;
 
@@ -44,7 +38,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                switch (GetSkillType())
+                switch (SkillType)
                 {
                     case SkillType.Active:
                         return LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_ACTIVE.ToString());
@@ -106,27 +100,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override bool Validate()
-        {
-            bool hasChanges = false;
-            if (castEffects.effects != null && castEffects.effects.Length > 0)
-            {
-                if (skillCastEffects == null || skillCastEffects.Length == 0)
-                    skillCastEffects = castEffects.effects;
-                castEffects.effects = null;
-                hasChanges = true;
-            }
-
-            if (hitEffects.effects != null && hitEffects.effects.Length > 0)
-            {
-                if (damageHitEffects == null || damageHitEffects.Length == 0)
-                    damageHitEffects = hitEffects.effects;
-                hitEffects.effects = null;
-                hasChanges = true;
-            }
-            return base.Validate() || hasChanges;
-        }
-
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -173,7 +146,7 @@ namespace MultiplayerARPG
             return character.GetCaches().Skills.TryGetValue(this, out skillLevel) && skillLevel > 0;
         }
 
-        public abstract SkillType GetSkillType();
+        public abstract SkillType SkillType { get; }
         public abstract bool IsAttack();
         public abstract bool IsBuff();
         public abstract bool IsDebuff();
@@ -192,6 +165,21 @@ namespace MultiplayerARPG
         public virtual SkillSummon GetSummon() { return new SkillSummon(); }
         public virtual SkillMount GetMount() { return new SkillMount(); }
         public virtual ItemCraft GetItemCraft() { return new ItemCraft(); }
+
+        public bool IsActive()
+        {
+            return SkillType == SkillType.Active;
+        }
+
+        public bool IsPassive()
+        {
+            return SkillType == SkillType.Passive;
+        }
+
+        public bool IsCraftItem()
+        {
+            return SkillType == SkillType.CraftItem;
+        }
 
         public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
@@ -360,7 +348,7 @@ namespace MultiplayerARPG
                 }
 
                 // Only player character will check for available weapons
-                switch (GetSkillType())
+                switch (SkillType)
                 {
                     case SkillType.Active:
                         available = availableWeapons == null || availableWeapons.Length == 0;
@@ -443,13 +431,6 @@ namespace MultiplayerARPG
 
             return true;
         }
-    }
-
-    public enum SkillType : byte
-    {
-        Active,
-        Passive,
-        CraftItem,
     }
 
     [System.Serializable]

@@ -77,7 +77,7 @@ public class CharacterSkill : INetSerializableWithElement
             cachePassiveBuffIncreaseDamages = null;
             if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill))
             {
-                if (cacheSkill.GetSkillType() == SkillType.Passive)
+                if (cacheSkill.IsPassive())
                 {
                     cachePassiveBuff = cacheSkill.GetBuff();
                     cachePassiveBuffDuration = cachePassiveBuff.GetDuration(level);

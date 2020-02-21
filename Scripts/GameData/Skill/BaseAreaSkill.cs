@@ -25,9 +25,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public override SkillType GetSkillType()
+        public override SkillType SkillType
         {
-            return SkillType.Active;
+            get { return SkillType.Active; }
         }
 
         public override float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)

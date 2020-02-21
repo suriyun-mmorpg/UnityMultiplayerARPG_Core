@@ -220,9 +220,9 @@ namespace MultiplayerARPG
             return default(DamageInfo);
         }
 
-        public override SkillType GetSkillType()
+        public override SkillType SkillType
         {
-            return skillType;
+            get { return skillType; }
         }
 
         public override bool IsAttack()

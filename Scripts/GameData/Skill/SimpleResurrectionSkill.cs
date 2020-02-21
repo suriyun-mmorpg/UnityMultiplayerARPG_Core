@@ -65,9 +65,9 @@ namespace MultiplayerARPG
             return new KeyValuePair<DamageElement, MinMaxFloat>();
         }
 
-        public override SkillType GetSkillType()
+        public override SkillType SkillType
         {
-            return SkillType.Active;
+            get { return SkillType.Active; }
         }
 
         public override bool IsAttack()

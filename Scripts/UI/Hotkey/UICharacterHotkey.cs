@@ -145,7 +145,7 @@ namespace MultiplayerARPG
         public Vector3? UpdateAimControls(Vector2 axes)
         {
             if (hotkeySkill != null && hotkeySkillLevel > 0 &&
-                hotkeySkill.GetSkillType() == SkillType.Active &&
+                hotkeySkill.IsActive() &&
                 hotkeySkill.HasCustomAimControls())
             {
                 return hotkeySkill.UpdateAimControls(axes, hotkeySkillLevel);
@@ -184,7 +184,7 @@ namespace MultiplayerARPG
             }
 
             if (hotkeySkill != null && hotkeySkillLevel > 0 &&
-                hotkeySkill.GetSkillType() == SkillType.Active &&
+                hotkeySkill.IsActive() &&
                 hotkeySkill.HasCustomAimControls())
             {
                 UICharacterHotkeys.SetUsingHotkey(this);
@@ -215,7 +215,7 @@ namespace MultiplayerARPG
             if (characterSkill.IsEmpty())
                 return false;
             if (characterSkill.GetSkill().IsAvailable(OwningCharacter) &&
-                UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().GetSkillType()))
+                UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().SkillType))
                 return true;
             return false;
         }

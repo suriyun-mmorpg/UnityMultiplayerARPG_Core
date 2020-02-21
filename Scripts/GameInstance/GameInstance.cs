@@ -76,10 +76,6 @@ namespace MultiplayerARPG
         [Tooltip("Default damage element, will be used when attacks to enemies or receives damages from enemies")]
         [SerializeField]
         private DamageElement defaultDamageElement;
-        [HideInInspector]
-        [SerializeField]
-        [System.Obsolete("`GameEffectCollection` is deprecated and will be removed in future version")]
-        private GameEffectCollection defaultHitEffects;
         [Tooltip("Default hit effects, will be used when attack to enemies or receive damages from enemies")]
         [SerializeField]
         private GameEffect[] defaultDamageHitEffects;
@@ -282,11 +278,7 @@ namespace MultiplayerARPG
 
         public GameEffect[] DefaultDamageHitEffects
         {
-            get
-            {
-                ValidateDamageHitEffects();
-                return defaultDamageHitEffects;
-            }
+            get { return defaultDamageHitEffects; }
         }
 
         public bool HasNewCharacterSetting
@@ -392,27 +384,6 @@ namespace MultiplayerARPG
         protected virtual void Start()
         {
             GameDatabase.LoadData(this);
-        }
-
-        private void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (ValidateDamageHitEffects())
-                UnityEditor.EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool ValidateDamageHitEffects()
-        {
-            // This function will be removed in future version
-            if (defaultHitEffects.effects != null && defaultHitEffects.effects.Length > 0)
-            {
-                if (defaultDamageHitEffects == null || defaultDamageHitEffects.Length == 0)
-                    defaultDamageHitEffects = defaultHitEffects.effects;
-                defaultHitEffects.effects = null;
-                return true;
-            }
-            return false;
         }
 
         public void LoadedGameData()
