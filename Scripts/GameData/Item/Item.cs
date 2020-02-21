@@ -200,9 +200,16 @@ namespace MultiplayerARPG
             get { return requirement; }
         }
 
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
         public Dictionary<Attribute, float> RequireAttributeAmounts
         {
-            get { return CacheRequireAttributeAmounts; }
+            get
+            {
+                if (cacheRequireAttributeAmounts == null)
+                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
+                return cacheRequireAttributeAmounts;
+            }
         }
 
         public EquipmentSet EquipmentSet
@@ -425,17 +432,11 @@ namespace MultiplayerARPG
                 skillLevels.AddRange(increaseSkillLevels);
             skillLevels.Add(skillLevel);
             GameInstance.AddSkillLevels(skillLevels);
-        }
-
-        [System.NonSerialized]
-        private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
-        public Dictionary<Attribute, float> CacheRequireAttributeAmounts
-        {
-            get
+            // Validate equipment set
+            if (equipmentSet != null)
             {
-                if (cacheRequireAttributeAmounts == null)
-                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
-                return cacheRequireAttributeAmounts;
+                equipmentSet.Validate();
+                equipmentSet.PrepareRelatesData();
             }
         }
 
@@ -470,7 +471,7 @@ namespace MultiplayerARPG
 
             // Check is it pass attribute requirement or not
             Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(true, false);
-            Dictionary<Attribute, float> requireAttributeAmounts = CacheRequireAttributeAmounts;
+            Dictionary<Attribute, float> requireAttributeAmounts = RequireAttributeAmounts;
             foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
             {
                 if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||

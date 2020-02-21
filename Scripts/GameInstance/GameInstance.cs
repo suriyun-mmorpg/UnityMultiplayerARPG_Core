@@ -551,7 +551,6 @@ namespace MultiplayerARPG
         {
             if (items == null)
                 return;
-            IEquipmentItem equipmentItem;
             foreach (BaseItem item in items)
             {
                 if (item == null || Items.ContainsKey(item.DataId))
@@ -559,13 +558,6 @@ namespace MultiplayerARPG
                 item.Validate();
                 Items[item.DataId] = item;
                 item.PrepareRelatesData();
-                // Validate equipment set
-                equipmentItem = item as IEquipmentItem;
-                if (equipmentItem != null && equipmentItem.EquipmentSet != null)
-                {
-                    equipmentItem.EquipmentSet.Validate();
-                    equipmentItem.EquipmentSet.PrepareRelatesData();
-                }
             }
         }
 
