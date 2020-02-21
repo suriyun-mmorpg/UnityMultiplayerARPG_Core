@@ -70,9 +70,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUseSkill(short index, bool isLeftHand)
+        public bool RequestUseSkill(int dataId, bool isLeftHand)
         {
-            return RequestUseSkill(index, isLeftHand, GetDefaultAttackAimPosition(isLeftHand));
+            return RequestUseSkill(dataId, isLeftHand, GetDefaultAttackAimPosition(isLeftHand));
         }
 
         public bool RequestUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)

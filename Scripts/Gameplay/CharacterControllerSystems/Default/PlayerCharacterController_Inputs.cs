@@ -552,7 +552,6 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-
                 if (IsTargetInAttackDistance(targetCharacter, attackDistance, CurrentGameInstance.characterLayer.Mask))
                 {
                     // Stop movement to attack
@@ -792,7 +791,6 @@ namespace MultiplayerARPG
             VoidAction setQueueFunction,
             BoolAction useFunction)
         {
-
             BaseCharacterEntity attackingCharacter;
             if (TryGetAttackingCharacter(out attackingCharacter))
             {
