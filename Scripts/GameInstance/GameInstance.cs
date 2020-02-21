@@ -269,7 +269,11 @@ namespace MultiplayerARPG
         
         public ArmorType DefaultArmorType { get; private set; }
         public WeaponType DefaultWeaponType { get; private set; }
-        public IWeaponItem DefaultWeaponItem { get; private set; }
+
+        public IWeaponItem DefaultWeaponItem
+        {
+            get { return defaultWeaponItem as IWeaponItem; }
+        }
 
         public DamageElement DefaultDamageElement
         {
@@ -295,7 +299,11 @@ namespace MultiplayerARPG
 
         protected virtual void Awake()
         {
-            Application.targetFrameRate = SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null ? 30 : -1;
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+            {
+                // Set target framerate when running headless to reduce CPU usage
+                Application.targetFrameRate = 30;
+            }
             Application.runInBackground = true;
             if (Singleton != null)
             {
