@@ -144,5 +144,26 @@ namespace MultiplayerARPG
         {
             return ItemType == ItemType.Skill;
         }
+
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            // Equipment / Pet max stack always equals to 1
+            switch (ItemType)
+            {
+                case ItemType.Armor:
+                case ItemType.Weapon:
+                case ItemType.Shield:
+                case ItemType.Pet:
+                case ItemType.Mount:
+                    if (maxStack != 1)
+                    {
+                        maxStack = 1;
+                        hasChanges = true;
+                    }
+                    break;
+            }
+            return hasChanges;
+        }
     }
 }

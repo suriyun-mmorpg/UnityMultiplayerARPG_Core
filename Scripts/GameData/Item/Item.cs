@@ -397,28 +397,13 @@ namespace MultiplayerARPG
         public override bool Validate()
         {
             bool hasChanges = false;
-            // Equipment / Pet max stack always equals to 1
-            switch (itemType)
-            {
-                case LegacyItemType.Armor:
-                case LegacyItemType.Weapon:
-                case LegacyItemType.Shield:
-                case LegacyItemType.Pet:
-                case LegacyItemType.Mount:
-                    if (maxStack != 1)
-                    {
-                        maxStack = 1;
-                        hasChanges = true;
-                    }
-                    break;
-            }
             // Migrate character stats → armor (equipment)
             if (GameDataMigration.MigrateArmor(increaseStats, increaseArmors, out increaseStats, out increaseArmors))
                 hasChanges = true;
             // Migrate character stats → armor (armor)
             if (GameDataMigration.MigrateBuffArmor(buff, out buff))
                 hasChanges = true;
-            return hasChanges;
+            return hasChanges || base.Validate();
         }
 
         public override void PrepareRelatesData()
