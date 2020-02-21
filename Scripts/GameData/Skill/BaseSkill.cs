@@ -40,6 +40,24 @@ namespace MultiplayerARPG
         [Header("Requirements to Levelup")]
         public SkillRequirement requirement;
 
+        public virtual string TypeTitle
+        {
+            get
+            {
+                switch (GetSkillType())
+                {
+                    case SkillType.Active:
+                        return LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_ACTIVE.ToString());
+                    case SkillType.Passive:
+                        return LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_PASSIVE.ToString());
+                    case SkillType.CraftItem:
+                        return LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString());
+                    default:
+                        return LanguageManager.GetUnknowTitle();
+                }
+            }
+        }
+
         [System.NonSerialized]
         private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
         public Dictionary<Attribute, float> CacheRequireAttributeAmounts

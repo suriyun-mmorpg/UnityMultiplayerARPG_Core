@@ -154,6 +154,44 @@ namespace MultiplayerARPG
             }
         }
 
+        public string TypeTitle
+        {
+            get
+            {
+                switch (itemType)
+                {
+                    case ItemType.Junk:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_JUNK.ToString());
+                    case ItemType.Armor:
+                        return ArmorType.Title;
+                    case ItemType.Weapon:
+                        return WeaponType.Title;
+                    case ItemType.Shield:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SHIELD.ToString());
+                    case ItemType.Potion:
+                    case ItemType.AttributeIncrease:
+                    case ItemType.AttributeReset:
+                    case ItemType.SkillLearn:
+                    case ItemType.SkillReset:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_POTION.ToString());
+                    case ItemType.Ammo:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_AMMO.ToString());
+                    case ItemType.Building:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_BUILDING.ToString());
+                    case ItemType.Pet:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_PET.ToString());
+                    case ItemType.SocketEnhancer:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString());
+                    case ItemType.Mount:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_MOUNT.ToString());
+                    case ItemType.Skill:
+                        return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SKILL.ToString());
+                    default:
+                        return LanguageManager.GetUnknowTitle();
+                }
+            }
+        }
+
         public override bool Validate()
         {
             bool hasChanges = false;

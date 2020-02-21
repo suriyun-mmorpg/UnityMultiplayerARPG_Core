@@ -183,24 +183,9 @@ namespace MultiplayerARPG
 
             if (uiTextSkillType != null)
             {
-                switch (Skill.GetSkillType())
-                {
-                    case SkillType.Active:
-                        uiTextSkillType.text = string.Format(
-                            LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
-                        break;
-                    case SkillType.Passive:
-                        uiTextSkillType.text = string.Format(
-                            LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
-                        break;
-                    case SkillType.CraftItem:
-                        uiTextSkillType.text = string.Format(
-                            LanguageManager.GetText(formatKeySkillType),
-                            LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString()));
-                        break;
-                }
+                uiTextSkillType.text = string.Format(
+                    LanguageManager.GetText(formatKeySkillType),
+                    Skill == null ? LanguageManager.GetUnknowTitle() : Skill.TypeTitle);
             }
 
             if (uiTextAvailableWeapons != null)
