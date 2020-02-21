@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class UIEquipmentItemRequirement : UISelectionEntry<Item>
+    public partial class UIEquipmentItemRequirement : UISelectionEntry<IEquipmentItem>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Require Level}")]
@@ -17,11 +17,9 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            Item equipmentItem = Data;
-
             if (uiTextRequireLevel != null)
             {
-                if (equipmentItem == null || equipmentItem.requirement.level <= 0)
+                if (Data == null || Data.Requirement.level <= 0)
                 {
                     // Hide require level label when require level <= 0
                     uiTextRequireLevel.gameObject.SetActive(false);
@@ -31,13 +29,13 @@ namespace MultiplayerARPG
                     uiTextRequireLevel.gameObject.SetActive(true);
                     uiTextRequireLevel.text = string.Format(
                         LanguageManager.GetText(formatKeyRequireLevel),
-                        equipmentItem.requirement.level.ToString("N0"));
+                        Data.Requirement.level.ToString("N0"));
                 }
             }
 
             if (uiTextRequireClass != null)
             {
-                if (equipmentItem == null || equipmentItem.requirement.character == null)
+                if (Data == null || Data.Requirement.character == null)
                 {
                     // Hide require class label when require character is null
                     uiTextRequireClass.gameObject.SetActive(false);
@@ -47,13 +45,13 @@ namespace MultiplayerARPG
                     uiTextRequireClass.gameObject.SetActive(true);
                     uiTextRequireClass.text = string.Format(
                         LanguageManager.GetText(formatKeyRequireClass),
-                        equipmentItem.requirement.character.Title);
+                        Data.Requirement.character.Title);
                 }
             }
 
             if (uiRequireAttributeAmounts != null)
             {
-                if (equipmentItem == null)
+                if (Data == null)
                 {
                     // Hide attribute amounts when item data is empty
                     uiRequireAttributeAmounts.Hide();
@@ -63,7 +61,7 @@ namespace MultiplayerARPG
                     uiRequireAttributeAmounts.displayType = UIAttributeAmounts.DisplayType.Requirement;
                     uiRequireAttributeAmounts.isBonus = false;
                     uiRequireAttributeAmounts.Show();
-                    uiRequireAttributeAmounts.Data = equipmentItem.CacheRequireAttributeAmounts;
+                    uiRequireAttributeAmounts.Data = Data.RequireAttributeAmounts;
                 }
             }
         }

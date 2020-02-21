@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class UIItemAmounts : UISelectionEntry<Dictionary<Item, short>>
+    public partial class UIItemAmounts : UISelectionEntry<Dictionary<BaseItem, short>>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
@@ -18,15 +18,15 @@ namespace MultiplayerARPG
         public UIItemTextPair[] textAmounts;
         public bool showAsRequirement;
 
-        private Dictionary<Item, TextWrapper> cacheTextLevels;
-        public Dictionary<Item, TextWrapper> CacheTextLevels
+        private Dictionary<BaseItem, TextWrapper> cacheTextLevels;
+        public Dictionary<BaseItem, TextWrapper> CacheTextLevels
         {
             get
             {
                 if (cacheTextLevels == null)
                 {
-                    cacheTextLevels = new Dictionary<Item, TextWrapper>();
-                    Item tempItem;
+                    cacheTextLevels = new Dictionary<BaseItem, TextWrapper>();
+                    BaseItem tempItem;
                     TextWrapper tempTextComponent;
                     foreach (UIItemTextPair textLevel in textAmounts)
                     {
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
 
-                foreach (KeyValuePair<Item, TextWrapper> entry in CacheTextLevels)
+                foreach (KeyValuePair<BaseItem, TextWrapper> entry in CacheTextLevels)
                 {
                     entry.Value.text = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
@@ -66,13 +66,13 @@ namespace MultiplayerARPG
             else
             {
                 string tempAllText = string.Empty;
-                Item tempItem;
+                BaseItem tempItem;
                 int tempCurrentAmount;
                 short tempTargetAmount;
                 string tempFormat;
                 string tempAmountText;
                 TextWrapper tempTextWrapper;
-                foreach (KeyValuePair<Item, short> dataEntry in Data)
+                foreach (KeyValuePair<BaseItem, short> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;

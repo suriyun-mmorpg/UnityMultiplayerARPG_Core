@@ -17,9 +17,9 @@ namespace MultiplayerARPG
         private SkillLevel[] skillLevels;
 
         [Header("Start Equipments")]
-        public Item rightHandEquipItem;
-        public Item leftHandEquipItem;
-        public Item[] armorItems;
+        public BaseItem rightHandEquipItem;
+        public BaseItem leftHandEquipItem;
+        public BaseItem[] armorItems;
 
         [Header("Start Map")]
         public MapInfo startMap;
@@ -53,15 +53,15 @@ namespace MultiplayerARPG
         public override bool Validate()
         {
             bool hasChanges = base.Validate();
-            Item tempRightHandWeapon = null;
-            Item tempLeftHandWeapon = null;
-            Item tempLeftHandShield = null;
+            IWeaponItem tempRightHandWeapon = null;
+            IWeaponItem tempLeftHandWeapon = null;
+            IShieldItem tempLeftHandShield = null;
             if (rightHandEquipItem != null)
             {
-                if (rightHandEquipItem.itemType == ItemType.Weapon)
-                    tempRightHandWeapon = rightHandEquipItem;
+                if (rightHandEquipItem.IsWeapon())
+                    tempRightHandWeapon = rightHandEquipItem as IWeaponItem;
 
-                if (tempRightHandWeapon == null || tempRightHandWeapon.weaponType == null)
+                if (tempRightHandWeapon == null || tempRightHandWeapon.WeaponType == null)
                 {
                     Debug.LogWarning("Right hand equipment is not weapon");
                     rightHandEquipItem = null;
@@ -70,12 +70,12 @@ namespace MultiplayerARPG
             }
             if (leftHandEquipItem != null)
             {
-                if (leftHandEquipItem.itemType == ItemType.Weapon)
-                    tempLeftHandWeapon = leftHandEquipItem;
-                if (leftHandEquipItem.itemType == ItemType.Shield)
-                    tempLeftHandShield = leftHandEquipItem;
+                if (leftHandEquipItem.IsWeapon())
+                    tempLeftHandWeapon = leftHandEquipItem as IWeaponItem;
+                if (leftHandEquipItem.IsShield())
+                    tempLeftHandShield = leftHandEquipItem as IShieldItem;
 
-                if ((tempLeftHandWeapon == null || tempLeftHandWeapon.weaponType == null) && tempLeftHandShield == null)
+                if ((tempLeftHandWeapon == null || tempLeftHandWeapon.WeaponType == null) && tempLeftHandShield == null)
                 {
                     Debug.LogWarning("Left hand equipment is not weapon or shield");
                     leftHandEquipItem = null;
@@ -96,25 +96,24 @@ namespace MultiplayerARPG
                         hasChanges = true;
                     }
                 }
-                if (leftHandEquipItem != null)
+                if (tempLeftHandWeapon != null &&
+                    (tempLeftHandWeapon.EquipType == WeaponItemEquipType.OneHand ||
+                    tempLeftHandWeapon.EquipType == WeaponItemEquipType.TwoHand))
                 {
-                    if (leftHandEquipItem.EquipType == WeaponItemEquipType.OneHand ||
-                        leftHandEquipItem.EquipType == WeaponItemEquipType.TwoHand)
-                    {
-                        Debug.LogWarning("Left hand weapon cannot be OneHand or TwoHand");
-                        leftHandEquipItem = null;
-                        hasChanges = true;
-                    }
+                    Debug.LogWarning("Left hand weapon cannot be OneHand or TwoHand");
+                    leftHandEquipItem = null;
+                    hasChanges = true;
                 }
             }
             List<string> equipedPositions = new List<string>();
+            BaseItem armorItem;
             for (int i = 0; i < armorItems.Length; ++i)
             {
-                Item armorItem = armorItems[i];
+                armorItem = armorItems[i];
                 if (armorItem == null)
                     continue;
 
-                if (armorItem.itemType != ItemType.Armor)
+                if (!armorItem.IsArmor())
                 {
                     // Item is not armor, so set it to NULL
                     armorItems[i] = null;
@@ -122,14 +121,16 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                if (equipedPositions.Contains(armorItem.EquipPosition))
+                if (equipedPositions.Contains((armorItem as IArmorItem).EquipPosition))
                 {
                     // Already equip armor at the position, it cannot equip same position again, So set it to NULL
                     armorItems[i] = null;
                     hasChanges = true;
                 }
                 else
-                    equipedPositions.Add(armorItem.EquipPosition);
+                {
+                    equipedPositions.Add((armorItem as IArmorItem).EquipPosition);
+                }
             }
             return hasChanges;
         }
@@ -137,7 +138,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            List<Item> items = new List<Item>();
+            List<BaseItem> items = new List<BaseItem>();
             if (armorItems != null && armorItems.Length > 0)
                 items.AddRange(armorItems);
             items.Add(rightHandEquipItem);

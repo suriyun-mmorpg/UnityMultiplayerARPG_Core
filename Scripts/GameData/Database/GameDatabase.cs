@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     public class GameDatabase : BaseGameDatabase
     {
         public Attribute[] attributes;
-        public Item[] items;
+        public BaseItem[] items;
         public GuildSkill[] guildSkills;
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;

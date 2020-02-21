@@ -333,9 +333,9 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { summon.monsterEntity });
             GameInstance.AddVehicleEntities(new VehicleEntity[] { mount.mountEntity });
-            List<Item> items = new List<Item>();
+            List<BaseItem> items = new List<BaseItem>();
             items.Add(itemCraft.CraftingItem);
-            foreach (Item item in itemCraft.CacheCraftRequirements.Keys)
+            foreach (BaseItem item in itemCraft.CacheCraftRequirements.Keys)
             {
                 items.Add(item);
             }

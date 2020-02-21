@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             }
             GameInstance.AddNpcDialogs(menuDialogs);
             // Add items
-            List<Item> items = new List<Item>();
+            List<BaseItem> items = new List<BaseItem>();
             if (sellItems != null && sellItems.Length > 0)
             {
                 foreach (NpcSellItem sellItem in sellItems)
@@ -506,7 +506,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Selling item
         /// </summary>
-        public Item item;
+        public BaseItem item;
         /// <summary>
         /// Require gold to buy item
         /// </summary>

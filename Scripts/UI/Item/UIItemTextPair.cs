@@ -3,7 +3,7 @@
     [System.Serializable]
     public struct UIItemTextPair
     {
-        public Item item;
+        public BaseItem item;
         public TextWrapper uiText;
     }
 }

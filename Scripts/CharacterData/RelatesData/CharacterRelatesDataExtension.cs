@@ -57,35 +57,35 @@ public static class CharacterRelatesDataExtension
         return data == null || data.Equals(CharacterSummon.Empty);
     }
     
-    public static Item GetRightHandWeaponItem(this EquipWeapons equipWeapons)
+    public static IWeaponItem GetRightHandWeaponItem(this EquipWeapons equipWeapons)
     {
         if (equipWeapons.IsEmptyRightHandSlot())
             return null;
         return equipWeapons.rightHand.GetWeaponItem();
     }
 
-    public static Item GetRightHandEquipmentItem(this EquipWeapons equipWeapons)
+    public static IEquipmentItem GetRightHandEquipmentItem(this EquipWeapons equipWeapons)
     {
         if (equipWeapons.IsEmptyRightHandSlot())
             return null;
         return equipWeapons.rightHand.GetEquipmentItem();
     }
 
-    public static Item GetLeftHandWeaponItem(this EquipWeapons equipWeapons)
+    public static IWeaponItem GetLeftHandWeaponItem(this EquipWeapons equipWeapons)
     {
         if (equipWeapons.IsEmptyLeftHandSlot())
             return null;
         return equipWeapons.leftHand.GetWeaponItem();
     }
 
-    public static Item GetLeftHandShieldItem(this EquipWeapons equipWeapons)
+    public static IShieldItem GetLeftHandShieldItem(this EquipWeapons equipWeapons)
     {
         if (equipWeapons.IsEmptyLeftHandSlot())
             return null;
         return equipWeapons.leftHand.GetShieldItem();
     }
 
-    public static Item GetLeftHandEquipmentItem(this EquipWeapons equipWeapons)
+    public static IEquipmentItem GetLeftHandEquipmentItem(this EquipWeapons equipWeapons)
     {
         if (equipWeapons.IsEmptyLeftHandSlot())
             return null;

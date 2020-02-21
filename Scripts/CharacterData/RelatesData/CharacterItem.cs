@@ -23,39 +23,33 @@ public class CharacterItem : INetSerializableWithElement
     private int dirtyDataId;
 
     [System.NonSerialized]
-    private Item cacheItem;
+    private BaseItem cacheItem;
     [System.NonSerialized]
-    private Item cacheEquipmentItem;
+    private IUsableItem cacheUsableItem;
     [System.NonSerialized]
-    private Item cacheDefendItem;
+    private IEquipmentItem cacheEquipmentItem;
     [System.NonSerialized]
-    private Item cacheArmorItem;
+    private IDefendEquipmentItem cacheDefendItem;
     [System.NonSerialized]
-    private Item cacheWeaponItem;
+    private IArmorItem cacheArmorItem;
     [System.NonSerialized]
-    private Item cacheShieldItem;
+    private IWeaponItem cacheWeaponItem;
     [System.NonSerialized]
-    private Item cachePotionItem;
+    private IShieldItem cacheShieldItem;
     [System.NonSerialized]
-    private Item cacheAmmoItem;
+    private IPotionItem cachePotionItem;
     [System.NonSerialized]
-    private Item cacheBuildingItem;
+    private IAmmoItem cacheAmmoItem;
     [System.NonSerialized]
-    private Item cachePetItem;
+    private IBuildingItem cacheBuildingItem;
     [System.NonSerialized]
-    private Item cacheSocketEnhancerItem;
+    private IPetItem cachePetItem;
     [System.NonSerialized]
-    private Item cacheMountItem;
+    private ISocketEnhancerItem cacheSocketEnhancerItem;
     [System.NonSerialized]
-    private Item cacheAttributeIncreaseItem;
+    private IMountItem cacheMountItem;
     [System.NonSerialized]
-    private Item cacheAttributeResetItem;
-    [System.NonSerialized]
-    private Item cacheSkillItem;
-    [System.NonSerialized]
-    private Item cacheSkillLearnItem;
-    [System.NonSerialized]
-    private Item cacheSkillResetItem;
+    private ISkillItem cacheSkillItem;
 
     [System.NonSerialized]
     private LiteNetLibElement element;
@@ -92,159 +86,132 @@ public class CharacterItem : INetSerializableWithElement
             cachePetItem = null;
             cacheSocketEnhancerItem = null;
             cacheMountItem = null;
-            cacheAttributeIncreaseItem = null;
-            cacheAttributeResetItem = null;
             cacheSkillItem = null;
-            cacheSkillLearnItem = null;
-            cacheSkillResetItem = null;
+
             if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
             {
+                if (cacheItem.IsUsable())
+                    cacheUsableItem = cacheItem as IUsableItem;
                 if (cacheItem.IsEquipment())
-                    cacheEquipmentItem = cacheItem;
+                    cacheEquipmentItem = cacheItem as IEquipmentItem;
                 if (cacheItem.IsDefendEquipment())
-                    cacheDefendItem = cacheItem;
+                    cacheDefendItem = cacheItem as IDefendEquipmentItem;
                 if (cacheItem.IsArmor())
-                    cacheArmorItem = cacheItem;
+                    cacheArmorItem = cacheItem as IArmorItem;
                 if (cacheItem.IsWeapon())
-                    cacheWeaponItem = cacheItem;
+                    cacheWeaponItem = cacheItem as IWeaponItem;
                 if (cacheItem.IsShield())
-                    cacheShieldItem = cacheItem;
+                    cacheShieldItem = cacheItem as IShieldItem;
                 if (cacheItem.IsPotion())
-                    cachePotionItem = cacheItem;
+                    cachePotionItem = cacheItem as IPotionItem;
                 if (cacheItem.IsAmmo())
-                    cacheAmmoItem = cacheItem;
+                    cacheAmmoItem = cacheItem as IAmmoItem;
                 if (cacheItem.IsBuilding())
-                    cacheBuildingItem = cacheItem;
+                    cacheBuildingItem = cacheItem as IBuildingItem;
                 if (cacheItem.IsPet())
-                    cachePetItem = cacheItem;
+                    cachePetItem = cacheItem as IPetItem;
                 if (cacheItem.IsSocketEnhancer())
-                    cacheSocketEnhancerItem = cacheItem;
+                    cacheSocketEnhancerItem = cacheItem as ISocketEnhancerItem;
                 if (cacheItem.IsMount())
-                    cacheMountItem = cacheItem;
-                if (cacheItem.IsAttributeIncrease())
-                    cacheAttributeIncreaseItem = cacheItem;
-                if (cacheItem.IsAttributeReset())
-                    cacheAttributeResetItem = cacheItem;
+                    cacheMountItem = cacheItem as IMountItem;
                 if (cacheItem.IsSkill())
-                    cacheSkillItem = cacheItem;
-                if (cacheItem.IsSkillLearn())
-                    cacheSkillLearnItem = cacheItem;
-                if (cacheItem.IsSkillReset())
-                    cacheSkillResetItem = cacheItem;
+                    cacheSkillItem = cacheItem as ISkillItem;
             }
         }
     }
 
-    public Item GetItem()
+    public BaseItem GetItem()
     {
         MakeCache();
         return cacheItem;
     }
 
-    public Item GetEquipmentItem()
+    public IUsableItem GetUsableItem()
+    {
+        MakeCache();
+        return cacheUsableItem;
+    }
+
+    public IEquipmentItem GetEquipmentItem()
     {
         MakeCache();
         return cacheEquipmentItem;
     }
 
-    public Item GetDefendItem()
+    public IDefendEquipmentItem GetDefendItem()
     {
         MakeCache();
         return cacheDefendItem;
     }
 
-    public Item GetArmorItem()
+    public IArmorItem GetArmorItem()
     {
         MakeCache();
         return cacheArmorItem;
     }
 
-    public Item GetWeaponItem()
+    public IWeaponItem GetWeaponItem()
     {
         MakeCache();
         return cacheWeaponItem;
     }
 
-    public Item GetShieldItem()
+    public IShieldItem GetShieldItem()
     {
         MakeCache();
         return cacheShieldItem;
     }
 
-    public Item GetPotionItem()
+    public IPotionItem GetPotionItem()
     {
         MakeCache();
         return cachePotionItem;
     }
 
-    public Item GetAmmoItem()
+    public IAmmoItem GetAmmoItem()
     {
         MakeCache();
         return cacheAmmoItem;
     }
 
-    public Item GetBuildingItem()
+    public IBuildingItem GetBuildingItem()
     {
         MakeCache();
         return cacheBuildingItem;
     }
 
-    public Item GetPetItem()
+    public IPetItem GetPetItem()
     {
         MakeCache();
         return cachePetItem;
     }
 
-    public Item GetSocketEnhancerItem()
+    public ISocketEnhancerItem GetSocketEnhancerItem()
     {
         MakeCache();
         return cacheSocketEnhancerItem;
     }
 
-    public Item GetMountItem()
+    public IMountItem GetMountItem()
     {
         MakeCache();
         return cacheMountItem;
     }
 
-    public Item GetAttributeIncreaseItem()
-    {
-        MakeCache();
-        return cacheAttributeIncreaseItem;
-    }
-
-    public Item GetAttributeResetItem()
-    {
-        MakeCache();
-        return cacheAttributeResetItem;
-    }
-
-    public Item GetSkillItem()
+    public ISkillItem GetSkillItem()
     {
         MakeCache();
         return cacheSkillItem;
     }
 
-    public Item GetSkillLearnItem()
-    {
-        MakeCache();
-        return cacheSkillLearnItem;
-    }
-
-    public Item GetSkillResetItem()
-    {
-        MakeCache();
-        return cacheSkillResetItem;
-    }
-
     public short GetMaxStack()
     {
-        return GetItem() == null ? (short)0 : GetItem().maxStack;
+        return GetItem() == null ? (short)0 : GetItem().MaxStack;
     }
 
     public float GetMaxDurability()
     {
-        return GetItem() == null ? 0f : GetItem().maxDurability;
+        return GetEquipmentItem() == null ? 0f : GetEquipmentItem().MaxDurability;
     }
 
     public bool IsFull()
@@ -264,10 +231,10 @@ public class CharacterItem : INetSerializableWithElement
 
     public bool IsAmmoEmpty()
     {
-        Item item = GetWeaponItem();
+        IWeaponItem item = GetWeaponItem();
         if (item != null)
         {
-            if (item.ammoCapacity > 0)
+            if (item.AmmoCapacity > 0)
                 return ammo == 0;
         }
         return false;
@@ -275,11 +242,11 @@ public class CharacterItem : INetSerializableWithElement
 
     public bool IsAmmoFull()
     {
-        Item item = GetWeaponItem();
+        IWeaponItem item = GetWeaponItem();
         if (item != null)
         {
-            if (item.ammoCapacity > 0)
-                return ammo >= item.ammoCapacity;
+            if (item.AmmoCapacity > 0)
+                return ammo >= item.AmmoCapacity;
         }
         return true;
     }
@@ -390,11 +357,11 @@ public class CharacterItem : INetSerializableWithElement
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return CharacterStats.Empty;
         CharacterStats result = new CharacterStats();
-        Item tempEnhancer;
+        BaseItem tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                result += tempEnhancer.socketEnhanceEffect.stats;
+                result += (tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.stats;
         }
         return result;
     }
@@ -404,11 +371,11 @@ public class CharacterItem : INetSerializableWithElement
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return CharacterStats.Empty;
         CharacterStats result = new CharacterStats();
-        Item tempEnhancer;
+        BaseItem tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                result += tempEnhancer.socketEnhanceEffect.statsRate;
+                result += (tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.statsRate;
         }
         return result;
     }
@@ -418,11 +385,11 @@ public class CharacterItem : INetSerializableWithElement
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return null;
         Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
-        Item tempEnhancer;
+        BaseItem tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                result = GameDataHelpers.CombineAttributes(tempEnhancer.socketEnhanceEffect.attributes, result, 1f);
+                result = GameDataHelpers.CombineAttributes((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.attributes, result, 1f);
         }
         return result;
     }
@@ -432,11 +399,11 @@ public class CharacterItem : INetSerializableWithElement
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return null;
         Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
-        Item tempEnhancer;
+        BaseItem tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                result = GameDataHelpers.CombineAttributes(tempEnhancer.socketEnhanceEffect.attributesRate, result, 1f);
+                result = GameDataHelpers.CombineAttributes((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.attributesRate, result, 1f);
         }
         return result;
     }
@@ -446,11 +413,11 @@ public class CharacterItem : INetSerializableWithElement
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return null;
         Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-        Item tempEnhancer;
+        BaseItem tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                result = GameDataHelpers.CombineResistances(tempEnhancer.socketEnhanceEffect.resistances, result, 1f);
+                result = GameDataHelpers.CombineResistances((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.resistances, result, 1f);
         }
         return result;
     }
@@ -460,11 +427,11 @@ public class CharacterItem : INetSerializableWithElement
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return null;
         Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-        Item tempEnhancer;
+        BaseItem tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                result = GameDataHelpers.CombineArmors(tempEnhancer.socketEnhanceEffect.armors, result, 1f);
+                result = GameDataHelpers.CombineArmors((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.armors, result, 1f);
         }
         return result;
     }
@@ -474,11 +441,11 @@ public class CharacterItem : INetSerializableWithElement
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return null;
         Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
-        Item tempEnhancer;
+        BaseItem tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                result = GameDataHelpers.CombineDamages(tempEnhancer.socketEnhanceEffect.damages, result, 1f);
+                result = GameDataHelpers.CombineDamages((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.damages, result, 1f);
         }
         return result;
     }
@@ -488,11 +455,11 @@ public class CharacterItem : INetSerializableWithElement
         if (GetEquipmentItem() == null || Sockets.Count == 0)
             return null;
         Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>();
-        Item tempEnhancer;
+        BaseItem tempEnhancer;
         foreach (int socketId in Sockets)
         {
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                result = GameDataHelpers.CombineSkills(tempEnhancer.socketEnhanceEffect.skills, result);
+                result = GameDataHelpers.CombineSkills((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.skills, result);
         }
         return result;
     }
@@ -514,7 +481,7 @@ public class CharacterItem : INetSerializableWithElement
         return cloneItem;
     }
 
-    public static CharacterItem Create(Item item, short level = 1, short amount = 1)
+    public static CharacterItem Create(IItem item, short level = 1, short amount = 1)
     {
         return Create(item.DataId, level, amount);
     }
@@ -530,11 +497,11 @@ public class CharacterItem : INetSerializableWithElement
         newItem.exp = 0;
         newItem.lockRemainsDuration = 0f;
         newItem.ammo = 0;
-        Item tempItem = null;
-        if (GameInstance.Items.TryGetValue(dataId, out tempItem))
+        BaseItem tempItem = null;
+        if (GameInstance.Items.TryGetValue(dataId, out tempItem) && tempItem is IEquipmentItem)
         {
-            newItem.durability = tempItem.maxDurability;
-            newItem.lockRemainsDuration = tempItem.lockDuration;
+            newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
+            newItem.lockRemainsDuration = tempItem.LockDuration;
         }
         return newItem;
     }

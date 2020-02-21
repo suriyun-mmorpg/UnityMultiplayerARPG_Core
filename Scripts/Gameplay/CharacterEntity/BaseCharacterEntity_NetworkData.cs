@@ -161,7 +161,7 @@ namespace MultiplayerARPG
                 equipItemIndexes.Clear();
                 equipItems.Clear();
                 CharacterItem tempEquipItem;
-                Item tempArmor;
+                IArmorItem tempArmor;
                 string tempEquipPosition;
                 for (int i = 0; i < value.Count; ++i)
                 {
@@ -471,9 +471,9 @@ namespace MultiplayerARPG
         protected void SetEquipWeaponsModels()
         {
             tempDirtyEquipItems.Clear();
-            if (EquipWeapons.GetRightHandEquipmentItem())
+            if (EquipWeapons.GetRightHandEquipmentItem() != null)
                 tempDirtyEquipItems.Append(0).Append(EquipWeapons.rightHand.dataId).Append(":").Append(EquipWeapons.rightHand.level);
-            if (EquipWeapons.GetLeftHandEquipmentItem())
+            if (EquipWeapons.GetLeftHandEquipmentItem() != null)
                 tempDirtyEquipItems.Append(1).Append(EquipWeapons.leftHand.dataId).Append(":").Append(EquipWeapons.leftHand.level);
 
             if (!tempDirtyEquipItems.ToString().Equals(dirtyEquipWeapons))
@@ -491,11 +491,11 @@ namespace MultiplayerARPG
             tempDirtyEquipItems.Clear();
             if (EquipItems != null)
             {
-                Item armorItem;
+                IEquipmentItem armorItem;
                 for (int i = 0; i < EquipItems.Count; ++i)
                 {
                     armorItem = EquipItems[i].GetArmorItem();
-                    if (!armorItem) continue;
+                    if (armorItem == null) continue;
                     tempDirtyEquipItems.Append(i).Append(":").Append(EquipItems[i].dataId).Append(":").Append(EquipItems[i].level);
                 }
             }

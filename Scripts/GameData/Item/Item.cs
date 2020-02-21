@@ -7,48 +7,32 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public enum ItemType : byte
-    {
-        Junk,
-        Armor,
-        Weapon,
-        Shield,
-        Potion,
-        Ammo,
-        Building,
-        Pet,
-        SocketEnhancer,
-        Mount,
-        AttributeIncrease,
-        AttributeReset,
-        Skill,
-        SkillLearn,
-        SkillReset,
-    }
-
-    public enum FireType : byte
-    {
-        SingleFire,
-        Automatic,
-    }
-
     [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item", order = -4899)]
-    public partial class Item : BaseGameData
+    public partial class Item : BaseItem,
+        IArmorItem, IShieldItem, IWeaponItem,
+        IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem
     {
-        [Header("Item Configs")]
-        public ItemType itemType;
-        public GameObject dropModel;
-        public int sellPrice;
-        public float weight;
-        [Range(1, 1000)]
-        public short maxStack = 1;
-        public ItemRefine itemRefine;
-        [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
-        public float lockDuration;
+        public enum LegacyItemType : byte
+        {
+            Junk,
+            Armor,
+            Weapon,
+            Shield,
+            Potion,
+            Ammo,
+            Building,
+            Pet,
+            SocketEnhancer,
+            Mount,
+            AttributeIncrease,
+            AttributeReset,
+            Skill,
+            SkillLearn,
+            SkillReset,
+        }
 
-        [Header("Dismantle Configs")]
-        public int dismantleReturnGold;
-        public ItemAmount[] dismantleReturnItems;
+        [Header("Item Configs")]
+        public LegacyItemType itemType;
 
         [Header("Equipment Configs")]
         public EquipmentRequirement requirement;
@@ -134,57 +118,75 @@ namespace MultiplayerARPG
         [Header("Skill Configs")]
         public SkillLevel skillLevel;
 
-        public override string Title
-        {
-            get
-            {
-                if (itemRefine == null)
-                    return base.Title;
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + base.Title + "</color>";
-            }
-        }
-
-        public string RarityTitle
-        {
-            get
-            {
-                if (itemRefine == null)
-                    return "Normal";
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + itemRefine.Title + "</color>";
-            }
-        }
-
-        public string TypeTitle
+        public override ItemType ItemType
         {
             get
             {
                 switch (itemType)
                 {
-                    case ItemType.Junk:
+                    case LegacyItemType.Junk:
+                        return ItemType.Junk;
+                    case LegacyItemType.Armor:
+                        return ItemType.Armor;
+                    case LegacyItemType.Weapon:
+                        return ItemType.Weapon;
+                    case LegacyItemType.Shield:
+                        return ItemType.Shield;
+                    case LegacyItemType.Potion:
+                    case LegacyItemType.AttributeIncrease:
+                    case LegacyItemType.AttributeReset:
+                    case LegacyItemType.SkillLearn:
+                    case LegacyItemType.SkillReset:
+                        return ItemType.Potion;
+                    case LegacyItemType.Ammo:
+                        return ItemType.Ammo;
+                    case LegacyItemType.Building:
+                        return ItemType.Building;
+                    case LegacyItemType.Pet:
+                        return ItemType.Pet;
+                    case LegacyItemType.SocketEnhancer:
+                        return ItemType.SocketEnhancer;
+                    case LegacyItemType.Mount:
+                        return ItemType.Mount;
+                    case LegacyItemType.Skill:
+                        return ItemType.Skill;
+                    default:
+                        return ItemType.Junk;
+                }
+            }
+        }
+
+        public override string TypeTitle
+        {
+            get
+            {
+                switch (itemType)
+                {
+                    case LegacyItemType.Junk:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_JUNK.ToString());
-                    case ItemType.Armor:
+                    case LegacyItemType.Armor:
                         return ArmorType.Title;
-                    case ItemType.Weapon:
+                    case LegacyItemType.Weapon:
                         return WeaponType.Title;
-                    case ItemType.Shield:
+                    case LegacyItemType.Shield:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SHIELD.ToString());
-                    case ItemType.Potion:
-                    case ItemType.AttributeIncrease:
-                    case ItemType.AttributeReset:
-                    case ItemType.SkillLearn:
-                    case ItemType.SkillReset:
+                    case LegacyItemType.Potion:
+                    case LegacyItemType.AttributeIncrease:
+                    case LegacyItemType.AttributeReset:
+                    case LegacyItemType.SkillLearn:
+                    case LegacyItemType.SkillReset:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_POTION.ToString());
-                    case ItemType.Ammo:
+                    case LegacyItemType.Ammo:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_AMMO.ToString());
-                    case ItemType.Building:
+                    case LegacyItemType.Building:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_BUILDING.ToString());
-                    case ItemType.Pet:
+                    case LegacyItemType.Pet:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_PET.ToString());
-                    case ItemType.SocketEnhancer:
+                    case LegacyItemType.SocketEnhancer:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString());
-                    case ItemType.Mount:
+                    case LegacyItemType.Mount:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_MOUNT.ToString());
-                    case ItemType.Skill:
+                    case LegacyItemType.Skill:
                         return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SKILL.ToString());
                     default:
                         return LanguageManager.GetUnknowTitle();
@@ -192,17 +194,217 @@ namespace MultiplayerARPG
             }
         }
 
+        #region Implement IEquipmentItem
+        public EquipmentRequirement Requirement
+        {
+            get { return requirement; }
+        }
+
+        public Dictionary<Attribute, float> RequireAttributeAmounts
+        {
+            get { return CacheRequireAttributeAmounts; }
+        }
+
+        public EquipmentSet EquipmentSet
+        {
+            get { return equipmentSet; }
+        }
+
+        public float MaxDurability
+        {
+            get { return maxDurability; }
+        }
+
+        public bool DestroyIfBroken
+        {
+            get { return destroyIfBroken; }
+        }
+
+        public byte MaxSocket
+        {
+            get { return maxSocket; }
+        }
+
+        public EquipmentModel[] EquipmentModels
+        {
+            get { return equipmentModels; }
+        }
+
+        public CharacterStatsIncremental IncreaseStats
+        {
+            get { return increaseStats; }
+        }
+
+        public CharacterStatsIncremental IncreaseStatsRate
+        {
+            get { return increaseStatsRate; }
+        }
+
+        public AttributeIncremental[] IncreaseAttributes
+        {
+            get { return increaseAttributes; }
+        }
+
+        public AttributeIncremental[] IncreaseAttributesRate
+        {
+            get { return increaseAttributesRate; }
+        }
+
+        public ResistanceIncremental[] IncreaseResistances
+        {
+            get { return increaseResistances; }
+        }
+
+        public ArmorIncremental[] IncreaseArmors
+        {
+            get { return increaseArmors; }
+        }
+
+        public DamageIncremental[] IncreaseDamages
+        {
+            get { return increaseDamages; }
+        }
+
+        public SkillLevel[] IncreaseSkillLevels
+        {
+            get { return increaseSkillLevels; }
+        }
+        #endregion
+
+        #region Implement IDefendItem
+        public ArmorIncremental ArmorAmount
+        {
+            get { return armorAmount; }
+        }
+        #endregion
+
+        #region Implement IArmorItem
+        public ArmorType ArmorType
+        {
+            get
+            {
+                if (armorType == null && GameInstance.Singleton != null)
+                    armorType = GameInstance.Singleton.DefaultArmorType;
+                return armorType;
+            }
+        }
+
+        public string EquipPosition
+        {
+            get { return ArmorType == null ? string.Empty : ArmorType.Id; }
+        }
+        #endregion
+
+        #region Implement IWeaponItem
+        public WeaponType WeaponType
+        {
+            get
+            {
+                if (weaponType == null && GameInstance.Singleton != null)
+                    weaponType = GameInstance.Singleton.DefaultWeaponType;
+                return weaponType;
+            }
+        }
+
+        public WeaponItemEquipType EquipType
+        {
+            get { return WeaponType == null ? WeaponItemEquipType.OneHand : WeaponType.equipType; }
+        }
+
+        public EquipmentModel[] OffHandEquipmentModels
+        {
+            get { return subEquipmentModels; }
+        }
+
+        public DamageIncremental DamageAmount
+        {
+            get { return damageAmount; }
+        }
+
+        public IncrementalMinMaxFloat HarvestDamageAmount
+        {
+            get { return harvestDamageAmount; }
+        }
+
+        public float MoveSpeedRateWhileAttacking
+        {
+            get { return moveSpeedRateWhileAttacking; }
+        }
+
+        public short AmmoCapacity
+        {
+            get { return ammoCapacity; }
+        }
+
+        public BaseWeaponAbility WeaponAbility
+        {
+            get { return weaponAbility; }
+        }
+
+        public CrosshairSetting CrosshairSetting
+        {
+            get { return crosshairSetting; }
+        }
+
+        public FireType FireType
+        {
+            get { return fireType; }
+        }
+
+        public Vector2 FireStagger
+        {
+            get { return fireStagger; }
+        }
+
+        public byte FireSpread
+        {
+            get { return fireSpread; }
+        }
+        #endregion
+
+        #region Implement IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem
+        public Buff Buff
+        {
+            get { return buff; }
+        }
+
+        public BuildingEntity BuildingEntity
+        {
+            get { return buildingEntity; }
+        }
+
+        public BaseMonsterCharacterEntity PetEntity
+        {
+            get { return petEntity; }
+        }
+
+        public VehicleEntity MountEntity
+        {
+            get { return mountEntity; }
+        }
+
+        public BaseSkill UsingSkill
+        {
+            get { return skillLevel.skill; }
+        }
+
+        public short UsingSkillLevel
+        {
+            get { return skillLevel.level; }
+        }
+        #endregion
+
         public override bool Validate()
         {
             bool hasChanges = false;
             // Equipment / Pet max stack always equals to 1
             switch (itemType)
             {
-                case ItemType.Armor:
-                case ItemType.Weapon:
-                case ItemType.Shield:
-                case ItemType.Pet:
-                case ItemType.Mount:
+                case LegacyItemType.Armor:
+                case LegacyItemType.Weapon:
+                case LegacyItemType.Shield:
+                case LegacyItemType.Pet:
+                case LegacyItemType.Mount:
                     if (maxStack != 1)
                     {
                         maxStack = 1;
@@ -240,106 +442,6 @@ namespace MultiplayerARPG
             GameInstance.AddSkillLevels(skillLevels);
         }
 
-        public bool IsEquipment()
-        {
-            return IsArmor() || IsShield() || IsWeapon();
-        }
-
-        public bool IsUsable()
-        {
-            return IsPotion() || IsPet() || IsMount() || IsAttributeIncrease() || IsAttributeReset() || IsSkill() || IsSkillLearn() || IsSkillReset();
-        }
-
-        public bool IsDefendEquipment()
-        {
-            return IsArmor() || IsShield();
-        }
-
-        public bool IsJunk()
-        {
-            return itemType == ItemType.Junk;
-        }
-
-        public bool IsArmor()
-        {
-            return itemType == ItemType.Armor;
-        }
-
-        public bool IsShield()
-        {
-            return itemType == ItemType.Shield;
-        }
-
-        public bool IsWeapon()
-        {
-            return itemType == ItemType.Weapon;
-        }
-
-        public bool IsPotion()
-        {
-            return itemType == ItemType.Potion;
-        }
-
-        public bool IsAmmo()
-        {
-            return itemType == ItemType.Ammo;
-        }
-
-        public bool IsBuilding()
-        {
-            return itemType == ItemType.Building;
-        }
-
-        public bool IsPet()
-        {
-            return itemType == ItemType.Pet;
-        }
-
-        public bool IsSocketEnhancer()
-        {
-            return itemType == ItemType.SocketEnhancer;
-        }
-
-        public bool IsMount()
-        {
-            return itemType == ItemType.Mount;
-        }
-
-        public bool IsAttributeIncrease()
-        {
-            return itemType == ItemType.AttributeIncrease;
-        }
-
-        public bool IsAttributeReset()
-        {
-            return itemType == ItemType.AttributeReset;
-        }
-
-        public bool IsSkill()
-        {
-            return itemType == ItemType.Skill;
-        }
-
-        public bool IsSkillLearn()
-        {
-            return itemType == ItemType.SkillLearn;
-        }
-
-        public bool IsSkillReset()
-        {
-            return itemType == ItemType.SkillReset;
-        }
-
-        public int MaxLevel
-        {
-            get
-            {
-                if (itemRefine == null || itemRefine.levels == null || itemRefine.levels.Length == 0)
-                    return 1;
-                return itemRefine.levels.Length;
-            }
-        }
-        
         [System.NonSerialized]
         private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
         public Dictionary<Attribute, float> CacheRequireAttributeAmounts
@@ -352,34 +454,27 @@ namespace MultiplayerARPG
             }
         }
 
-        public ArmorType ArmorType
+        public Item GenerateDefaultItem(WeaponType type)
         {
-            get
+            name = GameDataConst.DEFAULT_WEAPON_ID;
+            title = GameDataConst.DEFAULT_WEAPON_TITLE;
+            itemType = LegacyItemType.Weapon;
+            weaponType = type;
+            // Default damage amount
+            IncrementalMinMaxFloat damageAmountMinMax = new IncrementalMinMaxFloat();
+            damageAmountMinMax.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
+            damageAmountMinMax.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
+            damageAmount = new DamageIncremental()
             {
-                if (armorType == null && GameInstance.Singleton != null)
-                    armorType = GameInstance.Singleton.DefaultArmorType;
-                return armorType;
-            }
-        }
-
-        public string EquipPosition
-        {
-            get { return ArmorType == null ? string.Empty : ArmorType.Id; }
-        }
-
-        public WeaponType WeaponType
-        {
-            get
+                amount = damageAmountMinMax,
+            };
+            // Default harvest damage amount
+            harvestDamageAmount = new IncrementalMinMaxFloat()
             {
-                if (weaponType == null && GameInstance.Singleton != null)
-                    weaponType = GameInstance.Singleton.DefaultWeaponType;
-                return weaponType;
-            }
-        }
-
-        public WeaponItemEquipType EquipType
-        {
-            get { return WeaponType == null ? WeaponItemEquipType.OneHand : WeaponType.equipType; }
+                baseAmount = new MinMaxFloat() { min = 1, max = 1 },
+                amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 }
+            };
+            return this;
         }
 
         public bool CanEquip(BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType)
@@ -425,56 +520,104 @@ namespace MultiplayerARPG
             AmmoType requireAmmoType = WeaponType.requireAmmoType;
             return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
         }
-    }
 
-    [System.Serializable]
-    public struct EquipmentModel
-    {
-        public string equipSocket;
-        public GameObject model;
-    }
+        public void UseItem(BaseCharacterEntity character, short itemIndex, CharacterItem characterItem)
+        {
+            switch (itemType)
+            {
+                case LegacyItemType.Potion:
+                    UseItemPotion(character, itemIndex, characterItem.level);
+                    break;
+                case LegacyItemType.Pet:
+                    UseItemPet(character, itemIndex, characterItem.level, characterItem.exp);
+                    break;
+                case LegacyItemType.Mount:
+                    UseItemMount(character, itemIndex, characterItem.level);
+                    break;
+                case LegacyItemType.AttributeIncrease:
+                    UseItemAttributeIncrease(character as BasePlayerCharacterEntity, itemIndex);
+                    break;
+                case LegacyItemType.AttributeReset:
+                    UseItemAttributeReset(character as BasePlayerCharacterEntity, itemIndex);
+                    break;
+                case LegacyItemType.SkillLearn:
+                    UseItemSkillLearn(character as BasePlayerCharacterEntity, itemIndex);
+                    break;
+                case LegacyItemType.SkillReset:
+                    UseItemSkillReset(character as BasePlayerCharacterEntity, itemIndex);
+                    break;
+            }
+        }
 
-    [System.Serializable]
-    public struct ItemAmount
-    {
-        public Item item;
-        public short amount;
-    }
+        protected void UseItemPotion(BaseCharacterEntity character, short itemIndex, short level)
+        {
+            if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1))
+                return;
+            character.ApplyBuff(DataId, BuffType.PotionBuff, level, character);
+        }
 
-    [System.Serializable]
-    public struct ItemDrop
-    {
-        public Item item;
-        public short amount;
-        [Range(0f, 1f)]
-        public float dropRate;
-    }
+        protected void UseItemPet(BaseCharacterEntity character, short itemIndex, short level, int exp)
+        {
+            if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1))
+                return;
+            // Clear all summoned pets
+            CharacterSummon tempSummon;
+            for (int i = 0; i < character.Summons.Count; ++i)
+            {
+                tempSummon = character.Summons[i];
+                if (tempSummon.type != SummonType.Pet)
+                    continue;
+                character.Summons.RemoveAt(i);
+                tempSummon.UnSummon(character);
+            }
+            // Summon new pet
+            CharacterSummon newSummon = CharacterSummon.Create(SummonType.Pet, DataId);
+            newSummon.Summon(character, level, 0f, exp);
+            character.Summons.Add(newSummon);
+        }
 
-    [System.Serializable]
-    public struct ItemDropByWeight
-    {
-        public Item item;
-        public float amountPerDamage;
-        public int randomWeight;
-    }
+        protected void UseItemMount(BaseCharacterEntity character, short itemIndex, short level)
+        {
+            if (!character.CanUseItem() || level <= 0)
+                return;
 
-    [System.Serializable]
-    public struct EquipmentRequirement
-    {
-        public PlayerCharacter character;
-        public short level;
-        [ArrayElementTitle("attribute", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
-        public AttributeAmount[] attributeAmounts;
-    }
+            character.Mount(MountEntity);
+        }
 
-    [System.Serializable]
-    public struct CrosshairSetting
-    {
-        public bool hidden;
-        public float expandPerFrameWhileMoving;
-        public float expandPerFrameWhileAttacking;
-        public float shrinkPerFrame;
-        public float minSpread;
-        public float maxSpread;
+        protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, short itemIndex)
+        {
+            if (!character.CanUseItem() || attributeAmount.attribute == null)
+                return;
+
+            GameMessage.Type gameMessageType;
+            if (!character.AddAttribute(out gameMessageType, attributeAmount.attribute.DataId, (short)attributeAmount.amount, itemIndex))
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(character.ConnectionId, gameMessageType);
+        }
+
+        protected void UseItemAttributeReset(BasePlayerCharacterEntity character, short itemIndex)
+        {
+            if (!character.CanUseItem())
+                return;
+
+            character.ResetAttributes(itemIndex);
+        }
+
+        protected void UseItemSkillLearn(BasePlayerCharacterEntity character, short itemIndex)
+        {
+            if (!character.CanUseItem() || UsingSkill == null)
+                return;
+
+            GameMessage.Type gameMessageType;
+            if (!character.AddSkill(out gameMessageType, UsingSkill.DataId, UsingSkillLevel, itemIndex))
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(character.ConnectionId, gameMessageType);
+        }
+
+        protected void UseItemSkillReset(BasePlayerCharacterEntity character, short itemIndex)
+        {
+            if (!character.CanUseItem())
+                return;
+
+            character.ResetSkills(itemIndex);
+        }
     }
 }

@@ -24,12 +24,12 @@ namespace MultiplayerARPG
             if (nonEquipItems[index].IsLock())
                 return false;
 
-            Item item = nonEquipItems[index].GetSkillItem();
+            ISkillItem item = nonEquipItems[index].GetSkillItem();
             if (item == null)
                 return false;
 
-            BaseSkill skill = item.skillLevel.skill;
-            short skillLevel = item.skillLevel.level;
+            BaseSkill skill = item.UsingSkill;
+            short skillLevel = item.UsingSkillLevel;
             if (skill == null)
                 return false;
 

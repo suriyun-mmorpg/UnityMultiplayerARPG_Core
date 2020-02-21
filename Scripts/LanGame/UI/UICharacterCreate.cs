@@ -291,7 +291,7 @@ namespace MultiplayerARPG
                 SelectedDataId = baseCharacter.DataId;
                 // Prepare equip items
                 List<CharacterItem> equipItems = new List<CharacterItem>();
-                foreach (Item armorItem in SelectedPlayerCharacter.armorItems)
+                foreach (BaseItem armorItem in SelectedPlayerCharacter.armorItems)
                 {
                     if (armorItem == null)
                         continue;

@@ -71,13 +71,13 @@ namespace MultiplayerARPG
         public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
 
         [System.NonSerialized]
-        private Dictionary<Item, short> cacheCreateGuildRequireItems;
-        public Dictionary<Item, short> CacheCreateGuildRequireItems
+        private Dictionary<BaseItem, short> cacheCreateGuildRequireItems;
+        public Dictionary<BaseItem, short> CacheCreateGuildRequireItems
         {
             get
             {
                 if (cacheCreateGuildRequireItems == null)
-                    cacheCreateGuildRequireItems = GameDataHelpers.CombineItems(createGuildRequireItems, new Dictionary<Item, short>());
+                    cacheCreateGuildRequireItems = GameDataHelpers.CombineItems(createGuildRequireItems, new Dictionary<BaseItem, short>());
                 return cacheCreateGuildRequireItems;
             }
         }

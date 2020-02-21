@@ -111,9 +111,9 @@ namespace MultiplayerARPG
                 return;
 
             // Detect type of equipping slot and validate
-            Item armorItem = draggedItemUI.uiCharacterItem.CharacterItem.GetArmorItem();
-            Item weaponItem = draggedItemUI.uiCharacterItem.CharacterItem.GetWeaponItem();
-            Item shieldItem = draggedItemUI.uiCharacterItem.CharacterItem.GetShieldItem();
+            IArmorItem armorItem = draggedItemUI.uiCharacterItem.CharacterItem.GetArmorItem();
+            IWeaponItem weaponItem = draggedItemUI.uiCharacterItem.CharacterItem.GetWeaponItem();
+            IShieldItem shieldItem = draggedItemUI.uiCharacterItem.CharacterItem.GetShieldItem();
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.EquipItems:

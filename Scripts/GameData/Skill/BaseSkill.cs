@@ -366,8 +366,8 @@ namespace MultiplayerARPG
                         available = availableWeapons == null || availableWeapons.Length == 0;
                         if (!available)
                         {
-                            Item rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
-                            Item leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
+                            IWeaponItem rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
+                            IWeaponItem leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
                             foreach (WeaponType availableWeapon in availableWeapons)
                             {
                                 if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)

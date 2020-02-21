@@ -31,7 +31,7 @@ public class CharacterBuff : INetSerializableWithElement
     [System.NonSerialized]
     private BaseSkill cacheSkill;
     [System.NonSerialized]
-    private Item cacheItem;
+    private BaseItem cacheItem;
     [System.NonSerialized]
     private GuildSkill cacheGuildSkill;
     [System.NonSerialized]
@@ -108,8 +108,8 @@ public class CharacterBuff : INetSerializableWithElement
                         cacheBuff = type == BuffType.SkillBuff ? cacheSkill.GetBuff() : cacheSkill.GetDebuff();
                     break;
                 case BuffType.PotionBuff:
-                    if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
-                        cacheBuff = cacheItem.buff;
+                    if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null && cacheItem.IsPotion())
+                        cacheBuff = (cacheItem as IPotionItem).Buff;
                     break;
                 case BuffType.GuildSkillBuff:
                     if (GameInstance.GuildSkills.TryGetValue(dataId, out cacheGuildSkill) && cacheGuildSkill != null)
@@ -139,7 +139,7 @@ public class CharacterBuff : INetSerializableWithElement
         return cacheSkill;
     }
 
-    public Item GetItem()
+    public BaseItem GetItem()
     {
         MakeCache();
         return cacheItem;

@@ -455,7 +455,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!equippingItem.GetItem().CanEquip(this, equippingItem.level, out gameMessageType))
+            if (!equippingItem.GetEquipmentItem().CanEquip(this, equippingItem.level, out gameMessageType))
                 return false;
 
             this.FillWeaponSetsIfNeeded(equipWeaponSet);
@@ -470,7 +470,7 @@ namespace MultiplayerARPG
                 tempEquipWeapons.GetLeftHandShieldItem() != null;
 
             // Equipping item is weapon
-            Item equippingWeaponItem = equippingItem.GetWeaponItem();
+            IWeaponItem equippingWeaponItem = equippingItem.GetWeaponItem();
             if (equippingWeaponItem != null)
             {
                 switch (equippingWeaponItem.EquipType)
@@ -526,7 +526,7 @@ namespace MultiplayerARPG
             }
 
             // Equipping item is shield
-            Item equippingShieldItem = equippingItem.GetShieldItem();
+            IShieldItem equippingShieldItem = equippingItem.GetShieldItem();
             if (equippingShieldItem != null)
             {
                 // If it is shield, its equip position must be left hand
@@ -556,11 +556,11 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!equippingItem.GetItem().CanEquip(this, equippingItem.level, out gameMessageType))
+            if (!equippingItem.GetEquipmentItem().CanEquip(this, equippingItem.level, out gameMessageType))
                 return false;
 
             // Equipping item is armor
-            Item equippingArmorItem = equippingItem.GetArmorItem();
+            IArmorItem equippingArmorItem = equippingItem.GetArmorItem();
             if (equippingArmorItem != null)
             {
                 unEquippingIndex = (short)this.IndexOfEquipItemByEquipPosition(equippingArmorItem.EquipPosition, equipSlotIndex);
@@ -681,7 +681,7 @@ namespace MultiplayerARPG
         {
             equipItemIndexes.Clear();
             CharacterItem tempEquipItem;
-            Item tempArmor;
+            IArmorItem tempArmor;
             string tempEquipPosition;
             for (int i = 0; i < equipItems.Count; ++i)
             {
@@ -731,32 +731,32 @@ namespace MultiplayerARPG
         #region Weapons / Damage
         public virtual CrosshairSetting GetCrosshairSetting()
         {
-            Item rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
-            Item leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
+            IWeaponItem rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
+            IWeaponItem leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
             if (rightWeaponItem != null && leftWeaponItem != null)
             {
                 // Create new crosshair setting based on weapons
                 return new CrosshairSetting()
                 {
-                    hidden = rightWeaponItem.crosshairSetting.hidden || leftWeaponItem.crosshairSetting.hidden,
-                    expandPerFrameWhileMoving = (rightWeaponItem.crosshairSetting.expandPerFrameWhileMoving + leftWeaponItem.crosshairSetting.expandPerFrameWhileMoving) / 2f,
-                    expandPerFrameWhileAttacking = (rightWeaponItem.crosshairSetting.expandPerFrameWhileAttacking + leftWeaponItem.crosshairSetting.expandPerFrameWhileAttacking) / 2f,
-                    shrinkPerFrame = (rightWeaponItem.crosshairSetting.shrinkPerFrame + leftWeaponItem.crosshairSetting.shrinkPerFrame) / 2f,
-                    minSpread = (rightWeaponItem.crosshairSetting.minSpread + leftWeaponItem.crosshairSetting.minSpread) / 2f,
-                    maxSpread = (rightWeaponItem.crosshairSetting.maxSpread + leftWeaponItem.crosshairSetting.maxSpread) / 2f
+                    hidden = rightWeaponItem.CrosshairSetting.hidden || leftWeaponItem.CrosshairSetting.hidden,
+                    expandPerFrameWhileMoving = (rightWeaponItem.CrosshairSetting.expandPerFrameWhileMoving + leftWeaponItem.CrosshairSetting.expandPerFrameWhileMoving) / 2f,
+                    expandPerFrameWhileAttacking = (rightWeaponItem.CrosshairSetting.expandPerFrameWhileAttacking + leftWeaponItem.CrosshairSetting.expandPerFrameWhileAttacking) / 2f,
+                    shrinkPerFrame = (rightWeaponItem.CrosshairSetting.shrinkPerFrame + leftWeaponItem.CrosshairSetting.shrinkPerFrame) / 2f,
+                    minSpread = (rightWeaponItem.CrosshairSetting.minSpread + leftWeaponItem.CrosshairSetting.minSpread) / 2f,
+                    maxSpread = (rightWeaponItem.CrosshairSetting.maxSpread + leftWeaponItem.CrosshairSetting.maxSpread) / 2f
                 };
             }
             if (rightWeaponItem != null)
-                return rightWeaponItem.crosshairSetting;
+                return rightWeaponItem.CrosshairSetting;
             if (leftWeaponItem != null)
-                return leftWeaponItem.crosshairSetting;
-            return CurrentGameInstance.DefaultWeaponItem.crosshairSetting;
+                return leftWeaponItem.CrosshairSetting;
+            return CurrentGameInstance.DefaultWeaponItem.CrosshairSetting;
         }
 
         public virtual float GetAttackDistance(bool isLeftHand)
         {
-            Item rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
-            Item leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
+            IWeaponItem rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
+            IWeaponItem leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
             if (!isLeftHand)
             {
                 if (rightWeaponItem != null)
@@ -776,8 +776,8 @@ namespace MultiplayerARPG
 
         public virtual float GetAttackFov(bool isLeftHand)
         {
-            Item rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
-            Item leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
+            IWeaponItem rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
+            IWeaponItem leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
             if (!isLeftHand)
             {
                 if (rightWeaponItem != null)
@@ -1379,12 +1379,12 @@ namespace MultiplayerARPG
             {
                 case AnimActionType.AttackRightHand:
                     if (EquipWeapons.GetRightHandWeaponItem() != null)
-                        return EquipWeapons.GetRightHandWeaponItem().moveSpeedRateWhileAttacking;
-                    return CurrentGameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                        return EquipWeapons.GetRightHandWeaponItem().MoveSpeedRateWhileAttacking;
+                    return CurrentGameInstance.DefaultWeaponItem.MoveSpeedRateWhileAttacking;
                 case AnimActionType.AttackLeftHand:
                     if (EquipWeapons.GetLeftHandWeaponItem() != null)
-                        return EquipWeapons.GetLeftHandWeaponItem().moveSpeedRateWhileAttacking;
-                    return CurrentGameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
+                        return EquipWeapons.GetLeftHandWeaponItem().MoveSpeedRateWhileAttacking;
+                    return CurrentGameInstance.DefaultWeaponItem.MoveSpeedRateWhileAttacking;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
                     // Calculate move speed rate while doing action at clients and server

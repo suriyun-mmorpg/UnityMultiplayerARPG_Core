@@ -14,23 +14,19 @@ namespace MultiplayerARPG
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public short Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
-        public Item Item { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() : null; } }
-        public Item EquipmentItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
-        public Item ArmorItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
-        public Item ShieldItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
-        public Item DefendItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetDefendItem() : null; } }
-        public Item WeaponItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
-        public Item PotionItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPotionItem() : null; } }
-        public Item AmmoItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
-        public Item BuildingItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetBuildingItem() : null; } }
-        public Item PetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPetItem() : null; } }
-        public Item SocketEnhancerItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
-        public Item MountItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetMountItem() : null; } }
-        public Item AttributeIncreaseItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAttributeIncreaseItem() : null; } }
-        public Item AttributeResetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAttributeResetItem() : null; } }
-        public Item SkillItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSkillItem() : null; } }
-        public Item SkillLearnItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSkillLearnItem() : null; } }
-        public Item SkillResetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSkillResetItem() : null; } }
+        public BaseItem Item { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() : null; } }
+        public IEquipmentItem EquipmentItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
+        public IArmorItem ArmorItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
+        public IShieldItem ShieldItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
+        public IDefendEquipmentItem DefendItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetDefendItem() : null; } }
+        public IWeaponItem WeaponItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
+        public IPotionItem PotionItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPotionItem() : null; } }
+        public IAmmoItem AmmoItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
+        public IBuildingItem BuildingItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetBuildingItem() : null; } }
+        public IPetItem PetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPetItem() : null; } }
+        public ISocketEnhancerItem SocketEnhancerItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
+        public IMountItem MountItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetMountItem() : null; } }
+        public ISkillItem SkillItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSkillItem() : null; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -305,7 +301,7 @@ namespace MultiplayerARPG
             {
                 uiTextSellPrice.text = string.Format(
                     LanguageManager.GetText(formatKeySellPrice),
-                    Item == null ? "0" : Item.sellPrice.ToString("N0"));
+                    Item == null ? "0" : Item.SellPrice.ToString("N0"));
             }
 
             if (uiTextStack != null)
@@ -323,10 +319,10 @@ namespace MultiplayerARPG
                     stackString = string.Format(
                         LanguageManager.GetText(formatKeyStack),
                         CharacterItem.amount.ToString("N0"),
-                        Item.maxStack);
+                        Item.MaxStack);
                 }
                 uiTextStack.text = stackString;
-                uiTextStack.gameObject.SetActive(CharacterItem.NotEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.maxStack > 1)));
+                uiTextStack.gameObject.SetActive(CharacterItem.NotEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
             }
 
             if (uiTextDurability != null)
@@ -344,23 +340,25 @@ namespace MultiplayerARPG
                     durabilityString = string.Format(
                         LanguageManager.GetText(formatKeyDurability),
                         CharacterItem.durability.ToString("N0"),
-                        Item.maxDurability);
+                        EquipmentItem != null ? EquipmentItem.MaxDurability.ToString("N0") : "0");
                 }
                 uiTextDurability.text = durabilityString;
-                uiTextDurability.gameObject.SetActive(EquipmentItem != null && Item.maxDurability > 0);
+                uiTextDurability.gameObject.SetActive(EquipmentItem != null && EquipmentItem.MaxDurability > 0);
             }
 
             if (uiTextWeight != null)
             {
                 uiTextWeight.text = string.Format(
                     LanguageManager.GetText(formatKeyWeight),
-                    Item == null ? "0" : Item.weight.ToString("N2"));
+                    Item == null ? "0" : Item.Weight.ToString("N2"));
             }
 
             if (uiRequirement != null)
             {
-                if (EquipmentItem == null || (EquipmentItem.requirement.level == 0 && EquipmentItem.requirement.character == null && EquipmentItem.CacheRequireAttributeAmounts.Count == 0))
+                if (EquipmentItem == null || (EquipmentItem.Requirement.level == 0 && EquipmentItem.Requirement.character == null && EquipmentItem.RequireAttributeAmounts.Count == 0))
+                {
                     uiRequirement.Hide();
+                }
                 else
                 {
                     uiRequirement.Show();
@@ -374,7 +372,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem != null)
                     stats += EquipmentItem.GetIncreaseStats(Level);
                 else if (SocketEnhancerItem != null)
-                    stats += SocketEnhancerItem.socketEnhanceEffect.stats;
+                    stats += SocketEnhancerItem.SocketEnhanceEffect.stats;
 
                 if (stats.IsEmpty())
                 {
@@ -396,7 +394,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem != null)
                     statsRate += EquipmentItem.GetIncreaseStatsRate(Level);
                 else if (SocketEnhancerItem != null)
-                    statsRate += SocketEnhancerItem.socketEnhanceEffect.statsRate;
+                    statsRate += SocketEnhancerItem.SocketEnhanceEffect.statsRate;
 
                 if (statsRate.IsEmpty())
                 {
@@ -418,7 +416,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem != null)
                     attributes = EquipmentItem.GetIncreaseAttributes(Level);
                 else if (SocketEnhancerItem != null)
-                    attributes = GameDataHelpers.CombineAttributes(SocketEnhancerItem.socketEnhanceEffect.attributes, attributes, 1f);
+                    attributes = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributes, attributes, 1f);
 
                 if (attributes == null || attributes.Count == 0)
                 {
@@ -440,7 +438,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem != null)
                     attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level);
                 else if (SocketEnhancerItem != null)
-                    attributesRate = GameDataHelpers.CombineAttributes(SocketEnhancerItem.socketEnhanceEffect.attributesRate, attributesRate, 1f);
+                    attributesRate = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributesRate, attributesRate, 1f);
 
                 if (attributesRate == null || attributesRate.Count == 0)
                 {
@@ -462,7 +460,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem != null)
                     resistances = EquipmentItem.GetIncreaseResistances(Level);
                 else if (SocketEnhancerItem != null)
-                    resistances = GameDataHelpers.CombineResistances(SocketEnhancerItem.socketEnhanceEffect.resistances, resistances, 1f);
+                    resistances = GameDataHelpers.CombineResistances(SocketEnhancerItem.SocketEnhanceEffect.resistances, resistances, 1f);
 
                 if (resistances == null || resistances.Count == 0)
                 {
@@ -483,7 +481,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem != null)
                     armors = EquipmentItem.GetIncreaseArmors(Level);
                 else if (SocketEnhancerItem != null)
-                    armors = GameDataHelpers.CombineArmors(SocketEnhancerItem.socketEnhanceEffect.armors, armors, 1f);
+                    armors = GameDataHelpers.CombineArmors(SocketEnhancerItem.SocketEnhanceEffect.armors, armors, 1f);
 
                 if (armors == null || armors.Count == 0)
                 {
@@ -504,7 +502,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem != null)
                     damageAmounts = EquipmentItem.GetIncreaseDamages(Level);
                 else if (SocketEnhancerItem != null)
-                    damageAmounts = GameDataHelpers.CombineDamages(SocketEnhancerItem.socketEnhanceEffect.damages, damageAmounts, 1f);
+                    damageAmounts = GameDataHelpers.CombineDamages(SocketEnhancerItem.SocketEnhanceEffect.damages, damageAmounts, 1f);
 
                 if (damageAmounts == null || damageAmounts.Count == 0)
                 {
@@ -525,7 +523,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem != null)
                     skillLevels = EquipmentItem.GetIncreaseSkills();
                 else if (SocketEnhancerItem != null)
-                    skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.socketEnhanceEffect.skills, skillLevels);
+                    skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.SocketEnhanceEffect.skills, skillLevels);
 
                 if (skillLevels == null || skillLevels.Count == 0)
                 {
@@ -543,7 +541,7 @@ namespace MultiplayerARPG
 
             if (uiEquipmentSet != null)
             {
-                if (EquipmentItem == null || EquipmentItem.equipmentSet == null || EquipmentItem.equipmentSet.effects.Length == 0)
+                if (EquipmentItem == null || EquipmentItem.EquipmentSet == null || EquipmentItem.EquipmentSet.effects.Length == 0)
                 {
                     // Only equipment item has equipment set data
                     uiEquipmentSet.Hide();
@@ -552,26 +550,30 @@ namespace MultiplayerARPG
                 {
                     uiEquipmentSet.Show();
                     int equippedCount = 0;
-                    Character.GetCaches().EquipmentSets.TryGetValue(EquipmentItem.equipmentSet, out equippedCount);
-                    uiEquipmentSet.Data = new UIEquipmentSetData(EquipmentItem.equipmentSet, equippedCount);
+                    Character.GetCaches().EquipmentSets.TryGetValue(EquipmentItem.EquipmentSet, out equippedCount);
+                    uiEquipmentSet.Data = new UIEquipmentSetData(EquipmentItem.EquipmentSet, equippedCount);
                 }
             }
 
             if (uiEquipmentSockets != null)
             {
-                if (EquipmentItem == null || EquipmentItem.maxSocket <= 0)
+                if (EquipmentItem == null || EquipmentItem.MaxSocket <= 0)
+                {
                     uiEquipmentSockets.Hide();
+                }
                 else
                 {
                     uiEquipmentSockets.Show();
-                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.maxSocket);
+                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.MaxSocket);
                 }
             }
 
             if (uiArmorAmount != null)
             {
                 if (DefendItem == null)
+                {
                     uiArmorAmount.Hide();
+                }
                 else
                 {
                     uiArmorAmount.Show();
@@ -583,7 +585,9 @@ namespace MultiplayerARPG
             if (uiDamageAmount != null)
             {
                 if (WeaponItem == null)
+                {
                     uiDamageAmount.Hide();
+                }
                 else
                 {
                     uiDamageAmount.Show();
@@ -592,7 +596,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (PetItem != null && PetItem.petEntity != null)
+            if (PetItem != null && PetItem.PetEntity != null)
             {
                 int[] expTree = GameInstance.Singleton.ExpTree;
                 int currentExp = 0;
@@ -626,54 +630,62 @@ namespace MultiplayerARPG
 
             if (uiTextBuilding != null)
             {
-                if (BuildingItem == null || BuildingItem.petEntity == null)
+                if (BuildingItem == null || BuildingItem.BuildingEntity == null)
+                {
                     uiTextBuilding.gameObject.SetActive(false);
+                }
                 else
                 {
                     uiTextBuilding.gameObject.SetActive(true);
                     uiTextBuilding.text = string.Format(
                         LanguageManager.GetText(formatKeyBuilding),
-                        BuildingItem.buildingEntity.Title);
+                        BuildingItem.BuildingEntity.Title);
                 }
             }
 
             if (uiTextPet != null)
             {
-                if (PetItem == null || PetItem.petEntity == null)
+                if (PetItem == null || PetItem.PetEntity == null)
+                {
                     uiTextPet.gameObject.SetActive(false);
+                }
                 else
                 {
                     uiTextPet.gameObject.SetActive(true);
                     uiTextPet.text = string.Format(
                         LanguageManager.GetText(formatKeyPet),
-                        PetItem.petEntity.Title);
+                        PetItem.PetEntity.Title);
                 }
             }
 
             if (uiTextMount != null)
             {
-                if (MountItem == null || MountItem.mountEntity == null)
+                if (MountItem == null || MountItem.MountEntity == null)
+                {
                     uiTextMount.gameObject.SetActive(false);
+                }
                 else
                 {
                     uiTextMount.gameObject.SetActive(true);
                     uiTextMount.text = string.Format(
                         LanguageManager.GetText(formatKeyMount),
-                        MountItem.mountEntity.Title);
+                        MountItem.MountEntity.Title);
                 }
             }
 
             if (uiTextSkill != null)
             {
-                if (SkillItem == null || SkillItem.skillLevel.skill == null)
+                if (SkillItem == null || SkillItem.UsingSkill == null)
+                {
                     uiTextSkill.gameObject.SetActive(false);
+                }
                 else
                 {
                     uiTextSkill.gameObject.SetActive(true);
                     uiTextSkill.text = string.Format(
                         LanguageManager.GetText(formatKeySkill),
-                        SkillItem.skillLevel.skill.Title,
-                        SkillItem.skillLevel.level);
+                        SkillItem.UsingSkill.Title,
+                        SkillItem.UsingSkillLevel);
                 }
             }
 

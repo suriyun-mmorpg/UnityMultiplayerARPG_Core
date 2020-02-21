@@ -84,7 +84,7 @@ public static partial class CharacterDataExtension
         foreach (CharacterItem item in itemList)
         {
             if (item.IsEmptySlot()) continue;
-            result += item.GetItem().weight * item.amount;
+            result += item.GetItem().Weight * item.amount;
         }
         return result;
     }
@@ -608,7 +608,7 @@ public static partial class CharacterDataExtension
     #region Increasing Items Will Overwhelming
     public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
     {
-        Item itemData;
+        BaseItem itemData;
         if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
         {
             // If item not valid
@@ -627,7 +627,7 @@ public static partial class CharacterDataExtension
             return false;
         }
 
-        short maxStack = itemData.maxStack;
+        short maxStack = itemData.MaxStack;
         // Loop to all slots to add amount to any slots that item amount not max in stack
         CharacterItem tempItem;
         for (int i = 0; i < itemList.Count; ++i)
@@ -753,10 +753,10 @@ public static partial class CharacterDataExtension
         if (minSlotIndex < 0)
             minSlotIndex = 0;
 
-        Item itemData = addingItem.GetItem();
+        BaseItem itemData = addingItem.GetItem();
         short amount = addingItem.amount;
 
-        short maxStack = itemData.maxStack;
+        short maxStack = itemData.MaxStack;
         Dictionary<int, CharacterItem> emptySlots = new Dictionary<int, CharacterItem>();
         Dictionary<int, CharacterItem> changes = new Dictionary<int, CharacterItem>();
         // Loop to all slots to add amount to any slots that item amount not max in stack
@@ -918,7 +918,7 @@ public static partial class CharacterDataExtension
         for (int i = nonEquipItems.Count - 1; i >= 0; --i)
         {
             CharacterItem nonEquipItem = nonEquipItems[i];
-            if (nonEquipItem.GetAmmoItem() != null && nonEquipItem.GetAmmoItem().ammoType == ammoType)
+            if (nonEquipItem.GetAmmoItem() != null && nonEquipItem.GetAmmoItem().AmmoType == ammoType)
             {
                 if (amount - nonEquipItem.amount > 0)
                     tempDecresingAmount = nonEquipItem.amount;
@@ -998,12 +998,12 @@ public static partial class CharacterDataExtension
         int count = 0;
         if (data != null && data.NonEquipItems.Count > 0)
         {
-            Item ammoItem;
+            IAmmoItem ammoItem;
             IList<CharacterItem> nonEquipItems = data.NonEquipItems;
             foreach (CharacterItem nonEquipItem in nonEquipItems)
             {
                 ammoItem = nonEquipItem.GetAmmoItem();
-                if (ammoItem != null && ammoType == ammoItem.ammoType)
+                if (ammoItem != null && ammoType == ammoItem.AmmoType)
                     count += nonEquipItem.amount;
             }
         }
@@ -1012,8 +1012,8 @@ public static partial class CharacterDataExtension
 
     public static CharacterItem GetAvailableWeapon(this ICharacterData data, ref bool isLeftHand)
     {
-        Item rightWeaponItem = data.EquipWeapons.GetRightHandWeaponItem();
-        Item leftWeaponItem = data.EquipWeapons.GetLeftHandWeaponItem();
+        IWeaponItem rightWeaponItem = data.EquipWeapons.GetRightHandWeaponItem();
+        IWeaponItem leftWeaponItem = data.EquipWeapons.GetLeftHandWeaponItem();
         if (!isLeftHand)
         {
             if (rightWeaponItem != null)
@@ -1035,7 +1035,7 @@ public static partial class CharacterDataExtension
             }
         }
         isLeftHand = false;
-        return CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem);
+        return CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem.DataId);
     }
 
     public static DamageInfo GetWeaponDamageInfo(this ICharacterData data, ref bool isLeftHand)
@@ -1183,7 +1183,7 @@ public static partial class CharacterDataExtension
                 continue;
 
             if (tempItem.equipSlotIndex == equipSlotIndex &&
-                equipPosition.Equals(tempItem.GetEquipmentItem().EquipPosition))
+                equipPosition.Equals(tempItem.GetArmorItem().EquipPosition))
             {
                 index = i;
                 break;
@@ -1376,12 +1376,12 @@ public static partial class CharacterDataExtension
     public static int IndexOfAmmoItem(this ICharacterData data, AmmoType ammoType)
     {
         IList<CharacterItem> list = data.NonEquipItems;
-        Item tempAmmoItem;
+        IAmmoItem tempAmmoItem;
         int index = -1;
         for (int i = 0; i < list.Count; ++i)
         {
             tempAmmoItem = list[i].GetAmmoItem();
-            if (tempAmmoItem != null && tempAmmoItem.ammoType == ammoType)
+            if (tempAmmoItem != null && tempAmmoItem.AmmoType == ammoType)
             {
                 index = i;
                 break;
@@ -1411,37 +1411,37 @@ public static partial class CharacterDataExtension
             equipmentSets.Clear();
         }
 
-        Item tempEquipmentItem;
+        IEquipmentItem tempEquipmentItem;
         // Armor equipment set
         foreach (CharacterItem equipItem in data.EquipItems)
         {
             tempEquipmentItem = equipItem.GetEquipmentItem();
-            if (tempEquipmentItem != null && tempEquipmentItem.equipmentSet != null)
+            if (tempEquipmentItem != null && tempEquipmentItem.EquipmentSet != null)
             {
-                if (equipmentSets.ContainsKey(tempEquipmentItem.equipmentSet))
-                    ++equipmentSets[tempEquipmentItem.equipmentSet];
+                if (equipmentSets.ContainsKey(tempEquipmentItem.EquipmentSet))
+                    ++equipmentSets[tempEquipmentItem.EquipmentSet];
                 else
-                    equipmentSets.Add(tempEquipmentItem.equipmentSet, 0);
+                    equipmentSets.Add(tempEquipmentItem.EquipmentSet, 0);
             }
         }
         // Weapon equipment set
         tempEquipmentItem = data.EquipWeapons.GetRightHandEquipmentItem();
         // Right hand equipment set
-        if (tempEquipmentItem != null && tempEquipmentItem.equipmentSet != null)
+        if (tempEquipmentItem != null && tempEquipmentItem.EquipmentSet != null)
         {
-            if (equipmentSets.ContainsKey(tempEquipmentItem.equipmentSet))
-                ++equipmentSets[tempEquipmentItem.equipmentSet];
+            if (equipmentSets.ContainsKey(tempEquipmentItem.EquipmentSet))
+                ++equipmentSets[tempEquipmentItem.EquipmentSet];
             else
-                equipmentSets.Add(tempEquipmentItem.equipmentSet, 0);
+                equipmentSets.Add(tempEquipmentItem.EquipmentSet, 0);
         }
         tempEquipmentItem = data.EquipWeapons.GetLeftHandEquipmentItem();
         // Left hand equipment set
-        if (tempEquipmentItem != null && tempEquipmentItem.equipmentSet != null)
+        if (tempEquipmentItem != null && tempEquipmentItem.EquipmentSet != null)
         {
-            if (equipmentSets.ContainsKey(tempEquipmentItem.equipmentSet))
-                ++equipmentSets[tempEquipmentItem.equipmentSet];
+            if (equipmentSets.ContainsKey(tempEquipmentItem.EquipmentSet))
+                ++equipmentSets[tempEquipmentItem.EquipmentSet];
             else
-                equipmentSets.Add(tempEquipmentItem.equipmentSet, 0);
+                equipmentSets.Add(tempEquipmentItem.EquipmentSet, 0);
         }
         // Prepare base stats, it will be multiplied with increase stats rate
         CharacterStats baseStats = new CharacterStats();

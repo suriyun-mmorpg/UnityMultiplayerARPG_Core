@@ -77,10 +77,10 @@ namespace MultiplayerARPG
             if (weapon == null)
                 return true;
 
-            Item weaponItem = weapon.GetWeaponItem();
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             if (weaponItem.WeaponType.requireAmmoType != null)
             {
-                if (weaponItem.ammoCapacity <= 0)
+                if (weaponItem.AmmoCapacity <= 0)
                 {
                     // Ammo capacity is 0 so reduce ammo from inventory
                     if (this.CountAmmos(weaponItem.WeaponType.requireAmmoType) == 0)
@@ -103,8 +103,8 @@ namespace MultiplayerARPG
             if (weapon == null)
                 return;
 
-            Item weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.ammoCapacity <= 0)
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem.AmmoCapacity <= 0)
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
                 Dictionary<CharacterItem, short> decreaseAmmoItems;
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
                 {
                     KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
                     CharacterItem ammoCharacterItem = firstEntry.Key;
-                    Item ammoItem = ammoCharacterItem.GetItem();
+                    IAmmoItem ammoItem = ammoCharacterItem.GetAmmoItem();
                     if (ammoItem != null && firstEntry.Value > 0)
                     {
                         // Ammo level always 1
@@ -146,16 +146,16 @@ namespace MultiplayerARPG
             if (reloadingWeapon.IsEmptySlot())
                 return;
 
-            Item reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
+            IWeaponItem reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
             if (reloadingWeaponItem == null ||
                 reloadingWeaponItem.WeaponType == null ||
                 reloadingWeaponItem.WeaponType.requireAmmoType == null ||
-                reloadingWeaponItem.ammoCapacity <= 0 ||
-                reloadingWeapon.ammo >= reloadingWeaponItem.ammoCapacity)
+                reloadingWeaponItem.AmmoCapacity <= 0 ||
+                reloadingWeapon.ammo >= reloadingWeaponItem.AmmoCapacity)
                 return;
 
             // Prepare reload data
-            reloadingAmmoAmount = (short)(reloadingWeaponItem.ammoCapacity - reloadingWeapon.ammo);
+            reloadingAmmoAmount = (short)(reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo);
             int inventoryAmount = this.CountAmmos(reloadingWeaponItem.WeaponType.requireAmmoType);
             if (inventoryAmount < reloadingAmmoAmount)
                 reloadingAmmoAmount = (short)inventoryAmount;
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
         {
             animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;
             CharacterItem reloadingWeapon = isLeftHand ? EquipWeapons.leftHand : EquipWeapons.rightHand;
-            Item reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
+            IWeaponItem reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
 
             // Prepare requires data and get animation data
             float[] triggerDurations;
@@ -388,8 +388,8 @@ namespace MultiplayerARPG
             if (weapon != null && weapon.GetWeaponItem() != null)
             {
                 // For monsters, their weapon can be null so have to avoid null exception
-                fireSpread = weapon.GetWeaponItem().fireSpread;
-                fireStagger = weapon.GetWeaponItem().fireStagger;
+                fireSpread = weapon.GetWeaponItem().FireSpread;
+                fireStagger = weapon.GetWeaponItem().FireStagger;
             }
 
             Vector3 stagger;

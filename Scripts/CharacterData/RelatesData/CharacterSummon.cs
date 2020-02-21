@@ -34,7 +34,7 @@ public class CharacterSummon : INetSerializableWithElement
     [System.NonSerialized]
     private BaseSkill cacheSkill;
     [System.NonSerialized]
-    private Item cachePetItem;
+    private BaseItem cachePetItem;
     [System.NonSerialized]
     private BaseMonsterCharacterEntity cachePrefab;
 
@@ -73,8 +73,8 @@ public class CharacterSummon : INetSerializableWithElement
                         cachePrefab = cacheSkill.GetSummon().monsterEntity;
                     break;
                 case SummonType.Pet:
-                    if (GameInstance.Items.TryGetValue(dataId, out cachePetItem))
-                        cachePrefab = cachePetItem.petEntity;
+                    if (GameInstance.Items.TryGetValue(dataId, out cachePetItem) && cachePetItem is IPetItem)
+                        cachePrefab = (cachePetItem as IPetItem).PetEntity;
                     break;
             }
         }
@@ -86,7 +86,7 @@ public class CharacterSummon : INetSerializableWithElement
         return cacheSkill;
     }
 
-    public Item GetPetItem()
+    public BaseItem GetPetItem()
     {
         MakeCache();
         return cachePetItem;

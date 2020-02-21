@@ -139,14 +139,14 @@ namespace MultiplayerARPG
                 return false;
 
             CharacterItem equippingItem = NonEquipItems[nonEquipIndex];
-            Item equippingArmorItem = equippingItem.GetArmorItem();
-            Item equippingWeaponItem = equippingItem.GetWeaponItem();
-            Item equippingShieldItem = equippingItem.GetShieldItem();
+            IArmorItem equippingArmorItem = equippingItem.GetArmorItem();
+            IWeaponItem equippingWeaponItem = equippingItem.GetWeaponItem();
+            IShieldItem equippingShieldItem = equippingItem.GetShieldItem();
             if (equippingWeaponItem != null)
             {
                 if (equippingWeaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
                 {
-                    Item rightWeapon = EquipWeapons.GetRightHandWeaponItem();
+                    IWeaponItem rightWeapon = EquipWeapons.GetRightHandWeaponItem();
                     // Equip at left-hand if able to do it
                     if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
                         return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
@@ -175,7 +175,7 @@ namespace MultiplayerARPG
                 {
                     equippedItem = EquipItems[i];
                     // If equipped item is same armor type, find which slot it is equipped
-                    if (equippedItem.GetItem().ArmorType == equippingArmorItem.ArmorType)
+                    if (equippedItem.GetArmorItem().ArmorType == equippingArmorItem.ArmorType)
                         equippedSlots[equippedItem.equipSlotIndex] = true;
                 }
                 // Find free slot

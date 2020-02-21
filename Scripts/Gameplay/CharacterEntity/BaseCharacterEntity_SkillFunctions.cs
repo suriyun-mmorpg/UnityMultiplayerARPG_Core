@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             if (skill == null)
                 return;
             // Prepare weapon data
-            Item weaponItem = weapon.GetWeaponItem();
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
             // Get activate animation type which defined at character model
             SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);

@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            List<ItemAmount> returningItems = Item.GetDismantleReturnItems(CharacterItem);
+            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(CharacterItem);
             if (uiReturnItems != null)
             {
                 if (CharacterItem.IsEmptySlot() || returningItems.Count == 0)
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                 {
                     uiReturnItems.showAsRequirement = false;
                     uiReturnItems.Show();
-                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems.ToArray(), new Dictionary<Item, short>()); ;
+                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems.ToArray(), new Dictionary<BaseItem, short>()); ;
                 }
             }
 
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
                 {
                     uiTextReturnGold.text = string.Format(
                             LanguageManager.GetText(formatKeyReturnGold),
-                            CharacterItem.GetItem().dismantleReturnGold.ToString("N0"));
+                            CharacterItem.GetItem().DismantleReturnGold.ToString("N0"));
                 }
             }
         }

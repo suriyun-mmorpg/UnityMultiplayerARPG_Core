@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class Item
+    public partial class BaseItem
     {
         public static List<ItemAmount> GetDismantleReturnItems(CharacterItem dismantlingItem)
         {
@@ -12,7 +12,7 @@ namespace MultiplayerARPG
             List<ItemAmount> result = new List<ItemAmount>(dismantlingItem.GetItem().dismantleReturnItems);
             if (dismantlingItem.Sockets.Count > 0)
             {
-                Item socketItem;
+                BaseItem socketItem;
                 for (int i = 0; i < dismantlingItem.Sockets.Count; ++i)
                 {
                     if (!GameInstance.Items.TryGetValue(dismantlingItem.Sockets[i], out socketItem))

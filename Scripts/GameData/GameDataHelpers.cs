@@ -151,10 +151,10 @@ namespace MultiplayerARPG
         /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> targetDictionary, KeyValuePair<Item, short> newEntry)
+        public static Dictionary<BaseItem, short> CombineItems(Dictionary<BaseItem, short> targetDictionary, KeyValuePair<BaseItem, short> newEntry)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Item, short>();
+                targetDictionary = new Dictionary<BaseItem, short>();
             if (newEntry.Key != null)
             {
                 if (!targetDictionary.ContainsKey(newEntry.Key))
@@ -324,13 +324,13 @@ namespace MultiplayerARPG
         /// <param name="targetDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> targetDictionary, Dictionary<Item, short> combineDictionary)
+        public static Dictionary<BaseItem, short> CombineItems(Dictionary<BaseItem, short> targetDictionary, Dictionary<BaseItem, short> combineDictionary)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Item, short>();
+                targetDictionary = new Dictionary<BaseItem, short>();
             if (combineDictionary != null && combineDictionary.Count > 0)
             {
-                foreach (KeyValuePair<Item, short> entry in combineDictionary)
+                foreach (KeyValuePair<BaseItem, short> entry in combineDictionary)
                 {
                     CombineItems(targetDictionary, entry);
                 }
@@ -512,11 +512,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<Item, short> MakeItem(ItemAmount source)
+        public static KeyValuePair<BaseItem, short> MakeItem(ItemAmount source)
         {
             if (source.item == null)
-                return new KeyValuePair<Item, short>();
-            return new KeyValuePair<Item, short>(source.item, source.amount);
+                return new KeyValuePair<BaseItem, short>();
+            return new KeyValuePair<BaseItem, short>(source.item, source.amount);
         }
         #endregion
 
@@ -808,13 +808,13 @@ namespace MultiplayerARPG
         /// <param name="sourceAmounts"></param>
         /// <param name="targetDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Item, short> CombineItems(ItemAmount[] sourceAmounts, Dictionary<Item, short> targetDictionary)
+        public static Dictionary<BaseItem, short> CombineItems(ItemAmount[] sourceAmounts, Dictionary<BaseItem, short> targetDictionary)
         {
             if (targetDictionary == null)
-                targetDictionary = new Dictionary<Item, short>();
+                targetDictionary = new Dictionary<BaseItem, short>();
             if (sourceAmounts != null)
             {
-                KeyValuePair<Item, short> pair;
+                KeyValuePair<BaseItem, short> pair;
                 foreach (ItemAmount sourceAmount in sourceAmounts)
                 {
                     pair = MakeItem(sourceAmount);

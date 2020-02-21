@@ -132,8 +132,8 @@ namespace MultiplayerARPG
                     // Setup skill item
                     if (characterItem.GetSkillItem() != null)
                     {
-                        hotkeySkill = characterItem.GetSkillItem().skillLevel.skill;
-                        hotkeySkillLevel = characterItem.GetSkillItem().skillLevel.level;
+                        hotkeySkill = characterItem.GetSkillItem().UsingSkill;
+                        hotkeySkillLevel = characterItem.GetSkillItem().UsingSkillLevel;
                     }
                     UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                     if (dragHandler != null)
@@ -205,7 +205,7 @@ namespace MultiplayerARPG
         {
             if (characterItem.IsEmpty() || characterItem.IsEmptySlot())
                 return false;
-            if (UICharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().itemType))
+            if (UICharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().ItemType))
                 return true;
             return false;
         }

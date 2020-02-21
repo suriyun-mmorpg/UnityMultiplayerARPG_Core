@@ -14,13 +14,13 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             string allBonusText = string.Empty;
-            Item tempItem;
+            BaseItem tempItem;
             string tempText;
             for (int i = 0; i < Data.maxSocket; ++i)
             {
-                if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem))
+                if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
                 {
-                    tempText = GetEquipmentBonusText(tempItem.socketEnhanceEffect);
+                    tempText = GetEquipmentBonusText((tempItem as ISocketEnhancerItem).SocketEnhanceEffect);
                     if (!string.IsNullOrEmpty(tempText))
                     {
                         if (!string.IsNullOrEmpty(allBonusText))

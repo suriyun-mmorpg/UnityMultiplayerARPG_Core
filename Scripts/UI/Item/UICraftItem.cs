@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
         public ItemCraft ItemCraft { get { return Data; } }
-        public Item CraftingItem { get { return ItemCraft.CraftingItem; } }
+        public BaseItem CraftingItem { get { return ItemCraft.CraftingItem; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]

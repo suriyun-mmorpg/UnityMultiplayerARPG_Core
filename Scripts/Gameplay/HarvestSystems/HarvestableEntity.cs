@@ -82,13 +82,13 @@ namespace MultiplayerARPG
 
             // Apply damages
             int totalDamage = 0;
-            Item weaponItem = weapon.GetWeaponItem();
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             HarvestEffectiveness harvestEffectiveness;
             WeightedRandomizer<ItemDropByWeight> itemRandomizer;
-            if (harvestable.CacheHarvestEffectivenesses.TryGetValue(weaponItem.weaponType, out harvestEffectiveness) &&
-                harvestable.CacheHarvestItems.TryGetValue(weaponItem.weaponType, out itemRandomizer))
+            if (harvestable.CacheHarvestEffectivenesses.TryGetValue(weaponItem.WeaponType, out harvestEffectiveness) &&
+                harvestable.CacheHarvestItems.TryGetValue(weaponItem.WeaponType, out itemRandomizer))
             {
-                totalDamage = (int)(weaponItem.harvestDamageAmount.GetAmount(weapon.level).Random() * harvestEffectiveness.damageEffectiveness);
+                totalDamage = (int)(weaponItem.HarvestDamageAmount.GetAmount(weapon.level).Random() * harvestEffectiveness.damageEffectiveness);
                 ItemDropByWeight receivingItem = itemRandomizer.TakeOne();
                 int dataId = receivingItem.item.DataId;
                 short amount = (short)(receivingItem.amountPerDamage * totalDamage);

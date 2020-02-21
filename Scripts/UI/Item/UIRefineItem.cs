@@ -7,9 +7,9 @@ namespace MultiplayerARPG
 {
     public partial class UIRefineItem : BaseUICharacterItemByIndex
     {
-        public Item EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
+        public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public bool CanRefine { get { return EquipmentItem != null && Level < EquipmentItem.MaxLevel; } }
-        public ItemRefineLevel RefineLevel { get { return EquipmentItem.itemRefine.levels[Level - 1]; } }
+        public ItemRefineLevel RefineLevel { get { return EquipmentItem.ItemRefine.levels[Level - 1]; } }
         
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]

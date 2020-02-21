@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         public abstract void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage);
         public abstract bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount);
         public abstract void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount);
-        public abstract void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, Item item, short amount);
+        public abstract void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, short amount);
         public abstract bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel);
         public abstract void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel);
         public abstract bool CurrenciesEnoughToRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice);

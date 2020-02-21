@@ -152,8 +152,8 @@ namespace MultiplayerARPG
             CharacterItem nonEquipItem = NonEquipItems[itemIndex];
             if (nonEquipItem.IsEmptySlot() ||
                 nonEquipItem.GetBuildingItem() == null ||
-                nonEquipItem.GetBuildingItem().buildingEntity == null ||
-                !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().buildingEntity.DataId, out buildingEntity) ||
+                nonEquipItem.GetBuildingItem().BuildingEntity == null ||
+                !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.DataId, out buildingEntity) ||
                 !this.DecreaseItemsByIndex(itemIndex, 1))
                 return;
 
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
             if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
-            Item item = nonEquipItem.GetItem();
+            BaseItem item = nonEquipItem.GetItem();
             if (this.DecreaseItemsByIndex(index, amount))
                 CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
         }
@@ -247,7 +247,7 @@ namespace MultiplayerARPG
             if (nonEquipItem.IsEmptySlot())
                 return;
 
-            Item item = nonEquipItems[index].GetItem();
+            BaseItem item = nonEquipItems[index].GetItem();
             if (item == null)
                 return;
 
@@ -259,7 +259,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            List<ItemAmount> returningItems = Item.GetDismantleReturnItems(nonEquipItem);
+            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(nonEquipItem);
 
             if (tempNonEquipItems.IncreasingItemsWillOverwhelming(
                 returningItems,
@@ -277,7 +277,7 @@ namespace MultiplayerARPG
             this.DecreaseItemsByIndex(index, nonEquipItem.amount);
             this.IncreaseItems(returningItems);
             this.FillEmptySlots();
-            Gold += item.dismantleReturnGold;
+            Gold += item.DismantleReturnGold;
         }
 
         protected void NetFuncRefineItem(InventoryType inventoryType, short index)
@@ -289,19 +289,19 @@ namespace MultiplayerARPG
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
-                    Item.RefineNonEquipItem(this, index, out gameMessageType);
+                    BaseItem.RefineNonEquipItem(this, index, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipItems:
-                    Item.RefineEquipItem(this, index, out gameMessageType);
+                    BaseItem.RefineEquipItem(this, index, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponRight:
-                    Item.RefineRightHandItem(this, out gameMessageType);
+                    BaseItem.RefineRightHandItem(this, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponLeft:
-                    Item.RefineLeftHandItem(this, out gameMessageType);
+                    BaseItem.RefineLeftHandItem(this, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
             }
@@ -316,19 +316,19 @@ namespace MultiplayerARPG
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
-                    Item.EnhanceSocketNonEquipItem(this, index, enhancerId, out gameMessageType);
+                    BaseItem.EnhanceSocketNonEquipItem(this, index, enhancerId, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipItems:
-                    Item.EnhanceSocketEquipItem(this, index, enhancerId, out gameMessageType);
+                    BaseItem.EnhanceSocketEquipItem(this, index, enhancerId, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponRight:
-                    Item.EnhanceSocketRightHandItem(this, enhancerId, out gameMessageType);
+                    BaseItem.EnhanceSocketRightHandItem(this, enhancerId, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponLeft:
-                    Item.EnhanceSocketLeftHandItem(this, enhancerId, out gameMessageType);
+                    BaseItem.EnhanceSocketLeftHandItem(this, enhancerId, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
             }
@@ -343,19 +343,19 @@ namespace MultiplayerARPG
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
-                    Item.RepairNonEquipItem(this, index, out gameMessageType);
+                    BaseItem.RepairNonEquipItem(this, index, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipItems:
-                    Item.RepairEquipItem(this, index, out gameMessageType);
+                    BaseItem.RepairEquipItem(this, index, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponRight:
-                    Item.RepairRightHandItem(this, out gameMessageType);
+                    BaseItem.RepairRightHandItem(this, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponLeft:
-                    Item.RepairLeftHandItem(this, out gameMessageType);
+                    BaseItem.RepairLeftHandItem(this, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
             }

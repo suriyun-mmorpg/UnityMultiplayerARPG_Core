@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class Item
+    public partial class BaseItem
     {
         public static void EnhanceSocketRightHandItem(IPlayerCharacterData character, int enhancerId, out GameMessage.Type gameMessageType)
         {
@@ -51,23 +51,23 @@ namespace MultiplayerARPG
                 // Cannot enhance socket because character item is empty
                 return;
             }
-            Item equipmentItem = enhancingItem.GetEquipmentItem();
+            IEquipmentItem equipmentItem = enhancingItem.GetEquipmentItem();
             if (equipmentItem == null)
             {
                 // Cannot enhance socket because it's not equipment item
                 return;
             }
-            if (equipmentItem.maxSocket <= 0)
+            if (equipmentItem.MaxSocket <= 0)
             {
                 // Cannot enhance socket because equipment has no socket(s)
                 return;
             }
-            if (enhancingItem.Sockets.Count >= equipmentItem.maxSocket)
+            if (enhancingItem.Sockets.Count >= equipmentItem.MaxSocket)
             {
                 // Cannot enhance socket because socket is full
                 return;
             }
-            Item enhancerItem;
+            BaseItem enhancerItem;
             if (!GameInstance.Items.TryGetValue(enhancerId, out enhancerItem) || !enhancerItem.IsSocketEnhancer())
             {
                 // Cannot enhance socket because enhancer id is invalid

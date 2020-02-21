@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class Item
+    public partial class BaseItem
     {
         public bool CanRefine(IPlayerCharacterData character, short level)
         {
@@ -19,18 +19,18 @@ namespace MultiplayerARPG
                 // Cannot refine because it's not equipment item
                 return false;
             }
-            if (itemRefine == null)
+            if (ItemRefine == null)
             {
                 // Cannot refine because there is no item refine info
                 return false;
             }
-            if (level >= itemRefine.levels.Length)
+            if (level >= ItemRefine.levels.Length)
             {
                 // Cannot refine because item reached max level
                 gameMessageType = GameMessage.Type.RefineItemReachedMaxLevel;
                 return false;
             }
-            return itemRefine.levels[level - 1].CanRefine(character, out gameMessageType);
+            return ItemRefine.levels[level - 1].CanRefine(character, out gameMessageType);
         }
 
         public static void RefineRightHandItem(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                 // Cannot refine because character item is empty
                 return;
             }
-            Item equipmentItem = refiningItem.GetEquipmentItem();
+            BaseItem equipmentItem = refiningItem.GetEquipmentItem() as BaseItem;
             if (equipmentItem == null)
             {
                 // Cannot refine because it's not equipment item
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
                 // Cannot refine because of some reasons
                 return;
             }
-            ItemRefineLevel refineLevel = equipmentItem.itemRefine.levels[refiningItem.level - 1];
+            ItemRefineLevel refineLevel = equipmentItem.ItemRefine.levels[refiningItem.level - 1];
             if (Random.value <= refineLevel.SuccessRate)
             {
                 // If success, increase item level

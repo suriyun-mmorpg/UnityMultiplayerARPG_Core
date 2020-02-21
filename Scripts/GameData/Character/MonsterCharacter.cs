@@ -262,7 +262,7 @@ namespace MultiplayerARPG
             return Random.Range(min, max);
         }
 
-        public void RandomItems(System.Action<Item, short> onRandomItem)
+        public void RandomItems(System.Action<BaseItem, short> onRandomItem)
         {
             ItemDrop randomItem;
 

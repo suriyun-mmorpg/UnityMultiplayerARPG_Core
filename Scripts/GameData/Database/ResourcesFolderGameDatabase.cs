@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         {
             // Use Resources Load Async ?
             Attribute[] attributes = Resources.LoadAll<Attribute>("");
-            Item[] items = Resources.LoadAll<Item>("");
+            BaseItem[] items = Resources.LoadAll<BaseItem>("");
             BaseSkill[] skills = Resources.LoadAll<BaseSkill>("");
             NpcDialog[] npcDialogs = Resources.LoadAll<NpcDialog>("");
             Quest[] quests = Resources.LoadAll<Quest>("");

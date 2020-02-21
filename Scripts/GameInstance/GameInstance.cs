@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         [Header("Gameplay Database / Settings")]
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
         [SerializeField]
-        private Item defaultWeaponItem;
+        private BaseItem defaultWeaponItem;
         [Tooltip("Default damage element, will be used when attacks to enemies or receives damages from enemies")]
         [SerializeField]
         private DamageElement defaultDamageElement;
@@ -184,7 +184,7 @@ namespace MultiplayerARPG
         public bool useMobileInEditor;
 
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
-        public static readonly Dictionary<int, Item> Items = new Dictionary<int, Item>();
+        public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
         public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
@@ -269,11 +269,7 @@ namespace MultiplayerARPG
         
         public ArmorType DefaultArmorType { get; private set; }
         public WeaponType DefaultWeaponType { get; private set; }
-
-        public Item DefaultWeaponItem
-        {
-            get { return defaultWeaponItem; }
-        }
+        public IWeaponItem DefaultWeaponItem { get; private set; }
 
         public DamageElement DefaultDamageElement
         {
@@ -322,29 +318,8 @@ namespace MultiplayerARPG
             DefaultWeaponType.damageInfo = new DamageInfo();
 
             // Setup default weapon item if not existed
-            if (defaultWeaponItem == null)
-            {
-                defaultWeaponItem = ScriptableObject.CreateInstance<Item>();
-                defaultWeaponItem.name = GameDataConst.DEFAULT_WEAPON_ID;
-                defaultWeaponItem.title = GameDataConst.DEFAULT_WEAPON_TITLE;
-                defaultWeaponItem.itemType = ItemType.Weapon;
-                defaultWeaponItem.weaponType = DefaultWeaponType;
-                // Default damage amount
-                IncrementalMinMaxFloat damageAmountMinMax = new IncrementalMinMaxFloat();
-                damageAmountMinMax.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
-                damageAmountMinMax.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
-                DamageIncremental damageAmount = new DamageIncremental()
-                {
-                    amount = damageAmountMinMax,
-                };
-                // Default harvest damage amount
-                IncrementalMinMaxFloat harvestDamageAmount = new IncrementalMinMaxFloat();
-                harvestDamageAmount.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
-                harvestDamageAmount.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
-                // Set damage amount
-                defaultWeaponItem.damageAmount = damageAmount;
-                defaultWeaponItem.harvestDamageAmount = harvestDamageAmount;
-            }
+            if (defaultWeaponItem == null || !defaultWeaponItem.IsWeapon())
+                defaultWeaponItem = ScriptableObject.CreateInstance<Item>().GenerateDefaultItem(DefaultWeaponType);
 
             // Setup default damage element if not existed
             if (defaultDamageElement == null)
@@ -437,7 +412,7 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("LoadedGameData");
 
             // Add required default game data
-            AddItems(new Item[] { DefaultWeaponItem });
+            AddItems(new BaseItem[] { DefaultWeaponItem as BaseItem });
             AddWeaponTypes(new WeaponType[] { DefaultWeaponType });
 
             if (warpPortalDatabase != null)
@@ -593,11 +568,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddItems(IEnumerable<Item> items)
+        public static void AddItems(IEnumerable<BaseItem> items)
         {
             if (items == null)
                 return;
-            foreach (Item item in items)
+            IEquipmentItem equipmentItem;
+            foreach (BaseItem item in items)
             {
                 if (item == null || Items.ContainsKey(item.DataId))
                     continue;
@@ -605,10 +581,11 @@ namespace MultiplayerARPG
                 Items[item.DataId] = item;
                 item.PrepareRelatesData();
                 // Validate equipment set
-                if (item.equipmentSet != null)
+                equipmentItem = item as IEquipmentItem;
+                if (equipmentItem != null && equipmentItem.EquipmentSet != null)
                 {
-                    item.equipmentSet.Validate();
-                    item.equipmentSet.PrepareRelatesData();
+                    equipmentItem.EquipmentSet.Validate();
+                    equipmentItem.EquipmentSet.PrepareRelatesData();
                 }
             }
         }

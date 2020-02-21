@@ -57,14 +57,14 @@ namespace MultiplayerARPG
                 if (commandKey.Equals(GMCommands.AddItem))
                 {
                     receiver = sender;
-                    Item item;
+                    BaseItem item;
                     short amount;
                     if (TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         GameInstance.Items.TryGetValue(splited[1].GenerateHashId(), out item) &&
                         short.TryParse(splited[2], out amount))
                     {
-                        if (amount > item.maxStack)
-                            amount = item.maxStack;
+                        if (amount > item.MaxStack)
+                            amount = item.MaxStack;
                         playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
                     }
                 }
@@ -79,14 +79,14 @@ namespace MultiplayerARPG
                 if (commandKey.Equals(GMCommands.GiveItem))
                 {
                     receiver = splited[1];
-                    Item item;
+                    BaseItem item;
                     short amount;
                     if (TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         GameInstance.Items.TryGetValue(splited[2].GenerateHashId(), out item) &&
                         short.TryParse(splited[3], out amount))
                     {
-                        if (amount > item.maxStack)
-                            amount = item.maxStack;
+                        if (amount > item.MaxStack)
+                            amount = item.MaxStack;
                         playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
                     }
                 }

@@ -252,10 +252,10 @@ namespace MultiplayerARPG
             float result = character.EquipItems.GetTotalItemWeight() + character.NonEquipItems.GetTotalItemWeight();
             // Weight from right hand equipment
             if (character.EquipWeapons.rightHand.NotEmptySlot())
-                result += character.EquipWeapons.rightHand.GetItem().weight;
+                result += character.EquipWeapons.rightHand.GetItem().Weight;
             // Weight from left hand equipment
             if (character.EquipWeapons.leftHand.NotEmptySlot())
-                result += character.EquipWeapons.leftHand.GetItem().weight;
+                result += character.EquipWeapons.leftHand.GetItem().Weight;
             return result;
         }
 
@@ -541,10 +541,10 @@ namespace MultiplayerARPG
         private CharacterItem DecreaseDurability(CharacterItem characterItem, float decreaseDurability, out bool destroy)
         {
             destroy = false;
-            Item item = characterItem.GetEquipmentItem();
+            IEquipmentItem item = characterItem.GetEquipmentItem();
             if (item != null)
             {
-                if (characterItem.durability - decreaseDurability <= 0 && item.destroyIfBroken)
+                if (characterItem.durability - decreaseDurability <= 0 && item.DestroyIfBroken)
                     destroy = true;
                 characterItem.durability -= decreaseDurability;
                 if (characterItem.durability < 0)
@@ -563,9 +563,9 @@ namespace MultiplayerARPG
             character.Gold -= sellItem.sellPrice * amount;
         }
 
-        public override void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, Item item, short amount)
+        public override void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, short amount)
         {
-            character.Gold += item.sellPrice * amount;
+            character.Gold += item.SellPrice * amount;
         }
 
         public override bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)

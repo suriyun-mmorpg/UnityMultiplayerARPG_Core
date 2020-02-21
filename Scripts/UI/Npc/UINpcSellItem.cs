@@ -43,7 +43,7 @@ namespace MultiplayerARPG
 
         public void OnClickBuy()
         {
-            Item item = Data.item;
+            BaseItem item = Data.item;
             if (item == null)
             {
                 Debug.LogWarning("Cannot buy item, the item data is empty");
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (item.maxStack == 1)
+            if (item.MaxStack == 1)
             {
                 if (owningCharacter != null)
                     owningCharacter.RequestBuyNpcItem((short)indexOfData, 1);
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(UITextKeys.UI_BUY_ITEM_DESCRIPTION.ToString()),
                     OnBuyAmountConfirmed,
                     1,  /* Min Amount */
-                    item.maxStack,
+                    item.MaxStack,
                     1   /* Start Amount*/);
             }
         }

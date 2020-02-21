@@ -223,7 +223,7 @@ namespace MultiplayerARPG
 
         public override void PrepareRelatesData()
         {
-            List<Item> items = new List<Item>();
+            List<BaseItem> items = new List<BaseItem>();
             if (convertItems != null && convertItems.Length > 0)
             {
                 foreach (ConvertItem convertItem in convertItems)

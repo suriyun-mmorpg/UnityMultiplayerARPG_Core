@@ -18,11 +18,11 @@ namespace MultiplayerARPG
         [SerializeField]
         private SyncFieldInt itemDataId = new SyncFieldInt();
 
-        public Item Item
+        public BaseItem Item
         {
             get
             {
-                Item item;
+                BaseItem item;
                 if (GameInstance.Items.TryGetValue(itemDataId, out item))
                     return item;
                 return null;
@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                Item item = Item;
+                BaseItem item = Item;
                 return item == null ? LanguageManager.GetUnknowTitle() : item.Title;
             }
             set { }
@@ -91,10 +91,10 @@ namespace MultiplayerARPG
 
         private void OnItemDataIdChange(bool isInitial, int itemDataId)
         {
-            Item item;
-            if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.dropModel != null)
+            BaseItem item;
+            if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.DropModel != null)
             {
-                GameObject model = Instantiate(item.dropModel, CacheModelContainer);
+                GameObject model = Instantiate(item.DropModel, CacheModelContainer);
                 model.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
                 model.gameObject.SetActive(true);
                 model.RemoveComponentsInChildren<Collider>(false);

@@ -5,8 +5,8 @@ namespace MultiplayerARPG
 {
 	public class UIEnhanceSocketItem : BaseUICharacterItemByIndex
 	{
-        public Item EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
-        public bool CanEnhance { get { return EquipmentItem != null && EquipmentItem.maxSocket > 0 && CharacterItem.Sockets.Count < EquipmentItem.maxSocket; } }
+        public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
+        public bool CanEnhance { get { return EquipmentItem != null && EquipmentItem.MaxSocket > 0 && CharacterItem.Sockets.Count < EquipmentItem.MaxSocket; } }
 		public int SelectedEnhancerId
         {
             get

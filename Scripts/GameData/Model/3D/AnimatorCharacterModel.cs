@@ -337,7 +337,7 @@ namespace MultiplayerARPG
             if (GameInstance.Singleton == null)
                 return;
 
-            Item weaponItem = equipWeapons.GetRightHandWeaponItem();
+            IWeaponItem weaponItem = equipWeapons.GetRightHandWeaponItem();
             if (weaponItem == null)
                 weaponItem = GameInstance.Singleton.DefaultWeaponItem;
 

@@ -535,11 +535,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnRandomDropItem(Item item, short amount)
+        private void OnRandomDropItem(BaseItem item, short amount)
         {
             // Drop item to the ground
-            if (amount > item.maxStack)
-                amount = item.maxStack;
+            if (amount > item.MaxStack)
+                amount = item.MaxStack;
             ItemDropEntity.DropItem(this, CharacterItem.Create(item, 1, amount), looters);
         }
 

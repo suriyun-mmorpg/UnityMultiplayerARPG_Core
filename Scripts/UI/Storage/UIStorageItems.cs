@@ -147,7 +147,7 @@ namespace MultiplayerARPG
                 tempUiCharacterItem.Show();
                 if (characterItem.NotEmptySlot())
                 {
-                    TotalWeight += characterItem.GetItem().weight * characterItem.amount;
+                    TotalWeight += characterItem.GetItem().Weight * characterItem.amount;
                     UsedSlots++;
                 }
                 UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();

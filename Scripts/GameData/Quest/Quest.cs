@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             List<MonsterCharacter> monsters = new List<MonsterCharacter>();
-            List<Item> items = new List<Item>();
+            List<BaseItem> items = new List<BaseItem>();
             if (tasks != null && tasks.Length > 0)
             {
                 foreach (QuestTask task in tasks)

@@ -162,7 +162,7 @@ namespace MultiplayerARPG
                 return;
 
             CharacterItem tempEquipItem;
-            Item tempArmorItem;
+            IArmorItem tempArmorItem;
             UICharacterItem tempSlot;
             int i;
             for (i = 0; i < character.EquipItems.Count; ++i)
@@ -171,7 +171,7 @@ namespace MultiplayerARPG
                 tempArmorItem = tempEquipItem.GetArmorItem();
                 if (tempArmorItem == null)
                     continue;
-                
+
                 if (CacheEquipItemSlots.TryGetValue(GetEquipPosition(tempArmorItem.EquipPosition, tempEquipItem.equipSlotIndex), out tempSlot))
                     tempSlot.Setup(new UICharacterItemData(tempEquipItem, tempEquipItem.level, InventoryType.EquipItems), character, i);
             }

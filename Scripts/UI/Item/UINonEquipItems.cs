@@ -104,7 +104,7 @@ namespace MultiplayerARPG
             }
             
             // Filter items to show by specific item types
-            Item tempItem;
+            BaseItem tempItem;
             UICharacterItem tempUiCharacterItem;
             CacheItemList.Generate(character.NonEquipItems, (index, nonEquipItem, ui) =>
             {
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                     filterCategories.Contains(tempItem.category))
                 {
                     if (filterItemTypes == null || filterItemTypes.Count == 0 ||
-                        filterItemTypes.Contains(tempItem.itemType))
+                        filterItemTypes.Contains(tempItem.ItemType))
                     {
                         tempUiCharacterItem.Setup(new UICharacterItemData(nonEquipItem, nonEquipItem.level, InventoryType.NonEquipItems), this.character, index);
                         tempUiCharacterItem.Show();

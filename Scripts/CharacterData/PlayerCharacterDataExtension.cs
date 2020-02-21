@@ -196,8 +196,8 @@ public static partial class PlayerCharacterDataExtension
             character.Skills.Add(characterSkill);
         }
         // Right hand & left hand items
-        Item rightHandEquipItem = playerCharacter.rightHandEquipItem;
-        Item leftHandEquipItem = playerCharacter.leftHandEquipItem;
+        BaseItem rightHandEquipItem = playerCharacter.rightHandEquipItem;
+        BaseItem leftHandEquipItem = playerCharacter.leftHandEquipItem;
         EquipWeapons equipWeapons = new EquipWeapons();
         // Right hand equipped item
         if (rightHandEquipItem != null)
@@ -213,8 +213,8 @@ public static partial class PlayerCharacterDataExtension
         }
         character.EquipWeapons = equipWeapons;
         // Armors
-        Item[] armorItems = playerCharacter.armorItems;
-        foreach (Item armorItem in armorItems)
+        BaseItem[] armorItems = playerCharacter.armorItems;
+        foreach (BaseItem armorItem in armorItems)
         {
             if (armorItem == null)
                 continue;
@@ -243,8 +243,8 @@ public static partial class PlayerCharacterDataExtension
             while (amount > 0)
             {
                 short addAmount = amount;
-                if (addAmount > startItem.item.maxStack)
-                    addAmount = startItem.item.maxStack;
+                if (addAmount > startItem.item.MaxStack)
+                    addAmount = startItem.item.MaxStack;
                 character.AddOrSetNonEquipItems(CharacterItem.Create(startItem.item, 1, addAmount));
                 amount -= addAmount;
             }

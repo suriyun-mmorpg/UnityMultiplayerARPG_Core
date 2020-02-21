@@ -3,16 +3,17 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class Item
+    public partial class BaseItem
     {
-        public bool CanRepair(IPlayerCharacterData character, float durability, out ItemRepairPrice repairPrice)
+        public bool CanRepair(IPlayerCharacterData character, float durability, out float maxDurability, out ItemRepairPrice repairPrice)
         {
             GameMessage.Type gameMessageType;
-            return CanRepair(character, durability, out repairPrice, out gameMessageType);
+            return CanRepair(character, durability, out maxDurability, out repairPrice, out gameMessageType);
         }
 
-        public bool CanRepair(IPlayerCharacterData character, float durability, out ItemRepairPrice repairPrice, out GameMessage.Type gameMessageType)
+        public bool CanRepair(IPlayerCharacterData character, float durability, out float maxDurability, out ItemRepairPrice repairPrice, out GameMessage.Type gameMessageType)
         {
+            maxDurability = 0f;
             repairPrice = default(ItemRepairPrice);
             gameMessageType = GameMessage.Type.CannotRepair;
             if (!IsEquipment())
@@ -25,6 +26,7 @@ namespace MultiplayerARPG
                 // Cannot repair because there is no item refine info
                 return false;
             }
+            maxDurability = (this as IEquipmentItem).MaxDurability;
             float durabilityRate = durability / maxDurability;
             for (int i = 0; i < itemRefine.repairPrices.Length; ++i)
             {
@@ -81,18 +83,19 @@ namespace MultiplayerARPG
                 // Cannot refine because character item is empty
                 return;
             }
-            Item equipmentItem = repairingItem.GetEquipmentItem();
+            BaseItem equipmentItem = repairingItem.GetEquipmentItem() as BaseItem;
             if (equipmentItem == null)
             {
                 // Cannot refine because it's not equipment item
                 return;
             }
+            float maxDurability;
             ItemRepairPrice repairPrice;
-            if (equipmentItem.CanRepair(character, repairingItem.durability, out repairPrice, out gameMessageType))
+            if (equipmentItem.CanRepair(character, repairingItem.durability, out maxDurability, out repairPrice, out gameMessageType))
             {
                 gameMessageType = GameMessage.Type.RepairSuccess;
                 // Repair item
-                repairingItem.durability = equipmentItem.maxDurability;
+                repairingItem.durability = maxDurability;
                 onRepaired.Invoke(repairingItem);
                 // Decrease required gold
                 GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRepairItem(character, repairPrice);

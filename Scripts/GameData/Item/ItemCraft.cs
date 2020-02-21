@@ -8,23 +8,23 @@ namespace MultiplayerARPG
     public partial struct ItemCraft
     {
         [SerializeField]
-        private Item craftingItem;
+        private BaseItem craftingItem;
         [SerializeField]
         [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         private ItemAmount[] craftRequirements;
         [SerializeField]
         private int requireGold;
 
-        public Item CraftingItem { get { return craftingItem; } }
+        public BaseItem CraftingItem { get { return craftingItem; } }
 
         [System.NonSerialized]
-        private Dictionary<Item, short> cacheCraftRequirements;
-        public Dictionary<Item, short> CacheCraftRequirements
+        private Dictionary<BaseItem, short> cacheCraftRequirements;
+        public Dictionary<BaseItem, short> CacheCraftRequirements
         {
             get
             {
                 if (cacheCraftRequirements == null)
-                    cacheCraftRequirements = GameDataHelpers.CombineItems(craftRequirements, new Dictionary<Item, short>());
+                    cacheCraftRequirements = GameDataHelpers.CombineItems(craftRequirements, new Dictionary<BaseItem, short>());
                 return cacheCraftRequirements;
             }
         }

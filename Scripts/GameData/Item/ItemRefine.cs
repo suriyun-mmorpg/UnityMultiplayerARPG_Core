@@ -36,13 +36,13 @@ namespace MultiplayerARPG
         public ItemAmount[] RequireItems { get { return requireItems; } }
 
         [System.NonSerialized]
-        private Dictionary<Item, short> cacheRequireItems;
-        public Dictionary<Item, short> CacheRequireItems
+        private Dictionary<BaseItem, short> cacheRequireItems;
+        public Dictionary<BaseItem, short> CacheRequireItems
         {
             get
             {
                 if (cacheRequireItems == null)
-                    cacheRequireItems = GameDataHelpers.CombineItems(requireItems, new Dictionary<Item, short>());
+                    cacheRequireItems = GameDataHelpers.CombineItems(requireItems, new Dictionary<BaseItem, short>());
                 return cacheRequireItems;
             }
         }

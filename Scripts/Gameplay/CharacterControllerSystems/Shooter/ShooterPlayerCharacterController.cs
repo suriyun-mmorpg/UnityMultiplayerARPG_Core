@@ -186,8 +186,8 @@ namespace MultiplayerARPG
         // Controlling states
         bool isDoingAction;
         bool mustReleaseFireKey;
-        Item rightHandWeapon;
-        Item leftHandWeapon;
+        IWeaponItem rightHandWeapon;
+        IWeaponItem leftHandWeapon;
         MovementState movementState;
         ExtraMovementState extraMovementState;
         bool toggleSprintOn;
@@ -257,11 +257,11 @@ namespace MultiplayerARPG
             // Weapon ability will be able to use when equip weapon at main-hand only
             if (rightHandWeapon != null && leftHandWeapon == null)
             {
-                if (rightHandWeapon.weaponAbility != WeaponAbility)
+                if (rightHandWeapon.WeaponAbility != WeaponAbility)
                 {
                     if (WeaponAbility != null)
                         WeaponAbility.Desetup();
-                    WeaponAbility = rightHandWeapon.weaponAbility;
+                    WeaponAbility = rightHandWeapon.WeaponAbility;
                     if (WeaponAbility != null)
                         WeaponAbility.Setup(this, equipWeapons.rightHand);
                     WeaponAbilityState = WeaponAbilityState.Deactivated;
@@ -867,12 +867,12 @@ namespace MultiplayerARPG
             }
 
             // Setup releasing state
-            if (tempPressAttackRight && rightHandWeapon != null && rightHandWeapon.fireType == FireType.SingleFire)
+            if (tempPressAttackRight && rightHandWeapon != null && rightHandWeapon.FireType == FireType.SingleFire)
             {
                 // The weapon's fire mode is single fire, so player have to release fire key for next fire
                 mustReleaseFireKey = true;
             }
-            else if (tempPressAttackLeft && leftHandWeapon != null && leftHandWeapon.fireType == FireType.SingleFire)
+            else if (tempPressAttackLeft && leftHandWeapon != null && leftHandWeapon.FireType == FireType.SingleFire)
             {
                 // The weapon's fire mode is single fire, so player have to release fire key for next fire
                 mustReleaseFireKey = true;
@@ -1050,7 +1050,7 @@ namespace MultiplayerARPG
             if (itemIndex < 0)
                 return;
 
-            Item item = characterItem.GetItem();
+            BaseItem item = characterItem.GetItem();
             if (item == null)
                 return;
 
@@ -1062,7 +1062,7 @@ namespace MultiplayerARPG
             {
                 if (item.IsSkill())
                 {
-                    SetQueueUsingSkill(aimPosition, item.skillLevel.skill, item.skillLevel.level, (short)itemIndex);
+                    SetQueueUsingSkill(aimPosition, (item as ISkillItem).UsingSkill, (item as ISkillItem).UsingSkillLevel, (short)itemIndex);
                 }
                 else
                 {
@@ -1072,7 +1072,7 @@ namespace MultiplayerARPG
             else if (item.IsBuilding())
             {
                 buildingItemIndex = itemIndex;
-                ConstructingBuildingEntity = Instantiate(item.buildingEntity);
+                ConstructingBuildingEntity = Instantiate((item as IBuildingItem).BuildingEntity);
                 ConstructingBuildingEntity.SetupAsBuildMode();
                 ConstructingBuildingEntity.CacheTransform.parent = null;
             }

@@ -229,7 +229,7 @@ namespace MultiplayerARPG
             }
 
             Quest quest = null;
-            Item craftingItem = null;
+            BaseItem craftingItem = null;
             List<NpcSellItem> sellItems = new List<NpcSellItem>();
             List<UINpcDialogMenuAction> menuActions = new List<UINpcDialogMenuAction>();
             UINpcDialogMenuAction confirmMenuAction;
