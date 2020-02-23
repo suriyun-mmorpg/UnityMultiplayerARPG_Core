@@ -292,6 +292,8 @@ namespace MultiplayerARPG
         {
             // Cache components
             CacheTransform = transform;
+            if (model == null)
+                model = GetComponent<GameEntityModel>();
             if (cameraTargetTransform == null)
                 cameraTargetTransform = CacheTransform;
             if (fpsCameraTargetTransform == null)
