@@ -99,8 +99,8 @@ namespace MultiplayerARPG
                             SetTarget(EnemyEntityDetector.characters[findingEnemyIndex], TargetActionType.Attack);
                             if (SelectedEntity != null)
                             {
-                                targetLookDirection = SelectedEntity.CacheTransform.position - MovementTransform.position;
-                                targetLookDirection.Normalize();
+                                // Turn character to enemy but does not move or attack yet.
+                                TurnCharacterToEntity(SelectedEntity);
                             }
                         }
                     }
@@ -398,7 +398,7 @@ namespace MultiplayerARPG
             {
                 destination = null;
                 ClearTarget();
-                targetLookDirection = moveDirection;
+                targetLookDirection = null;
             }
             // Always forward
             MovementState movementState = MovementState.Forward;
@@ -479,15 +479,13 @@ namespace MultiplayerARPG
                     else
                     {
                         // No nearby target, so use skill immediately
-                        if (RequestUsePendingSkill(isLeftHandAttacking))
-                            isLeftHandAttacking = !isLeftHandAttacking;
+                        RequestUsePendingSkill();
                     }
                 }
                 else if (!IsLockTarget())
                 {
                     // Not lock target, so not finding target and use skill immediately
-                    if (RequestUsePendingSkill(isLeftHandAttacking))
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                    RequestUsePendingSkill();
                 }
             }
             else
@@ -506,7 +504,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Target not required, use skill immediately
-                    RequestUsePendingSkill(isLeftHandAttacking);
+                    RequestUsePendingSkill();
                 }
             }
         }
@@ -544,7 +542,7 @@ namespace MultiplayerARPG
                 {
                     // Try use non-attack skill
                     PlayerCharacterEntity.StopMove();
-                    RequestUsePendingSkill(false);
+                    RequestUsePendingSkill();
                     return;
                 }
 
@@ -552,35 +550,20 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-                if (IsTargetInAttackDistance(targetCharacter, attackDistance, CurrentGameInstance.characterLayer.Mask))
+                AttackOrMoveToEntity(targetCharacter, attackDistance, attackFov, CurrentGameInstance.characterLayer.Mask, () =>
                 {
-                    // Stop movement to attack
-                    PlayerCharacterEntity.StopMove();
-                    // Set direction to turn character to target
-                    targetLookDirection = targetCharacter.CacheTransform.position - MovementTransform.position;
-                    targetLookDirection.Normalize();
-                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetCharacter.CacheTransform.position))
+                    // If has queue using skill, attack by the skill
+                    if (queueUsingSkill.skill != null)
                     {
-                        // If has queue using skill, attack by the skill
-                        if (queueUsingSkill.skill != null)
-                        {
-                            if (RequestUsePendingSkill(isLeftHandAttacking))
-                            {
-                                // Change attacking hand after attack requested
-                                isLeftHandAttacking = !isLeftHandAttacking;
-                            }
-                            return;
-                        }
-                        else if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
-                        {
-                            // Change attacking hand after attack requested
-                            isLeftHandAttacking = !isLeftHandAttacking;
-                            return;
-                        }
+                        RequestUsePendingSkill();
+                        return;
                     }
-                }
-                else
-                    UpdateTargetEntityPosition(targetCharacter);
+                    else
+                    {
+                        RequestAttack();
+                        return;
+                    }
+                });
             }
             else if (TryGetUsingSkillCharacter(out targetCharacter))
             {
@@ -588,84 +571,48 @@ namespace MultiplayerARPG
                 float castDistance = 0f;
                 float castFov = 0f;
                 GetUseSkillDistanceAndFov(out castDistance, out castFov);
-
-                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= castDistance)
-                {
-                    // Stop movement to use skill
-                    PlayerCharacterEntity.StopMove();
-                    // Set direction to turn character to target
-                    targetLookDirection = targetCharacter.CacheTransform.position - MovementTransform.position;
-                    targetLookDirection.Normalize();
-                    if (targetCharacter == PlayerCharacterEntity || PlayerCharacterEntity.IsPositionInFov(castFov, targetCharacter.CacheTransform.position))
-                    {
-                        if (queueUsingSkill.skill != null)
-                        {
-                            if (RequestUsePendingSkill(false))
-                                targetActionType = TargetActionType.Undefined;
-                            return;
-                        }
-                        else
-                        {
-                            // Can't use skill
-                            targetActionType = TargetActionType.Undefined;
-                            ClearQueueUsingSkill();
-                            return;
-                        }
-                    }
-                }
-                else
-                    UpdateTargetEntityPosition(targetCharacter);
+                UseSkillOrMoveToEntity(targetCharacter, castDistance, castFov);
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter))
             {
-                if (targetCharacter == PlayerCharacterEntity || Vector3.Distance(MovementTransform.position, targetCharacter.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
+                DoActionOrMoveToEntity(targetCharacter, CurrentGameInstance.conversationDistance, () =>
                 {
-                    // Stop movement to do something
-                    PlayerCharacterEntity.StopMove();
-                }
-                else
-                    UpdateTargetEntityPosition(targetCharacter);
+                    // TODO: Do something
+                });
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetNpc))
             {
-                if (Vector3.Distance(MovementTransform.position, targetNpc.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
+                DoActionOrMoveToEntity(targetNpc, CurrentGameInstance.conversationDistance, () =>
                 {
                     if (lastNpcObjectId != targetNpc.ObjectId)
                     {
                         PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
                         lastNpcObjectId = targetNpc.ObjectId;
                     }
-                    PlayerCharacterEntity.StopMove();
-                }
-                else
-                    UpdateTargetEntityPosition(targetNpc);
+                });
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetItemDrop))
             {
-                if (Vector3.Distance(MovementTransform.position, targetItemDrop.CacheTransform.position) <= CurrentGameInstance.pickUpItemDistance)
+                DoActionOrMoveToEntity(targetItemDrop, CurrentGameInstance.pickUpItemDistance, () =>
                 {
                     PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
-                    PlayerCharacterEntity.StopMove();
                     ClearTarget();
-                }
-                else
-                    UpdateTargetEntityPosition(targetItemDrop);
+                });
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetBuilding))
             {
-                if (Vector3.Distance(MovementTransform.position, targetBuilding.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
+                DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
                 {
-                    PlayerCharacterEntity.StopMove();
                     if (!IsEditingBuilding)
                     {
                         ActivateBuilding(targetBuilding);
                         ClearTarget();
                     }
                     else
+                    {
                         ShowCurrentBuildingDialog();
-                }
-                else
-                    UpdateTargetEntityPosition(targetBuilding);
+                    }
+                });
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetHarvestable))
             {
@@ -681,66 +628,138 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-
-                if (IsTargetInAttackDistance(targetHarvestable, attackDistance, CurrentGameInstance.harvestableLayer.Mask))
+                AttackOrMoveToEntity(targetHarvestable, attackDistance, attackFov, CurrentGameInstance.harvestableLayer.Mask, () =>
                 {
-                    // Stop movement to attack
-                    PlayerCharacterEntity.StopMove();
-                    // Set direction to turn character to target
-                    targetLookDirection = targetHarvestable.CacheTransform.position - MovementTransform.position;
-                    targetLookDirection.Normalize();
-                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
-                    {
-                        if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
-                            isLeftHandAttacking = !isLeftHandAttacking;
-                    }
-                }
-                else
-                    UpdateTargetEntityPosition(targetHarvestable);
+                    RequestAttack();
+                });
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetVehicle))
             {
-                if (Vector3.Distance(MovementTransform.position, targetVehicle.CacheTransform.position) <= CurrentGameInstance.conversationDistance)
+                DoActionOrMoveToEntity(targetVehicle, CurrentGameInstance.conversationDistance, () =>
                 {
                     PlayerCharacterEntity.RequestEnterVehicle(targetVehicle.ObjectId);
-                    PlayerCharacterEntity.StopMove();
                     ClearTarget();
-                }
-                else
-                    UpdateTargetEntityPosition(targetVehicle);
+                });
             }
         }
 
-        protected void UpdateTargetEntityPosition(BaseGameEntity entity)
+        protected void DoActionOrMoveToEntity(BaseGameEntity entity, float distance, System.Action action)
+        {
+            if (Vector3.Distance(MovementTransform.position, entity.CacheTransform.position) <= distance)
+            {
+                // Stop movement to do action
+                PlayerCharacterEntity.StopMove();
+                // Do action
+                action.Invoke();
+            }
+            else
+            {
+                // Move to target entity
+                UpdateTargetEntityPosition(entity, distance);
+            }
+        }
+
+        protected void AttackOrMoveToEntity(IDamageableEntity entity, float distance, float fov, int layerMask, System.Action action)
+        {
+            if (IsTargetInAttackDistance(entity, distance, layerMask))
+            {
+                // Stop movement to attack
+                PlayerCharacterEntity.StopMove();
+                if (targetLookDirection.HasValue)
+                    return;
+                // Set direction to turn character to target
+                if (PlayerCharacterEntity.IsPositionInFov(fov, entity.GetTransform().position))
+                {
+                    // Do action
+                    action.Invoke();
+                }
+                else
+                {
+                    // Target not in Fov, turn controlling character to target
+                    TurnCharacterToEntity(entity.Entity);
+                }
+            }
+            else
+            {
+                // Move to target entity
+                UpdateTargetEntityPosition(entity.Entity, distance);
+            }
+        }
+
+        protected void UseSkillOrMoveToEntity(IDamageableEntity entity, float distance, float fov)
+        {
+            if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() || 
+                Vector3.Distance(MovementTransform.position, entity.GetTransform().position) <= distance)
+            {
+                // Stop movement to use skill
+                PlayerCharacterEntity.StopMove();
+                if (targetLookDirection.HasValue)
+                    return;
+                // Set direction to turn character to target
+                bool isPositionInFov = PlayerCharacterEntity.IsPositionInFov(fov, entity.GetTransform().position);
+                if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() || isPositionInFov)
+                {
+                    if (queueUsingSkill.skill != null)
+                    {
+                        // Can use skill
+                        RequestUsePendingSkill();
+                        targetActionType = TargetActionType.Undefined;
+                        return;
+                    }
+                    else
+                    {
+                        // Can't use skill
+                        targetActionType = TargetActionType.Undefined;
+                        ClearQueueUsingSkill();
+                        return;
+                    }
+                }
+                else
+                {
+                    if (!isPositionInFov)
+                    {
+                        // Target not in Fov, turn controlling character to target
+                        TurnCharacterToEntity(entity.Entity);
+                    }
+                }
+            }
+            else
+            {
+                // Move to target entity
+                UpdateTargetEntityPosition(entity.Entity, distance);
+            }
+        }
+
+        protected void UpdateTargetEntityPosition(BaseGameEntity entity, float distance)
         {
             if (entity == null)
                 return;
-            Vector3 targetPosition = entity.CacheTransform.position;
-            PlayerCharacterEntity.PointClickMovement(targetPosition);
-            targetLookDirection = targetPosition - MovementTransform.position;
-            targetLookDirection.Normalize();
+            PlayerCharacterEntity.PointClickMovement(entity.CacheTransform.position);
+        }
+
+        protected void TurnCharacterToEntity(BaseGameEntity entity)
+        {
+            if (entity == null)
+                return;
+            targetLookDirection = (entity.CacheTransform.position - MovementTransform.position).normalized;
         }
 
         public void UpdateLookAtTarget()
         {
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
-            if (destination.HasValue)
-            {
-                targetLookDirection = destination.Value - MovementTransform.position;
-                targetLookDirection.Normalize();
-            }
 
-            if (Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection) > 0)
+            if (targetLookDirection.HasValue && Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection.Value) > 0)
             {
                 // Update rotation when angle difference more than 1
-                tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
+                tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection.Value), Time.deltaTime * angularSpeed);
                 PlayerCharacterEntity.SetLookRotation(tempLookAt);
             }
             else
             {
                 // Update temp look at to character's rotation
                 tempLookAt = PlayerCharacterEntity.GetLookRotation();
+                targetLookDirection = null;
             }
         }
 

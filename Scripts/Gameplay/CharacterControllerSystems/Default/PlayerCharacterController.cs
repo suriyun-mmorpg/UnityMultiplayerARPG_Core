@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         protected VehicleEntity targetVehicle;
         protected HarvestableEntity targetHarvestable;
         protected Quaternion tempLookAt;
-        protected Vector3 targetLookDirection;
+        protected Vector3? targetLookDirection;
         public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
         public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
         public NearbyEntityDetector EnemyEntityDetector { get; protected set; }
@@ -309,7 +309,13 @@ namespace MultiplayerARPG
             return moveDirection;
         }
 
-        public bool RequestUsePendingSkill(bool isLeftHand)
+        public void RequestAttack()
+        {
+            if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
+                isLeftHandAttacking = !isLeftHandAttacking;
+        }
+
+        public void RequestUsePendingSkill()
         {
             if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseSkill())
             {
@@ -317,21 +323,21 @@ namespace MultiplayerARPG
                 if (queueUsingSkill.itemIndex >= 0)
                 {
                     if (queueUsingSkill.aimPosition.HasValue)
-                        canUseSkill = PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition.Value);
+                        canUseSkill = PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, queueUsingSkill.aimPosition.Value);
                     else
-                        canUseSkill = PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHand);
+                        canUseSkill = PlayerCharacterEntity.RequestUseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking);
                 }
                 else
                 {
                     if (queueUsingSkill.aimPosition.HasValue)
-                        canUseSkill = PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition.Value);
+                        canUseSkill = PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, queueUsingSkill.aimPosition.Value);
                     else
-                        canUseSkill = PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHand);
+                        canUseSkill = PlayerCharacterEntity.RequestUseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking);
                 }
+                if (canUseSkill)
+                    isLeftHandAttacking = !isLeftHandAttacking;
                 ClearQueueUsingSkill();
-                return canUseSkill;
             }
-            return false;
         }
     }
 }
