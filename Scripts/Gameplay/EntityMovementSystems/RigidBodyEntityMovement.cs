@@ -58,9 +58,14 @@ namespace MultiplayerARPG
         private MovementState tempMovementState;
         private Vector3 tempInputDirection;
         private Vector3 tempMoveDirection;
+        private Vector3 tempHorizontalMoveDirection;
+        private Vector3 tempMoveVelocity;
         private Vector3 tempTargetPosition;
         private Vector3 tempCurrentPosition;
         private Vector3 groundContactNormal;
+        private Vector3 tempPredictPosition;
+        private float tempSqrMagnitude;
+        private float tempPredictSqrMagnitude;
         private float tempTargetDistance;
         private bool previouslyGrounded;
         private bool applyingJump;
@@ -317,8 +322,8 @@ namespace MultiplayerARPG
             if (HasNavPaths)
             {
                 tempTargetPosition = navPaths.Peek();
-                tempTargetPosition.y = 0;
                 tempCurrentPosition = CacheTransform.position;
+                tempTargetPosition.y = 0;
                 tempCurrentPosition.y = 0;
                 tempMoveDirection = tempTargetPosition - tempCurrentPosition;
                 tempMoveDirection.Normalize();
@@ -335,8 +340,7 @@ namespace MultiplayerARPG
                     CacheTransform.rotation = Quaternion.LookRotation(tempMoveDirection);
                 }
             }
-
-            UpdateMovement();
+            UpdateMovement(Time.deltaTime);
 
             tempMovementState = CacheRigidbody.velocity.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
             if (isUnderWater)
@@ -412,7 +416,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateMovement()
+        private void UpdateMovement(float deltaTime)
         {
             WaterCheck();
             GroundCheck();
@@ -448,34 +452,51 @@ namespace MultiplayerARPG
 
             if (tempMoveDirection.sqrMagnitude > 0f)
             {
-                tempMoveDirection.Normalize();
-
                 if (!isUnderWater)
                 {
                     // always move along the camera forward as it is the direction that it being aimed at
                     tempMoveDirection = Vector3.ProjectOnPlane(tempMoveDirection, groundContactNormal);
-                    tempMoveDirection.Normalize();
                 }
+                tempMoveDirection.Normalize();
 
                 float currentTargetSpeed = CacheEntity.GetMoveSpeed();
                 // If character move backward
                 if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
                     currentTargetSpeed *= backwardMoveSpeedRate;
 
-                tempMoveDirection *= currentTargetSpeed;
+                if (HasNavPaths)
+                {
+                    tempHorizontalMoveDirection = tempMoveDirection;
+                    tempHorizontalMoveDirection.y = 0;
+                    tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
+                    tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * currentTargetSpeed * deltaTime);
+                    tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
+                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                    // rigidbody will reaching target and character is moving pass it,
+                    // so adjust move speed by distance and time (with physic formula: v=s/t)
+                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                        currentTargetSpeed *= tempTargetDistance / deltaTime / currentTargetSpeed;
+                    tempMoveVelocity = tempMoveDirection * currentTargetSpeed;
+                }
+                else
+                {
+                    // Move with wasd keys so it does not have to adjust speed
+                    tempMoveVelocity = tempMoveDirection * currentTargetSpeed;
+                }
 
                 if (isUnderWater)
                 {
                     // Update velocity while under water
-                    CacheRigidbody.velocity = tempMoveDirection;
+                    CacheRigidbody.velocity = tempMoveVelocity;
                 }
                 else
                 {
                     // Update velocity while not under water
                     if (isGrounded && !useRootMotionForMovement)
-                        CacheRigidbody.velocity = tempMoveDirection;
+                        CacheRigidbody.velocity = tempMoveVelocity;
                     else if (!isGrounded && !useRootMotionForAirMovement)
-                        CacheRigidbody.velocity = new Vector3(tempMoveDirection.x, CacheRigidbody.velocity.y, tempMoveDirection.z);
+                        CacheRigidbody.velocity = new Vector3(tempMoveVelocity.x, CacheRigidbody.velocity.y, tempMoveVelocity.z);
                 }
             }
             else
