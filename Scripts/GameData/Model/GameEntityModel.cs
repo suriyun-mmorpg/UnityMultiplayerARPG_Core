@@ -124,6 +124,22 @@ namespace MultiplayerARPG
                                 hiddingRenderers[i].enabled = true;
                         }
                     }
+                    if (fpsHiddingObjects != null && fpsHiddingObjects.Length > 0)
+                    {
+                        for (i = 0; i < fpsHiddingObjects.Length; ++i)
+                        {
+                            if (fpsHiddingObjects[i].activeSelf)
+                                fpsHiddingObjects[i].SetActive(true);
+                        }
+                    }
+                    if (fpsHiddingRenderers != null && fpsHiddingRenderers.Length > 0)
+                    {
+                        for (i = 0; i < fpsHiddingRenderers.Length; ++i)
+                        {
+                            if (fpsHiddingRenderers[i].enabled)
+                                fpsHiddingRenderers[i].enabled = true;
+                        }
+                    }
                     break;
                 case EVisibleState.Invisible:
                     if (hiddingObjects != null && hiddingObjects.Length > 0)
@@ -140,6 +156,22 @@ namespace MultiplayerARPG
                         {
                             if (hiddingRenderers[i].enabled)
                                 hiddingRenderers[i].enabled = false;
+                        }
+                    }
+                    if (fpsHiddingObjects != null && fpsHiddingObjects.Length > 0)
+                    {
+                        for (i = 0; i < fpsHiddingObjects.Length; ++i)
+                        {
+                            if (fpsHiddingObjects[i].activeSelf)
+                                fpsHiddingObjects[i].SetActive(false);
+                        }
+                    }
+                    if (fpsHiddingRenderers != null && fpsHiddingRenderers.Length > 0)
+                    {
+                        for (i = 0; i < fpsHiddingRenderers.Length; ++i)
+                        {
+                            if (fpsHiddingRenderers[i].enabled)
+                                fpsHiddingRenderers[i].enabled = false;
                         }
                     }
                     break;
