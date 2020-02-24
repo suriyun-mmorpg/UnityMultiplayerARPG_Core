@@ -865,7 +865,7 @@ public static partial class CharacterDataExtension
     #endregion
 
     #region Decrease Items
-    public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, short amount, out Dictionary<CharacterItem, short> decreaseItems)
+    public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitInventorySlot, out Dictionary<CharacterItem, short> decreaseItems)
     {
         decreaseItems = new Dictionary<CharacterItem, short>();
         Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
@@ -891,20 +891,20 @@ public static partial class CharacterDataExtension
         foreach (KeyValuePair<int, short> decreasingItem in decreasingItemIndexes)
         {
             decreaseItems.Add(itemList[decreasingItem.Key], decreasingItem.Value);
-            itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value);
+            itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value, isLimitInventorySlot);
         }
         return true;
     }
 
-    public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, out Dictionary<CharacterItem, short> decreaseItems)
+    public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, bool isLimitInventorySlot, out Dictionary<CharacterItem, short> decreaseItems)
     {
-        return data.NonEquipItems.DecreaseItems(dataId, amount, out decreaseItems);
+        return data.NonEquipItems.DecreaseItems(dataId, amount, isLimitInventorySlot, out decreaseItems);
     }
 
-    public static bool DecreaseItems(this ICharacterData data, int dataId, short amount)
+    public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, bool isLimitInventorySlot)
     {
         Dictionary<CharacterItem, short> decreaseItems;
-        return DecreaseItems(data, dataId, amount, out decreaseItems);
+        return DecreaseItems(data, dataId, amount, isLimitInventorySlot, out decreaseItems);
     }
     #endregion
 
@@ -948,7 +948,7 @@ public static partial class CharacterDataExtension
     #endregion
 
     #region Decrease Items By Index
-    public static bool DecreaseItemsByIndex(this IList<CharacterItem> itemList, int index, short amount)
+    public static bool DecreaseItemsByIndex(this IList<CharacterItem> itemList, int index, short amount, bool isLimitInventorySlot)
     {
         if (index < 0 || index >= itemList.Count)
             return false;
@@ -956,7 +956,12 @@ public static partial class CharacterDataExtension
         if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
             return false;
         if (nonEquipItem.amount - amount == 0)
-            itemList.RemoveAt(index);
+        {
+            if (isLimitInventorySlot)
+                itemList[index] = CharacterItem.Empty;
+            else
+                itemList.RemoveAt(index);
+        }
         else
         {
             nonEquipItem.amount -= amount;
@@ -967,7 +972,7 @@ public static partial class CharacterDataExtension
 
     public static bool DecreaseItemsByIndex(this ICharacterData data, int index, short amount)
     {
-        if (data.NonEquipItems.DecreaseItemsByIndex(index, amount))
+        if (data.NonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot))
         {
             data.FillEmptySlots();
             return true;
@@ -1249,21 +1254,34 @@ public static partial class CharacterDataExtension
 
     public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem)
     {
-        data.NonEquipItems.AddOrSetItems(characterItem);
+        int index;
+        data.AddOrSetNonEquipItems(characterItem, out index);
+    }
+
+    public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, out int index)
+    {
+        data.NonEquipItems.AddOrSetItems(characterItem, out index);
     }
 
     public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem)
     {
-        int setIndex = IndexOfEmptyItemSlot(itemList);
-        if (setIndex >= 0)
+        int index;
+        itemList.AddOrSetItems(characterItem, out index);
+    }
+
+    public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, out int index)
+    {
+        index = IndexOfEmptyItemSlot(itemList);
+        if (index >= 0)
         {
             // Insert to empty slot
-            itemList[setIndex] = characterItem;
+            itemList[index] = characterItem;
         }
         else
         {
             // Add to last index
             itemList.Add(characterItem);
+            index = itemList.Count - 1;
         }
     }
 
@@ -1274,120 +1292,80 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfEmptyItemSlot(this IList<CharacterItem> list)
     {
-        CharacterItem tempItem;
-        int index = -1;
         for (int i = 0; i < list.Count; ++i)
         {
-            tempItem = list[i];
-            if (tempItem.IsEmptySlot())
-            {
-                index = i;
-                break;
-            }
+            if (list[i].IsEmptySlot())
+                return i;
         }
-        return index;
+        return -1;
     }
 
     public static int IndexOfNonEquipItem(this ICharacterData data, int dataId)
     {
         IList<CharacterItem> list = data.NonEquipItems;
-        CharacterItem tempItem;
-        int index = -1;
         for (int i = 0; i < list.Count; ++i)
         {
-            tempItem = list[i];
-            if (tempItem.dataId == dataId)
-            {
-                index = i;
-                break;
-            }
+            if (list[i].dataId == dataId)
+                return i;
         }
-        return index;
+        return -1;
     }
 
     public static int IndexOfNonEquipItem(this ICharacterData data, string id)
     {
         IList<CharacterItem> list = data.NonEquipItems;
-        CharacterItem tempItem;
-        int index = -1;
         for (int i = 0; i < list.Count; ++i)
         {
-            tempItem = list[i];
-            if (!string.IsNullOrEmpty(tempItem.id) && tempItem.id.Equals(id))
-            {
-                index = i;
-                break;
-            }
+            if (!string.IsNullOrEmpty(list[i].id) && list[i].id.Equals(id))
+                return i;
         }
-        return index;
+        return -1;
     }
 
     public static int IndexOfSummon(this ICharacterData data, uint objectId)
     {
         IList<CharacterSummon> list = data.Summons;
-        CharacterSummon tempSummon;
-        int index = -1;
         for (int i = 0; i < list.Count; ++i)
         {
-            tempSummon = list[i];
-            if (tempSummon.objectId == objectId)
-            {
-                index = i;
-                break;
-            }
+            if (list[i].objectId == objectId)
+                return i;
         }
-        return index;
+        return -1;
     }
 
     public static int IndexOfSummon(this ICharacterData data, SummonType type)
     {
         IList<CharacterSummon> list = data.Summons;
-        CharacterSummon tempSummon;
-        int index = -1;
         for (int i = 0; i < list.Count; ++i)
         {
-            tempSummon = list[i];
-            if (tempSummon.type == type)
-            {
-                index = i;
-                break;
-            }
+            if (list[i].type == type)
+                return i;
         }
-        return index;
+        return -1;
     }
 
     public static int IndexOfSummon(this ICharacterData data, int dataId, SummonType type)
     {
         IList<CharacterSummon> list = data.Summons;
-        CharacterSummon tempSummon;
-        int index = -1;
         for (int i = 0; i < list.Count; ++i)
         {
-            tempSummon = list[i];
-            if (tempSummon.dataId == dataId && tempSummon.type == type)
-            {
-                index = i;
-                break;
-            }
+            if (list[i].dataId == dataId && list[i].type == type)
+                return i;
         }
-        return index;
+        return -1;
     }
 
     public static int IndexOfAmmoItem(this ICharacterData data, AmmoType ammoType)
     {
         IList<CharacterItem> list = data.NonEquipItems;
         IAmmoItem tempAmmoItem;
-        int index = -1;
         for (int i = 0; i < list.Count; ++i)
         {
             tempAmmoItem = list[i].GetAmmoItem();
             if (tempAmmoItem != null && tempAmmoItem.AmmoType == ammoType)
-            {
-                index = i;
-                break;
-            }
+                return i;
         }
-        return index;
+        return -1;
     }
 
     public static void GetEquipmentSetBonus(this ICharacterData data,

@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         public bool CanRefine(IPlayerCharacterData character, short level, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.CannotRefine;
-            if (!IsEquipment())
+            if (!this.IsEquipment())
             {
                 // Cannot refine because it's not equipment item
                 return false;
@@ -80,7 +80,10 @@ namespace MultiplayerARPG
                 list[index] = refinedItem;
             }, () =>
             {
-                list.RemoveAt(index);
+                if (GameInstance.Singleton.IsLimitInventorySlot)
+                    list[index] = CharacterItem.Empty;
+                else
+                    list.RemoveAt(index);
             }, out gameMessageType);
         }
 
@@ -135,7 +138,7 @@ namespace MultiplayerARPG
                 foreach (ItemAmount requireItem in refineLevel.RequireItems)
                 {
                     if (requireItem.item != null && requireItem.amount > 0)
-                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
+                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount, GameInstance.Singleton.IsLimitInventorySlot);
                 }
                 character.FillEmptySlots();
             }

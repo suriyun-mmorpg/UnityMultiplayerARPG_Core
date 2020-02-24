@@ -38,8 +38,12 @@ namespace MultiplayerARPG
                 if (toItem.amount + fromItem.amount <= maxStack)
                 {
                     toItem.amount += fromItem.amount;
-                    NonEquipItems[fromIndex] = CharacterItem.Empty;
+                    if (CurrentGameInstance.IsLimitInventorySlot)
+                        NonEquipItems[fromIndex] = CharacterItem.Empty;
+                    else
+                        NonEquipItems.RemoveAt(fromIndex);
                     NonEquipItems[toIndex] = toItem;
+                    this.FillEmptySlots();
                 }
                 else
                 {
@@ -253,7 +257,7 @@ namespace MultiplayerARPG
 
             // Simulate data before applies
             List<CharacterItem> tempNonEquipItems = new List<CharacterItem>(nonEquipItems);
-            if (!tempNonEquipItems.DecreaseItemsByIndex(index, tempNonEquipItems[index].amount))
+            if (!tempNonEquipItems.DecreaseItemsByIndex(index, tempNonEquipItems[index].amount, CurrentGameInstance.IsLimitInventorySlot))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
                 return;

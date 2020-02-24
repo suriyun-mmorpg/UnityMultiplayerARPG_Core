@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                 foreach (ItemAmount requireItem in createGuildRequireItems)
                 {
                     if (requireItem.item != null && requireItem.amount > 0)
-                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
+                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount, GameInstance.Singleton.IsLimitInventorySlot);
                 }
                 character.FillEmptySlots();
             }

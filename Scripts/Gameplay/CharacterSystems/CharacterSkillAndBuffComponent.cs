@@ -66,7 +66,10 @@ namespace MultiplayerARPG
                     nonEquipItem = CacheEntity.NonEquipItems[i];
                     if (nonEquipItem.ShouldRemove())
                     {
-                        CacheEntity.NonEquipItems.RemoveAt(i);
+                        if (CurrentGameInstance.IsLimitInventorySlot)
+                            CacheEntity.NonEquipItems[i] = CharacterItem.Empty;
+                        else
+                            CacheEntity.NonEquipItems.RemoveAt(i);
                         hasRemovedItem = true;
                     }
                     else

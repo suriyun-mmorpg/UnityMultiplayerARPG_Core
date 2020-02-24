@@ -193,9 +193,18 @@ namespace MultiplayerARPG
                             // Reduce item amount when able to increase item to co character
                             nonEquipItem.amount -= dealingItem.characterItem.amount;
                             if (nonEquipItem.amount == 0)
-                                nonEquipItems.RemoveAt(i);
+                            {
+                                // Amount is 0, remove it from inventory
+                                if (CurrentGameInstance.IsLimitInventorySlot)
+                                    nonEquipItems[i] = CharacterItem.Empty;
+                                else
+                                    nonEquipItems.RemoveAt(i);
+                            }
                             else
+                            {
+                                // Update amount
                                 nonEquipItems[i] = nonEquipItem;
+                            }
                         }
                         tempDealingItems.RemoveAt(j);
                         break;

@@ -141,17 +141,19 @@ namespace MultiplayerARPG
                 return;
             }
 
+            int unEquippedIndexRightHand = -1;
             if (shouldUnequipRightHand)
             {
-                if (!UnEquipWeapon(equipWeaponSet, false, true, out gameMessageType))
+                if (!UnEquipWeapon(equipWeaponSet, false, true, out gameMessageType, out unEquippedIndexRightHand))
                 {
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     return;
                 }
             }
+            int unEquippedIndexLeftHand = -1;
             if (shouldUnequipLeftHand)
             {
-                if (!UnEquipWeapon(equipWeaponSet, true, true, out gameMessageType))
+                if (!UnEquipWeapon(equipWeaponSet, true, true, out gameMessageType, out unEquippedIndexLeftHand))
                 {
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     return;
@@ -174,7 +176,47 @@ namespace MultiplayerARPG
                 SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
             }
             // Update inventory
-            nonEquipItems.RemoveAt(nonEquipIndex);
+            if (unEquippedIndexRightHand >= 0 && unEquippedIndexLeftHand >= 0)
+            {
+                // Swap with equipped item
+                NonEquipItems[nonEquipIndex] = NonEquipItems[unEquippedIndexRightHand];
+                if (CurrentGameInstance.IsLimitInventorySlot)
+                    NonEquipItems[unEquippedIndexRightHand] = CharacterItem.Empty;
+                else
+                    NonEquipItems.RemoveAt(unEquippedIndexRightHand);
+                // Find empty slot for unequipped left-hand weapon to swap with empty slot
+                if (CurrentGameInstance.IsLimitInventorySlot)
+                {
+                    NonEquipItems[this.IndexOfEmptyNonEquipItemSlot()] = NonEquipItems[unEquippedIndexLeftHand];
+                    NonEquipItems[unEquippedIndexLeftHand] = CharacterItem.Empty;
+                }
+            }
+            else if (unEquippedIndexRightHand >= 0)
+            {
+                // Swap with equipped item
+                NonEquipItems[nonEquipIndex] = NonEquipItems[unEquippedIndexRightHand];
+                if (CurrentGameInstance.IsLimitInventorySlot)
+                    NonEquipItems[unEquippedIndexRightHand] = CharacterItem.Empty;
+                else
+                    NonEquipItems.RemoveAt(unEquippedIndexRightHand);
+            }
+            else if (unEquippedIndexLeftHand >= 0)
+            {
+                // Swap with equipped item
+                NonEquipItems[nonEquipIndex] = NonEquipItems[unEquippedIndexLeftHand];
+                if (CurrentGameInstance.IsLimitInventorySlot)
+                    NonEquipItems[unEquippedIndexLeftHand] = CharacterItem.Empty;
+                else
+                    NonEquipItems.RemoveAt(unEquippedIndexLeftHand);
+            }
+            else
+            {
+                // Remove equipped item
+                if (CurrentGameInstance.IsLimitInventorySlot)
+                    NonEquipItems[nonEquipIndex] = CharacterItem.Empty;
+                else
+                    NonEquipItems.RemoveAt(nonEquipIndex);
+            }
             this.FillEmptySlots();
         }
 
@@ -191,15 +233,16 @@ namespace MultiplayerARPG
 
             CharacterItem equippingItem = nonEquipItems[nonEquipIndex];
 
-            short unEquippingIndex = -1;
             GameMessage.Type gameMessageType;
+            int unEquippingIndex = -1;
             if (!CanEquipItem(equippingItem, equipSlotIndex, out gameMessageType, out unEquippingIndex))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                 return;
             }
 
-            if (unEquippingIndex >= 0 && !UnEquipArmor(unEquippingIndex, true, out gameMessageType))
+            int unEquippedIndex = -1;
+            if (unEquippingIndex >= 0 && !UnEquipArmor(unEquippingIndex, true, out gameMessageType, out unEquippedIndex))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                 return;
@@ -211,23 +254,41 @@ namespace MultiplayerARPG
             // Update equip item indexes
             equipItemIndexes[GetEquipPosition(equippingItem.GetArmorItem().EquipPosition, equipSlotIndex)] = equipItems.Count - 1;
             // Update inventory
-            nonEquipItems.RemoveAt(nonEquipIndex);
+            if (unEquippedIndex >= 0)
+            {
+                // Swap with equipped item
+                NonEquipItems[nonEquipIndex] = NonEquipItems[unEquippedIndex];
+                if (CurrentGameInstance.IsLimitInventorySlot)
+                    NonEquipItems[unEquippedIndex] = CharacterItem.Empty;
+                else
+                    NonEquipItems.RemoveAt(unEquippedIndex);
+            }
+            else
+            {
+                // Remove equipped item
+                if (CurrentGameInstance.IsLimitInventorySlot)
+                    NonEquipItems[nonEquipIndex] = CharacterItem.Empty;
+                else
+                    NonEquipItems.RemoveAt(nonEquipIndex);
+            }
             this.FillEmptySlots();
         }
 
         protected virtual void NetFuncUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
         {
             GameMessage.Type gameMessageType;
-            if (!UnEquipWeapon(equipWeaponSet, isLeftHand, false, out gameMessageType))
+            int unEquippedIndex;
+            if (!UnEquipWeapon(equipWeaponSet, isLeftHand, false, out gameMessageType, out unEquippedIndex))
             {
                 // Cannot unequip weapon, send reasons to client
                 CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
             }
         }
 
-        protected bool UnEquipWeapon(byte equipWeaponSet, bool isLeftHand, bool doNotValidate, out GameMessage.Type gameMessageType)
+        protected bool UnEquipWeapon(byte equipWeaponSet, bool isLeftHand, bool doNotValidate, out GameMessage.Type gameMessageType, out int unEquippedIndex)
         {
             gameMessageType = GameMessage.Type.None;
+            unEquippedIndex = -1;
             if (!CanDoActions())
                 return false;
 
@@ -264,7 +325,7 @@ namespace MultiplayerARPG
 
             if (unEquipItem.NotEmptySlot())
             {
-                this.AddOrSetNonEquipItems(unEquipItem);
+                this.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex);
                 this.FillEmptySlots();
             }
 
@@ -278,16 +339,18 @@ namespace MultiplayerARPG
         protected virtual void NetFuncUnEquipArmor(short index)
         {
             GameMessage.Type gameMessageType;
-            if (!UnEquipArmor(index, false, out gameMessageType))
+            int unEquippedIndex;
+            if (!UnEquipArmor(index, false, out gameMessageType, out unEquippedIndex))
             {
                 // Cannot unequip weapon, send reasons to client
                 CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
             }
         }
 
-        protected bool UnEquipArmor(short index, bool doNotValidate, out GameMessage.Type gameMessageType)
+        protected bool UnEquipArmor(int index, bool doNotValidate, out GameMessage.Type gameMessageType, out int unEquippedIndex)
         {
             gameMessageType = GameMessage.Type.None;
+            unEquippedIndex = -1;
             if (!CanDoActions() || index >= equipItems.Count)
                 return false;
 
@@ -304,7 +367,7 @@ namespace MultiplayerARPG
 
             if (unEquipItem.NotEmptySlot())
             {
-                this.AddOrSetNonEquipItems(unEquipItem);
+                this.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex);
                 this.FillEmptySlots();
             }
 
@@ -345,46 +408,6 @@ namespace MultiplayerARPG
 
             Summons.RemoveAt(index);
             summon.UnSummon(this);
-        }
-
-        protected void NetFuncMergeNonEquipItems(short index1, short index2)
-        {
-            if (!CanDoActions() ||
-                index1 >= nonEquipItems.Count ||
-                index2 >= nonEquipItems.Count)
-                return;
-
-            CharacterItem nonEquipItem1 = nonEquipItems[index1];
-            CharacterItem nonEquipItem2 = nonEquipItems[index2];
-            short maxStack = nonEquipItem2.GetMaxStack();
-            if (nonEquipItem2.amount + nonEquipItem1.amount <= maxStack)
-            {
-                nonEquipItem2.amount += nonEquipItem1.amount;
-                nonEquipItems[index2] = nonEquipItem2;
-                nonEquipItems.RemoveAt(index1);
-            }
-            else
-            {
-                short mergeAmount = (short)(maxStack - nonEquipItem2.amount);
-                nonEquipItem2.amount = maxStack;
-                nonEquipItem1.amount -= mergeAmount;
-                nonEquipItems[index1] = nonEquipItem1;
-                nonEquipItems[index2] = nonEquipItem2;
-            }
-        }
-
-        protected void NetFuncSwapNonEquipItems(short index1, short index2)
-        {
-            if (!CanDoActions() ||
-                index1 >= nonEquipItems.Count ||
-                index2 >= nonEquipItems.Count)
-                return;
-
-            CharacterItem nonEquipItem1 = nonEquipItems[index1];
-            CharacterItem nonEquipItem2 = nonEquipItems[index2];
-
-            nonEquipItems[index2] = nonEquipItem1;
-            nonEquipItems[index1] = nonEquipItem2;
         }
 
         protected void NetFuncSwitchEquipWeaponSet(byte equipWeaponSet)

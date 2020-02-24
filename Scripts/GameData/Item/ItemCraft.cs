@@ -78,7 +78,7 @@ namespace MultiplayerARPG
                 foreach (ItemAmount craftRequirement in craftRequirements)
                 {
                     if (craftRequirement.item != null && craftRequirement.amount > 0)
-                        character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
+                        character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount, GameInstance.Singleton.IsLimitInventorySlot);
                 }
                 character.FillEmptySlots();
                 // Decrease required gold

@@ -73,7 +73,7 @@ namespace MultiplayerARPG
                 // Cannot enhance socket because enhancer id is invalid
                 return;
             }
-            if (!character.DecreaseItems(enhancerItem.DataId, 1))
+            if (!character.DecreaseItems(enhancerItem.DataId, 1, GameInstance.Singleton.IsLimitInventorySlot))
             {
                 // Cannot enhance socket because there is no item
                 gameMessageType = GameMessage.Type.NotEnoughSocketEnchaner;
