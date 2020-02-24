@@ -760,18 +760,18 @@ namespace MultiplayerARPG
             if (!isLeftHand)
             {
                 if (rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.damageInfo.GetDistance();
+                    return rightWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
                 if (rightWeaponItem == null && leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.damageInfo.GetDistance();
+                    return leftWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
             }
             else
             {
                 if (leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.damageInfo.GetDistance();
+                    return leftWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
                 if (leftWeaponItem == null && rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.damageInfo.GetDistance();
+                    return rightWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
             }
-            return CurrentGameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetDistance();
+            return CurrentGameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
         }
 
         public virtual float GetAttackFov(bool isLeftHand)

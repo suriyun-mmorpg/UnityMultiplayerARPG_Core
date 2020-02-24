@@ -667,8 +667,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 if (targetLookDirection.HasValue)
                     return;
-                // Set direction to turn character to target, now use fov = 5, to make character always turn to target
-                if (PlayerCharacterEntity.IsPositionInFov(5f, entity.GetTransform().position))
+                // Set direction to turn character to target, now use fov = 10, to make character always turn to target
+                if (PlayerCharacterEntity.IsPositionInFov(10f, entity.GetTransform().position))
                 {
                     // Do action
                     action.Invoke();
@@ -695,8 +695,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 if (targetLookDirection.HasValue)
                     return;
-                // Set direction to turn character to target, now use fov = 5, to make character always turn to target
-                bool isPositionInFov = PlayerCharacterEntity.IsPositionInFov(5f, entity.GetTransform().position);
+                // Set direction to turn character to target, now use fov = 10, to make character always turn to target
+                bool isPositionInFov = PlayerCharacterEntity.IsPositionInFov(10f, entity.GetTransform().position);
                 if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() || isPositionInFov)
                 {
                     if (queueUsingSkill.skill != null)
@@ -755,7 +755,7 @@ namespace MultiplayerARPG
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
 
-            if (targetLookDirection.HasValue && Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection.Value) > 0)
+            if (targetLookDirection.HasValue && Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection.Value) > 1)
             {
                 // Update rotation when angle difference more than 1
                 tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection.Value), Time.deltaTime * angularSpeed);
