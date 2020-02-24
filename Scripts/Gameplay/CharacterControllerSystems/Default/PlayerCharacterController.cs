@@ -71,6 +71,7 @@ namespace MultiplayerARPG
         protected HarvestableEntity targetHarvestable;
         protected Quaternion tempLookAt;
         protected Vector3? targetLookDirection;
+        protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
         public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
         public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
         public NearbyEntityDetector EnemyEntityDetector { get; protected set; }

@@ -398,7 +398,7 @@ namespace MultiplayerARPG
             {
                 destination = null;
                 ClearTarget();
-                targetLookDirection = null;
+                targetLookDirection = moveDirection;
             }
             // Always forward
             MovementState movementState = MovementState.Forward;
@@ -734,7 +734,13 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return;
-            PlayerCharacterEntity.PointClickMovement(entity.CacheTransform.position);
+            Vector3 direction = (entity.CacheTransform.position - MovementTransform.position).normalized;
+            Vector3 position = entity.CacheTransform.position - (direction * (distance - StoppingDistance));
+            if (Vector3.Distance(previousPointClickPosition, position) > 0.01f)
+            {
+                PlayerCharacterEntity.PointClickMovement(position);
+                previousPointClickPosition = position;
+            }
         }
 
         protected void TurnCharacterToEntity(BaseGameEntity entity)

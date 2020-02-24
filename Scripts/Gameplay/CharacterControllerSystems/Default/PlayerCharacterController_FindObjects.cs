@@ -147,12 +147,12 @@ namespace MultiplayerARPG
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 IDamageableEntity damageableEntity;
-                int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(damageTransform.position, target.GetTransform().position - damageTransform.position, raycasts, attackDistance, layerMask);
+                int tempCount = PhysicUtils.SortedOverlapSphereNonAlloc(damageTransform.position, attackDistance, overlapColliders, layerMask);
                 for (int i = 0; i < tempCount; ++i)
                 {
-                    if (GetRaycastTransform(i) == target.GetTransform())
+                    if (GetOverlapObject(i) == target.GetGameObject())
                         return true;
-                    damageableEntity = GetRaycastTransform(i).GetComponent<IDamageableEntity>();
+                    damageableEntity = GetOverlapObject(i).GetComponent<IDamageableEntity>();
                     if (damageableEntity != null && damageableEntity.GetObjectId() == target.GetObjectId())
                         return true;
                 }
@@ -160,12 +160,12 @@ namespace MultiplayerARPG
             else
             {
                 IDamageableEntity damageableEntity;
-                int tempCount = PhysicUtils.SortedRaycastNonAlloc2D(damageTransform.position, target.GetTransform().position - damageTransform.position, raycasts2D, attackDistance, layerMask);
+                int tempCount = PhysicUtils.SortedOverlapCircleNonAlloc(damageTransform.position, attackDistance, overlapColliders2D, layerMask);
                 for (int i = 0; i < tempCount; ++i)
                 {
-                    if (GetRaycastTransform(i) == target.GetTransform())
+                    if (GetOverlapObject(i) == target.GetTransform())
                         return true;
-                    damageableEntity = GetRaycastTransform(i).GetComponent<IDamageableEntity>();
+                    damageableEntity = GetOverlapObject(i).GetComponent<IDamageableEntity>();
                     if (damageableEntity != null && damageableEntity.GetObjectId() == target.GetObjectId())
                         return true;
                 }
