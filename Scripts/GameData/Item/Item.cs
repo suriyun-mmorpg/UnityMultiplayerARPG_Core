@@ -9,8 +9,9 @@ namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item", order = -4899)]
     public partial class Item : BaseItem,
-        IArmorItem, IShieldItem, IWeaponItem,
-        IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem
+        IAmmoItem, IArmorItem, IShieldItem, IWeaponItem,
+        IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem,
+        ISocketEnhancerItem
     {
         public enum LegacyItemType : byte
         {
@@ -194,6 +195,13 @@ namespace MultiplayerARPG
             }
         }
 
+        #region Implement IAmmoItem
+        public AmmoType AmmoType
+        {
+            get { return ammoType; }
+        }
+        #endregion
+
         #region Implement IEquipmentItem
         public EquipmentRequirement Requirement
         {
@@ -278,7 +286,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Implement IDefendItem
+        #region Implement IDefendEquipmentItem
         public ArmorIncremental ArmorAmount
         {
             get { return armorAmount; }
@@ -401,6 +409,13 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Implement ISocketEnhancerItem
+        public EquipmentBonus SocketEnhanceEffect
+        {
+            get { return socketEnhanceEffect; }
+        }
+        #endregion
+
         public override bool Validate()
         {
             bool hasChanges = false;
@@ -466,7 +481,7 @@ namespace MultiplayerARPG
         public bool CanEquip(BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.None;
-            if (!IsEquipment() || character == null)
+            if (!this.IsEquipment() || character == null)
                 return false;
 
             // Check is it pass attribute requirement or not
@@ -500,7 +515,7 @@ namespace MultiplayerARPG
 
         public bool CanAttack(BaseCharacterEntity character)
         {
-            if (!IsWeapon() || character == null)
+            if (!this.IsWeapon() || character == null)
                 return false;
 
             AmmoType requireAmmoType = WeaponType.requireAmmoType;
