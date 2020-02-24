@@ -4,6 +4,87 @@ namespace MultiplayerARPG
 {
     public static class ItemExtension
     {
+        #region Item Type Extension
+
+        public static bool IsDefendEquipment<T>(this T item)
+            where T : IItem
+        {
+            return item.IsArmor() || item.IsShield();
+        }
+
+        public static bool IsEquipment<T>(this T item)
+            where T : IItem
+        {
+            return item.IsDefendEquipment() || item.IsWeapon();
+        }
+
+        public static bool IsUsable<T>(this T item)
+            where T : IItem
+        {
+            return item.IsPotion() || item.IsPet() || item.IsMount() || item.IsSkill();
+        }
+
+        public static bool IsArmor<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Armor;
+        }
+
+        public static bool IsShield<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Shield;
+        }
+
+        public static bool IsWeapon<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Weapon;
+        }
+
+        public static bool IsPotion<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Potion;
+        }
+
+        public static bool IsAmmo<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Ammo;
+        }
+
+        public static bool IsBuilding<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Building;
+        }
+
+        public static bool IsPet<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Pet;
+        }
+
+        public static bool IsSocketEnhancer<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.SocketEnhancer;
+        }
+
+        public static bool IsMount<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Mount;
+        }
+
+        public static bool IsSkill<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Skill;
+        }
+        #endregion
+
         #region Ammo Extension
         public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this IAmmoItem ammoItem, short level)
         {
