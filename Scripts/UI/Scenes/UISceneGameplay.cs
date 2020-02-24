@@ -553,7 +553,8 @@ namespace MultiplayerARPG
         {
             if (uiRefineItem == null)
                 return;
-
+            // Don't select any item yet, wait player to select the item
+            uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
             uiRefineItem.Show();
         }
 
@@ -561,7 +562,8 @@ namespace MultiplayerARPG
         {
             if (uiDismantleItem == null)
                 return;
-
+            // Don't select any item yet, wait player to select the item
+            uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
             uiDismantleItem.Show();
         }
 

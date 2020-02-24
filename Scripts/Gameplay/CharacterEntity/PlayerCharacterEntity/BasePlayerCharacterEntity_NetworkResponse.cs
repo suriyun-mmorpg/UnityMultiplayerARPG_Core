@@ -248,12 +248,10 @@ namespace MultiplayerARPG
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
-            if (nonEquipItem.IsEmptySlot())
+            if (nonEquipItem.IsEmptySlot() || !CurrentGameInstance.dismantleFilter.Filter(nonEquipItem))
                 return;
 
             BaseItem item = nonEquipItems[index].GetItem();
-            if (item == null)
-                return;
 
             // Simulate data before applies
             List<CharacterItem> tempNonEquipItems = new List<CharacterItem>(nonEquipItems);

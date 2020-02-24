@@ -34,13 +34,31 @@ namespace MultiplayerARPG
         public short Level { get { return (short)(CharacterItem != null ? CharacterItem.level : 1); } }
 
         public UICharacterItem uiCharacterItem;
+        [Tooltip("These objects will be activated while item is not set")]
+        public GameObject[] noItemObjects;
+        
+        protected override void Update()
+        {
+            base.Update();
+            if (noItemObjects != null && noItemObjects.Length > 0)
+            {
+                foreach (GameObject noItemObject in noItemObjects)
+                {
+                    if (noItemObject == null)
+                        continue;
+                    noItemObject.SetActive(CharacterItem.IsEmptySlot());
+                }
+            }
+        }
 
         protected override void UpdateData()
         {
             if (uiCharacterItem != null)
             {
-                if (CharacterItem == null)
+                if (CharacterItem.IsEmptySlot())
+                {
                     uiCharacterItem.Hide();
+                }
                 else
                 {
                     uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);

@@ -22,15 +22,28 @@ namespace MultiplayerARPG
         [Header("UI Elements for UI Enhance Socket Item")]
         public UINonEquipItems uiSocketEnhancerItems;
 
+        protected bool activated;
+        protected string activeItemId;
+
         public void OnUpdateCharacterItems()
         {
             if (!IsVisible())
                 return;
 
+            if (activated && (CharacterItem.IsEmptySlot() || !CharacterItem.id.Equals(activeItemId)))
+            {
+                // Item's ID is difference to active item ID, so the item may be destroyed
+                // So clear data
+                Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+                return;
+            }
+
             if (uiCharacterItem != null)
             {
-                if (CharacterItem == null)
+                if (CharacterItem.IsEmptySlot())
+                {
                     uiCharacterItem.Hide();
+                }
                 else
                 {
                     uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
@@ -49,6 +62,7 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
+            activated = false;
             OnUpdateCharacterItems();
         }
 
@@ -60,8 +74,10 @@ namespace MultiplayerARPG
 
         public void OnClickEnhanceSocket()
         {
-            if (IndexOfData < 0 || SelectedEnhancerId == 0)
+            if (CharacterItem.IsEmptySlot() || SelectedEnhancerId == 0)
                 return;
+            activated = true;
+            activeItemId = CharacterItem.id;
             OwningCharacter.RequestEnhanceSocketItem(InventoryType, (short)IndexOfData, SelectedEnhancerId);
         }
 	}

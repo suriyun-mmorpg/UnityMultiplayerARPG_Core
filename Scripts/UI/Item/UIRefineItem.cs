@@ -30,6 +30,9 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSuccessRate;
         public TextWrapper uiTextRefiningLevel;
 
+        protected bool activated;
+        protected string activeItemId;
+
         protected override void Awake()
         {
             base.Awake();
@@ -52,6 +55,14 @@ namespace MultiplayerARPG
         {
             if (!IsVisible())
                 return;
+
+            if (activated && (CharacterItem.IsEmptySlot() || !CharacterItem.id.Equals(activeItemId)))
+            {
+                // Item's ID is difference to active item ID, so the item may be destroyed
+                // So clear data
+                Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+                return;
+            }
 
             if (uiCharacterItem != null)
             {
@@ -139,6 +150,7 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
+            activated = false;
             OnUpdateCharacterItems();
         }
 
@@ -150,8 +162,10 @@ namespace MultiplayerARPG
 
         public void OnClickRefine()
         {
-            if (IndexOfData < 0)
+            if (CharacterItem.IsEmptySlot())
                 return;
+            activated = true;
+            activeItemId = CharacterItem.id;
             OwningCharacter.RequestRefineItem(InventoryType, (short)IndexOfData);
         }
     }

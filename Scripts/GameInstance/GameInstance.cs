@@ -130,7 +130,13 @@ namespace MultiplayerARPG
         [Range(1, 16)]
         public byte maxEquipWeaponSet = 2;
 
-        [Header("Gameplay Configs - Inventory and Storage")]
+        [Header("Gameplay Configs - Items, Inventory and Storage")]
+        public ItemTypeFilter dismantleFilter = new ItemTypeFilter()
+        {
+            includeArmor = true,
+            includeShield = true,
+            includeWeapon = true
+        };
         public InventorySystem inventorySystem;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
         public short baseSlotLimit;

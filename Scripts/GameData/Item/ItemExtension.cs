@@ -24,6 +24,12 @@ namespace MultiplayerARPG
             return item.IsPotion() || item.IsPet() || item.IsMount() || item.IsSkill();
         }
 
+        public static bool IsJunk<T>(this T item)
+            where T : IItem
+        {
+            return item.ItemType == ItemType.Junk;
+        }
+
         public static bool IsArmor<T>(this T item)
             where T : IItem
         {

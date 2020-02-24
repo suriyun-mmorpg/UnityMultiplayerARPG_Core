@@ -1142,7 +1142,7 @@ namespace MultiplayerARPG
 
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiDismantleItem != null &&
-                CharacterItem.GetEquipmentItem() != null)
+                GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
             {
                 uiGameplay.uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
                 uiGameplay.uiDismantleItem.Show();

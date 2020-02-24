@@ -14,10 +14,21 @@ namespace MultiplayerARPG
         public UIItemAmounts uiReturnItems;
         public TextWrapper uiTextReturnGold;
 
+        protected bool activated;
+        protected string activeItemId;
+
         public void OnUpdateCharacterItems()
         {
             if (!IsVisible())
                 return;
+
+            if (activated && (CharacterItem.IsEmptySlot() || !CharacterItem.id.Equals(activeItemId)))
+            {
+                // Item's ID is difference to active item ID, so the item may be destroyed
+                // So clear data
+                Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+                return;
+            }
 
             if (uiCharacterItem != null)
             {
@@ -67,6 +78,7 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
+            activated = false;
             OnUpdateCharacterItems();
         }
 
@@ -78,8 +90,10 @@ namespace MultiplayerARPG
 
         public void OnClickDismantle()
         {
-            if (InventoryType != InventoryType.NonEquipItems || IndexOfData < 0)
+            if (InventoryType != InventoryType.NonEquipItems || CharacterItem.IsEmptySlot())
                 return;
+            activated = true;
+            activeItemId = CharacterItem.id;
             OwningCharacter.RequestDismantleItem((short)IndexOfData);
         }
     }

@@ -17,10 +17,10 @@ namespace MultiplayerARPG
         public Button buttonMoveToStorage;
         public Button buttonMoveFromStorage;
         public Button buttonDrop;
-
+        private UICharacterItem ui;
         private void Start()
         {
-            UICharacterItem ui = GetComponent<UICharacterItem>();
+            ui = GetComponent<UICharacterItem>();
             ui.onSetEquippedData.AddListener(OnSetEquippedData);
             ui.onSetUnEquippedData.AddListener(OnSetUnEquippedData);
             ui.onSetUnEquippableData.AddListener(OnSetUnEquippableData);
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             if (buttonRefine)
                 buttonRefine.gameObject.SetActive(canRefineItemByOwnerCharacter);
             if (buttonDismantle)
-                buttonDismantle.gameObject.SetActive(canDismantleItemByOwnerCharacter);
+                buttonDismantle.gameObject.SetActive(canDismantleItemByOwnerCharacter && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
             if (buttonDrop)
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
                 return;
             
             if (buttonDismantle)
-                buttonDismantle.gameObject.SetActive(true);
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
         }
 
         public void OnDismantleItemDialogDisappear()
