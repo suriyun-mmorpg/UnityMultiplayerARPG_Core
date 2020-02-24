@@ -287,11 +287,6 @@ namespace MultiplayerARPG
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamages(ref isLeftHand);
 
-            // Get aim position by character's forward
-            Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);
-            if (HasAimPosition)
-                aimPosition = AimPosition;
-
             // Set doing action state at clients and server
             IsAttackingOrUsingSkill = true;
 
@@ -327,6 +322,11 @@ namespace MultiplayerARPG
                     if (FpsModel && FpsModel.gameObject.activeSelf)
                         FpsModel.PlayWeaponLaunchEffect(animActionType);
                 }
+
+                // Get aim position by character's forward
+                Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);
+                if (HasAimPosition)
+                    aimPosition = AimPosition;
 
                 // Call on attack to extend attack functionality while attacking
                 bool overrideDefaultAttack = false;

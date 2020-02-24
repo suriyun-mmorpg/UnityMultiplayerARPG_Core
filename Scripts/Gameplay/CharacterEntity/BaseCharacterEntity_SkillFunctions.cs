@@ -176,14 +176,7 @@ namespace MultiplayerARPG
             // Prepare requires data and get damages data
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
-
-            // Get aim position by character's forward
-            Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);
-            if (skillAimPosition.HasValue)
-                aimPosition = skillAimPosition.Value;
-            else if (HasAimPosition)
-                aimPosition = AimPosition;
-
+            
             // Set doing action state at clients and server
             IsAttackingOrUsingSkill = true;
 
@@ -246,6 +239,13 @@ namespace MultiplayerARPG
                         if (FpsModel && FpsModel.gameObject.activeSelf)
                             FpsModel.PlayWeaponLaunchEffect(animActionType);
                     }
+
+                    // Get aim position by character's forward
+                    Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);
+                    if (skillAimPosition.HasValue)
+                        aimPosition = skillAimPosition.Value;
+                    else if (HasAimPosition)
+                        aimPosition = AimPosition;
 
                     // Trigger skill event
                     if (onUseSkillRoutine != null)
