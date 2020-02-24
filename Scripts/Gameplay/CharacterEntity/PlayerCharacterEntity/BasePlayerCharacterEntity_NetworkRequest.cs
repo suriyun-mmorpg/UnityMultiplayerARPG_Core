@@ -57,14 +57,17 @@ namespace MultiplayerARPG
 
         public bool RequestUseSkillItem(short index, bool isLeftHand)
         {
-            return RequestUseSkillItem(index, isLeftHand, GetDefaultAttackAimPosition(isLeftHand));
+            if (!ValidateRequestUseSkillItem(index, isLeftHand))
+                return false;
+            CallNetFunction(NetFuncUseSkillItem, FunctionReceivers.Server, index, isLeftHand);
+            return true;
         }
 
         public bool RequestUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
         {
             if (!ValidateRequestUseSkillItem(index, isLeftHand))
                 return false;
-            CallNetFunction(NetFuncUseSkillItem, FunctionReceivers.Server, index, isLeftHand, aimPosition);
+            CallNetFunction(NetFuncUseSkillItemWithAimPosition, FunctionReceivers.Server, index, isLeftHand, aimPosition);
             return true;
         }
 

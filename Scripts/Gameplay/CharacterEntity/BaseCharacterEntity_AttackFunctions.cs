@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
         }
 
-        public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamageAmounts(ref bool isLeftHand)
+        public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamages(ref bool isLeftHand)
         {
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Calculate all damages
@@ -285,7 +285,7 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get damages data
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamageAmounts(ref isLeftHand);
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamages(ref isLeftHand);
 
             // Get aim position by character's forward
             Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);

@@ -59,8 +59,23 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="dataId"></param>
         /// <param name="isLeftHand"></param>
+        protected void NetFuncUseSkill(int dataId, bool isLeftHand)
+        {
+            UseSkillFunction(dataId, isLeftHand, null);
+        }
+
+        /// <summary>
+        /// Is function will be called at server to order character to use skill
+        /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="isLeftHand"></param>
         /// <param name="aimPosition"></param>
-        protected virtual void NetFuncUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
+        protected void NetFuncUseSkillWithAimPosition(int dataId, bool isLeftHand, Vector3 aimPosition)
+        {
+            UseSkillFunction(dataId, isLeftHand, aimPosition);
+        }
+
+        protected virtual void UseSkillFunction(int dataId, bool isLeftHand, Vector3? aimPosition)
         {
             if (!CanUseSkill())
                 return;
@@ -101,12 +116,15 @@ namespace MultiplayerARPG
                 out animationIndex,
                 out triggerDurations,
                 out totalDuration);
-            
+
             // Start use skill routine
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition);
+            if (!aimPosition.HasValue)
+                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel);
+            else
+                RequestPlaySkillAnimationWithAimPosition(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition.Value);
         }
 
         /// <summary>
@@ -125,7 +143,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async void UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3 aimPosition)
+        protected async void UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3? skillAimPosition)
         {
             // Update skill usage states at server only
             if (IsServer)
@@ -156,7 +174,15 @@ namespace MultiplayerARPG
                 out totalDuration);
 
             // Prepare requires data and get damages data
+            DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
+
+            // Get aim position by character's forward
+            Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);
+            if (skillAimPosition.HasValue)
+                aimPosition = skillAimPosition.Value;
+            else if (HasAimPosition)
+                aimPosition = AimPosition;
 
             // Set doing action state at clients and server
             IsAttackingOrUsingSkill = true;

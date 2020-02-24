@@ -15,7 +15,17 @@ namespace MultiplayerARPG
             AttackRoutine(isLeftHand, animationIndex);
         }
 
-        protected void NetFuncPlayUseSkill(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
+        protected void NetFuncPlayUseSkill(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
+        {
+            PlayUseSkillFunction(isLeftHand, animationIndex, skillDataId, skillLevel, null);
+        }
+
+        protected void NetFuncPlayUseSkillWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
+        {
+            PlayUseSkillFunction(isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+        }
+
+        protected virtual void PlayUseSkillFunction(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3? aimPosition)
         {
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)

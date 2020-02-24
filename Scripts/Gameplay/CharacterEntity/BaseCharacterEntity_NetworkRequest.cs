@@ -72,14 +72,17 @@ namespace MultiplayerARPG
 
         public bool RequestUseSkill(int dataId, bool isLeftHand)
         {
-            return RequestUseSkill(dataId, isLeftHand, GetDefaultAttackAimPosition(isLeftHand));
+            if (!ValidateRequestUseSKill(dataId, isLeftHand))
+                return false;
+            CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId, isLeftHand);
+            return true;
         }
 
         public bool RequestUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
             if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
-            CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId, isLeftHand, aimPosition);
+            CallNetFunction(NetFuncUseSkillWithAimPosition, FunctionReceivers.Server, dataId, isLeftHand, aimPosition);
             return true;
         }
 
@@ -91,11 +94,19 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestPlaySkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
+        public bool RequestPlaySkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayUseSkill, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+            CallNetFunction(NetFuncPlayUseSkill, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel);
+            return true;
+        }
+
+        public bool RequestPlaySkillAnimationWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
+        {
+            if (IsDead())
+                return false;
+            CallNetFunction(NetFuncPlayUseSkillWithAimPosition, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
             return true;
         }
 

@@ -19,11 +19,7 @@ namespace MultiplayerARPG
             Attack,
             UseSkill
         }
-
-        protected delegate bool UsePendingSkillAction(bool isLeftHand);
-        protected delegate void VoidAction();
-        protected delegate bool BoolAction();
-
+        
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
 
