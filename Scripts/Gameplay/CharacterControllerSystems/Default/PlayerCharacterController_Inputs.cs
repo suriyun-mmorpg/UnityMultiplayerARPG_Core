@@ -550,7 +550,7 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-                AttackOrMoveToEntity(targetCharacter, attackDistance, attackFov, CurrentGameInstance.characterLayer.Mask, () =>
+                AttackOrMoveToEntity(targetCharacter, attackDistance, CurrentGameInstance.characterLayer.Mask, () =>
                 {
                     // If has queue using skill, attack by the skill
                     if (queueUsingSkill.skill != null)
@@ -571,7 +571,7 @@ namespace MultiplayerARPG
                 float castDistance = 0f;
                 float castFov = 0f;
                 GetUseSkillDistanceAndFov(out castDistance, out castFov);
-                UseSkillOrMoveToEntity(targetCharacter, castDistance, castFov);
+                UseSkillOrMoveToEntity(targetCharacter, castDistance);
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter))
             {
@@ -628,7 +628,7 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-                AttackOrMoveToEntity(targetHarvestable, attackDistance, attackFov, CurrentGameInstance.harvestableLayer.Mask, () =>
+                AttackOrMoveToEntity(targetHarvestable, attackDistance, CurrentGameInstance.harvestableLayer.Mask, () =>
                 {
                     RequestAttack();
                 });
@@ -659,7 +659,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void AttackOrMoveToEntity(IDamageableEntity entity, float distance, float fov, int layerMask, System.Action action)
+        protected void AttackOrMoveToEntity(IDamageableEntity entity, float distance, int layerMask, System.Action action)
         {
             if (IsTargetInAttackDistance(entity, distance, layerMask))
             {
@@ -667,8 +667,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 if (targetLookDirection.HasValue)
                     return;
-                // Set direction to turn character to target
-                if (PlayerCharacterEntity.IsPositionInFov(fov, entity.GetTransform().position))
+                // Set direction to turn character to target, now use fov = 5, to make character always turn to target
+                if (PlayerCharacterEntity.IsPositionInFov(5f, entity.GetTransform().position))
                 {
                     // Do action
                     action.Invoke();
@@ -686,7 +686,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UseSkillOrMoveToEntity(IDamageableEntity entity, float distance, float fov)
+        protected void UseSkillOrMoveToEntity(IDamageableEntity entity, float distance)
         {
             if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() || 
                 Vector3.Distance(MovementTransform.position, entity.GetTransform().position) <= distance)
@@ -695,8 +695,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 if (targetLookDirection.HasValue)
                     return;
-                // Set direction to turn character to target
-                bool isPositionInFov = PlayerCharacterEntity.IsPositionInFov(fov, entity.GetTransform().position);
+                // Set direction to turn character to target, now use fov = 5, to make character always turn to target
+                bool isPositionInFov = PlayerCharacterEntity.IsPositionInFov(5f, entity.GetTransform().position);
                 if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() || isPositionInFov)
                 {
                     if (queueUsingSkill.skill != null)
