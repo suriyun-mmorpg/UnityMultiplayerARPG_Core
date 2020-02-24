@@ -30,7 +30,7 @@ namespace MultiplayerARPG
                 lastAppliedTime = Time.unscaledTime;
                 foreach (BaseCharacterEntity entity in receivingBuffCharacters.Values)
                 {
-                    if (entity == null)
+                    if (entity == null || !entity.IsAlly(buffApplier))
                         continue;
 
                     ApplyBuffTo(entity);
