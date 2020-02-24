@@ -83,7 +83,7 @@ namespace MultiplayerARPG
 
             if (selectableCharacters.Count > 0)
             {
-                if (selectableCharacters.Count > GameInstance.Singleton.maxCharacterSaves)
+                if (selectableCharacters.Count >= GameInstance.Singleton.maxCharacterSaves)
                     eventOnNotAbleToCreateCharacter.Invoke();
                 else
                     eventOnAbleToCreateCharacter.Invoke();
