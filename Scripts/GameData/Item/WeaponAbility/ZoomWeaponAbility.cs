@@ -69,11 +69,15 @@ namespace MultiplayerARPG
             shooterController.SetActiveCrosshair(!isActive && !shooterController.CurrentCrosshairSetting.hidden);
 
             if (!isActive)
+            {
+                shooterController.PlayerCharacterEntity.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, false);
                 shooterController.ViewMode = preActivateViewMode;
-
-            // Hidding character model while activate
-            shooterController.PlayerCharacterEntity.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, isActive);
-
+            }
+            else
+            {
+                if (disableRenderersOnZoom)
+                    shooterController.PlayerCharacterEntity.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, true);
+            }
             return state;
         }
 
