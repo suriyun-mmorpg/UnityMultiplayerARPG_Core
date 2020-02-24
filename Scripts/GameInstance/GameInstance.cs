@@ -181,6 +181,7 @@ namespace MultiplayerARPG
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
+        public int maxCharacterSaves = 5;
 
         [Header("Playing In Editor")]
         public bool useMobileInEditor;

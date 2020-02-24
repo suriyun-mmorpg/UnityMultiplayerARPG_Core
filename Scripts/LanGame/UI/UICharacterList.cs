@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         public Button buttonDelete;
         [Header("Event")]
         public UnityEvent eventOnNoCharacter;
+        public UnityEvent eventOnAbleToCreateCharacter;
+        public UnityEvent eventOnNotAbleToCreateCharacter;
 
         private UIList cacheCharacterList;
         public UIList CacheCharacterList
@@ -81,6 +83,11 @@ namespace MultiplayerARPG
 
             if (selectableCharacters.Count > 0)
             {
+                if (selectableCharacters.Count > GameInstance.Singleton.maxCharacterSaves)
+                    eventOnNotAbleToCreateCharacter.Invoke();
+                else
+                    eventOnAbleToCreateCharacter.Invoke();
+
                 selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
                 CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
                 {
@@ -103,8 +110,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (eventOnNoCharacter != null)
-                    eventOnNoCharacter.Invoke();
+                eventOnNoCharacter.Invoke();
             }
         }
 
