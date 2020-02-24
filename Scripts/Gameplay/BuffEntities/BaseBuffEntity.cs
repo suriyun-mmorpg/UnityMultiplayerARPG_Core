@@ -6,6 +6,9 @@ namespace MultiplayerARPG
 {
     public class BaseBuffEntity : MonoBehaviour
     {
+        [Tooltip("If this is `TRUE` buffs will applies to everyone including with an enemies")]
+        public bool applyBuffToEveryone;
+
         protected BaseCharacterEntity buffApplier;
         protected BaseSkill skill;
         protected short skillLevel;
@@ -54,7 +57,7 @@ namespace MultiplayerARPG
 
         public virtual void ApplyBuffTo(BaseCharacterEntity target)
         {
-            if (target == null)
+            if (target == null || (!applyBuffToEveryone && !target.IsAlly(buffApplier)))
                 return;
             target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel, buffApplier);
         }
