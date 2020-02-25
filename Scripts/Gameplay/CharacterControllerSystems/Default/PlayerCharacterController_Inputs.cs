@@ -324,6 +324,7 @@ namespace MultiplayerARPG
                         else
                         {
                             destination = targetPosition.Value;
+                            targetLookDirection = null;
                             PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
                         }
                     }
@@ -665,18 +666,13 @@ namespace MultiplayerARPG
             {
                 // Stop movement to attack
                 PlayerCharacterEntity.StopMove();
-                if (targetLookDirection.HasValue)
-                    return;
+                // Turn character to attacking target
+                TurnCharacterToEntity(entity.Entity);
                 // Set direction to turn character to target, now use fov = 10, to make character always turn to target
                 if (PlayerCharacterEntity.IsPositionInFov(10f, entity.GetTransform().position))
                 {
                     // Do action
                     action.Invoke();
-                }
-                else
-                {
-                    // Target not in Fov, turn controlling character to target
-                    TurnCharacterToEntity(entity.Entity);
                 }
             }
             else
@@ -693,11 +689,11 @@ namespace MultiplayerARPG
             {
                 // Stop movement to use skill
                 PlayerCharacterEntity.StopMove();
-                if (targetLookDirection.HasValue)
-                    return;
+                // Turn character to attacking target
+                TurnCharacterToEntity(entity.Entity);
                 // Set direction to turn character to target, now use fov = 10, to make character always turn to target
-                bool isPositionInFov = PlayerCharacterEntity.IsPositionInFov(10f, entity.GetTransform().position);
-                if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() || isPositionInFov)
+                if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() || 
+                    PlayerCharacterEntity.IsPositionInFov(10f, entity.GetTransform().position))
                 {
                     if (queueUsingSkill.skill != null)
                     {
@@ -712,14 +708,6 @@ namespace MultiplayerARPG
                         targetActionType = TargetActionType.Undefined;
                         ClearQueueUsingSkill();
                         return;
-                    }
-                }
-                else
-                {
-                    if (!isPositionInFov)
-                    {
-                        // Target not in Fov, turn controlling character to target
-                        TurnCharacterToEntity(entity.Entity);
                     }
                 }
             }
@@ -752,9 +740,6 @@ namespace MultiplayerARPG
 
         public void UpdateLookAtTarget()
         {
-            if (PlayerCharacterEntity.IsPlayingActionAnimation())
-                return;
-
             if (targetLookDirection.HasValue && Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection.Value) > 1)
             {
                 // Update rotation when angle difference more than 1
