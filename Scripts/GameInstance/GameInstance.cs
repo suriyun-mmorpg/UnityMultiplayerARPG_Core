@@ -298,7 +298,16 @@ namespace MultiplayerARPG
 
         protected virtual void Awake()
         {
-            Application.targetFrameRate = 60;
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+            {
+                // Set target framerate when running headless to reduce CPU usage
+                Application.targetFrameRate = 30;
+            }
+            else
+            {
+                // Not running headless, set target framerate higher
+                Application.targetFrameRate = 60;
+            }
             Application.runInBackground = true;
             if (Singleton != null)
             {
