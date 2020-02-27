@@ -7,6 +7,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Skill Item", menuName = "Create GameData/Item/Skill Item", order = -4882)]
     public class SkillItem : BaseItem, ISkillItem
     {
+        public override string TypeTitle
+        {
+            get { return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_SKILL.ToString()); }
+        }
+
         public override ItemType ItemType
         {
             get { return ItemType.Skill; }

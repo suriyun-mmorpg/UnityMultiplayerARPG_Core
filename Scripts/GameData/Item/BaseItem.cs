@@ -47,12 +47,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual string TypeTitle
-        {
-            get { return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_JUNK.ToString()); }
-        }
+        public abstract string TypeTitle { get; }
 
-        public virtual ItemType ItemType { get { return ItemType.Junk; } }
+        public abstract ItemType ItemType { get; }
 
         public GameObject DropModel { get { return dropModel; } }
 

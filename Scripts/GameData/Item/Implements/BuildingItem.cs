@@ -7,6 +7,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Building Item", menuName = "Create GameData/Item/Building Item", order = -4885)]
     public partial class BuildingItem : BaseItem, IBuildingItem
     {
+        public override string TypeTitle
+        {
+            get { return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_BUILDING.ToString()); }
+        }
+
         public override ItemType ItemType
         {
             get { return ItemType.Building; }

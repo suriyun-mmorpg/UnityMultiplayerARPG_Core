@@ -7,6 +7,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Pet Item", menuName = "Create GameData/Item/Pet Item", order = -4884)]
     public class PetItem : BaseItem, IPetItem
     {
+        public override string TypeTitle
+        {
+            get { return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_PET.ToString()); }
+        }
+
         public override ItemType ItemType
         {
             get { return ItemType.Pet; }

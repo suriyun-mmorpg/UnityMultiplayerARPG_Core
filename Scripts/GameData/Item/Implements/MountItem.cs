@@ -7,6 +7,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Mount Item", menuName = "Create GameData/Item/Mount Item", order = -4883)]
     public class MountItem : BaseItem, IMountItem
     {
+        public override string TypeTitle
+        {
+            get { return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_MOUNT.ToString()); }
+        }
+
         public override ItemType ItemType
         {
             get { return ItemType.Mount; }

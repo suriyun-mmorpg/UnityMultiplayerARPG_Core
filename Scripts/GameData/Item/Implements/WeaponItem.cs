@@ -7,6 +7,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Weapon Item", menuName = "Create GameData/Item/Weapon Item", order = -4889)]
     public partial class WeaponItem : BaseEquipmentItem, IWeaponItem
     {
+        public override string TypeTitle
+        {
+            get { return WeaponType.Title; }
+        }
+
         public override ItemType ItemType
         {
             get { return ItemType.Weapon; }

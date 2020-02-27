@@ -7,6 +7,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Potion Item", menuName = "Create GameData/Item/Potion Item", order = -4886)]
     public partial class PotionItem : BaseItem, IPotionItem
     {
+        public override string TypeTitle
+        {
+            get { return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_POTION.ToString()); }
+        }
+
         public override ItemType ItemType
         {
             get { return ItemType.Potion; }
