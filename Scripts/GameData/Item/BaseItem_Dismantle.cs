@@ -9,7 +9,17 @@ namespace MultiplayerARPG
         {
             if (dismantlingItem.IsEmptySlot())
                 return new List<ItemAmount>();
-            List<ItemAmount> result = new List<ItemAmount>(dismantlingItem.GetItem().dismantleReturnItems);
+
+            List<ItemAmount> result = new List<ItemAmount>();
+            ItemAmount[] dismantleReturnItems = dismantlingItem.GetItem().dismantleReturnItems;
+            for (int i = 0; i < dismantleReturnItems.Length; ++i)
+            {
+                result.Add(new ItemAmount()
+                {
+                    item = dismantleReturnItems[i].item,
+                    amount = (short)(dismantleReturnItems[i].amount * dismantlingItem.amount)
+                });
+            }
             if (dismantlingItem.Sockets.Count > 0)
             {
                 BaseItem socketItem;
