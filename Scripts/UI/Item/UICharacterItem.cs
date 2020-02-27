@@ -799,7 +799,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             if (BaseUISceneGameplay.Singleton.IsDismantleItemDialogVisible() &&
-                Data.characterItem.GetEquipmentItem() != null &&
+                GameInstance.Singleton.dismantleFilter.Filter(CharacterItem) &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isDismantleItemDialogAppeared)
