@@ -21,6 +21,11 @@ namespace MultiplayerARPG
         public BaseItem leftHandEquipItem;
         public BaseItem[] armorItems;
 
+        [Header("Start Items")]
+        [Tooltip("Items that will be added to character when create new character")]
+        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        public ItemAmount[] startItems;
+
         [Header("Start Map")]
         public MapInfo startMap;
         public MapInfo StartMap

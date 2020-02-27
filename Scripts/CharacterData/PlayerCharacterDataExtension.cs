@@ -233,8 +233,10 @@ public static partial class PlayerCharacterDataExtension
         character.CurrentFood = (int)stats.food;
         character.CurrentWater = (int)stats.water;
         character.Gold = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startGold : gameInstance.startGold;
-        // Inventory
-        ItemAmount[] startItems = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startItems : gameInstance.startItems;
+        // Start items
+        List<ItemAmount> startItems = new List<ItemAmount>();
+        startItems.AddRange(gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startItems : gameInstance.startItems);
+        startItems.AddRange(database.startItems);
         foreach (ItemAmount startItem in startItems)
         {
             if (startItem.item == null || startItem.amount <= 0)
@@ -245,7 +247,8 @@ public static partial class PlayerCharacterDataExtension
                 short addAmount = amount;
                 if (addAmount > startItem.item.MaxStack)
                     addAmount = startItem.item.MaxStack;
-                character.AddOrSetNonEquipItems(CharacterItem.Create(startItem.item, 1, addAmount));
+                if (!character.IncreasingItemsWillOverwhelming(startItem.item.DataId, addAmount))
+                    character.AddOrSetNonEquipItems(CharacterItem.Create(startItem.item, 1, addAmount));
                 amount -= addAmount;
             }
         }
