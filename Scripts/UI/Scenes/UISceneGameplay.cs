@@ -772,6 +772,14 @@ namespace MultiplayerARPG
             if (uiBuildingCraftItems != null &&
                 uiBuildingCraftItems.IsVisible())
                 uiBuildingCraftItems.Hide();
+            if (!GameInstance.Singleton.canRefineItemByPlayer &&
+                uiRefineItem != null &&
+                uiRefineItem.IsVisible())
+                uiRefineItem.Hide();
+            if (!GameInstance.Singleton.canDismantleItemByPlayer &&
+                uiDismantleItem != null &&
+                uiDismantleItem.IsVisible())
+                uiDismantleItem.Hide();
         }
 
         public override bool IsShopDialogVisible()
