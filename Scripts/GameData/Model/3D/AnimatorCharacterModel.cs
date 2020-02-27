@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class AnimatorCharacterModel : BaseRemakeCharacterModel
+    public partial class AnimatorCharacterModel : BaseRemakeCharacterModel
     {
         public enum AnimatorControllerType
         {
@@ -601,6 +601,8 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
 
             Debug.Log("[AnimatorCharacterModel] Animation Clips already set to animator controller, you can test an animations in Animation tab");
+
+            this.InvokeInstanceDevExtMethods("SetAnimatorClipsForTest");
         }
 #endif
     }

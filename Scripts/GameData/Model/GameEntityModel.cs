@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class GameEntityModel : MonoBehaviour
+    public partial class GameEntityModel : MonoBehaviour
     {
         [System.Flags]
         public enum EVisibleState : byte
@@ -94,6 +94,7 @@ namespace MultiplayerARPG
                     setter.ApplyToCharacterModel(this);
                 }
             }
+            this.InvokeInstanceDevExtMethods("SetEffectContainersBySetters");
 #if UNITY_EDITOR
             EditorUtility.SetDirty(this);
 #endif

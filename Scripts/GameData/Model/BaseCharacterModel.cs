@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel
+    public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel
     {
         [SerializeField]
         private CharacterModelManager modelManager;
@@ -164,6 +164,7 @@ namespace MultiplayerARPG
                     setter.ApplyToCharacterModel(this);
                 }
             }
+            this.InvokeInstanceDevExtMethods("SetEquipmentContainersBySetters");
 #if UNITY_EDITOR
             EditorUtility.SetDirty(this);
 #endif

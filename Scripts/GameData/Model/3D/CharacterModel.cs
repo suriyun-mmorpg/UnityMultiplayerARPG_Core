@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class CharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations>
+    public partial class CharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations>
     {
         // Animator variables
         public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
@@ -1021,6 +1021,8 @@ namespace MultiplayerARPG
             {
                 Debug.LogError("[CharacterModel] " + ex.Message);
             }
+
+            this.InvokeInstanceDevExtMethods("SetAnimatorClipsForTest");
         }
 #endif
     }
