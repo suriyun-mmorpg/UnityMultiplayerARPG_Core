@@ -1,0 +1,157 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace MultiplayerARPG
+{
+    public enum CombatAmountType : byte
+    {
+        Miss,
+        NormalDamage,
+        CriticalDamage,
+        BlockedDamage,
+        HpRecovery,
+        MpRecovery,
+        StaminaRecovery,
+        FoodRecovery,
+        WaterRecovery,
+    }
+
+    [DisallowMultipleComponent]
+    public abstract class BaseUISceneGameplay : MonoBehaviour
+    {
+        public static BaseUISceneGameplay Singleton { get; private set; }
+
+        [Header("Combat Text")]
+        public Transform combatTextTransform;
+        public UICombatText uiCombatTextMiss;
+        public UICombatText uiCombatTextNormalDamage;
+        public UICombatText uiCombatTextCriticalDamage;
+        public UICombatText uiCombatTextBlockedDamage;
+        public UICombatText uiCombatTextHpRecovery;
+        public UICombatText uiCombatTextMpRecovery;
+        public UICombatText uiCombatTextStaminaRecovery;
+        public UICombatText uiCombatTextFoodRecovery;
+        public UICombatText uiCombatTextWaterRecovery;
+
+        private readonly Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>> spawningCombatTexts = new Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>>();
+        private readonly Dictionary<DamageableEntity, float> spawningCombatTextTimes = new Dictionary<DamageableEntity, float>();
+
+        protected virtual void Awake()
+        {
+            Singleton = this;
+        }
+
+        protected virtual void Update()
+        {
+            float currentTime = Time.unscaledTime;
+            KeyValuePair<CombatAmountType, int> combatTextData;
+            foreach (DamageableEntity damageableEntity in spawningCombatTexts.Keys)
+            {
+                if (damageableEntity == null || spawningCombatTexts[damageableEntity].Count == 0)
+                    continue;
+
+                if (!spawningCombatTextTimes.ContainsKey(damageableEntity))
+                    spawningCombatTextTimes[damageableEntity] = currentTime;
+
+                if (currentTime - spawningCombatTextTimes[damageableEntity] >= 0.1f)
+                {
+                    spawningCombatTextTimes[damageableEntity] = currentTime;
+                    combatTextData = spawningCombatTexts[damageableEntity].Dequeue();
+                    SpawnCombatText(damageableEntity.CombatTextTransform, combatTextData.Key, combatTextData.Value);
+                }
+            }
+        }
+
+        public void PrepareCombatText(DamageableEntity damageableEntity, CombatAmountType combatAmountType, int amount)
+        {
+            if (Vector3.Distance(BasePlayerCharacterController.OwningCharacter.CacheTransform.position, damageableEntity.CacheTransform.position) > GameInstance.Singleton.combatTextDistance)
+                return;
+
+            if (!spawningCombatTexts.ContainsKey(damageableEntity))
+                spawningCombatTexts[damageableEntity] = new Queue<KeyValuePair<CombatAmountType, int>>();
+            spawningCombatTexts[damageableEntity].Enqueue(new KeyValuePair<CombatAmountType, int>(combatAmountType, amount));
+        }
+
+        public void SpawnCombatText(Transform followingTransform, CombatAmountType combatAmountType, int amount)
+        {
+            switch (combatAmountType)
+            {
+                case CombatAmountType.Miss:
+                    SpawnCombatText(followingTransform, uiCombatTextMiss, amount);
+                    break;
+                case CombatAmountType.NormalDamage:
+                    SpawnCombatText(followingTransform, uiCombatTextNormalDamage, amount);
+                    break;
+                case CombatAmountType.CriticalDamage:
+                    SpawnCombatText(followingTransform, uiCombatTextCriticalDamage, amount);
+                    break;
+                case CombatAmountType.BlockedDamage:
+                    SpawnCombatText(followingTransform, uiCombatTextBlockedDamage, amount);
+                    break;
+                case CombatAmountType.HpRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextHpRecovery, amount);
+                    break;
+                case CombatAmountType.MpRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextMpRecovery, amount);
+                    break;
+                case CombatAmountType.StaminaRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextStaminaRecovery, amount);
+                    break;
+                case CombatAmountType.FoodRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextFoodRecovery, amount);
+                    break;
+                case CombatAmountType.WaterRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextWaterRecovery, amount);
+                    break;
+            }
+        }
+
+        public void SpawnCombatText(Transform followingTransform, UICombatText prefab, int amount)
+        {
+            if (combatTextTransform == null || prefab == null)
+                return;
+
+            UICombatText combatText = Instantiate(prefab, combatTextTransform);
+            combatText.transform.localScale = Vector3.one;
+            combatText.CacheObjectFollower.TargetObject = followingTransform;
+            combatText.Amount = amount;
+        }
+
+        public virtual bool IsBlockController()
+        {
+            if (UISceneGlobal.Singleton.uiMessageDialog.IsVisible() ||
+                UISceneGlobal.Singleton.uiInputDialog.IsVisible() ||
+                UISceneGlobal.Singleton.uiPasswordDialog.IsVisible())
+                return true;
+
+            return false;
+        }
+
+        public virtual bool IsPointerOverUIObject()
+        {
+            return false;
+        }
+
+        public abstract void SetTargetEntity(BaseGameEntity entity);
+        public abstract void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter);
+        public abstract void ShowNpcDialog(int npcDialogDataId);
+        public abstract void ShowConstructBuildingDialog(BuildingEntity buildingEntity);
+        public abstract void HideConstructBuildingDialog();
+        public abstract void ShowCurrentBuildingDialog(BuildingEntity buildingEntity);
+        public abstract void HideCurrentBuildingDialog();
+        public abstract void HideNpcDialog();
+        public abstract bool IsShopDialogVisible();
+        public abstract bool IsRefineItemDialogVisible();
+        public abstract bool IsDismantleItemDialogVisible();
+        public abstract bool IsEnhanceSocketItemDialogVisible();
+        public abstract bool IsStorageDialogVisible();
+        public abstract bool IsDealingDialogVisibleWithDealingState();
+        public abstract void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData);
+        public abstract void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
+        public abstract void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData);
+        public abstract void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity);
+        public abstract void OnControllerSetup(BasePlayerCharacterEntity characterEntity);
+        public abstract void OnControllerDesetup(BasePlayerCharacterEntity characterEntity);
+    }
+}

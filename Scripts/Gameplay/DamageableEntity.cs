@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                 return;
 
             CombatAmountType combatAmountType = (CombatAmountType)byteCombatAmountType;
-            UISceneGameplay.Singleton.PrepareCombatText(this, combatAmountType, amount);
+            BaseUISceneGameplay.Singleton.PrepareCombatText(this, combatAmountType, amount);
             switch (combatAmountType)
             {
                 case CombatAmountType.NormalDamage:

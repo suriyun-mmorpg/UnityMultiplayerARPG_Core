@@ -397,7 +397,7 @@ namespace MultiplayerARPG
 
             // Hide Npc UIs when move
             if (moveDirection.sqrMagnitude > 0f)
-                HideNpcDialogs();
+                HideNpcDialog();
 
             // If jumping add jump state
             if (InputManager.GetButtonDown("Jump"))

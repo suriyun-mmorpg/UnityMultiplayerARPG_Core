@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
         public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
         public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
-        public UISceneGameplay CacheUISceneGameplay { get; protected set; }
+        public BaseUISceneGameplay CacheUISceneGameplay { get; protected set; }
         public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;
         public BaseGameEntity SelectedEntity { get; protected set; }
@@ -120,52 +120,9 @@ namespace MultiplayerARPG
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
-            if (characterEntity == null)
-                return;
-
             // Instantiate gameplay UI
             if (CacheUISceneGameplay != null)
-            {
-                characterEntity.onShowNpcDialog += CacheUISceneGameplay.OnShowNpcDialog;
-                characterEntity.onShowNpcRefineItem += CacheUISceneGameplay.OnShowNpcRefineItem;
-                characterEntity.onShowNpcDismantleItem += CacheUISceneGameplay.OnShowNpcDismantleItem;
-                characterEntity.onDead += CacheUISceneGameplay.OnCharacterDead;
-                characterEntity.onRespawn += CacheUISceneGameplay.OnCharacterRespawn;
-                characterEntity.onShowDealingRequestDialog += CacheUISceneGameplay.OnShowDealingRequest;
-                characterEntity.onShowDealingDialog += CacheUISceneGameplay.OnShowDealing;
-                characterEntity.onUpdateDealingState += CacheUISceneGameplay.OnUpdateDealingState;
-                characterEntity.onUpdateDealingGold += CacheUISceneGameplay.OnUpdateDealingGold;
-                characterEntity.onUpdateDealingItems += CacheUISceneGameplay.OnUpdateDealingItems;
-                characterEntity.onUpdateAnotherDealingState += CacheUISceneGameplay.OnUpdateAnotherDealingState;
-                characterEntity.onUpdateAnotherDealingGold += CacheUISceneGameplay.OnUpdateAnotherDealingGold;
-                characterEntity.onUpdateAnotherDealingItems += CacheUISceneGameplay.OnUpdateAnotherDealingItems;
-                characterEntity.onShowPartyInvitationDialog += CacheUISceneGameplay.OnShowPartyInvitation;
-                characterEntity.onShowGuildInvitationDialog += CacheUISceneGameplay.OnShowGuildInvitation;
-                characterEntity.onShowStorage += CacheUISceneGameplay.OnShowStorage;
-                characterEntity.onIsWarpingChange += CacheUISceneGameplay.OnIsWarpingChange;
-
-                CacheUISceneGameplay.UpdateCharacter();
-                CacheUISceneGameplay.UpdateSkills();
-                CacheUISceneGameplay.UpdateSummons();
-                CacheUISceneGameplay.UpdateEquipItems();
-                CacheUISceneGameplay.UpdateEquipWeapons();
-                CacheUISceneGameplay.UpdateNonEquipItems();
-                CacheUISceneGameplay.UpdateHotkeys();
-                CacheUISceneGameplay.UpdateQuests();
-                CacheUISceneGameplay.UpdateStorageItems();
-            }
-            characterEntity.onIdChange += OnIdChange;
-            characterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            characterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            characterEntity.onAttributesOperation += OnAttributesOperation;
-            characterEntity.onSkillsOperation += OnSkillsOperation;
-            characterEntity.onSummonsOperation += OnSummonsOperation;
-            characterEntity.onBuffsOperation += OnBuffsOperation;
-            characterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            characterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
-            characterEntity.onHotkeysOperation += OnHotkeysOperation;
-            characterEntity.onQuestsOperation += OnQuestsOperation;
-            characterEntity.onStorageItemsOperation += OnStorageItemsOperation;
+                CacheUISceneGameplay.OnControllerSetup(characterEntity);
 
             if (onSetup != null)
                 onSetup.Invoke(this);
@@ -178,43 +135,6 @@ namespace MultiplayerARPG
 
             if (CacheMinimapCameraControls != null)
                 CacheMinimapCameraControls.target = null;
-
-            if (characterEntity == null)
-                return;
-
-            characterEntity.onIdChange -= OnIdChange;
-            characterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            characterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            characterEntity.onAttributesOperation -= OnAttributesOperation;
-            characterEntity.onSkillsOperation -= OnSkillsOperation;
-            characterEntity.onSummonsOperation -= OnSummonsOperation;
-            characterEntity.onBuffsOperation -= OnBuffsOperation;
-            characterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-            characterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-            characterEntity.onHotkeysOperation -= OnHotkeysOperation;
-            characterEntity.onQuestsOperation -= OnQuestsOperation;
-            characterEntity.onStorageItemsOperation -= OnStorageItemsOperation;
-
-            if (CacheUISceneGameplay != null)
-            {
-                characterEntity.onShowNpcDialog -= CacheUISceneGameplay.OnShowNpcDialog;
-                characterEntity.onShowNpcRefineItem -= CacheUISceneGameplay.OnShowNpcRefineItem;
-                characterEntity.onShowNpcDismantleItem -= CacheUISceneGameplay.OnShowNpcDismantleItem;
-                characterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
-                characterEntity.onRespawn -= CacheUISceneGameplay.OnCharacterRespawn;
-                characterEntity.onShowDealingRequestDialog -= CacheUISceneGameplay.OnShowDealingRequest;
-                characterEntity.onShowDealingDialog -= CacheUISceneGameplay.OnShowDealing;
-                characterEntity.onUpdateDealingState -= CacheUISceneGameplay.OnUpdateDealingState;
-                characterEntity.onUpdateDealingGold -= CacheUISceneGameplay.OnUpdateDealingGold;
-                characterEntity.onUpdateDealingItems -= CacheUISceneGameplay.OnUpdateDealingItems;
-                characterEntity.onUpdateAnotherDealingState -= CacheUISceneGameplay.OnUpdateAnotherDealingState;
-                characterEntity.onUpdateAnotherDealingGold -= CacheUISceneGameplay.OnUpdateAnotherDealingGold;
-                characterEntity.onUpdateAnotherDealingItems -= CacheUISceneGameplay.OnUpdateAnotherDealingItems;
-                characterEntity.onShowPartyInvitationDialog -= CacheUISceneGameplay.OnShowPartyInvitation;
-                characterEntity.onShowGuildInvitationDialog -= CacheUISceneGameplay.OnShowGuildInvitation;
-                characterEntity.onShowStorage -= CacheUISceneGameplay.OnShowStorage;
-                characterEntity.onIsWarpingChange -= CacheUISceneGameplay.OnIsWarpingChange;
-            }
 
             if (onDesetup != null)
                 onDesetup.Invoke(this);
@@ -232,110 +152,6 @@ namespace MultiplayerARPG
             if (CacheUISceneGameplay != null)
                 Destroy(CacheUISceneGameplay.gameObject);
         }
-
-        #region Sync data changes callback
-        protected void OnIdChange(string id)
-        {
-            if (CacheUISceneGameplay != null)
-            {
-                CacheUISceneGameplay.UpdateCharacter();
-                CacheUISceneGameplay.UpdateSkills();
-                CacheUISceneGameplay.UpdateEquipItems();
-                CacheUISceneGameplay.UpdateNonEquipItems();
-            }
-        }
-
-        protected void OnEquipWeaponSetChange(byte equipWeaponSet)
-        {
-            if (CacheUISceneGameplay != null)
-            {
-                CacheUISceneGameplay.UpdateCharacter();
-                CacheUISceneGameplay.UpdateEquipItems();
-                CacheUISceneGameplay.UpdateEquipWeapons();
-                CacheUISceneGameplay.UpdateSkills();
-                CacheUISceneGameplay.UpdateHotkeys();
-            }
-        }
-
-        protected void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-            {
-                CacheUISceneGameplay.UpdateCharacter();
-                CacheUISceneGameplay.UpdateEquipItems();
-                CacheUISceneGameplay.UpdateEquipWeapons();
-                CacheUISceneGameplay.UpdateSkills();
-                CacheUISceneGameplay.UpdateHotkeys();
-            }
-        }
-
-        protected void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-                CacheUISceneGameplay.UpdateCharacter();
-        }
-
-        protected void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-            {
-                CacheUISceneGameplay.UpdateCharacter();
-                CacheUISceneGameplay.UpdateSkills();
-            }
-        }
-
-        protected void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-                CacheUISceneGameplay.UpdateSummons();
-        }
-
-        protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-                CacheUISceneGameplay.UpdateCharacter();
-        }
-
-        protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-            {
-                CacheUISceneGameplay.UpdateCharacter();
-                CacheUISceneGameplay.UpdateEquipItems();
-                CacheUISceneGameplay.UpdateSkills();
-                CacheUISceneGameplay.UpdateHotkeys();
-            }
-        }
-
-        protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-            {
-                CacheUISceneGameplay.UpdateCharacter();
-                CacheUISceneGameplay.UpdateNonEquipItems();
-                CacheUISceneGameplay.UpdateHotkeys();
-                CacheUISceneGameplay.UpdateQuests();
-            }
-        }
-
-        protected void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-                CacheUISceneGameplay.UpdateHotkeys();
-        }
-
-        protected void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-                CacheUISceneGameplay.UpdateQuests();
-        }
-
-        protected void OnStorageItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (CacheUISceneGameplay != null)
-                CacheUISceneGameplay.UpdateStorageItems();
-        }
-        #endregion
 
         public virtual void ConfirmBuild()
         {
@@ -407,75 +223,27 @@ namespace MultiplayerARPG
 
         protected void ShowConstructBuildingDialog()
         {
-            HideConstructBuildingDialog();
-            if (ConstructingBuildingEntity == null)
-                return;
-            if (!CacheUISceneGameplay.uiConstructBuilding.IsVisible())
-                CacheUISceneGameplay.uiConstructBuilding.Show();
+            CacheUISceneGameplay.ShowConstructBuildingDialog(ConstructingBuildingEntity);
         }
 
         protected void HideConstructBuildingDialog()
         {
-            if (CacheUISceneGameplay.uiConstructBuilding.IsVisible())
-                CacheUISceneGameplay.uiConstructBuilding.Hide();
+            CacheUISceneGameplay.HideConstructBuildingDialog();
         }
 
         protected void ShowCurrentBuildingDialog()
         {
-            HideCurrentBuildingDialog();
-            if (TargetBuildingEntity == null)
-                return;
-            if (TargetBuildingEntity is DoorEntity)
-            {
-                if (!CacheUISceneGameplay.uiCurrentDoor.IsVisible())
-                    CacheUISceneGameplay.uiCurrentDoor.Show();
-            }
-            else if (TargetBuildingEntity is StorageEntity)
-            {
-                if (!CacheUISceneGameplay.uiCurrentStorage.IsVisible())
-                    CacheUISceneGameplay.uiCurrentStorage.Show();
-            }
-            else if (TargetBuildingEntity is WorkbenchEntity)
-            {
-                if (!CacheUISceneGameplay.uiCurrentWorkbench.IsVisible())
-                    CacheUISceneGameplay.uiCurrentWorkbench.Show();
-            }
-            else
-            {
-                if (!CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
-                    CacheUISceneGameplay.uiCurrentBuilding.Show();
-            }
+            CacheUISceneGameplay.ShowConstructBuildingDialog(TargetBuildingEntity);
         }
 
         protected void HideCurrentBuildingDialog()
         {
-            if (CacheUISceneGameplay.uiCurrentDoor.IsVisible())
-                CacheUISceneGameplay.uiCurrentDoor.Hide();
-            if (CacheUISceneGameplay.uiCurrentStorage.IsVisible())
-                CacheUISceneGameplay.uiCurrentStorage.Hide();
-            if (CacheUISceneGameplay.uiCurrentWorkbench.IsVisible())
-                CacheUISceneGameplay.uiCurrentWorkbench.Hide();
-            if (CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
-                CacheUISceneGameplay.uiCurrentBuilding.Hide();
+            CacheUISceneGameplay.HideCurrentBuildingDialog();
         }
 
-        protected void HideNpcDialogs()
+        protected void HideNpcDialog()
         {
-            if (CacheUISceneGameplay.uiNpcDialog != null &&
-                CacheUISceneGameplay.uiNpcDialog.IsVisible())
-                CacheUISceneGameplay.uiNpcDialog.Hide();
-            if (CacheUISceneGameplay.uiPlayerStorageItems != null &&
-                CacheUISceneGameplay.uiPlayerStorageItems.IsVisible())
-                CacheUISceneGameplay.uiPlayerStorageItems.Hide();
-            if (CacheUISceneGameplay.uiGuildStorageItems != null &&
-                CacheUISceneGameplay.uiGuildStorageItems.IsVisible())
-                CacheUISceneGameplay.uiGuildStorageItems.Hide();
-            if (CacheUISceneGameplay.uiBuildingStorageItems != null &&
-                CacheUISceneGameplay.uiBuildingStorageItems.IsVisible())
-                CacheUISceneGameplay.uiBuildingStorageItems.Hide();
-            if (CacheUISceneGameplay.uiBuildingCraftItems != null &&
-                CacheUISceneGameplay.uiBuildingCraftItems.IsVisible())
-                CacheUISceneGameplay.uiBuildingCraftItems.Hide();
+            CacheUISceneGameplay.HideNpcDialog();
         }
 
         public void ActivateBuilding()
@@ -534,9 +302,7 @@ namespace MultiplayerARPG
 
             if (buildingEntity is WorkbenchEntity)
             {
-                if (CacheUISceneGameplay != null &&
-                    CacheUISceneGameplay.uiBuildingCraftItems != null)
-                    CacheUISceneGameplay.uiBuildingCraftItems.Show(CrafterType.Workbench, buildingEntity);
+                CacheUISceneGameplay.ShowWorkbenchDialog(buildingEntity as WorkbenchEntity);
             }
         }
 

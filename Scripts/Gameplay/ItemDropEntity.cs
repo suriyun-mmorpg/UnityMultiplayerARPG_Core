@@ -104,8 +104,8 @@ namespace MultiplayerARPG
 
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
-            if (looters == null || 
-                looters.Contains(baseCharacterEntity.ObjectId) || 
+            if (looters == null ||
+                looters.Contains(baseCharacterEntity.ObjectId) ||
                 Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration ||
                 isPickedUp)
                 return true;
@@ -120,20 +120,33 @@ namespace MultiplayerARPG
         public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
         {
             GameInstance gameInstance = GameInstance.Singleton;
+            Vector3 dropPosition = dropper.CacheTransform.position;
+            Quaternion dropRotation = Quaternion.identity;
+            switch (gameInstance.DimensionType)
+            {
+                case DimensionType.Dimension2D:
+                    // Random position around character
+                    dropPosition = dropPosition + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+                    break;
+                case DimensionType.Dimension3D:
+                    // Random position around character
+                    dropPosition = dropPosition + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+                    // Random rotation
+                    dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
+                    break;
+            }
+            return DropItem(dropPosition, dropRotation, dropData, looters);
+        }
+
+        public static ItemDropEntity DropItem(Vector3 dropPosition, Quaternion dropRotation, CharacterItem dropData, IEnumerable<uint> looters = null)
+        {
+            GameInstance gameInstance = GameInstance.Singleton;
             if (gameInstance.itemDropEntityPrefab == null)
                 return null;
 
-            Vector3 dropPosition = dropper.CacheTransform.position;
-            Quaternion dropRotation = Quaternion.identity;
-            if (gameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                // If 2d, just random position around character
-                dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
-            }
-            else
+            if (gameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 // Random drop position around character
-                dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
                 // Raycast to find hit floor
                 Vector3? aboveHitPoint = null;
                 Vector3? underHitPoint = null;
@@ -155,8 +168,6 @@ namespace MultiplayerARPG
                     dropPosition = aboveHitPoint.Value;
                 else if (underHitPoint.HasValue)
                     dropPosition = underHitPoint.Value;
-                // Random rotation
-                dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
             }
             GameObject spawnObj = Instantiate(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();

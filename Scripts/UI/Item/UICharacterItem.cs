@@ -729,11 +729,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiNpcDialog != null &&
-                uiGameplay.uiNpcDialog.IsVisible() &&
-                uiGameplay.uiNpcDialog.Data != null &&
-                uiGameplay.uiNpcDialog.Data.type == NpcDialogType.Shop &&
+            if (BaseUISceneGameplay.Singleton.IsShopDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isSellItemDialogAppeared)
@@ -767,9 +763,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiRefineItem != null &&
-                uiGameplay.uiRefineItem.IsVisible() &&
+            if (BaseUISceneGameplay.Singleton.IsRefineItemDialogVisible() &&
                 Data.characterItem.GetEquipmentItem() != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
@@ -804,9 +798,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiDismantleItem != null &&
-                uiGameplay.uiDismantleItem.IsVisible() &&
+            if (BaseUISceneGameplay.Singleton.IsDismantleItemDialogVisible() &&
                 Data.characterItem.GetEquipmentItem() != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
@@ -841,9 +833,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiEnhanceSocketItem != null &&
-                uiGameplay.uiEnhanceSocketItem.IsVisible() &&
+            if (BaseUISceneGameplay.Singleton.IsEnhanceSocketItemDialogVisible() &&
                 Data.characterItem.GetEquipmentItem() != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
@@ -878,13 +868,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            bool isAnyStorageVisible =
-                (uiGameplay.uiPlayerStorageItems != null && uiGameplay.uiPlayerStorageItems.IsVisible()) ||
-                (uiGameplay.uiGuildStorageItems != null && uiGameplay.uiGuildStorageItems.IsVisible()) ||
-                (uiGameplay.uiBuildingStorageItems != null && uiGameplay.uiBuildingStorageItems.IsVisible() ||
-                (uiGameplay.uiBuildingCampfireItems != null && uiGameplay.uiBuildingCampfireItems.IsVisible()));
-            if (isAnyStorageVisible &&
+            if (BaseUISceneGameplay.Singleton.IsStorageDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isStorageDialogAppeared)
@@ -918,9 +902,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible dealing dialog
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiDealing.IsVisible() &&
-                uiGameplay.uiDealing.dealingState == DealingState.Dealing &&
+            if (BaseUISceneGameplay.Singleton.IsDealingDialogVisibleWithDealingState() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isDealingStateEntered)
@@ -1116,13 +1098,10 @@ namespace MultiplayerARPG
             // Only owning character can refine item
             if (!IsOwningCharacter())
                 return;
-
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiRefineItem != null &&
-                CharacterItem.GetEquipmentItem() != null)
+            
+            if (CharacterItem.GetEquipmentItem() != null)
             {
-                uiGameplay.uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
-                uiGameplay.uiRefineItem.Show();
+                BaseUISceneGameplay.Singleton.ShowRefineItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
@@ -1139,13 +1118,10 @@ namespace MultiplayerARPG
             // Only owning character can dismantle item
             if (!IsOwningCharacter())
                 return;
-
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiDismantleItem != null &&
-                GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
+            
+            if (GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
             {
-                uiGameplay.uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
-                uiGameplay.uiDismantleItem.Show();
+                BaseUISceneGameplay.Singleton.ShowDismantleItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
@@ -1158,13 +1134,10 @@ namespace MultiplayerARPG
             // Only owning character can refine item
             if (!IsOwningCharacter())
                 return;
-
-            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiEnhanceSocketItem != null &&
-                CharacterItem.GetEquipmentItem() != null)
+            
+            if (CharacterItem.GetEquipmentItem() != null)
             {
-                uiGameplay.uiEnhanceSocketItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
-                uiGameplay.uiEnhanceSocketItem.Show();
+                BaseUISceneGameplay.Singleton.ShowEnhanceSocketItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }

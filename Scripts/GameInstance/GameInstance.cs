@@ -42,8 +42,8 @@ namespace MultiplayerARPG
         [Header("Gameplay Objects")]
         public ItemDropEntity itemDropEntityPrefab;
         public WarpPortalEntity warpPortalEntityPrefab;
-        public UISceneGameplay uiSceneGameplayPrefab;
-        public UISceneGameplay uiSceneGameplayMobilePrefab;
+        public BaseUISceneGameplay uiSceneGameplayPrefab;
+        public BaseUISceneGameplay uiSceneGameplayMobilePrefab;
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
         public BasePlayerCharacterController defaultControllerPrefab;
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
@@ -137,6 +137,10 @@ namespace MultiplayerARPG
             includeShield = true,
             includeWeapon = true
         };
+        [Tooltip("If this is `TRUE`, player will be able to refine an items by themself, doesn't have to talk to NPCs")]
+        public bool canRefineItemByPlayer;
+        [Tooltip("If this is `TRUE`, player will be able to dismantle an items by themself, doesn't have to talk to NPCs")]
+        public bool canDismantleItemByPlayer;
         public InventorySystem inventorySystem;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
         public short baseSlotLimit;
@@ -245,7 +249,7 @@ namespace MultiplayerARPG
             get { return socialSystemSetting; }
         }
 
-        public UISceneGameplay UISceneGameplayPrefab
+        public BaseUISceneGameplay UISceneGameplayPrefab
         {
             get
             {

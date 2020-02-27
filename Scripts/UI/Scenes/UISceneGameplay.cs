@@ -2,35 +2,21 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace MultiplayerARPG
 {
-    public enum CombatAmountType : byte
-    {
-        Miss,
-        NormalDamage,
-        CriticalDamage,
-        BlockedDamage,
-        HpRecovery,
-        MpRecovery,
-        StaminaRecovery,
-        FoodRecovery,
-        WaterRecovery,
-    }
-
-    public partial class UISceneGameplay : MonoBehaviour
+    public partial class UISceneGameplay : BaseUISceneGameplay
     {
         [System.Serializable]
-        public class UIToggleUI
+        public struct UIToggleUI
         {
             public UIBase ui;
             public KeyCode key;
         }
-
-        public static UISceneGameplay Singleton { get; private set; }
 
         [Header("Character Releates UIs")]
         public UICharacter[] uiCharacters;
@@ -92,18 +78,6 @@ namespace MultiplayerARPG
         [Tooltip("These UI (s) will block character controller inputs while visible")]
         public List<UIBase> blockControllerUIs;
 
-        [Header("Combat Text")]
-        public Transform combatTextTransform;
-        public UICombatText uiCombatTextMiss;
-        public UICombatText uiCombatTextNormalDamage;
-        public UICombatText uiCombatTextCriticalDamage;
-        public UICombatText uiCombatTextBlockedDamage;
-        public UICombatText uiCombatTextHpRecovery;
-        public UICombatText uiCombatTextMpRecovery;
-        public UICombatText uiCombatTextStaminaRecovery;
-        public UICombatText uiCombatTextFoodRecovery;
-        public UICombatText uiCombatTextWaterRecovery;
-
         [Header("Events")]
         public UnityEvent onCharacterDead;
         public UnityEvent onCharacterRespawn;
@@ -118,12 +92,9 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onUpdateQuests;
         public System.Action<BasePlayerCharacterEntity> onUpdateStorageItems;
 
-        private readonly Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>> spawningCombatTexts = new Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>>();
-        private readonly Dictionary<DamageableEntity, float> spawningCombatTextTimes = new Dictionary<DamageableEntity, float>();
-
-        private void Awake()
+        protected override void Awake()
         {
-            Singleton = this;
+            base.Awake();
             if (uiCurrentDoor == null)
                 uiCurrentDoor = uiCurrentBuilding;
             if (uiCurrentStorage == null)
@@ -201,10 +172,12 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        private void Update()
+        protected override void Update()
         {
             if (GenericUtils.IsFocusInputField())
                 return;
+
+            base.Update();
 
             foreach (UIToggleUI toggleUi in toggleUis)
             {
@@ -212,24 +185,6 @@ namespace MultiplayerARPG
                 {
                     UIBase ui = toggleUi.ui;
                     ui.Toggle();
-                }
-            }
-
-            float currentTime = Time.unscaledTime;
-            KeyValuePair<CombatAmountType, int> combatTextData;
-            foreach (DamageableEntity damageableEntity in spawningCombatTexts.Keys)
-            {
-                if (damageableEntity == null || spawningCombatTexts[damageableEntity].Count == 0)
-                    continue;
-
-                if (!spawningCombatTextTimes.ContainsKey(damageableEntity))
-                    spawningCombatTextTimes[damageableEntity] = currentTime;
-
-                if (currentTime - spawningCombatTextTimes[damageableEntity] >= 0.1f)
-                {
-                    spawningCombatTextTimes[damageableEntity] = currentTime;
-                    combatTextData = spawningCombatTexts[damageableEntity].Dequeue();
-                    SpawnCombatText(damageableEntity.CombatTextTransform, combatTextData.Key, combatTextData.Value);
                 }
             }
         }
@@ -389,7 +344,7 @@ namespace MultiplayerARPG
         /// To set selected target entity UIs
         /// </summary>
         /// <param name="entity"></param>
-        public void SetTargetEntity(BaseGameEntity entity)
+        public override void SetTargetEntity(BaseGameEntity entity)
         {
             if (entity == null)
             {
@@ -506,7 +461,7 @@ namespace MultiplayerARPG
             uiTargetVehicle.Show();
         }
 
-        public void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter)
+        public override void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter)
         {
             if (uiPlayerActivateMenu == null)
                 return;
@@ -535,7 +490,7 @@ namespace MultiplayerARPG
             onCharacterRespawn.Invoke();
         }
 
-        public void OnShowNpcDialog(int npcDialogDataId)
+        public override void ShowNpcDialog(int npcDialogDataId)
         {
             if (uiNpcDialog == null)
                 return;
@@ -704,7 +659,7 @@ namespace MultiplayerARPG
                 uiIsWarping.Hide();
         }
 
-        public bool IsPointerOverUIObject()
+        public override bool IsPointerOverUIObject()
         {
             PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
             if (eventDataCurrentPosition.dragging)
@@ -722,12 +677,17 @@ namespace MultiplayerARPG
                 }
             }
             else
+            {
                 return results.Count > 0;
+            }
             return false;
         }
 
-        public bool IsBlockController()
+        public override bool IsBlockController()
         {
+            if (base.IsBlockController())
+                return true;
+
             if (blockControllerUIs != null && blockControllerUIs.Count > 0)
             {
                 foreach (UIBase ui in blockControllerUIs)
@@ -738,68 +698,306 @@ namespace MultiplayerARPG
                         return true;
                 }
             }
-
-            if (UISceneGlobal.Singleton.uiMessageDialog.IsVisible() ||
-                UISceneGlobal.Singleton.uiInputDialog.IsVisible() ||
-                UISceneGlobal.Singleton.uiPasswordDialog.IsVisible())
-                return true;
-
             return false;
         }
 
-        public void PrepareCombatText(DamageableEntity damageableEntity, CombatAmountType combatAmountType, int amount)
+        public override void ShowConstructBuildingDialog(BuildingEntity buildingEntity)
         {
-            if (Vector3.Distance(BasePlayerCharacterController.OwningCharacter.CacheTransform.position, damageableEntity.CacheTransform.position) > GameInstance.Singleton.combatTextDistance)
+            HideConstructBuildingDialog();
+            if (buildingEntity == null)
                 return;
-
-            if (!spawningCombatTexts.ContainsKey(damageableEntity))
-                spawningCombatTexts[damageableEntity] = new Queue<KeyValuePair<CombatAmountType, int>>();
-            spawningCombatTexts[damageableEntity].Enqueue(new KeyValuePair<CombatAmountType, int>(combatAmountType, amount));
+            if (!uiConstructBuilding.IsVisible())
+                uiConstructBuilding.Show();
         }
 
-        public void SpawnCombatText(Transform followingTransform, CombatAmountType combatAmountType, int amount)
+        public override void HideConstructBuildingDialog()
         {
-            switch (combatAmountType)
+            if (uiConstructBuilding.IsVisible())
+                uiConstructBuilding.Hide();
+        }
+
+        public override void ShowCurrentBuildingDialog(BuildingEntity buildingEntity)
+        {
+            HideCurrentBuildingDialog();
+            if (buildingEntity == null)
+                return;
+            if (buildingEntity is DoorEntity)
             {
-                case CombatAmountType.Miss:
-                    SpawnCombatText(followingTransform, uiCombatTextMiss, amount);
-                    break;
-                case CombatAmountType.NormalDamage:
-                    SpawnCombatText(followingTransform, uiCombatTextNormalDamage, amount);
-                    break;
-                case CombatAmountType.CriticalDamage:
-                    SpawnCombatText(followingTransform, uiCombatTextCriticalDamage, amount);
-                    break;
-                case CombatAmountType.BlockedDamage:
-                    SpawnCombatText(followingTransform, uiCombatTextBlockedDamage, amount);
-                    break;
-                case CombatAmountType.HpRecovery:
-                    SpawnCombatText(followingTransform, uiCombatTextHpRecovery, amount);
-                    break;
-                case CombatAmountType.MpRecovery:
-                    SpawnCombatText(followingTransform, uiCombatTextMpRecovery, amount);
-                    break;
-                case CombatAmountType.StaminaRecovery:
-                    SpawnCombatText(followingTransform, uiCombatTextStaminaRecovery, amount);
-                    break;
-                case CombatAmountType.FoodRecovery:
-                    SpawnCombatText(followingTransform, uiCombatTextFoodRecovery, amount);
-                    break;
-                case CombatAmountType.WaterRecovery:
-                    SpawnCombatText(followingTransform, uiCombatTextWaterRecovery, amount);
-                    break;
+                if (!uiCurrentDoor.IsVisible())
+                    uiCurrentDoor.Show();
+            }
+            else if (buildingEntity is StorageEntity)
+            {
+                if (!uiCurrentStorage.IsVisible())
+                    uiCurrentStorage.Show();
+            }
+            else if (buildingEntity is WorkbenchEntity)
+            {
+                if (!uiCurrentWorkbench.IsVisible())
+                    uiCurrentWorkbench.Show();
+            }
+            else
+            {
+                if (!uiCurrentBuilding.IsVisible())
+                    uiCurrentBuilding.Show();
             }
         }
 
-        public void SpawnCombatText(Transform followingTransform, UICombatText prefab, int amount)
+        public override void HideCurrentBuildingDialog()
         {
-            if (combatTextTransform == null || prefab == null)
-                return;
-
-            UICombatText combatText = Instantiate(prefab, combatTextTransform);
-            combatText.transform.localScale = Vector3.one;
-            combatText.CacheObjectFollower.TargetObject = followingTransform;
-            combatText.Amount = amount;
+            if (uiCurrentDoor.IsVisible())
+                uiCurrentDoor.Hide();
+            if (uiCurrentStorage.IsVisible())
+                uiCurrentStorage.Hide();
+            if (uiCurrentWorkbench.IsVisible())
+                uiCurrentWorkbench.Hide();
+            if (uiCurrentBuilding.IsVisible())
+                uiCurrentBuilding.Hide();
         }
+
+        public override void HideNpcDialog()
+        {
+            if (uiNpcDialog != null &&
+                uiNpcDialog.IsVisible())
+                uiNpcDialog.Hide();
+            if (uiPlayerStorageItems != null &&
+                uiPlayerStorageItems.IsVisible())
+                uiPlayerStorageItems.Hide();
+            if (uiGuildStorageItems != null &&
+                uiGuildStorageItems.IsVisible())
+                uiGuildStorageItems.Hide();
+            if (uiBuildingStorageItems != null &&
+                uiBuildingStorageItems.IsVisible())
+                uiBuildingStorageItems.Hide();
+            if (uiBuildingCraftItems != null &&
+                uiBuildingCraftItems.IsVisible())
+                uiBuildingCraftItems.Hide();
+        }
+
+        public override bool IsShopDialogVisible()
+        {
+            return uiNpcDialog != null &&
+                uiNpcDialog.IsVisible() &&
+                uiNpcDialog.Data != null &&
+                uiNpcDialog.Data.type == NpcDialogType.Shop;
+        }
+
+        public override bool IsRefineItemDialogVisible()
+        {
+            return uiRefineItem != null &&
+                uiRefineItem.IsVisible();
+        }
+
+        public override bool IsDismantleItemDialogVisible()
+        {
+            return uiDismantleItem != null &&
+                uiDismantleItem.IsVisible();
+        }
+
+        public override bool IsEnhanceSocketItemDialogVisible()
+        {
+            return uiEnhanceSocketItem != null &&
+                uiEnhanceSocketItem.IsVisible();
+        }
+
+        public override bool IsStorageDialogVisible()
+        {
+            return (uiPlayerStorageItems != null && uiPlayerStorageItems.IsVisible()) ||
+                (uiGuildStorageItems != null && uiGuildStorageItems.IsVisible()) ||
+                (uiBuildingStorageItems != null && uiBuildingStorageItems.IsVisible()) ||
+                (uiBuildingCampfireItems != null && uiBuildingCampfireItems.IsVisible());
+        }
+
+        public override bool IsDealingDialogVisibleWithDealingState()
+        {
+            return uiDealing != null && uiDealing.IsVisible() &&
+                uiDealing.dealingState == DealingState.Dealing;
+        }
+
+        public override void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData)
+        {
+            if (uiRefineItem == null)
+                return;
+            uiRefineItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
+            uiRefineItem.Show();
+        }
+
+        public override void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData)
+        {
+            if (uiDismantleItem == null)
+                return;
+            uiDismantleItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
+            uiDismantleItem.Show();
+        }
+
+        public override void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData)
+        {
+            if (uiEnhanceSocketItem == null)
+                return;
+            uiEnhanceSocketItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
+            uiEnhanceSocketItem.Show();
+        }
+
+        public override void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity)
+        {
+            if (uiBuildingCraftItems != null)
+                uiBuildingCraftItems.Show(CrafterType.Workbench, workbenchEntity);
+        }
+
+        public override void OnControllerSetup(BasePlayerCharacterEntity characterEntity)
+        {
+            characterEntity.onShowNpcDialog += ShowNpcDialog;
+            characterEntity.onShowNpcRefineItem += OnShowNpcRefineItem;
+            characterEntity.onShowNpcDismantleItem += OnShowNpcDismantleItem;
+            characterEntity.onDead += OnCharacterDead;
+            characterEntity.onRespawn += OnCharacterRespawn;
+            characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
+            characterEntity.onShowDealingDialog += OnShowDealing;
+            characterEntity.onUpdateDealingState += OnUpdateDealingState;
+            characterEntity.onUpdateDealingGold += OnUpdateDealingGold;
+            characterEntity.onUpdateDealingItems += OnUpdateDealingItems;
+            characterEntity.onUpdateAnotherDealingState += OnUpdateAnotherDealingState;
+            characterEntity.onUpdateAnotherDealingGold += OnUpdateAnotherDealingGold;
+            characterEntity.onUpdateAnotherDealingItems += OnUpdateAnotherDealingItems;
+            characterEntity.onShowPartyInvitationDialog += OnShowPartyInvitation;
+            characterEntity.onShowGuildInvitationDialog += OnShowGuildInvitation;
+            characterEntity.onShowStorage += OnShowStorage;
+            characterEntity.onIsWarpingChange += OnIsWarpingChange;
+            characterEntity.onIdChange += OnIdChange;
+            characterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            characterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            characterEntity.onAttributesOperation += OnAttributesOperation;
+            characterEntity.onSkillsOperation += OnSkillsOperation;
+            characterEntity.onSummonsOperation += OnSummonsOperation;
+            characterEntity.onBuffsOperation += OnBuffsOperation;
+            characterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            characterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            characterEntity.onHotkeysOperation += OnHotkeysOperation;
+            characterEntity.onQuestsOperation += OnQuestsOperation;
+            characterEntity.onStorageItemsOperation += OnStorageItemsOperation;
+
+            UpdateCharacter();
+            UpdateSkills();
+            UpdateSummons();
+            UpdateEquipItems();
+            UpdateEquipWeapons();
+            UpdateNonEquipItems();
+            UpdateHotkeys();
+            UpdateQuests();
+            UpdateStorageItems();
+        }
+
+        public override void OnControllerDesetup(BasePlayerCharacterEntity characterEntity)
+        {
+            characterEntity.onShowNpcDialog -= ShowNpcDialog;
+            characterEntity.onShowNpcRefineItem -= OnShowNpcRefineItem;
+            characterEntity.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
+            characterEntity.onDead -= OnCharacterDead;
+            characterEntity.onRespawn -= OnCharacterRespawn;
+            characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;
+            characterEntity.onShowDealingDialog -= OnShowDealing;
+            characterEntity.onUpdateDealingState -= OnUpdateDealingState;
+            characterEntity.onUpdateDealingGold -= OnUpdateDealingGold;
+            characterEntity.onUpdateDealingItems -= OnUpdateDealingItems;
+            characterEntity.onUpdateAnotherDealingState -= OnUpdateAnotherDealingState;
+            characterEntity.onUpdateAnotherDealingGold -= OnUpdateAnotherDealingGold;
+            characterEntity.onUpdateAnotherDealingItems -= OnUpdateAnotherDealingItems;
+            characterEntity.onShowPartyInvitationDialog -= OnShowPartyInvitation;
+            characterEntity.onShowGuildInvitationDialog -= OnShowGuildInvitation;
+            characterEntity.onShowStorage -= OnShowStorage;
+            characterEntity.onIsWarpingChange -= OnIsWarpingChange;
+            characterEntity.onIdChange -= OnIdChange;
+            characterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            characterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            characterEntity.onAttributesOperation -= OnAttributesOperation;
+            characterEntity.onSkillsOperation -= OnSkillsOperation;
+            characterEntity.onSummonsOperation -= OnSummonsOperation;
+            characterEntity.onBuffsOperation -= OnBuffsOperation;
+            characterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
+            characterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            characterEntity.onHotkeysOperation -= OnHotkeysOperation;
+            characterEntity.onQuestsOperation -= OnQuestsOperation;
+            characterEntity.onStorageItemsOperation -= OnStorageItemsOperation;
+        }
+
+        #region Sync data changes callback
+        protected void OnIdChange(string id)
+        {
+            UpdateCharacter();
+            UpdateSkills();
+            UpdateEquipItems();
+            UpdateNonEquipItems();
+        }
+
+        protected void OnEquipWeaponSetChange(byte equipWeaponSet)
+        {
+            UpdateCharacter();
+            UpdateEquipItems();
+            UpdateEquipWeapons();
+            UpdateSkills();
+            UpdateHotkeys();
+        }
+
+        protected void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateCharacter();
+            UpdateEquipItems();
+            UpdateEquipWeapons();
+            UpdateSkills();
+            UpdateHotkeys();
+        }
+
+        protected void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateCharacter();
+        }
+
+        protected void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateCharacter();
+            UpdateSkills();
+        }
+
+        protected void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateSummons();
+        }
+
+        protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateCharacter();
+        }
+
+        protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateCharacter();
+            UpdateEquipItems();
+            UpdateSkills();
+            UpdateHotkeys();
+        }
+
+        protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateCharacter();
+            UpdateNonEquipItems();
+            UpdateHotkeys();
+            UpdateQuests();
+        }
+
+        protected void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateHotkeys();
+        }
+
+        protected void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateQuests();
+        }
+
+        protected void OnStorageItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateStorageItems();
+        }
+        #endregion
     }
 }

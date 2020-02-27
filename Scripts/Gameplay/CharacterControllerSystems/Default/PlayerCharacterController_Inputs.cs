@@ -313,7 +313,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Close NPC dialog, when target changes
-                        HideNpcDialogs();
+                        HideNpcDialog();
                         ClearQueueUsingSkill();
 
                         // Move to target, will hide destination when target is object
@@ -383,7 +383,7 @@ namespace MultiplayerARPG
 
             if (moveDirection.sqrMagnitude > 0f)
             {
-                HideNpcDialogs();
+                HideNpcDialog();
                 ClearQueueUsingSkill();
                 FindAndSetBuildingAreaFromCharacterDirection();
             }

@@ -5,8 +5,6 @@ namespace MultiplayerARPG
 {
     public class ButtonsActivatorForUICharacterItem : MonoBehaviour
     {
-        public bool canRefineItemByOwnerCharacter;
-        public bool canDismantleItemByOwnerCharacter;
         public Button buttonEquip;
         public Button buttonUnEquip;
         public Button buttonRefine;
@@ -69,7 +67,7 @@ namespace MultiplayerARPG
             if (buttonUnEquip)
                 buttonUnEquip.gameObject.SetActive(true);
             if (buttonRefine)
-                buttonRefine.gameObject.SetActive(canRefineItemByOwnerCharacter);
+                buttonRefine.gameObject.SetActive(GameInstance.Singleton.canRefineItemByPlayer);
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
         }
@@ -80,9 +78,9 @@ namespace MultiplayerARPG
             if (buttonEquip)
                 buttonEquip.gameObject.SetActive(true);
             if (buttonRefine)
-                buttonRefine.gameObject.SetActive(canRefineItemByOwnerCharacter);
+                buttonRefine.gameObject.SetActive(GameInstance.Singleton.canRefineItemByPlayer);
             if (buttonDismantle)
-                buttonDismantle.gameObject.SetActive(canDismantleItemByOwnerCharacter && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
             if (buttonDrop)
@@ -105,36 +103,36 @@ namespace MultiplayerARPG
 
         public void OnRefineItemDialogAppear()
         {
-            if (canRefineItemByOwnerCharacter)
+            if (GameInstance.Singleton.canRefineItemByPlayer)
                 return;
-            
+
             if (buttonRefine)
                 buttonRefine.gameObject.SetActive(true);
         }
 
         public void OnRefineItemDialogDisappear()
         {
-            if (canRefineItemByOwnerCharacter)
+            if (GameInstance.Singleton.canRefineItemByPlayer)
                 return;
-            
+
             if (buttonRefine)
                 buttonRefine.gameObject.SetActive(false);
         }
 
         public void OnDismantleItemDialogAppear()
         {
-            if (canDismantleItemByOwnerCharacter)
+            if (GameInstance.Singleton.canDismantleItemByPlayer)
                 return;
-            
+
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
         }
 
         public void OnDismantleItemDialogDisappear()
         {
-            if (canDismantleItemByOwnerCharacter)
+            if (GameInstance.Singleton.canDismantleItemByPlayer)
                 return;
-            
+
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(false);
         }
