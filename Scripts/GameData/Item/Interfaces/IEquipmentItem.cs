@@ -19,6 +19,5 @@ namespace MultiplayerARPG
         ArmorIncremental[] IncreaseArmors { get; }
         DamageIncremental[] IncreaseDamages { get; }
         SkillLevel[] IncreaseSkillLevels { get; }
-        bool CanEquip(BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType);
     }
 }

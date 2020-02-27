@@ -1,0 +1,29 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    [CreateAssetMenu(fileName = "Weapon Item", menuName = "Create GameData/Item/Weapon Item", order = -4887)]
+    public partial class ArmorItem : BaseDefendEquipmentItem, IArmorItem
+    {
+        public override ItemType ItemType
+        {
+            get { return ItemType.Armor; }
+        }
+
+        [SerializeField]
+        private ArmorType armorType;
+        public ArmorType ArmorType
+        {
+            get { return armorType; }
+        }
+
+        [SerializeField]
+        private string equipPosition;
+        public string EquipPosition
+        {
+            get { return equipPosition; }
+        }
+    }
+}

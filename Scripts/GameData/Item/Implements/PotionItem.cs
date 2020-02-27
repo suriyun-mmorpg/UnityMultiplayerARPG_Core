@@ -1,0 +1,29 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    [CreateAssetMenu(fileName = "Potion Item", menuName = "Create GameData/Item/Potion Item", order = -4886)]
+    public partial class PotionItem : BaseItem, IPotionItem
+    {
+        public override ItemType ItemType
+        {
+            get { return ItemType.Potion; }
+        }
+
+        [SerializeField]
+        private Buff buff;
+        public Buff Buff
+        {
+            get { return buff; }
+        }
+
+        public void UseItem(BaseCharacterEntity characterEntity, short itemIndex, CharacterItem characterItem)
+        {
+            if (!characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1))
+                return;
+            characterEntity.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, characterEntity);
+        }
+    }
+}

@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item", order = -4899)]
+    [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Legacy Item", order = -4899)]
     public partial class Item : BaseItem,
         IAmmoItem, IArmorItem, IShieldItem, IWeaponItem,
         IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem,
@@ -476,50 +476,6 @@ namespace MultiplayerARPG
                 amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 }
             };
             return this;
-        }
-
-        public bool CanEquip(BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType)
-        {
-            gameMessageType = GameMessage.Type.None;
-            if (!this.IsEquipment() || character == null)
-                return false;
-
-            // Check is it pass attribute requirement or not
-            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(true, false);
-            Dictionary<Attribute, float> requireAttributeAmounts = RequireAttributeAmounts;
-            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
-            {
-                if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
-                    attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
-                {
-                    gameMessageType = GameMessage.Type.NotEnoughAttributeAmounts;
-                    return false;
-                }
-            }
-
-            // Check another requirements
-            if (requirement.character != null && requirement.character != character.GetDatabase())
-            {
-                gameMessageType = GameMessage.Type.NotMatchCharacterClass;
-                return false;
-            }
-
-            if (character.Level < requirement.level)
-            {
-                gameMessageType = GameMessage.Type.NotEnoughLevel;
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool CanAttack(BaseCharacterEntity character)
-        {
-            if (!this.IsWeapon() || character == null)
-                return false;
-
-            AmmoType requireAmmoType = WeaponType.requireAmmoType;
-            return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
         }
 
         public void UseItem(BaseCharacterEntity character, short itemIndex, CharacterItem characterItem)

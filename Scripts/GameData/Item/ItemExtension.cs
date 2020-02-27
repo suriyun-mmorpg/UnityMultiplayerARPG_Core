@@ -210,5 +210,51 @@ namespace MultiplayerARPG
             return true;
         }
         #endregion
+
+        public static bool CanEquip<T>(this T item, BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType)
+             where T : IEquipmentItem
+        {
+            gameMessageType = GameMessage.Type.None;
+            if (!item.IsEquipment() || character == null)
+                return false;
+
+            // Check is it pass attribute requirement or not
+            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(true, false);
+            Dictionary<Attribute, float> requireAttributeAmounts = item.RequireAttributeAmounts;
+            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
+            {
+                if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
+                    attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
+                {
+                    gameMessageType = GameMessage.Type.NotEnoughAttributeAmounts;
+                    return false;
+                }
+            }
+
+            // Check another requirements
+            if (item.Requirement.character != null && item.Requirement.character != character.GetDatabase())
+            {
+                gameMessageType = GameMessage.Type.NotMatchCharacterClass;
+                return false;
+            }
+
+            if (character.Level < item.Requirement.level)
+            {
+                gameMessageType = GameMessage.Type.NotEnoughLevel;
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool CanAttack<T>(this T item, BaseCharacterEntity character)
+             where T : IWeaponItem
+        {
+            if (!item.IsWeapon() || character == null)
+                return false;
+
+            AmmoType requireAmmoType = item.WeaponType.requireAmmoType;
+            return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
+        }
     }
 }

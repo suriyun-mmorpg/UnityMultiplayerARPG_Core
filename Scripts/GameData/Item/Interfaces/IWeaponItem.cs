@@ -16,6 +16,5 @@ namespace MultiplayerARPG
         FireType FireType { get; }
         Vector2 FireStagger { get; }
         byte FireSpread { get; }
-        bool CanAttack(BaseCharacterEntity character);
     }
 }

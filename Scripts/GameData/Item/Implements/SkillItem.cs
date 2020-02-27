@@ -1,0 +1,34 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    [CreateAssetMenu(fileName = "Skill Item", menuName = "Create GameData/Item/Skill Item", order = -4882)]
+    public class SkillItem : BaseItem, ISkillItem
+    {
+        public override ItemType ItemType
+        {
+            get { return ItemType.Skill; }
+        }
+
+        [SerializeField]
+        private BaseSkill usingSkill;
+        public BaseSkill UsingSkill
+        {
+            get { return usingSkill; }
+        }
+
+        [SerializeField]
+        private short usingSkillLevel;
+        public short UsingSkillLevel
+        {
+            get { return usingSkillLevel; }
+        }
+
+        public void UseItem(BaseCharacterEntity characterEntity, short itemIndex, CharacterItem characterItem)
+        {
+            // TODO: May changes this function later.
+        }
+    }
+}
