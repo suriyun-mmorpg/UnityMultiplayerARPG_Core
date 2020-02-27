@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Weapon Item", menuName = "Create GameData/Item/Weapon Item", order = -4888)]
+    [CreateAssetMenu(fileName = "Shield Item", menuName = "Create GameData/Item/Shield Item", order = -4888)]
     public partial class ShieldItem : BaseDefendEquipmentItem, IShieldItem
     {
         public override string TypeTitle
