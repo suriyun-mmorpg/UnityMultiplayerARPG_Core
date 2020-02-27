@@ -33,6 +33,8 @@ namespace MultiplayerARPG
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
         public ProjectileEffect projectileEffect;
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
+        public byte pierceThroughEntities;
         // TODO: Add impact effect
 
         public float GetDistance()

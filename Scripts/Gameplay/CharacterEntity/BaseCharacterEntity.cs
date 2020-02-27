@@ -942,6 +942,7 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Raycast:
                     float minDistance = damageInfo.missileDistance;
+                    byte pierceThroughEntities = damageInfo.pierceThroughEntities;
                     // Just raycast to any entity to apply damage
                     int tempRaycastSize = RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, damageInfo.missileDistance, Physics.DefaultRaycastLayers);
                     if (tempRaycastSize > 0)
@@ -989,6 +990,11 @@ namespace MultiplayerARPG
                                 tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                             if (IsServer)
                                 tempDamageableEntity.ReceiveDamage(this, weapon, damageAmounts, skill, skillLevel);
+
+                            // Update pierce trough entities count
+                            if (pierceThroughEntities <= 0)
+                                break;
+                            --pierceThroughEntities;
                         } // End of for...loop (raycast result)
                     }
                     // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
