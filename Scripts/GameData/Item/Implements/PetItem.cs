@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Pet Item", menuName = "Create GameData/Item/Pet Item", order = -4884)]
-    public class PetItem : BaseItem, IPetItem
+    public partial class PetItem : BaseItem, IPetItem
     {
         public override string TypeTitle
         {

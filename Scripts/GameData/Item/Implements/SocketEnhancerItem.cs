@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Socket Enhancer Item", menuName = "Create GameData/Item/Socket Enhancer Item", order = -4880)]
-    public class SocketEnhancerItem : BaseItem, ISocketEnhancerItem
+    public partial class SocketEnhancerItem : BaseItem, ISocketEnhancerItem
     {
         public override string TypeTitle
         {

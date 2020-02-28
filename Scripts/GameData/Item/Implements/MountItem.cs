@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Mount Item", menuName = "Create GameData/Item/Mount Item", order = -4883)]
-    public class MountItem : BaseItem, IMountItem
+    public partial class MountItem : BaseItem, IMountItem
     {
         public override string TypeTitle
         {

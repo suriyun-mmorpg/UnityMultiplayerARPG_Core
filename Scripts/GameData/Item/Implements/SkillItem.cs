@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Skill Item", menuName = "Create GameData/Item/Skill Item", order = -4882)]
-    public class SkillItem : BaseItem, ISkillItem
+    public partial class SkillItem : BaseItem, ISkillItem
     {
         public override string TypeTitle
         {
