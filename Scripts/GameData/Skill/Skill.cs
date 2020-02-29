@@ -39,6 +39,7 @@ namespace MultiplayerARPG
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
+        public short useAmmoAmount = 1;
 
         [Header("Buffs")]
         public SkillBuffType skillBuffType;
@@ -103,11 +104,11 @@ namespace MultiplayerARPG
             // Apply attack skill
             if (IsAttack())
             {
-                if (skillUser.IsServer)
+                if (skillUser.IsServer && GetUseAmmoAmount() > 0)
                 {
                     // Increase damage with ammo damage
                     Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                    skillUser.ReduceAmmo(weapon, isLeftHand, out increaseDamages);
+                    skillUser.ReduceAmmo(weapon, isLeftHand, out increaseDamages, GetUseAmmoAmount());
                     if (increaseDamages != null)
                         damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
                 }
@@ -340,6 +341,11 @@ namespace MultiplayerARPG
                 items.Add(item);
             }
             GameInstance.AddItems(items);
+        }
+
+        public override short GetUseAmmoAmount()
+        {
+            return useAmmoAmount;
         }
     }
 }

@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
+        public short useAmmoAmount;
 
         private Dictionary<Attribute, float> cacheEffectivenessAttributes;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
@@ -36,6 +37,15 @@ namespace MultiplayerARPG
 
         public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
         {
+            // Reduce Ammo, Bow area skill may required arrow :)
+            if (skillUser.IsServer && GetUseAmmoAmount() > 0)
+            {
+                // Increase damage with ammo damage
+                Dictionary<DamageElement, MinMaxFloat> increaseDamages;
+                skillUser.ReduceAmmo(weapon, isLeftHand, out increaseDamages, GetUseAmmoAmount());
+                if (increaseDamages != null)
+                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
+            }
             // Spawn area entity
             aimPosition = AreaSkillControls.FindGround(AreaSkillControls.ValidateDistance(skillUser.CacheTransform.position, aimPosition, castDistance.GetAmount(skillLevel)));
             AreaDamageEntity damageEntity = Instantiate(areaDamageEntity, aimPosition, skillUser.GetSummonRotation());
@@ -94,6 +104,11 @@ namespace MultiplayerARPG
             if (!IsDebuff())
                 return default(Buff);
             return debuff;
+        }
+
+        public override short GetUseAmmoAmount()
+        {
+            return useAmmoAmount;
         }
     }
 }

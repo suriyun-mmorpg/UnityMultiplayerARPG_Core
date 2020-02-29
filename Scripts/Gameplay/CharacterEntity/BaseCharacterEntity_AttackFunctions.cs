@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             return damageAmounts;
         }
 
-        public bool ValidateAmmo(CharacterItem weapon)
+        public bool ValidateAmmo(CharacterItem weapon, short amount = 1)
         {
             // Avoid null data
             if (weapon == null)
@@ -83,20 +83,20 @@ namespace MultiplayerARPG
                 if (weaponItem.AmmoCapacity <= 0)
                 {
                     // Ammo capacity is 0 so reduce ammo from inventory
-                    if (this.CountAmmos(weaponItem.WeaponType.requireAmmoType) == 0)
+                    if (this.CountAmmos(weaponItem.WeaponType.requireAmmoType) < amount)
                         return false;
                 }
                 else
                 {
                     // Ammo capacity more than 0 reduce loaded ammo
-                    if (weapon.ammo <= 0)
+                    if (weapon.ammo < amount)
                         return false;
                 }
             }
             return true;
         }
 
-        public void ReduceAmmo(CharacterItem weapon, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamges)
+        public void ReduceAmmo(CharacterItem weapon, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamges, short amount = 1)
         {
             increaseDamges = null;
             // Avoid null data
@@ -108,24 +108,20 @@ namespace MultiplayerARPG
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
                 Dictionary<CharacterItem, short> decreaseAmmoItems;
-                if (this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, 1, out decreaseAmmoItems))
+                if (this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, amount, out decreaseAmmoItems))
                 {
-                    KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
-                    CharacterItem ammoCharacterItem = firstEntry.Key;
+                    CharacterItem ammoCharacterItem = decreaseAmmoItems.FirstOrDefault().Key;
                     IAmmoItem ammoItem = ammoCharacterItem.GetAmmoItem();
-                    if (ammoItem != null && firstEntry.Value > 0)
-                    {
-                        // Ammo level always 1
-                        increaseDamges = ammoItem.GetIncreaseDamages(1);
-                    }
+                    if (ammoItem != null)
+                        increaseDamges = ammoItem.GetIncreaseDamages(ammoCharacterItem.level);
                 }
             }
             else
             {
-                // Ammo capacity more than 0 reduce loaded ammo
-                if (weapon.ammo > 0)
+                // Ammo capacity >= `amount` reduce loaded ammo
+                if (weapon.ammo >= amount)
                 {
-                    weapon.ammo--;
+                    weapon.ammo -= amount;
                     EquipWeapons equipWeapons = EquipWeapons;
                     if (isLeftHand)
                         equipWeapons.leftHand = weapon;

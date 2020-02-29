@@ -160,6 +160,7 @@ namespace MultiplayerARPG
         public virtual bool HasCustomAimControls() { return false; }
         public virtual Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel) { return null; }
         public virtual void FinishAimControls() { }
+        public virtual short GetUseAmmoAmount() { return 0; }
         public virtual Buff GetBuff() { return new Buff(); }
         public virtual Buff GetDebuff() { return new Buff(); }
         public virtual SkillSummon GetSummon() { return new SkillSummon(); }
@@ -423,7 +424,7 @@ namespace MultiplayerARPG
             }
 
             CharacterItem weapon = character.GetAvailableWeapon(ref isLeftHand);
-            if (IsAttack() && !character.ValidateAmmo(weapon))
+            if (IsAttack() && GetUseAmmoAmount() > 0 && !character.ValidateAmmo(weapon, GetUseAmmoAmount()))
             {
                 gameMessageType = GameMessage.Type.NoAmmo;
                 return false;
