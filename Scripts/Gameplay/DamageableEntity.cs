@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         // Events / delegates
         public event ReceiveDamageDelegate onReceiveDamage;
-        public event ReceivedDamage onReceivedDamage;
+        public event ReceivedDamageDelegate onReceivedDamage;
 
         [Header("Damageable Settings")]
         [Tooltip("This is transform where combat texts will be instantiates from")]

@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         BaseSkill skill,
         short skillLevel);
-    public delegate void ReceivedDamage(
+    public delegate void ReceivedDamageDelegate(
         IGameEntity attacker,
         CombatAmountType combatAmountType,
         int damage);
