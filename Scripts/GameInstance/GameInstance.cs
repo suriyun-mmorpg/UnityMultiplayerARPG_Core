@@ -456,8 +456,7 @@ namespace MultiplayerARPG
 
         IEnumerator LoadHomeSceneOnLoadedGameDataRoutine()
         {
-            yield return new WaitForEndOfFrame();
-            UISceneLoading.Singleton.LoadScene(HomeSceneName);
+            yield return UISceneLoading.Singleton.LoadScene(HomeSceneName);
         }
 
         public List<string> GetGameMapIds()
