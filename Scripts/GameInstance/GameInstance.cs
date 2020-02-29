@@ -20,6 +20,12 @@ namespace MultiplayerARPG
         UseRespawnPosition
     }
 
+    public enum TestInEditorMode
+    {
+        Standalone,
+        Mobile
+    } // TODO: Add console mode
+
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
 #else
@@ -43,6 +49,7 @@ namespace MultiplayerARPG
         public ItemDropEntity itemDropEntityPrefab;
         public WarpPortalEntity warpPortalEntityPrefab;
         public BaseUISceneGameplay uiSceneGameplayPrefab;
+        [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
         public BaseUISceneGameplay uiSceneGameplayMobilePrefab;
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
         public BasePlayerCharacterController defaultControllerPrefab;
@@ -181,6 +188,8 @@ namespace MultiplayerARPG
 
         [Header("Scene/Maps")]
         public UnityScene homeScene;
+        [Tooltip("If this is empty, it will use `Home Mobile Scene` as home scene")]
+        public UnityScene homeMobileScene;
 
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
@@ -189,7 +198,7 @@ namespace MultiplayerARPG
         public byte maxCharacterSaves = 5;
 
         [Header("Playing In Editor")]
-        public bool useMobileInEditor;
+        public TestInEditorMode testInEditorMode;
 
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
@@ -254,9 +263,19 @@ namespace MultiplayerARPG
         {
             get
             {
-                if ((Application.isMobilePlatform || (useMobileInEditor && Application.isEditor)) && uiSceneGameplayMobilePrefab != null)
+                if ((Application.isMobilePlatform || (testInEditorMode == TestInEditorMode.Mobile && Application.isEditor)) && uiSceneGameplayMobilePrefab != null)
                     return uiSceneGameplayMobilePrefab;
                 return uiSceneGameplayPrefab;
+            }
+        }
+
+        public string HomeSceneName
+        {
+            get
+            {
+                if ((Application.isMobilePlatform || (testInEditorMode == TestInEditorMode.Mobile && Application.isEditor)) && homeMobileScene.IsSet())
+                    return homeMobileScene;
+                return homeScene;
             }
         }
 
@@ -322,7 +341,7 @@ namespace MultiplayerARPG
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
-            InputManager.useMobileInputOnNonMobile = useMobileInEditor && Application.isEditor;
+            InputManager.useMobileInputOnNonMobile = testInEditorMode == TestInEditorMode.Mobile && Application.isEditor;
 
             DefaultArmorType = ScriptableObject.CreateInstance<ArmorType>();
             DefaultArmorType.name = GameDataConst.UNKNOW_ARMOR_TYPE_ID;
@@ -438,7 +457,7 @@ namespace MultiplayerARPG
         IEnumerator LoadHomeSceneOnLoadedGameDataRoutine()
         {
             yield return new WaitForEndOfFrame();
-            UISceneLoading.Singleton.LoadScene(homeScene);
+            UISceneLoading.Singleton.LoadScene(HomeSceneName);
         }
 
         public List<string> GetGameMapIds()

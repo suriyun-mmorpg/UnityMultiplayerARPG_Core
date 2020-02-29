@@ -685,7 +685,7 @@ namespace MultiplayerARPG
         public void Init()
         {
             doNotEnterGameOnConnect = false;
-            Assets.offlineScene.SceneName = CurrentGameInstance.homeScene;
+            Assets.offlineScene.SceneName = CurrentGameInstance.HomeSceneName;
             Assets.playerPrefab = null;
             List<LiteNetLibIdentity> spawnablePrefabs = new List<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             if (CurrentGameInstance.itemDropEntityPrefab != null)
