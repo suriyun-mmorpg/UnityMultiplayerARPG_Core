@@ -279,7 +279,7 @@ namespace MultiplayerARPG
             this.DecreaseItemsByIndex(index, nonEquipItem.amount);
             this.IncreaseItems(returningItems);
             this.FillEmptySlots();
-            Gold += item.DismantleReturnGold;
+            Gold += item.DismantleReturnGold * nonEquipItem.amount;
         }
 
         protected void NetFuncRefineItem(InventoryType inventoryType, short index)
