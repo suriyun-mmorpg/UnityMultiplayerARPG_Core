@@ -90,6 +90,8 @@ namespace MultiplayerARPG
         public void OnSetUnEquippableData()
         {
             DeactivateAllButtons();
+            if (buttonDismantle)
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
             if (buttonDrop)
                 buttonDrop.gameObject.SetActive(true);
         }
