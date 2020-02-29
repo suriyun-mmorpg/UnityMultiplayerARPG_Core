@@ -6,10 +6,12 @@ using UnityEngine.UI;
 
 public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    public static readonly HashSet<GameObject> DraggingObjects = new HashSet<GameObject>();
+
     public Transform rootTransform;
-    
+
     public Canvas CacheCanvas { get; private set; }
-    
+
     public List<Graphic> CacheGraphics { get; private set; }
 
     public virtual bool CanDrag { get { return true; } }
@@ -22,7 +24,7 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private Vector3 defaultLocalPosition;
     private Vector3 defaultLocalScale;
     private Button attachedButton;
-    
+
     protected virtual void Start()
     {
         if (rootTransform == null)
@@ -52,6 +54,7 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         if (!CanDrag)
             return;
 
+        DraggingObjects.Add(gameObject);
         isDropped = false;
         rootTransform.SetParent(CacheCanvas.transform);
         rootTransform.SetAsLastSibling();
@@ -77,6 +80,7 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public virtual void OnEndDrag(PointerEventData eventData)
     {
+        DraggingObjects.Remove(gameObject);
         rootTransform.SetParent(defaultParent);
         rootTransform.SetSiblingIndex(defaultSiblingIndex);
         rootTransform.localPosition = defaultLocalPosition;
@@ -85,7 +89,7 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         // Enable button to allow on click event after drag
         if (attachedButton != null)
             attachedButton.enabled = true;
-        
+
         // Enable raycast graphics
         foreach (Graphic graphic in CacheGraphics)
         {

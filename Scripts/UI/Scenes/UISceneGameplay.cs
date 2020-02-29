@@ -662,7 +662,7 @@ namespace MultiplayerARPG
         public override bool IsPointerOverUIObject()
         {
             PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-            if (eventDataCurrentPosition.dragging)
+            if (UIDragHandler.DraggingObjects.Count > 0)
                 return true;
             eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             List<RaycastResult> results = new List<RaycastResult>();
