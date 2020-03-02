@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
+using UnityEngine.Rendering;
 
 namespace MultiplayerARPG
 {
@@ -805,12 +806,16 @@ namespace MultiplayerARPG
             }
             RegisterEntities();
             // Spawn monsters
+            if (LogInfo)
+                Debug.Log("Spawning monsters");
             MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
             foreach (MonsterSpawnArea monsterSpawnArea in monsterSpawnAreas)
             {
                 monsterSpawnArea.SpawnAll();
             }
             // Spawn Warp Portals
+            if (LogInfo)
+                Debug.Log("Spawning warp portals");
             if (GameInstance.MapWarpPortals.Count > 0)
             {
                 List<WarpPortal> mapWarpPortals;
@@ -832,6 +837,8 @@ namespace MultiplayerARPG
                 }
             }
             // Spawn Npcs
+            if (LogInfo)
+                Debug.Log("Spawning NPCs");
             if (GameInstance.MapNpcs.Count > 0)
             {
                 List<Npc> mapNpcs;
@@ -853,8 +860,13 @@ namespace MultiplayerARPG
                 }
             }
             // If it's server (not host) spawn simple camera controller
-            if (!IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
+            if (!IsClient && GameInstance.Singleton.serverCharacterPrefab != null &&
+                SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
+            {
+                if (LogInfo)
+                    Debug.Log("Spawning server character");
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab);
+            }
         }
 
         public virtual void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)
