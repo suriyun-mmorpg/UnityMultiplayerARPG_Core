@@ -12,7 +12,12 @@ namespace MultiplayerARPG
         {
             if (!CanAttack())
                 return false;
-            
+
+            float time = Time.unscaledTime;
+            if (time - lastActionTime < ACTION_DELAY)
+                return false;
+            lastActionTime = time;
+
             CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
             if (!ValidateAmmo(weapon))
             {
@@ -42,6 +47,11 @@ namespace MultiplayerARPG
         {
             if (!CanUseSkill())
                 return false;
+
+            float time = Time.unscaledTime;
+            if (time - lastActionTime < ACTION_DELAY)
+                return false;
+            lastActionTime = time;
 
             BaseSkill skill;
             short skillLevel;

@@ -12,7 +12,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData
     {
-        public const float ACTION_DELAY = 0.2f;
+        public const float ACTION_DELAY = 0.1f;
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float MOUNT_DELAY = 1f;
@@ -77,9 +77,9 @@ namespace MultiplayerARPG
         public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         public float RespawnGroundedCheckCountDown { get; protected set; }
+        protected float lastMountTime;
         protected float lastActionTime;
         protected float lastCombatantErrorTime;
-        protected float lastMountTime;
         protected readonly Dictionary<int, float> requestUseSkillErrorTime = new Dictionary<int, float>();
         #endregion
 

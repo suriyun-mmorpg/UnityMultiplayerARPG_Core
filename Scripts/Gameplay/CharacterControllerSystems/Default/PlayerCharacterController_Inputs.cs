@@ -8,16 +8,19 @@ namespace MultiplayerARPG
     {
         public virtual void UpdateInput()
         {
-            if (GenericUtils.IsFocusInputField())
-                return;
-
+            bool isFocusInputField = GenericUtils.IsFocusInputField();
+            bool isPointerOverUIObject = CacheUISceneGameplay.IsPointerOverUIObject();
             if (CacheGameplayCameraControls != null)
             {
                 CacheGameplayCameraControls.updateRotationX = false;
                 CacheGameplayCameraControls.updateRotationY = false;
-                CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
+                CacheGameplayCameraControls.updateRotation = !isFocusInputField && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
+                CacheGameplayCameraControls.updateZoom = !isFocusInputField && !isPointerOverUIObject;
             }
 
+            if (isFocusInputField)
+                return;
+            
             if (PlayerCharacterEntity.IsDead())
                 return;
 

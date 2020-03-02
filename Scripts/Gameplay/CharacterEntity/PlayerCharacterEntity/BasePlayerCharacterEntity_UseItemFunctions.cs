@@ -26,6 +26,7 @@ namespace MultiplayerARPG
             IUsableItem usableItem = characterItem.GetUsableItem();
             if (usableItem == null)
                 return;
+
             usableItem.UseItem(this, itemIndex, characterItem);
         }
 

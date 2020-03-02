@@ -5,9 +5,32 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public bool RequestUseItem(short index)
+        public bool ValidateRequestUseItem(short index)
         {
             if (!CanUseItem())
+                return false;
+
+            float time = Time.unscaledTime;
+            if (time - lastActionTime < ACTION_DELAY)
+                return false;
+            lastActionTime = time;
+
+            if (index >= nonEquipItems.Count)
+                return false;
+
+            if (nonEquipItems[index].IsLock())
+                return false;
+
+            IUsableItem item = nonEquipItems[index].GetUsableItem();
+            if (item == null)
+                return false;
+
+            return true;
+        }
+
+        public bool RequestUseItem(short index)
+        {
+            if (!ValidateRequestUseItem(index))
                 return false;
             CallNetFunction(NetFuncUseItem, FunctionReceivers.Server, index);
             return true;
@@ -17,6 +40,11 @@ namespace MultiplayerARPG
         {
             if (!CanUseItem())
                 return false;
+
+            float time = Time.unscaledTime;
+            if (time - lastActionTime < ACTION_DELAY)
+                return false;
+            lastActionTime = time;
 
             if (index >= nonEquipItems.Count)
                 return false;
