@@ -23,6 +23,7 @@
         to.LockPassword = from.LockPassword;
         to.CreatorId = from.CreatorId;
         to.CreatorName = from.CreatorName;
+        to.ExtraData = from.ExtraData;
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);
         return to;
     }

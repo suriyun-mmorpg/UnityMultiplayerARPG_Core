@@ -18,6 +18,7 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         info.AddValue("lockPassword", data.lockPassword);
         info.AddValue("creatorId", data.creatorId);
         info.AddValue("creatorName", data.creatorName);
+        info.AddValue("extraData", data.extraData);
     }
 
     public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
@@ -43,6 +44,12 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         catch { }
         data.creatorId = info.GetString("creatorId");
         data.creatorName = info.GetString("creatorName");
+        // TODO: Backward compatible, this will be removed in future version
+        try
+        {
+            data.extraData = info.GetString("extraData");
+        }
+        catch { }
         obj = data;
         return obj;
     }

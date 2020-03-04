@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
+using System.Text;
 
 namespace MultiplayerARPG
 {
@@ -30,6 +31,26 @@ namespace MultiplayerARPG
         {
             get { return turnOnElapsed.Value; }
             set { turnOnElapsed.Value = value; }
+        }
+
+        public override string ExtraData
+        {
+            get
+            {
+                return new StringBuilder().Append(IsTurnOn ? byte.MaxValue : byte.MinValue).Append(':').Append(TurnOnElapsed).ToString();
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    return;
+                string[] splitedTexts = value.Split(':');
+                byte isTurnOn;
+                if (splitedTexts.Length == 2 && byte.TryParse(splitedTexts[0], out isTurnOn))
+                    IsTurnOn = isTurnOn != 0;
+                float turnOnElapsed;
+                if (splitedTexts.Length == 2 && float.TryParse(splitedTexts[1], out turnOnElapsed))
+                    TurnOnElapsed = turnOnElapsed;
+            }
         }
 
         private float tempDeltaTime;

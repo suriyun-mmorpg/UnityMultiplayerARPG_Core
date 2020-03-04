@@ -93,6 +93,12 @@ namespace MultiplayerARPG
             set { creatorName.Value = value; }
         }
 
+        public virtual string ExtraData
+        {
+            get { return string.Empty; }
+            set { }
+        }
+
         public int DataId
         {
             get { return dataId; }

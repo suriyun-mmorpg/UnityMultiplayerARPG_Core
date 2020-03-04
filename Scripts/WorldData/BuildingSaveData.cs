@@ -15,6 +15,7 @@ public struct BuildingSaveData : IBuildingSaveData
     public Quaternion rotation;
     public string creatorId;
     public string creatorName;
+    public string extraData;
 
     public string Id
     {
@@ -74,5 +75,11 @@ public struct BuildingSaveData : IBuildingSaveData
     {
         get { return creatorName; }
         set { creatorName = value; }
+    }
+
+    public string ExtraData
+    {
+        get { return extraData; }
+        set { extraData = value; }
     }
 }

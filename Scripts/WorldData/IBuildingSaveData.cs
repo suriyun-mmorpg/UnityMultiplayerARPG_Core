@@ -12,4 +12,5 @@ public interface IBuildingSaveData
     Quaternion Rotation { get; set; }
     string CreatorId { get; set; }
     string CreatorName { get; set; }
+    string ExtraData { get; set; }
 }
