@@ -409,7 +409,7 @@ public static partial class PlayerCharacterDataExtension
         {
             entry.Serialize(writer);
         }
-        writer.Put((byte)characterData.Skills.Count);
+        writer.Put((short)characterData.Skills.Count);
         foreach (CharacterSkill entry in characterData.Skills)
         {
             entry.Serialize(writer);
@@ -439,7 +439,7 @@ public static partial class PlayerCharacterDataExtension
         {
             entry.Serialize(writer);
         }
-        writer.Put((byte)characterData.Quests.Count);
+        writer.Put((short)characterData.Quests.Count);
         foreach (CharacterQuest entry in characterData.Quests)
         {
             entry.Serialize(writer);
@@ -500,7 +500,7 @@ public static partial class PlayerCharacterDataExtension
             entry.Deserialize(reader);
             tempCharacterData.Buffs.Add(entry);
         }
-        count = reader.GetByte();
+        count = reader.GetShort();
         for (int i = 0; i < count; ++i)
         {
             CharacterSkill entry = new CharacterSkill();
@@ -542,7 +542,7 @@ public static partial class PlayerCharacterDataExtension
             entry.Deserialize(reader);
             tempCharacterData.Hotkeys.Add(entry);
         }
-        count = reader.GetByte();
+        count = reader.GetShort();
         for (int i = 0; i < count; ++i)
         {
             CharacterQuest entry = new CharacterQuest();
