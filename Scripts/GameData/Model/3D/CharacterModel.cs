@@ -6,6 +6,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
+    [System.Obsolete("`Character Model` is deprecate and stopped development, use context menu to convert to newer character model")]
     public partial class CharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations>
     {
         // Animator variables
@@ -107,7 +108,7 @@ namespace MultiplayerARPG
         public WeaponAnimations[] weaponAnimations;
         [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillAnimations[] skillAnimations;
-        
+
 #if UNITY_EDITOR
         [Header("Animation Test Tool")]
         public AnimActionType testAnimActionType;
@@ -1023,6 +1024,99 @@ namespace MultiplayerARPG
             }
 
             this.InvokeInstanceDevExtMethods("SetAnimatorClipsForTest");
+        }
+
+        [ContextMenu("Convert To Newer Character Model")]
+        public virtual void ConvertToNewerCharacterModel()
+        {
+            switch (animatorType)
+            {
+                case AnimatorType.Animator:
+                    ConvertToAnimatorCharacterModel();
+                    break;
+                case AnimatorType.LegacyAnimtion:
+                    ConvertToAnimationCharacterModel();
+                    break;
+            }
+            Debug.Log("[Character Model] Converted, you can remove this component.");
+        }
+
+        private void ConvertToAnimatorCharacterModel()
+        {
+            AnimatorCharacterModel model = gameObject.GetComponent<AnimatorCharacterModel>();
+            if (!model)
+                model = gameObject.AddComponent<AnimatorCharacterModel>();
+            model.skinnedMeshRenderer = skinnedMeshRenderer;
+            model.weaponAnimations = weaponAnimations;
+            model.skillAnimations = skillAnimations;
+            model.defaultAnimations = new DefaultAnimations()
+            {
+                idleClip = defaultAnimatorData.idleClip,
+                moveClip = defaultAnimatorData.moveClip,
+                moveBackwardClip = defaultAnimatorData.moveBackwardClip,
+                moveLeftClip = defaultAnimatorData.moveLeftClip,
+                moveRightClip = defaultAnimatorData.moveRightClip,
+                moveForwardLeftClip = defaultAnimatorData.moveForwardLeftClip,
+                moveForwardRightClip = defaultAnimatorData.moveForwardRightClip,
+                moveBackwardLeftClip = defaultAnimatorData.moveBackwardLeftClip,
+                moveBackwardRightClip = defaultAnimatorData.moveBackwardRightClip,
+                jumpClip = defaultAnimatorData.jumpClip,
+                fallClip = defaultAnimatorData.fallClip,
+                hurtClip = defaultAnimatorData.hurtClip,
+                deadClip = defaultAnimatorData.deadClip,
+                rightHandAttackAnimations = defaultAttackAnimations,
+                leftHandAttackAnimations = defaultAttackAnimations,
+                rightHandReloadAnimation = defaultReloadAnimation,
+                leftHandReloadAnimation = defaultReloadAnimation,
+                skillCastClip = defaultSkillCastClip,
+                skillActivateAnimation = defaultSkillActivateAnimation,
+            };
+            model.hiddingObjects = hiddingObjects;
+            model.hiddingRenderers = hiddingRenderers;
+            model.fpsHiddingObjects = fpsHiddingObjects;
+            model.fpsHiddingRenderers = fpsHiddingRenderers;
+            model.effectContainers = effectContainers;
+            model.equipmentContainers = equipmentContainers;
+            EditorUtility.SetDirty(model);
+        }
+
+        private void ConvertToAnimationCharacterModel()
+        {
+            AnimationCharacterModel model = gameObject.GetComponent<AnimationCharacterModel>();
+            if (!model)
+                model = gameObject.AddComponent<AnimationCharacterModel>();
+            model.skinnedMeshRenderer = skinnedMeshRenderer;
+            model.weaponAnimations = weaponAnimations;
+            model.skillAnimations = skillAnimations;
+            model.defaultAnimations = new DefaultAnimations()
+            {
+                idleClip = legacyAnimationData.idleClip,
+                moveClip = legacyAnimationData.moveClip,
+                moveBackwardClip = legacyAnimationData.moveBackwardClip,
+                moveLeftClip = legacyAnimationData.moveLeftClip,
+                moveRightClip = legacyAnimationData.moveRightClip,
+                moveForwardLeftClip = legacyAnimationData.moveForwardLeftClip,
+                moveForwardRightClip = legacyAnimationData.moveForwardRightClip,
+                moveBackwardLeftClip = legacyAnimationData.moveBackwardLeftClip,
+                moveBackwardRightClip = legacyAnimationData.moveBackwardRightClip,
+                jumpClip = legacyAnimationData.jumpClip,
+                fallClip = legacyAnimationData.fallClip,
+                hurtClip = legacyAnimationData.hurtClip,
+                deadClip = legacyAnimationData.deadClip,
+                rightHandAttackAnimations = defaultAttackAnimations,
+                leftHandAttackAnimations = defaultAttackAnimations,
+                rightHandReloadAnimation = defaultReloadAnimation,
+                leftHandReloadAnimation = defaultReloadAnimation,
+                skillCastClip = defaultSkillCastClip,
+                skillActivateAnimation = defaultSkillActivateAnimation,
+            };
+            model.hiddingObjects = hiddingObjects;
+            model.hiddingRenderers = hiddingRenderers;
+            model.fpsHiddingObjects = fpsHiddingObjects;
+            model.fpsHiddingRenderers = fpsHiddingRenderers;
+            model.effectContainers = effectContainers;
+            model.equipmentContainers = equipmentContainers;
+            EditorUtility.SetDirty(model);
         }
 #endif
     }
