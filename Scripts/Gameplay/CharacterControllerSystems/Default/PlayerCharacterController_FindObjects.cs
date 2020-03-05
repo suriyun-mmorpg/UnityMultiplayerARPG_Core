@@ -163,7 +163,7 @@ namespace MultiplayerARPG
                 int tempCount = PhysicUtils.SortedOverlapCircleNonAlloc(damageTransform.position, attackDistance, overlapColliders2D, layerMask);
                 for (int i = 0; i < tempCount; ++i)
                 {
-                    if (GetOverlapObject(i) == target.GetTransform())
+                    if (GetOverlapObject(i) == target.GetGameObject())
                         return true;
                     damageableEntity = GetOverlapObject(i).GetComponent<IDamageableEntity>();
                     if (damageableEntity != null && damageableEntity.GetObjectId() == target.GetObjectId())
