@@ -83,6 +83,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
         {
+            Debug.LogError(this + " receive damage from " + amount);
             CallNetFunction(NetFuncCombatAmount, FunctionReceivers.All, (byte)combatAmountType, amount);
         }
 

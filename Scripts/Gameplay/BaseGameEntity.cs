@@ -368,9 +368,13 @@ namespace MultiplayerARPG
 
         protected virtual void EntityUpdate()
         {
-            lastGrounded = MovementState.HasFlag(MovementState.IsGrounded);
-            if (lastGrounded)
-                lastGroundedPosition = CacheTransform.position;
+            if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+            {
+                // Ground check / ground damage will be calculated at server while dimension type is 3d only
+                lastGrounded = MovementState.HasFlag(MovementState.IsGrounded);
+                if (lastGrounded)
+                    lastGroundedPosition = CacheTransform.position;
+            }
 
             if (Movement != null)
             {
@@ -695,8 +699,12 @@ namespace MultiplayerARPG
                 return;
             }
             ActiveMovement.Teleport(position);
-            lastGrounded = true;
-            lastGroundedPosition = position;
+            if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+            {
+                // Ground check / ground damage will be calculated at server while dimension type is 3d only
+                lastGrounded = true;
+                lastGroundedPosition = position;
+            }
         }
 
         public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)

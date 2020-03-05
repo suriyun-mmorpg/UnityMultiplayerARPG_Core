@@ -203,14 +203,18 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             MakeCaches();
-            if (!lastGrounded && MovementState.HasFlag(MovementState.IsGrounded))
+            if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
-                // Apply fall damage when not passenging vehicle
-                CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
+                // Ground check / ground damage will be calculated at server while dimension type is 3d only
+                if (!lastGrounded && MovementState.HasFlag(MovementState.IsGrounded))
+                {
+                    // Apply fall damage when not passenging vehicle
+                    CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
+                }
+                lastGrounded = MovementState.HasFlag(MovementState.IsGrounded);
+                if (lastGrounded)
+                    lastGroundedPosition = CacheTransform.position;
             }
-            lastGrounded = MovementState.HasFlag(MovementState.IsGrounded);
-            if (lastGrounded)
-                lastGroundedPosition = CacheTransform.position;
 
             bool tempEnableMovement = PassengingVehicleEntity == null;
             if (RespawnGroundedCheckCountDown <= 0)
