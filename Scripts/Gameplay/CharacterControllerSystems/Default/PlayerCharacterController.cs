@@ -260,6 +260,7 @@ namespace MultiplayerARPG
                 // If skill is attack skill, set distance and fov by skill
                 GetUseSkillDistanceAndFov(out attackDistance, out attackFov);
             }
+            attackDistance -= PlayerCharacterEntity.StoppingDistance;
         }
 
         public void GetUseSkillDistanceAndFov(out float castDistance, out float castFov)
@@ -272,6 +273,7 @@ namespace MultiplayerARPG
                 castDistance = queueUsingSkill.skill.GetCastDistance(PlayerCharacterEntity, queueUsingSkill.level, false);
                 castFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, false);
             }
+            castDistance -= PlayerCharacterEntity.StoppingDistance;
         }
 
         public bool IsLockTarget()
