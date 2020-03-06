@@ -1038,7 +1038,7 @@ namespace MultiplayerARPG
                     ConvertToAnimationCharacterModel();
                     break;
             }
-            Debug.Log("[Character Model] Converted, you can remove this component.");
+            EditorUtility.DisplayDialog("Character Model Conversion", "New Character Model component has been added.\n\nThe old component doesn't removed yet to let you check values.\n\nThen, you have to remove the old one.", "OK");
         }
 
         private void ConvertToAnimatorCharacterModel()
