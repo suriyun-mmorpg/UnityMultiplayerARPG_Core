@@ -385,10 +385,6 @@ public static partial class PlayerCharacterDataExtension
         writer.PutPackedInt(characterData.Gold);
         writer.PutPackedInt(characterData.UserGold);
         writer.PutPackedInt(characterData.UserCash);
-        writer.PutPackedInt(characterData.PartyId);
-        writer.PutPackedInt(characterData.GuildId);
-        writer.Put(characterData.GuildRole);
-        writer.PutPackedInt(characterData.SharedGuildExp);
         writer.Put(characterData.CurrentMapName);
         writer.Put(characterData.CurrentPosition.x);
         writer.Put(characterData.CurrentPosition.y);
@@ -475,10 +471,6 @@ public static partial class PlayerCharacterDataExtension
         tempCharacterData.Gold = reader.GetPackedInt();
         tempCharacterData.UserGold = reader.GetPackedInt();
         tempCharacterData.UserCash = reader.GetPackedInt();
-        tempCharacterData.PartyId = reader.GetPackedInt();
-        tempCharacterData.GuildId = reader.GetPackedInt();
-        tempCharacterData.GuildRole = reader.GetByte();
-        tempCharacterData.SharedGuildExp = reader.GetPackedInt();
         tempCharacterData.CurrentMapName = reader.GetString();
         tempCharacterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
         tempCharacterData.RespawnMapName = reader.GetString();
