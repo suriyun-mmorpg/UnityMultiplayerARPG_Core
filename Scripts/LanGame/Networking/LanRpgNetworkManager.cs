@@ -222,6 +222,44 @@ namespace MultiplayerARPG
 
             // Register player, will use registered player to send chat / player messages
             RegisterPlayerCharacter(playerCharacterEntity);
+
+            SocialCharacterData[] members;
+            // Set guild id
+            if (guilds.Count > 0)
+            {
+                foreach (GuildData guild in guilds.Values)
+                {
+                    members = guild.GetMembers();
+                    for (int i = 0; i < members.Length; ++i)
+                    {
+                        if (members[i].id.Equals(playerCharacterEntity.Id))
+                        {
+                            playerCharacterEntity.GuildId = guild.id;
+                            break;
+                        }
+                    }
+                    if (playerCharacterEntity.GuildId > 0)
+                        break;
+                }
+            }
+            // Set party id
+            if (parties.Count > 0)
+            {
+                foreach (PartyData party in parties.Values)
+                {
+                    members = party.GetMembers();
+                    for (int i = 0; i < members.Length; ++i)
+                    {
+                        if (members[i].id.Equals(playerCharacterEntity.Id))
+                        {
+                            playerCharacterEntity.PartyId = party.id;
+                            break;
+                        }
+                    }
+                    if (playerCharacterEntity.PartyId > 0)
+                        break;
+                }
+            }
         }
 
         protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
