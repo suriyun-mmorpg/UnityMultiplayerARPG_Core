@@ -80,7 +80,7 @@ namespace MultiplayerARPG
 
         public override int GetWidth()
         {
-            return 340;
+            return 400;
         }
     }
 }
