@@ -9,5 +9,6 @@
         QuestTasksCompleted,
         QuestCompleted,
         FactionIs,
+        Custom = 255
     }
 }
