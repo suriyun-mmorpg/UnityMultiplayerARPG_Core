@@ -344,6 +344,9 @@ namespace MultiplayerARPG
 
         private void SetDialogByPort(NodePort from, NodePort to)
         {
+            if (from.node != this)
+                return;
+
             NpcDialog dialog = null;
             if (to != null && to.node != null)
                 dialog = to.node as NpcDialog;
