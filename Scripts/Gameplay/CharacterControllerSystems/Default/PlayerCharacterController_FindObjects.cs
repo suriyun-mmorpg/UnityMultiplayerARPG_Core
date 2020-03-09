@@ -143,7 +143,7 @@ namespace MultiplayerARPG
 
         public bool IsTargetInAttackDistance(IDamageableEntity target, float attackDistance, int layerMask)
         {
-            Transform damageTransform = PlayerCharacterEntity.GetDamageTransform(isLeftHandAttacking);
+            Transform damageTransform = PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 IDamageableEntity damageableEntity;

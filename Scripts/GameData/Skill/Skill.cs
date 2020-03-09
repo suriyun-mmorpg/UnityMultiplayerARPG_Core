@@ -114,10 +114,10 @@ namespace MultiplayerARPG
                 }
 
                 // Launch damage entity to apply damage to other characters
-                skillUser.LaunchDamageEntity(
+                GetDamageInfo(skillUser, isLeftHand).LaunchDamageEntity(
+                    skillUser,
                     isLeftHand,
                     weapon,
-                    GetDamageInfo(skillUser, isLeftHand),
                     damageAmounts,
                     this,
                     skillLevel,

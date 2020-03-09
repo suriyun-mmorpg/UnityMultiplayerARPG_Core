@@ -23,10 +23,10 @@ namespace MultiplayerARPG
 
         public Vector3 GetDefaultAttackAimPosition(bool isLeftHand)
         {
-            return GetDefaultAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand).damageType, isLeftHand);
+            return GetDefaultAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand);
         }
 
-        public virtual Vector3 GetDefaultAttackAimPosition(DamageType damageType, bool isLeftHand)
+        public Vector3 GetDefaultAttackAimPosition(DamageInfo damageInfo, bool isLeftHand)
         {
             // No aim position set, set aim position to forward direction
             BaseGameEntity targetEntity = GetTargetEntity();
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                     return targetEntity.CacheTransform.position;
                 }
             }
-            return GetDamageTransform(damageType, isLeftHand).position + CacheTransform.forward;
+            return damageInfo.GetDamageTransform(this, isLeftHand).position + CacheTransform.forward;
         }
 
         public virtual void GetAttackingData(
@@ -320,7 +320,7 @@ namespace MultiplayerARPG
                 }
 
                 // Get aim position by character's forward
-                Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);
+                Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
                 if (HasAimPosition)
                     aimPosition = AimPosition;
 
@@ -392,10 +392,10 @@ namespace MultiplayerARPG
             for (int i = 0; i < fireSpread + 1; ++i)
             {
                 stagger = new Vector3(Random.Range(-fireStagger.x, fireStagger.x), Random.Range(-fireStagger.y, fireStagger.y));
-                LaunchDamageEntity(
+                damageInfo.LaunchDamageEntity(
+                    this,
                     isLeftHand,
                     weapon,
-                    damageInfo,
                     damageAmounts,
                     null,
                     0,

@@ -241,7 +241,7 @@ namespace MultiplayerARPG
                     }
 
                     // Get aim position by character's forward
-                    Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo.damageType, isLeftHand);
+                    Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
                     if (skillAimPosition.HasValue)
                         aimPosition = skillAimPosition.Value;
                     else if (HasAimPosition)
