@@ -10,6 +10,9 @@
         public Quest quest;
         [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "LevelMoreThanOrEqual", "LevelLessThanOrEqual" })]
         public int conditionalLevel;
+        [NpcCustomDialogCondition]
+        public SerializableCallbackBool conditionData;
+
         public bool IsPass(IPlayerCharacterData character)
         {
             int indexOfQuest = -1;
@@ -41,6 +44,8 @@
                     return questCompleted;
                 case NpcDialogConditionType.FactionIs:
                     return character.FactionId == faction.DataId;
+                case NpcDialogConditionType.Custom:
+                    return conditionData.Invoke();
             }
             return true;
         }
