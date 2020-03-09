@@ -19,3 +19,6 @@
 [submodule "xNode"]
 	path = xNode
 	url = https://github.com/Siccity/xNode.git
+[submodule "SerializableCallback"]
+	path = SerializableCallback
+	url = https://github.com/Siccity/SerializableCallback.git
