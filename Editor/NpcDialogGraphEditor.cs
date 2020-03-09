@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     {
         public override string GetNodeMenuName(System.Type type)
         {
-            if (type == typeof(NpcDialog))
+            if (type == typeof(NpcDialog) || type == typeof(NpcDialogConditionNode))
                 return base.GetNodeMenuName(type).Replace("Dialog/", "");
             else
                 return null;
