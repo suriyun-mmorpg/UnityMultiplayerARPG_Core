@@ -233,7 +233,7 @@ namespace MultiplayerARPG
 
         protected void ShowCurrentBuildingDialog()
         {
-            CacheUISceneGameplay.ShowConstructBuildingDialog(TargetBuildingEntity);
+            CacheUISceneGameplay.ShowCurrentBuildingDialog(TargetBuildingEntity);
         }
 
         protected void HideCurrentBuildingDialog()
