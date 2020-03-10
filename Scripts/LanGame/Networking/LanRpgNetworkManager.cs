@@ -6,6 +6,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine.Profiling;
 using System;
+using System.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -118,7 +119,7 @@ namespace MultiplayerARPG
                 lastSaveTime = tempUnscaledTime;
             }
 
-            if (IsServer && pendingSpawnPlayerCharacters.Count > 0 && IsReadyToInstantiateObjects())
+            if (IsServer && pendingSpawnPlayerCharacters.Count > 0 && isReadyToInstantiatePlayers)
             {
                 // Spawn pending player characters
                 foreach (PendingSpawnPlayerCharacter spawnPlayerCharacter in pendingSpawnPlayerCharacters)
@@ -151,7 +152,7 @@ namespace MultiplayerARPG
 
         public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
-            if (!IsReadyToInstantiateObjects())
+            if (!isReadyToInstantiatePlayers)
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
                 if (LogDev) Debug.Log("[LanRpgNetworkManager] Not ready to deserializing client ready extra");
@@ -859,11 +860,10 @@ namespace MultiplayerARPG
             base.OnStartServer();
             SaveSystem.OnServerStart();
         }
-
-        public override void OnServerOnlineSceneLoaded()
+        
+        protected override async Task PreSpawnEntities()
         {
-            base.OnServerOnlineSceneLoaded();
-            SaveSystem.OnServerOnlineSceneLoaded(selectedCharacter, buildingEntities, storageItems);
+            await SaveSystem.PreSpawnEntities(selectedCharacter, buildingEntities, storageItems);
         }
         #endregion
     }

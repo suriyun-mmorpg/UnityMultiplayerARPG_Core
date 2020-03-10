@@ -4,6 +4,8 @@ using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
 using UnityEngine.Rendering;
+using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
 {
@@ -53,6 +55,7 @@ namespace MultiplayerARPG
         /// * This value will reset to `FALSE` in `OnServerOnlineSceneLoaded`<para />
         /// </summary>
         protected static bool isReadyToInstantiateObjects;
+        protected static bool isReadyToInstantiatePlayers;
         public static PartyData ClientParty { get; protected set; }
         public static GuildData ClientGuild { get; protected set; }
         public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(1);
@@ -67,6 +70,10 @@ namespace MultiplayerARPG
         public System.Action<SocialGroupData> onClientUpdateFriends;
         protected float lastUpdateOnlineCharacterTime;
         protected float serverSceneLoadedTime;
+        // Spawn entities events
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish;
 
         public bool TryGetPlayerCharacter(long connectionId, out BasePlayerCharacterEntity result)
         {
@@ -793,26 +800,24 @@ namespace MultiplayerARPG
             base.OnServerOnlineSceneLoaded();
             readyToInstantiateObjectsStates.Clear();
             isReadyToInstantiateObjects = false;
+            isReadyToInstantiatePlayers = false;
             serverSceneLoadedTime = Time.unscaledTime;
             this.InvokeInstanceDevExtMethods("OnServerOnlineSceneLoaded");
-            StartCoroutine(OnServerOnlineSceneLoaded_SpawnEntitiesRoutine());
+            SpawnEntities();
         }
 
-        private IEnumerator OnServerOnlineSceneLoaded_SpawnEntitiesRoutine()
+        protected virtual async void SpawnEntities()
         {
             while (!IsReadyToInstantiateObjects())
             {
-                yield return null;
+                await Task.Yield();
             }
+            string sceneName = SceneManager.GetActiveScene().name;
+            onSpawnEntitiesStart.Invoke(sceneName, true, 0f);
+            await PreSpawnEntities();
             RegisterEntities();
-            // Spawn monsters
-            if (LogInfo)
-                Debug.Log("Spawning monsters");
-            MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
-            foreach (MonsterSpawnArea monsterSpawnArea in monsterSpawnAreas)
-            {
-                monsterSpawnArea.SpawnAll();
-            }
+            int i;
+            float progress = 0f;
             // Spawn Warp Portals
             if (LogInfo)
                 Debug.Log("Spawning warp portals");
@@ -821,21 +826,30 @@ namespace MultiplayerARPG
                 List<WarpPortal> mapWarpPortals;
                 if (GameInstance.MapWarpPortals.TryGetValue(CurrentMapInfo.Id, out mapWarpPortals))
                 {
-                    foreach (WarpPortal warpPortal in mapWarpPortals)
+                    WarpPortal warpPortal;
+                    WarpPortalEntity warpPortalPrefab;
+                    WarpPortalEntity warpPortalEntity;
+                    for (i = 0; i < mapWarpPortals.Count; ++i)
                     {
-                        WarpPortalEntity warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
+                        warpPortal = mapWarpPortals[i];
+                        warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
                         if (warpPortalPrefab != null)
                         {
-                            GameObject spawnObj = Instantiate(warpPortalPrefab.gameObject, warpPortal.position, Quaternion.identity);
-                            WarpPortalEntity warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
+                            warpPortalEntity = Instantiate(warpPortalPrefab, warpPortal.position, Quaternion.identity);
                             warpPortalEntity.type = warpPortal.warpPortalType;
                             warpPortalEntity.mapInfo = warpPortal.warpToMapInfo;
                             warpPortalEntity.position = warpPortal.warpToPosition;
-                            Assets.NetworkSpawn(spawnObj);
+                            Assets.NetworkSpawn(warpPortalEntity.gameObject);
                         }
+                        await Task.Yield();
+                        progress = 0f + ((float)i / (float)mapWarpPortals.Count * 0.25f);
+                        onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
                     }
                 }
             }
+            await Task.Yield();
+            progress = 0.25f;
+            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn Npcs
             if (LogInfo)
                 Debug.Log("Spawning NPCs");
@@ -844,21 +858,58 @@ namespace MultiplayerARPG
                 List<Npc> mapNpcs;
                 if (GameInstance.MapNpcs.TryGetValue(CurrentMapInfo.Id, out mapNpcs))
                 {
-                    foreach (Npc npc in mapNpcs)
+                    Npc npc;
+                    NpcEntity npcPrefab;
+                    NpcEntity npcEntity;
+                    for (i = 0; i < mapNpcs.Count; ++i)
                     {
-                        NpcEntity npcPrefab = npc.entityPrefab;
+                        npc = mapNpcs[i];
+                        npcPrefab = npc.entityPrefab;
                         if (npcPrefab != null)
                         {
-                            GameObject spawnObj = Instantiate(npcPrefab.gameObject, npc.position, Quaternion.Euler(npc.rotation));
-                            NpcEntity npcEntity = spawnObj.GetComponent<NpcEntity>();
+                            npcEntity = Instantiate(npcPrefab, npc.position, Quaternion.Euler(npc.rotation));
                             npcEntity.Title = npc.title;
                             npcEntity.StartDialog = npc.startDialog;
                             npcEntity.Graph = npc.graph;
-                            Assets.NetworkSpawn(spawnObj);
+                            Assets.NetworkSpawn(npcEntity.gameObject);
                         }
+                        await Task.Yield();
+                        progress = 0.25f + ((float)i / (float)mapNpcs.Count * 0.25f);
+                        onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
                     }
                 }
             }
+            await Task.Yield();
+            progress = 0.5f;
+            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+            // Spawn monsters
+            if (LogInfo)
+                Debug.Log("Spawning monsters");
+            MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
+            for (i = 0; i < monsterSpawnAreas.Length; ++i)
+            {
+                monsterSpawnAreas[i].SpawnAll();
+                await Task.Yield();
+                progress = 0.5f + ((float)i / (float)monsterSpawnAreas.Length * 0.25f);
+                onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+            }
+            await Task.Yield();
+            progress = 0.75f;
+            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+            // Spawn harvestables
+            if (LogInfo)
+                Debug.Log("Spawning harvestables");
+            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            for (i = 0; i < harvestableSpawnAreas.Length; ++i)
+            {
+                harvestableSpawnAreas[i].SpawnAll();
+                await Task.Yield();
+                progress = 0.75f + ((float)i / (float)harvestableSpawnAreas.Length * 0.25f);
+                onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+            }
+            await Task.Yield();
+            progress = 1f;
+            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // If it's server (not host) spawn simple camera controller
             if (!IsClient && GameInstance.Singleton.serverCharacterPrefab != null &&
                 SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
@@ -867,6 +918,21 @@ namespace MultiplayerARPG
                     Debug.Log("Spawning server character");
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab);
             }
+            await Task.Yield();
+            progress = 1f;
+            onSpawnEntitiesFinish.Invoke(sceneName, true, progress);
+            await PostSpawnEntities();
+            isReadyToInstantiatePlayers = true;
+        }
+
+        protected virtual async Task PreSpawnEntities()
+        {
+            await Task.Yield();
+        }
+
+        protected virtual async Task PostSpawnEntities()
+        {
+            await Task.Yield();
         }
 
         public virtual void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)

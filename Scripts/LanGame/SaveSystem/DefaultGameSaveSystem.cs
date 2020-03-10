@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -16,30 +17,21 @@ namespace MultiplayerARPG
             isReadyToSave = false;
         }
 
-        public override void OnServerOnlineSceneLoaded(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
+        public override async Task PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
-            BaseGameNetworkManager.Singleton.StartCoroutine(OnServerOnlineSceneLoadedRoutine(hostPlayerCharacterData, buildingEntities, storageItems));
-        }
-
-        private IEnumerator OnServerOnlineSceneLoadedRoutine(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
-        {
-            while (!BaseGameNetworkManager.Singleton.IsReadyToInstantiateObjects())
-            {
-                yield return null;
-            }
             buildingEntities.Clear();
             storageItems.Clear();
             // Load and Spawn buildings
             worldSaveData.LoadPersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
-            yield return null;
+            await Task.Yield();
             foreach (BuildingSaveData building in worldSaveData.buildings)
             {
                 BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
             }
             // Load storage data
             storageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
-            yield return null;
+            await Task.Yield();
             StorageId storageId;
             foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
             {
@@ -47,12 +39,6 @@ namespace MultiplayerARPG
                 if (!storageItems.ContainsKey(storageId))
                     storageItems[storageId] = new List<CharacterItem>();
                 storageItems[storageId].Add(storageItem.characterItem);
-            }
-            // Spawn harvestables
-            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
-            {
-                harvestableSpawnArea.SpawnAll();
             }
             isReadyToSave = true;
         }
