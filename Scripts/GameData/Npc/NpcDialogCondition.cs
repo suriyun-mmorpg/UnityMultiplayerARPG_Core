@@ -10,8 +10,8 @@
         public Quest quest;
         [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "LevelMoreThanOrEqual", "LevelLessThanOrEqual" })]
         public int conditionalLevel;
-        [NpcCustomDialogCondition]
-        public SerializableCallbackBool conditionData;
+        [NpcDialogConditionData]
+        public NpcDialogConditionData conditionData;
 
         public bool IsPass(IPlayerCharacterData character)
         {
@@ -45,7 +45,7 @@
                 case NpcDialogConditionType.FactionIs:
                     return character.FactionId == faction.DataId;
                 case NpcDialogConditionType.Custom:
-                    return conditionData.Invoke();
+                    return conditionData.Invoke(character);
             }
             return true;
         }

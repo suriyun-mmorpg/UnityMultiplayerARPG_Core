@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CustomPropertyDrawer(typeof(NpcCustomDialogConditionAttribute))]
-    public class NpcCustomDialogConditionPropertyDrawer : SerializableCallbackDrawer
+    [CustomPropertyDrawer(typeof(NpcDialogConditionDataAttribute))]
+    public class NpcDialogConditionDataPropertyDrawer : SerializableCallbackDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
