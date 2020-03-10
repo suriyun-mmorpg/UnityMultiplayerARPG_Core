@@ -102,11 +102,40 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
+        internal virtual void CopyCacheDataTo(
+            Dictionary<string, Dictionary<string, GameObject>> destModels,
+            Dictionary<string, List<GameEffect>> destEffects,
+            ref BaseEquipmentEntity destRightHandEquipmentEntity,
+            ref BaseEquipmentEntity destLeftHandEquipmentEntity,
+            Dictionary<string, List<BaseEquipmentEntity>> destEquipmentEntities,
+            Dictionary<string, int> destItemIds)
+        {
+            destModels.Clear();
+            foreach (var entry in cacheModels)
+            {
+                destModels.Add(entry.Key, entry.Value);
+            }
+            destEffects.Clear();
+            foreach (var entry in cacheEffects)
+            {
+                destEffects.Add(entry.Key, entry.Value);
+            }
+            destRightHandEquipmentEntity = rightHandEquipmentEntity;
+            destLeftHandEquipmentEntity = leftHandEquipmentEntity;
+            destEquipmentEntities.Clear();
+            foreach (var entry in equipmentEntities)
+            {
+                destEquipmentEntities.Add(entry.Key, entry.Value);
+            }
+            destItemIds.Clear();
+            foreach (var entry in itemIds)
+            {
+                destItemIds.Add(entry.Key, entry.Value);
+            }
+        }
+
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
-            DestroyCacheModels();
-            DestroyCacheEffects();
-
             if (ModelManager && !IsMainOrFpsModel)
             {
                 // Sub-model will use some data same as main model
@@ -118,11 +147,13 @@ namespace MultiplayerARPG
 
             if (previousModel != null)
             {
-                previousModel.DestroyCacheModels();
-                previousModel.DestroyCacheEffects();
-                SetEquipWeapons(previousModel.equipWeapons);
-                SetEquipItems(previousModel.equipItems);
-                SetBuffs(previousModel.buffs);
+                previousModel.CopyCacheDataTo(
+                    cacheModels,
+                    cacheEffects,
+                    ref rightHandEquipmentEntity,
+                    ref leftHandEquipmentEntity,
+                    equipmentEntities,
+                    itemIds);
                 SetIsDead(previousModel.isDead);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
                 SetMovementState(previousModel.movementState, previousModel.extraMovementState, direction2D);
