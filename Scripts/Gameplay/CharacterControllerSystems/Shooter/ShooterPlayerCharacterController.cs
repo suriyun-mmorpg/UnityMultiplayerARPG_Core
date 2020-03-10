@@ -337,6 +337,7 @@ namespace MultiplayerARPG
                 CacheGameplayCameraControls.updateRotationX = false;
                 CacheGameplayCameraControls.updateRotationY = false;
                 CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
+                CacheGameplayCameraControls.updateZoom = !IsBlockController;
             }
             else
             {
@@ -344,6 +345,7 @@ namespace MultiplayerARPG
                 Cursor.lockState = !IsBlockController ? CursorLockMode.Locked : CursorLockMode.None;
                 Cursor.visible = IsBlockController;
                 CacheGameplayCameraControls.updateRotation = !IsBlockController;
+                CacheGameplayCameraControls.updateZoom = !IsBlockController;
             }
             // Clear selected entity
             SelectedEntity = null;
