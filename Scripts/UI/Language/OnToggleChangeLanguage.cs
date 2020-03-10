@@ -20,7 +20,18 @@ namespace MultiplayerARPG
         public void OnToggle(bool selected)
         {
             if (selected)
+            {
                 LanguageManager.ChangeLanguage(languageKey);
+                UIBase[] uis = FindObjectsOfType<UIBase>();
+                for (int i = 0; i < uis.Length; ++i)
+                {
+                    if (!uis[i].IsVisible())
+                        continue;
+                    if (uis[i] is IUISelectionEntry)
+                        (uis[i] as IUISelectionEntry).ForceUpdate();
+                        
+                }
+            }
         }
     }
 }

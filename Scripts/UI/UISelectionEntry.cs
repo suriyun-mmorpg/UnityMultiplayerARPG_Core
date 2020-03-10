@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class UISelectionEntry<T> : UIBase
+public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
 {
     [Header("UI Selection Elements")]
     public GameObject objectSelected;
@@ -90,6 +90,17 @@ public abstract class UISelectionEntry<T> : UIBase
     public void Deselect()
     {
         IsSelected = false;
+    }
+
+    public void SetData(object data)
+    {
+        if (data is T)
+            Data = (T)data;
+    }
+
+    public object GetData()
+    {
+        return Data;
     }
 
     protected virtual void UpdateUI() { }
