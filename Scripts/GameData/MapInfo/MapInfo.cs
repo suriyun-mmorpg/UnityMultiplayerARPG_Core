@@ -1,18 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Map Info", menuName = "Create GameData/Map Info", order = -4799)]
-    public partial class MapInfo : BaseGameData
+    public partial class MapInfo : BaseMapInfo
     {
-        [Header("Map Info Configs")]
-        public UnityScene scene;
-        [Tooltip("This will be used when new character have been created, and this map data is start map")]
-        public Vector3 startPosition;
-        [Tooltip("When character fall to this position, character will dead")]
-        public float deadY = -100f;
         [Tooltip("If this is `TRUE`, player can return to save point by `return` key. Else it will able to do that when dead only")]
         public bool canReturnToSavePoint;
         [Tooltip("If this is `Pvp`, player can battle all other players. `FactionPvp`, player can battle difference faction players. `GuildPvp`, player can battle difference guild players")]
@@ -51,14 +44,13 @@ namespace MultiplayerARPG
         [Tooltip("This is deprecated, use `overrideRespawnPointMove`")]
         public bool overrideRespawnPoint;
         [Tooltip("This is deprecated, use `overrideRespawnPoints`")]
-        public MapInfo overrideRespawnPointMap;
+        public BaseMapInfo overrideRespawnPointMap;
         [Tooltip("This is deprecated, use `overrideRespawnPoints`")]
         public Vector3 overrideRespawnPointPosition;
 
-        public void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position)
+        public override void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position)
         {
-            mapName = playerCharacterData.RespawnMapName;
-            position = playerCharacterData.RespawnPosition;
+            base.GetRespawnPoint(playerCharacterData, out mapName, out position);
             switch (overrideRespawnPointMode)
             {
                 case OverrideRespawnPointMode.Override:
@@ -71,6 +63,107 @@ namespace MultiplayerARPG
                     }
                     break;
             }
+        }
+
+        protected override bool IsPlayerAlly(BasePlayerCharacterEntity playerCharacter, BaseCharacterEntity targetCharacter)
+        {
+            if (targetCharacter == null)
+                return false;
+
+            if (targetCharacter is BasePlayerCharacterEntity)
+            {
+                BasePlayerCharacterEntity targetPlayer = targetCharacter as BasePlayerCharacterEntity;
+                switch (pvpMode)
+                {
+                    case PvpMode.Pvp:
+                        return targetPlayer.PartyId == playerCharacter.PartyId;
+                    case PvpMode.FactionPvp:
+                        return targetPlayer.FactionId != 0 && targetPlayer.FactionId == playerCharacter.FactionId;
+                    case PvpMode.GuildPvp:
+                        return targetPlayer.GuildId == playerCharacter.GuildId;
+                    default:
+                        return false;
+                }
+            }
+
+            if (targetCharacter is BaseMonsterCharacterEntity)
+            {
+                // If this character is summoner so it is ally
+                BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
+                return targetMonster.Summoner != null && targetMonster.Summoner == this;
+            }
+
+            return false;
+        }
+
+        protected override bool IsMonsterAlly(BaseMonsterCharacterEntity monsterCharacter, BaseCharacterEntity targetCharacter)
+        {
+            if (targetCharacter == null)
+                return false;
+
+            if (monsterCharacter.IsSummoned)
+            {
+                // If summoned by someone, will have same allies with summoner
+                return targetCharacter == monsterCharacter.Summoner || targetCharacter.IsAlly(monsterCharacter.Summoner);
+            }
+
+            if (targetCharacter is BaseMonsterCharacterEntity)
+            {
+                // If another monster has same allyId so it is ally
+                BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
+                if (targetMonster != null)
+                {
+                    if (targetMonster.IsSummoned)
+                        return monsterCharacter.IsAlly(targetMonster.Summoner);
+                    return targetMonster.MonsterDatabase.allyId == monsterCharacter.MonsterDatabase.allyId;
+                }
+            }
+
+            return false;
+        }
+
+        protected override bool IsPlayerEnemy(BasePlayerCharacterEntity playerCharacter, BaseCharacterEntity targetCharacter)
+        {
+            if (targetCharacter == null)
+                return false;
+
+            if (targetCharacter is BasePlayerCharacterEntity)
+            {
+                BasePlayerCharacterEntity targetPlayer = targetCharacter as BasePlayerCharacterEntity;
+                switch (pvpMode)
+                {
+                    case PvpMode.Pvp:
+                        return targetPlayer.PartyId != playerCharacter.PartyId;
+                    case PvpMode.FactionPvp:
+                        return targetPlayer.FactionId != 0 && targetPlayer.FactionId != playerCharacter.FactionId;
+                    case PvpMode.GuildPvp:
+                        return targetPlayer.GuildId != playerCharacter.GuildId;
+                    default:
+                        return false;
+                }
+            }
+            if (targetCharacter is BaseMonsterCharacterEntity)
+            {
+                // If this character is not summoner so it is enemy
+                BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
+                return targetMonster.Summoner == null || targetMonster.Summoner != this;
+            }
+            return false;
+        }
+
+        protected override bool IsMonsterEnemy(BaseMonsterCharacterEntity monsterCharacter, BaseCharacterEntity targetCharacter)
+        {
+            if (targetCharacter == null)
+                return false;
+
+            if (monsterCharacter.IsSummoned)
+            {
+                // If summoned by someone, will have same enemies with summoner
+                return targetCharacter != monsterCharacter.Summoner && targetCharacter.IsEnemy(monsterCharacter.Summoner);
+            }
+
+            // Attack only player by default
+            return targetCharacter is BasePlayerCharacterEntity;
         }
     }
 
@@ -93,9 +186,7 @@ namespace MultiplayerARPG
     {
         [Tooltip("If this is not empty, character who have the same faction will respawn to this point")]
         public Faction forFaction;
-        public MapInfo respawnMapInfo;
+        public BaseMapInfo respawnMapInfo;
         public Vector3 respawnPosition;
     }
-
-
 }

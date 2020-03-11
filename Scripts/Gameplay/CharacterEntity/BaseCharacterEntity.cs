@@ -221,8 +221,7 @@ namespace MultiplayerARPG
             {
                 // Killing character when it fall below dead Y
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D &&
-                    BaseGameNetworkManager.CurrentMapInfo != null &&
-                    CacheTransform.position.y <= BaseGameNetworkManager.CurrentMapInfo.deadY)
+                    CurrentMapInfo != null && CacheTransform.position.y <= CurrentMapInfo.DeadY)
                 {
                     if (IsServer && !IsDead())
                     {
@@ -1190,8 +1189,16 @@ namespace MultiplayerARPG
             return !IsAlly(attacker.Entity as BaseCharacterEntity);
         }
 
+        public bool IsAlly(BaseCharacterEntity targetCharacter)
+        {
+            return CurrentMapInfo.IsAlly(this, targetCharacter);
+        }
+
+        public bool IsEnemy(BaseCharacterEntity targetCharacter)
+        {
+            return CurrentMapInfo.IsEnemy(this, targetCharacter);
+        }
+
         public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
-        public abstract bool IsAlly(BaseCharacterEntity characterEntity);
-        public abstract bool IsEnemy(BaseCharacterEntity characterEntity);
     }
 }

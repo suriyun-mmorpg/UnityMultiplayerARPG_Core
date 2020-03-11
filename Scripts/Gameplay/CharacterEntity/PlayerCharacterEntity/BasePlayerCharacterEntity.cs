@@ -66,64 +66,6 @@ namespace MultiplayerARPG
             CurrentGameManager.RespawnCharacter(this);
         }
 
-        public override bool IsAlly(BaseCharacterEntity characterEntity)
-        {
-            if (characterEntity == null)
-                return false;
-
-            if (characterEntity is BasePlayerCharacterEntity)
-            {
-                BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                switch (BaseGameNetworkManager.CurrentMapInfo.pvpMode)
-                {
-                    case PvpMode.Pvp:
-                        return playerCharacterEntity.PartyId == PartyId;
-                    case PvpMode.FactionPvp:
-                        return playerCharacterEntity.FactionId != 0 && playerCharacterEntity.FactionId == FactionId;
-                    case PvpMode.GuildPvp:
-                        return playerCharacterEntity.GuildId == GuildId;
-                    default:
-                        return false;
-                }
-            }
-            if (characterEntity is BaseMonsterCharacterEntity)
-            {
-                // If this character is summoner so it is ally
-                BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-                return monsterCharacterEntity.Summoner != null && monsterCharacterEntity.Summoner == this;
-            }
-            return false;
-        }
-
-        public override bool IsEnemy(BaseCharacterEntity characterEntity)
-        {
-            if (characterEntity == null)
-                return false;
-
-            if (characterEntity is BasePlayerCharacterEntity)
-            {
-                BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                switch (BaseGameNetworkManager.CurrentMapInfo.pvpMode)
-                {
-                    case PvpMode.Pvp:
-                        return playerCharacterEntity.PartyId != PartyId;
-                    case PvpMode.FactionPvp:
-                        return playerCharacterEntity.FactionId != 0 && playerCharacterEntity.FactionId != FactionId;
-                    case PvpMode.GuildPvp:
-                        return playerCharacterEntity.GuildId != GuildId;
-                    default:
-                        return false;
-                }
-            }
-            if (characterEntity is BaseMonsterCharacterEntity)
-            {
-                // If this character is not summoner so it is enemy
-                BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-                return monsterCharacterEntity.Summoner == null || monsterCharacterEntity.Summoner != this;
-            }
-            return false;
-        }
-
         public override sealed void Killed(IGameEntity lastAttacker)
         {
             float expLostPercentage = CurrentGameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);

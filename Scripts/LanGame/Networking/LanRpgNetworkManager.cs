@@ -178,7 +178,7 @@ namespace MultiplayerARPG
                 return;
             }
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
-                playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.startPosition;
+                playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.StartPosition;
             GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
@@ -276,7 +276,7 @@ namespace MultiplayerARPG
             }
 
             long connectionId = playerCharacterEntity.ConnectionId;
-            MapInfo mapInfo;
+            BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 playerCharacters.ContainsKey(connectionId) &&
                 playerCharacterEntity.IsServer &&
@@ -309,7 +309,7 @@ namespace MultiplayerARPG
                     // Destroy owning character to avoid save while warp
                     owningCharacter.NetworkDestroy();
                 }
-                ServerSceneChange(mapInfo.scene);
+                ServerSceneChange(mapInfo.Scene);
             }
         }
 

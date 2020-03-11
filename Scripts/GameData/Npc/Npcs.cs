@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct Npcs
     {
-        public MapInfo mapInfo;
+        public BaseMapInfo mapInfo;
         public Npc[] npcs;
     }
 }

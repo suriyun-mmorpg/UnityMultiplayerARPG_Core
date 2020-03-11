@@ -58,7 +58,7 @@ namespace MultiplayerARPG
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog craftCancelDialog;
         // Save Spawn Point
-        public MapInfo saveRespawnMap;
+        public BaseMapInfo saveRespawnMap;
         public Vector3 saveRespawnPosition;
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog saveRespawnConfirmDialog;
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
         public NpcDialog saveRespawnCancelDialog;
         // Warp
         public WarpPortalType warpPortalType;
-        public MapInfo warpMap;
+        public BaseMapInfo warpMap;
         public Vector3 warpPosition;
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog warpCancelDialog;

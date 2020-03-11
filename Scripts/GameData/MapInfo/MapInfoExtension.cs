@@ -5,15 +5,15 @@ namespace MultiplayerARPG
 {
     public static class MapInfoExtension
     {
-        public static bool IsSceneSet(this MapInfo mapInfo)
+        public static bool IsSceneSet(this BaseMapInfo mapInfo)
         {
-            return mapInfo != null && mapInfo.scene != null && mapInfo.scene.IsSet();
+            return mapInfo != null && mapInfo.Scene != null && mapInfo.Scene.IsSet();
         }
 
-        public static string GetSceneName(this MapInfo mapInfo)
+        public static string GetSceneName(this BaseMapInfo mapInfo)
         {
             if (mapInfo.IsSceneSet())
-                return mapInfo.scene.SceneName;
+                return mapInfo.Scene.SceneName;
             return string.Empty;
         }
     }

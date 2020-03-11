@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public bool warpImmediatelyWhenEnter;
         public WarpPortalType type;
         [Tooltip("Leave this empty to warp character to other position in the same map")]
-        public MapInfo mapInfo;
+        public BaseMapInfo mapInfo;
         public Vector3 position;
 
         protected override void EntityAwake()

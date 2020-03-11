@@ -193,48 +193,7 @@ namespace MultiplayerARPG
                 return MonsterDatabase.wanderMoveSpeed;
             return base.GetMoveSpeed();
         }
-
-        public override sealed bool IsAlly(BaseCharacterEntity characterEntity)
-        {
-            if (characterEntity == null)
-                return false;
-
-            if (IsSummoned)
-            {
-                // If summoned by someone, will have same allies with summoner
-                return characterEntity == Summoner || characterEntity.IsAlly(Summoner);
-            }
-
-            if (characterEntity is BaseMonsterCharacterEntity)
-            {
-                // If another monster has same allyId so it is ally
-                BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-                if (monsterCharacterEntity != null)
-                {
-                    if (monsterCharacterEntity.IsSummoned)
-                        return IsAlly(monsterCharacterEntity.Summoner);
-                    return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
-                }
-            }
-
-            return false;
-        }
-
-        public override sealed bool IsEnemy(BaseCharacterEntity characterEntity)
-        {
-            if (characterEntity == null)
-                return false;
-
-            if (IsSummoned)
-            {
-                // If summoned by someone, will have same enemies with summoner
-                return characterEntity != Summoner && characterEntity.IsEnemy(Summoner);
-            }
-
-            // Attack only player by default
-            return characterEntity is BasePlayerCharacterEntity;
-        }
-
+        
         public override void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))

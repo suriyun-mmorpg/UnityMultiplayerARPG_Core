@@ -245,6 +245,11 @@ namespace MultiplayerARPG
             get { return BaseGameNetworkManager.Singleton; }
         }
 
+        public BaseMapInfo CurrentMapInfo
+        {
+            get { return BaseGameNetworkManager.CurrentMapInfo; }
+        }
+
         public BaseGameEntity Entity
         {
             get { return this; }

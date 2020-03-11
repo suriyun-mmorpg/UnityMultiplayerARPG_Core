@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
         [FormerlySerializedAs("mountEntities")]
         public VehicleEntity[] vehicleEntities;
-        public MapInfo[] mapInfos;
+        public BaseMapInfo[] mapInfos;
         public Faction[] factions;
         
         public override void LoadData(GameInstance gameInstance)

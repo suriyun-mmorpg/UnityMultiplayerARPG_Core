@@ -27,8 +27,8 @@ namespace MultiplayerARPG
         public ItemAmount[] startItems;
 
         [Header("Start Map")]
-        public MapInfo startMap;
-        public MapInfo StartMap
+        public BaseMapInfo startMap;
+        public BaseMapInfo StartMap
         {
             get
             {

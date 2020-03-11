@@ -60,7 +60,7 @@ namespace MultiplayerARPG
         public static GuildData ClientGuild { get; protected set; }
         public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(1);
         public static readonly SocialGroupData ClientFriends = new SocialGroupData(1);
-        public static MapInfo CurrentMapInfo { get; protected set; }
+        public static BaseMapInfo CurrentMapInfo { get; protected set; }
         // Events
         public System.Action<ChatMessage> onClientReceiveChat;
         public System.Action<GameMessage> onClientReceiveGameMessage;
@@ -1001,7 +1001,7 @@ namespace MultiplayerARPG
                 SetMapInfo(GameInstance.MapInfos[mapId]);
         }
 
-        public void SetMapInfo(MapInfo mapInfo)
+        public void SetMapInfo(BaseMapInfo mapInfo)
         {
             if (mapInfo == null)
                 return;

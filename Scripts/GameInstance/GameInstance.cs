@@ -220,7 +220,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
-        public static readonly Dictionary<string, MapInfo> MapInfos = new Dictionary<string, MapInfo>();
+        public static readonly Dictionary<string, BaseMapInfo> MapInfos = new Dictionary<string, BaseMapInfo>();
         public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
 
         #region Cache Data
@@ -462,7 +462,7 @@ namespace MultiplayerARPG
         public List<string> GetGameMapIds()
         {
             List<string> mapIds = new List<string>();
-            foreach (MapInfo mapInfo in MapInfos.Values)
+            foreach (BaseMapInfo mapInfo in MapInfos.Values)
             {
                 if (mapInfo != null && !string.IsNullOrEmpty(mapInfo.Id) && !mapIds.Contains(mapInfo.Id))
                     mapIds.Add(mapInfo.Id);
@@ -844,11 +844,11 @@ namespace MultiplayerARPG
             AddNpcDialogs(npcDialogs);
         }
 
-        public static void AddMapInfos(IEnumerable<MapInfo> mapInfos)
+        public static void AddMapInfos(IEnumerable<BaseMapInfo> mapInfos)
         {
             if (mapInfos == null)
                 return;
-            foreach (MapInfo mapInfo in mapInfos)
+            foreach (BaseMapInfo mapInfo in mapInfos)
             {
                 if (mapInfo == null || MapInfos.ContainsKey(mapInfo.Id) || !mapInfo.IsSceneSet())
                     continue;

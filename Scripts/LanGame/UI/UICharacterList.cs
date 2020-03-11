@@ -175,9 +175,9 @@ namespace MultiplayerARPG
             LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
             if (!gameInstance.GetGameMapIds().Contains(characterData.CurrentMapName))
             {
-                MapInfo startMap = (characterData.GetDatabase() as PlayerCharacter).StartMap;
+                BaseMapInfo startMap = (characterData.GetDatabase() as PlayerCharacter).StartMap;
                 characterData.CurrentMapName = startMap.Id;
-                characterData.CurrentPosition = startMap.startPosition;
+                characterData.CurrentPosition = startMap.StartPosition;
             }
             networkManager.Assets.onlineScene.SceneName = GameInstance.MapInfos[characterData.CurrentMapName].GetSceneName();
             networkManager.selectedCharacter = characterData;

@@ -21,7 +21,7 @@ namespace MultiplayerARPG
             GuildSkill[] guildSkills = Resources.LoadAll<GuildSkill>("");
             PlayerCharacter[] playerCharacters = Resources.LoadAll<PlayerCharacter>("");
             MonsterCharacter[] monsterCharacters = Resources.LoadAll<MonsterCharacter>("");
-            MapInfo[] mapInfos = Resources.LoadAll<MapInfo>("");
+            BaseMapInfo[] mapInfos = Resources.LoadAll<BaseMapInfo>("");
             Faction[] factions = Resources.LoadAll<Faction>("");
             BaseCharacterEntity[] characterEntities = Resources.LoadAll<BaseCharacterEntity>("");
             VehicleEntity[] vehicleEntities = Resources.LoadAll<VehicleEntity>("");

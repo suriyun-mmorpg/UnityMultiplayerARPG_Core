@@ -253,11 +253,11 @@ public static partial class PlayerCharacterDataExtension
             }
         }
         // Position
-        MapInfo startMap = playerCharacter.StartMap;
+        BaseMapInfo startMap = playerCharacter.StartMap;
         character.CurrentMapName = startMap.Id;
         character.RespawnMapName = startMap.Id;
-        character.CurrentPosition = startMap.startPosition;
-        character.RespawnPosition = startMap.startPosition;
+        character.CurrentPosition = startMap.StartPosition;
+        character.RespawnPosition = startMap.StartPosition;
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId, entityId);
         return character;
     }
