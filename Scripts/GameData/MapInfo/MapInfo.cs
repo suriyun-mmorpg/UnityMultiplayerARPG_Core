@@ -38,16 +38,6 @@ namespace MultiplayerARPG
             }
         }
 
-        [Header("Deprecated")]
-        [Tooltip("This is deprecated, use `pvpMode`")]
-        public bool canPvp;
-        [Tooltip("This is deprecated, use `overrideRespawnPointMove`")]
-        public bool overrideRespawnPoint;
-        [Tooltip("This is deprecated, use `overrideRespawnPoints`")]
-        public BaseMapInfo overrideRespawnPointMap;
-        [Tooltip("This is deprecated, use `overrideRespawnPoints`")]
-        public Vector3 overrideRespawnPointPosition;
-
         public override void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position)
         {
             base.GetRespawnPoint(playerCharacterData, out mapName, out position);
