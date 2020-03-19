@@ -160,12 +160,14 @@ namespace MultiplayerARPG
         private void UpdateHotkeyMobileInputs()
         {
             bool isAnyHotkeyJoyStickDragging = false;
-            foreach (UICharacterHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
+            for (int i = 0; i < hotkeyJoysticks.Count; ++i)
             {
-                if (!hotkeyJoystick)
+                if (hotkeyJoysticks[i] == null)
                     continue;
-                hotkeyJoystick.UpdateEvent();
-                if (hotkeyJoystick.IsDragging)
+                hotkeyJoysticks[i].UpdateEvent();
+                if (UsingHotkey == hotkeyJoysticks[i].CacheHotkey)
+                    HotkeyAimPosition = hotkeyJoysticks[i].AimPosition;
+                if (hotkeyJoysticks[i].IsDragging)
                     isAnyHotkeyJoyStickDragging = true;
             }
 
@@ -199,7 +201,7 @@ namespace MultiplayerARPG
         {
             foreach (UICharacterHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
             {
-                if (!hotkeyJoystick)
+                if (hotkeyJoystick == null)
                     continue;
                 if (hotkeyJoystick.IsDragging)
                     return true;
