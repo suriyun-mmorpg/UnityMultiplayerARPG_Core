@@ -27,6 +27,8 @@ namespace MultiplayerARPG
 
         public bool IsAlly(BaseCharacterEntity characterA, BaseCharacterEntity characterB)
         {
+            if (characterA == characterB)
+                return true;
             if (characterA is BasePlayerCharacterEntity)
                 return IsPlayerAlly(characterA as BasePlayerCharacterEntity, characterB);
             if (characterA is BaseMonsterCharacterEntity)
@@ -36,6 +38,8 @@ namespace MultiplayerARPG
 
         public bool IsEnemy(BaseCharacterEntity characterA, BaseCharacterEntity characterB)
         {
+            if (characterA == characterB)
+                return false;
             if (characterA is BasePlayerCharacterEntity)
                 return IsPlayerEnemy(characterA as BasePlayerCharacterEntity, characterB);
             if (characterA is BaseMonsterCharacterEntity)
