@@ -212,7 +212,9 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (!Application.isPlaying && dataId != name.GenerateHashId())
+            if (Application.isPlaying)
+                return;
+            if (dataId != name.GenerateHashId())
             {
                 dataId = name.GenerateHashId();
                 EditorUtility.SetDirty(this);
