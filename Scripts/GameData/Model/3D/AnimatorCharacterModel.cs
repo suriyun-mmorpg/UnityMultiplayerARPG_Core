@@ -406,7 +406,7 @@ namespace MultiplayerARPG
 
         public override void PlayMoveAnimation()
         {
-            if (!animator.gameObject.activeInHierarchy)
+            if (!animator.isActiveAndEnabled)
                 return;
 
             if (animator.runtimeAnimatorController != CacheAnimatorController)
