@@ -519,7 +519,7 @@ namespace MultiplayerARPG
         #region Update Animation Functions
         private void UpdateAnimation_Animator()
         {
-            if (!animator.gameObject.activeInHierarchy)
+            if (!animator.isActiveAndEnabled)
                 return;
 
             if (animator.runtimeAnimatorController != CacheAnimatorController)
