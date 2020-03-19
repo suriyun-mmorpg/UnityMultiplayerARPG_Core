@@ -156,6 +156,8 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
+            if (Application.isPlaying)
+                return;
             ModelManager = GetComponent<CharacterModelManager>();
             if (ModelManager == null)
                 ModelManager = gameObject.AddComponent<CharacterModelManager>();
