@@ -32,6 +32,7 @@ namespace MultiplayerARPG
 			}
 		}
         public short Level { get { return (short)(CharacterItem != null ? CharacterItem.level : 1); } }
+        public short Amount { get { return (short)(CharacterItem != null ? CharacterItem.amount : 0); } }
 
         public UICharacterItem uiCharacterItem;
         [Tooltip("These objects will be activated while item is not set")]

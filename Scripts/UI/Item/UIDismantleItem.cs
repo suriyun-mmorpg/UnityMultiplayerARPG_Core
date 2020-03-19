@@ -44,6 +44,14 @@ namespace MultiplayerARPG
             }
 
             List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(CharacterItem);
+            // Multiplies with dismantle item amount
+            ItemAmount tempReturningItem;
+            for (int i = 0; i < returningItems.Count; ++i)
+            {
+                tempReturningItem = returningItems[i];
+                tempReturningItem.amount *= Amount;
+                returningItems[i] = tempReturningItem;
+            }
             if (uiReturnItems != null)
             {
                 if (CharacterItem.IsEmptySlot() || returningItems.Count == 0)
@@ -70,7 +78,7 @@ namespace MultiplayerARPG
                 {
                     uiTextReturnGold.text = string.Format(
                             LanguageManager.GetText(formatKeyReturnGold),
-                            CharacterItem.GetItem().DismantleReturnGold.ToString("N0"));
+                            (CharacterItem.GetItem().DismantleReturnGold * Amount).ToString("N0"));
                 }
             }
         }
