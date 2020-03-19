@@ -695,7 +695,7 @@ namespace MultiplayerARPG
             doNotEnterGameOnConnect = false;
             Assets.offlineScene.SceneName = CurrentGameInstance.HomeSceneName;
             Assets.playerPrefab = null;
-            List<LiteNetLibIdentity> spawnablePrefabs = new List<LiteNetLibIdentity>(Assets.spawnablePrefabs);
+            HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             if (CurrentGameInstance.itemDropEntityPrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.itemDropEntityPrefab.Identity);
             if (CurrentGameInstance.warpPortalEntityPrefab != null)
@@ -720,7 +720,8 @@ namespace MultiplayerARPG
             {
                 spawnablePrefabs.Add(entry.Identity);
             }
-            Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
+            Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
+            spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
             this.InvokeInstanceDevExtMethods("Init");
         }
 
