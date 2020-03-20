@@ -75,6 +75,7 @@ public class CharacterItem : INetSerializableWithElement
         {
             dirtyDataId = dataId;
             cacheItem = null;
+            cacheUsableItem = null;
             cacheEquipmentItem = null;
             cacheDefendItem = null;
             cacheArmorItem = null;
