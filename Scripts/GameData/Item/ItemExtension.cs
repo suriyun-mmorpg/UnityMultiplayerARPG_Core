@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public static bool IsUsable<T>(this T item)
             where T : IItem
         {
-            return item.IsPotion() || item.IsPet() || item.IsMount() || item.IsSkill();
+            return item.IsPotion() || item.IsBuilding() || item.IsPet() || item.IsMount() || item.IsSkill() ;
         }
 
         public static bool IsJunk<T>(this T item)
