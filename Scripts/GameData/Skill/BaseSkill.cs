@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseSkill : BaseGameData
+    public abstract partial class BaseSkill : BaseGameData, ICustomAimController
     {
         [Header("Skill Configs")]
         [Range(1, 100)]
@@ -158,8 +158,8 @@ namespace MultiplayerARPG
         public virtual bool RequiredTarget() { return false; }
         public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel) { return false; }
         public virtual bool HasCustomAimControls() { return false; }
-        public virtual Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel) { return null; }
-        public virtual void FinishAimControls() { }
+        public virtual Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data) { return null; }
+        public virtual void FinishAimControls(bool isCancel) { }
         public virtual short GetUseAmmoAmount() { return 0; }
         public virtual Buff GetBuff() { return new Buff(); }
         public virtual Buff GetDebuff() { return new Buff(); }
