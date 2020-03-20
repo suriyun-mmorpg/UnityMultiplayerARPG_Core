@@ -576,5 +576,60 @@ namespace MultiplayerARPG
 
             character.ResetSkills(itemIndex);
         }
+
+        public bool HasCustomAimControls()
+        {
+            switch (itemType)
+            {
+                case LegacyItemType.Potion:
+                    return false;
+                case LegacyItemType.Building:
+                    return true;
+                case LegacyItemType.Pet:
+                    return false;
+                case LegacyItemType.Mount:
+                    return false;
+                case LegacyItemType.Skill:
+                    return skillLevel.skill.HasCustomAimControls();
+            }
+            return false;
+        }
+
+        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        {
+            switch (itemType)
+            {
+                case LegacyItemType.Potion:
+                    return null;
+                case LegacyItemType.Building:
+                    return BasePlayerCharacterController.Singleton.UpdateBuildAimControls(aimAxes, BuildingEntity);
+                case LegacyItemType.Pet:
+                    return null;
+                case LegacyItemType.Mount:
+                    return null;
+                case LegacyItemType.Skill:
+                    return UsingSkill.UpdateAimControls(aimAxes, UsingSkillLevel);
+            }
+            return null;
+        }
+
+        public void FinishAimControls(bool isCancel)
+        {
+            switch (itemType)
+            {
+                case LegacyItemType.Potion:
+                    break;
+                case LegacyItemType.Building:
+                    BasePlayerCharacterController.Singleton.FinishBuildAimControls(isCancel);
+                    break;
+                case LegacyItemType.Pet:
+                    break;
+                case LegacyItemType.Mount:
+                    break;
+                case LegacyItemType.Skill:
+                    skillLevel.skill.FinishAimControls(isCancel);
+                    break;
+            }
+        }
     }
 }

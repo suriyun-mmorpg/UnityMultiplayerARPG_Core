@@ -43,5 +43,20 @@ namespace MultiplayerARPG
             newSummon.Summon(characterEntity, characterItem.level, 0f, characterItem.exp);
             characterEntity.Summons.Add(newSummon);
         }
+
+        public bool HasCustomAimControls()
+        {
+            return false;
+        }
+
+        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        {
+            return null;
+        }
+
+        public void FinishAimControls(bool isCancel)
+        {
+
+        }
     }
 }

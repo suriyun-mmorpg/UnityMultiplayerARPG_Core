@@ -28,5 +28,20 @@ namespace MultiplayerARPG
         {
             // TODO: May changes this function later.
         }
+
+        public bool HasCustomAimControls()
+        {
+            return true;
+        }
+
+        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        {
+            return BasePlayerCharacterController.Singleton.UpdateBuildAimControls(aimAxes, BuildingEntity);
+        }
+
+        public void FinishAimControls(bool isCancel)
+        {
+            BasePlayerCharacterController.Singleton.FinishBuildAimControls(isCancel);
+        }
     }
 }

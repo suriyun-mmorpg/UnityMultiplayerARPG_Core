@@ -35,5 +35,20 @@ namespace MultiplayerARPG
         {
             // TODO: May changes this function later.
         }
+
+        public bool HasCustomAimControls()
+        {
+            return UsingSkill.HasCustomAimControls();
+        }
+
+        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        {
+            return UsingSkill.UpdateAimControls(aimAxes, UsingSkillLevel);
+        }
+
+        public void FinishAimControls(bool isCancel)
+        {
+            UsingSkill.FinishAimControls(isCancel);
+        }
     }
 }

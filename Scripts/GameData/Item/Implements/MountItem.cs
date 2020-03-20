@@ -31,5 +31,20 @@ namespace MultiplayerARPG
 
             characterEntity.Mount(MountEntity);
         }
+
+        public bool HasCustomAimControls()
+        {
+            return false;
+        }
+
+        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        {
+            return null;
+        }
+
+        public void FinishAimControls(bool isCancel)
+        {
+
+        }
     }
 }
