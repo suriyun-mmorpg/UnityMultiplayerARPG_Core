@@ -78,7 +78,6 @@ namespace MultiplayerARPG
         public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
         public BaseUISceneGameplay CacheUISceneGameplay { get; protected set; }
         public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
-        protected int buildingItemIndex;
         public BaseGameEntity SelectedEntity { get; protected set; }
         public BaseGameEntity TargetEntity { get; protected set; }
         public BuildingEntity ConstructingBuildingEntity { get; protected set; }
@@ -92,6 +91,7 @@ namespace MultiplayerARPG
             }
         }
         public bool IsEditingBuilding { get; protected set; }
+        protected int buildingItemIndex;
         protected UsingSkillData queueUsingSkill;
 
         protected virtual void Awake()
@@ -164,11 +164,23 @@ namespace MultiplayerARPG
                     parentObjectId = ConstructingBuildingEntity.BuildingArea.GetObjectId();
                 PlayerCharacterEntity.RequestBuild((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
             }
-            Destroy(ConstructingBuildingEntity.gameObject);
-            ConstructingBuildingEntity = null;
+            DestroyConstructingBuilding();
         }
 
         public virtual void CancelBuild()
+        {
+            DestroyConstructingBuilding();
+        }
+
+        public virtual BuildingEntity InstantiateConstructingBuilding(BuildingEntity prefab)
+        {
+            ConstructingBuildingEntity = Instantiate(prefab);
+            ConstructingBuildingEntity.SetupAsBuildMode();
+            ConstructingBuildingEntity.CacheTransform.parent = null;
+            return ConstructingBuildingEntity;
+        }
+
+        public virtual void DestroyConstructingBuilding()
         {
             if (ConstructingBuildingEntity == null)
                 return;
@@ -326,5 +338,7 @@ namespace MultiplayerARPG
         }
 
         public abstract void UseHotkey(int hotkeyIndex, Vector3? aimPosition);
+        public abstract Vector3? UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab);
+        public abstract void FinishBuildAimControls(bool isCancel);
     }
 }

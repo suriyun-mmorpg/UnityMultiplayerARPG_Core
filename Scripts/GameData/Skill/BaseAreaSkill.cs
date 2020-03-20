@@ -45,14 +45,15 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override Vector3? UpdateAimControls(Vector2 aimAxes, short skillLevel)
+        public override Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
+            short skillLevel = (short)data[0];
             if (BasePlayerCharacterController.Singleton is ShooterPlayerCharacterController)
                 return AreaSkillControls.UpdateAimControls_Shooter(aimAxes, this, skillLevel, CacheTargetObject);
             return AreaSkillControls.UpdateAimControls(aimAxes, this, skillLevel, CacheTargetObject);
         }
 
-        public override void FinishAimControls()
+        public override void FinishAimControls(bool isCancel)
         {
             if (CacheTargetObject != null)
                 CacheTargetObject.SetActive(false);

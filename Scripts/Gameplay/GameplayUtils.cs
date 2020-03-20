@@ -6,6 +6,77 @@ namespace MultiplayerARPG
 {
     public static class GameplayUtils
     {
+        public static Vector3 CursorWorldPosition(Camera camera, Vector3 cursorPosition)
+        {
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
+            {
+                RaycastHit tempHit;
+                if (Physics.Raycast(camera.ScreenPointToRay(cursorPosition), out tempHit))
+                {
+                    return tempHit.point;
+                }
+            }
+            return camera.ScreenToWorldPoint(cursorPosition);
+        }
+
+        public static Vector3 FindGround(Vector3 cursorPosition, float detectionDistance, int layerMask)
+        {
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
+                return cursorPosition;
+            // Raycast to find hit floor
+            Vector3? aboveHitPoint = null;
+            Vector3? underHitPoint = null;
+            RaycastHit tempHit;
+            if (Physics.Raycast(cursorPosition, Vector3.up, out tempHit, detectionDistance, layerMask))
+                aboveHitPoint = tempHit.point;
+            if (Physics.Raycast(cursorPosition, Vector3.down, out tempHit, detectionDistance, layerMask))
+                underHitPoint = tempHit.point;
+            // Set drop position to nearest hit point
+            if (aboveHitPoint.HasValue && underHitPoint.HasValue)
+            {
+                if (Vector3.Distance(cursorPosition, aboveHitPoint.Value) < Vector3.Distance(cursorPosition, underHitPoint.Value))
+                    cursorPosition = aboveHitPoint.Value;
+                else
+                    cursorPosition = underHitPoint.Value;
+            }
+            else if (aboveHitPoint.HasValue)
+                cursorPosition = aboveHitPoint.Value;
+            else if (underHitPoint.HasValue)
+                cursorPosition = underHitPoint.Value;
+            return cursorPosition;
+        }
+
+        public static Vector3 ClampPosition(Vector3 centerPosition, Vector3 validatingPosition, float distance)
+        {
+            Vector3 offset = validatingPosition - centerPosition;
+            return centerPosition + Vector3.ClampMagnitude(offset, distance);
+        }
+
+        public static Vector3 GetDirectionByAxes(Transform cameraTransform, float xAxis, float yAxis)
+        {
+            Vector3 aimDirection = Vector3.zero;
+            switch (GameInstance.Singleton.DimensionType)
+            {
+                case DimensionType.Dimension3D:
+                    Vector3 forward = cameraTransform.forward;
+                    Vector3 right = cameraTransform.right;
+                    forward.y = 0f;
+                    right.y = 0f;
+                    forward.Normalize();
+                    right.Normalize();
+                    aimDirection += forward * yAxis;
+                    aimDirection += right * xAxis;
+                    // normalize input if it exceeds 1 in combined length:
+                    if (aimDirection.sqrMagnitude > 1)
+                        aimDirection.Normalize();
+                    break;
+                case DimensionType.Dimension2D:
+                    aimDirection = new Vector2(xAxis, yAxis);
+                    break;
+            }
+            return aimDirection;
+        }
+
         public static DirectionType2D GetDirectionTypeByVector2(Vector2 direction)
         {
             float absX = Mathf.Abs(direction.x);

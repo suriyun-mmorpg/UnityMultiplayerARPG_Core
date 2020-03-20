@@ -13,7 +13,9 @@ namespace MultiplayerARPG
         public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
         {
             // Spawn area entity
-            aimPosition = AreaSkillControls.FindGround(AreaSkillControls.ValidateDistance(skillUser.CacheTransform.position, aimPosition, castDistance.GetAmount(skillLevel)));
+            aimPosition = GameplayUtils.FindGround(GameplayUtils.ClampPosition(skillUser.CacheTransform.position, aimPosition, castDistance.GetAmount(skillLevel)),
+                AreaSkillControls.GROUND_DETECTION_DISTANCE,
+                GameInstance.Singleton.GetMonsterSpawnGroundDetectionLayerMask());
             AreaBuffEntity buffEntity = Instantiate(areaBuffEntity, aimPosition, skillUser.GetSummonRotation());
             buffEntity.Setup(skillUser, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }

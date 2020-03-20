@@ -134,7 +134,7 @@ namespace MultiplayerARPG
             // Cancel old using hotkey
             if (UsingHotkey != null)
             {
-                UsingHotkey.FinishAimControls();
+                UsingHotkey.FinishAimControls(true);
                 UsingHotkey = null;
                 HotkeyAimPosition = null;
             }
@@ -175,13 +175,13 @@ namespace MultiplayerARPG
                 hotkeyCancelArea.gameObject.SetActive(isAnyHotkeyJoyStickDragging);
         }
 
-        public void FinishHotkeyAimControls(bool hotkeyCancel)
+        public void FinishHotkeyAimControls(bool isCancel)
         {
             if (UsingHotkey == null)
                 return;
 
-            UsingHotkey.FinishAimControls();
-            if (!hotkeyCancel)
+            UsingHotkey.FinishAimControls(isCancel);
+            if (!isCancel)
             {
                 // Use hotkey
                 UsingHotkey.Use(HotkeyAimPosition);

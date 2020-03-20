@@ -17,9 +17,10 @@ namespace MultiplayerARPG
         public UICharacterSkill uiCharacterSkill;
         public UICharacterItem uiCharacterItem;
         public KeyCode key;
-        
-        private BaseSkill hotkeySkill;
-        private short hotkeySkillLevel;
+
+        private IUsableItem usingItem;
+        private BaseSkill usingSkill;
+        private short usingSkillLevel;
 
         public void Setup(UICharacterHotkeys uiCharacterHotkeys, UICharacterHotkeyAssigner uiCharacterHotkeyAssigner, CharacterHotkey data, int indexOfData)
         {
@@ -53,8 +54,9 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            hotkeySkill = null;
-            hotkeySkillLevel = 0;
+            usingItem = null;
+            usingSkill = null;
+            usingSkillLevel = 0;
 
             if (uiCharacterSkill == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterSkillPrefab != null)
             {
@@ -75,8 +77,8 @@ namespace MultiplayerARPG
                 // All skills included equipment skills
                 Dictionary<BaseSkill, short> skills = OwningCharacter.GetCaches().Skills;
 
-                if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.relateId), out hotkeySkill) ||
-                    hotkeySkill == null || !skills.TryGetValue(hotkeySkill, out hotkeySkillLevel))
+                if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.relateId), out usingSkill) ||
+                    usingSkill == null || !skills.TryGetValue(usingSkill, out usingSkillLevel))
                 {
                     uiCharacterSkill.Hide();
                 }
@@ -84,8 +86,8 @@ namespace MultiplayerARPG
                 {
                     // Found skill, so create new skill entry if it's not existed in learn skill list
                     int skillIndex = OwningCharacter.IndexOfSkill(BaseGameData.MakeDataId(Data.relateId));
-                    CharacterSkill characterSkill = skillIndex >= 0 ? OwningCharacter.Skills[skillIndex] : CharacterSkill.Create(hotkeySkill, hotkeySkillLevel);
-                    uiCharacterSkill.Setup(new UICharacterSkillData(characterSkill, hotkeySkillLevel), OwningCharacter, skillIndex);
+                    CharacterSkill characterSkill = skillIndex >= 0 ? OwningCharacter.Skills[skillIndex] : CharacterSkill.Create(usingSkill, usingSkillLevel);
+                    uiCharacterSkill.Setup(new UICharacterSkillData(characterSkill, usingSkillLevel), OwningCharacter, skillIndex);
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)
@@ -130,11 +132,7 @@ namespace MultiplayerARPG
                     uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), OwningCharacter, itemIndex);
                     uiCharacterItem.Show();
                     // Setup skill item
-                    if (characterItem.GetSkillItem() != null)
-                    {
-                        hotkeySkill = characterItem.GetSkillItem().UsingSkill;
-                        hotkeySkillLevel = characterItem.GetSkillItem().UsingSkillLevel;
-                    }
+                    usingItem = characterItem.GetUsableItem();
                     UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                     if (dragHandler != null)
                         dragHandler.SetupForHotkey(this);
@@ -144,19 +142,26 @@ namespace MultiplayerARPG
 
         public Vector3? UpdateAimControls(Vector2 axes)
         {
-            if (hotkeySkill != null && hotkeySkillLevel > 0 &&
-                hotkeySkill.IsActive() &&
-                hotkeySkill.HasCustomAimControls())
+            if (usingItem != null &&
+                usingItem.HasCustomAimControls())
             {
-                return hotkeySkill.UpdateAimControls(axes, hotkeySkillLevel);
+                return usingItem.UpdateAimControls(axes);
+            }
+            if (usingSkill != null && usingSkillLevel > 0 &&
+                usingSkill.IsActive() &&
+                usingSkill.HasCustomAimControls())
+            {
+                return usingSkill.UpdateAimControls(axes, usingSkillLevel);
             }
             return null;
         }
 
-        public void FinishAimControls()
+        public void FinishAimControls(bool isCancel)
         {
-            if (hotkeySkill != null)
-                hotkeySkill.FinishAimControls();
+            if (usingItem != null)
+                usingItem.FinishAimControls(isCancel);
+            if (usingSkill != null)
+                usingSkill.FinishAimControls(isCancel);
         }
 
         public void OnClickAssign()
@@ -182,10 +187,15 @@ namespace MultiplayerARPG
                 }
                 UICharacterHotkeys.SetUsingHotkey(null);
             }
-
-            if (hotkeySkill != null && hotkeySkillLevel > 0 &&
-                hotkeySkill.IsActive() &&
-                hotkeySkill.HasCustomAimControls())
+            
+            if (usingItem != null &&
+                usingItem.HasCustomAimControls())
+            {
+                UICharacterHotkeys.SetUsingHotkey(this);
+            }
+            else if (usingSkill != null && usingSkillLevel > 0 &&
+                usingSkill.IsActive() &&
+                usingSkill.HasCustomAimControls())
             {
                 UICharacterHotkeys.SetUsingHotkey(this);
             }
