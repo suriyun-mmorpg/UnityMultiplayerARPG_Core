@@ -17,7 +17,10 @@ namespace MultiplayerARPG
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
         public string buildingType;
         public List<string> buildingTypes;
-        public float characterForwardDistance = 4;
+        [Tooltip("This is a distance that allows a player to build the building")]
+        public float buildDistance = 5f;
+        [Tooltip("If this is value `TRUE`, this entity will be destroyed when its parent building entity was destroyed")]
+        public bool destroyWhenParentDestroyed;
         public int maxHp = 100;
         public List<ItemAmount> droppingItems;
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
@@ -340,7 +343,7 @@ namespace MultiplayerARPG
                 // Chain destroy
                 foreach (BuildingEntity child in children)
                 {
-                    if (child == null) continue;
+                    if (child == null || !child.destroyWhenParentDestroyed) continue;
                     child.Destroy();
                 }
                 children.Clear();

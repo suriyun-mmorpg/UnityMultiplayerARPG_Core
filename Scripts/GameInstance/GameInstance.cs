@@ -125,10 +125,8 @@ namespace MultiplayerARPG
         public float pickUpItemDistance = 1f;
         [Tooltip("This is a distance that random drop item around a player")]
         public float dropDistance = 1f;
-        [Tooltip("This is a distance that allows a player to converstion with NPC / send requests to other players")]
+        [Tooltip("This is a distance that allows players to start converstion with NPC, send requests to other player entities and activate an building entities")]
         public float conversationDistance = 1f;
-        [Tooltip("This is a distance that allows a player to builds an building")]
-        public float buildDistance = 10f;
         [Tooltip("This is a distance that other players will receives local chat")]
         public float localChatDistance = 10f;
         [Tooltip("This is a distance from controlling character that combat texts will instantiates")]

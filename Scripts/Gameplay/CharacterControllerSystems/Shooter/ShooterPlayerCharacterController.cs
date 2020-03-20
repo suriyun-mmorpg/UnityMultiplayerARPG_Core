@@ -1182,7 +1182,7 @@ namespace MultiplayerARPG
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
             // Default aim position (aim to sky/space)
-            aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + CurrentGameInstance.buildDistance);
+            aimPosition = centerRay.origin + centerRay.direction * (centerRayToCharacterDist + ConstructingBuildingEntity.buildDistance);
             // Raycast from camera position to center of screen
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, 100f, CurrentGameInstance.GetBuildLayerMask());
             float tempDistance;
@@ -1213,7 +1213,7 @@ namespace MultiplayerARPG
                 if (!buildingArea.snapBuildingObject)
                 {
                     // There is no snap build position, set building rotation by camera look direction
-                    ConstructingBuildingEntity.CacheTransform.position = GameplayUtils.ClampPosition(MovementTransform.position, aimPosition, CurrentGameInstance.buildDistance);
+                    ConstructingBuildingEntity.CacheTransform.position = GameplayUtils.ClampPosition(MovementTransform.position, aimPosition, ConstructingBuildingEntity.buildDistance);
                     // Rotate to camera
                     Vector3 direction = (aimPosition - CacheGameplayCameraTransform.position).normalized;
                     direction.y = 0;
@@ -1222,7 +1222,7 @@ namespace MultiplayerARPG
                 break;
             }
 
-            if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > CurrentGameInstance.buildDistance)
+            if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > ConstructingBuildingEntity.buildDistance)
             {
                 // Mark as unable to build when the building is far from character
                 ConstructingBuildingEntity.BuildingArea = null;
