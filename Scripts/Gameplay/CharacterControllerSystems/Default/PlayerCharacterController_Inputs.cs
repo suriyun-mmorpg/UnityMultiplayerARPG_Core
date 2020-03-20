@@ -131,6 +131,18 @@ namespace MultiplayerARPG
                     ReloadAmmo();
                 }
             }
+            else
+            {
+                // Rotate by keys
+                if (InputManager.GetButtonDown("RotateLeft"))
+                {
+                    ConstructingBuildingEntity.CacheTransform.eulerAngles -= Vector3.up * buildRotateAngle;
+                }
+                else if (InputManager.GetButtonDown("RotateRight"))
+                {
+                    ConstructingBuildingEntity.CacheTransform.eulerAngles += Vector3.up * buildRotateAngle;
+                }
+            }
             // Update enemy detecting radius to attack distance
             EnemyEntityDetector.detectingRadius = PlayerCharacterEntity.GetAttackDistance(false) + lockAttackTargetDistance;
             // Update inputs
@@ -909,6 +921,7 @@ namespace MultiplayerARPG
             // Instantiate constructing building
             if (ConstructingBuildingEntity == null)
                 InstantiateConstructingBuilding(prefab);
+            // Find position to place building
             if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
                 FindAndSetBuildingAreaByAxes(aimAxes);
             else

@@ -78,7 +78,7 @@ namespace MultiplayerARPG
                 }
 
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
-                ConstructingBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
+                ConstructingBuildingEntity.Position = GetBuildingPlacePosition(tempVector3);
                 return true;
             }
             return false;
