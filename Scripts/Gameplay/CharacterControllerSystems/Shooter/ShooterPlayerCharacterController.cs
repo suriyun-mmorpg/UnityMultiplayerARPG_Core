@@ -53,7 +53,9 @@ namespace MultiplayerARPG
         [SerializeField]
         private float findTargetRaycastDistance = 16f;
         [SerializeField]
-        private bool showConfirmConstructionUI;
+        private bool showConfirmConstructionUI = false;
+        [SerializeField]
+        private float buildRotateAngle = 45f;
         [SerializeField]
         private RectTransform crosshairRect;
 
@@ -194,6 +196,7 @@ namespace MultiplayerARPG
         bool toggleCrouchOn;
         bool toggleCrawlOn;
         ControllerViewMode? viewModeBeforeDead;
+        float buildYRotate;
         public BaseWeaponAbility WeaponAbility { get; private set; }
         public WeaponAbilityState WeaponAbilityState { get; private set; }
 
@@ -1178,7 +1181,15 @@ namespace MultiplayerARPG
         {
             // Instantiate constructing building
             if (ConstructingBuildingEntity == null)
+            {
                 InstantiateConstructingBuilding(prefab);
+                buildYRotate = 0f;
+            }
+            // Rotate by keys
+            if (InputManager.GetButtonDown("RotateLeft"))
+                buildYRotate -= buildRotateAngle;
+            else if (InputManager.GetButtonDown("RotateRight"))
+                buildYRotate += buildRotateAngle;
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
             // Default aim position (aim to sky/space)
@@ -1217,7 +1228,7 @@ namespace MultiplayerARPG
                     // Rotate to camera
                     Vector3 direction = (aimPosition - CacheGameplayCameraTransform.position).normalized;
                     direction.y = 0;
-                    ConstructingBuildingEntity.CacheTransform.rotation = Quaternion.LookRotation(direction);
+                    ConstructingBuildingEntity.CacheTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);
                 }
                 break;
             }
