@@ -22,8 +22,7 @@ namespace MultiplayerARPG
         
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
-
-        public float angularSpeed = 800f;
+        
         public PlayerCharacterControllerMode controllerMode;
         [Tooltip("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
         public bool wasdLockAttackTarget;
@@ -67,7 +66,6 @@ namespace MultiplayerARPG
         protected VehicleEntity targetVehicle;
         protected HarvestableEntity targetHarvestable;
         protected Quaternion tempLookAt;
-        protected Vector3? targetLookDirection;
         protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
         public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
         public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
@@ -173,7 +171,6 @@ namespace MultiplayerARPG
 
             UpdateInput();
             UpdateFollowTarget();
-            UpdateLookAtTarget();
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)

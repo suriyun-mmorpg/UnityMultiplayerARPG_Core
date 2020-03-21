@@ -326,7 +326,6 @@ namespace MultiplayerARPG
                         else
                         {
                             destination = targetPosition.Value;
-                            targetLookDirection = null;
                             PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
                         }
                     }
@@ -400,7 +399,6 @@ namespace MultiplayerARPG
             {
                 destination = null;
                 ClearTarget();
-                targetLookDirection = moveDirection;
             }
             // Always forward
             MovementState movementState = MovementState.Forward;
@@ -655,12 +653,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 // Turn character to attacking target
                 TurnCharacterToEntity(entity.Entity);
-                // Set direction to turn character to target, now use fov = 10, to make character always turn to target
-                if (PlayerCharacterEntity.IsPositionInFov(10f, entity.GetTransform().position))
-                {
-                    // Do action
-                    action.Invoke();
-                }
+                // Do action
+                action.Invoke();
             }
             else
             {
@@ -678,24 +672,20 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 // Turn character to attacking target
                 TurnCharacterToEntity(entity.Entity);
-                // Set direction to turn character to target, now use fov = 10, to make character always turn to target
-                if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() ||
-                    PlayerCharacterEntity.IsPositionInFov(10f, entity.GetTransform().position))
+                // Use the skill
+                if (queueUsingSkill.skill != null)
                 {
-                    if (queueUsingSkill.skill != null)
-                    {
-                        // Can use skill
-                        RequestUsePendingSkill();
-                        targetActionType = TargetActionType.Undefined;
-                        return;
-                    }
-                    else
-                    {
-                        // Can't use skill
-                        targetActionType = TargetActionType.Undefined;
-                        ClearQueueUsingSkill();
-                        return;
-                    }
+                    // Can use skill
+                    RequestUsePendingSkill();
+                    targetActionType = TargetActionType.Undefined;
+                    return;
+                }
+                else
+                {
+                    // Can't use skill
+                    targetActionType = TargetActionType.Undefined;
+                    ClearQueueUsingSkill();
+                    return;
                 }
             }
             else
@@ -722,23 +712,7 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return;
-            targetLookDirection = (entity.CacheTransform.position - MovementTransform.position).normalized;
-        }
-
-        public void UpdateLookAtTarget()
-        {
-            if (targetLookDirection.HasValue && Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection.Value) > 1)
-            {
-                // Update rotation when angle difference more than 1
-                tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection.Value), Time.deltaTime * angularSpeed);
-                PlayerCharacterEntity.SetLookRotation(tempLookAt);
-            }
-            else
-            {
-                // Update temp look at to character's rotation
-                tempLookAt = PlayerCharacterEntity.GetLookRotation();
-                targetLookDirection = null;
-            }
+            PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(entity.CacheTransform.position - MovementTransform.position).normalized);
         }
 
         public override void UseHotkey(int hotkeyIndex, Vector3? aimPosition)
