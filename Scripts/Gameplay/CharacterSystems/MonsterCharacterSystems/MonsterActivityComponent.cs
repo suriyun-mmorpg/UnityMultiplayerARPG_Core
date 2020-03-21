@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             float time = Time.unscaledTime;
             float deltaTime = Time.unscaledDeltaTime;
 
-            Vector3 currentPosition = CacheEntity.CacheTransform.position;
+            Vector3 currentPosition = CacheEntity.MovementTransform.position;
             if (CacheEntity.Summoner != null)
             {
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
@@ -135,13 +135,14 @@ namespace MultiplayerARPG
                 startedFollowEnemy = false;
                 CacheEntity.StopMove();
                 // Lookat target then do something when it's in range
+                CacheEntity.SetLookRotation(Quaternion.LookRotation(targetPosition - currentPosition).normalized);
                 Vector3 lookAtDirection = targetPosition - currentPosition;
                 lookAtDirection.Normalize();
                 if (lookAtDirection.sqrMagnitude > 0)
                 {
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                     {
-                        Quaternion currentLookAtRotation = CacheEntity.CacheTransform.rotation;
+                        Quaternion currentLookAtRotation = CacheEntity.GetLookRotation();
                         Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
                         lookRotationEuler.x = 0;
                         lookRotationEuler.z = 0;
@@ -178,7 +179,7 @@ namespace MultiplayerARPG
                 }
 
                 // Update destination if target's position changed
-                SetDestination(targetPosition);
+                SetDestination(targetPosition, attackDistance);
 
                 if (CacheEntity.Summoner == null)
                 {
@@ -191,10 +192,12 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void SetDestination(Vector3 destination)
+        public void SetDestination(Vector3 destination, float distance)
         {
+            Vector3 direction = (destination - CacheEntity.MovementTransform.position).normalized;
+            Vector3 position = destination - (direction * (distance - CacheEntity.StoppingDistance));
             CacheEntity.IsWandering = false;
-            CacheEntity.PointClickMovement(destination);
+            CacheEntity.PointClickMovement(position);
         }
 
         public void SetWanderDestination(Vector3 destination)
@@ -233,7 +236,7 @@ namespace MultiplayerARPG
                 randomPosition = CacheEntity.Summoner.GetSummonPosition();
 
             CacheEntity.SetTargetEntity(null);
-            SetDestination(randomPosition);
+            SetDestination(randomPosition, 0f);
         }
 
         /// <summary>
