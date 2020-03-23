@@ -310,20 +310,20 @@ namespace MultiplayerARPG
         public virtual uint RequestCashShopInfo(AckMessageCallback callback)
         {
             BaseAckMessage message = new BaseAckMessage();
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, message, callback);
+            return ClientSendRequest(MsgTypes.CashShopInfo, message, callback);
         }
 
         public virtual uint RequestCashPackageInfo(AckMessageCallback callback)
         {
             BaseAckMessage message = new BaseAckMessage();
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, message, callback);
+            return ClientSendRequest(MsgTypes.CashPackageInfo, message, callback);
         }
 
         public virtual uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
         {
             RequestCashShopBuyMessage message = new RequestCashShopBuyMessage();
             message.dataId = dataId;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, message, callback);
+            return ClientSendRequest(MsgTypes.CashShopBuy, message, callback);
         }
 
         public virtual uint RequestCashPackageBuyValidation(int dataId, string receipt, AckMessageCallback callback)
@@ -332,7 +332,7 @@ namespace MultiplayerARPG
             message.dataId = dataId;
             message.platform = Application.platform;
             message.receipt = receipt;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, message, callback);
+            return ClientSendRequest(MsgTypes.CashPackageBuyValidation, message, callback);
         }
 
         protected virtual void HandleGameMessageAtClient(LiteNetLibMessageHandler messageHandler)
@@ -363,28 +363,28 @@ namespace MultiplayerARPG
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCashShopInfoMessage message = messageHandler.ReadMessage<ResponseCashShopInfoMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCashShopBuyMessage message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCashPackageInfoMessage message = messageHandler.ReadMessage<ResponseCashPackageInfoMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCashPackageBuyValidationMessage message = messageHandler.ReadMessage<ResponseCashPackageBuyValidationMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleUpdatePartyMemberAtClient(LiteNetLibMessageHandler messageHandler)
