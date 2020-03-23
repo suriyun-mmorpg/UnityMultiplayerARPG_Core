@@ -9,12 +9,12 @@ namespace MultiplayerARPG
     {
         public void SendCreatePartyToClient(long connectionId, PartyData party)
         {
-            Server.SendCreateParty(connectionId, MsgTypes.UpdateParty, party.id, party.shareExp, party.shareItem, party.leaderId);
+            this.SendCreateParty(connectionId, MsgTypes.UpdateParty, party.id, party.shareExp, party.shareItem, party.leaderId);
         }
 
         public void SendChangePartyLeaderToClient(long connectionId, PartyData party)
         {
-            Server.SendChangePartyLeader(connectionId, MsgTypes.UpdateParty, party.id, party.leaderId);
+            this.SendChangePartyLeader(connectionId, MsgTypes.UpdateParty, party.id, party.leaderId);
         }
 
         public void SendChangePartyLeaderToClients(PartyData party)
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
 
         public void SendPartySettingToClient(long connectionId, PartyData party)
         {
-            Server.SendPartySetting(connectionId, MsgTypes.UpdateParty, party.id, party.shareExp, party.shareItem);
+            this.SendPartySetting(connectionId, MsgTypes.UpdateParty, party.id, party.shareExp, party.shareItem);
         }
 
         public void SendPartySettingToClients(PartyData party)
@@ -50,12 +50,12 @@ namespace MultiplayerARPG
 
         public void SendPartyTerminateToClient(long connectionId, int id)
         {
-            Server.SendPartyTerminate(connectionId, MsgTypes.UpdateParty, id);
+            this.SendPartyTerminate(connectionId, MsgTypes.UpdateParty, id);
         }
 
         public void SendAddPartyMemberToClient(long connectionId, int id, string characterId, string characterName, int dataId, short level)
         {
-            Server.SendAddSocialMember(connectionId, MsgTypes.UpdatePartyMember, id, characterId, characterName, dataId, level);
+            this.SendAddSocialMember(connectionId, MsgTypes.UpdatePartyMember, id, characterId, characterName, dataId, level);
         }
 
         public void SendAddPartyMembersToClient(long connectionId, PartyData party)
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
 
         public void SendUpdatePartyMemberToClient(long connectionId, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp)
         {
-            Server.SendUpdateSocialMember(connectionId, MsgTypes.UpdatePartyMember, id, isOnline, characterId, characterName, dataId, level, currentHp, maxHp, currentMp, maxMp);
+            this.SendUpdateSocialMember(connectionId, MsgTypes.UpdatePartyMember, id, isOnline, characterId, characterName, dataId, level, currentHp, maxHp, currentMp, maxMp);
         }
 
         public void SendUpdatePartyMembersToClient(long connectionId, PartyData party)
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
 
         public void SendRemovePartyMemberToClient(long connectionId, int id, string characterId)
         {
-            Server.SendRemoveSocialMember(connectionId, MsgTypes.UpdatePartyMember, id, characterId);
+            this.SendRemoveSocialMember(connectionId, MsgTypes.UpdatePartyMember, id, characterId);
         }
 
         public void SendRemovePartyMemberToClients(PartyData party, string characterId)
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
 
-            Server.SendCreateGuild(connectionId, MsgTypes.UpdateGuild, guild.id, guild.guildName, guild.leaderId);
+            this.SendCreateGuild(connectionId, MsgTypes.UpdateGuild, guild.id, guild.guildName, guild.leaderId);
         }
 
         public void SendChangeGuildLeaderToClient(long connectionId, GuildData guild)
@@ -123,7 +123,7 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
 
-            Server.SendChangeGuildLeader(connectionId, MsgTypes.UpdateGuild, guild.id, guild.leaderId);
+            this.SendChangeGuildLeader(connectionId, MsgTypes.UpdateGuild, guild.id, guild.leaderId);
         }
 
         public void SendChangeGuildLeaderToClients(GuildData guild)
@@ -144,7 +144,7 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
 
-            Server.SendSetGuildMessage(connectionId, MsgTypes.UpdateGuild, guild.id, guild.guildMessage);
+            this.SendSetGuildMessage(connectionId, MsgTypes.UpdateGuild, guild.id, guild.guildMessage);
         }
 
         public void SendSetGuildMessageToClients(GuildData guild)
@@ -162,7 +162,7 @@ namespace MultiplayerARPG
 
         public void SendSetGuildRoleToClient(long connectionId, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            Server.SendSetGuildRole(connectionId, MsgTypes.UpdateGuild, id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
+            this.SendSetGuildRole(connectionId, MsgTypes.UpdateGuild, id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
         }
 
         public void SendSetGuildRoleToClients(GuildData guild, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
@@ -194,7 +194,7 @@ namespace MultiplayerARPG
 
         public void SendSetGuildMemberRoleToClient(long connectionId, int id, string characterId, byte guildRole)
         {
-            Server.SendSetGuildMemberRole(connectionId, MsgTypes.UpdateGuild, id, characterId, guildRole);
+            this.SendSetGuildMemberRole(connectionId, MsgTypes.UpdateGuild, id, characterId, guildRole);
         }
 
         public void SendSetGuildMemberRoleToClients(GuildData guild, string characterId, byte guildRole)
@@ -225,12 +225,12 @@ namespace MultiplayerARPG
 
         public void SendGuildTerminateToClient(long connectionId, int id)
         {
-            Server.SendGuildTerminate(connectionId, MsgTypes.UpdateGuild, id);
+            this.SendGuildTerminate(connectionId, MsgTypes.UpdateGuild, id);
         }
 
         public void SendAddGuildMemberToClient(long connectionId, int id, string characterId, string characterName, int dataId, short level)
         {
-            Server.SendAddSocialMember(connectionId, MsgTypes.UpdateGuildMember, id, characterId, characterName, dataId, level);
+            this.SendAddSocialMember(connectionId, MsgTypes.UpdateGuildMember, id, characterId, characterName, dataId, level);
         }
 
         public void SendAddGuildMembersToClient(long connectionId, GuildData guild)
@@ -259,7 +259,7 @@ namespace MultiplayerARPG
 
         public void SendUpdateGuildMemberToClient(long connectionId, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp)
         {
-            Server.SendUpdateSocialMember(connectionId, MsgTypes.UpdateGuildMember, id, isOnline, characterId, characterName, dataId, level, currentHp, maxHp, currentMp, maxMp);
+            this.SendUpdateSocialMember(connectionId, MsgTypes.UpdateGuildMember, id, isOnline, characterId, characterName, dataId, level, currentHp, maxHp, currentMp, maxMp);
         }
 
         public void SendUpdateGuildMembersToClient(long connectionId, GuildData guild)
@@ -275,7 +275,7 @@ namespace MultiplayerARPG
 
         public void SendRemoveGuildMemberToClient(long connectionId, int id, string characterId)
         {
-            Server.SendRemoveSocialMember(connectionId, MsgTypes.UpdateGuildMember, id, characterId);
+            this.SendRemoveSocialMember(connectionId, MsgTypes.UpdateGuildMember, id, characterId);
         }
 
         public void SendRemoveGuildMemberToClients(GuildData guild, string characterId)
@@ -290,7 +290,7 @@ namespace MultiplayerARPG
 
         public void SendSetGuildSkillLevelToClient(long connectionId, int id, int dataId, short level)
         {
-            Server.SendSetGuildSkillLevel(connectionId, MsgTypes.UpdateGuild, id, dataId, level);
+            this.SendSetGuildSkillLevel(connectionId, MsgTypes.UpdateGuild, id, dataId, level);
         }
 
         public void SendSetGuildSkillLevelsToClient(long connectionId, GuildData guild)
@@ -320,7 +320,7 @@ namespace MultiplayerARPG
 
         public void SendSetGuildGoldToClient(long connectionId, int id, int gold)
         {
-            Server.SendSetGuildGold(connectionId, MsgTypes.UpdateGuild, id, gold);
+            this.SendSetGuildGold(connectionId, MsgTypes.UpdateGuild, id, gold);
         }
 
         public void SendSetGuildGoldToClient(long connectionId, GuildData guild)
@@ -346,7 +346,7 @@ namespace MultiplayerARPG
 
         public void SendGuildLevelExpSkillPointToClient(long connectionId, GuildData guild)
         {
-            Server.SendGuildLevelExpSkillPoint(connectionId, MsgTypes.UpdateGuild, guild.id, guild.level, guild.exp, guild.skillPoint);
+            this.SendGuildLevelExpSkillPoint(connectionId, MsgTypes.UpdateGuild, guild.id, guild.level, guild.exp, guild.skillPoint);
         }
 
         public void SendGuildLevelExpSkillPointToClients(GuildData guild)
@@ -364,12 +364,12 @@ namespace MultiplayerARPG
 
         public void SendUpdateFoundCharactersToClient(long connectionId, SocialCharacterData[] members)
         {
-            Server.SendSocialMembers(connectionId, MsgTypes.UpdateFoundCharacters, members);
+            this.SendSocialMembers(connectionId, MsgTypes.UpdateFoundCharacters, members);
         }
 
         public void SendUpdateFriendsToClient(long connectionId, SocialCharacterData[] members)
         {
-            Server.SendSocialMembers(connectionId, MsgTypes.UpdateFriends, members);
+            this.SendSocialMembers(connectionId, MsgTypes.UpdateFriends, members);
         }
     }
 }

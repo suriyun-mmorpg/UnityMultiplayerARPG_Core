@@ -822,7 +822,7 @@ namespace MultiplayerARPG
                     level = playerCharacter.Level,
                 });
             }
-            Server.SendSocialMembers(playerCharacterEntity.ConnectionId, MsgTypes.UpdateFoundCharacters, socialCharacters.ToArray());
+            this.SendSocialMembers(playerCharacterEntity.ConnectionId, MsgTypes.UpdateFoundCharacters, socialCharacters.ToArray());
         }
 
         public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
