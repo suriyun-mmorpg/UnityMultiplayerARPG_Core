@@ -399,6 +399,7 @@ namespace MultiplayerARPG
             {
                 destination = null;
                 ClearTarget();
+                PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(moveDirection));
             }
             // Always forward
             MovementState movementState = MovementState.Forward;
