@@ -593,8 +593,10 @@ public static partial class CharacterDataExtension
         }
     }
 
-    public static void FillEmptySlots(this ICharacterData data)
+    public static void FillEmptySlots(this ICharacterData data, bool recacheStats = false)
     {
+        if (recacheStats)
+            data.MarkToMakeCaches();
         data.NonEquipItems.FillEmptySlots(GameInstance.Singleton.IsLimitInventorySlot, GameInstance.Singleton.GameplayRule.GetTotalSlot(data));
     }
 

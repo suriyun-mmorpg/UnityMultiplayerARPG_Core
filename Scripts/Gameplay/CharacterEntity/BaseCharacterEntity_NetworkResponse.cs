@@ -217,7 +217,7 @@ namespace MultiplayerARPG
                 else
                     NonEquipItems.RemoveAt(nonEquipIndex);
             }
-            this.FillEmptySlots();
+            this.FillEmptySlots(true);
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace MultiplayerARPG
                 else
                     NonEquipItems.RemoveAt(nonEquipIndex);
             }
-            this.FillEmptySlots();
+            this.FillEmptySlots(true);
         }
 
         protected virtual void NetFuncUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
@@ -326,7 +326,7 @@ namespace MultiplayerARPG
             if (unEquipItem.NotEmptySlot())
             {
                 this.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex);
-                this.FillEmptySlots();
+                this.FillEmptySlots(true);
             }
 
             return true;
@@ -368,7 +368,7 @@ namespace MultiplayerARPG
             if (unEquipItem.NotEmptySlot())
             {
                 this.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex);
-                this.FillEmptySlots();
+                this.FillEmptySlots(true);
             }
 
             return true;
