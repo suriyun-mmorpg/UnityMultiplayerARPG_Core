@@ -247,6 +247,11 @@ namespace MultiplayerARPG
             return moveSpeedRateWhileSwimming;
         }
 
+        public override float GetLimitWeight(ICharacterData character)
+        {
+            return character.GetCaches().Stats.weightLimit;
+        }
+
         public override float GetTotalWeight(ICharacterData character)
         {
             float result = character.EquipItems.GetTotalItemWeight() + character.NonEquipItems.GetTotalItemWeight();
@@ -259,9 +264,14 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public override short GetTotalSlot(ICharacterData character)
+        public override short GetLimitSlot(ICharacterData character)
         {
             return (short)(character.GetCaches().Stats.slotLimit + GameInstance.Singleton.baseSlotLimit);
+        }
+
+        public override short GetTotalSlot(ICharacterData character)
+        {
+            return character.NonEquipItems.GetTotalItemSlot();
         }
 
         public override bool IsHungry(BaseCharacterEntity character)

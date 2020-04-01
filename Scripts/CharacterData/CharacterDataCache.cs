@@ -30,13 +30,15 @@ namespace MultiplayerARPG
         public int MaxFood { get { return maxFood; } }
         private int maxWater;
         public int MaxWater { get { return maxWater; } }
-        private float totalItemWeight;
-        public float TotalItemWeight { get { return totalItemWeight; } }
         private float atkSpeed;
         public float AtkSpeed { get { return atkSpeed; } }
         private float moveSpeed;
         public float MoveSpeed { get { return moveSpeed; } }
         public float BaseMoveSpeed { get; private set; }
+        public float TotalItemWeight { get; private set; }
+        public short TotalItemSlot { get; private set; }
+        public float LimitItemWeight { get; private set; }
+        public short LimitItemSlot { get; private set; }
         public bool DisallowMove { get; private set; }
         public bool DisallowAttack { get; private set; }
         public bool DisallowUseSkill { get; private set; }
@@ -81,12 +83,16 @@ namespace MultiplayerARPG
                 out maxStamina,
                 out maxFood,
                 out maxWater,
-                out totalItemWeight,
                 out atkSpeed,
                 out moveSpeed);
 
             if (characterData.GetDatabase() != null)
                 BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;
+
+            TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData);
+            TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData);
+            LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData);
+            LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData);
 
             DisallowMove = false;
             DisallowAttack = false;

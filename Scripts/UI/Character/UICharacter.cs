@@ -19,6 +19,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
         public UILocaleKeySetting formatKeyWeightLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_WEIGHT);
+        [Tooltip("Format => {0} = {Current Total Slots}, {1} = {Slot Limit}")]
+        public UILocaleKeySetting formatKeySlotLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_SLOT);
         [Tooltip("Format => {0} = {Min Damage}, {1} = {Max Damage}")]
         public UILocaleKeySetting formatKeyWeaponDamage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_AMOUNT);
 
@@ -42,6 +44,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSkillPoint;
         public TextWrapper uiTextGold;
         public TextWrapper uiTextWeightLimit;
+        public TextWrapper uiTextSlotLimit;
         public TextWrapper uiTextWeaponDamages;
         public UIDamageElementAmounts uiRightHandDamages;
         public UIDamageElementAmounts uiLeftHandDamages;
@@ -266,7 +269,15 @@ namespace MultiplayerARPG
                 uiTextWeightLimit.text = string.Format(
                     LanguageManager.GetText(formatKeyWeightLimitStats),
                     Data.GetCaches().TotalItemWeight.ToString("N2"),
-                    Data.GetCaches().Stats.weightLimit.ToString("N2"));
+                    Data.GetCaches().LimitItemWeight.ToString("N2"));
+            }
+
+            if (uiTextSlotLimit != null)
+            {
+                uiTextSlotLimit.text = string.Format(
+                    LanguageManager.GetText(formatKeySlotLimitStats),
+                    Data.GetCaches().TotalItemSlot.ToString("N0"),
+                    Data.GetCaches().LimitItemSlot.ToString("N0"));
             }
 
             CharacterItem rightHandItem = Data.EquipWeapons.rightHand;

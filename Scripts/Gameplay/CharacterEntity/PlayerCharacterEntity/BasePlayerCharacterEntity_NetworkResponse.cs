@@ -266,10 +266,10 @@ namespace MultiplayerARPG
             if (tempNonEquipItems.IncreasingItemsWillOverwhelming(
                 returningItems,
                 true,
-                this.GetCaches().Stats.weightLimit,
-                CurrentGameInstance.GameplayRule.GetTotalWeight(this),
+                this.GetCaches().LimitItemWeight,
+                this.GetCaches().TotalItemWeight,
                 CurrentGameInstance.IsLimitInventorySlot,
-                CurrentGameInstance.GameplayRule.GetTotalSlot(this)))
+                this.GetCaches().LimitItemSlot))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
