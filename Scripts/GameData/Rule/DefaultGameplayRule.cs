@@ -247,12 +247,12 @@ namespace MultiplayerARPG
             return moveSpeedRateWhileSwimming;
         }
 
-        public override float GetLimitWeight(ICharacterData character)
+        public override float GetLimitWeight(ICharacterData character, CharacterStats stats)
         {
-            return character.GetCaches().Stats.weightLimit;
+            return stats.weightLimit;
         }
 
-        public override float GetTotalWeight(ICharacterData character)
+        public override float GetTotalWeight(ICharacterData character, CharacterStats stats)
         {
             float result = character.EquipItems.GetTotalItemWeight() + character.NonEquipItems.GetTotalItemWeight();
             // Weight from right hand equipment
@@ -264,12 +264,12 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public override short GetLimitSlot(ICharacterData character)
+        public override short GetLimitSlot(ICharacterData character, CharacterStats stats)
         {
-            return (short)(character.GetCaches().Stats.slotLimit + GameInstance.Singleton.baseSlotLimit);
+            return (short)(stats.slotLimit + GameInstance.Singleton.baseSlotLimit);
         }
 
-        public override short GetTotalSlot(ICharacterData character)
+        public override short GetTotalSlot(ICharacterData character, CharacterStats stats)
         {
             return character.NonEquipItems.GetTotalItemSlot();
         }

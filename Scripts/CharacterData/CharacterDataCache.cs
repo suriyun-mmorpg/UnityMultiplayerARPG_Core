@@ -89,10 +89,10 @@ namespace MultiplayerARPG
             if (characterData.GetDatabase() != null)
                 BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;
 
-            TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData);
-            TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData);
-            LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData);
-            LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData);
+            TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData, stats);
+            TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData, stats);
+            LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, stats);
+            LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, stats);
 
             DisallowMove = false;
             DisallowAttack = false;
