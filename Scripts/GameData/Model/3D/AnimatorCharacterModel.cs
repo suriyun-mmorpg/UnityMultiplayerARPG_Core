@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -125,9 +126,9 @@ namespace MultiplayerARPG
                     break;
             }
             if (animator == null)
-                Debug.LogError("[" + this + "] `Animator` is empty");
+                Logging.LogError(ToString(), "`Animator` is empty");
             if (animatorController == null)
-                Debug.LogError("[" + this + "] `Animator Controller` is empty");
+                Logging.LogError(ToString(), "`Animator Controller` is empty");
             if (hasChanges)
             {
                 isSetupComponent = false;
@@ -600,7 +601,7 @@ namespace MultiplayerARPG
             AnimationClip castClip = GetSkillCastClip(testCastSkillAnimDataId);
             CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
 
-            Debug.Log("[AnimatorCharacterModel] Animation Clips already set to animator controller, you can test an animations in Animation tab");
+            Logging.Log(ToString(), "Animation Clips already set to animator controller, you can test an animations in Animation tab");
 
             this.InvokeInstanceDevExtMethods("SetAnimatorClipsForTest");
         }

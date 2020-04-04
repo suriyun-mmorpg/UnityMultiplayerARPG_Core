@@ -821,7 +821,7 @@ namespace MultiplayerARPG
             float progress = 0f;
             // Spawn Warp Portals
             if (LogInfo)
-                Debug.Log("Spawning warp portals");
+                Logging.Log("Spawning warp portals");
             if (GameInstance.MapWarpPortals.Count > 0)
             {
                 List<WarpPortal> mapWarpPortals;
@@ -853,7 +853,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn Npcs
             if (LogInfo)
-                Debug.Log("Spawning NPCs");
+                Logging.Log("Spawning NPCs");
             if (GameInstance.MapNpcs.Count > 0)
             {
                 List<Npc> mapNpcs;
@@ -885,7 +885,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn monsters
             if (LogInfo)
-                Debug.Log("Spawning monsters");
+                Logging.Log("Spawning monsters");
             MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
             for (i = 0; i < monsterSpawnAreas.Length; ++i)
             {
@@ -899,7 +899,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn harvestables
             if (LogInfo)
-                Debug.Log("Spawning harvestables");
+                Logging.Log("Spawning harvestables");
             HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
             for (i = 0; i < harvestableSpawnAreas.Length; ++i)
             {
@@ -916,7 +916,7 @@ namespace MultiplayerARPG
                 SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
             {
                 if (LogInfo)
-                    Debug.Log("Spawning server character");
+                    Logging.Log("Spawning server character");
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab);
             }
             await Task.Yield();

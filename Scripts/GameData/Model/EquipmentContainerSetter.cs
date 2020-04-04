@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -12,7 +13,7 @@ namespace MultiplayerARPG
         {
             if (characterModel == null)
             {
-                Debug.LogWarning("[EquipmentModelContainerSetter] Cannot find character model");
+                Logging.LogWarning(ToString(), "Cannot find character model");
                 return;
             }
             bool hasChanges = false;

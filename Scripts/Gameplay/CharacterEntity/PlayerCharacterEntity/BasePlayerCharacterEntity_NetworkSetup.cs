@@ -173,7 +173,7 @@ namespace MultiplayerARPG
                         controller.PlayerCharacterEntity = this;
                     }
                     else
-                        Debug.LogWarning("[BasePlayerCharacterEntity] `controllerPrefab` is empty so it cannot be instantiated");
+                        Logging.LogWarning(ToString(), "`Controller Prefab` is empty so it cannot be instantiated");
                 }
                 if (CurrentGameInstance.owningCharacterObjects != null && CurrentGameInstance.owningCharacterObjects.Length > 0)
                 {

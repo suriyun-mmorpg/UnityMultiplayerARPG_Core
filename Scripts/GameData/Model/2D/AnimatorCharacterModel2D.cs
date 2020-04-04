@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
@@ -151,9 +152,9 @@ namespace MultiplayerARPG
                     break;
             }
             if (animator == null)
-                Debug.LogError("[" + this + "] `Animator` is empty");
+                Logging.LogError(ToString(), "`Animator` is empty");
             if (animatorController == null)
-                Debug.LogError("[" + this + "] `Animator Controller` is empty");
+                Logging.LogError(ToString(), "`Animator Controller` is empty");
             if (hasChanges)
             {
                 isSetupComponent = false;
@@ -535,7 +536,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_CAST_SKILL_UP_LEFT] = animation2D.upLeft;
             CacheAnimatorController[CLIP_CAST_SKILL_UP_RIGHT] = animation2D.upRight;
 
-            Debug.Log("[AnimatorCharacterModel2D] Animation Clips already set to animator controller, you can test an animations in Animation tab");
+            Logging.Log(ToString(), "Animation Clips already set to animator controller, you can test an animations in Animation tab");
 
             this.InvokeInstanceDevExtMethods("SetAnimatorClipsForTest");
         }

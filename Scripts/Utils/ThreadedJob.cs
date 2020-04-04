@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Threading;
-using UnityEngine;
+using LiteNetLibManager;
 
 public class ThreadedJob
 {
@@ -87,8 +87,8 @@ public class ThreadedJob
         }
         if (IsError)
         {
-            Debug.LogError("[ThreadedJob] Error occurs on " + GetType().Name);
-            Debug.LogException(Exception);
+            Logging.LogError("[ThreadedJob] Error occurs on " + GetType().Name);
+            Logging.LogException(Exception);
         }
     }
 

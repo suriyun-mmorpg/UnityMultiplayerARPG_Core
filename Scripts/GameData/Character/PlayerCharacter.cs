@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -68,7 +69,7 @@ namespace MultiplayerARPG
 
                 if (tempRightHandWeapon == null || tempRightHandWeapon.WeaponType == null)
                 {
-                    Debug.LogWarning("Right hand equipment is not weapon");
+                    Logging.LogWarning(ToString(), "Right hand equipment is not weapon");
                     rightHandEquipItem = null;
                     hasChanges = true;
                 }
@@ -82,7 +83,7 @@ namespace MultiplayerARPG
 
                 if ((tempLeftHandWeapon == null || tempLeftHandWeapon.WeaponType == null) && tempLeftHandShield == null)
                 {
-                    Debug.LogWarning("Left hand equipment is not weapon or shield");
+                    Logging.LogWarning(ToString(), "Left hand equipment is not weapon or shield");
                     leftHandEquipItem = null;
                     hasChanges = true;
                 }
@@ -90,13 +91,13 @@ namespace MultiplayerARPG
                 {
                     if (tempLeftHandShield != null && tempRightHandWeapon.EquipType == WeaponItemEquipType.TwoHand)
                     {
-                        Debug.LogWarning("Cannot set left hand equipment because it's equipping two hand weapon");
+                        Logging.LogWarning(ToString(), "Cannot set left hand equipment because it's equipping two hand weapon");
                         leftHandEquipItem = null;
                         hasChanges = true;
                     }
                     else if (tempLeftHandWeapon != null && tempRightHandWeapon.EquipType != WeaponItemEquipType.OneHandCanDual)
                     {
-                        Debug.LogWarning("Cannot set left hand equipment because it's equipping one hand weapon which cannot equip dual");
+                        Logging.LogWarning(ToString(), "Cannot set left hand equipment because it's equipping one hand weapon which cannot equip dual");
                         leftHandEquipItem = null;
                         hasChanges = true;
                     }
@@ -105,7 +106,7 @@ namespace MultiplayerARPG
                     (tempLeftHandWeapon.EquipType == WeaponItemEquipType.OneHand ||
                     tempLeftHandWeapon.EquipType == WeaponItemEquipType.TwoHand))
                 {
-                    Debug.LogWarning("Left hand weapon cannot be OneHand or TwoHand");
+                    Logging.LogWarning(ToString(), "Left hand weapon cannot be OneHand or TwoHand");
                     leftHandEquipItem = null;
                     hasChanges = true;
                 }

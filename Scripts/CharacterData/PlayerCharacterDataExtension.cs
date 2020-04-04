@@ -1,4 +1,5 @@
 ﻿using LiteNetLib.Utils;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
@@ -298,11 +299,11 @@ public static partial class PlayerCharacterDataExtension
         surrogateSelector.AddAllCharacterRelatesDataSurrogate();
         binaryFormatter.SurrogateSelector = surrogateSelector;
         string path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
-        Debug.Log("Character Saving to: " + path);
+        Logging.Log("Character Saving to: " + path);
         FileStream file = File.Open(path, FileMode.OpenOrCreate);
         binaryFormatter.Serialize(file, savingData);
         file.Close();
-        Debug.Log("Character Saved to: " + path);
+        Logging.Log("Character Saved to: " + path);
     }
 
     public static T LoadPersistentCharacterDataById<T>(this T characterData, string id) where T : IPlayerCharacterData
@@ -332,7 +333,7 @@ public static partial class PlayerCharacterDataExtension
         List<PlayerCharacterData> result = new List<PlayerCharacterData>();
         string path = Application.persistentDataPath;
         string[] files = Directory.GetFiles(path, "*.sav");
-        Debug.Log("Characters loading from: " + path);
+        Logging.Log("Characters loading from: " + path);
         PlayerCharacterData characterData;
         foreach (string file in files)
         {
@@ -342,7 +343,7 @@ public static partial class PlayerCharacterDataExtension
             characterData = new PlayerCharacterData();
             result.Add(characterData.LoadPersistentCharacterData(file));
         }
-        Debug.Log("Characters loaded from: " + path);
+        Logging.Log("Characters loaded from: " + path);
         return result;
     }
 
@@ -350,7 +351,7 @@ public static partial class PlayerCharacterDataExtension
     {
         if (string.IsNullOrEmpty(id))
         {
-            Debug.LogWarning("Cannot delete character: character id is empty");
+            Logging.LogWarning("Cannot delete character: character id is empty");
             return;
         }
         File.Delete(Application.persistentDataPath + "/" + id + ".sav");
@@ -360,7 +361,7 @@ public static partial class PlayerCharacterDataExtension
     {
         if (characterData == null)
         {
-            Debug.LogWarning("Cannot delete character: character data is empty");
+            Logging.LogWarning("Cannot delete character: character data is empty");
             return;
         }
         DeletePersistentCharacterData(characterData.Id);

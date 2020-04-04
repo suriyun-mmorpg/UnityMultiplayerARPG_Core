@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -47,7 +48,7 @@ namespace MultiplayerARPG
         {
             if (CacheGameInstance.newCharacterSetting ==  null)
             {
-                Debug.LogError("[GameInstanceTools] `newCharacterSetting` is null, cannot copy");
+                Logging.LogError(ToString(), "`New Character Setting` is null, cannot copy");
                 return;
             }
             CacheGameInstance.newCharacterSetting.startGold = CacheGameInstance.startGold;

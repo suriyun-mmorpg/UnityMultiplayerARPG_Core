@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace MultiplayerARPG
 {
@@ -57,7 +56,7 @@ namespace MultiplayerARPG
         {
             if (targetTransform == null)
             {
-                Debug.LogError("[" + this + "] `Target Transform` is empty");
+                Debug.LogError(ToString() + "`Target Transform` is empty");
                 return;
             }
             ApplyingSettings(ref standSettings);

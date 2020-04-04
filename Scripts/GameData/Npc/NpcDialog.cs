@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 using XNode;
 #if UNITY_EDITOR
@@ -149,7 +150,7 @@ namespace MultiplayerARPG
                     if (quest == null)
                     {
                         // Validate quest data
-                        Debug.LogWarning("[NpcDialog] Quest dialog's quest is empty");
+                        Logging.LogWarning(ToString(), "Quest dialog's quest is empty");
                         return false;
                     }
                     break;
@@ -157,7 +158,7 @@ namespace MultiplayerARPG
                     if (itemCraft.CraftingItem == null)
                     {
                         // Validate crafting item
-                        Debug.LogWarning("[NpcDialog] Item craft dialog's crafting item is empty");
+                        Logging.LogWarning(ToString(), "Item craft dialog's crafting item is empty");
                         return false;
                     }
                     break;
@@ -165,7 +166,7 @@ namespace MultiplayerARPG
                     if (saveRespawnMap == null)
                     {
                         // Validate quest data
-                        Debug.LogWarning("[NpcDialog] Save respawn point dialog's save respawn map is empty");
+                        Logging.LogWarning(ToString(), "Save respawn point dialog's save respawn map is empty");
                         return false;
                     }
                     break;
@@ -173,7 +174,7 @@ namespace MultiplayerARPG
                     if (warpMap == null)
                     {
                         // Validate quest data
-                        Debug.LogWarning("[NpcDialog] Warp dialog's warp map is empty");
+                        Logging.LogWarning(ToString(), "Warp dialog's warp map is empty");
                         return false;
                     }
                     break;

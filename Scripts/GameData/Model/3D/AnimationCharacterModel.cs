@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -44,7 +45,7 @@ namespace MultiplayerARPG
                     hasChanges = true;
             }
             if (legacyAnimation == null)
-                Debug.LogError("[" + this + "] `Legacy Animation` is empty");
+                Logging.LogError(ToString(), "`Legacy Animation` is empty");
             if (hasChanges)
             {
                 isSetupComponent = false;

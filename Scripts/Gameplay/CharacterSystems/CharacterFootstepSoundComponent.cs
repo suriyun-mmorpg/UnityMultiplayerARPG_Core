@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -61,7 +62,7 @@ namespace MultiplayerARPG
                 moveFootstepSettings.soundData.randomAudioClips == null || 
                 moveFootstepSettings.soundData.randomAudioClips.Length == 0))
             {
-                Debug.LogWarning("[CharacterFootstepSoundComponent] Migration run to setup old footstep settings to new footstep settings due to codes structure changes");
+                Logging.LogWarning(ToString(), "Migration run to setup old footstep settings to new footstep settings due to codes structure changes");
                 moveFootstepSettings = new FootstepSettings()
                 {
                     soundData = soundData,

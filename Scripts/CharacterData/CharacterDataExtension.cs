@@ -17,7 +17,7 @@ public static partial class CharacterDataExtension
         BaseCharacter database = null;
         if (!GameInstance.Characters.TryGetValue(data.DataId, out database))
         {
-            Debug.LogWarning("[GetDatabase] Cannot find character database with id: " + data.DataId);
+            Logging.LogWarning("[GetDatabase] Cannot find character database with id: " + data.DataId);
             return null;
         }
 
@@ -29,7 +29,7 @@ public static partial class CharacterDataExtension
         BaseCharacterEntity entityPrefab = null;
         if (!GameInstance.CharacterEntities.TryGetValue(data.EntityId, out entityPrefab))
         {
-            Debug.LogWarning("[GetEntityPrefab] Cannot find character entity with id: " + data.EntityId);
+            Logging.LogWarning("[GetEntityPrefab] Cannot find character entity with id: " + data.EntityId);
             return null;
         }
         return entityPrefab;
@@ -40,7 +40,7 @@ public static partial class CharacterDataExtension
         BaseCharacterEntity entityPrefab = data.GetEntityPrefab();
         if (entityPrefab == null)
         {
-            Debug.LogWarning("[InstantiateModel] Cannot find character entity with id: " + data.EntityId);
+            Logging.LogWarning("[InstantiateModel] Cannot find character entity with id: " + data.EntityId);
             return null;
         }
 

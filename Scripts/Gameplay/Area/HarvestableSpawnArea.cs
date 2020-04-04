@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -63,7 +64,7 @@ namespace MultiplayerARPG
             else
             {
                 ++pending;
-                Debug.LogWarning("[HarvestableSpawnArea(" + name + ")] Cannot spawn harvestable it is collided to another entities, pending harvestable amount " + pending);
+                Logging.LogWarning(ToString(), "Cannot spawn harvestable it is collided to another entities, pending harvestable amount " + pending);
             }
         }
 

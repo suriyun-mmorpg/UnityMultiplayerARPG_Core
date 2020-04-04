@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -201,7 +202,7 @@ namespace MultiplayerARPG
         {
             if (guildMemberRoles.Length < 2)
             {
-                Debug.LogWarning("[SocialSystemSetting] `guildMemberRoles` must more or equals to 2");
+                Logging.LogWarning(ToString(), "`Guild Member Roles` must more or equals to 2");
                 guildMemberRoles = new GuildRoleData[] {
                     guildMemberRoles[0],
                     new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },
@@ -210,7 +211,7 @@ namespace MultiplayerARPG
             }
             else if (guildMemberRoles.Length < 1)
             {
-                Debug.LogWarning("[SocialSystemSetting] `guildMemberRoles` must more or equals to 2");
+                Logging.LogWarning(ToString(), "`Guild Member Roles` must more or equals to 2");
                 guildMemberRoles = new GuildRoleData[] {
                     new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true },
                     new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },

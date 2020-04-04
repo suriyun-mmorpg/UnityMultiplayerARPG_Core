@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -102,7 +103,7 @@ namespace MultiplayerARPG
             {
                 mainModel = GetComponent<BaseCharacterModel>();
                 if (!mainModel)
-                    Debug.LogError("Can't find main model for [" + this + "]");
+                    Logging.LogError(ToString(), "Can't find main model");
                 hasChanges = mainModel;
             }
             return hasChanges;

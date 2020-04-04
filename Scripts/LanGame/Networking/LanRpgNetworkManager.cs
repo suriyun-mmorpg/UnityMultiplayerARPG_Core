@@ -155,7 +155,7 @@ namespace MultiplayerARPG
             if (!isReadyToInstantiatePlayers)
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
-                if (LogDev) Debug.Log("[LanRpgNetworkManager] Not ready to deserializing client ready extra");
+                if (LogDev) Logging.Log("[LanRpgNetworkManager] Not ready to deserializing client ready extra");
                 pendingSpawnPlayerCharacters.Add(new PendingSpawnPlayerCharacter()
                 {
                     connectionId = connectionId,
@@ -164,7 +164,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (LogDev) Debug.Log("[LanRpgNetworkManager] Deserializing client ready extra");
+            if (LogDev) Logging.Log("[LanRpgNetworkManager] Deserializing client ready extra");
             SpawnPlayerCharacter(connectionId, new PlayerCharacterData().DeserializeCharacterData(reader));
         }
 
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
             // If it is not allow this character data, disconnect user
             if (entityPrefab == null)
             {
-                Debug.LogError("[LanRpgNetworkManager] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
+                Logging.LogError("[LanRpgNetworkManager] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
             }
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
