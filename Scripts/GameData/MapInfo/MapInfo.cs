@@ -66,11 +66,11 @@ namespace MultiplayerARPG
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
-                        return targetPlayer.PartyId == playerCharacter.PartyId;
+                        return targetPlayer.PartyId != 0 && targetPlayer.PartyId == playerCharacter.PartyId;
                     case PvpMode.FactionPvp:
                         return targetPlayer.FactionId != 0 && targetPlayer.FactionId == playerCharacter.FactionId;
                     case PvpMode.GuildPvp:
-                        return targetPlayer.GuildId == playerCharacter.GuildId;
+                        return targetPlayer.GuildId != 0 && targetPlayer.GuildId == playerCharacter.GuildId;
                     default:
                         return false;
                 }
@@ -123,11 +123,11 @@ namespace MultiplayerARPG
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
-                        return targetPlayer.PartyId != playerCharacter.PartyId;
+                        return targetPlayer.PartyId == 0 || targetPlayer.PartyId != playerCharacter.PartyId;
                     case PvpMode.FactionPvp:
-                        return targetPlayer.FactionId != 0 && targetPlayer.FactionId != playerCharacter.FactionId;
+                        return targetPlayer.FactionId == 0 || targetPlayer.FactionId != playerCharacter.FactionId;
                     case PvpMode.GuildPvp:
-                        return targetPlayer.GuildId != playerCharacter.GuildId;
+                        return targetPlayer.GuildId == 0 || targetPlayer.GuildId != playerCharacter.GuildId;
                     default:
                         return false;
                 }
