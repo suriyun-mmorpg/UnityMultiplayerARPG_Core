@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -56,7 +57,7 @@ namespace MultiplayerARPG
         {
             if (targetTransform == null)
             {
-                Debug.LogError(ToString() + "`Target Transform` is empty");
+                Logging.LogError(ToString(), "`Target Transform` is empty");
                 return;
             }
             ApplyingSettings(ref standSettings);

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
@@ -62,7 +63,7 @@ namespace MultiplayerARPG
                 title = Metadata.localizedTitle;
             return title;
 #else
-            Debug.LogWarning("Cannot get IAP product title, Unity Purchasing is not enabled.");
+            Logging.LogWarning(ToString(), "Cannot get IAP product title, Unity Purchasing is not enabled.");
             return LanguageManager.GetUnknowTitle();
 #endif
         }
@@ -77,7 +78,7 @@ namespace MultiplayerARPG
                 description = Metadata.localizedDescription;
             return description;
 #else
-            Debug.LogWarning("Cannot get IAP product description, Unity Purchasing is not enabled.");
+            Logging.LogWarning(ToString(), "Cannot get IAP product description, Unity Purchasing is not enabled.");
             return "";
 #endif
         }
@@ -89,7 +90,7 @@ namespace MultiplayerARPG
                 return LanguageManager.GetUnknowDescription();
             return Metadata.localizedPrice.ToString("N0") + " " + Metadata.isoCurrencyCode;
 #else
-            Debug.LogWarning("Cannot get IAP product price, Unity Purchasing is not enabled.");
+            Logging.LogWarning(ToString(), "Cannot get IAP product price, Unity Purchasing is not enabled.");
             return LanguageManager.GetUnknowDescription();
 #endif
         }
