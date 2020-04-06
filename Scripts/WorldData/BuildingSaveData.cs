@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct BuildingSaveData : IBuildingSaveData
+public partial struct BuildingSaveData : IBuildingSaveData
 {
     public string id;
     public string parentId;
