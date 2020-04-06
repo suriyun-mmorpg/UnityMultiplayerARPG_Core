@@ -13,11 +13,15 @@ namespace MultiplayerARPG
         public string leaderId { get; protected set; }
 
         public static SocialSystemSetting SystemSetting { get { return GameInstance.Singleton.SocialSystemSetting; } }
-        
-        public SocialGroupData(int id)
+
+        public SocialGroupData()
+        {
+            members = new Dictionary<string, SocialCharacterData>();
+        }
+
+        public SocialGroupData(int id) : this()
         {
             this.id = id;
-            members = new Dictionary<string, SocialCharacterData>();
         }
 
         public SocialGroupData(int id, string leaderId) : this(id)

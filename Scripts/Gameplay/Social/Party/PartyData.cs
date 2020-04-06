@@ -1,11 +1,31 @@
 ﻿using System.Collections.Generic;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public sealed class PartyData : SocialGroupData
+    [System.Serializable]
+    public sealed class PartyData : SocialGroupData, INetSerializable
     {
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }
+
+        public PartyData()
+            : base()
+        {
+
+        }
+
+        public PartyData(int id)
+            : base(id)
+        {
+
+        }
+
+        public PartyData(int id, string leaderId)
+            : base(id, leaderId)
+        {
+
+        }
 
         public PartyData(int id, bool shareExp, bool shareItem, string leaderId)
             : base(id, leaderId)
@@ -70,6 +90,22 @@ namespace MultiplayerARPG
                 return true;
             else
                 return SystemSetting.PartyMemberCanKick;
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put(id);
+            writer.Put(leaderId);
+            writer.Put(shareExp);
+            writer.Put(shareItem);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            id = reader.GetInt();
+            leaderId = reader.GetString();
+            shareExp = reader.GetBool();
+            shareItem = reader.GetBool();
         }
     }
 }

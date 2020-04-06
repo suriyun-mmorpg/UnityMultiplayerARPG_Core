@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public sealed class GuildData : SocialGroupData
+    public sealed class GuildData : SocialGroupData, INetSerializable
     {
         public const byte LeaderRole = 0;
 
@@ -33,24 +34,43 @@ namespace MultiplayerARPG
             }
         }
 
-        public GuildData(int id, string guildName, string leaderId, GuildRoleData[] roles)
-            : base(id)
+        public GuildData()
+            : base()
         {
-            this.guildName = guildName;
             level = 1;
             exp = 0;
             skillPoint = 0;
             guildMessage = string.Empty;
-            this.roles = new List<GuildRoleData>(roles);
+            gold = 0;
             memberRoles = new Dictionary<string, byte>();
             skillLevels = new Dictionary<int, short>();
+            AddMember(new SocialCharacterData() { id = leaderId });
+        }
+
+        public GuildData(int id)
+            : this()
+        {
+            this.id = id;
+        }
+
+        public GuildData(int id, string leaderId)
+            : this(id)
+        {
             this.leaderId = leaderId;
             AddMember(new SocialCharacterData() { id = leaderId });
+        }
+
+        public GuildData(int id, string guildName, string leaderId, GuildRoleData[] roles)
+            : this(id, leaderId)
+        {
+            this.guildName = guildName;
+            this.roles = new List<GuildRoleData>(roles);
         }
 
         public GuildData(int id, string guildName, string leaderId)
             : this(id, guildName, leaderId, SystemSetting.GuildMemberRoles)
         {
+
         }
 
         public GuildData(int id, string guildName, BasePlayerCharacterEntity leaderCharacterEntity)
@@ -300,6 +320,28 @@ namespace MultiplayerARPG
         public int GetNextLevelExp()
         {
             return SystemSetting.GetNextLevelExp(level);
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put(id);
+            writer.Put(leaderId);
+            writer.Put(level);
+            writer.Put(exp);
+            writer.Put(skillPoint);
+            writer.Put(guildMessage);
+            writer.Put(gold);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            id = reader.GetInt();
+            leaderId = reader.GetString();
+            level = reader.GetShort();
+            exp = reader.GetInt();
+            skillPoint = reader.GetShort();
+            guildMessage = reader.GetString();
+            gold = reader.GetInt();
         }
     }
 }
