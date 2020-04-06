@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLib.Utils;
 
 [System.Serializable]
-public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
+public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData, INetSerializable
 {
     private int factionId;
     private short statPoint;
@@ -59,6 +60,16 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
             quests = new List<CharacterQuest>();
             quests.AddRange(value);
         }
+    }
+
+    public void Deserialize(NetDataReader reader)
+    {
+        this.DeserializeCharacterData(reader);
+    }
+
+    public void Serialize(NetDataWriter writer)
+    {
+        this.SerializeCharacterData(writer);
     }
 }
 

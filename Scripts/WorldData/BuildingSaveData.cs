@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLib.Utils;
 
 [System.Serializable]
-public partial struct BuildingSaveData : IBuildingSaveData
+public partial struct BuildingSaveData : IBuildingSaveData, INetSerializable
 {
     public string id;
     public string parentId;
@@ -81,5 +82,15 @@ public partial struct BuildingSaveData : IBuildingSaveData
     {
         get { return extraData; }
         set { extraData = value; }
+    }
+
+    public void Deserialize(NetDataReader reader)
+    {
+        this.DeserializeBuildingSaveData(reader);
+    }
+
+    public void Serialize(NetDataWriter writer)
+    {
+        this.SerializeBuildingSaveData(writer);
     }
 }
