@@ -452,109 +452,113 @@ public static partial class PlayerCharacterDataExtension
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SerializeCharacterData", characterData, writer);
     }
 
-    public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
+    public static PlayerCharacterData DeserializeCharacterData(NetDataReader reader)
     {
-        PlayerCharacterData tempCharacterData = new PlayerCharacterData();
-        tempCharacterData.Id = reader.GetString();
-        tempCharacterData.DataId = reader.GetPackedInt();
-        tempCharacterData.EntityId = reader.GetPackedInt();
-        tempCharacterData.FactionId = reader.GetPackedInt();
-        tempCharacterData.CharacterName = reader.GetString();
-        tempCharacterData.Level = reader.GetPackedShort();
-        tempCharacterData.Exp = reader.GetPackedInt();
-        tempCharacterData.CurrentHp = reader.GetPackedInt();
-        tempCharacterData.CurrentMp = reader.GetPackedInt();
-        tempCharacterData.CurrentStamina = reader.GetPackedInt();
-        tempCharacterData.CurrentFood = reader.GetPackedInt();
-        tempCharacterData.CurrentWater = reader.GetPackedInt();
-        tempCharacterData.StatPoint = reader.GetPackedShort();
-        tempCharacterData.SkillPoint = reader.GetPackedShort();
-        tempCharacterData.Gold = reader.GetPackedInt();
-        tempCharacterData.UserGold = reader.GetPackedInt();
-        tempCharacterData.UserCash = reader.GetPackedInt();
-        tempCharacterData.CurrentMapName = reader.GetString();
-        tempCharacterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
-        tempCharacterData.RespawnMapName = reader.GetString();
-        tempCharacterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
-        tempCharacterData.MountDataId = reader.GetPackedInt();
-        tempCharacterData.LastUpdate = reader.GetPackedInt();
+        PlayerCharacterData result = new PlayerCharacterData();
+        result.Id = reader.GetString();
+        result.DataId = reader.GetPackedInt();
+        result.EntityId = reader.GetPackedInt();
+        result.FactionId = reader.GetPackedInt();
+        result.CharacterName = reader.GetString();
+        result.Level = reader.GetPackedShort();
+        result.Exp = reader.GetPackedInt();
+        result.CurrentHp = reader.GetPackedInt();
+        result.CurrentMp = reader.GetPackedInt();
+        result.CurrentStamina = reader.GetPackedInt();
+        result.CurrentFood = reader.GetPackedInt();
+        result.CurrentWater = reader.GetPackedInt();
+        result.StatPoint = reader.GetPackedShort();
+        result.SkillPoint = reader.GetPackedShort();
+        result.Gold = reader.GetPackedInt();
+        result.UserGold = reader.GetPackedInt();
+        result.UserCash = reader.GetPackedInt();
+        result.CurrentMapName = reader.GetString();
+        result.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+        result.RespawnMapName = reader.GetString();
+        result.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+        result.MountDataId = reader.GetPackedInt();
+        result.LastUpdate = reader.GetPackedInt();
         int count = 0;
         count = reader.GetByte();
         for (int i = 0; i < count; ++i)
         {
             CharacterAttribute entry = new CharacterAttribute();
             entry.Deserialize(reader);
-            tempCharacterData.Attributes.Add(entry);
+            result.Attributes.Add(entry);
         }
         count = reader.GetByte();
         for (int i = 0; i < count; ++i)
         {
             CharacterBuff entry = new CharacterBuff();
             entry.Deserialize(reader);
-            tempCharacterData.Buffs.Add(entry);
+            result.Buffs.Add(entry);
         }
         count = reader.GetShort();
         for (int i = 0; i < count; ++i)
         {
             CharacterSkill entry = new CharacterSkill();
             entry.Deserialize(reader);
-            tempCharacterData.Skills.Add(entry);
+            result.Skills.Add(entry);
         }
         count = reader.GetByte();
         for (int i = 0; i < count; ++i)
         {
             CharacterSkillUsage entry = new CharacterSkillUsage();
             entry.Deserialize(reader);
-            tempCharacterData.SkillUsages.Add(entry);
+            result.SkillUsages.Add(entry);
         }
         count = reader.GetByte();
         for (int i = 0; i < count; ++i)
         {
             CharacterSummon entry = new CharacterSummon();
             entry.Deserialize(reader);
-            tempCharacterData.Summons.Add(entry);
+            result.Summons.Add(entry);
         }
         count = reader.GetByte();
         for (int i = 0; i < count; ++i)
         {
             CharacterItem entry = new CharacterItem();
             entry.Deserialize(reader);
-            tempCharacterData.EquipItems.Add(entry);
+            result.EquipItems.Add(entry);
         }
         count = reader.GetShort();
         for (int i = 0; i < count; ++i)
         {
             CharacterItem entry = new CharacterItem();
             entry.Deserialize(reader);
-            tempCharacterData.NonEquipItems.Add(entry);
+            result.NonEquipItems.Add(entry);
         }
         count = reader.GetByte();
         for (int i = 0; i < count; ++i)
         {
             CharacterHotkey entry = new CharacterHotkey();
             entry.Deserialize(reader);
-            tempCharacterData.Hotkeys.Add(entry);
+            result.Hotkeys.Add(entry);
         }
         count = reader.GetShort();
         for (int i = 0; i < count; ++i)
         {
             CharacterQuest entry = new CharacterQuest();
             entry.Deserialize(reader);
-            tempCharacterData.Quests.Add(entry);
+            result.Quests.Add(entry);
         }
         // Equip weapon set
-        tempCharacterData.EquipWeaponSet = reader.GetByte();
+        result.EquipWeaponSet = reader.GetByte();
         // Selectable weapon sets
         count = reader.GetByte();
         for (int i = 0; i < count; ++i)
         {
             EquipWeapons entry = new EquipWeapons();
             entry.Deserialize(reader);
-            tempCharacterData.SelectableWeaponSets.Add(entry);
+            result.SelectableWeaponSets.Add(entry);
         }
-        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", tempCharacterData, reader);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", result, reader);
+        return result;
+    }
 
-        tempCharacterData.CloneTo(characterData);
+    public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
+    {
+        DeserializeCharacterData(reader).CloneTo(characterData);
         return characterData;
     }
 
