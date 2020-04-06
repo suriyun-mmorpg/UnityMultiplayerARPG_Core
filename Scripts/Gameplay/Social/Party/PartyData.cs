@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         }
 
         public PartyData(int id, bool shareExp, bool shareItem, string leaderId)
-            : base(id, leaderId)
+            : this(id, leaderId)
         {
             this.shareExp = shareExp;
             this.shareItem = shareItem;
@@ -92,18 +92,16 @@ namespace MultiplayerARPG
                 return SystemSetting.PartyMemberCanKick;
         }
 
-        public void Serialize(NetDataWriter writer)
+        public override void Serialize(NetDataWriter writer)
         {
-            writer.Put(id);
-            writer.Put(leaderId);
+            base.Serialize(writer);
             writer.Put(shareExp);
             writer.Put(shareItem);
         }
 
-        public void Deserialize(NetDataReader reader)
+        public override void Deserialize(NetDataReader reader)
         {
-            id = reader.GetInt();
-            leaderId = reader.GetString();
+            base.Deserialize(reader);
             shareExp = reader.GetBool();
             shareItem = reader.GetBool();
         }

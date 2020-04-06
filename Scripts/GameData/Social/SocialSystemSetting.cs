@@ -233,13 +233,4 @@ namespace MultiplayerARPG
         }
 #endif
     }
-
-    [System.Serializable]
-    public struct GuildRoleData
-    {
-        public string roleName;
-        public bool canInvite;
-        public bool canKick;
-        public byte shareExpPercentage;
-    }
 }

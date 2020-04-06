@@ -322,26 +322,30 @@ namespace MultiplayerARPG
             return SystemSetting.GetNextLevelExp(level);
         }
 
-        public void Serialize(NetDataWriter writer)
+        public override void Serialize(NetDataWriter writer)
         {
-            writer.Put(id);
-            writer.Put(leaderId);
+            base.Serialize(writer);
             writer.Put(level);
             writer.Put(exp);
             writer.Put(skillPoint);
             writer.Put(guildMessage);
             writer.Put(gold);
+            writer.Put(roles);
+            writer.Put(memberRoles);
+            writer.Put(skillLevels);
         }
 
-        public void Deserialize(NetDataReader reader)
+        public override void Deserialize(NetDataReader reader)
         {
-            id = reader.GetInt();
-            leaderId = reader.GetString();
+            base.Deserialize(reader);
             level = reader.GetShort();
             exp = reader.GetInt();
             skillPoint = reader.GetShort();
             guildMessage = reader.GetString();
             gold = reader.GetInt();
+            roles = reader.GetList<GuildRoleData>();
+            memberRoles = reader.GetDictionary<string, byte>();
+            skillLevels = reader.GetDictionary<int, short>();
         }
     }
 }
