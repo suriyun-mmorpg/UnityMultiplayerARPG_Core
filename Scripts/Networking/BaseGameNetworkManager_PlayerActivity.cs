@@ -835,7 +835,7 @@ namespace MultiplayerARPG
                 case StorageType.Building:
                     StorageEntity buildingEntity;
                     if (!TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity) ||
-                        !buildingEntity.IsCreator(playerCharacterEntity))
+                        !(buildingEntity.IsCreator(playerCharacterEntity) || buildingEntity.canUseByEveryone))
                         return false;
                     break;
             }
