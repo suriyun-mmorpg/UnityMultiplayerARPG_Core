@@ -19,21 +19,6 @@ namespace MultiplayerARPG
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
-        private void Update()
-        {
-            if (Time.unscaledTime - lastAppliedTime >= applyDuration)
-            {
-                lastAppliedTime = Time.unscaledTime;
-                foreach (IDamageableEntity entity in receivingDamageEntities.Values)
-                {
-                    if (entity == null)
-                        continue;
-
-                    ApplyDamageTo(entity);
-                }
-            }
-        }
-
         public void Setup(
             IGameEntity attacker,
             CharacterItem weapon,
@@ -47,6 +32,21 @@ namespace MultiplayerARPG
             PushBack(areaDuration);
             this.applyDuration = applyDuration;
             lastAppliedTime = Time.unscaledTime;
+        }
+
+        private void Update()
+        {
+            if (Time.unscaledTime - lastAppliedTime >= applyDuration)
+            {
+                lastAppliedTime = Time.unscaledTime;
+                foreach (IDamageableEntity entity in receivingDamageEntities.Values)
+                {
+                    if (entity == null)
+                        continue;
+
+                    ApplyDamageTo(entity);
+                }
+            }
         }
 
         protected override void OnPushBack()

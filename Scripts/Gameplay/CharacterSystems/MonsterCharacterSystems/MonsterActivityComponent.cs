@@ -135,7 +135,7 @@ namespace MultiplayerARPG
                 startedFollowEnemy = false;
                 CacheEntity.StopMove();
                 // Lookat target then do something when it's in range
-                CacheEntity.SetLookRotation(Quaternion.LookRotation(targetPosition - currentPosition).normalized);
+                CacheEntity.SetLookRotation(Quaternion.LookRotation((targetPosition - currentPosition).normalized));
                 Vector3 lookAtDirection = targetPosition - currentPosition;
                 lookAtDirection.Normalize();
                 if (lookAtDirection.sqrMagnitude > 0)

@@ -16,8 +16,8 @@ namespace MultiplayerARPG
             aimPosition = GameplayUtils.FindGround(GameplayUtils.ClampPosition(skillUser.CacheTransform.position, aimPosition, castDistance.GetAmount(skillLevel)),
                 AreaSkillControls.GROUND_DETECTION_DISTANCE,
                 GameInstance.Singleton.GetMonsterSpawnGroundDetectionLayerMask());
-            AreaBuffEntity buffEntity = Instantiate(areaBuffEntity, aimPosition, skillUser.GetSummonRotation());
-            buffEntity.Setup(skillUser, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+            PoolSystem.GetInstance(areaBuffEntity, aimPosition, skillUser.GetSummonRotation())
+                .Setup(skillUser, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)
@@ -53,6 +53,12 @@ namespace MultiplayerARPG
         public override Buff GetBuff()
         {
             return buff;
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddPoolingObjects(new IPoolDescriptor[] { areaBuffEntity });
         }
     }
 }

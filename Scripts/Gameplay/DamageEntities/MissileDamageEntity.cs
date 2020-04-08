@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             if (destroying)
                 return;
 
-            if (Time.unscaledTime - launchTime > missileDuration)
+            if (Time.unscaledTime - launchTime >= missileDuration)
             {
                 Explode();
                 PushBack(destroyDelay);

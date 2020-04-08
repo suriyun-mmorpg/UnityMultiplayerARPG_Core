@@ -13,14 +13,27 @@ namespace MultiplayerARPG
         private float lastAppliedTime;
         private readonly Dictionary<uint, BaseCharacterEntity> receivingBuffCharacters = new Dictionary<uint, BaseCharacterEntity>();
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
         private void Start()
         {
             lastAppliedTime = Time.unscaledTime;
+        }
+
+        public void Setup(
+            BaseCharacterEntity buffApplier,
+            BaseSkill skill,
+            short skillLevel,
+            float areaDuration,
+            float applyDuration)
+        {
+            base.Setup(buffApplier, skill, skillLevel);
+            PushBack(areaDuration);
+            this.applyDuration = applyDuration;
         }
 
         private void Update()
@@ -36,18 +49,6 @@ namespace MultiplayerARPG
                     ApplyBuffTo(entity);
                 }
             }
-        }
-
-        public void Setup(
-            BaseCharacterEntity buffApplier,
-            BaseSkill skill,
-            short skillLevel,
-            float areaDuration,
-            float applyDuration)
-        {
-            base.Setup(buffApplier, skill, skillLevel);
-            Destroy(gameObject, areaDuration);
-            this.applyDuration = applyDuration;
         }
 
         private void OnTriggerEnter(Collider other)
