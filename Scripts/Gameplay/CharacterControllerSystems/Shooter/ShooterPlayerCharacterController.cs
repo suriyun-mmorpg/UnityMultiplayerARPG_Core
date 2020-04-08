@@ -482,7 +482,11 @@ namespace MultiplayerARPG
             float attackFov = 90f;
             // Calculating aim distance, also read attack inputs here
             // Attack inputs will be used to calculate attack distance
-            if (ConstructingBuildingEntity == null)
+            if (IsUsingHotkey())
+            {
+                mustReleaseFireKey = true;
+            }
+            else
             {
                 // Attack with right hand weapon
                 tempPressAttackRight = GetPrimaryAttackButton();
@@ -1109,29 +1113,25 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool GetPrimaryAttackButton()
+        public bool IsUsingHotkey()
         {
             // Check using hotkey for PC only
             if (!InputManager.useMobileInputOnNonMobile &&
                 !Application.isMobilePlatform &&
                 UICharacterHotkeys.UsingHotkey != null)
             {
-                mustReleaseFireKey = true;
-                return false;
+                return true;
             }
+            return false;
+        }
+
+        public bool GetPrimaryAttackButton()
+        {
             return InputManager.GetButton("Fire1") || InputManager.GetButton("Attack");
         }
 
         public bool GetSecondaryAttackButton()
         {
-            // Check using hotkey for PC only
-            if (!InputManager.useMobileInputOnNonMobile &&
-                !Application.isMobilePlatform &&
-                UICharacterHotkeys.UsingHotkey != null)
-            {
-                mustReleaseFireKey = true;
-                return false;
-            }
             return InputManager.GetButton("Fire2");
         }
 
