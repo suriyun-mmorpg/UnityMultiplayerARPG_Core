@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         public UnityEvent onInitialClose;
         public UnityEvent onOpen;
         public UnityEvent onClose;
+        public bool canUseByEveryone;
         [SerializeField]
         protected SyncFieldBool isOpen = new SyncFieldBool();
         private bool dirtyIsOpen;
