@@ -49,11 +49,11 @@ namespace MultiplayerARPG
             float applyDuration)
         {
             base.Setup(attacker, weapon, damageAmounts, skill, skillLevel);
-            Destroy(gameObject, areaDuration);
+            PushBack(areaDuration);
             this.applyDuration = applyDuration;
         }
 
-        private void OnDestroy()
+        protected override void OnPushBack()
         {
             if (onDestroy != null)
                 onDestroy.Invoke();

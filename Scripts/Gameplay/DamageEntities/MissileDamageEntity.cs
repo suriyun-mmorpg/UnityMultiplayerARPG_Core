@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             {
                 // Explode immediately when distance and speed is 0
                 Explode();
-                Destroy(gameObject, destroyDelay);
+                PushBack(destroyDelay);
                 destroying = true;
                 return;
             }
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - launchTime > missileDuration)
             {
                 Explode();
-                Destroy(gameObject, destroyDelay);
+                PushBack(destroyDelay);
                 destroying = true;
             }
         }
@@ -104,8 +104,8 @@ namespace MultiplayerARPG
                     CacheRigidbody.velocity = CacheTransform.forward * missileSpeed;
             }
         }
-
-        private void OnDestroy()
+        
+        protected override void OnPushBack()
         {
             if (onDestroy != null)
                 onDestroy.Invoke();
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
                     // If this is not going to explode, just apply damage to target
                     ApplyDamageTo(target);
                 }
-                Destroy(gameObject, destroyDelay);
+                PushBack(destroyDelay);
                 destroying = true;
                 return;
             }
@@ -165,7 +165,7 @@ namespace MultiplayerARPG
                     // Explode immediately when hit something
                     Explode();
                 }
-                Destroy(gameObject, destroyDelay);
+                PushBack(destroyDelay);
                 destroying = true;
                 return;
             }

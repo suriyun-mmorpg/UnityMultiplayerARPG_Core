@@ -4,20 +4,26 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class GameEffect : MonoBehaviour
+    public class GameEffect : MonoBehaviour, IPoolDescriptor
     {
-        public enum DestroyMode
-        {
-            DestroyGameObject,
-            DeactivateGameObject,
-        }
         public string effectSocket;
         public bool isLoop;
         public float lifeTime;
-        public DestroyMode destroyMode;
         public Transform followingTarget;
         
         public Transform CacheTransform { get; private set; }
+
+        [SerializeField]
+        private int poolSize = 30;
+        public int PoolSize
+        {
+            get { return poolSize; }
+        }
+
+        public IPoolDescriptor ObjectPrefab
+        {
+            get; set;
+        }
 
         public AudioClip[] randomSoundEffects;
         private float volume;
@@ -46,6 +52,16 @@ namespace MultiplayerARPG
                 Play();
         }
 
+        protected virtual void PushBack(float delay)
+        {
+            Invoke("PushBack", delay);
+        }
+
+        protected virtual void PushBack()
+        {
+            PoolSystem.PushBack(this);
+        }
+
         private void Update()
         {
             if (followingTarget != null)
@@ -56,10 +72,7 @@ namespace MultiplayerARPG
 
             if (destroyTime >= 0 && destroyTime - Time.time <= 0)
             {
-                if (destroyMode == DestroyMode.DestroyGameObject)
-                    Destroy(gameObject);
-                else
-                    gameObject.SetActive(false);
+                PushBack();
             }
         }
 
@@ -87,13 +100,10 @@ namespace MultiplayerARPG
             destroyTime = Time.time + lifeTime;
         }
 
-        public GameEffect InstantiateTo(Transform parent)
+        public GameEffect GetInstance()
         {
-            GameEffect newEffect = Instantiate(this, parent);
-            newEffect.transform.localPosition = Vector3.zero;
-            newEffect.transform.localEulerAngles = Vector3.zero;
-            newEffect.transform.localScale = Vector3.one;
-            return newEffect;
+            // `this` is prefab
+            return PoolSystem.GetInstance(this);
         }
 
         public void Play()

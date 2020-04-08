@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseDamageEntity : MonoBehaviour
+    public abstract class BaseDamageEntity : MonoBehaviour, IPoolDescriptor
     {
         protected IGameEntity attacker;
         protected CharacterItem weapon;
@@ -38,9 +38,37 @@ namespace MultiplayerARPG
         
         public Transform CacheTransform { get; private set; }
 
+        [SerializeField]
+        private int poolSize = 30;
+        public int PoolSize
+        {
+            get { return poolSize; }
+        }
+
+        public IPoolDescriptor ObjectPrefab
+        {
+            get; set;
+        }
+
         protected virtual void Awake()
         {
             CacheTransform = transform;
+        }
+
+        protected virtual void PushBack(float delay)
+        {
+            Invoke("PushBack", delay);
+        }
+
+        protected virtual void PushBack()
+        {
+            OnPushBack();
+            PoolSystem.PushBack(this);
+        }
+
+        protected virtual void OnPushBack()
+        {
+
         }
 
         public virtual void Setup(

@@ -308,7 +308,7 @@ namespace MultiplayerARPG
                             if (!attacker.TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
-                        Object.Instantiate(missileDamageEntity, damagePosition, damageRotation)
+                        PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation)
                             .Setup(attacker, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableEntity);
                     }
                     break;
@@ -373,7 +373,7 @@ namespace MultiplayerARPG
                     // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
                     if (isClient && projectileEffect != null)
                     {
-                        Object.Instantiate(projectileEffect, damagePosition, damageRotation)
+                        PoolSystem.GetInstance(projectileEffect, damagePosition, damageRotation)
                             .Setup(minDistance, missileSpeed);
                     }
                     break;

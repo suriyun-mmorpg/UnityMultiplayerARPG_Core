@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                 if (!CacheEffectContainers.TryGetValue(effect.effectSocket, out tempContainer))
                     continue;
                 // Setup transform and activate effect
-                tempGameEffect = effect.InstantiateTo(null);
+                tempGameEffect = effect.GetInstance();
                 tempGameEffect.followingTarget = tempContainer.transform;
                 tempGameEffect.CacheTransform.position = tempGameEffect.followingTarget.position;
                 tempGameEffect.CacheTransform.rotation = tempGameEffect.followingTarget.rotation;

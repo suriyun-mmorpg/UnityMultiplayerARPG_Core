@@ -4,14 +4,28 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class ProjectileEffect : MonoBehaviour
+    public class ProjectileEffect : MonoBehaviour, IPoolDescriptor
     {
         public float speed;
         public float lifeTime = 1;
+        [SerializeField]
+        private int poolSize = 30;
+        public int PoolSize { get { return poolSize; } set { poolSize = value; } }
+        public IPoolDescriptor ObjectPrefab { get; set; }
 
         private void Start()
         {
-            Destroy(gameObject, lifeTime);
+            PushBack(lifeTime);
+        }
+
+        protected virtual void PushBack(float delay)
+        {
+            Invoke("PushBack", delay);
+        }
+
+        protected virtual void PushBack()
+        {
+            PoolSystem.PushBack(this);
         }
 
         private void Update()
