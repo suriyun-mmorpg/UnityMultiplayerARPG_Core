@@ -120,7 +120,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (tempTargetEnemy.IsDead() || tempTargetEnemy.IsInSafeArea)
+            if (tempTargetEnemy.IsDead() || tempTargetEnemy.IsInSafeArea || tempTargetEnemy == CacheEntity)
             {
                 // If target is dead or in safe area stop attacking
                 CacheEntity.SetTargetEntity(null);
@@ -135,9 +135,7 @@ namespace MultiplayerARPG
                 startedFollowEnemy = false;
                 CacheEntity.StopMove();
                 // Lookat target then do something when it's in range
-                CacheEntity.SetLookRotation(Quaternion.LookRotation((targetPosition - currentPosition).normalized));
-                Vector3 lookAtDirection = targetPosition - currentPosition;
-                lookAtDirection.Normalize();
+                Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
                 if (lookAtDirection.sqrMagnitude > 0)
                 {
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)

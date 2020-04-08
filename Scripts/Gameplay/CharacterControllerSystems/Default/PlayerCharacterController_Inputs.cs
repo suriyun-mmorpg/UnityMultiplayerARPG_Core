@@ -713,7 +713,9 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return;
-            PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation((entity.CacheTransform.position - MovementTransform.position).normalized));
+            Vector3 lookAtDirection = (entity.CacheTransform.position - MovementTransform.position).normalized;
+            if (lookAtDirection.sqrMagnitude > 0)
+                PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
         }
 
         public override void UseHotkey(int hotkeyIndex, Vector3? aimPosition)
