@@ -15,7 +15,8 @@ namespace MultiplayerARPG
                 while (queue.Count > 0)
                 {
                     IPoolDescriptor instance = queue.Dequeue();
-                    Object.Destroy(instance.gameObject);
+                    if (instance != null)
+                        Object.Destroy(instance.gameObject);
                 }
             }
             m_Pools.Clear();
@@ -23,7 +24,7 @@ namespace MultiplayerARPG
 
         public static void InitPool(IPoolDescriptor prefab)
         {
-            if (m_Pools.ContainsKey(prefab))
+            if (prefab == null || m_Pools.ContainsKey(prefab))
                 return;
 
             Queue<IPoolDescriptor> queue = new Queue<IPoolDescriptor>();
@@ -44,6 +45,8 @@ namespace MultiplayerARPG
         public static T GetInstance<T>(T prefab, Vector3 position, Quaternion rotation)
             where T : class, IPoolDescriptor
         {
+            if (prefab == null)
+                return null;
             T instance = GetInstance(prefab);
             instance.transform.position = position;
             instance.transform.rotation = rotation;
@@ -53,6 +56,8 @@ namespace MultiplayerARPG
         public static T GetInstance<T>(T prefab)
             where T : class, IPoolDescriptor
         {
+            if (prefab == null)
+                return null;
             Queue<IPoolDescriptor> queue;
             if (m_Pools.TryGetValue(prefab, out queue))
             {
