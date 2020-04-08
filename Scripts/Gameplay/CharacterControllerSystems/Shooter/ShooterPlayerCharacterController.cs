@@ -1115,7 +1115,10 @@ namespace MultiplayerARPG
             if (!InputManager.useMobileInputOnNonMobile &&
                 !Application.isMobilePlatform &&
                 UICharacterHotkeys.UsingHotkey != null)
+            {
+                mustReleaseFireKey = true;
                 return false;
+            }
             return InputManager.GetButton("Fire1") || InputManager.GetButton("Attack");
         }
 
@@ -1125,7 +1128,10 @@ namespace MultiplayerARPG
             if (!InputManager.useMobileInputOnNonMobile &&
                 !Application.isMobilePlatform &&
                 UICharacterHotkeys.UsingHotkey != null)
+            {
+                mustReleaseFireKey = true;
                 return false;
+            }
             return InputManager.GetButton("Fire2");
         }
 

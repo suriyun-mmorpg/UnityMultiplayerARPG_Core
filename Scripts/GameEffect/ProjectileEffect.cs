@@ -21,9 +21,9 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             CacheTransform = transform;
-            particles = GetComponentsInChildren<ParticleSystem>();
-            audioSources = GetComponentsInChildren<AudioSource>();
-            audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>();
+            particles = GetComponentsInChildren<ParticleSystem>(true);
+            audioSources = GetComponentsInChildren<AudioSource>(true);
+            audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
         }
 
         protected virtual void PushBack(float delay)
@@ -51,8 +51,7 @@ namespace MultiplayerARPG
         public virtual void InitPrefab()
         {
             // Prepare audio sources
-            if (audioSources == null)
-                audioSources = GetComponentsInChildren<AudioSource>();
+            audioSources = GetComponentsInChildren<AudioSource>(true);
             if (audioSources != null && audioSources.Length > 0)
             {
                 foreach (AudioSource audioSource in audioSources)
@@ -63,8 +62,7 @@ namespace MultiplayerARPG
                 }
             }
             // Prepare audio source setters
-            if (audioSourceSetters == null)
-                audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>();
+            audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
             if (audioSourceSetters != null && audioSourceSetters.Length > 0)
             {
                 foreach (AudioSourceSetter audioSourceSetter in audioSourceSetters)
