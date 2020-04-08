@@ -80,7 +80,11 @@ namespace MultiplayerARPG
             {
                 // If this character is summoner so it is ally
                 BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
-                return targetMonster.Summoner != null && targetMonster.Summoner == this;
+                if (targetMonster.IsSummoned)
+                {
+                    // If summoned by someone, will have same allies with summoner
+                    return playerCharacter == targetMonster.Summoner || targetCharacter.IsAlly(targetMonster.Summoner);
+                }
             }
 
             return false;
