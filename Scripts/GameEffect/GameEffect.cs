@@ -64,15 +64,18 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            if (destroyTime >= 0 && destroyTime - Time.time <= 0)
+            {
+                PushBack();
+            }
+        }
+
+        private void LateUpdate()
+        {
             if (followingTarget != null)
             {
                 CacheTransform.position = followingTarget.position;
                 CacheTransform.rotation = followingTarget.rotation;
-            }
-
-            if (destroyTime >= 0 && destroyTime - Time.time <= 0)
-            {
-                PushBack();
             }
         }
 
