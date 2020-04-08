@@ -100,5 +100,14 @@ namespace MultiplayerARPG
         {
             get { return fireSpread; }
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            // Add weapon type
+            GameInstance.AddWeaponTypes(new WeaponType[] { weaponType });
+            // Add damage elements
+            GameInstance.AddDamageElements(new DamageIncremental[] { damageAmount });
+        }
     }
 }

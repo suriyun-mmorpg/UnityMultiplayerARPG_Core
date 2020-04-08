@@ -30,26 +30,29 @@ namespace MultiplayerARPG
         private ParticleSystem[] particles;
         private AudioSource[] audioSources;
         private float destroyTime;
-        private bool isStarted;
 
         private void Awake()
         {
             CacheTransform = transform;
         }
 
-        private void Start()
+        public void InitPrefab()
         {
-            if (!isStarted)
+            // Prepare particles
+            if (particles == null)
+                particles = GetComponentsInChildren<ParticleSystem>();
+            // Prepare audio sources
+            if (audioSources == null)
+                audioSources = GetComponentsInChildren<AudioSource>();
+            if (audioSources != null && audioSources.Length > 0)
             {
-                Play();
-                isStarted = true;
+                foreach (AudioSource audioSource in audioSources)
+                {
+                    if (!audioSource)
+                        continue;
+                    audioSource.playOnAwake = false;
+                }
             }
-        }
-
-        private void OnEnable()
-        {
-            if (isStarted)
-                Play();
         }
 
         protected virtual void PushBack(float delay)
@@ -76,6 +79,10 @@ namespace MultiplayerARPG
             {
                 CacheTransform.position = followingTarget.position;
                 CacheTransform.rotation = followingTarget.rotation;
+            }
+            else
+            {
+                PushBack();
             }
         }
 

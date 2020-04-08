@@ -441,12 +441,12 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { petEntity });
             // Add mount entity
             GameInstance.AddVehicleEntities(new VehicleEntity[] { mountEntity });
+            // Add damage elements
+            GameInstance.AddDamageElements(increaseDamages);
+            GameInstance.AddDamageElements(new DamageIncremental[] { damageAmount });
             // Add skills
-            List<SkillLevel> skillLevels = new List<SkillLevel>();
-            if (increaseSkillLevels != null && increaseSkillLevels.Length > 0)
-                skillLevels.AddRange(increaseSkillLevels);
-            skillLevels.Add(skillLevel);
-            GameInstance.AddSkillLevels(skillLevels);
+            GameInstance.AddSkills(increaseSkillLevels);
+            GameInstance.AddSkills(new SkillLevel[] { skillLevel });
             // Validate equipment set
             if (equipmentSet != null)
             {

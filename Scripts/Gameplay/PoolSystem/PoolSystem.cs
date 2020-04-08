@@ -15,7 +15,7 @@ namespace MultiplayerARPG
                 while (queue.Count > 0)
                 {
                     IPoolDescriptor instance = queue.Dequeue();
-                    if (instance != null)
+                    if (instance != null && instance.gameObject != null)
                         Object.Destroy(instance.gameObject);
                 }
             }
@@ -26,6 +26,8 @@ namespace MultiplayerARPG
         {
             if (prefab == null || m_Pools.ContainsKey(prefab))
                 return;
+
+            prefab.InitPrefab();
 
             Queue<IPoolDescriptor> queue = new Queue<IPoolDescriptor>();
 

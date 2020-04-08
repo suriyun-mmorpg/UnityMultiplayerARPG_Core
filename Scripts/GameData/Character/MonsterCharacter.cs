@@ -312,5 +312,11 @@ namespace MultiplayerARPG
             }
             return false;
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            damageInfo.PrepareRelatesData();
+        }
     }
 }

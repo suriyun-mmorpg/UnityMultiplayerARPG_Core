@@ -229,10 +229,8 @@ namespace MultiplayerARPG
                     continue;
                 // Setup transform and activate effect
                 tempGameEffect = effect.GetInstance();
+                tempGameEffect.Play();
                 tempGameEffect.followingTarget = tempContainer.transform;
-                tempGameEffect.CacheTransform.position = tempGameEffect.followingTarget.position;
-                tempGameEffect.CacheTransform.rotation = tempGameEffect.followingTarget.rotation;
-                tempGameEffect.gameObject.SetActive(true);
                 tempGameEffect.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
                 AddingNewEffect(tempGameEffect);
                 tempAddingEffects.Add(tempGameEffect);

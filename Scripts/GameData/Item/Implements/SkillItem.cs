@@ -50,5 +50,12 @@ namespace MultiplayerARPG
         {
             UsingSkill.FinishAimControls(isCancel);
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            // Add skills
+            GameInstance.AddSkills(new BaseSkill[] { usingSkill });
+        }
     }
 }

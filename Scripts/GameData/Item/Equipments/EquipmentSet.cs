@@ -11,17 +11,33 @@ namespace MultiplayerARPG
         public override bool Validate()
         {
             bool hasChanges = false;
-            EquipmentBonus effect;
-            for (int i  = 0; i < effects.Length; ++i)
+            if (effects != null && effects.Length > 0)
             {
-                effect = effects[i];
-                if (GameDataMigration.MigrateArmor(effect.stats, effect.armors, out effect.stats, out effect.armors))
+                EquipmentBonus effect;
+                for (int i = 0; i < effects.Length; ++i)
                 {
-                    effects[i] = effect;
-                    hasChanges = true;
+                    effect = effects[i];
+                    if (GameDataMigration.MigrateArmor(effect.stats, effect.armors, out effect.stats, out effect.armors))
+                    {
+                        effects[i] = effect;
+                        hasChanges = true;
+                    }
                 }
             }
             return hasChanges;
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            if (effects != null && effects.Length > 0)
+            {
+                foreach (EquipmentBonus effect in effects)
+                {
+                    GameInstance.AddDamageElements(effect.damages);
+                    GameInstance.AddSkills(effect.skills);
+                }
+            }
         }
     }
 

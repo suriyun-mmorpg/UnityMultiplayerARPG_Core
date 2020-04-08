@@ -58,6 +58,7 @@ namespace MultiplayerARPG
 
             this.skill = skill;
             this.lockingTarget = lockingTarget;
+            destroying = false;
             launchTime = Time.unscaledTime;
             missileDuration = (missileDistance / missileSpeed) + 0.25f;
         }

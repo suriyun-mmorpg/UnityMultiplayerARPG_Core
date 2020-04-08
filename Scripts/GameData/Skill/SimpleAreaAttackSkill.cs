@@ -112,5 +112,11 @@ namespace MultiplayerARPG
         {
             return useAmmoAmount;
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddPoolingObjects(new IPoolDescriptor[] { areaDamageEntity });
+        }
     }
 }

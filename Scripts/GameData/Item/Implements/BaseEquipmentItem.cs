@@ -115,5 +115,20 @@ namespace MultiplayerARPG
         {
             get { return increaseSkillLevels; }
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            // Add damage elements
+            GameInstance.AddDamageElements(increaseDamages);
+            // Add skills
+            GameInstance.AddSkills(increaseSkillLevels);
+            // Validate equipment set
+            if (equipmentSet != null)
+            {
+                equipmentSet.Validate();
+                equipmentSet.PrepareRelatesData();
+            }
+        }
     }
 }

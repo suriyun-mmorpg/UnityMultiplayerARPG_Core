@@ -341,6 +341,7 @@ namespace MultiplayerARPG
                 items.Add(item);
             }
             GameInstance.AddItems(items);
+            damageInfo.PrepareRelatesData();
         }
 
         public override short GetUseAmmoAmount()

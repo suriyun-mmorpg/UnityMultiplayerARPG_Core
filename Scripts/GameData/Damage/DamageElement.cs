@@ -19,5 +19,11 @@ namespace MultiplayerARPG
         {
             return damageHitEffects;
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddPoolingObjects(damageHitEffects);
+        }
     }
 }

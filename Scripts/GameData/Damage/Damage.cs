@@ -379,6 +379,17 @@ namespace MultiplayerARPG
                     break;
             }
         }
+
+        public void PrepareRelatesData()
+        {
+            GameInstance.AddPoolingObjects(new IPoolDescriptor[]
+            {
+                missileDamageEntity,
+                projectileEffect
+            });
+            if (customDamageInfo != null)
+                customDamageInfo.PrepareRelatesData();
+        }
     }
 
     [System.Serializable]

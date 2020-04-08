@@ -412,6 +412,7 @@ namespace MultiplayerARPG
             MapWarpPortals.Clear();
             MapNpcs.Clear();
             MapInfos.Clear();
+            PoolingObjectPrefabs.Clear();
 
             this.InvokeInstanceDevExtMethods("Awake");
         }
@@ -428,6 +429,8 @@ namespace MultiplayerARPG
             // Add required default game data
             AddItems(new BaseItem[] { DefaultWeaponItem as BaseItem });
             AddWeaponTypes(new WeaponType[] { DefaultWeaponType });
+            AddPoolingObjects(new IPoolDescriptor[] { levelUpEffect });
+            AddPoolingObjects(DefaultDamageHitEffects);
 
             if (warpPortalDatabase != null)
                 AddMapWarpPortals(warpPortalDatabase.maps);
@@ -658,7 +661,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddSkillLevels(IEnumerable<SkillLevel> skillLevels)
+        public static void AddSkills(IEnumerable<SkillLevel> skillLevels)
         {
             if (skillLevels == null)
                 return;
@@ -868,6 +871,47 @@ namespace MultiplayerARPG
                 faction.Validate();
                 Factions[faction.DataId] = faction;
                 faction.PrepareRelatesData();
+            }
+        }
+        
+        public static void AddDamageElements(IEnumerable<DamageAmount> damageAmounts)
+        {
+            if (damageAmounts == null)
+                return;
+            List<DamageElement> elements = new List<DamageElement>();
+            foreach (DamageAmount damageAmount in damageAmounts)
+            {
+                if (damageAmount.damageElement == null)
+                    continue;
+                elements.Add(damageAmount.damageElement);
+            }
+            AddDamageElements(elements);
+        }
+        
+        public static void AddDamageElements(IEnumerable<DamageIncremental> damageIncrementals)
+        {
+            if (damageIncrementals == null)
+                return;
+            List<DamageElement> elements = new List<DamageElement>();
+            foreach (DamageIncremental damageIncremental in damageIncrementals)
+            {
+                if (damageIncremental.damageElement == null)
+                    continue;
+                elements.Add(damageIncremental.damageElement);
+            }
+            AddDamageElements(elements);
+        }
+
+        public static void AddDamageElements(IEnumerable<DamageElement> damageElements)
+        {
+            if (damageElements == null)
+                return;
+            foreach (DamageElement damageElement in damageElements)
+            {
+                if (damageElement == null || Skills.ContainsKey(damageElement.DataId))
+                    continue;
+                damageElement.Validate();
+                damageElement.PrepareRelatesData();
             }
         }
 

@@ -19,11 +19,6 @@ namespace MultiplayerARPG
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
-        private void Start()
-        {
-            lastAppliedTime = Time.unscaledTime;
-        }
-
         private void Update()
         {
             if (Time.unscaledTime - lastAppliedTime >= applyDuration)
@@ -51,6 +46,7 @@ namespace MultiplayerARPG
             base.Setup(attacker, weapon, damageAmounts, skill, skillLevel);
             PushBack(areaDuration);
             this.applyDuration = applyDuration;
+            lastAppliedTime = Time.unscaledTime;
         }
 
         protected override void OnPushBack()

@@ -43,5 +43,12 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterController.Singleton.FinishBuildAimControls(isCancel);
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            // Add building entity
+            GameInstance.AddBuildingEntities(new BuildingEntity[] { buildingEntity });
+        }
     }
 }

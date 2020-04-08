@@ -94,5 +94,10 @@ namespace MultiplayerARPG
             if (IsServer)
                 target.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
         }
+
+        public virtual void InitPrefab()
+        {
+            // Do nothing
+        }
     }
 }
