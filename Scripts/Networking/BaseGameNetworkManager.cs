@@ -762,6 +762,12 @@ namespace MultiplayerARPG
             {
                 harvestableSpawnArea.RegisterAssets();
             }
+            
+            PoolSystem.Clear();
+            foreach (IPoolDescriptor poolingObject in GameInstance.PoolingObjectPrefabs)
+            {
+                PoolSystem.InitPool(poolingObject);
+            }
         }
 
         protected bool UpdateSocialGroupMember(SocialGroupData socialGroupData, UpdateSocialMemberMessage message)

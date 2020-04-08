@@ -220,6 +220,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, BaseMapInfo> MapInfos = new Dictionary<string, BaseMapInfo>();
         public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
+        public static readonly HashSet<IPoolDescriptor> PoolingObjectPrefabs = new HashSet<IPoolDescriptor>();
 
         #region Cache Data
         public DimensionType DimensionType
@@ -867,6 +868,18 @@ namespace MultiplayerARPG
                 faction.Validate();
                 Factions[faction.DataId] = faction;
                 faction.PrepareRelatesData();
+            }
+        }
+
+        public static void AddPoolingObjects(IEnumerable<IPoolDescriptor> poolingObjects)
+        {
+            if (poolingObjects == null)
+                return;
+            foreach (IPoolDescriptor poolingObject in poolingObjects)
+            {
+                if (poolingObject == null || PoolingObjectPrefabs.Contains(poolingObject))
+                    continue;
+                PoolingObjectPrefabs.Add(poolingObject);
             }
         }
     }
