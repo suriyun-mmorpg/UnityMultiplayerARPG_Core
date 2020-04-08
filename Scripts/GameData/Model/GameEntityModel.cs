@@ -228,8 +228,7 @@ namespace MultiplayerARPG
                 if (!CacheEffectContainers.TryGetValue(effect.effectSocket, out tempContainer))
                     continue;
                 // Setup transform and activate effect
-                tempGameEffect = effect.GetInstance();
-                tempGameEffect.Play();
+                tempGameEffect = PoolSystem.GetInstance(effect, tempContainer.transform.position, tempContainer.transform.rotation);
                 tempGameEffect.followingTarget = tempContainer.transform;
                 tempGameEffect.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
                 AddingNewEffect(tempGameEffect);

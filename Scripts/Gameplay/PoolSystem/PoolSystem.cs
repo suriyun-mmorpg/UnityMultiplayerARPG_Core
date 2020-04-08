@@ -15,8 +15,13 @@ namespace MultiplayerARPG
                 while (queue.Count > 0)
                 {
                     IPoolDescriptor instance = queue.Dequeue();
-                    if (instance != null && instance.gameObject != null)
-                        Object.Destroy(instance.gameObject);
+                    try
+                    {
+                        // I tried to avoid null exception but it still ocurring
+                        if (instance != null && instance.gameObject != null)
+                            Object.Destroy(instance.gameObject);
+                    }
+                    catch { }
                 }
             }
             m_Pools.Clear();
@@ -44,18 +49,16 @@ namespace MultiplayerARPG
             m_Pools[prefab] = queue;
         }
 
-        public static T GetInstance<T>(T prefab, Vector3 position, Quaternion rotation)
+        public static T GetInstance<T>(T prefab)
             where T : class, IPoolDescriptor
         {
             if (prefab == null)
                 return null;
-            T instance = GetInstance(prefab);
-            instance.transform.position = position;
-            instance.transform.rotation = rotation;
+            T instance = GetInstance(prefab, Vector3.zero, Quaternion.identity);
             return instance;
         }
 
-        public static T GetInstance<T>(T prefab)
+        public static T GetInstance<T>(T prefab, Vector3 position, Quaternion rotation)
             where T : class, IPoolDescriptor
         {
             if (prefab == null)
@@ -73,17 +76,22 @@ namespace MultiplayerARPG
                 {
                     obj = Object.Instantiate(prefab.gameObject).GetComponent<IPoolDescriptor>();
                 }
+                obj.transform.position = position;
+                obj.transform.rotation = rotation;
                 obj.gameObject.SetActive(true);
+                obj.OnGetInstance();
 
                 return obj as T;
             }
 
             InitPool(prefab);
-            return GetInstance(prefab);
+            return GetInstance(prefab, position, rotation);
         }
 
         public static void PushBack(IPoolDescriptor instance)
         {
+            if (instance == null || instance.ObjectPrefab == null)
+                return;
             Queue<IPoolDescriptor> queue;
             if (m_Pools.TryGetValue(instance.ObjectPrefab, out queue))
             {

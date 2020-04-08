@@ -10,8 +10,6 @@ namespace MultiplayerARPG
         public bool isLoop;
         public float lifeTime;
         public Transform followingTarget;
-        
-        public Transform CacheTransform { get; private set; }
 
         [SerializeField]
         private int poolSize = 30;
@@ -25,34 +23,20 @@ namespace MultiplayerARPG
             get; set;
         }
 
+        public Transform CacheTransform { get; private set; }
+
         public AudioClip[] randomSoundEffects;
-        private float volume;
         private ParticleSystem[] particles;
         private AudioSource[] audioSources;
+        private AudioSourceSetter[] audioSourceSetters;
         private float destroyTime;
 
         private void Awake()
         {
             CacheTransform = transform;
-        }
-
-        public void InitPrefab()
-        {
-            // Prepare particles
-            if (particles == null)
-                particles = GetComponentsInChildren<ParticleSystem>();
-            // Prepare audio sources
-            if (audioSources == null)
-                audioSources = GetComponentsInChildren<AudioSource>();
-            if (audioSources != null && audioSources.Length > 0)
-            {
-                foreach (AudioSource audioSource in audioSources)
-                {
-                    if (!audioSource)
-                        continue;
-                    audioSource.playOnAwake = false;
-                }
-            }
+            particles = GetComponentsInChildren<ParticleSystem>();
+            audioSources = GetComponentsInChildren<AudioSource>();
+            audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>();
         }
 
         protected virtual void PushBack(float delay)
@@ -110,29 +94,50 @@ namespace MultiplayerARPG
             destroyTime = Time.time + lifeTime;
         }
 
-        public GameEffect GetInstance()
+        public void InitPrefab()
         {
-            // `this` is prefab
-            return PoolSystem.GetInstance(this);
-        }
-
-        public void Play()
-        {
-            if (!gameObject.activeSelf)
-            {
-                gameObject.SetActive(true);
-                return;
-            }
-            // Prepare particles
-            if (particles == null)
-                particles = GetComponentsInChildren<ParticleSystem>();
             // Prepare audio sources
             if (audioSources == null)
                 audioSources = GetComponentsInChildren<AudioSource>();
+            if (audioSources != null && audioSources.Length > 0)
+            {
+                foreach (AudioSource audioSource in audioSources)
+                {
+                    if (!audioSource)
+                        continue;
+                    audioSource.playOnAwake = false;
+                }
+            }
+            if (audioSourceSetters == null)
+                audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>();
+            if (audioSourceSetters != null && audioSourceSetters.Length > 0)
+            {
+                foreach (AudioSourceSetter audioSourceSetter in audioSourceSetters)
+                {
+                    if (!audioSourceSetter)
+                        continue;
+                    audioSourceSetter.playOnAwake = false;
+                    audioSourceSetter.playOnEnable = false;
+                }
+            }
+        }
+
+        public virtual void OnGetInstance()
+        {
+            Play();
+        }
+
+        /// <summary>
+        /// Play particle effects and an audio
+        /// </summary>
+        public virtual void Play()
+        {
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
             // Prepare destroy time
             destroyTime = isLoop ? -1 : Time.time + lifeTime;
             // Play random audio
-            volume = AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level;
+            float volume = AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level;
             if (randomSoundEffects.Length > 0)
             {
                 AudioClip soundEffect = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
@@ -150,6 +155,15 @@ namespace MultiplayerARPG
                 }
             }
             // Play audio sources
+            if (audioSourceSetters != null && audioSourceSetters.Length > 0)
+            {
+                foreach (AudioSourceSetter audioSourceSetter in audioSourceSetters)
+                {
+                    if (!audioSourceSetter)
+                        continue;
+                    audioSourceSetter.Play();
+                }
+            }
             if (audioSources != null && audioSources.Length > 0)
             {
                 foreach (AudioSource audioSource in audioSources)

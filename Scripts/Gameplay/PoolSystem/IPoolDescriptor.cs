@@ -12,5 +12,9 @@ namespace MultiplayerARPG
         /// Use this function to prepare prefab default value
         /// </summary>
         void InitPrefab();
+        /// <summary>
+        /// Use this function to do something when get instance
+        /// </summary>
+        void OnGetInstance();
     }
 }
