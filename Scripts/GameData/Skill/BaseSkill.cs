@@ -174,6 +174,7 @@ namespace MultiplayerARPG
         public virtual SkillSummon GetSummon() { return new SkillSummon(); }
         public virtual SkillMount GetMount() { return new SkillMount(); }
         public virtual ItemCraft GetItemCraft() { return new ItemCraft(); }
+        public virtual void RenderUI() { }
 
         public bool IsActive()
         {

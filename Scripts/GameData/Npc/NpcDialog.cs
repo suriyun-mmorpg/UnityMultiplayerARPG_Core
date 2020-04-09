@@ -10,7 +10,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog", order = -4798)]
-    public partial class NpcDialog : Node
+    public partial class NpcDialog : BaseNpcDialog
     {
         public const int QUEST_ACCEPT_MENU_INDEX = 0;
         public const int QUEST_DECLINE_MENU_INDEX = 1;
@@ -19,20 +19,6 @@ namespace MultiplayerARPG
         public const int CONFIRM_MENU_INDEX = 0;
         public const int CANCEL_MENU_INDEX = 1;
 
-        [Input]
-        public NpcDialog input;
-
-        [Header("NPC Dialog Configs")]
-        [Tooltip("Default title")]
-        public string title;
-        [Tooltip("Titles by language keys")]
-        public LanguageData[] titles;
-        [Tooltip("Default description")]
-        [TextArea]
-        public string description;
-        [Tooltip("Descriptions by language keys")]
-        public LanguageData[] descriptions;
-        public Sprite icon;
         public NpcDialogType type;
         [Output(dynamicPortList = true, connectionType = ConnectionType.Override)]
         public NpcDialogMenu[] menus;
@@ -81,38 +67,7 @@ namespace MultiplayerARPG
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog storageCancelDialog;
 
-        #region Generic Data
-        public string Id { get { return name; } }
-        public string Title
-        {
-            get { return Language.GetText(titles, title); }
-        }
-        public string Description
-        {
-            get { return Language.GetText(descriptions, description); }
-        }
-        public int DataId { get { return MakeDataId(Id); } }
-
-        public static int MakeDataId(string id)
-        {
-            return id.GenerateHashId();
-        }
-        #endregion
-
-#if UNITY_EDITOR
-        protected void OnValidate()
-        {
-            if (Validate())
-                EditorUtility.SetDirty(this);
-        }
-#endif
-
-        public bool Validate()
-        {
-            return false;
-        }
-
-        public void PrepareRelatesData()
+        public override void PrepareRelatesData()
         {
             // Add dialogs from menus
             List<NpcDialog> menuDialogs = new List<NpcDialog>();
@@ -142,7 +97,7 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(new Quest[] { quest });
         }
 
-        public bool ValidateDialog(BasePlayerCharacterEntity characterEntity)
+        public override bool ValidateDialog(BasePlayerCharacterEntity characterEntity)
         {
             switch (type)
             {
@@ -182,7 +137,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public NpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
+        public override NpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
         {
             // This dialog is current NPC dialog
             NpcDialog nextDialog = null;
@@ -328,22 +283,7 @@ namespace MultiplayerARPG
             return nextDialog;
         }
 
-        public override object GetValue(NodePort port)
-        {
-            return port.node;
-        }
-
-        public override void OnCreateConnection(NodePort from, NodePort to)
-        {
-            SetDialogByPort(from, to);
-        }
-
-        public override void OnRemoveConnection(NodePort port)
-        {
-            SetDialogByPort(port, null);
-        }
-
-        private void SetDialogByPort(NodePort from, NodePort to)
+        protected override void SetDialogByPort(NodePort from, NodePort to)
         {
             if (from.node != this)
                 return;
@@ -388,7 +328,7 @@ namespace MultiplayerARPG
 
             if (from.fieldName.Equals(this.GetMemberName(a => a.warpCancelDialog)))
                 warpCancelDialog = dialog;
-            
+
             if (from.fieldName.Equals(this.GetMemberName(a => a.refineItemCancelDialog)))
                 refineItemCancelDialog = dialog;
 
