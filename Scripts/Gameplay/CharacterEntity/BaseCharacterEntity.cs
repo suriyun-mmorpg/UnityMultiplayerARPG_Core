@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             public LiteNetLibSyncList.Operation operation;
             public int index;
         }
-        
+
         [Header("Character Settings")]
         [Tooltip("When character attack with melee weapon, it will cast sphere from this transform to detect hit objects")]
         [SerializeField]
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
         public override sealed bool MuteFootstepSound { get { return this.GetCaches().MuteFootstepSound; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
-        
+
         public CharacterModelManager ModelManager { get; private set; }
 
         public BaseCharacterModel CharacterModel
@@ -742,7 +742,7 @@ namespace MultiplayerARPG
             debugDamageRotation = damageRotation;
         }
 #endif
-#endregion
+        #endregion
 
         #region Allowed abilities
         public virtual bool IsPlayingActionAnimation()
@@ -1193,11 +1193,15 @@ namespace MultiplayerARPG
 
         public bool IsAlly(BaseCharacterEntity targetCharacter)
         {
+            if (CurrentMapInfo == null)
+                return false;
             return CurrentMapInfo.IsAlly(this, targetCharacter);
         }
 
         public bool IsEnemy(BaseCharacterEntity targetCharacter)
         {
+            if (CurrentMapInfo == null)
+                return false;
             return CurrentMapInfo.IsEnemy(this, targetCharacter);
         }
 
