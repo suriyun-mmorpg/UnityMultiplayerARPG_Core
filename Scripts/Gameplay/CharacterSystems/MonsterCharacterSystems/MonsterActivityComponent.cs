@@ -120,7 +120,8 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (tempTargetEnemy.IsDead() || tempTargetEnemy.IsInSafeArea || tempTargetEnemy == CacheEntity)
+            if (tempTargetEnemy.Entity == CacheEntity.Entity ||
+                tempTargetEnemy.IsDead() || !tempTargetEnemy.CanReceiveDamageFrom(CacheEntity))
             {
                 // If target is dead or in safe area stop attacking
                 CacheEntity.SetTargetEntity(null);
@@ -250,14 +251,16 @@ namespace MultiplayerARPG
                 return false;
 
             BaseCharacterEntity targetCharacter;
-            if (!CacheEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
+            if (!CacheEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.Entity == CacheEntity.Entity ||
+                 targetCharacter.IsDead() || !targetCharacter.CanReceiveDamageFrom(CacheEntity))
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
                 List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(MonsterDatabase.visualRange, false, true, false);
                 foreach (BaseCharacterEntity characterEntity in characterEntities)
                 {
                     // Attack target settings
-                    if (characterEntity == null || !characterEntity.CanReceiveDamageFrom(CacheEntity))
+                    if (characterEntity == null || characterEntity.Entity == CacheEntity.Entity ||
+                        characterEntity.IsDead() || !characterEntity.CanReceiveDamageFrom(CacheEntity))
                     {
                         // If character is null or cannot receive damage from monster, skip it
                         continue;

@@ -171,7 +171,8 @@ namespace MultiplayerARPG
 
         public void SetAttackTarget(BaseCharacterEntity target)
         {
-            if (target == null || target.IsDead())
+            if (target == null || target.Entity == Entity ||
+                target.IsDead() || !target.CanReceiveDamageFrom(this))
                 return;
             // Already have target so don't set target
             BaseCharacterEntity oldTarget;
