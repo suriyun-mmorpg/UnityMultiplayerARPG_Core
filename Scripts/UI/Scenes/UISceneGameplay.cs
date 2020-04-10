@@ -787,7 +787,7 @@ namespace MultiplayerARPG
             return uiNpcDialog != null &&
                 uiNpcDialog.IsVisible() &&
                 uiNpcDialog.Data != null &&
-                uiNpcDialog.Data.type == NpcDialogType.Shop;
+                uiNpcDialog.Data.IsShop;
         }
 
         public override bool IsRefineItemDialogVisible()

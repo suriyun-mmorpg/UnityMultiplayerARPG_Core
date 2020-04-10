@@ -81,5 +81,6 @@ namespace MultiplayerARPG
         public abstract bool ValidateDialog(BasePlayerCharacterEntity characterEntity);
         public abstract NpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
         protected abstract void SetDialogByPort(NodePort from, NodePort to);
+        public abstract bool IsShop { get; }
     }
 }

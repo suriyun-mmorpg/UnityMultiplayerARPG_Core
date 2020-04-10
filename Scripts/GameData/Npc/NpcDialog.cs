@@ -541,5 +541,10 @@ namespace MultiplayerARPG
             if (from.fieldName.Equals(this.GetMemberName(a => a.storageCancelDialog)))
                 storageCancelDialog = dialog;
         }
+
+        public override bool IsShop
+        {
+            get { return type == NpcDialogType.Shop; }
+        }
     }
 }
