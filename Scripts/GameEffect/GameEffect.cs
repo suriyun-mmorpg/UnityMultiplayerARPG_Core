@@ -9,7 +9,17 @@ namespace MultiplayerARPG
         public string effectSocket;
         public bool isLoop;
         public float lifeTime;
-        public Transform followingTarget;
+        private bool intendToFollowingTarget;
+        private Transform followingTarget;
+        public Transform FollowingTarget
+        {
+            get { return followingTarget; }
+            set
+            {
+                followingTarget = value;
+                intendToFollowingTarget = true;
+            }
+        }
 
         [SerializeField]
         private int poolSize = 30;
@@ -46,7 +56,10 @@ namespace MultiplayerARPG
 
         protected virtual void PushBack()
         {
-            PoolSystem.PushBack(this);
+            if (ObjectPrefab != null)
+                PoolSystem.PushBack(this);
+            else if (gameObject.activeSelf)
+                gameObject.SetActive(false);
         }
 
         private void Update()
@@ -59,12 +72,12 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            if (followingTarget != null)
+            if (FollowingTarget != null)
             {
-                CacheTransform.position = followingTarget.position;
-                CacheTransform.rotation = followingTarget.rotation;
+                CacheTransform.position = FollowingTarget.position;
+                CacheTransform.rotation = FollowingTarget.rotation;
             }
-            else
+            else if (intendToFollowingTarget)
             {
                 PushBack();
             }
