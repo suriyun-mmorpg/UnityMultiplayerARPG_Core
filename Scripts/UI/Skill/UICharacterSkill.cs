@@ -227,7 +227,7 @@ namespace MultiplayerARPG
 
             if (uiTextSummon != null)
             {
-                if (Skill == null || !Skill.IsActive() || Skill.GetSummon().monsterEntity == null)
+                if (Skill == null || !Skill.IsActive() || Skill.GetSummon().MonsterEntity == null)
                 {
                     uiTextSummon.gameObject.SetActive(false);
                 }
@@ -236,17 +236,17 @@ namespace MultiplayerARPG
                     uiTextSummon.gameObject.SetActive(true);
                     uiTextSummon.text = string.Format(
                         LanguageManager.GetText(formatKeySummon),
-                        Skill.GetSummon().monsterEntity.Title,
-                        Skill.GetSummon().level.GetAmount(Level),
-                        Skill.GetSummon().amountEachTime.GetAmount(Level),
-                        Skill.GetSummon().maxStack.GetAmount(Level),
-                        Skill.GetSummon().duration.GetAmount(Level));
+                        Skill.GetSummon().MonsterEntity.Title,
+                        Skill.GetSummon().Level.GetAmount(Level),
+                        Skill.GetSummon().AmountEachTime.GetAmount(Level),
+                        Skill.GetSummon().MaxStack.GetAmount(Level),
+                        Skill.GetSummon().Duration.GetAmount(Level));
                 }
             }
 
             if (uiTextMount != null)
             {
-                if (Skill == null || !Skill.IsActive() || Skill.GetMount().mountEntity == null)
+                if (Skill == null || !Skill.IsActive() || Skill.GetMount().MountEntity == null)
                 {
                     uiTextMount.gameObject.SetActive(false);
                 }
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
                     uiTextMount.gameObject.SetActive(true);
                     uiTextMount.text = string.Format(
                         LanguageManager.GetText(formatKeyMount),
-                        Skill.GetMount().mountEntity.Title);
+                        Skill.GetMount().MountEntity.Title);
                 }
             }
 

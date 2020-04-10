@@ -8,11 +8,21 @@ namespace MultiplayerARPG
     public partial struct SkillSummon
     {
         [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
-        public BaseMonsterCharacterEntity monsterEntity;
+        [SerializeField]
+        private BaseMonsterCharacterEntity monsterEntity;
+        public BaseMonsterCharacterEntity MonsterEntity { get { return monsterEntity; } }
         [Tooltip("If duration less than or equals to 0, summoned monster will die")]
-        public IncrementalFloat duration;
-        public IncrementalInt amountEachTime;
-        public IncrementalInt maxStack;
-        public IncrementalShort level;
+        [SerializeField]
+        private IncrementalFloat duration;
+        public IncrementalFloat Duration { get { return duration; } }
+        [SerializeField]
+        private IncrementalInt amountEachTime;
+        public IncrementalInt AmountEachTime { get { return amountEachTime; } }
+        [SerializeField]
+        private IncrementalInt maxStack;
+        public IncrementalInt MaxStack { get { return maxStack; } }
+        [SerializeField]
+        private IncrementalShort level;
+        public IncrementalShort Level { get { return level; } }
     }
 }

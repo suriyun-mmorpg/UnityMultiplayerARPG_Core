@@ -70,7 +70,7 @@ public class CharacterSummon : INetSerializableWithElement
             {
                 case SummonType.Skill:
                     if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill))
-                        cachePrefab = cacheSkill.GetSummon().monsterEntity;
+                        cachePrefab = cacheSkill.GetSummon().MonsterEntity;
                     break;
                 case SummonType.Pet:
                     if (GameInstance.Items.TryGetValue(dataId, out cachePetItem) && cachePetItem is IPetItem)

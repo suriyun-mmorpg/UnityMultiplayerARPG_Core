@@ -173,11 +173,11 @@ namespace MultiplayerARPG
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
             int i = 0;
-            int amountEachTime = summon.amountEachTime.GetAmount(skillLevel);
+            int amountEachTime = summon.AmountEachTime.GetAmount(skillLevel);
             for (i = 0; i < amountEachTime; ++i)
             {
                 CharacterSummon newSummon = CharacterSummon.Create(SummonType.Skill, DataId);
-                newSummon.Summon(skillUser, summon.level.GetAmount(skillLevel), summon.duration.GetAmount(skillLevel));
+                newSummon.Summon(skillUser, summon.Level.GetAmount(skillLevel), summon.Duration.GetAmount(skillLevel));
                 skillUser.Summons.Add(newSummon);
             }
             int count = 0;
@@ -186,7 +186,7 @@ namespace MultiplayerARPG
                 if (skillUser.Summons[i].dataId == DataId)
                     ++count;
             }
-            int maxStack = summon.maxStack.GetAmount(skillLevel);
+            int maxStack = summon.MaxStack.GetAmount(skillLevel);
             int unSummonAmount = count > maxStack ? count - maxStack : 0;
             CharacterSummon tempSummon;
             for (i = unSummonAmount; i > 0; --i)
@@ -206,7 +206,7 @@ namespace MultiplayerARPG
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
 
-            skillUser.Mount(mount.mountEntity);
+            skillUser.Mount(mount.MountEntity);
         }
 
         protected DamageInfo GetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand)
@@ -332,8 +332,8 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { summon.monsterEntity });
-            GameInstance.AddVehicleEntities(new VehicleEntity[] { mount.mountEntity });
+            GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { summon.MonsterEntity });
+            GameInstance.AddVehicleEntities(new VehicleEntity[] { mount.MountEntity });
             List<BaseItem> items = new List<BaseItem>();
             items.Add(itemCraft.CraftingItem);
             foreach (BaseItem item in itemCraft.CacheCraftRequirements.Keys)
