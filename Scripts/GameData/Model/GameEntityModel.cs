@@ -229,7 +229,7 @@ namespace MultiplayerARPG
                     continue;
                 // Setup transform and activate effect
                 tempGameEffect = PoolSystem.GetInstance(effect, tempContainer.transform.position, tempContainer.transform.rotation);
-                tempGameEffect.followingTarget = tempContainer.transform;
+                tempGameEffect.FollowingTarget = tempContainer.transform;
                 tempGameEffect.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
                 AddingNewEffect(tempGameEffect);
                 tempAddingEffects.Add(tempGameEffect);
