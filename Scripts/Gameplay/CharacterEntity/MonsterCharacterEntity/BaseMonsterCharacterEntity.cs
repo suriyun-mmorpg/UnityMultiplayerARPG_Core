@@ -563,6 +563,23 @@ namespace MultiplayerARPG
                 MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
+
+        public override float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, BaseSkill skill)
+        {
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                case AnimActionType.AttackLeftHand:
+                    return MonsterDatabase.MoveSpeedRateWhileAttacking;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    // Calculate move speed rate while doing action at clients and server
+                    if (skill != null)
+                        return skill.moveSpeedRateWhileUsingSkill;
+                    break;
+            }
+            return 1f;
+        }
     }
 
     public struct ReceivedDamageRecord

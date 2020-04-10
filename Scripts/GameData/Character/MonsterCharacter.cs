@@ -37,19 +37,28 @@ namespace MultiplayerARPG
         [Header("Weapon/Attack Abilities")]
         [SerializeField]
         private DamageInfo damageInfo;
-        public DamageInfo DamageInfo { get { return damageInfo; } }
-        public DamageIncremental damageAmount;
+        [SerializeField]
+        private DamageIncremental damageAmount;
+        [SerializeField]
+        private float moveSpeedRateWhileAttacking = 0f;
 
         [Header("Killing Rewards")]
-        public int randomExpMin;
-        public int randomExpMax;
-        public int randomGoldMin;
-        public int randomGoldMax;
+        [SerializeField]
+        private int randomExpMin;
+        [SerializeField]
+        private int randomExpMax;
+        [SerializeField]
+        private int randomGoldMin;
+        [SerializeField]
+        private int randomGoldMax;
         [Tooltip("Max kind of items that will be dropped in ground")]
-        public byte maxDropItems = 5;
+        [SerializeField]
+        private byte maxDropItems = 5;
         [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
-        public ItemDrop[] randomItems;
-        public ItemDropTable itemDropTable;
+        [SerializeField]
+        private ItemDrop[] randomItems;
+        [SerializeField]
+        private ItemDropTable itemDropTable;
 
         [System.NonSerialized]
         private CharacterStatsIncremental? adjustStats;
@@ -204,6 +213,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public DamageInfo DamageInfo
+        {
+            get { return damageInfo; }
+        }
+
         public DamageIncremental DamageAmount
         {
             get
@@ -230,6 +244,11 @@ namespace MultiplayerARPG
                     return adjustDamageAmount.Value;
                 }
             }
+        }
+
+        public float MoveSpeedRateWhileAttacking
+        {
+            get { return moveSpeedRateWhileAttacking; }
         }
 
         [System.NonSerialized]
