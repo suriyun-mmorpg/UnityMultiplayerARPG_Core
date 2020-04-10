@@ -97,6 +97,212 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(new Quest[] { quest });
         }
 
+        public override void RenderUI(UINpcDialog uiNpcDialog)
+        {
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BaseItem craftingItem = null;
+            List<NpcSellItem> sellItems = new List<NpcSellItem>();
+            List<UINpcDialogMenuAction> menuActions = new List<UINpcDialogMenuAction>();
+            UINpcDialogMenuAction confirmMenuAction;
+            UINpcDialogMenuAction cancelMenuAction;
+            switch (type)
+            {
+                case NpcDialogType.Normal:
+                    if (uiNpcDialog.onSwitchToNormalDialog == null)
+                        uiNpcDialog.onSwitchToNormalDialog.Invoke();
+                    for (int i = 0; i < menus.Length; ++i)
+                    {
+                        NpcDialogMenu menu = menus[i];
+                        if (menu.IsPassConditions(owningCharacter))
+                        {
+                            UINpcDialogMenuAction menuAction = new UINpcDialogMenuAction();
+                            menuAction.title = menu.Title;
+                            menuAction.menuIndex = i;
+                            menuActions.Add(menuAction);
+                        }
+                    }
+                    break;
+                case NpcDialogType.Quest:
+                    if (uiNpcDialog.onSwitchToQuestDialog == null)
+                        uiNpcDialog.onSwitchToQuestDialog.Invoke();
+                    if (uiNpcDialog.uiCharacterQuest != null)
+                    {
+                        if (quest != null)
+                        {
+                            UINpcDialogMenuAction acceptMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction declineMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction abandonMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction completeMenuAction = new UINpcDialogMenuAction();
+                            acceptMenuAction.title = uiNpcDialog.MessageQuestAccept;
+                            acceptMenuAction.menuIndex = QUEST_ACCEPT_MENU_INDEX;
+                            declineMenuAction.title = uiNpcDialog.MessageQuestDecline;
+                            declineMenuAction.menuIndex = QUEST_DECLINE_MENU_INDEX;
+                            abandonMenuAction.title = uiNpcDialog.MessageQuestAbandon;
+                            abandonMenuAction.menuIndex = QUEST_ABANDON_MENU_INDEX;
+                            completeMenuAction.title = uiNpcDialog.MessageQuestComplete;
+                            completeMenuAction.menuIndex = QUEST_COMPLETE_MENU_INDEX;
+
+                            CharacterQuest characterQuest;
+                            int index = owningCharacter.IndexOfQuest(quest.DataId);
+                            if (index >= 0)
+                            {
+                                characterQuest = owningCharacter.Quests[index];
+                                if (!characterQuest.IsAllTasksDone(owningCharacter))
+                                    menuActions.Add(abandonMenuAction);
+                                else
+                                    menuActions.Add(completeMenuAction);
+                            }
+                            else
+                            {
+                                characterQuest = CharacterQuest.Create(quest);
+                                menuActions.Add(acceptMenuAction);
+                                menuActions.Add(declineMenuAction);
+                            }
+                            uiNpcDialog.uiCharacterQuest.Setup(characterQuest, owningCharacter, index);
+                        }
+                    }
+                    break;
+                case NpcDialogType.Shop:
+                    if (uiNpcDialog.onSwitchToSellItemDialog == null)
+                        uiNpcDialog.onSwitchToSellItemDialog.Invoke();
+                    sellItems.AddRange(sellItems);
+                    break;
+                case NpcDialogType.CraftItem:
+                    if (uiNpcDialog.onSwitchToCraftItemDialog == null)
+                        uiNpcDialog.onSwitchToCraftItemDialog.Invoke();
+                    if (uiNpcDialog.uiCraftItem != null)
+                    {
+                        craftingItem = itemCraft.CraftingItem;
+                        if (craftingItem != null)
+                        {
+                            confirmMenuAction = new UINpcDialogMenuAction();
+                            cancelMenuAction = new UINpcDialogMenuAction();
+                            confirmMenuAction.title = uiNpcDialog.MessageCraftItemConfirm;
+                            confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+                            cancelMenuAction.title = uiNpcDialog.MessageCraftItemCancel;
+                            cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+                            uiNpcDialog.uiCraftItem.Setup(CrafterType.Npc, null, itemCraft);
+                            menuActions.Add(confirmMenuAction);
+                            menuActions.Add(cancelMenuAction);
+                        }
+                    }
+                    break;
+                case NpcDialogType.SaveRespawnPoint:
+                    if (uiNpcDialog.onSwitchToSaveRespawnPointDialog != null)
+                        uiNpcDialog.onSwitchToSaveRespawnPointDialog.Invoke();
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = uiNpcDialog.MessageSaveRespawnPointConfirm;
+                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = uiNpcDialog.MessageSaveRespawnPointCancel;
+                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
+                    break;
+                case NpcDialogType.Warp:
+                    if (uiNpcDialog.onSwitchToWarpDialog != null)
+                        uiNpcDialog.onSwitchToWarpDialog.Invoke();
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = uiNpcDialog.MessageWarpConfirm;
+                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = uiNpcDialog.MessageWarpCancel;
+                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
+                    break;
+                case NpcDialogType.RefineItem:
+                    if (uiNpcDialog.onSwitchToRefineItemDialog != null)
+                        uiNpcDialog.onSwitchToRefineItemDialog.Invoke();
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = uiNpcDialog.MessageRefineItemConfirm;
+                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = uiNpcDialog.MessageRefineItemCancel;
+                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
+                    break;
+                case NpcDialogType.DismantleItem:
+                    if (uiNpcDialog.onSwitchToDismantleItemDialog != null)
+                        uiNpcDialog.onSwitchToDismantleItemDialog.Invoke();
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = uiNpcDialog.MessageDismantleItemConfirm;
+                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = uiNpcDialog.MessageDismantleItemCancel;
+                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
+                    break;
+                case NpcDialogType.PlayerStorage:
+                    if (uiNpcDialog.onSwitchToPlayerStorageDialog != null)
+                        uiNpcDialog.onSwitchToPlayerStorageDialog.Invoke();
+                    UINpcDialogMenuAction playerStorageConfirmAction = new UINpcDialogMenuAction();
+                    UINpcDialogMenuAction playerStorageCancelAction = new UINpcDialogMenuAction();
+                    playerStorageConfirmAction.title = uiNpcDialog.MessagePlayerStorageConfirm;
+                    playerStorageConfirmAction.menuIndex = CONFIRM_MENU_INDEX;
+                    playerStorageCancelAction.title = uiNpcDialog.MessagePlayerStorageCancel;
+                    playerStorageCancelAction.menuIndex = CANCEL_MENU_INDEX;
+                    menuActions.Add(playerStorageConfirmAction);
+                    menuActions.Add(playerStorageCancelAction);
+                    break;
+                case NpcDialogType.GuildStorage:
+                    if (uiNpcDialog.onSwitchToGuildStorageDialog != null)
+                        uiNpcDialog.onSwitchToGuildStorageDialog.Invoke();
+                    UINpcDialogMenuAction guildStorageConfirmAction = new UINpcDialogMenuAction();
+                    UINpcDialogMenuAction guildStorageCancelAction = new UINpcDialogMenuAction();
+                    guildStorageConfirmAction.title = uiNpcDialog.MessageGuildStorageConfirm;
+                    guildStorageConfirmAction.menuIndex = CONFIRM_MENU_INDEX;
+                    guildStorageCancelAction.title = uiNpcDialog.MessageGuildStorageCancel;
+                    guildStorageCancelAction.menuIndex = CANCEL_MENU_INDEX;
+                    menuActions.Add(guildStorageConfirmAction);
+                    menuActions.Add(guildStorageCancelAction);
+                    break;
+            }
+
+            // Menu
+            if (uiNpcDialog.uiMenuRoot != null)
+                uiNpcDialog.uiMenuRoot.SetActive(menuActions.Count > 0);
+            UINpcDialogMenu tempUiNpcDialogMenu;
+            uiNpcDialog.CacheMenuList.Generate(menuActions, (index, menuAction, ui) =>
+            {
+                tempUiNpcDialogMenu = ui.GetComponent<UINpcDialogMenu>();
+                tempUiNpcDialogMenu.Data = menuAction;
+                tempUiNpcDialogMenu.uiNpcDialog = uiNpcDialog;
+                tempUiNpcDialogMenu.Show();
+            });
+
+            // Quest
+            if (uiNpcDialog.uiCharacterQuest != null)
+            {
+                if (quest == null)
+                    uiNpcDialog.uiCharacterQuest.Hide();
+                else
+                    uiNpcDialog.uiCharacterQuest.Show();
+            }
+
+            // Shop
+            if (uiNpcDialog.uiSellItemRoot != null)
+                uiNpcDialog.uiSellItemRoot.SetActive(sellItems.Count > 0);
+            UINpcSellItem tempUiNpcSellItem;
+            uiNpcDialog.CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
+            {
+                tempUiNpcSellItem = ui.GetComponent<UINpcSellItem>();
+                tempUiNpcSellItem.Setup(sellItem, index);
+                tempUiNpcSellItem.Show();
+            });
+
+            // Craft Item
+            if (uiNpcDialog.uiCraftItem != null)
+            {
+                if (craftingItem == null)
+                    uiNpcDialog.uiCraftItem.Hide();
+                else
+                    uiNpcDialog.uiCraftItem.Show();
+            }
+        }
+
         public override bool ValidateDialog(BasePlayerCharacterEntity characterEntity)
         {
             switch (type)

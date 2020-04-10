@@ -58,7 +58,7 @@ namespace MultiplayerARPG
 
         }
 
-        public virtual void RenderUI()
+        public virtual void RenderUI(UINpcDialog uiNpcDialog)
         {
 
         }
