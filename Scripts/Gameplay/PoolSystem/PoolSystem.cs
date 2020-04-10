@@ -92,18 +92,18 @@ namespace MultiplayerARPG
         {
             if (instance == null)
             {
-                Debug.LogWarning("[PoolSystem] Cannot push back. The instance's is empty.");
+                Debug.LogWarning("[PoolSystem] Cannot push back (" + instance.gameObject + "). The instance's is empty.");
                 return;
             }
             if (instance.ObjectPrefab == null)
             {
-                Debug.LogWarning("[PoolSystem] Cannot push back. The instance's prefab is empty");
+                Debug.LogWarning("[PoolSystem] Cannot push back (" + instance.gameObject + "). The instance's prefab is empty");
                 return;
             }
             Queue<IPoolDescriptor> queue;
             if (!m_Pools.TryGetValue(instance.ObjectPrefab, out queue))
             {
-                Debug.LogWarning("[PoolSystem] Cannot push back. The instance's prefab does not initailized yet.");
+                Debug.LogWarning("[PoolSystem] Cannot push back (" + instance.gameObject + "). The instance's prefab does not initailized yet.");
                 return;
             }
             instance.gameObject.SetActive(false);
