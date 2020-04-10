@@ -35,7 +35,9 @@ namespace MultiplayerARPG
         private MonsterSkill[] monsterSkills;
 
         [Header("Weapon/Attack Abilities")]
-        public DamageInfo damageInfo;
+        [SerializeField]
+        private DamageInfo damageInfo;
+        public DamageInfo DamageInfo { get { return damageInfo; } }
         public DamageIncremental damageAmount;
 
         [Header("Killing Rewards")]
@@ -316,7 +318,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            damageInfo.PrepareRelatesData();
+            DamageInfo.PrepareRelatesData();
         }
     }
 }

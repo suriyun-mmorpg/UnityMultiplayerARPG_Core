@@ -700,18 +700,18 @@ namespace MultiplayerARPG
             if (!isLeftHand)
             {
                 if (rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
+                    return rightWeaponItem.WeaponType.DamageInfo.GetDistance() + StoppingDistance;
                 if (rightWeaponItem == null && leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
+                    return leftWeaponItem.WeaponType.DamageInfo.GetDistance() + StoppingDistance;
             }
             else
             {
                 if (leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
+                    return leftWeaponItem.WeaponType.DamageInfo.GetDistance() + StoppingDistance;
                 if (leftWeaponItem == null && rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
+                    return rightWeaponItem.WeaponType.DamageInfo.GetDistance() + StoppingDistance;
             }
-            return CurrentGameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetDistance() + StoppingDistance;
+            return CurrentGameInstance.DefaultWeaponItem.WeaponType.DamageInfo.GetDistance() + StoppingDistance;
         }
 
         public virtual float GetAttackFov(bool isLeftHand)
@@ -721,18 +721,18 @@ namespace MultiplayerARPG
             if (!isLeftHand)
             {
                 if (rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.damageInfo.GetFov();
+                    return rightWeaponItem.WeaponType.DamageInfo.GetFov();
                 if (rightWeaponItem == null && leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.damageInfo.GetFov();
+                    return leftWeaponItem.WeaponType.DamageInfo.GetFov();
             }
             else
             {
                 if (leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.damageInfo.GetFov();
+                    return leftWeaponItem.WeaponType.DamageInfo.GetFov();
                 if (leftWeaponItem == null && rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.damageInfo.GetFov();
+                    return rightWeaponItem.WeaponType.DamageInfo.GetFov();
             }
-            return CurrentGameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetFov();
+            return CurrentGameInstance.DefaultWeaponItem.WeaponType.DamageInfo.GetFov();
         }
 
 #if UNITY_EDITOR

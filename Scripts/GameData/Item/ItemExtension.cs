@@ -253,7 +253,7 @@ namespace MultiplayerARPG
             if (!item.IsWeapon() || character == null)
                 return false;
 
-            AmmoType requireAmmoType = item.WeaponType.requireAmmoType;
+            AmmoType requireAmmoType = item.WeaponType.RequireAmmoType;
             return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
         }
     }

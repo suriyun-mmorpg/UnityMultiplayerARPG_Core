@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         private void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, CharacterItem characterItem)
         {
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
-            bool isActive = weaponItem != null && weaponItem.WeaponType.requireAmmoType != null;
+            bool isActive = weaponItem != null && weaponItem.WeaponType.RequireAmmoType != null;
             if (root != null)
                 root.SetActive(isActive);
 
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                 textReserveAmmo.gameObject.SetActive(isActive);
                 if (isActive)
                 {
-                    int ammoAmount = character != null && weaponItem.WeaponType.requireAmmoType != null ? character.CountAmmos(weaponItem.WeaponType.requireAmmoType) : 0;
+                    int ammoAmount = character != null && weaponItem.WeaponType.RequireAmmoType != null ? character.CountAmmos(weaponItem.WeaponType.RequireAmmoType) : 0;
                     textReserveAmmo.text = ammoAmount.ToString("N0");
                 }
             }

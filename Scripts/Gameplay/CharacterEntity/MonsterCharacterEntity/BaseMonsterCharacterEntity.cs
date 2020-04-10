@@ -273,12 +273,12 @@ namespace MultiplayerARPG
 
         public override float GetAttackDistance(bool isLeftHand)
         {
-            return MonsterDatabase.damageInfo.GetDistance();
+            return MonsterDatabase.DamageInfo.GetDistance();
         }
 
         public override float GetAttackFov(bool isLeftHand)
         {
-            return MonsterDatabase.damageInfo.GetFov();
+            return MonsterDatabase.DamageInfo.GetFov();
         }
 
         public override void ReceivedDamage(IGameEntity attacker, CombatAmountType damageAmountType, int damage)

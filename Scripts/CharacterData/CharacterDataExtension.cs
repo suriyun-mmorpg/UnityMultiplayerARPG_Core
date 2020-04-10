@@ -1056,11 +1056,25 @@ public static partial class CharacterDataExtension
         {
             BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
             isLeftHand = false;
-            return monsterCharacterEntity.MonsterDatabase.damageInfo;
+            return monsterCharacterEntity.MonsterDatabase.DamageInfo;
         }
         else
         {
-            return data.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.damageInfo;
+            return data.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DamageInfo;
+        }
+    }
+
+    public static Transform GetWeaponDamageTransform(this BaseCharacterEntity characterEntity, ref bool isLeftHand)
+    {
+        if (characterEntity is BaseMonsterCharacterEntity)
+        {
+            BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+            isLeftHand = false;
+            return monsterCharacterEntity.MonsterDatabase.DamageInfo.GetDamageTransform(characterEntity, isLeftHand);
+        }
+        else
+        {
+            return characterEntity.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DamageInfo.GetDamageTransform(characterEntity, isLeftHand);
         }
     }
 

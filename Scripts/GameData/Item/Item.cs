@@ -323,7 +323,7 @@ namespace MultiplayerARPG
 
         public WeaponItemEquipType EquipType
         {
-            get { return WeaponType == null ? WeaponItemEquipType.OneHand : WeaponType.equipType; }
+            get { return WeaponType == null ? WeaponItemEquipType.OneHand : WeaponType.EquipType; }
         }
 
         public EquipmentModel[] OffHandEquipmentModels

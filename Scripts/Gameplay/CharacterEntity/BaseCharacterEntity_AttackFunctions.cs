@@ -78,12 +78,12 @@ namespace MultiplayerARPG
                 return true;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.WeaponType.requireAmmoType != null)
+            if (weaponItem.WeaponType.RequireAmmoType != null)
             {
                 if (weaponItem.AmmoCapacity <= 0)
                 {
                     // Ammo capacity is 0 so reduce ammo from inventory
-                    if (this.CountAmmos(weaponItem.WeaponType.requireAmmoType) < amount)
+                    if (this.CountAmmos(weaponItem.WeaponType.RequireAmmoType) < amount)
                         return false;
                 }
                 else
@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
                 Dictionary<CharacterItem, short> decreaseAmmoItems;
-                if (this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, amount, out decreaseAmmoItems))
+                if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out decreaseAmmoItems))
                 {
                     CharacterItem ammoCharacterItem = decreaseAmmoItems.FirstOrDefault().Key;
                     IAmmoItem ammoItem = ammoCharacterItem.GetAmmoItem();
@@ -145,14 +145,14 @@ namespace MultiplayerARPG
             IWeaponItem reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
             if (reloadingWeaponItem == null ||
                 reloadingWeaponItem.WeaponType == null ||
-                reloadingWeaponItem.WeaponType.requireAmmoType == null ||
+                reloadingWeaponItem.WeaponType.RequireAmmoType == null ||
                 reloadingWeaponItem.AmmoCapacity <= 0 ||
                 reloadingWeapon.ammo >= reloadingWeaponItem.AmmoCapacity)
                 return;
 
             // Prepare reload data
             reloadingAmmoAmount = (short)(reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo);
-            int inventoryAmount = this.CountAmmos(reloadingWeaponItem.WeaponType.requireAmmoType);
+            int inventoryAmount = this.CountAmmos(reloadingWeaponItem.WeaponType.RequireAmmoType);
             if (inventoryAmount < reloadingAmmoAmount)
                 reloadingAmmoAmount = (short)inventoryAmount;
 
@@ -203,7 +203,7 @@ namespace MultiplayerARPG
                 // Prepare data
                 EquipWeapons equipWeapons = EquipWeapons;
                 Dictionary<CharacterItem, short> decreaseItems;
-                if (IsServer && this.DecreaseAmmos(reloadingWeaponItem.WeaponType.requireAmmoType, reloadingAmmoAmount, out decreaseItems))
+                if (IsServer && this.DecreaseAmmos(reloadingWeaponItem.WeaponType.RequireAmmoType, reloadingAmmoAmount, out decreaseItems))
                 {
                     reloadingWeapon.ammo += reloadingAmmoAmount;
                     if (isLeftHand)
