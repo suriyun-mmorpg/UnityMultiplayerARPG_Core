@@ -342,19 +342,18 @@ namespace MultiplayerARPG
 
             InputManager.useMobileInputOnNonMobile = testInEditorMode == TestInEditorMode.Mobile && Application.isEditor;
 
-            DefaultArmorType = ScriptableObject.CreateInstance<ArmorType>();
-            DefaultArmorType.name = GameDataConst.UNKNOW_ARMOR_TYPE_ID;
-            DefaultArmorType.title = GameDataConst.UNKNOW_ARMOR_TYPE_TITLE;
+            DefaultArmorType = ScriptableObject.CreateInstance<ArmorType>()
+                .GenerateDefaultArmorType();
 
-            DefaultWeaponType = ScriptableObject.CreateInstance<WeaponType>();
-            DefaultWeaponType.name = GameDataConst.UNKNOW_WEAPON_TYPE_ID;
-            DefaultWeaponType.title = GameDataConst.UNKNOW_WEAPON_TYPE_TITLE;
-            DefaultWeaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
-            DefaultWeaponType.damageInfo = new DamageInfo();
+            DefaultWeaponType = ScriptableObject.CreateInstance<WeaponType>()
+                .GenerateDefaultWeaponType();
 
             // Setup default weapon item if not existed
             if (defaultWeaponItem == null || !defaultWeaponItem.IsWeapon())
-                defaultWeaponItem = ScriptableObject.CreateInstance<Item>().GenerateDefaultItem(DefaultWeaponType);
+            {
+                defaultWeaponItem = ScriptableObject.CreateInstance<Item>()
+                    .GenerateDefaultItem(DefaultWeaponType);
+            }
 
             // Setup default damage element if not existed
             if (defaultDamageElement == null)
