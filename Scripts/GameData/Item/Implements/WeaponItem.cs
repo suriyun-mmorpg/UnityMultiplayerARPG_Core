@@ -53,7 +53,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private float moveSpeedRateWhileAttacking;
+        private float moveSpeedRateWhileAttacking = 0f;
         public float MoveSpeedRateWhileAttacking
         {
             get { return moveSpeedRateWhileAttacking; }

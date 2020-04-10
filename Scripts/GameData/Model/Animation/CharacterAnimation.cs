@@ -18,6 +18,7 @@ namespace MultiplayerARPG
     public struct ActionAnimation
     {
         public AnimationClip clip;
+        public bool playClipAllLayers;
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float triggerDurationRate;
@@ -174,6 +175,7 @@ namespace MultiplayerARPG
     {
         public BaseSkill skill;
         public AnimationClip castClip;
+        public bool playCastClipAllLayers;
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional("activateAnimationType", "UseActivateAnimation")]
         public ActionAnimation activateAnimation;
@@ -264,6 +266,7 @@ namespace MultiplayerARPG
 
         [Header("Skill movements")]
         public AnimationClip skillCastClip;
+        public bool playSkillCastClipAllLayers;
         public ActionAnimation skillActivateAnimation;
     }
 }

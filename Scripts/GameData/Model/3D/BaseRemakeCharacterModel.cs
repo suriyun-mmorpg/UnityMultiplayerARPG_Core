@@ -151,6 +151,14 @@ namespace MultiplayerARPG
             return defaultAnimations.skillCastClip;
         }
 
+        public bool IsSkillCastClipPlayingAllLayers(int dataId)
+        {
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheSkillAnimations[dataId].castClip != null)
+                return GetAnims().CacheSkillAnimations[dataId].playCastClipAllLayers;
+            return defaultAnimations.playSkillCastClipAllLayers;
+        }
+
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
             if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&

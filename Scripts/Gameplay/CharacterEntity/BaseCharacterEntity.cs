@@ -1115,7 +1115,7 @@ namespace MultiplayerARPG
             return 1f;
         }
 
-        public float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, BaseSkill skill)
+        public virtual float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, BaseSkill skill)
         {
             switch (animActionType)
             {

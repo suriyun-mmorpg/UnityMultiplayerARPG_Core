@@ -23,7 +23,9 @@ namespace MultiplayerARPG
         public static readonly int ANIM_MOVE_SPEED = Animator.StringToHash("MoveSpeed");
         public static readonly int ANIM_SIDE_MOVE_SPEED = Animator.StringToHash("SideMoveSpeed");
         public static readonly int ANIM_DO_ACTION = Animator.StringToHash("DoAction");
+        public static readonly int ANIM_DO_ACTION_ALL_LAYERS = Animator.StringToHash("DoActionAllLayers");
         public static readonly int ANIM_IS_CASTING_SKILL = Animator.StringToHash("IsCastingSkill");
+        public static readonly int ANIM_IS_CASTING_SKILL_ALL_LAYERS = Animator.StringToHash("IsCastingSkillAllLayers");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
         public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
@@ -498,12 +500,26 @@ namespace MultiplayerARPG
             {
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
-                animator.Play(0, actionStateLayer, 0f);
+                animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, tempActionAnimation.playClipAllLayers);
+                if (tempActionAnimation.playClipAllLayers)
+                {
+                    for (int i = 0; i < animator.layerCount; ++i)
+                    {
+                        animator.Play(0, i, 0f);
+                    }
+                }
+                else
+                {
+                    animator.Play(0, actionStateLayer, 0f);
+                }
             }
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
             if (tempActionAnimation.clip)
+            {
                 animator.SetBool(ANIM_DO_ACTION, false);
+                animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
+            }
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
         }
@@ -516,12 +532,25 @@ namespace MultiplayerARPG
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
         {
             AnimationClip castClip = GetSkillCastClip(dataId);
+            bool playAllLayers = IsSkillCastClipPlayingAllLayers(dataId);
             CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
             yield return 0;
             animator.SetBool(ANIM_IS_CASTING_SKILL, true);
-            animator.Play(0, castSkillStateLayer, 0f);
+            animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, playAllLayers);
+            if (playAllLayers)
+            {
+                for (int i = 0; i < animator.layerCount; ++i)
+                {
+                    animator.Play(0, i, 0f);
+                }
+            }
+            else
+            {
+                animator.Play(0, castSkillStateLayer, 0f);
+            }
             yield return new WaitForSecondsRealtime(duration);
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+            animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
         }
 
         public override void StopActionAnimation()
