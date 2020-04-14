@@ -323,7 +323,7 @@ namespace MultiplayerARPG
                         {
                             destination = null;
                         }
-                        else
+                        else if (!PlayerCharacterEntity.IsPlayingActionAnimation())
                         {
                             destination = targetPosition.Value;
                             PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
@@ -399,8 +399,10 @@ namespace MultiplayerARPG
             {
                 destination = null;
                 ClearTarget();
-                PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(moveDirection));
+                if (!PlayerCharacterEntity.IsPlayingActionAnimation())
+                    PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(moveDirection));
             }
+
             // Always forward
             MovementState movementState = MovementState.Forward;
             if (InputManager.GetButtonDown("Jump"))
@@ -700,6 +702,10 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return;
+
+            if (PlayerCharacterEntity.IsPlayingActionAnimation())
+                return;
+
             Vector3 direction = (entity.CacheTransform.position - MovementTransform.position).normalized;
             Vector3 position = entity.CacheTransform.position - (direction * (distance - StoppingDistance));
             if (Vector3.Distance(previousPointClickPosition, position) > 0.01f)
