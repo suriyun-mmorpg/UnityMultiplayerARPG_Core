@@ -101,7 +101,6 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             BaseItem craftingItem = null;
-            List<NpcSellItem> sellItems = new List<NpcSellItem>();
             List<UINpcDialogMenuAction> menuActions = new List<UINpcDialogMenuAction>();
             UINpcDialogMenuAction confirmMenuAction;
             UINpcDialogMenuAction cancelMenuAction;
@@ -165,7 +164,6 @@ namespace MultiplayerARPG
                 case NpcDialogType.Shop:
                     if (uiNpcDialog.onSwitchToSellItemDialog == null)
                         uiNpcDialog.onSwitchToSellItemDialog.Invoke();
-                    sellItems.AddRange(sellItems);
                     break;
                 case NpcDialogType.CraftItem:
                     if (uiNpcDialog.onSwitchToCraftItemDialog == null)
@@ -284,7 +282,7 @@ namespace MultiplayerARPG
 
             // Shop
             if (uiNpcDialog.uiSellItemRoot != null)
-                uiNpcDialog.uiSellItemRoot.SetActive(sellItems.Count > 0);
+                uiNpcDialog.uiSellItemRoot.SetActive(sellItems.Length > 0);
             UINpcSellItem tempUiNpcSellItem;
             uiNpcDialog.CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
             {
