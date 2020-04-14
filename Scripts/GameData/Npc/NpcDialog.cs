@@ -101,6 +101,16 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             BaseItem craftingItem = null;
+
+            if (uiNpcDialog.uiCharacterQuest != null)
+                uiNpcDialog.uiCharacterQuest.Hide();
+
+            if (uiNpcDialog.uiSellItemRoot != null)
+                uiNpcDialog.uiSellItemRoot.SetActive(false);
+
+            if (uiNpcDialog.uiCraftItem != null)
+                uiNpcDialog.uiCraftItem.Hide();
+
             List<UINpcDialogMenuAction> menuActions = new List<UINpcDialogMenuAction>();
             UINpcDialogMenuAction confirmMenuAction;
             UINpcDialogMenuAction cancelMenuAction;
@@ -159,11 +169,21 @@ namespace MultiplayerARPG
                             }
                             uiNpcDialog.uiCharacterQuest.Setup(characterQuest, owningCharacter, index);
                         }
+                        uiNpcDialog.uiCharacterQuest.Show();
                     }
                     break;
                 case NpcDialogType.Shop:
                     if (uiNpcDialog.onSwitchToSellItemDialog == null)
                         uiNpcDialog.onSwitchToSellItemDialog.Invoke();
+                    if (uiNpcDialog.uiSellItemRoot != null)
+                        uiNpcDialog.uiSellItemRoot.SetActive(true);
+                    UINpcSellItem tempUiNpcSellItem;
+                    uiNpcDialog.CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
+                    {
+                        tempUiNpcSellItem = ui.GetComponent<UINpcSellItem>();
+                        tempUiNpcSellItem.Setup(sellItem, index);
+                        tempUiNpcSellItem.Show();
+                    });
                     break;
                 case NpcDialogType.CraftItem:
                     if (uiNpcDialog.onSwitchToCraftItemDialog == null)
@@ -183,6 +203,7 @@ namespace MultiplayerARPG
                             menuActions.Add(confirmMenuAction);
                             menuActions.Add(cancelMenuAction);
                         }
+                        uiNpcDialog.uiCraftItem.Show();
                     }
                     break;
                 case NpcDialogType.SaveRespawnPoint:
@@ -270,35 +291,6 @@ namespace MultiplayerARPG
                 tempUiNpcDialogMenu.uiNpcDialog = uiNpcDialog;
                 tempUiNpcDialogMenu.Show();
             });
-
-            // Quest
-            if (uiNpcDialog.uiCharacterQuest != null)
-            {
-                if (quest == null)
-                    uiNpcDialog.uiCharacterQuest.Hide();
-                else
-                    uiNpcDialog.uiCharacterQuest.Show();
-            }
-
-            // Shop
-            if (uiNpcDialog.uiSellItemRoot != null)
-                uiNpcDialog.uiSellItemRoot.SetActive(sellItems.Length > 0);
-            UINpcSellItem tempUiNpcSellItem;
-            uiNpcDialog.CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
-            {
-                tempUiNpcSellItem = ui.GetComponent<UINpcSellItem>();
-                tempUiNpcSellItem.Setup(sellItem, index);
-                tempUiNpcSellItem.Show();
-            });
-
-            // Craft Item
-            if (uiNpcDialog.uiCraftItem != null)
-            {
-                if (craftingItem == null)
-                    uiNpcDialog.uiCraftItem.Hide();
-                else
-                    uiNpcDialog.uiCraftItem.Show();
-            }
         }
 
         public override bool ValidateDialog(BasePlayerCharacterEntity characterEntity)
