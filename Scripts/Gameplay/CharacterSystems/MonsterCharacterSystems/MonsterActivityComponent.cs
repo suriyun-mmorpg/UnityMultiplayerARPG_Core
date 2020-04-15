@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         public float turnToEnemySpeed = 800f;
         [Tooltip("If this is TRUE, monster will attacks buildings")]
         public bool isAttackBuilding = false;
-        [Tooltip("IF this is TRUE, monster will attacks targets while its summoner still idle")]
+        [Tooltip("If this is TRUE, monster will attacks targets while its summoner still idle")]
         public bool isAggressiveWhileSummonerIdle = false;
 
         protected bool startedAggressive;
