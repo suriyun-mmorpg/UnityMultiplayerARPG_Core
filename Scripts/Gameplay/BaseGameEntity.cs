@@ -703,6 +703,7 @@ namespace MultiplayerARPG
                 teleportingPosition = position;
                 return;
             }
+            OnTeleport(position);
             ActiveMovement.Teleport(position);
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
@@ -710,6 +711,11 @@ namespace MultiplayerARPG
                 lastGrounded = true;
                 lastGroundedPosition = position;
             }
+        }
+
+        protected virtual void OnTeleport(Vector3 position)
+        {
+
         }
 
         public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)

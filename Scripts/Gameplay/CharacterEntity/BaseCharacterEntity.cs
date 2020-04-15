@@ -294,6 +294,13 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnTeleport(Vector3 position)
+        {
+            base.OnTeleport(position);
+            // Clear target entity when teleport
+            SetTargetEntity(null);
+        }
+
         #region Relates Objects
         public virtual void InstantiateUI(UICharacterEntity prefab)
         {
@@ -980,7 +987,43 @@ namespace MultiplayerARPG
             return Vector3.Angle(targetDir, forward) < fov * 0.5f;
         }
 
-        public List<T> FindCharacters<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
+        public List<T> FindDamageableEntities<T>(float distance, int layerMask, bool findForAlive, bool findInFov = false, float fov = 0)
+            where T : class, IDamageableEntity
+        {
+            List<T> result = new List<T>();
+            int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, layerMask);
+            if (tempOverlapSize == 0)
+                return result;
+            GameObject tempGameObject;
+            IDamageableEntity tempBaseEntity;
+            T tempEntity;
+            for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
+            {
+                tempGameObject = GetOverlapObject_ForFindFunctions(tempLoopCounter);
+                tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                if (tempBaseEntity == null)
+                    continue;
+                tempEntity = tempBaseEntity.Entity as T;
+                if (tempEntity == null)
+                    continue;
+                if (findForAlive && tempEntity.IsDead())
+                    continue;
+                if (findInFov && !IsPositionInFov(fov, tempEntity.GetTransform().position))
+                    continue;
+                if (result.Contains(tempEntity))
+                    continue;
+                result.Add(tempEntity);
+            }
+            return result;
+        }
+
+        public List<T> FindAliveDamageableEntities<T>(float distance, int layerMask, bool findInFov = false, float fov = 0)
+            where T : class, IDamageableEntity
+        {
+            return FindDamageableEntities<T>(distance, layerMask, true, findInFov, fov);
+        }
+
+        public List<T> FindCharacters<T>(float distance, bool findForAlive, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
             List<T> result = new List<T>();
@@ -988,12 +1031,16 @@ namespace MultiplayerARPG
             if (tempOverlapSize == 0)
                 return result;
             GameObject tempGameObject;
+            IDamageableEntity tempBaseEntity;
             T tempEntity;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
                 tempGameObject = GetOverlapObject_ForFindFunctions(tempLoopCounter);
-                tempEntity = tempGameObject.GetComponent<T>();
-                if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral, findInFov, fov))
+                tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                if (tempBaseEntity == null)
+                    continue;
+                tempEntity = tempBaseEntity.Entity as T;
+                if (!IsCharacterWhichLookingFor(tempEntity, findForAlive, findForAlly, findForEnemy, findForNeutral, findInFov, fov))
                     continue;
                 if (result.Contains(tempEntity))
                     continue;
@@ -1005,7 +1052,7 @@ namespace MultiplayerARPG
         public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            return FindCharacters<T>(distance, true, findForAlly, findForEnemy, findForNeutral, findInFov, 0);
+            return FindCharacters<T>(distance, true, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
         }
 
         public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
@@ -1016,13 +1063,17 @@ namespace MultiplayerARPG
                 return null;
             GameObject tempGameObject;
             float tempDistance;
+            IDamageableEntity tempBaseEntity;
             T tempEntity;
             float nearestDistance = float.MaxValue;
             T nearestEntity = null;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
                 tempGameObject = GetOverlapObject_ForFindFunctions(tempLoopCounter);
-                tempEntity = tempGameObject.GetComponent<T>();
+                tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                if (tempBaseEntity == null)
+                    continue;
+                tempEntity = tempBaseEntity.Entity as T;
                 if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral, findInFov, fov))
                     continue;
                 tempDistance = Vector3.Distance(CacheTransform.position, tempEntity.CacheTransform.position);
@@ -1049,9 +1100,13 @@ namespace MultiplayerARPG
                 return false;
             if (findInFov && !IsPositionInFov(fov, characterEntity.CacheTransform.position))
                 return false;
-            return (findForAlly && characterEntity.IsAlly(this)) ||
-                (findForEnemy && characterEntity.IsEnemy(this)) ||
-                (findForNeutral && characterEntity.IsNeutral(this));
+            if (findForAlly && !IsAlly(characterEntity))
+                return false;
+            if (findForEnemy && !IsEnemy(characterEntity))
+                return false;
+            if (findForNeutral && !IsNeutral(characterEntity))
+                return false;
+            return true;
         }
         #endregion
 

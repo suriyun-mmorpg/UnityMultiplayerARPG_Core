@@ -18,6 +18,10 @@ namespace MultiplayerARPG
         public float followTargetDuration = 5f;
         [Tooltip("Turn to enemy speed")]
         public float turnToEnemySpeed = 800f;
+        [Tooltip("If this is TRUE, monster will attacks buildings")]
+        public bool isAttackBuilding = false;
+        [Tooltip("IF this is TRUE, monster will attacks targets while its summoner still idle")]
+        public bool isAggressiveWhileSummonerIdle = false;
 
         protected bool startedAggressive;
         protected float aggressiveElasped;
@@ -26,7 +30,7 @@ namespace MultiplayerARPG
         protected bool startedFollowEnemy;
         protected float startFollowEnemyElasped;
         protected Vector3 lastPosition;
-        protected BaseCharacterEntity tempTargetEnemy;
+        protected IDamageableEntity tempTargetEnemy;
         protected BaseSkill queueSkill;
         protected short queueSkillLevel;
 
@@ -50,11 +54,23 @@ namespace MultiplayerARPG
             {
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
+                    if (startedAggressive)
+                    {
+                        aggressiveElasped += deltaTime;
+                        // Find target when it's time
+                        if (aggressiveElasped >= findEnemyDelay &&
+                            FindEnemy(currentPosition))
+                        {
+                            aggressiveElasped = 0f;
+                            startedAggressive = false;
+                        }
+                    }
+
                     if (Vector3.Distance(currentPosition, CacheEntity.Summoner.CacheTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
                     {
                         // Follow summoner
                         FollowSummoner();
-                        startedFollowEnemy = false;
+                        startedAggressive = isAggressiveWhileSummonerIdle;
                     }
                     else
                     {
@@ -64,9 +80,10 @@ namespace MultiplayerARPG
                         {
                             randomedWanderElasped = 0f;
                             RandomWanderDestination();
+                            startedAggressive = isAggressiveWhileSummonerIdle;
                         }
-                        startedFollowEnemy = false;
                     }
+                    startedFollowEnemy = false;
                 }
             }
             else
@@ -129,7 +146,7 @@ namespace MultiplayerARPG
             }
 
             // If it has target then go to target
-            Vector3 targetPosition = tempTargetEnemy.CacheTransform.position;
+            Vector3 targetPosition = tempTargetEnemy.GetTransform().position;
             float attackDistance = CacheEntity.GetAttackDistance(false);
             if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
             {
@@ -250,9 +267,9 @@ namespace MultiplayerARPG
                 CacheEntity.Summoner == null)
                 return false;
 
-            BaseCharacterEntity targetCharacter;
-            if (!CacheEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.Entity == CacheEntity.Entity ||
-                 targetCharacter.IsDead() || !targetCharacter.CanReceiveDamageFrom(CacheEntity))
+            IDamageableEntity targetEntity;
+            if (!CacheEntity.TryGetTargetEntity(out targetEntity) || targetEntity.Entity == CacheEntity.Entity ||
+                 targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(CacheEntity))
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
                 List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(MonsterDatabase.visualRange, false, true, false);
@@ -265,12 +282,6 @@ namespace MultiplayerARPG
                         // If character is null or cannot receive damage from monster, skip it
                         continue;
                     }
-                    if (CacheEntity.Summoner != null &&
-                        CacheEntity.Summoner != characterEntity.GetTargetEntity())
-                    {
-                        // If character is not attacking summoner, skip it
-                        continue;
-                    }
                     if (!CacheEntity.IsEnemy(characterEntity))
                     {
                         // If character is not enemy, skip it
@@ -278,6 +289,31 @@ namespace MultiplayerARPG
                     }
                     // Found target, attack it
                     CacheEntity.SetAttackTarget(characterEntity);
+                    return true;
+                }
+                if (!isAttackBuilding)
+                    return false;
+                // Find building to attack
+                List<BuildingEntity> buildingEntities = CacheEntity.FindAliveDamageableEntities<BuildingEntity>(MonsterDatabase.visualRange, CurrentGameInstance.buildingLayer.Mask);
+                foreach (BuildingEntity buildingEntity in buildingEntities)
+                {
+                    // Attack target settings
+                    if (buildingEntity == null || buildingEntity.Entity == CacheEntity.Entity ||
+                        buildingEntity.IsDead() || !buildingEntity.CanReceiveDamageFrom(CacheEntity))
+                    {
+                        // If building is null or cannot receive damage from monster, skip it
+                        continue;
+                    }
+                    if (CacheEntity.Summoner != null)
+                    {
+                        if (CacheEntity.Summoner.Id.Equals(buildingEntity.CreatorId))
+                        {
+                            // If building was built by summoner, skip it
+                            continue;
+                        }
+                    }
+                    // Found target, attack it
+                    CacheEntity.SetAttackTarget(buildingEntity);
                     return true;
                 }
             }

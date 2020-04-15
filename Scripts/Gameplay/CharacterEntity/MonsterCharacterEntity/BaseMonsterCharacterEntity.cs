@@ -169,17 +169,17 @@ namespace MultiplayerARPG
                 SpawnPosition = CacheTransform.position;
         }
 
-        public void SetAttackTarget(BaseCharacterEntity target)
+        public void SetAttackTarget(IDamageableEntity target)
         {
             if (target == null || target.Entity == Entity ||
                 target.IsDead() || !target.CanReceiveDamageFrom(this))
                 return;
             // Already have target so don't set target
-            BaseCharacterEntity oldTarget;
+            IDamageableEntity oldTarget;
             if (TryGetTargetEntity(out oldTarget) && !oldTarget.IsDead())
                 return;
             // Set target to attack
-            SetTargetEntity(target);
+            SetTargetEntity(target.Entity);
         }
 
         public override float GetMoveSpeed()
