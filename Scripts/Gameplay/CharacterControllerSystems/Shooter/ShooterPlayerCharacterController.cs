@@ -74,6 +74,8 @@ namespace MultiplayerARPG
         private float tpsNearClipPlane = 0.3f;
         [SerializeField]
         private float tpsFarClipPlane = 1000f;
+        [SerializeField]
+        private bool turnForwardWhileDoingAction;
 
         [Header("FPS Settings")]
         [SerializeField]
@@ -540,6 +542,10 @@ namespace MultiplayerARPG
                 {
                     tempEntity = tempDamageableEntity.Entity;
 
+                    // Entity is in front of character, so this is target
+                    if (turnForwardWhileDoingAction && !IsInFront(tempHitInfo.point))
+                        continue;
+
                     // Target must be damageable, not player character entity, within aim distance and alive
                     if (tempDamageableEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
                         continue;
@@ -556,7 +562,8 @@ namespace MultiplayerARPG
                 }
                 // Find item drop entity
                 tempEntity = tempHitInfo.collider.GetComponent<ItemDropEntity>();
-                if (tempEntity != null && tempDistance <= CurrentGameInstance.pickUpItemDistance)
+                if (tempEntity != null && tempDistance <= CurrentGameInstance.pickUpItemDistance &&
+                    (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point)))
                 {
                     // Entity is in front of character, so this is target
                     aimPosition = tempHitInfo.point;
@@ -565,7 +572,8 @@ namespace MultiplayerARPG
                 }
                 // Find activatable entity (NPC/Building/Mount/Etc)
                 tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
-                if (tempEntity != null && tempDistance <= CurrentGameInstance.conversationDistance)
+                if (tempEntity != null && tempDistance <= CurrentGameInstance.conversationDistance &&
+                    (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point)))
                 {
                     // Entity is in front of character, so this is target
                     aimPosition = tempHitInfo.point;
@@ -695,7 +703,7 @@ namespace MultiplayerARPG
                             targetLookDirection = cameraForward;
                             break;
                         case ControllerViewMode.Tps:
-                            targetLookDirection = aimDirection;
+                            targetLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
                             break;
                     }
                 }
@@ -721,7 +729,7 @@ namespace MultiplayerARPG
                     }
                     // Calculate turn duration to smoothing character rotation in `UpdateLookAtTarget()`
                     calculatedTurnDuration = (180f - tempCalculateAngle) / 180f * turnToTargetDuration;
-                    targetLookDirection = aimDirection;
+                    targetLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
                     // Set movement state by inputs
                     if (inputV > 0.5f)
                         movementState |= MovementState.Forward;
@@ -1195,7 +1203,7 @@ namespace MultiplayerARPG
 
         public bool IsInFront(Vector3 position)
         {
-            return Vector3.Angle(cameraForward, PlayerCharacterEntity.CacheTransform.position - position) > 135f;
+            return Vector3.Angle(cameraForward, MovementTransform.position - position) > 135f;
         }
 
         public override Vector3? UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab)
