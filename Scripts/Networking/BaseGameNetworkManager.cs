@@ -62,6 +62,7 @@ namespace MultiplayerARPG
         public static readonly SocialGroupData ClientFriends = new SocialGroupData(1);
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
         // Events
+        public System.Action onClientWarp;
         public System.Action<ChatMessage> onClientReceiveChat;
         public System.Action<GameMessage> onClientReceiveGameMessage;
         public System.Action<PartyData> onClientUpdateParty;
@@ -349,7 +350,8 @@ namespace MultiplayerARPG
 
         protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            // TODO: May fade black when warping
+            if (onClientWarp != null)
+                onClientWarp.Invoke();
         }
 
         protected virtual void HandleChatAtClient(LiteNetLibMessageHandler messageHandler)
