@@ -272,7 +272,11 @@ namespace MultiplayerARPG
                  targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(CacheEntity))
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
-                List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(MonsterDatabase.visualRange, false, true, false);
+                List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(
+                    MonsterDatabase.visualRange,
+                    false, /* Don't find an allies */
+                    true,  /* Always find an enemies */
+                    CacheEntity.IsSummoned && isAggressiveWhileSummonerIdle /* Find enemy while summoned and aggresively */);
                 foreach (BaseCharacterEntity characterEntity in characterEntities)
                 {
                     // Attack target settings
