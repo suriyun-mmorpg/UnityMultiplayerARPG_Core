@@ -58,37 +58,40 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override bool IsGMCommand(string chatMessage)
+        public override bool IsGMCommand(string chatMessage, out string command)
         {
+            command = string.Empty;
             if (string.IsNullOrEmpty(chatMessage))
                 return false;
 
             string[] splited = chatMessage.Split(' ');
-            string commandKey = splited[0];
-            if (commandKey.Equals(Level))
+            command = splited[0];
+            if (command.Equals(Level) ||
+                command.Equals(StatPoint) ||
+                command.Equals(SkillPoint) ||
+                command.Equals(Gold) ||
+                command.Equals(AddItem) ||
+                command.Equals(GiveGold) ||
+                command.Equals(GiveItem))
+            {
                 return true;
-            if (commandKey.Equals(StatPoint))
-                return true;
-            if (commandKey.Equals(SkillPoint))
-                return true;
-            if (commandKey.Equals(Gold))
-                return true;
-            if (commandKey.Equals(AddItem))
-                return true;
-            if (commandKey.Equals(GiveGold))
-                return true;
-            if (commandKey.Equals(GiveItem))
-                return true;
-
+            }
+            command = string.Empty;
             return false;
         }
 
-        public override void HandleGMCommand(BaseGameNetworkManager manager, string sender, string command)
+        public override bool CanUseGMCommand(BasePlayerCharacterEntity characterEntity, string command)
         {
-            if (string.IsNullOrEmpty(command))
+            // TODO: May allow user to use some GM commands by their user level.
+            return characterEntity != null && characterEntity.UserLevel > 0;
+        }
+
+        public override void HandleGMCommand(BaseGameNetworkManager manager, string sender, string chatMessage)
+        {
+            if (string.IsNullOrEmpty(chatMessage))
                 return;
 
-            string[] data = command.Split(' ');
+            string[] data = chatMessage.Split(' ');
             string commandKey = data[0];
             string receiver;
             BasePlayerCharacterEntity playerCharacter;

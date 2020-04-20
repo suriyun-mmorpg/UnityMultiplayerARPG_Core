@@ -551,8 +551,9 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(message.sender) &&
                         TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
-                        // TODO: Don't use fixed user level
-                        if (CurrentGameInstance.GMCommands.IsGMCommand(message.message) && playerCharacter.UserLevel > 0)
+                        string gmCommand;
+                        if (CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
+                            CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacter, gmCommand))
                         {
                             // If it's gm command and sender's user level > 0, handle gm commands
                             CurrentGameInstance.GMCommands.HandleGMCommand(this, message.sender, message.message);
