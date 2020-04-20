@@ -62,6 +62,8 @@ namespace MultiplayerARPG
         public static readonly SocialGroupData ClientFriends = new SocialGroupData(1);
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
         // Events
+        public System.Action onServerUpdate;
+        public System.Action onClientUpdate;
         public System.Action onClientWarp;
         public System.Action<ChatMessage> onClientReceiveChat;
         public System.Action<GameMessage> onClientReceiveGameMessage;
@@ -122,6 +124,11 @@ namespace MultiplayerARPG
                     UpdateOnlineCharacters();
                 lastUpdateOnlineCharacterTime = tempUnscaledTime;
             }
+            // Handle update events
+            if (IsServer && onServerUpdate != null)
+                onServerUpdate.Invoke();
+            if (IsClientConnected && onClientUpdate != null)
+                onClientUpdate.Invoke();
         }
 
         protected override void RegisterClientMessages()
