@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public string whisperCommand = "/w";
         public string partyCommand = "/p";
         public string guildCommand = "/g";
+        public string systemCommand = "/s";
         public KeyCode enterChatKey = KeyCode.Return;
         public int chatEntrySize = 30;
         public GameObject[] enterChatActiveObjects;
@@ -148,7 +149,7 @@ namespace MultiplayerARPG
                     message = trimText.Substring(cmd.Length + receiver.Length + 1); // +1 for space
                     EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 1); // +1 for space
                 }
-                if ((cmd == globalCommand || cmd == partyCommand || cmd == guildCommand) && splitedText.Length > 1)
+                if ((cmd == globalCommand || cmd == partyCommand || cmd == guildCommand || cmd == systemCommand) && splitedText.Length > 1)
                 {
                     if (cmd == globalCommand)
                         channel = ChatChannel.Global;
@@ -156,6 +157,8 @@ namespace MultiplayerARPG
                         channel = ChatChannel.Party;
                     if (cmd == guildCommand)
                         channel = ChatChannel.Guild;
+                    if (cmd == systemCommand)
+                        channel = ChatChannel.System;
                     message = trimText.Substring(cmd.Length + 1); // +1 for space
                     EnterChatMessage = trimText.Substring(0, cmd.Length + 1); // +1 for space
                 }

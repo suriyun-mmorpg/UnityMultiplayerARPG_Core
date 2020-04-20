@@ -622,6 +622,16 @@ namespace MultiplayerARPG
                         }
                     }
                     break;
+                case ChatChannel.System:
+                    // TODO: Don't use fixed user level
+                    if (!string.IsNullOrEmpty(message.sender) &&
+                        TryGetPlayerCharacterByName(message.sender, out playerCharacter) &&
+                        playerCharacter.UserLevel > 0)
+                    {
+                        // Send message to all clients
+                        ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                    }
+                    break;
             }
         }
 
