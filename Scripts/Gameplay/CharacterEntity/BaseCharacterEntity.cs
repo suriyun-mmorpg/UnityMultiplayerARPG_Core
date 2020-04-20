@@ -1100,13 +1100,9 @@ namespace MultiplayerARPG
                 return false;
             if (findInFov && !IsPositionInFov(fov, characterEntity.CacheTransform.position))
                 return false;
-            if (findForAlly && !IsAlly(characterEntity))
-                return false;
-            if (findForEnemy && !IsEnemy(characterEntity))
-                return false;
-            if (findForNeutral && !IsNeutral(characterEntity))
-                return false;
-            return true;
+            return (findForAlly && characterEntity.IsAlly(this)) ||
+                (findForEnemy && characterEntity.IsEnemy(this)) ||
+                (findForNeutral && characterEntity.IsNeutral(this));
         }
         #endregion
 
