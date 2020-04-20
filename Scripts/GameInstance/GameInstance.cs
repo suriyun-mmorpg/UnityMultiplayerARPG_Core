@@ -43,6 +43,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private BaseGameplayRule gameplayRule;
         [SerializeField]
+        private BaseGMCommands gmCommands;
+        [SerializeField]
         private NetworkSetting networkSetting;
 
         [Header("Gameplay Objects")]
@@ -243,6 +245,11 @@ namespace MultiplayerARPG
             get { return gameplayRule; }
         }
 
+        public BaseGMCommands GMCommands
+        {
+            get { return gmCommands; }
+        }
+
         public BaseGameDatabase GameDatabase
         {
             get { return gameDatabase; }
@@ -371,6 +378,10 @@ namespace MultiplayerARPG
             // Setup gameplay rule if not existed
             if (gameplayRule == null)
                 gameplayRule = ScriptableObject.CreateInstance<DefaultGameplayRule>();
+
+            // Setup GM commands if not existed
+            if (gmCommands == null)
+                gmCommands = ScriptableObject.CreateInstance<DefaultGMCommands>();
 
             // Setup game database if not existed
             if (gameDatabase == null)

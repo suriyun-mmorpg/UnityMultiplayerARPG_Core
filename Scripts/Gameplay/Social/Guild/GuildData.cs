@@ -44,7 +44,6 @@ namespace MultiplayerARPG
             gold = 0;
             memberRoles = new Dictionary<string, byte>();
             skillLevels = new Dictionary<int, short>();
-            AddMember(new SocialCharacterData() { id = leaderId });
         }
 
         public GuildData(int id)
