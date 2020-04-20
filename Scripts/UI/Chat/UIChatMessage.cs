@@ -15,33 +15,39 @@ namespace MultiplayerARPG
         public string formatParty = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_PARTY);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
         public string formatGuild = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GUILD);
+        [Tooltip("Format {0} = Message")]
+        public string formatSystem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_SYSTEM);
 
         public TextWrapper uiTextMessage;
         public UIChatHandler uiChatHandler;
         protected override void UpdateData()
         {
-            string format = string.Empty;
-            switch (Data.channel)
-            {
-                case ChatChannel.Local:
-                    format = LanguageManager.GetText(formatLocal);
-                    break;
-                case ChatChannel.Global:
-                    format = LanguageManager.GetText(formatGlobal);
-                    break;
-                case ChatChannel.Whisper:
-                    format = LanguageManager.GetText(formatWhisper);
-                    break;
-                case ChatChannel.Party:
-                    format = LanguageManager.GetText(formatParty);
-                    break;
-                case ChatChannel.Guild:
-                    format = LanguageManager.GetText(formatGuild);
-                    break;
-            }
-
             if (uiTextMessage != null)
-                uiTextMessage.text = string.Format(format, Data.sender, Data.message);
+            {
+                string format = string.Empty;
+                switch (Data.channel)
+                {
+                    case ChatChannel.Local:
+                        format = LanguageManager.GetText(formatLocal);
+                        break;
+                    case ChatChannel.Global:
+                        format = LanguageManager.GetText(formatGlobal);
+                        break;
+                    case ChatChannel.Whisper:
+                        format = LanguageManager.GetText(formatWhisper);
+                        break;
+                    case ChatChannel.Party:
+                        format = LanguageManager.GetText(formatParty);
+                        break;
+                    case ChatChannel.Guild:
+                        format = LanguageManager.GetText(formatGuild);
+                        break;
+                }
+                if (Data.channel == ChatChannel.System)
+                    uiTextMessage.text = string.Format(LanguageManager.GetText(formatSystem), Data.message);
+                else
+                    uiTextMessage.text = string.Format(format, Data.sender, Data.message);
+            }
         }
 
         public void OnClickEntry()

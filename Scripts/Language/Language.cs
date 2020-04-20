@@ -547,6 +547,10 @@ namespace MultiplayerARPG
         /// Format => {0} = {Character Name}, {1} = {Message}
         /// </summary>
         UI_FORMAT_CHAT_GUILD,
+        /// <summary>
+        /// Format => {0} = {Message}
+        /// </summary>
+        UI_FORMAT_CHAT_SYSTEM,
         // Format - Armor Amount
         /// <summary>
         /// Format => {0} = {Damage Element Title}, {1} = {Target Amount}
@@ -881,6 +885,7 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_WHISPER.ToString(), "<color=green>(WHISPER) {0}: {1}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_PARTY.ToString(), "<color=cyan>(PARTY) {0}: {1}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_GUILD.ToString(), "<color=blue>(GUILD) {0}: {1}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_SYSTEM.ToString(), "<color=orange>{0}</color>");
             // Error - Generic Error
             Texts.Add(UITextKeys.UI_ERROR_KICKED_FROM_SERVER.ToString(), "You have been kicked from server");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_FAILED.ToString(), "Cannot connect to the server");
