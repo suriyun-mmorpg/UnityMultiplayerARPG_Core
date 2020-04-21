@@ -105,12 +105,9 @@ namespace MultiplayerARPG
             {
                 // If another monster has same allyId so it is ally
                 BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
-                if (targetMonster != null)
-                {
-                    if (targetMonster.IsSummoned)
-                        return monsterCharacter.IsAlly(targetMonster.Summoner);
-                    return targetMonster.MonsterDatabase.allyId == monsterCharacter.MonsterDatabase.allyId;
-                }
+                if (targetMonster.IsSummoned)
+                    return monsterCharacter.IsAlly(targetMonster.Summoner);
+                return targetMonster.MonsterDatabase.allyId == monsterCharacter.MonsterDatabase.allyId;
             }
 
             return false;
