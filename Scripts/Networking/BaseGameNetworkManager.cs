@@ -76,6 +76,11 @@ namespace MultiplayerARPG
         public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish;
 
+        public Dictionary<long, BasePlayerCharacterEntity>.ValueCollection GetPlayerCharacters()
+        {
+            return playerCharacters.Values;
+        }
+
         public bool TryGetPlayerCharacter(long connectionId, out BasePlayerCharacterEntity result)
         {
             return playerCharacters.TryGetValue(connectionId, out result);
