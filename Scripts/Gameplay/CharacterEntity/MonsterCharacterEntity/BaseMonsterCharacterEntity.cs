@@ -311,7 +311,7 @@ namespace MultiplayerARPG
             base.ReceivedDamage(attacker, damageAmountType, damage);
         }
 
-        public override sealed void Killed(IGameEntity lastAttacker)
+        public override void Killed(IGameEntity lastAttacker)
         {
             base.Killed(lastAttacker);
 

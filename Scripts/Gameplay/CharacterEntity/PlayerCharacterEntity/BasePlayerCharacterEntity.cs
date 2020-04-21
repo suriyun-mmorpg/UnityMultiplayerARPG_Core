@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             CurrentGameManager.RespawnCharacter(this);
         }
 
-        public override sealed void Killed(IGameEntity lastAttacker)
+        public override void Killed(IGameEntity lastAttacker)
         {
             float expLostPercentage = CurrentGameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;
