@@ -337,7 +337,7 @@ namespace MultiplayerARPG
             queueUsingSkill.itemIndex = -1;
         }
 
-        public abstract void UseHotkey(int hotkeyIndex, Vector3? aimPosition);
+        public abstract void UseHotkey(HotkeyType type, string relateId, Vector3? aimPosition);
         public abstract Vector3? UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab);
         public abstract void FinishBuildAimControls(bool isCancel);
     }
