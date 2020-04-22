@@ -23,9 +23,9 @@ public class UIBase : MonoBehaviour
             return root;
         }
     }
-    
+
     public Canvas CacheRootCanvas { get; private set; }
-    
+
     public GraphicRaycaster CacheGraphicRaycaster { get; private set; }
 
     public bool AlreadyCachedComponents { get; private set; }
@@ -73,7 +73,8 @@ public class UIBase : MonoBehaviour
         CacheGraphicRaycaster.enabled = true;
         if (!CacheRoot.activeSelf)
             CacheRoot.SetActive(true);
-        onShow.Invoke();
+        if (onShow != null)
+            onShow.Invoke();
         if (moveToLastSiblingOnShow)
             CacheRoot.transform.SetAsLastSibling();
         this.InvokeInstanceDevExtMethods("Show");
@@ -86,7 +87,8 @@ public class UIBase : MonoBehaviour
         CacheRootCanvas.enabled = false;
         CacheGraphicRaycaster.enabled = false;
         CacheRoot.SetActive(false);
-        onHide.Invoke();
+        if (onHide != null)
+            onHide.Invoke();
         this.InvokeInstanceDevExtMethods("Hide");
     }
 
