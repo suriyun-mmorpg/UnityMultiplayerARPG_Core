@@ -41,7 +41,7 @@ namespace MultiplayerARPG
 
             if (!IsDragging && joystick.IsDragging)
             {
-                CacheHotkey.UICharacterHotkeys.SetUsingHotkey(CacheHotkey);
+                UICharacterHotkeys.SetUsingHotkey(CacheHotkey);
                 IsDragging = true;
             }
 
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
 
             if (IsDragging && !joystick.IsDragging)
             {
-                CacheHotkey.UICharacterHotkeys.FinishHotkeyAimControls(hotkeyCancel);
+                UICharacterHotkeys.FinishHotkeyAimControls(hotkeyCancel);
                 IsDragging = false;
             }
         }

@@ -58,6 +58,46 @@ namespace MultiplayerARPG
             usingSkill = null;
             usingSkillLevel = 0;
 
+            // Find skill by relate Id
+            bool foundUsingSkill = false;
+            if (Data.type == HotkeyType.Skill)
+            {
+                // Get all skills included equipment skills
+                Dictionary<BaseSkill, short> skills = OwningCharacter.GetCaches().Skills;
+                foundUsingSkill = GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.relateId), out usingSkill) && usingSkill != null && skills.TryGetValue(usingSkill, out usingSkillLevel);
+            }
+
+            // Find item by relate Id
+            bool foundUsingItem = false;
+            int itemIndex = -1;
+            CharacterItem characterItem = null;
+            if (Data.type == HotkeyType.Item)
+            {
+                InventoryType inventoryType;
+                byte equipWeaponSet;
+                OwningCharacter.IsEquipped(
+                    Data.relateId,
+                    out inventoryType,
+                    out itemIndex,
+                    out equipWeaponSet,
+                    out characterItem);
+
+                switch (inventoryType)
+                {
+                    case InventoryType.EquipItems:
+                    case InventoryType.NonEquipItems:
+                        foundUsingItem = itemIndex >= 0;
+                        break;
+                    case InventoryType.EquipWeaponRight:
+                    case InventoryType.EquipWeaponLeft:
+                        foundUsingItem = true;
+                        break;
+                }
+
+                if (foundUsingItem)
+                    usingItem = characterItem.GetUsableItem();
+            }
+
             if (uiCharacterSkill == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterSkillPrefab != null)
             {
                 uiCharacterSkill = Instantiate(UICharacterHotkeys.uiCharacterSkillPrefab, transform);
@@ -74,11 +114,7 @@ namespace MultiplayerARPG
 
             if (uiCharacterSkill != null)
             {
-                // All skills included equipment skills
-                Dictionary<BaseSkill, short> skills = OwningCharacter.GetCaches().Skills;
-
-                if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.relateId), out usingSkill) ||
-                    usingSkill == null || !skills.TryGetValue(usingSkill, out usingSkillLevel))
+                if (!foundUsingSkill)
                 {
                     uiCharacterSkill.Hide();
                 }
@@ -98,31 +134,8 @@ namespace MultiplayerARPG
             if (uiCharacterItem != null)
             {
                 // Prepare item data
-                InventoryType inventoryType;
-                int itemIndex;
-                byte equipWeaponSet;
-                CharacterItem characterItem;
-                OwningCharacter.IsEquipped(
-                    Data.relateId,
-                    out inventoryType,
-                    out itemIndex,
-                    out equipWeaponSet,
-                    out characterItem);
 
-                bool isFound = false;
-                switch (inventoryType)
-                {
-                    case InventoryType.EquipItems:
-                    case InventoryType.NonEquipItems:
-                        isFound = itemIndex >= 0;
-                        break;
-                    case InventoryType.EquipWeaponRight:
-                    case InventoryType.EquipWeaponLeft:
-                        isFound = true;
-                        break;
-                }
-
-                if (!isFound)
+                if (!foundUsingItem)
                 {
                     uiCharacterItem.Hide();
                 }
@@ -131,8 +144,6 @@ namespace MultiplayerARPG
                     // Show only existed items
                     uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), OwningCharacter, itemIndex);
                     uiCharacterItem.Show();
-                    // Setup skill item
-                    usingItem = characterItem.GetUsableItem();
                     UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                     if (dragHandler != null)
                         dragHandler.SetupForHotkey(this);
@@ -207,8 +218,8 @@ namespace MultiplayerARPG
 
         public void Use(Vector3? aimPosition)
         {
-            if (BasePlayerCharacterController.Singleton != null)
-                BasePlayerCharacterController.Singleton.UseHotkey(indexOfData, aimPosition);
+            if (BasePlayerCharacterController.Singleton != null && Data != null)
+                BasePlayerCharacterController.Singleton.UseHotkey(Data.type, Data.relateId, aimPosition);
         }
 
         public bool CanAssignCharacterItem(CharacterItem characterItem)

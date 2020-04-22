@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     {
         public Button buttonEquip;
         public Button buttonUnEquip;
+        public Button buttonUse;
         public Button buttonRefine;
         public Button buttonDismantle;
         public Button buttonSocketEnhance;
@@ -22,6 +23,7 @@ namespace MultiplayerARPG
             ui.onSetEquippedData.AddListener(OnSetEquippedData);
             ui.onSetUnEquippedData.AddListener(OnSetUnEquippedData);
             ui.onSetUnEquippableData.AddListener(OnSetUnEquippableData);
+            ui.onSetUsableData.AddListener(OnSetUsableData);
             ui.onSetStorageItemData.AddListener(OnSetStorageItemData);
             ui.onRefineItemDialogAppear.AddListener(OnRefineItemDialogAppear);
             ui.onRefineItemDialogDisappear.AddListener(OnRefineItemDialogDisappear);
@@ -43,6 +45,8 @@ namespace MultiplayerARPG
                 buttonEquip.gameObject.SetActive(false);
             if (buttonUnEquip)
                 buttonUnEquip.gameObject.SetActive(false);
+            if (buttonUse)
+                buttonUse.gameObject.SetActive(false);
             if (buttonRefine)
                 buttonRefine.gameObject.SetActive(false);
             if (buttonDismantle)
@@ -90,6 +94,17 @@ namespace MultiplayerARPG
         public void OnSetUnEquippableData()
         {
             DeactivateAllButtons();
+            if (buttonDismantle)
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
+            if (buttonDrop)
+                buttonDrop.gameObject.SetActive(true);
+        }
+
+        public void OnSetUsableData()
+        {
+            DeactivateAllButtons();
+            if (buttonUse)
+                buttonUse.gameObject.SetActive(true);
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
             if (buttonDrop)

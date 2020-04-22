@@ -24,7 +24,23 @@ namespace MultiplayerARPG
         public RectTransform hotkeyCancelArea;
         public static UICharacterHotkey UsingHotkey { get; private set; }
         public static Vector3? HotkeyAimPosition { get; private set; }
-        private readonly List<UICharacterHotkeyJoystickEventHandler> hotkeyJoysticks = new List<UICharacterHotkeyJoystickEventHandler>();
+        private static UICharacterHotkey otherHotkey;
+        /// <summary>
+        /// The hotkey which will be used by other components
+        /// </summary>
+        public static UICharacterHotkey OtherHotkey
+        {
+            get
+            {
+                if (otherHotkey == null)
+                {
+                    otherHotkey = new GameObject("_OtherHotkey").AddComponent<UICharacterHotkey>();
+                    otherHotkey.transform.localScale = Vector3.zero;
+                }
+                return otherHotkey;
+            }
+        }
+        private static readonly List<UICharacterHotkeyJoystickEventHandler> hotkeyJoysticks = new List<UICharacterHotkeyJoystickEventHandler>();
 
         private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys;
         public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
@@ -127,7 +143,7 @@ namespace MultiplayerARPG
         }
 
         #region Mobile Controls
-        public void SetUsingHotkey(UICharacterHotkey hotkey)
+        public static void SetUsingHotkey(UICharacterHotkey hotkey)
         {
             if (IsAnyHotkeyJoyStickDragging())
                 return;
@@ -175,7 +191,7 @@ namespace MultiplayerARPG
                 hotkeyCancelArea.gameObject.SetActive(isAnyHotkeyJoyStickDragging);
         }
 
-        public void FinishHotkeyAimControls(bool isCancel)
+        public static void FinishHotkeyAimControls(bool isCancel)
         {
             if (UsingHotkey == null)
                 return;
@@ -197,7 +213,7 @@ namespace MultiplayerARPG
                 hotkeyJoysticks.Add(hotkeyJoystick);
         }
 
-        public bool IsAnyHotkeyJoyStickDragging()
+        public static bool IsAnyHotkeyJoyStickDragging()
         {
             foreach (UICharacterHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
             {
@@ -209,5 +225,14 @@ namespace MultiplayerARPG
             return false;
         }
         #endregion
+
+        public static void SetupAndUseOtherHotkey(HotkeyType type, string relateId)
+        {
+            CharacterHotkey hotkey = new CharacterHotkey();
+            hotkey.type = type;
+            hotkey.relateId = relateId;
+            OtherHotkey.Data = hotkey;
+            OtherHotkey.OnClickUse();
+        }
     }
 }

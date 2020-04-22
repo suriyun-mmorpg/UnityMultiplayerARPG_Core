@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         public short Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
         public BaseItem Item { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() : null; } }
+        public IUsableItem UsableItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetUsableItem() : null; } }
         public IEquipmentItem EquipmentItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
         public IArmorItem ArmorItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
         public IShieldItem ShieldItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
@@ -118,6 +119,7 @@ namespace MultiplayerARPG
         public UnityEvent onSetEquippedData;
         public UnityEvent onSetUnEquippedData;
         public UnityEvent onSetUnEquippableData;
+        public UnityEvent onSetUsableData;
         public UnityEvent onSetStorageItemData;
         public UnityEvent onNpcSellItemDialogAppear;
         public UnityEvent onNpcSellItemDialogDisappear;
@@ -223,7 +225,11 @@ namespace MultiplayerARPG
                         onSetUnEquippedData.Invoke();
                 }
                 else
+                {
                     onSetUnEquippableData.Invoke();
+                    if (UsableItem != null)
+                        onSetUsableData.Invoke();
+                }
             }
             else
                 onSetStorageItemData.Invoke();
@@ -938,13 +944,25 @@ namespace MultiplayerARPG
         public void OnClickUnEquip()
         {
             // Only equipped equipment can be unequipped
-            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
             OwningCharacter.RequestUnEquipItem(InventoryType, (short)IndexOfData, CharacterItem.equipSlotIndex);
+        }
+
+        public void OnClickUse()
+        {
+            if (!IsOwningCharacter())
+                return;
+
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+
+            // Controlling by hotkey controller
+            UICharacterHotkeys.SetupAndUseOtherHotkey(HotkeyType.Item, CharacterItem.id);
         }
 
         #region Drop Item Functions
