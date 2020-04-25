@@ -132,7 +132,7 @@ namespace MultiplayerARPG
                 }
             }
             // Update enemy detecting radius to attack distance
-            EnemyEntityDetector.detectingRadius = PlayerCharacterEntity.GetAttackDistance(false) + lockAttackTargetDistance;
+            EnemyEntityDetector.detectingRadius = Mathf.Max(PlayerCharacterEntity.GetAttackDistance(false), lockAttackTargetDistance);
             // Update inputs
             UpdatePointClickInput();
             UpdateWASDInput();
@@ -212,7 +212,6 @@ namespace MultiplayerARPG
                             break;
                         }
                     }
-                    // When clicking on target
                     else if (mouseUpOnTarget)
                     {
                         targetPlayer = tempTransform.GetComponent<BasePlayerCharacterEntity>();
@@ -230,6 +229,7 @@ namespace MultiplayerARPG
                         {
                             // Found activating entity as player character entity
                             SetTarget(targetPlayer, TargetActionType.Attack);
+                            isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -237,6 +237,7 @@ namespace MultiplayerARPG
                         {
                             // Found activating entity as monster character entity
                             SetTarget(targetMonster, TargetActionType.Attack);
+                            isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -244,6 +245,7 @@ namespace MultiplayerARPG
                         {
                             // Found activating entity as npc entity
                             SetTarget(targetNpc, TargetActionType.Undefined);
+                            isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -251,6 +253,7 @@ namespace MultiplayerARPG
                         {
                             // Found activating entity as item drop entity
                             SetTarget(targetItemDrop, TargetActionType.Undefined);
+                            isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -258,6 +261,7 @@ namespace MultiplayerARPG
                         {
                             // Found activating entity as harvestable entity
                             SetTarget(targetHarvestable, TargetActionType.Undefined);
+                            isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -265,6 +269,7 @@ namespace MultiplayerARPG
                         {
                             // Found activating entity as building entity
                             SetTarget(targetBuilding, TargetActionType.Undefined);
+                            isFollowingTarget = true;
                             IsEditingBuilding = false;
                             tempHasMapPosition = false;
                             break;
@@ -273,6 +278,7 @@ namespace MultiplayerARPG
                         {
                             // Found activating entity as vehicle entity
                             SetTarget(targetVehicle, TargetActionType.Undefined);
+                            isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -284,7 +290,7 @@ namespace MultiplayerARPG
                             if (tempMapPosition.y > tempHighestY)
                                 tempHighestY = tempMapPosition.y;
                         }
-                    }
+                    } // End mouseUpOnTarget
                 }
                 // When clicked on map (Not touch any game entity)
                 // - Clear selected target to hide selected entity UIs
@@ -305,29 +311,18 @@ namespace MultiplayerARPG
                     tempVector3.z = 0;
                     targetPosition = tempVector3;
                 }
-                // If Found target, do something
+
+                // Found ground position
                 if (targetPosition.HasValue)
                 {
-                    if (controllerMode == PlayerCharacterControllerMode.WASD)
+                    // Close NPC dialog, when target changes
+                    HideNpcDialog();
+                    ClearQueueUsingSkill();
+                    isFollowingTarget = false;
+                    if (!PlayerCharacterEntity.IsPlayingActionAnimation())
                     {
-                        destination = null;
-                    }
-                    else
-                    {
-                        // Close NPC dialog, when target changes
-                        HideNpcDialog();
-                        ClearQueueUsingSkill();
-
-                        // Move to target, will hide destination when target is object
-                        if (TargetEntity != null)
-                        {
-                            destination = null;
-                        }
-                        else if (!PlayerCharacterEntity.IsPlayingActionAnimation())
-                        {
-                            destination = targetPosition.Value;
-                            PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
-                        }
+                        destination = targetPosition.Value;
+                        PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
                     }
                 }
             }
@@ -382,10 +377,20 @@ namespace MultiplayerARPG
             Vector3 moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
             moveDirection.Normalize();
 
+            // Move
             if (moveDirection.sqrMagnitude > 0f)
             {
                 HideNpcDialog();
                 ClearQueueUsingSkill();
+                destination = null;
+                isFollowingTarget = false;
+                if (TargetEntity != null && Vector3.Distance(MovementTransform.position, TargetEntity.MovementTransform.position) >= wasdClearTargetDistance)
+                {
+                    // Clear target when character moved far from target
+                    ClearTarget();
+                }
+                if (!PlayerCharacterEntity.IsPlayingActionAnimation())
+                    PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(moveDirection));
             }
 
             // Attack when player pressed attack button
@@ -393,15 +398,6 @@ namespace MultiplayerARPG
                 UpdateWASDPendingSkill(queueUsingSkill.skill, queueUsingSkill.level);
             else if (InputManager.GetButton("Attack"))
                 UpdateWASDAttack();
-
-            // Move
-            if (moveDirection.sqrMagnitude > 0f)
-            {
-                destination = null;
-                ClearTarget();
-                if (!PlayerCharacterEntity.IsPlayingActionAnimation())
-                    PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(moveDirection));
-            }
 
             // Always forward
             MovementState movementState = MovementState.Forward;
@@ -418,28 +414,33 @@ namespace MultiplayerARPG
             if (TryGetSelectedTargetAsAttackingEntity(out targetEntity))
                 SetTarget(targetEntity, TargetActionType.Attack, false);
 
-            if (IsLockTarget() && !TryGetAttackingCharacter(out targetEntity))
+            if (wasdLockAttackTarget)
             {
-                // Find nearest target and move to the target
-                SelectedEntity = PlayerCharacterEntity
-                    .FindNearestAliveCharacter<BaseCharacterEntity>(
-                    PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking) + lockAttackTargetDistance,
-                    false,
-                    true,
-                    false);
-                if (SelectedEntity != null)
+                if (!TryGetAttackingCharacter(out targetEntity))
+                {
+                    // Find nearest target and move to the target
+                    targetEntity = PlayerCharacterEntity
+                        .FindNearestAliveCharacter<BaseCharacterEntity>(
+                        Mathf.Max(PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking), lockAttackTargetDistance),
+                        false,
+                        true,
+                        false);
+                }
+                if (targetEntity != null)
                 {
                     // Set target, then attack later when moved nearby target
-                    SetTarget(SelectedEntity, TargetActionType.Attack, false);
+                    SetTarget(targetEntity, TargetActionType.Attack, false);
+                    isFollowingTarget = true;
                 }
                 else
                 {
                     // No nearby target, so attack immediately
                     if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
                         isLeftHandAttacking = !isLeftHandAttacking;
+                    isFollowingTarget = false;
                 }
             }
-            else if (!IsLockTarget())
+            else if (!wasdLockAttackTarget)
             {
                 // Find nearest target and set selected target to show character hp/mp UIs
                 SelectedEntity = PlayerCharacterEntity
@@ -447,12 +448,16 @@ namespace MultiplayerARPG
                     PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking),
                     false,
                     true,
-                    false,
-                    true,
-                    PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking));
+                    false);
+                if (SelectedEntity != null)
+                {
+                    // Look at target and attack
+                    TurnCharacterToEntity(SelectedEntity);
+                }
                 // Not lock target, so not finding target and attack immediately
                 if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
                     isLeftHandAttacking = !isLeftHandAttacking;
+                isFollowingTarget = false;
             }
         }
 
@@ -466,29 +471,35 @@ namespace MultiplayerARPG
                 if (TryGetSelectedTargetAsAttackingEntity(out targetEntity))
                     SetTarget(targetEntity, TargetActionType.Attack, false);
 
-                if (IsLockTarget() && !TryGetAttackingCharacter(out targetEntity))
+                if (wasdLockAttackTarget)
                 {
-                    BaseCharacterEntity nearestTarget = PlayerCharacterEntity
-                        .FindNearestAliveCharacter<BaseCharacterEntity>(
-                        skill.GetCastDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking) + lockAttackTargetDistance,
-                        false,
-                        true,
-                        false);
-                    if (nearestTarget != null)
+                    if (!TryGetAttackingCharacter(out targetEntity))
+                    {
+                        targetEntity = PlayerCharacterEntity
+                            .FindNearestAliveCharacter<BaseCharacterEntity>(
+                            Mathf.Max(skill.GetCastDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking), lockAttackTargetDistance),
+                            false,
+                            true,
+                            false);
+                    }
+                    if (targetEntity != null)
                     {
                         // Set target, then use skill later when moved nearby target
-                        SetTarget(nearestTarget, TargetActionType.Attack, false);
+                        SetTarget(targetEntity, TargetActionType.Attack, false);
+                        isFollowingTarget = true;
                     }
                     else
                     {
-                        // No nearby target, so use skill immediately
+                        // No target, so use skill immediately
                         RequestUsePendingSkill();
+                        isFollowingTarget = false;
                     }
                 }
-                else if (!IsLockTarget())
+                else if (!wasdLockAttackTarget)
                 {
                     // Not lock target, so not finding target and use skill immediately
                     RequestUsePendingSkill();
+                    isFollowingTarget = false;
                 }
             }
             else
@@ -496,25 +507,38 @@ namespace MultiplayerARPG
                 // Not attack skill, so use skill immediately
                 if (skill.RequiredTarget())
                 {
-                    if (IsLockTarget())
+                    if (wasdLockAttackTarget)
                     {
-                        // Let's update follow target do it
-                        return;
+                        // Set target, then use skill later when moved nearby target
+                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
+                        {
+                            SetTarget(SelectedEntity, TargetActionType.UseSkill, false);
+                            isFollowingTarget = true;
+                        }
                     }
-                    // TODO: Check is target nearby or not
-                    ClearQueueUsingSkill();
+                    else
+                    {
+                        // Try apply skill to selected entity immediately, it will fail if selected entity is far from the character
+                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
+                        {
+                            SetTarget(SelectedEntity, TargetActionType.UseSkill, false);
+                            RequestUsePendingSkill();
+                            isFollowingTarget = false;
+                        }
+                    }
                 }
                 else
                 {
                     // Target not required, use skill immediately
                     RequestUsePendingSkill();
+                    isFollowingTarget = false;
                 }
             }
         }
 
         public void UpdateFollowTarget()
         {
-            if (!IsLockTarget())
+            if (!isFollowingTarget)
                 return;
 
             if (TryGetAttackingCharacter(out targetCharacter))
@@ -776,49 +800,80 @@ namespace MultiplayerARPG
             }
             else
             {
-                // If not attacking any character, use skill immediately
+                if (controllerMode == PlayerCharacterControllerMode.WASD ||
+                    controllerMode == PlayerCharacterControllerMode.Both)
+                {
+                    // For WASD controls, it will use queued skill later
+                    setQueueFunction.Invoke();
+                    return;
+                }
+
                 if (skill.IsAttack())
                 {
-                    // Default damage type attacks
-                    if (IsLockTarget() && !skill.HasCustomAimControls())
+                    // It's not an area skills, so find nearby entity to attack (if no selected entity existed)
+                    if (!skill.HasCustomAimControls())
                     {
-                        // If attacking any character, will use skill later
-                        setQueueFunction.Invoke();
-                        if (SelectedEntity == null && !(SelectedEntity is BaseCharacterEntity))
+                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
-                            // Attacking nearest target
-                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity
+                            // It may have to move to target to use skill, so add using skill to queue
+                            setQueueFunction.Invoke();
+                            SetTarget(SelectedEntity, TargetActionType.Attack, false);
+                            isFollowingTarget = true;
+                        }
+                        else
+                        {
+                            // No selected entity, find nearest entity
+                            BaseCharacterEntity targetEntity = PlayerCharacterEntity
                                 .FindNearestAliveCharacter<BaseCharacterEntity>(
-                                skill.GetCastDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking) + lockAttackTargetDistance,
+                                Mathf.Max(skill.GetCastDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking), lockAttackTargetDistance),
                                 false,
                                 true,
                                 false);
-                            if (nearestTarget != null)
-                                SetTarget(nearestTarget, TargetActionType.Attack);
+                            if (targetEntity != null)
+                            {
+                                // It may have to move to target to use skill, so add using skill to queue
+                                setQueueFunction.Invoke();
+                                SetTarget(targetEntity, TargetActionType.Attack, false);
+                                isFollowingTarget = true;
+                            }
+                            else
+                            {
+                                // No target, so use skill immediately
+                                destination = null;
+                                PlayerCharacterEntity.StopMove();
+                                useFunction.Invoke();
+                                isFollowingTarget = false;
+                            }
                         }
                     }
                     else
                     {
-                        // Not lock target, use it immediately
+                        // Cast skill to aimed position immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
                         useFunction.Invoke();
+                        isFollowingTarget = false;
                     }
                 }
                 else
                 {
-                    // This is not attack skill, use it immediately
-                    destination = null;
-                    PlayerCharacterEntity.StopMove();
                     if (skill.RequiredTarget())
                     {
-                        setQueueFunction.Invoke();
-                        if (IsLockTarget())
+                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
+                        {
+                            // It may have to move to target to use skill, so add using skill to queue
+                            setQueueFunction.Invoke();
                             SetTarget(SelectedEntity, TargetActionType.UseSkill, false);
+                            isFollowingTarget = true;
+                        }
                     }
                     else
                     {
+                        // Target not required, use skill immediately
+                        destination = null;
+                        PlayerCharacterEntity.StopMove();
                         useFunction.Invoke();
+                        isFollowingTarget = false;
                     }
                 }
             }

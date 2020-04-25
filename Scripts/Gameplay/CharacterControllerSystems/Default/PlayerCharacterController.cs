@@ -24,10 +24,12 @@ namespace MultiplayerARPG
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
         
         public PlayerCharacterControllerMode controllerMode;
-        [Tooltip("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
+        [Tooltip("Set this to `TRUE` to find nearby enemy and follow it to attack while `Controller Mode` is `WASD`")]
         public bool wasdLockAttackTarget;
-        [Tooltip("This will be used to find nearby enemy when `Controller Mode` is `Point Click` or when `Wasd Lock Attack Target` is `TRUE`")]
+        [Tooltip("This will be used to find nearby enemy while `Controller Mode` is `Point Click` or when `Wasd Lock Attack Target` is `TRUE`")]
         public float lockAttackTargetDistance = 10f;
+        [Tooltip("This will be used to clear selected target when character move with WASD keys and far from target")]
+        public float wasdClearTargetDistance = 15f;
         [Tooltip("Set this to TRUE to move to target immediately when clicked on target, if this is FALSE it will not move to target immediately")]
         public bool pointClickSetTargetImmediately;
         public GameObject targetObjectPrefab;
@@ -72,6 +74,7 @@ namespace MultiplayerARPG
         public NearbyEntityDetector EnemyEntityDetector { get; protected set; }
         protected int findingEnemyIndex;
         protected bool isLeftHandAttacking;
+        protected bool isFollowingTarget;
 
         protected override void Awake()
         {
@@ -151,6 +154,7 @@ namespace MultiplayerARPG
             {
                 ClearQueueUsingSkill();
                 destination = null;
+                isFollowingTarget = false;
                 if (CacheUISceneGameplay != null)
                     CacheUISceneGameplay.SetTargetEntity(null);
                 CancelBuild();
@@ -272,13 +276,6 @@ namespace MultiplayerARPG
                 castFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, false);
             }
             castDistance -= PlayerCharacterEntity.StoppingDistance;
-        }
-
-        public bool IsLockTarget()
-        {
-            return controllerMode == PlayerCharacterControllerMode.Both ||
-                controllerMode == PlayerCharacterControllerMode.PointClick ||
-                (controllerMode == PlayerCharacterControllerMode.WASD && wasdLockAttackTarget);
         }
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
