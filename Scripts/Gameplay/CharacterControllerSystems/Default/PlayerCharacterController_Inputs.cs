@@ -429,6 +429,7 @@ namespace MultiplayerARPG
                 if (targetEntity != null)
                 {
                     // Set target, then attack later when moved nearby target
+                    SelectedEntity = targetEntity;
                     SetTarget(targetEntity, TargetActionType.Attack, false);
                     isFollowingTarget = true;
                 }
@@ -485,6 +486,7 @@ namespace MultiplayerARPG
                     if (targetEntity != null)
                     {
                         // Set target, then use skill later when moved nearby target
+                        SelectedEntity = targetEntity;
                         SetTarget(targetEntity, TargetActionType.Attack, false);
                         isFollowingTarget = true;
                     }
@@ -833,6 +835,7 @@ namespace MultiplayerARPG
                             {
                                 // It may have to move to target to use skill, so add using skill to queue
                                 setQueueFunction.Invoke();
+                                SelectedEntity = targetEntity;
                                 SetTarget(targetEntity, TargetActionType.Attack, false);
                                 isFollowingTarget = true;
                             }
