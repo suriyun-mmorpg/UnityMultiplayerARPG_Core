@@ -944,7 +944,7 @@ namespace MultiplayerARPG
         public void OnClickUnEquip()
         {
             // Only equipped equipment can be unequipped
-            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
                 return;
 
             if (selectionManager != null)
