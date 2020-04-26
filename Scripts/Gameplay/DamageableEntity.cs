@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public abstract class DamageableEntity : BaseGameEntity, IDamageableEntity
     {
-        // Events / delegates
+        // Events
         public event ReceiveDamageDelegate onReceiveDamage;
         public event ReceivedDamageDelegate onReceivedDamage;
 

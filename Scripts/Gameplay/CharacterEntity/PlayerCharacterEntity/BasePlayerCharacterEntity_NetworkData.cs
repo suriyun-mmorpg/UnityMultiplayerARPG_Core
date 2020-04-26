@@ -121,23 +121,6 @@ namespace MultiplayerARPG
                     storageItems.Add(entry);
             }
         }
-        public System.Action<LiteNetLibSyncList.Operation, int> onStorageItemsOperation;
-        #endregion
-
-        #region Sync data actions
-        public System.Action<int> onDataIdChange;
-        public System.Action<int> onFactionIdChange;
-        public System.Action<short> onStatPointChange;
-        public System.Action<short> onSkillPointChange;
-        public System.Action<int> onGoldChange;
-        public System.Action<int> onUserGoldChange;
-        public System.Action<int> onUserCashChange;
-        public System.Action<int> onPartyIdChange;
-        public System.Action<int> onGuildIdChange;
-        public System.Action<bool> onIsWarpingChange;
-        // List
-        public System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
         #endregion
 
         #region Fields/Interface/Getter/Setter implementation

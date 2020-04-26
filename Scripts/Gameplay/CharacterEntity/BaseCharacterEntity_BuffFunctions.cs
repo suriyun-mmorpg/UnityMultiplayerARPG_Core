@@ -6,8 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public event ApplyBuffDelegate onApplyBuff;
-
         public void ApplyBuff(int dataId, BuffType type, short level, IGameEntity buffApplier)
         {
             if (IsDead() || !IsServer)

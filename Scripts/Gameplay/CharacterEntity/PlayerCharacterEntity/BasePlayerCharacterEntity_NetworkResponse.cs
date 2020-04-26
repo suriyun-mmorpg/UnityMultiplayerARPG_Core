@@ -6,21 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public System.Action<int> onShowNpcDialog;
-        public System.Action onShowNpcRefineItem;
-        public System.Action onShowNpcDismantleItem;
-        public System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
-        public System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
-        public System.Action<DealingState> onUpdateDealingState;
-        public System.Action<DealingState> onUpdateAnotherDealingState;
-        public System.Action<int> onUpdateDealingGold;
-        public System.Action<int> onUpdateAnotherDealingGold;
-        public System.Action<DealingCharacterItems> onUpdateDealingItems;
-        public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
-        public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
-        public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
-        public System.Action<StorageType, uint, short, short> onShowStorage;
-
         protected void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (!CanDoActions() ||

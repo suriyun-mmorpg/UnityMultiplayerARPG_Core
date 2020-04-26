@@ -8,8 +8,6 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public event AttackRoutineDelegate onAttackRoutine;
-
         /// <summary>
         /// This will be `TRUE` if it's allowing to change aim position instead of using default aim position (character's forward)
         /// So it should be `TRUE` while player's controller is shooter controller

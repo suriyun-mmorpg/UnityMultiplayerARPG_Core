@@ -49,29 +49,6 @@ namespace MultiplayerARPG
         protected SyncListCharacterSummon summons = new SyncListCharacterSummon();
         #endregion
 
-        #region Sync data actions
-        public System.Action<string> onIdChange;
-        public System.Action<string> onCharacterNameChange;
-        public System.Action<short> onLevelChange;
-        public System.Action<int> onExpChange;
-        public System.Action<int> onCurrentHpChange;
-        public System.Action<int> onCurrentMpChange;
-        public System.Action<int> onCurrentFoodChange;
-        public System.Action<int> onCurrentWaterChange;
-        public System.Action<byte> onEquipWeaponSetChange;
-        public System.Action<byte> onPitchChange;
-        public System.Action<uint> onTargetEntityIdChange;
-        // List
-        public System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onSummonsOperation;
-        #endregion
-
         #region Fields/Interface implementation
         public string Id { get { return id.Value; } set { id.Value = value; } }
         public int EntityId { get { return Identity.HashAssetId; } set { } }

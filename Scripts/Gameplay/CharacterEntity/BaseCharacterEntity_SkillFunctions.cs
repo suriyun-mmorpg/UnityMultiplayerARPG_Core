@@ -7,8 +7,6 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public event UseSkillRoutineDelegate onUseSkillRoutine;
-
         public virtual void GetUsingSkillData(
             BaseSkill skill,
             ref bool isLeftHand,

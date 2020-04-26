@@ -6,10 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public System.Action onDead;
-        public System.Action onRespawn;
-        public System.Action onLevelUp;
-
         protected void NetFuncPlayAttack(bool isLeftHand, byte animationIndex)
         {
             AttackRoutine(isLeftHand, animationIndex);
