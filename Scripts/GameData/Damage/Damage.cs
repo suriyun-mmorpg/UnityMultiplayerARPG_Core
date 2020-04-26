@@ -86,6 +86,28 @@ namespace MultiplayerARPG
             switch (damageType)
             {
                 case DamageType.Melee:
+                    // Use melee damage transform for distance calculation
+                    transform = attacker.MeleeDamageTransform;
+                    break;
+                case DamageType.Missile:
+                case DamageType.Raycast:
+                    // Always use missile transform for distance calculation
+                    // custom transforms (set via `EquipmentEntity`) will be used for muzzle effects and fake shot effects only
+                    transform = attacker.MissileDamageTransform;
+                    break;
+                case DamageType.Custom:
+                    transform = customDamageInfo.GetDamageTransform(attacker, isLeftHand);
+                    break;
+            }
+            return transform;
+        }
+
+        public Transform GetDamageEffectTransform(BaseCharacterEntity attacker, bool isLeftHand)
+        {
+            Transform transform = null;
+            switch (damageType)
+            {
+                case DamageType.Melee:
                     transform = attacker.MeleeDamageTransform;
                     break;
                 case DamageType.Missile:
@@ -111,31 +133,31 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Custom:
-                    transform = customDamageInfo.GetDamageTransform(attacker, isLeftHand);
+                    transform = customDamageInfo.GetDamageEffectTransform(attacker, isLeftHand);
                     break;
             }
             return transform;
         }
 
-        private void GetDamagePositionAndRotation(BaseCharacterEntity attacker, bool isLeftHand, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        private void GetDamagePositionAndRotation(BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
-                GetDamagePositionAndRotation2D(attacker, isLeftHand, aimPosition, stagger, out position, out direction, out rotation);
+                GetDamagePositionAndRotation2D(attacker, isLeftHand, forEffect, aimPosition, stagger, out position, out direction, out rotation);
             else
-                GetDamagePositionAndRotation3D(attacker, isLeftHand, aimPosition, stagger, out position, out direction, out rotation);
+                GetDamagePositionAndRotation3D(attacker, isLeftHand, forEffect, aimPosition, stagger, out position, out direction, out rotation);
         }
 
-        private void GetDamagePositionAndRotation2D(BaseCharacterEntity attacker, bool isLeftHand, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        private void GetDamagePositionAndRotation2D(BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
-            Transform transform = GetDamageTransform(attacker, isLeftHand);
+            Transform transform = forEffect ? GetDamageEffectTransform(attacker, isLeftHand) : GetDamageTransform(attacker, isLeftHand);
             position = transform.position;
             direction = attacker.Direction2D;
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(direction.y, direction.x) * (180 / Mathf.PI)) + 90);
         }
 
-        private void GetDamagePositionAndRotation3D(BaseCharacterEntity attacker, bool isLeftHand, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        private void GetDamagePositionAndRotation3D(BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
-            Transform aimTransform = GetDamageTransform(attacker, isLeftHand);
+            Transform aimTransform = forEffect ? GetDamageEffectTransform(attacker, isLeftHand) : GetDamageTransform(attacker, isLeftHand);
             position = aimTransform.position;
             Quaternion forwardRotation = Quaternion.LookRotation(aimPosition - position);
             Vector3 forwardStagger = forwardRotation * stagger;
@@ -188,11 +210,18 @@ namespace MultiplayerARPG
             int damageableLayerMask = GameInstance.Singleton.GetDamageableLayerMask();
 
             IDamageableEntity tempDamageableEntity = null;
+
+            // Damage transform data
             Vector3 damagePosition;
             Vector3 damageDirection;
             Quaternion damageRotation;
+            GetDamagePositionAndRotation(attacker, isLeftHand, false, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
 
-            GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
+            // Damage effect transform data
+            Vector3 damageEffectPosition;
+            Vector3 damageEffectDirection;
+            Quaternion damageEffectRotation;
+            GetDamagePositionAndRotation(attacker, isLeftHand, true, aimPosition, stagger, out damageEffectPosition, out damageEffectDirection, out damageEffectRotation);
 #if UNITY_EDITOR
             attacker.SetDebugDamage(damagePosition, damageRotation);
 #endif
@@ -308,8 +337,9 @@ namespace MultiplayerARPG
                             if (!attacker.TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
-                        PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation)
-                            .Setup(attacker, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableEntity);
+                        float adjustingDistance = Vector3.Distance(aimPosition, damageEffectPosition) - Vector3.Distance(aimPosition, damagePosition);
+                        PoolSystem.GetInstance(missileDamageEntity, damageEffectPosition, damageEffectRotation)
+                            .Setup(attacker, weapon, damageAmounts, skill, skillLevel, missileDistance + adjustingDistance, missileSpeed, tempDamageableEntity);
                     }
                     break;
                 case DamageType.Raycast:
@@ -373,7 +403,7 @@ namespace MultiplayerARPG
                     // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
                     if (isClient && projectileEffect != null)
                     {
-                        PoolSystem.GetInstance(projectileEffect, damagePosition, damageRotation)
+                        PoolSystem.GetInstance(projectileEffect, damageEffectPosition, damageEffectRotation)
                             .Setup(minDistance, missileSpeed);
                     }
                     break;

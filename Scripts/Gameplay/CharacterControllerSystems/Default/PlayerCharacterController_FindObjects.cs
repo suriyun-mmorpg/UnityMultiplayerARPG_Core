@@ -118,37 +118,5 @@ namespace MultiplayerARPG
                 return overlapColliders[index].gameObject;
             return overlapColliders2D[index].gameObject;
         }
-
-        public bool IsTargetInAttackDistance(IDamageableEntity target, float attackDistance, int layerMask)
-        {
-            Transform damageTransform = PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-            {
-                IDamageableEntity damageableEntity;
-                int tempCount = PhysicUtils.SortedOverlapSphereNonAlloc(damageTransform.position, attackDistance, overlapColliders, layerMask);
-                for (int i = 0; i < tempCount; ++i)
-                {
-                    if (GetOverlapObject(i) == target.GetGameObject())
-                        return true;
-                    damageableEntity = GetOverlapObject(i).GetComponent<IDamageableEntity>();
-                    if (damageableEntity != null && damageableEntity.GetObjectId() == target.GetObjectId())
-                        return true;
-                }
-            }
-            else
-            {
-                IDamageableEntity damageableEntity;
-                int tempCount = PhysicUtils.SortedOverlapCircleNonAlloc(damageTransform.position, attackDistance, overlapColliders2D, layerMask);
-                for (int i = 0; i < tempCount; ++i)
-                {
-                    if (GetOverlapObject(i) == target.GetGameObject())
-                        return true;
-                    damageableEntity = GetOverlapObject(i).GetComponent<IDamageableEntity>();
-                    if (damageableEntity != null && damageableEntity.GetObjectId() == target.GetObjectId())
-                        return true;
-                }
-            }
-            return false;
-        }
     }
 }

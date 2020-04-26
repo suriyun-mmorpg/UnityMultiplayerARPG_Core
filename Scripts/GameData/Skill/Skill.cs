@@ -348,5 +348,12 @@ namespace MultiplayerARPG
         {
             return useAmmoAmount;
         }
+
+        public override Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
+        {
+            if (IsAttack())
+                return GetDamageInfo(skillUser, isLeftHand).GetDamageTransform(skillUser, isLeftHand);
+            return base.GetApplyTransform(skillUser, isLeftHand);
+        }
     }
 }

@@ -660,7 +660,9 @@ namespace MultiplayerARPG
 
         protected void DoActionOrMoveToEntity(BaseGameEntity entity, float distance, System.Action action)
         {
-            if (Vector3.Distance(MovementTransform.position, entity.CacheTransform.position) <= distance)
+            Vector3 measuringPosition = MovementTransform.position;
+            Vector3 targetPosition = entity.CacheTransform.position;
+            if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
             {
                 // Stop movement to do action
                 PlayerCharacterEntity.StopMove();
@@ -670,13 +672,20 @@ namespace MultiplayerARPG
             else
             {
                 // Move to target entity
-                UpdateTargetEntityPosition(entity, distance);
+                UpdateTargetEntityPosition(measuringPosition, targetPosition, distance);
             }
         }
 
         protected void AttackOrMoveToEntity(IDamageableEntity entity, float distance, int layerMask, System.Action action)
         {
-            if (IsTargetInAttackDistance(entity, distance, layerMask))
+            // Attack or using attack skill, find distance to target by attack transform
+            Transform damageTransform = queueUsingSkill.skill != null ?
+                damageTransform = queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, isLeftHandAttacking) :
+                damageTransform = PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
+            // If target in attack distance, attack!
+            Vector3 measuringPosition = damageTransform.position;
+            Vector3 targetPosition = entity.OpponentAimTransform.position;
+            if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
             {
                 // Stop movement to attack
                 PlayerCharacterEntity.StopMove();
@@ -688,52 +697,52 @@ namespace MultiplayerARPG
             else
             {
                 // Move to target entity
-                UpdateTargetEntityPosition(entity.Entity, distance);
+                UpdateTargetEntityPosition(measuringPosition, targetPosition, distance);
             }
         }
 
         protected void UseSkillOrMoveToEntity(IDamageableEntity entity, float distance)
         {
-            if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() ||
-                Vector3.Distance(MovementTransform.position, entity.GetTransform().position) <= distance)
+            // Using non-attack skill, so find distance to target by positions
+            if (queueUsingSkill.skill != null)
             {
-                // Stop movement to use skill
-                PlayerCharacterEntity.StopMove();
-                // Turn character to attacking target
-                TurnCharacterToEntity(entity.Entity);
-                // Use the skill
-                if (queueUsingSkill.skill != null)
+                // Non-attack skills can be any hand
+                Transform applyTransform = queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, false);
+                Vector3 measuringPosition = applyTransform.position;
+                Vector3 targetPosition = entity.GetTransform().position;
+                if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() /* Applying skill to user? */ ||
+                    Vector3.Distance(measuringPosition, targetPosition) <= distance)
                 {
-                    // Can use skill
+                    // Stop movement to use skill
+                    PlayerCharacterEntity.StopMove();
+                    // Turn character to attacking target
+                    TurnCharacterToEntity(entity.Entity);
+                    // Use the skill
                     RequestUsePendingSkill();
                     targetActionType = TargetActionType.Undefined;
-                    return;
                 }
                 else
                 {
-                    // Can't use skill
-                    targetActionType = TargetActionType.Undefined;
-                    ClearQueueUsingSkill();
-                    return;
+                    // Move to target entity
+                    UpdateTargetEntityPosition(measuringPosition, targetPosition, distance);
                 }
             }
             else
             {
-                // Move to target entity
-                UpdateTargetEntityPosition(entity.Entity, distance);
+                // Can't use skill
+                targetActionType = TargetActionType.Undefined;
+                ClearQueueUsingSkill();
+                return;
             }
         }
 
-        protected void UpdateTargetEntityPosition(BaseGameEntity entity, float distance)
+        protected void UpdateTargetEntityPosition(Vector3 measuringPosition, Vector3 targetPosition, float distance)
         {
-            if (entity == null)
-                return;
-
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
-
-            Vector3 direction = (entity.CacheTransform.position - MovementTransform.position).normalized;
-            Vector3 position = entity.CacheTransform.position - (direction * (distance - StoppingDistance));
+            
+            Vector3 direction = (targetPosition - measuringPosition).normalized;
+            Vector3 position = targetPosition - (direction * (distance - StoppingDistance));
             if (Vector3.Distance(previousPointClickPosition, position) > 0.01f)
             {
                 PlayerCharacterEntity.PointClickMovement(position);

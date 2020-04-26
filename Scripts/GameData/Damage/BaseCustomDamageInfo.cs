@@ -15,6 +15,7 @@ namespace MultiplayerARPG
             Vector3 aimPosition,
             Vector3 stagger);
         public abstract Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
+        public abstract Transform GetDamageEffectTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract float GetDistance();
         public abstract float GetFov();
 

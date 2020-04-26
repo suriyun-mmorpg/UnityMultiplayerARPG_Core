@@ -61,7 +61,7 @@ namespace MultiplayerARPG
             isExploded = false;
             destroying = false;
             launchTime = Time.unscaledTime;
-            missileDuration = (missileDistance / missileSpeed) + 0.25f;
+            missileDuration = (missileDistance / missileSpeed) + 0.1f;
         }
 
         private void Update()
