@@ -223,6 +223,12 @@ namespace MultiplayerARPG
             set { passengingVehicle.Value = value; }
         }
 
+        [SerializeField]
+        protected bool canSideSprint;
+
+        [SerializeField]
+        protected bool canBackwardSprint;
+
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
@@ -756,6 +762,10 @@ namespace MultiplayerARPG
                 {
                     case ExtraMovementState.IsSprinting:
                         if (!ActiveMovement.Entity.CanSprint())
+                            extraMovementState = ExtraMovementState.None;
+                        else if (!canSideSprint && (MovementState.HasFlag(MovementState.Left) || MovementState.HasFlag(MovementState.Right)))
+                            extraMovementState = ExtraMovementState.None;
+                        else if (!canBackwardSprint && MovementState.HasFlag(MovementState.Backward))
                             extraMovementState = ExtraMovementState.None;
                         break;
                     case ExtraMovementState.IsCrouching:
