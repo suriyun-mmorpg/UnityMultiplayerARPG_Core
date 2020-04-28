@@ -499,6 +499,18 @@ namespace MultiplayerARPG
                 }
                 else if (!wasdLockAttackTarget)
                 {
+                    // Find nearest target and set selected target to show character hp/mp UIs
+                    SelectedEntity = PlayerCharacterEntity
+                        .FindNearestAliveCharacter<BaseCharacterEntity>(
+                        skill.GetCastDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking),
+                        false,
+                        true,
+                        false);
+                    if (SelectedEntity != null)
+                    {
+                        // Look at target and attack
+                        TurnCharacterToEntity(SelectedEntity);
+                    }
                     // Not lock target, so not finding target and use skill immediately
                     RequestUsePendingSkill();
                     isFollowingTarget = false;
@@ -523,7 +535,11 @@ namespace MultiplayerARPG
                         // Try apply skill to selected entity immediately, it will fail if selected entity is far from the character
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
-                            SetTarget(SelectedEntity, TargetActionType.UseSkill, false);
+                            if (SelectedEntity != PlayerCharacterEntity)
+                            {
+                                // Look at target and use skill
+                                TurnCharacterToEntity(SelectedEntity);
+                            }
                             RequestUsePendingSkill();
                             isFollowingTarget = false;
                         }
