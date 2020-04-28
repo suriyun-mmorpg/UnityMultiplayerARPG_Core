@@ -98,6 +98,11 @@ namespace MultiplayerARPG
 
         public virtual void InitPrefab()
         {
+            if (this == null)
+            {
+                Debug.LogWarning("The Base Bufff Entity is null, this should not happens " + this);
+                return;
+            }
             // Prepare audio sources
             audioSources = GetComponentsInChildren<AudioSource>(true);
             if (audioSources != null && audioSources.Length > 0)

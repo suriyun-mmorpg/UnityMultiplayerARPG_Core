@@ -109,6 +109,11 @@ namespace MultiplayerARPG
 
         public void InitPrefab()
         {
+            if (this == null)
+            {
+                Debug.LogWarning("The Game Effect is null, this should not happens " + this);
+                return;
+            }
             // Prepare audio sources
             audioSources = GetComponentsInChildren<AudioSource>(true);
             if (audioSources != null && audioSources.Length > 0)
