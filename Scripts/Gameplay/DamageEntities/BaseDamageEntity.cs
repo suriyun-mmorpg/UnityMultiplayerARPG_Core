@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseDamageEntity : MonoBehaviour, IPoolDescriptor
+    public abstract partial class BaseDamageEntity : MonoBehaviour, IPoolDescriptor
     {
         protected IGameEntity attacker;
         protected CharacterItem weapon;
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
         {
             get { return CurrentGameManager.IsClient; }
         }
-        
+
         [SerializeField]
         private int poolSize = 30;
         public int PoolSize
@@ -50,9 +50,9 @@ namespace MultiplayerARPG
 
         public Transform CacheTransform { get; private set; }
 
-        private ParticleSystem[] particles;
-        private AudioSource[] audioSources;
-        private AudioSourceSetter[] audioSourceSetters;
+        protected ParticleSystem[] particles;
+        protected AudioSource[] audioSources;
+        protected AudioSourceSetter[] audioSourceSetters;
 
         protected virtual void Awake()
         {

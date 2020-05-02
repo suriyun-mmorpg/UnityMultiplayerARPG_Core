@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class MissileDamageEntity : BaseDamageEntity
+    public partial class MissileDamageEntity : BaseDamageEntity
     {
         public float destroyDelay;
         public UnityEvent onExploded;
@@ -21,9 +21,9 @@ namespace MultiplayerARPG
         public Rigidbody CacheRigidbody { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
 
-        private float launchTime;
-        private float missileDuration;
-        private bool destroying;
+        protected float launchTime;
+        protected float missileDuration;
+        protected bool destroying;
 
         protected override void Awake()
         {
@@ -33,7 +33,7 @@ namespace MultiplayerARPG
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
         }
 
-        public void Setup(
+        public virtual void Setup(
             IGameEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
             missileDuration = (missileDistance / missileSpeed) + 0.1f;
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (destroying)
                 return;
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             // Don't move if exploded
             if (isExploded)
@@ -113,17 +113,17 @@ namespace MultiplayerARPG
                 onDestroy.Invoke();
         }
 
-        private void OnTriggerEnter(Collider other)
+        protected virtual void OnTriggerEnter(Collider other)
         {
             TriggerEnter(other.gameObject);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        protected virtual void OnTriggerEnter2D(Collider2D other)
         {
             TriggerEnter(other.gameObject);
         }
 
-        private void TriggerEnter(GameObject other)
+        protected virtual void TriggerEnter(GameObject other)
         {
             if (destroying)
                 return;
@@ -173,7 +173,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private bool FindTargetEntity(GameObject other, out IDamageableEntity target)
+        protected virtual bool FindTargetEntity(GameObject other, out IDamageableEntity target)
         {
             target = null;
 
@@ -191,7 +191,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        private bool FindAndApplyDamage(GameObject other)
+        protected virtual bool FindAndApplyDamage(GameObject other)
         {
             IDamageableEntity target;
             if (FindTargetEntity(other, out target))
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        private void Explode()
+        protected virtual void Explode()
         {
             if (isExploded || !IsServer)
                 return;
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
             ExplodeApplyDamage();
         }
 
-        private void ExplodeApplyDamage()
+        protected virtual void ExplodeApplyDamage()
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
