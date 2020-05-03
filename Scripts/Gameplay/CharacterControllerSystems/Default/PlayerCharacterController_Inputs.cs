@@ -151,6 +151,9 @@ namespace MultiplayerARPG
 
         public virtual void UpdatePointClickInput()
         {
+            if (controllerMode == PlayerCharacterControllerMode.WASD)
+                return;
+
             // If it's building something, not allow point click movement
             if (ConstructingBuildingEntity != null)
                 return;
@@ -368,8 +371,7 @@ namespace MultiplayerARPG
 
         public virtual void UpdateWASDInput()
         {
-            if (controllerMode != PlayerCharacterControllerMode.WASD &&
-                controllerMode != PlayerCharacterControllerMode.Both)
+            if (controllerMode == PlayerCharacterControllerMode.PointClick)
                 return;
 
             // If mobile platforms, don't receive input raw to make it smooth
@@ -604,14 +606,14 @@ namespace MultiplayerARPG
                 GetUseSkillDistanceAndFov(out castDistance, out castFov);
                 UseSkillOrMoveToEntity(targetCharacter, castDistance);
             }
-            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter))
+            else if (TryGetDoActionCharacter(out targetCharacter))
             {
                 DoActionOrMoveToEntity(targetCharacter, CurrentGameInstance.conversationDistance, () =>
                 {
                     // TODO: Do something
                 });
             }
-            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetNpc))
+            else if (TryGetDoActionCharacter(out targetNpc))
             {
                 DoActionOrMoveToEntity(targetNpc, CurrentGameInstance.conversationDistance, () =>
                 {
@@ -622,7 +624,7 @@ namespace MultiplayerARPG
                     }
                 });
             }
-            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetItemDrop))
+            else if (TryGetDoActionCharacter(out targetItemDrop))
             {
                 DoActionOrMoveToEntity(targetItemDrop, CurrentGameInstance.pickUpItemDistance, () =>
                 {
@@ -630,7 +632,7 @@ namespace MultiplayerARPG
                     ClearTarget();
                 });
             }
-            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetBuilding))
+            else if (TryGetDoActionCharacter(out targetBuilding))
             {
                 DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
                 {
@@ -645,7 +647,7 @@ namespace MultiplayerARPG
                     }
                 });
             }
-            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetHarvestable))
+            else if (TryGetDoActionCharacter(out targetHarvestable))
             {
                 if (targetHarvestable.IsDead())
                 {
@@ -654,7 +656,7 @@ namespace MultiplayerARPG
                     ClearTarget();
                     return;
                 }
-
+                
                 // Find attack distance and fov, from weapon
                 float attackDistance = 0f;
                 float attackFov = 0f;
@@ -664,7 +666,7 @@ namespace MultiplayerARPG
                     RequestAttack();
                 });
             }
-            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetVehicle))
+            else if (TryGetDoActionCharacter(out targetVehicle))
             {
                 DoActionOrMoveToEntity(targetVehicle, CurrentGameInstance.conversationDistance, () =>
                 {
