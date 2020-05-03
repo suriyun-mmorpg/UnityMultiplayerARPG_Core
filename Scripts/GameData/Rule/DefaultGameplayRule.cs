@@ -59,6 +59,12 @@ namespace MultiplayerARPG
         public float fallDamageMinDistance = 5;
         [Tooltip("Character will receive damage 100% of Max Hp, when fall distance >= max distance")]
         public float fallDamageMaxDistance = 20;
+        [Header("Level Up")]
+        public bool recoverHpWhenLevelUp;
+        public bool recoverMpWhenLevelUp;
+        public bool recoverFoodWhenLevelUp;
+        public bool recoverWaterWhenLevelUp;
+        public bool recoverStaminaWhenLevelUp;
 
         public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
@@ -369,6 +375,20 @@ namespace MultiplayerARPG
             {
                 // Don't collect exp if character reached max level
                 character.Exp = 0;
+            }
+
+            if (isLevelUp)
+            {
+                if (recoverHpWhenLevelUp)
+                    character.CurrentHp = character.MaxHp;
+                if (recoverMpWhenLevelUp)
+                    character.CurrentMp = character.MaxMp;
+                if (recoverFoodWhenLevelUp)
+                    character.CurrentFood = character.MaxFood;
+                if (recoverWaterWhenLevelUp)
+                    character.CurrentWater = character.MaxWater;
+                if (recoverStaminaWhenLevelUp)
+                    character.CurrentStamina = character.MaxStamina;
             }
 
             return isLevelUp;
