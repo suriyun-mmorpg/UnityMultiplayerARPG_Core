@@ -28,6 +28,9 @@ namespace MultiplayerARPG
             public const ushort UpdateFoundCharacters = 111;
             public const ushort UpdateFriends = 112;
             public const ushort NotifyOnlineCharacter = 113;
+            public const ushort NotifyRewardExp = 114;
+            public const ushort NotifyRewardGold = 115;
+            public const ushort NotifyRewardItem = 116;
         }
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
@@ -69,6 +72,9 @@ namespace MultiplayerARPG
         public System.Action<GuildData> onClientUpdateGuild;
         public System.Action<SocialGroupData> onClientUpdateFoundCharacters;
         public System.Action<SocialGroupData> onClientUpdateFriends;
+        public System.Action<int> onNotifyRewardExp;
+        public System.Action<int> onNotifyRewardGold;
+        public System.Action<int, short> onNotifyRewardItem;
         protected float lastUpdateOnlineCharacterTime;
         protected float serverSceneLoadedTime;
         // Spawn entities events
@@ -148,6 +154,9 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.UpdateFoundCharacters, HandleUpdateFoundCharactersAtClient);
             RegisterClientMessage(MsgTypes.UpdateFriends, HandleUpdateFriendsAtClient);
             RegisterClientMessage(MsgTypes.NotifyOnlineCharacter, HandleNotifyOnlineCharacterAtClient);
+            RegisterClientMessage(MsgTypes.NotifyRewardExp, HandleNotifyRewardExpAtClient);
+            RegisterClientMessage(MsgTypes.NotifyRewardGold, HandleNotifyRewardGoldAtClient);
+            RegisterClientMessage(MsgTypes.NotifyRewardItem, HandleNotifyRewardItemAtClient);
         }
 
         protected override void RegisterServerMessages()
@@ -251,10 +260,10 @@ namespace MultiplayerARPG
                 notifyTime.lastRequestTime = unscaledTime;
                 lastCharacterOnlineTimes[characterId] = notifyTime;
             }
-
-            StringMessage msg = new StringMessage();
-            msg.value = characterId;
-            Singleton.ClientSendPacket(DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, msg);
+            Singleton.ClientSendPacket(DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, (writer) =>
+            {
+                writer.Put(characterId);
+            });
         }
 
         public static bool IsCharacterOnline(string characterId)
@@ -304,6 +313,31 @@ namespace MultiplayerARPG
             {
                 SendUpdateGuildMembersToClient(connectionId, updatingGuildMembers[connectionId]);
             }
+        }
+
+        public virtual void SendNotifyRewardExp(long connectionId, int exp)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardExp, (writer) =>
+            {
+                writer.Put(exp);
+            });
+        }
+
+        public virtual void SendNotifyRewardGold(long connectionId, int gold)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardGold, (writer) =>
+            {
+                writer.Put(gold);
+            });
+        }
+
+        public virtual void SendNotifyRewardItem(long connectionId, int dataId, short amount)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardItem, (writer) =>
+            {
+                writer.Put(dataId);
+                writer.Put(amount);
+            });
         }
 
         public virtual void SendServerGameMessage(long connectionId, GameMessage.Type type)
@@ -516,8 +550,25 @@ namespace MultiplayerARPG
 
         protected virtual void HandleNotifyOnlineCharacterAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            StringMessage msg = messageHandler.ReadMessage<StringMessage>();
-            NotifyOnlineCharacter(msg.value);
+            NotifyOnlineCharacter(messageHandler.reader.GetString());
+        }
+
+        protected virtual void HandleNotifyRewardExpAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            if (onNotifyRewardExp != null)
+                onNotifyRewardExp.Invoke(messageHandler.reader.GetInt());
+        }
+
+        protected virtual void HandleNotifyRewardGoldAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            if (onNotifyRewardGold != null)
+                onNotifyRewardGold.Invoke(messageHandler.reader.GetInt());
+        }
+
+        protected virtual void HandleNotifyRewardItemAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            if (onNotifyRewardItem != null)
+                onNotifyRewardItem.Invoke(messageHandler.reader.GetInt(), messageHandler.reader.GetShort());
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -688,11 +739,14 @@ namespace MultiplayerARPG
 
         protected virtual void HandleRequestOnlineCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            StringMessage msg = messageHandler.ReadMessage<StringMessage>();
-            if (IsCharacterOnline(msg.value))
+            string characterId = messageHandler.reader.GetString();
+            if (IsCharacterOnline(characterId))
             {
                 // Notify back online character
-                ServerSendPacket(messageHandler.connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, msg);
+                ServerSendPacket(messageHandler.connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, (writer) =>
+                {
+                    writer.Put(characterId);
+                });
             }
         }
 
