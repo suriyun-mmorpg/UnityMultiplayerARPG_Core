@@ -43,6 +43,8 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            if (characterEntity.IsDead())
+                return;
             tempPitch = characterEntity.Pitch;
             if (maxAngle > 0f)
             {
@@ -74,6 +76,8 @@ namespace MultiplayerARPG
 
         private void OnAnimatorIK(int layerIndex)
         {
+            if (characterEntity.IsDead())
+                return;
             animator.SetBoneLocalRotation(pitchBone, pitchRotation);
         }
     }
