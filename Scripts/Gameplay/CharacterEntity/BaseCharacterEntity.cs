@@ -377,6 +377,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
+            CurrentGameManager.SendNotifyRewardExp(ConnectionId, reward.exp);
             if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType))
                 return;
             // Send OnLevelUp to owner player only
@@ -385,6 +386,9 @@ namespace MultiplayerARPG
 
         public void RewardCurrencies(Reward reward, float multiplier, RewardGivenType rewardGivenType)
         {
+            if (!IsServer)
+                return;
+            CurrentGameManager.SendNotifyRewardGold(ConnectionId, reward.gold);
             CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType);
         }
         #endregion

@@ -66,7 +66,10 @@ namespace MultiplayerARPG
                 foreach (ItemAmount rewardItem in quest.rewardItems)
                 {
                     if (rewardItem.item != null && rewardItem.amount > 0)
+                    {
                         this.IncreaseItems(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount));
+                        CurrentGameManager.SendNotifyRewardItem(ConnectionId, rewardItem.item.DataId, rewardItem.amount);
+                    }
                 }
             }
             this.FillEmptySlots();

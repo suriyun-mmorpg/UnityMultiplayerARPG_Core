@@ -70,12 +70,17 @@ namespace MultiplayerARPG
                 itemDropEntity.NetworkDestroy();
                 return;
             }
-            if (!this.IncreasingItemsWillOverwhelming(itemDropData.dataId, itemDropData.amount) && this.IncreaseItems(itemDropData))
+            if (this.IncreasingItemsWillOverwhelming(itemDropData.dataId, itemDropData.amount))
             {
-                this.FillEmptySlots();
-                itemDropEntity.MarkAsPickedUp();
-                itemDropEntity.NetworkDestroy();
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                return;
             }
+
+            this.IncreaseItems(itemDropData);
+            this.FillEmptySlots();
+            CurrentGameManager.SendNotifyRewardItem(ConnectionId, itemDropData.dataId, itemDropData.amount);
+            itemDropEntity.MarkAsPickedUp();
+            itemDropEntity.NetworkDestroy();
         }
 
         /// <summary>

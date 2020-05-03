@@ -100,6 +100,7 @@ namespace MultiplayerARPG
                         droppingToGround = true;
                     if (!droppingToGround)
                     {
+                        CurrentGameManager.SendNotifyRewardItem(attackerCharacter.ConnectionId, dataId, amount);
                         attackerCharacter.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
                         attackerCharacter.FillEmptySlots();
                     }
