@@ -661,6 +661,19 @@ namespace MultiplayerARPG
         /// Format => {1} = {Value}
         /// </summary>
         UI_FORMAT_SKIP_TITLE_PERCENTAGE,
+        // Format - Notify Rewards
+        /// <summary>
+        /// Format => {0} = {Exp Amount}
+        /// </summary>
+        UI_FORMAT_NOTIFY_REWARD_EXP,
+        /// <summary>
+        /// Format => {0} = {Gold Amount}
+        /// </summary>
+        UI_FORMAT_NOTIFY_REWARD_GOLD,
+        /// <summary>
+        /// Format => {0} = {Item Title}, {1} = {Amount}
+        /// </summary>
+        UI_FORMAT_NOTIFY_REWARD_ITEM,
     }
 
     public static class DefaultLocale
@@ -1025,6 +1038,10 @@ namespace MultiplayerARPG
             // Format - Skip Title
             Texts.Add(UIFormatKeys.UI_FORMAT_SKIP_TITLE.ToString(), "{1}");
             Texts.Add(UIFormatKeys.UI_FORMAT_SKIP_TITLE_PERCENTAGE.ToString(), "{1}%");
+            // Format - Notify Rewards
+            Texts.Add(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_EXP.ToString(), "Obtain {0} Exp");
+            Texts.Add(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_GOLD.ToString(), "Obtain {0} Gold");
+            Texts.Add(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_ITEM.ToString(), "Obtain {0} x {1} ea");
         }
     }
 
