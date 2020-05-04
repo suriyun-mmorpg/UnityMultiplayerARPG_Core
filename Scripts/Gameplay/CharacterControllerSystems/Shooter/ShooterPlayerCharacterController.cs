@@ -562,21 +562,21 @@ namespace MultiplayerARPG
                 }
                 // Find item drop entity
                 tempEntity = tempHitInfo.collider.GetComponent<ItemDropEntity>();
-                if (tempEntity != null && tempDistance <= CurrentGameInstance.pickUpItemDistance &&
-                    (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point)))
+                if (tempEntity != null && tempDistance <= CurrentGameInstance.pickUpItemDistance)
                 {
                     // Entity is in front of character, so this is target
-                    aimPosition = tempHitInfo.point;
+                    if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
+                        aimPosition = tempHitInfo.point;
                     SelectedEntity = tempEntity;
                     break;
                 }
                 // Find activatable entity (NPC/Building/Mount/Etc)
                 tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
-                if (tempEntity != null && tempDistance <= CurrentGameInstance.conversationDistance &&
-                    (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point)))
+                if (tempEntity != null && tempDistance <= CurrentGameInstance.conversationDistance)
                 {
                     // Entity is in front of character, so this is target
-                    aimPosition = tempHitInfo.point;
+                    if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
+                        aimPosition = tempHitInfo.point;
                     SelectedEntity = tempEntity;
                     break;
                 }
