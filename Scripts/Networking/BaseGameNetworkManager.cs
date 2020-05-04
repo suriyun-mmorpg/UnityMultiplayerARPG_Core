@@ -834,10 +834,12 @@ namespace MultiplayerARPG
             {
                 harvestableSpawnArea.RegisterAssets();
             }
-            
+
             PoolSystem.Clear();
             foreach (IPoolDescriptor poolingObject in GameInstance.PoolingObjectPrefabs)
             {
+                if (!IsClient && (poolingObject is GameEffect || poolingObject is ProjectileEffect))
+                    continue;
                 PoolSystem.InitPool(poolingObject);
             }
         }
