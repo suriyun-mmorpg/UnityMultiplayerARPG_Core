@@ -772,6 +772,9 @@ namespace MultiplayerARPG
             if (uiBuildingCraftItems != null &&
                 uiBuildingCraftItems.IsVisible())
                 uiBuildingCraftItems.Hide();
+            if (uiBuildingCampfireItems != null &&
+                uiBuildingCampfireItems.IsVisible())
+                uiBuildingCampfireItems.Hide();
             if (!GameInstance.Singleton.canRefineItemByPlayer &&
                 uiRefineItem != null &&
                 uiRefineItem.IsVisible())
