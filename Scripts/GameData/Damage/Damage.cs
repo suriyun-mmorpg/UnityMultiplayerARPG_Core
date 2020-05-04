@@ -37,7 +37,8 @@ namespace MultiplayerARPG
         public ProjectileEffect projectileEffect;
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
         public byte pierceThroughEntities;
-        // TODO: Add impact effect
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
+        public ImpactEffects impactEffects;
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Custom" })]
         public BaseCustomDamageInfo customDamageInfo;
@@ -352,6 +353,7 @@ namespace MultiplayerARPG
                         Vector3 point;
                         Vector3 normal;
                         float distance;
+                        bool hasImpactEffects = impactEffects != null;
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
                         {
@@ -394,6 +396,10 @@ namespace MultiplayerARPG
                             if (isServer)
                                 tempDamageableEntity.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
 
+                            // Instantiate impact effects
+                            if (hasImpactEffects && isClient)
+                                PoolSystem.GetInstance(impactEffects.TryGetEffect(tempGameObject.tag), point, Quaternion.LookRotation(Vector3.up, normal));
+
                             // Update pierce trough entities count
                             if (pierceThroughEntities <= 0)
                                 break;
@@ -419,6 +425,8 @@ namespace MultiplayerARPG
             });
             if (customDamageInfo != null)
                 customDamageInfo.PrepareRelatesData();
+            if (impactEffects != null)
+                impactEffects.PrepareRelatesData();
         }
     }
 
