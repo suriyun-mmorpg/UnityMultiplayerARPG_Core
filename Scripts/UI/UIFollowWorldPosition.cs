@@ -11,9 +11,9 @@ public class UIFollowWorldPosition : MonoBehaviour
     public Camera targetCamera;
     public Vector3 targetPosition;
     public float damping = 5f;
+    public float snapDistance = 100f;
 
     private Vector3? wantedPosition;
-    private bool updatedOnce;
     private TransformAccessArray followJobTransforms;
     private UIFollowWorldPositionJob followJob;
     private JobHandle followJobHandle;
@@ -63,6 +63,7 @@ public class UIFollowWorldPosition : MonoBehaviour
         {
             wantedPosition = wantedPosition.Value,
             damping = damping,
+            snapDistance = snapDistance,
             deltaTime = Time.deltaTime,
         };
         followJobHandle = followJob.Schedule(followJobTransforms);
@@ -74,11 +75,12 @@ public struct UIFollowWorldPositionJob : IJobParallelForTransform
 {
     public Vector2 wantedPosition;
     public float damping;
+    public float snapDistance;
     public float deltaTime;
 
     public void Execute(int index, TransformAccess transform)
     {
-        if (damping <= 0)
+        if (damping <= 0f || Vector3.Distance(transform.position, wantedPosition) >= snapDistance)
             transform.position = wantedPosition;
         else
             transform.position = Vector3.Lerp(transform.position, wantedPosition, damping * deltaTime);
