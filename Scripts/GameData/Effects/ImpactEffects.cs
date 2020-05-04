@@ -41,11 +41,9 @@ namespace MultiplayerARPG
 
         public void PrepareRelatesData()
         {
-            PoolSystem.InitPool(defaultEffect);
-            foreach (GameEffect effect in Effects.Values)
-            {
-                PoolSystem.InitPool(effect);
-            }
+            List<GameEffect> effects = new List<GameEffect>(Effects.Values);
+            effects.Add(defaultEffect);
+            GameInstance.AddPoolingObjects(effects);
         }
     }
 }
