@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseDamageEntity : MonoBehaviour, IPoolDescriptor
+    public abstract partial class BaseDamageEntity : PoolDescriptor, IPoolDescriptor
     {
         protected IGameEntity attacker;
         protected CharacterItem weapon;
@@ -36,18 +36,6 @@ namespace MultiplayerARPG
             get { return CurrentGameManager.IsClient; }
         }
 
-        [SerializeField]
-        private int poolSize = 30;
-        public int PoolSize
-        {
-            get { return poolSize; }
-        }
-
-        public IPoolDescriptor ObjectPrefab
-        {
-            get; set;
-        }
-
         public Transform CacheTransform { get; private set; }
 
         protected ParticleSystem[] particles;
@@ -60,22 +48,6 @@ namespace MultiplayerARPG
             particles = GetComponentsInChildren<ParticleSystem>(true);
             audioSources = GetComponentsInChildren<AudioSource>(true);
             audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
-        }
-
-        protected virtual void PushBack(float delay)
-        {
-            Invoke("PushBack", delay);
-        }
-
-        protected virtual void PushBack()
-        {
-            OnPushBack();
-            PoolSystem.PushBack(this);
-        }
-
-        protected virtual void OnPushBack()
-        {
-
         }
 
         public virtual void Setup(
@@ -102,7 +74,7 @@ namespace MultiplayerARPG
                 target.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
         }
 
-        public virtual void InitPrefab()
+        public override void InitPrefab()
         {
             if (this == null)
             {
@@ -132,9 +104,10 @@ namespace MultiplayerARPG
                     audioSourceSetter.playOnEnable = false;
                 }
             }
+            base.InitPrefab();
         }
 
-        public virtual void OnGetInstance()
+        public override void OnGetInstance()
         {
             // Play particles
             if (particles != null && particles.Length > 0)
@@ -167,6 +140,7 @@ namespace MultiplayerARPG
                     audioSource.Play();
                 }
             }
+            base.OnGetInstance();
         }
     }
 }

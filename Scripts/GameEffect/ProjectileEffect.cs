@@ -4,14 +4,10 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class ProjectileEffect : MonoBehaviour, IPoolDescriptor
+    public class ProjectileEffect : PoolDescriptor, IPoolDescriptor
     {
         public float speed;
         public float lifeTime = 1;
-        [SerializeField]
-        private int poolSize = 30;
-        public int PoolSize { get { return poolSize; } set { poolSize = value; } }
-        public IPoolDescriptor ObjectPrefab { get; set; }
         public Transform CacheTransform { get; private set; }
 
         private ParticleSystem[] particles;
@@ -26,16 +22,6 @@ namespace MultiplayerARPG
             audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
         }
 
-        protected virtual void PushBack(float delay)
-        {
-            Invoke("PushBack", delay);
-        }
-
-        protected virtual void PushBack()
-        {
-            PoolSystem.PushBack(this);
-        }
-
         protected virtual void Update()
         {
             transform.position += transform.forward * speed * Time.deltaTime;
@@ -48,7 +34,7 @@ namespace MultiplayerARPG
             PushBack(lifeTime);
         }
 
-        public virtual void InitPrefab()
+        public override void InitPrefab()
         {
             if (this == null)
             {
@@ -78,9 +64,10 @@ namespace MultiplayerARPG
                     audioSourceSetter.playOnEnable = false;
                 }
             }
+            base.InitPrefab();
         }
 
-        public virtual void OnGetInstance()
+        public override void OnGetInstance()
         {
             // Play particles
             if (particles != null && particles.Length > 0)
@@ -113,6 +100,7 @@ namespace MultiplayerARPG
                     audioSource.Play();
                 }
             }
+            base.OnGetInstance();
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class GameEffect : MonoBehaviour, IPoolDescriptor
+    public class GameEffect : PoolDescriptor, IPoolDescriptor
     {
         public string effectSocket;
         public bool isLoop;
@@ -19,18 +19,6 @@ namespace MultiplayerARPG
                 followingTarget = value;
                 intendToFollowingTarget = true;
             }
-        }
-
-        [SerializeField]
-        private int poolSize = 30;
-        public int PoolSize
-        {
-            get { return poolSize; }
-        }
-
-        public IPoolDescriptor ObjectPrefab
-        {
-            get; set;
         }
 
         public Transform CacheTransform { get; private set; }
@@ -48,14 +36,10 @@ namespace MultiplayerARPG
             audioSources = GetComponentsInChildren<AudioSource>(true);
             audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
         }
-
-        protected virtual void PushBack(float delay)
+        
+        protected override void PushBack()
         {
-            Invoke("PushBack", delay);
-        }
-
-        protected virtual void PushBack()
-        {
+            OnPushBack();
             if (ObjectPrefab != null)
                 PoolSystem.PushBack(this);
             else if (gameObject.activeSelf)
@@ -107,7 +91,7 @@ namespace MultiplayerARPG
             destroyTime = Time.time + lifeTime;
         }
 
-        public void InitPrefab()
+        public override void InitPrefab()
         {
             if (this == null)
             {
@@ -136,11 +120,13 @@ namespace MultiplayerARPG
                     audioSourceSetter.playOnEnable = false;
                 }
             }
+            base.InitPrefab();
         }
 
-        public virtual void OnGetInstance()
+        public override void OnGetInstance()
         {
             Play();
+            base.OnGetInstance();
         }
 
         /// <summary>
