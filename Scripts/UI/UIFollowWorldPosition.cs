@@ -11,12 +11,9 @@ public class UIFollowWorldPosition : MonoBehaviour
     public Camera targetCamera;
     public Vector3 targetPosition;
     public float damping = 5f;
-    public float snapDistance = 5f;
 
-    private Vector3 wantedPosition;
-    private Vector3 oldTargetPosition;
-    private Vector3 oldCameraPosition;
-    private Quaternion oldCameraRotation;
+    private Vector3? wantedPosition;
+    private bool updatedOnce;
     private TransformAccessArray followJobTransforms;
     private UIFollowWorldPositionJob followJob;
     private JobHandle followJobHandle;
@@ -30,10 +27,7 @@ public class UIFollowWorldPosition : MonoBehaviour
         {
             targetCamera = Camera.main;
             if (targetCamera != null)
-            {
                 CacheCameraTransform = targetCamera.transform;
-                CacheTransform.position = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
-            }
         }
         return targetCamera != null;
     }
@@ -53,26 +47,22 @@ public class UIFollowWorldPosition : MonoBehaviour
 
     private void Update()
     {
-        followJobHandle.Complete();
-
         if (!SetupCamera())
             return;
 
-        // Find wanted position only when it needed
-        if (!oldTargetPosition.Equals(targetPosition) ||
-            !CacheCameraTransform.position.Equals(oldCameraPosition) ||
-            !CacheCameraTransform.rotation.Equals(oldCameraRotation))
-            wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
+        wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
+    }
 
-        oldTargetPosition = targetPosition;
-        oldCameraPosition = CacheCameraTransform.position;
-        oldCameraRotation = CacheCameraTransform.rotation;
+    private void LateUpdate()
+    {
+        if (!wantedPosition.HasValue)
+            return;
 
+        followJobHandle.Complete();
         followJob = new UIFollowWorldPositionJob()
         {
-            wantedPosition = wantedPosition,
+            wantedPosition = wantedPosition.Value,
             damping = damping,
-            snapDistance = snapDistance,
             deltaTime = Time.deltaTime,
         };
         followJobHandle = followJob.Schedule(followJobTransforms);
@@ -84,14 +74,13 @@ public struct UIFollowWorldPositionJob : IJobParallelForTransform
 {
     public Vector2 wantedPosition;
     public float damping;
-    public float snapDistance;
     public float deltaTime;
 
     public void Execute(int index, TransformAccess transform)
     {
-        if (damping <= 0 || Vector3.Distance(transform.position, wantedPosition) >= snapDistance)
+        if (damping <= 0)
             transform.position = wantedPosition;
         else
-            transform.position = Vector3.Slerp(transform.position, wantedPosition, damping * deltaTime);
+            transform.position = Vector3.Lerp(transform.position, wantedPosition, damping * deltaTime);
     }
 }
