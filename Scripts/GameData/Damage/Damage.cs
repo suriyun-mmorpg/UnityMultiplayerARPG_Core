@@ -397,7 +397,7 @@ namespace MultiplayerARPG
                                 tempDamageableEntity.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
 
                             // Instantiate impact effects
-                            if (hasImpactEffects && isClient)
+                            if (isClient && hasImpactEffects)
                                 PoolSystem.GetInstance(impactEffects.TryGetEffect(tempGameObject.tag), point, Quaternion.LookRotation(Vector3.up, normal));
 
                             // Update pierce trough entities count
