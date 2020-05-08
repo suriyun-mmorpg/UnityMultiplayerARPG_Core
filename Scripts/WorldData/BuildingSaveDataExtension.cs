@@ -38,8 +38,8 @@ public static partial class BuildingSaveDataExtension
         writer.Put(buildingSaveData.CurrentHp);
         writer.Put(buildingSaveData.IsLocked);
         writer.Put(buildingSaveData.LockPassword);
-        writer.Put(buildingSaveData.Position);
-        writer.Put(buildingSaveData.Rotation);
+        writer.PutVector3(buildingSaveData.Position);
+        writer.PutQuaternion(buildingSaveData.Rotation);
         writer.Put(buildingSaveData.CreatorId);
         writer.Put(buildingSaveData.CreatorName);
         writer.Put(buildingSaveData.ExtraData);

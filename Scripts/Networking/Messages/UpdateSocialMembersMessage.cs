@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(id);
-            writer.Put(members);
+            writer.PutArray(members);
         }
     }
 }

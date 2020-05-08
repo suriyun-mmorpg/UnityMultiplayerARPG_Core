@@ -159,7 +159,7 @@ namespace MultiplayerARPG
         {
             writer.Put(id);
             writer.Put(leaderId);
-            writer.Put(members);
+            writer.PutDictionary(members);
         }
 
         public virtual void Deserialize(NetDataReader reader)

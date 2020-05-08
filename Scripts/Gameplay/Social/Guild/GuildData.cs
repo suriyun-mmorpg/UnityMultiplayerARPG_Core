@@ -329,9 +329,9 @@ namespace MultiplayerARPG
             writer.Put(skillPoint);
             writer.Put(guildMessage);
             writer.Put(gold);
-            writer.Put(roles);
-            writer.Put(memberRoles);
-            writer.Put(skillLevels);
+            writer.PutList(roles);
+            writer.PutDictionary(memberRoles);
+            writer.PutDictionary(skillLevels);
         }
 
         public override void Deserialize(NetDataReader reader)
