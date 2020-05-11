@@ -227,13 +227,6 @@ public static partial class PlayerCharacterDataExtension
         character.EntityId = entityId;
         character.CharacterName = characterName;
         character.Level = 1;
-        CharacterStats stats = character.GetStats();
-        character.CurrentHp = (int)stats.hp;
-        character.CurrentMp = (int)stats.mp;
-        character.CurrentStamina = (int)stats.stamina;
-        character.CurrentFood = (int)stats.food;
-        character.CurrentWater = (int)stats.water;
-        character.Gold = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startGold : gameInstance.startGold;
         // Start items
         List<ItemAmount> startItems = new List<ItemAmount>();
         startItems.AddRange(gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startItems : gameInstance.startItems);
@@ -253,6 +246,14 @@ public static partial class PlayerCharacterDataExtension
                 amount -= addAmount;
             }
         }
+        // Set start stats
+        CharacterStats stats = character.GetCaches().Stats;
+        character.CurrentHp = (int)stats.hp;
+        character.CurrentMp = (int)stats.mp;
+        character.CurrentStamina = (int)stats.stamina;
+        character.CurrentFood = (int)stats.food;
+        character.CurrentWater = (int)stats.water;
+        character.Gold = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startGold : gameInstance.startGold;
         // Position
         BaseMapInfo startMap = playerCharacter.StartMap;
         character.CurrentMapName = startMap.Id;

@@ -84,7 +84,8 @@ namespace MultiplayerARPG
                 out maxFood,
                 out maxWater,
                 out atkSpeed,
-                out moveSpeed);
+                out moveSpeed,
+                false);
 
             if (characterData.GetDatabase() != null)
                 BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;

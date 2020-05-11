@@ -166,26 +166,39 @@ public static partial class CharacterDataExtension
         if (data == null)
             return new Dictionary<Attribute, float>();
         Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
-        // Increase stats from buffs
         foreach (CharacterBuff buff in data.Buffs)
         {
             result = GameDataHelpers.CombineAttributes(result, buff.GetIncreaseAttributes());
             // Increase with rates
             result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
         }
-        // Increase attributes from passive skills
-        foreach (CharacterSkill learnedSkill in data.Skills)
+        return result;
+    }
+
+    public static Dictionary<Attribute, float> GetPassiveSkillAttributes(this ICharacterData data, Dictionary<Attribute, float> baseAttributes)
+    {
+        if (data == null)
+            return new Dictionary<Attribute, float>();
+        return data.GetSkills(true).GetPassiveSkillAttributes(baseAttributes);
+    }
+
+    public static Dictionary<Attribute, float> GetPassiveSkillAttributes(this Dictionary<BaseSkill, short> skills, Dictionary<Attribute, float> baseAttributes)
+    {
+        if (skills == null)
+            return new Dictionary<Attribute, float>();
+        Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
+        foreach (KeyValuePair<BaseSkill, short> skill in skills)
         {
-            if (learnedSkill.GetSkill() == null || !learnedSkill.GetSkill().IsPassive() || learnedSkill.level <= 0)
+            if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
                 continue;
-            result = GameDataHelpers.CombineAttributes(result, learnedSkill.GetPassiveBuffIncreaseAttributes());
+            result = GameDataHelpers.CombineAttributes(result, skill.Key.GetBuff().GetIncreaseAttributes(skill.Value));
             // Increase with rates
-            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), learnedSkill.GetPassiveBuffIncreaseAttributesRate()));
+            result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.Key.GetBuff().GetIncreaseAttributesRate(skill.Value)));
         }
         return result;
     }
 
-    public static Dictionary<Attribute, float> GetAttributes(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    public static Dictionary<Attribute, float> GetAttributes(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
     {
         Dictionary<Attribute, float> result = data.GetCharacterAttributes();
         if (sumWithEquipments || sumWithBuffs)
@@ -195,6 +208,8 @@ public static partial class CharacterDataExtension
                 result = GameDataHelpers.CombineAttributes(result, data.GetEquipmentAttributes(baseAttributes));
             if (sumWithBuffs)
                 result = GameDataHelpers.CombineAttributes(result, data.GetBuffAttributes(baseAttributes));
+            if (skills != null)
+                result = GameDataHelpers.CombineAttributes(result, skills.GetPassiveSkillAttributes(baseAttributes));
         }
         return result;
     }
@@ -249,7 +264,7 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<BaseSkill, short> GetSkills(this ICharacterData data, bool sumWithEquipments = true)
+    public static Dictionary<BaseSkill, short> GetSkills(this ICharacterData data, bool sumWithEquipments)
     {
         Dictionary<BaseSkill, short> result = data.GetCharacterSkills();
         if (sumWithEquipments)
@@ -303,23 +318,39 @@ public static partial class CharacterDataExtension
         {
             result = GameDataHelpers.CombineResistances(result, buff.GetIncreaseResistances());
         }
-        // Passive skills
-        foreach (CharacterSkill learnedSkill in data.Skills)
+        return result;
+    }
+
+    public static Dictionary<DamageElement, float> GetPassiveSkillResistances(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<DamageElement, float>();
+        return data.GetSkills(true).GetPassiveSkillResistances();
+    }
+
+    public static Dictionary<DamageElement, float> GetPassiveSkillResistances(this Dictionary<BaseSkill, short> skills)
+    {
+        if (skills == null)
+            return new Dictionary<DamageElement, float>();
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        foreach (KeyValuePair<BaseSkill, short> skill in skills)
         {
-            if (learnedSkill.GetSkill() == null || !learnedSkill.GetSkill().IsPassive() || learnedSkill.level <= 0)
+            if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
                 continue;
-            result = GameDataHelpers.CombineResistances(result, learnedSkill.GetPassiveBuffIncreaseResistances());
+            result = GameDataHelpers.CombineResistances(result, skill.Key.GetBuff().GetIncreaseResistances(skill.Value));
         }
         return result;
     }
 
-    public static Dictionary<DamageElement, float> GetResistances(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    public static Dictionary<DamageElement, float> GetResistances(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
     {
         Dictionary<DamageElement, float> result = data.GetCharacterResistances();
         if (sumWithEquipments)
             result = GameDataHelpers.CombineResistances(result, data.GetEquipmentResistances());
         if (sumWithBuffs)
             result = GameDataHelpers.CombineResistances(result, data.GetBuffResistances());
+        if (skills != null)
+            result = GameDataHelpers.CombineResistances(result, skills.GetPassiveSkillResistances());
         return result;
     }
 
@@ -374,23 +405,39 @@ public static partial class CharacterDataExtension
         {
             result = GameDataHelpers.CombineArmors(result, buff.GetIncreaseArmors());
         }
-        // Passive skills
-        foreach (CharacterSkill learnedSkill in data.Skills)
+        return result;
+    }
+
+    public static Dictionary<DamageElement, float> GetPassiveSkillArmors(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<DamageElement, float>();
+        return data.GetPassiveSkillArmors();
+    }
+
+    public static Dictionary<DamageElement, float> GetPassiveSkillArmors(this Dictionary<BaseSkill, short> skills)
+    {
+        if (skills == null)
+            return new Dictionary<DamageElement, float>();
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        foreach (KeyValuePair<BaseSkill, short> skill in skills)
         {
-            if (learnedSkill.GetSkill() == null || !learnedSkill.GetSkill().IsPassive() || learnedSkill.level <= 0)
+            if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
                 continue;
-            result = GameDataHelpers.CombineArmors(result, learnedSkill.GetPassiveBuffIncreaseArmors());
+            result = GameDataHelpers.CombineArmors(result, skill.Key.GetBuff().GetIncreaseArmors(skill.Value));
         }
         return result;
     }
 
-    public static Dictionary<DamageElement, float> GetArmors(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    public static Dictionary<DamageElement, float> GetArmors(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
     {
         Dictionary<DamageElement, float> result = data.GetCharacterArmors();
         if (sumWithEquipments)
             result = GameDataHelpers.CombineArmors(result, data.GetEquipmentArmors());
         if (sumWithBuffs)
             result = GameDataHelpers.CombineArmors(result, data.GetBuffArmors());
+        if (skills != null)
+            result = GameDataHelpers.CombineArmors(result, skills.GetPassiveSkillArmors());
         return result;
     }
 
@@ -430,24 +477,39 @@ public static partial class CharacterDataExtension
         {
             result = GameDataHelpers.CombineDamages(result, buff.GetIncreaseDamages());
         }
+        return result;
+    }
 
-        // Passive skills
-        foreach (CharacterSkill learnedSkill in data.Skills)
+    public static Dictionary<DamageElement, MinMaxFloat> GetPassiveSkillIncreaseDamages(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<DamageElement, MinMaxFloat>();
+        return data.GetSkills(true).GetPassiveSkillIncreaseDamages();
+    }
+
+    public static Dictionary<DamageElement, MinMaxFloat> GetPassiveSkillIncreaseDamages(this Dictionary<BaseSkill, short> skills)
+    {
+        if (skills == null)
+            return new Dictionary<DamageElement, MinMaxFloat>();
+        Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
+        foreach (KeyValuePair<BaseSkill, short> skill in skills)
         {
-            if (learnedSkill.GetSkill() == null || !learnedSkill.GetSkill().IsPassive() || learnedSkill.level <= 0)
+            if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
                 continue;
-            result = GameDataHelpers.CombineDamages(result, learnedSkill.GetPassiveBuffIncreaseDamages());
+            result = GameDataHelpers.CombineDamages(result, skill.Key.GetBuff().GetIncreaseDamages(skill.Value));
         }
         return result;
     }
 
-    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
     {
         Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
         if (sumWithEquipments)
             result = GameDataHelpers.CombineDamages(result, data.GetEquipmentIncreaseDamages());
         if (sumWithBuffs)
             result = GameDataHelpers.CombineDamages(result, data.GetBuffIncreaseDamages());
+        if (skills != null)
+            result = GameDataHelpers.CombineDamages(result, skills.GetPassiveSkillIncreaseDamages());
         return result;
     }
 
@@ -515,7 +577,6 @@ public static partial class CharacterDataExtension
         if (data == null)
             return new CharacterStats();
         CharacterStats result = new CharacterStats();
-        // Increase stats from buffs
         foreach (CharacterBuff buff in data.Buffs)
         {
             result += buff.GetIncreaseStats();
@@ -524,25 +585,38 @@ public static partial class CharacterDataExtension
             result += baseStats * buff.GetIncreaseStatsRate();
             result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
         }
-        // Increase stats from passive skills
-        foreach (CharacterSkill learnedSkill in data.Skills)
+        return result;
+    }
+    public static CharacterStats GetPassiveSkillStats(this ICharacterData data, CharacterStats baseStats, Dictionary<Attribute, float> baseAttributes)
+    {
+        if (data == null)
+            return new CharacterStats();
+        return data.GetSkills(true).GetPassiveSkillStats(baseStats, baseAttributes);
+    }
+
+    public static CharacterStats GetPassiveSkillStats(this Dictionary<BaseSkill, short> skills, CharacterStats baseStats, Dictionary<Attribute, float> baseAttributes)
+    {
+        if (skills == null)
+            return new CharacterStats();
+        CharacterStats result = new CharacterStats();
+        foreach (KeyValuePair<BaseSkill, short> skill in skills)
         {
-            if (learnedSkill.GetSkill() == null || !learnedSkill.GetSkill().IsPassive() || learnedSkill.level <= 0)
+            if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
                 continue;
-            result += learnedSkill.GetPassiveBuffIncreaseStats();
-            result += GameDataHelpers.GetStatsFromAttributes(learnedSkill.GetPassiveBuffIncreaseAttributes());
+            result += skill.Key.GetBuff().GetIncreaseStats(skill.Value);
+            result += GameDataHelpers.GetStatsFromAttributes(skill.Key.GetBuff().GetIncreaseAttributes(skill.Value));
             // Increase with rates
-            result += baseStats * learnedSkill.GetPassiveBuffIncreaseStatsRate();
-            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), learnedSkill.GetPassiveBuffIncreaseAttributesRate()));
+            result += baseStats * skill.Key.GetBuff().GetIncreaseStatsRate(skill.Value);
+            result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.Key.GetBuff().GetIncreaseAttributesRate(skill.Value)));
         }
         return result;
     }
 
-    public static CharacterStats GetStats(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    public static CharacterStats GetStats(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
     {
         CharacterStats result = new CharacterStats();
         result += data.GetCharacterStats();
-        if (sumWithEquipments || sumWithBuffs)
+        if (sumWithEquipments || sumWithBuffs || skills != null)
         {
             // Prepare base stats, it will be multiplied with increase stats rate
             CharacterStats baseStats = new CharacterStats();
@@ -555,6 +629,8 @@ public static partial class CharacterDataExtension
                 result += data.GetEquipmentStats(baseStats, baseAttributes);
             if (sumWithBuffs)
                 result += data.GetBuffStats(baseStats, baseAttributes);
+            if (skills != null)
+                result += skills.GetPassiveSkillStats(baseStats, baseAttributes);
         }
         return result;
     }
@@ -1324,7 +1400,7 @@ public static partial class CharacterDataExtension
         Dictionary<DamageElement, MinMaxFloat> bonusDamages,
         Dictionary<BaseSkill, short> bonusSkills,
         Dictionary<EquipmentSet, int> equipmentSets,
-        bool combine = false)
+        bool combine)
     {
         if (!combine)
         {
@@ -1439,27 +1515,28 @@ public static partial class CharacterDataExtension
         out int resultMaxWater,
         out float resultAtkSpeed,
         out float resultMoveSpeed,
-        bool combine = false)
+        bool combine)
     {
         if (!combine)
         {
             resultStats = new CharacterStats();
+            resultSkills.Clear();
             resultAttributes.Clear();
             resultResistances.Clear();
             resultArmors.Clear();
             resultIncreaseDamages.Clear();
-            resultSkills.Clear();
             resultEquipmentSets.Clear();
         }
-
-        resultStats = resultStats + data.GetStats();
-        resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes());
-        resultResistances = GameDataHelpers.CombineResistances(resultResistances, data.GetResistances());
-        resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.GetArmors());
-        resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages());
-        resultSkills = GameDataHelpers.CombineSkills(resultSkills, data.GetSkills());
-        GetEquipmentSetBonus(data, ref resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets, true);
-        // Sum with other stats
+        // Prepare equipment set bonus
+        data.GetEquipmentSetBonus(ref resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets, true);
+        // Set results values
+        resultSkills = GameDataHelpers.CombineSkills(resultSkills, data.GetSkills(true));
+        resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes(true, true, resultSkills));
+        resultResistances = GameDataHelpers.CombineResistances(resultResistances, data.GetResistances(true, true, resultSkills));
+        resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.GetArmors(true, true, resultSkills));
+        resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages(true, true, resultSkills));
+        resultStats = resultStats + data.GetStats(true, true, resultSkills);
+        // Separated stats results
         resultMaxHp = (int)resultStats.hp;
         resultMaxMp = (int)resultStats.mp;
         resultMaxStamina = (int)resultStats.stamina;

@@ -11,7 +11,6 @@ public class CharacterAttribute : INetSerializableWithElement
 
     [System.NonSerialized]
     private int dirtyDataId;
-
     [System.NonSerialized]
     private Attribute cacheAttribute;
 
