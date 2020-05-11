@@ -317,6 +317,8 @@ namespace MultiplayerARPG
 
         public virtual void SendNotifyRewardExp(long connectionId, int exp)
         {
+            if (exp <= 0)
+                return;
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardExp, (writer) =>
             {
                 writer.Put(exp);
@@ -325,6 +327,8 @@ namespace MultiplayerARPG
 
         public virtual void SendNotifyRewardGold(long connectionId, int gold)
         {
+            if (gold <= 0)
+                return;
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardGold, (writer) =>
             {
                 writer.Put(gold);
