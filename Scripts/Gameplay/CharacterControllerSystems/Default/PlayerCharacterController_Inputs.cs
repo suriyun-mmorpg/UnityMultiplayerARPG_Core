@@ -639,7 +639,6 @@ namespace MultiplayerARPG
                     if (!IsEditingBuilding)
                     {
                         ActivateBuilding(targetBuilding);
-                        ClearTarget();
                     }
                     else
                     {
@@ -686,12 +685,19 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 // Do action
                 action.Invoke();
+                // This function may be used by extending classes
+                OnDoActionOnEntity();
             }
             else
             {
                 // Move to target entity
                 UpdateTargetEntityPosition(measuringPosition, targetPosition, distance);
             }
+        }
+
+        protected virtual void OnDoActionOnEntity()
+        {
+
         }
 
         protected void AttackOrMoveToEntity(IDamageableEntity entity, float distance, int layerMask, System.Action action)
@@ -711,12 +717,19 @@ namespace MultiplayerARPG
                 TurnCharacterToEntity(entity.Entity);
                 // Do action
                 action.Invoke();
+                // This function may be used by extending classes
+                OnAttackOnEntity();
             }
             else
             {
                 // Move to target entity
                 UpdateTargetEntityPosition(measuringPosition, targetPosition, distance);
             }
+        }
+
+        protected virtual void OnAttackOnEntity()
+        {
+
         }
 
         protected void UseSkillOrMoveToEntity(IDamageableEntity entity, float distance)
@@ -738,6 +751,8 @@ namespace MultiplayerARPG
                     // Use the skill
                     RequestUsePendingSkill();
                     targetActionType = TargetActionType.Undefined;
+                    // This function may be used by extending classes
+                    OnUseSkillOnEntity();
                 }
                 else
                 {
@@ -752,6 +767,11 @@ namespace MultiplayerARPG
                 ClearQueueUsingSkill();
                 return;
             }
+        }
+
+        protected virtual void OnUseSkillOnEntity()
+        {
+
         }
 
         protected void UpdateTargetEntityPosition(Vector3 measuringPosition, Vector3 targetPosition, float distance)
