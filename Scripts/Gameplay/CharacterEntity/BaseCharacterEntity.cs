@@ -1172,6 +1172,8 @@ namespace MultiplayerARPG
 
         public virtual float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, BaseSkill skill)
         {
+            if (skill != null)
+                return skill.moveSpeedRateWhileUsingSkill;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
@@ -1182,12 +1184,6 @@ namespace MultiplayerARPG
                     if (EquipWeapons.GetLeftHandWeaponItem() != null)
                         return EquipWeapons.GetLeftHandWeaponItem().MoveSpeedRateWhileAttacking;
                     return CurrentGameInstance.DefaultWeaponItem.MoveSpeedRateWhileAttacking;
-                case AnimActionType.SkillRightHand:
-                case AnimActionType.SkillLeftHand:
-                    // Calculate move speed rate while doing action at clients and server
-                    if (skill != null)
-                        return skill.moveSpeedRateWhileUsingSkill;
-                    break;
             }
             return 1f;
         }
