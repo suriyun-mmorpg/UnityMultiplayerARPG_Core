@@ -43,6 +43,7 @@ namespace MultiplayerARPG
         private int currentFrame = 0;
         private bool playing = false;
         private bool playingAction = false;
+        private float transitionToMoveAnim = 0f;
         private float secsPerFrame = 0;
         private float nextFrameTime = 0;
         private SampleAnimation? dirtySampleAnimation;
@@ -168,23 +169,29 @@ namespace MultiplayerARPG
 
         public override void PlayMoveAnimation()
         {
-            if (playingAction)
-                return;
-
             if (isDead)
             {
                 Play(deadAnimation2D, DirectionType2D);
+                playingAction = false;
+                transitionToMoveAnim = 0f;
             }
-            else
+
+            if (playingAction)
+                return;
+
+            if (transitionToMoveAnim >= 0f)
             {
-                if (movementState.HasFlag(MovementState.Forward) ||
-                    movementState.HasFlag(MovementState.Backward) ||
-                    movementState.HasFlag(MovementState.Right) ||
-                    movementState.HasFlag(MovementState.Left))
-                    Play(moveAnimation2D, DirectionType2D);
-                else
-                    Play(idleAnimation2D, DirectionType2D);
+                transitionToMoveAnim -= Time.deltaTime;
+                return;
             }
+
+            if (movementState.HasFlag(MovementState.Forward) ||
+                movementState.HasFlag(MovementState.Backward) ||
+                movementState.HasFlag(MovementState.Right) ||
+                movementState.HasFlag(MovementState.Left))
+                Play(moveAnimation2D, DirectionType2D);
+            else
+                Play(idleAnimation2D, DirectionType2D);
         }
 
         private ActionAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)
@@ -231,6 +238,7 @@ namespace MultiplayerARPG
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
         {
+            playingAction = true;
             return StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier));
         }
 
@@ -243,7 +251,6 @@ namespace MultiplayerARPG
                 AnimationClip2D anim = animation2D.GetClipByDirection(DirectionType2D);
                 if (anim != null)
                 {
-                    playingAction = true;
                     AudioClip audioClip = animation2D.GetRandomAudioClip();
                     if (audioClip != null)
                         AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
@@ -252,13 +259,15 @@ namespace MultiplayerARPG
                     yield return new WaitForSecondsRealtime(anim.length / playSpeedMultiplier);
                     Play(idleAnimation2D, DirectionType2D);
                     yield return new WaitForSecondsRealtime(animation2D.extraDuration / playSpeedMultiplier);
-                    playingAction = false;
+                    transitionToMoveAnim = 0.25f;
                 }
             }
+            playingAction = false;
         }
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)
         {
+            playingAction = true;
             return StartCoroutine(PlaySkillCastClipRoutine(dataId, duration));
         }
 
@@ -274,13 +283,13 @@ namespace MultiplayerARPG
                 AnimationClip2D anim = animation2D.GetClipByDirection(DirectionType2D);
                 if (anim != null)
                 {
-                    playingAction = true;
                     Play(anim);
                     yield return new WaitForSecondsRealtime(duration);
                     Play(idleAnimation2D, DirectionType2D);
-                    playingAction = false;
+                    transitionToMoveAnim = 0.25f;
                 }
             }
+            playingAction = false;
         }
 
         public override void StopActionAnimation()
