@@ -246,8 +246,8 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool TryGetDoActionCharacter<T>(out T entity)
-            where T : class, IGameEntity
+        public bool TryGetDoActionEntity<T>(out T entity)
+            where T : BaseGameEntity
         {
             entity = null;
             if (targetActionType != TargetActionType.Undefined)

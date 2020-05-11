@@ -606,14 +606,14 @@ namespace MultiplayerARPG
                 GetUseSkillDistanceAndFov(out castDistance, out castFov);
                 UseSkillOrMoveToEntity(targetCharacter, castDistance);
             }
-            else if (TryGetDoActionCharacter(out targetCharacter))
+            else if (TryGetDoActionEntity(out targetCharacter))
             {
                 DoActionOrMoveToEntity(targetCharacter, CurrentGameInstance.conversationDistance, () =>
                 {
                     // TODO: Do something
                 });
             }
-            else if (TryGetDoActionCharacter(out targetNpc))
+            else if (TryGetDoActionEntity(out targetNpc))
             {
                 DoActionOrMoveToEntity(targetNpc, CurrentGameInstance.conversationDistance, () =>
                 {
@@ -624,7 +624,7 @@ namespace MultiplayerARPG
                     }
                 });
             }
-            else if (TryGetDoActionCharacter(out targetItemDrop))
+            else if (TryGetDoActionEntity(out targetItemDrop))
             {
                 DoActionOrMoveToEntity(targetItemDrop, CurrentGameInstance.pickUpItemDistance, () =>
                 {
@@ -632,7 +632,7 @@ namespace MultiplayerARPG
                     ClearTarget();
                 });
             }
-            else if (TryGetDoActionCharacter(out targetBuilding))
+            else if (TryGetDoActionEntity(out targetBuilding))
             {
                 DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
                 {
@@ -647,7 +647,7 @@ namespace MultiplayerARPG
                     }
                 });
             }
-            else if (TryGetDoActionCharacter(out targetHarvestable))
+            else if (TryGetDoActionEntity(out targetHarvestable))
             {
                 if (targetHarvestable.IsDead())
                 {
@@ -666,7 +666,7 @@ namespace MultiplayerARPG
                     RequestAttack();
                 });
             }
-            else if (TryGetDoActionCharacter(out targetVehicle))
+            else if (TryGetDoActionEntity(out targetVehicle))
             {
                 DoActionOrMoveToEntity(targetVehicle, CurrentGameInstance.conversationDistance, () =>
                 {
