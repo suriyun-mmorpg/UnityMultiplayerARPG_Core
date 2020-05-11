@@ -241,7 +241,7 @@ namespace MultiplayerARPG
             {
                 BuildingMaterial buildingMaterial = other.GetComponent<BuildingMaterial>();
                 if (buildingMaterial != null)
-                    building = buildingMaterial.entity;
+                    building = buildingMaterial.TargetEntity;
                 if (findWithAdvanceOptions)
                 {
                     if (findOnlyAliveBuildings && building != null && building.IsDead())

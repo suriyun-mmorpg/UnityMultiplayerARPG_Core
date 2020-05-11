@@ -5,10 +5,12 @@ namespace MultiplayerARPG
 {
     public class DamageableHitBox<T> : MonoBehaviour, IDamageableEntity where T : IDamageableEntity
     {
-        public T entity;
+        [SerializeField]
+        protected T entity;
         public int CurrentHp { get { return entity.CurrentHp; } set { entity.CurrentHp = value; } }
         public Transform OpponentAimTransform { get { return entity.OpponentAimTransform; } }
         public BaseGameEntity Entity { get { return entity.Entity; } }
+        public T TargetEntity { get { return entity; } }
 
         protected virtual void Start()
         {
