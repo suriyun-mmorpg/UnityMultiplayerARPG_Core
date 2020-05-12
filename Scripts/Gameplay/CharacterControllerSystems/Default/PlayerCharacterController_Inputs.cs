@@ -393,7 +393,7 @@ namespace MultiplayerARPG
                 ClearQueueUsingSkill();
                 destination = null;
                 isFollowingTarget = false;
-                if (TargetEntity != null && Vector3.Distance(MovementTransform.position, TargetEntity.MovementTransform.position) >= wasdClearTargetDistance)
+                if (TargetEntity != null && Vector3.Distance(MovementTransform.position, TargetEntity.CacheTransform.position) >= wasdClearTargetDistance)
                 {
                     // Clear target when character moved far from target
                     ClearTarget();
@@ -701,8 +701,8 @@ namespace MultiplayerARPG
         {
             // Attack or using attack skill, find distance to target by attack transform
             Transform damageTransform = queueUsingSkill.skill != null ?
-                damageTransform = queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, isLeftHandAttacking) :
-                damageTransform = PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
+                queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, isLeftHandAttacking) :
+                PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
             // If target in attack distance, attack!
             Vector3 measuringPosition = damageTransform.position;
             Vector3 targetPosition = entity.OpponentAimTransform.position;
@@ -737,7 +737,7 @@ namespace MultiplayerARPG
                 // Non-attack skills can be any hand
                 Transform applyTransform = queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, false);
                 Vector3 measuringPosition = applyTransform.position;
-                Vector3 targetPosition = entity.GetTransform().position;
+                Vector3 targetPosition = entity.OpponentAimTransform.position;
                 if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() /* Applying skill to user? */ ||
                     Vector3.Distance(measuringPosition, targetPosition) <= distance)
                 {
