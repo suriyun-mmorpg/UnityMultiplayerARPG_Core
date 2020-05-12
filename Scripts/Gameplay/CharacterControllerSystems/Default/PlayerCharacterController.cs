@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         {
             Undefined,
             Attack,
-            UseSkill
+            UseSkill,
         }
         
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
@@ -232,7 +232,8 @@ namespace MultiplayerARPG
         public bool TryGetUsingSkillCharacter(out BaseCharacterEntity character)
         {
             character = null;
-            if (targetActionType != TargetActionType.UseSkill)
+            if (targetActionType != TargetActionType.UseSkill ||
+                queueUsingSkill.skill == null)
                 return false;
 
             if (TargetEntity != null)
