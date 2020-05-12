@@ -138,7 +138,8 @@ namespace MultiplayerARPG
             }
 
             if (tempTargetEnemy.Entity == CacheEntity.Entity ||
-                tempTargetEnemy.IsDead() || !tempTargetEnemy.CanReceiveDamageFrom(CacheEntity))
+                tempTargetEnemy.IsDead() || !tempTargetEnemy.CanReceiveDamageFrom(CacheEntity) ||
+                (tempTargetEnemy is BaseCharacterEntity && (tempTargetEnemy as BaseCharacterEntity).IsHideOrDead))
             {
                 // If target is dead or in safe area stop attacking
                 CacheEntity.SetTargetEntity(null);
