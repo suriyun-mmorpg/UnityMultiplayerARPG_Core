@@ -418,7 +418,7 @@ namespace MultiplayerARPG
                 BaseCharacterEntity targetEntity;
                 if (character.TryGetTargetEntity(out targetEntity))
                 {
-                    if (Vector3.Distance(character.MovementTransform.position, targetEntity.CacheTransform.position) > GetCastDistance(character, level, isLeftHand))
+                    if (Vector3.Distance(character.CacheTransform.position, targetEntity.CacheTransform.position) > GetCastDistance(character, level, isLeftHand))
                     {
                         gameMessageType = GameMessage.Type.CharacterIsTooFar;
                         return false;
@@ -443,7 +443,7 @@ namespace MultiplayerARPG
 
         public virtual Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
         {
-            return skillUser.MovementTransform;
+            return skillUser.CacheTransform;
         }
     }
 }

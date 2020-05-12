@@ -49,7 +49,7 @@ namespace MultiplayerARPG
             float time = Time.unscaledTime;
             float deltaTime = Time.unscaledDeltaTime;
 
-            Vector3 currentPosition = CacheEntity.MovementTransform.position;
+            Vector3 currentPosition = CacheEntity.CacheTransform.position;
             if (CacheEntity.Summoner != null)
             {
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
