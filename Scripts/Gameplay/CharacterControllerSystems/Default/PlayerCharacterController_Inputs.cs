@@ -699,11 +699,7 @@ namespace MultiplayerARPG
 
         protected void AttackOrMoveToEntity(IDamageableEntity entity, float distance, int layerMask)
         {
-            // Attack or using attack skill, find distance to target by attack transform
-            Transform damageTransform = queueUsingSkill.skill != null ?
-                queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, isLeftHandAttacking) :
-                PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
-            // If target in attack distance, attack!
+            Transform damageTransform = PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
             Vector3 measuringPosition = damageTransform.position;
             Vector3 targetPosition = entity.OpponentAimTransform.position;
             if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
@@ -731,10 +727,8 @@ namespace MultiplayerARPG
 
         protected void UseSkillOrMoveToEntity(IDamageableEntity entity, float distance)
         {
-            // Using non-attack skill, so find distance to target by positions
             if (queueUsingSkill.skill != null)
             {
-                // Non-attack skills can be any hand
                 Transform applyTransform = queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, false);
                 Vector3 measuringPosition = applyTransform.position;
                 Vector3 targetPosition = entity.OpponentAimTransform.position;
