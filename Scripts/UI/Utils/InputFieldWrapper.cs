@@ -304,6 +304,22 @@ public class InputFieldWrapper : MonoBehaviour
 #endif
     }
 
+    public void MoveTextStart(bool shift)
+    {
+        if (unityInputField != null) unityInputField.MoveTextStart(shift);
+#if USE_TEXT_MESH_PRO
+        if (textMeshInputField != null) textMeshInputField.MoveTextStart(shift);
+#endif
+    }
+
+    public void MoveTextEnd(bool shift)
+    {
+        if (unityInputField != null) unityInputField.MoveTextEnd(shift);
+#if USE_TEXT_MESH_PRO
+        if (textMeshInputField != null) textMeshInputField.MoveTextEnd(shift);
+#endif
+    }
+
     public bool isFocused
     {
         get

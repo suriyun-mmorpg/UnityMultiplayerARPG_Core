@@ -46,6 +46,8 @@ namespace MultiplayerARPG
             }
         }
 
+        private bool movingToEnd;
+
         private void Start()
         {
             CacheList.Generate(ChatMessages, (index, message, ui) =>
@@ -77,6 +79,11 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            if (movingToEnd)
+            {
+                movingToEnd = false;
+                uiEnterChatField.MoveTextEnd(false);
+            }
             if (Input.GetKeyUp(enterChatKey))
             {
                 if (!EnterChatFieldVisible)
@@ -105,6 +112,7 @@ namespace MultiplayerARPG
             {
                 uiEnterChatField.ActivateInputField();
                 EventSystem.current.SetSelectedGameObject(uiEnterChatField.gameObject);
+                movingToEnd = true;
             }
             EnterChatFieldVisible = true;
         }
@@ -146,8 +154,8 @@ namespace MultiplayerARPG
                 {
                     channel = ChatChannel.Whisper;
                     receiver = splitedText[1];
-                    message = trimText.Substring(cmd.Length + receiver.Length + 1); // +1 for space
-                    EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 1); // +1 for space
+                    message = trimText.Substring(cmd.Length + receiver.Length + 2); // +2 for space
+                    EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 2); // +2 for space
                 }
                 if ((cmd == globalCommand || cmd == partyCommand || cmd == guildCommand || cmd == systemCommand) && splitedText.Length > 1)
                 {
