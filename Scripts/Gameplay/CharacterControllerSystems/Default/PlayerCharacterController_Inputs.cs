@@ -96,8 +96,7 @@ namespace MultiplayerARPG
                     if (EnemyEntityDetector.characters.Count > 0)
                     {
                         SetTarget(null, TargetActionType.Attack);
-                        if (!EnemyEntityDetector.characters[findingEnemyIndex].GetCaches().IsHide &&
-                            !EnemyEntityDetector.characters[findingEnemyIndex].IsDead())
+                        if (!EnemyEntityDetector.characters[findingEnemyIndex].IsHideOrDead)
                         {
                             SetTarget(EnemyEntityDetector.characters[findingEnemyIndex], TargetActionType.Attack);
                             if (SelectedEntity != null)
@@ -134,15 +133,9 @@ namespace MultiplayerARPG
             // Update enemy detecting radius to attack distance
             EnemyEntityDetector.detectingRadius = Mathf.Max(PlayerCharacterEntity.GetAttackDistance(false), lockAttackTargetDistance);
             // Update inputs
-            if (queueUsingSkill.skill != null)
-            {
-                UpdateQueuedSkill(queueUsingSkill.skill, queueUsingSkill.level);
-            }
-            else
-            {
-                UpdatePointClickInput();
-                UpdateWASDInput();
-            }
+            UpdateQueuedSkill();
+            UpdatePointClickInput();
+            UpdateWASDInput();
             // Set sprinting state
             PlayerCharacterEntity.SetExtraMovement(isSprinting ? ExtraMovementState.IsSprinting : ExtraMovementState.None);
         }
@@ -235,7 +228,7 @@ namespace MultiplayerARPG
                             targetBuilding = tempBuildingMaterial.TargetEntity;
                         targetVehicle = tempTransform.GetComponent<VehicleEntity>();
                         lastNpcObjectId = 0;
-                        if (targetPlayer && !targetPlayer.GetCaches().IsHide)
+                        if (targetPlayer && !targetPlayer.IsHideOrDead)
                         {
                             // Found activating entity as player character entity
                             SetTarget(targetPlayer, TargetActionType.Attack);
@@ -243,7 +236,7 @@ namespace MultiplayerARPG
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetMonster && !targetMonster.GetCaches().IsHide)
+                        else if (targetMonster && !targetMonster.IsHideOrDead)
                         {
                             // Found activating entity as monster character entity
                             SetTarget(targetMonster, TargetActionType.Attack);
@@ -423,7 +416,7 @@ namespace MultiplayerARPG
 
             if (wasdLockAttackTarget)
             {
-                if (!TryGetAttackingCharacter(out targetEntity) || targetEntity.IsDead())
+                if (!TryGetAttackingCharacter(out targetEntity) || targetEntity.IsHideOrDead)
                 {
                     // Find nearest target and move to the target
                     targetEntity = PlayerCharacterEntity
@@ -433,7 +426,7 @@ namespace MultiplayerARPG
                         true,
                         false);
                 }
-                if (targetEntity != null && !targetEntity.IsDead())
+                if (targetEntity != null && !targetEntity.IsHideOrDead)
                 {
                     // Set target, then attack later when moved nearby target
                     SelectedEntity = targetEntity;
@@ -469,18 +462,23 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateQueuedSkill(BaseSkill skill, short skillLevel)
+        protected void UpdateQueuedSkill()
         {
+            if (queueUsingSkill.skill == null || queueUsingSkill.level <= 0)
+                return;
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
-
             destination = null;
+            BaseSkill skill = queueUsingSkill.skill;
+            short skillLevel = queueUsingSkill.level;
+            Vector3? aimPosition = queueUsingSkill.aimPosition;
             BaseCharacterEntity targetEntity;
             bool wasdLockAttackTarget = this.wasdLockAttackTarget || controllerMode == PlayerCharacterControllerMode.PointClick;
 
             if (skill.HasCustomAimControls())
             {
                 // Target not required, use skill immediately
+                TurnCharacterToPosition(aimPosition.Value);
                 RequestUsePendingSkill();
                 isFollowingTarget = false;
                 return;
@@ -493,7 +491,7 @@ namespace MultiplayerARPG
 
                 if (wasdLockAttackTarget)
                 {
-                    if (!TryGetAttackingCharacter(out targetEntity) || targetEntity.IsDead())
+                    if (!TryGetAttackingCharacter(out targetEntity) || targetEntity.IsHideOrDead)
                     {
                         targetEntity = PlayerCharacterEntity
                             .FindNearestAliveCharacter<BaseCharacterEntity>(
@@ -502,7 +500,7 @@ namespace MultiplayerARPG
                             true,
                             false);
                     }
-                    if (targetEntity != null && !targetEntity.IsDead())
+                    if (targetEntity != null && !targetEntity.IsHideOrDead)
                     {
                         // Set target, then use skill later when moved nearby target
                         SelectedEntity = targetEntity;
@@ -580,7 +578,7 @@ namespace MultiplayerARPG
 
             if (TryGetAttackingCharacter(out targetCharacter))
             {
-                if (targetCharacter.GetCaches().IsHide || targetCharacter.IsDead())
+                if (targetCharacter.IsHideOrDead)
                 {
                     ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
@@ -594,7 +592,7 @@ namespace MultiplayerARPG
             }
             else if (TryGetUsingSkillCharacter(out targetCharacter))
             {
-                if (queueUsingSkill.skill.IsAttack() && (targetCharacter.GetCaches().IsHide || targetCharacter.IsDead()))
+                if (queueUsingSkill.skill.IsAttack() && targetCharacter.IsHideOrDead)
                 {
                     ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
@@ -784,7 +782,12 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return;
-            Vector3 lookAtDirection = (entity.CacheTransform.position - MovementTransform.position).normalized;
+            TurnCharacterToPosition(entity.CacheTransform.position);
+        }
+
+        protected void TurnCharacterToPosition(Vector3 position)
+        {
+            Vector3 lookAtDirection = (position - MovementTransform.position).normalized;
             if (lookAtDirection.sqrMagnitude > 0)
                 PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
         }

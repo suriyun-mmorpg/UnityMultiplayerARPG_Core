@@ -70,6 +70,7 @@ namespace MultiplayerARPG
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
         protected short reloadingAmmoAmount;
+        public bool IsHideOrDead { get { return this.GetCaches().IsHide || IsDead(); } }
         public bool IsAttackingOrUsingSkill { get; protected set; }
         public bool IsCastingSkillCanBeInterrupted { get; protected set; }
         public bool IsCastingSkillInterrupted { get; protected set; }
