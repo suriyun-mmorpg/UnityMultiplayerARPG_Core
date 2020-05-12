@@ -464,6 +464,11 @@ namespace MultiplayerARPG
 
         protected void UpdateQueuedSkill()
         {
+            if (PlayerCharacterEntity.IsHideOrDead)
+            {
+                ClearQueueUsingSkill();
+                return;
+            }
             if (queueUsingSkill.skill == null || queueUsingSkill.level <= 0)
                 return;
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
