@@ -67,7 +67,6 @@ namespace MultiplayerARPG
         protected BuildingEntity targetBuilding;
         protected VehicleEntity targetVehicle;
         protected HarvestableEntity targetHarvestable;
-        protected Quaternion tempLookAt;
         protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
         public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
         public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
@@ -115,16 +114,6 @@ namespace MultiplayerARPG
             EnemyEntityDetector.findMonster = true;
             EnemyEntityDetector.findOnlyAliveMonsters = true;
             EnemyEntityDetector.findMonsterToAttack = true;
-        }
-
-        protected override void Setup(BasePlayerCharacterEntity characterEntity)
-        {
-            base.Setup(characterEntity);
-
-            if (characterEntity == null)
-                return;
-
-            tempLookAt = MovementTransform.rotation;
         }
 
         protected override void OnDestroy()
