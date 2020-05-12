@@ -377,7 +377,7 @@ namespace MultiplayerARPG
                 character.Exp = 0;
             }
 
-            if (isLevelUp)
+            if (isLevelUp && !character.IsDead())
             {
                 if (recoverHpWhenLevelUp)
                     character.CurrentHp = character.MaxHp;
