@@ -551,6 +551,11 @@ namespace MultiplayerARPG
                             SetTarget(SelectedEntity, TargetActionType.UseSkill, false);
                             isFollowingTarget = true;
                         }
+                        else
+                        {
+                            ClearQueueUsingSkill();
+                            isFollowingTarget = false;
+                        }
                     }
                     else
                     {
@@ -563,6 +568,11 @@ namespace MultiplayerARPG
                                 TurnCharacterToEntity(SelectedEntity);
                             }
                             RequestUsePendingSkill();
+                            isFollowingTarget = false;
+                        }
+                        else
+                        {
+                            ClearQueueUsingSkill();
                             isFollowingTarget = false;
                         }
                     }
