@@ -423,7 +423,7 @@ namespace MultiplayerARPG
 
             if (wasdLockAttackTarget)
             {
-                if (!TryGetAttackingCharacter(out targetEntity))
+                if (!TryGetAttackingCharacter(out targetEntity) || targetEntity.IsDead())
                 {
                     // Find nearest target and move to the target
                     targetEntity = PlayerCharacterEntity
@@ -433,7 +433,7 @@ namespace MultiplayerARPG
                         true,
                         false);
                 }
-                if (targetEntity != null)
+                if (targetEntity != null && !targetEntity.IsDead())
                 {
                     // Set target, then attack later when moved nearby target
                     SelectedEntity = targetEntity;
@@ -493,7 +493,7 @@ namespace MultiplayerARPG
 
                 if (wasdLockAttackTarget)
                 {
-                    if (!TryGetAttackingCharacter(out targetEntity))
+                    if (!TryGetAttackingCharacter(out targetEntity) || targetEntity.IsDead())
                     {
                         targetEntity = PlayerCharacterEntity
                             .FindNearestAliveCharacter<BaseCharacterEntity>(
@@ -502,7 +502,7 @@ namespace MultiplayerARPG
                             true,
                             false);
                     }
-                    if (targetEntity != null)
+                    if (targetEntity != null && !targetEntity.IsDead())
                     {
                         // Set target, then use skill later when moved nearby target
                         SelectedEntity = targetEntity;
