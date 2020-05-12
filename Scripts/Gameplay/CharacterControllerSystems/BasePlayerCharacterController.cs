@@ -60,9 +60,9 @@ namespace MultiplayerARPG
             get { return PlayerCharacterEntity.CameraTargetTransform; }
         }
 
-        public Transform CacheTransform
+        public Transform MovementTransform
         {
-            get { return PlayerCharacterEntity.CacheTransform; }
+            get { return PlayerCharacterEntity.MovementTransform; }
         }
 
         public float StoppingDistance
