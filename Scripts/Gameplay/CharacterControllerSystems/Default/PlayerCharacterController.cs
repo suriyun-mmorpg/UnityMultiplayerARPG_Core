@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            tempLookAt = MovementTransform.rotation;
+            tempLookAt = CacheTransform.rotation;
         }
 
         protected override void OnDestroy()
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
             {
                 if (CacheTargetObject != null)
                     CacheTargetObject.transform.position = destination.Value;
-                if (Vector3.Distance(destination.Value, MovementTransform.position) < StoppingDistance + 0.5f)
+                if (Vector3.Distance(destination.Value, CacheTransform.position) < StoppingDistance + 0.5f)
                     destination = null;
             }
 

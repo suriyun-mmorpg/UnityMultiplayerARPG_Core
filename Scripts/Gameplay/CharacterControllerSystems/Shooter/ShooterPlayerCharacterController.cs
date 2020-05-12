@@ -376,7 +376,7 @@ namespace MultiplayerARPG
 
             // Prepare variables to find nearest raycasted hit point
             centerRay = CacheGameplayCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            centerOriginToCharacterDistance = Vector3.Distance(centerRay.origin, MovementTransform.position);
+            centerOriginToCharacterDistance = Vector3.Distance(centerRay.origin, CacheTransform.position);
             cameraForward = CacheGameplayCameraTransform.forward;
             cameraRight = CacheGameplayCameraTransform.right;
             cameraForward.y = 0f;
@@ -535,7 +535,7 @@ namespace MultiplayerARPG
                 tempHitInfo = raycasts[tempCounter];
 
                 // Get distance between character and raycast hit point
-                tempDistance = Vector3.Distance(MovementTransform.position, tempHitInfo.point);
+                tempDistance = Vector3.Distance(CacheTransform.position, tempHitInfo.point);
                 // If this is damageable entity
                 tempDamageableEntity = tempHitInfo.collider.GetComponent<IDamageableEntity>();
                 if (tempDamageableEntity != null)
@@ -581,7 +581,7 @@ namespace MultiplayerARPG
                     break;
                 }
             }
-            aimDirection = aimPosition - MovementTransform.position;
+            aimDirection = aimPosition - CacheTransform.position;
             aimDirection.y = 0f;
             aimDirection.Normalize();
             // Show target hp/mp
@@ -692,7 +692,7 @@ namespace MultiplayerARPG
                     }
                 }
                 // While attacking turn character to aim direction
-                tempCalculateAngle = Vector3.Angle(MovementTransform.forward, aimDirection);
+                tempCalculateAngle = Vector3.Angle(CacheTransform.forward, aimDirection);
 
                 if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 {
@@ -1121,7 +1121,7 @@ namespace MultiplayerARPG
 
         public bool FindTarget(GameObject target, float actDistance, int layerMask)
         {
-            int tempCount = OverlapObjects(MovementTransform.position, actDistance, layerMask);
+            int tempCount = OverlapObjects(CacheTransform.position, actDistance, layerMask);
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempGameObject = overlapColliders[tempCounter].gameObject;
@@ -1198,7 +1198,7 @@ namespace MultiplayerARPG
 
         public bool IsInFront(Vector3 position)
         {
-            return Vector3.Angle(cameraForward, MovementTransform.position - position) > 135f;
+            return Vector3.Angle(cameraForward, CacheTransform.position - position) > 135f;
         }
 
         public override Vector3? UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab)
@@ -1248,7 +1248,7 @@ namespace MultiplayerARPG
                 if (!buildingArea.snapBuildingObject)
                 {
                     // There is no snap build position, set building rotation by camera look direction
-                    ConstructingBuildingEntity.CacheTransform.position = GameplayUtils.ClampPosition(MovementTransform.position, aimPosition, ConstructingBuildingEntity.buildDistance);
+                    ConstructingBuildingEntity.CacheTransform.position = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.buildDistance);
                     // Rotate to camera
                     Vector3 direction = aimPosition - CacheGameplayCameraTransform.position;
                     direction.y = 0f;

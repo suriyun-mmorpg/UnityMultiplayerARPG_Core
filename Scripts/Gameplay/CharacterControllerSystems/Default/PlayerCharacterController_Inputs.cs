@@ -134,15 +134,9 @@ namespace MultiplayerARPG
             // Update enemy detecting radius to attack distance
             EnemyEntityDetector.detectingRadius = Mathf.Max(PlayerCharacterEntity.GetAttackDistance(false), lockAttackTargetDistance);
             // Update inputs
-            if (queueUsingSkill.skill != null)
-            {
-                UpdateQueuedSkill(queueUsingSkill.skill, queueUsingSkill.level);
-            }
-            else
-            {
-                UpdatePointClickInput();
-                UpdateWASDInput();
-            }
+            UpdateQueuedSkill();
+            UpdatePointClickInput();
+            UpdateWASDInput();
             // Set sprinting state
             PlayerCharacterEntity.SetExtraMovement(isSprinting ? ExtraMovementState.IsSprinting : ExtraMovementState.None);
         }
@@ -393,7 +387,7 @@ namespace MultiplayerARPG
                 ClearQueueUsingSkill();
                 destination = null;
                 isFollowingTarget = false;
-                if (TargetEntity != null && Vector3.Distance(MovementTransform.position, TargetEntity.MovementTransform.position) >= wasdClearTargetDistance)
+                if (TargetEntity != null && Vector3.Distance(CacheTransform.position, TargetEntity.CacheTransform.position) >= wasdClearTargetDistance)
                 {
                     // Clear target when character moved far from target
                     ClearTarget();
@@ -469,10 +463,17 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateQueuedSkill(BaseSkill skill, short skillLevel)
+        protected void UpdateQueuedSkill()
         {
+            if (queueUsingSkill.skill == null || queueUsingSkill.level <= 0)
+                return;
+
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
+
+            BaseSkill skill = queueUsingSkill.skill;
+            short skillLevel = queueUsingSkill.level;
+            Vector3? aimPosition = queueUsingSkill.aimPosition;
 
             destination = null;
             BaseCharacterEntity targetEntity;
@@ -481,6 +482,7 @@ namespace MultiplayerARPG
             if (skill.HasCustomAimControls())
             {
                 // Target not required, use skill immediately
+                TurnCharacterToPosition(aimPosition.Value);
                 RequestUsePendingSkill();
                 isFollowingTarget = false;
                 return;
@@ -542,24 +544,36 @@ namespace MultiplayerARPG
                 {
                     if (wasdLockAttackTarget)
                     {
-                        // Set target, then use skill later when moved nearby target
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
+                            // Set target, then use skill later when moved nearby target
                             SetTarget(SelectedEntity, TargetActionType.UseSkill, false);
                             isFollowingTarget = true;
+                        }
+                        else
+                        {
+                            // No selected entity, don't use skill
+                            ClearQueueUsingSkill();
+                            isFollowingTarget = false;
                         }
                     }
                     else
                     {
-                        // Try apply skill to selected entity immediately, it will fail if selected entity is far from the character
                         if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
+                            // Try apply skill to selected entity immediately, it will fail if selected entity is far from the character
                             if (SelectedEntity != PlayerCharacterEntity)
                             {
                                 // Look at target and use skill
                                 TurnCharacterToEntity(SelectedEntity);
                             }
                             RequestUsePendingSkill();
+                            isFollowingTarget = false;
+                        }
+                        else
+                        {
+                            // No selected entity, don't use skill
+                            ClearQueueUsingSkill();
                             isFollowingTarget = false;
                         }
                     }
@@ -674,7 +688,7 @@ namespace MultiplayerARPG
 
         protected void DoActionOrMoveToEntity(BaseGameEntity entity, float distance, System.Action action)
         {
-            Vector3 measuringPosition = MovementTransform.position;
+            Vector3 measuringPosition = CacheTransform.position;
             Vector3 targetPosition = entity.CacheTransform.position;
             if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
             {
@@ -790,7 +804,12 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return;
-            Vector3 lookAtDirection = (entity.CacheTransform.position - MovementTransform.position).normalized;
+            TurnCharacterToPosition(entity.CacheTransform.position);
+        }
+
+        protected void TurnCharacterToPosition(Vector3 targetPosition)
+        {
+            Vector3 lookAtDirection = (targetPosition - CacheTransform.position).normalized;
             if (lookAtDirection.sqrMagnitude > 0)
                 PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
         }
