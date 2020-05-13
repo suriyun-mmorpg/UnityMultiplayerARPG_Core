@@ -5,13 +5,13 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class AreaDamageEntity : BaseDamageEntity
+    public partial class AreaDamageEntity : BaseDamageEntity
     {
         public UnityEvent onDestroy;
 
-        private float applyDuration;
-        private float lastAppliedTime;
-        private readonly Dictionary<uint, IDamageableEntity> receivingDamageEntities = new Dictionary<uint, IDamageableEntity>();
+        protected float applyDuration;
+        protected float lastAppliedTime;
+        protected readonly Dictionary<uint, IDamageableEntity> receivingDamageEntities = new Dictionary<uint, IDamageableEntity>();
 
         protected override void Awake()
         {
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
-        public void Setup(
+        public virtual void Setup(
             IGameEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             lastAppliedTime = Time.unscaledTime;
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (Time.unscaledTime - lastAppliedTime >= applyDuration)
             {
@@ -55,17 +55,17 @@ namespace MultiplayerARPG
                 onDestroy.Invoke();
         }
 
-        private void OnTriggerEnter(Collider other)
+        protected virtual void OnTriggerEnter(Collider other)
         {
             TriggerEnter(other.gameObject);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        protected virtual void OnTriggerEnter2D(Collider2D other)
         {
             TriggerEnter(other.gameObject);
         }
 
-        private void TriggerEnter(GameObject other)
+        protected virtual void TriggerEnter(GameObject other)
         {
             if (attacker != null && attacker.GetGameObject() == other)
                 return;
@@ -80,17 +80,17 @@ namespace MultiplayerARPG
             receivingDamageEntities.Add(target.GetObjectId(), target);
         }
 
-        private void OnTriggerExit(Collider other)
+        protected virtual void OnTriggerExit(Collider other)
         {
             TriggerExit(other.gameObject);
         }
 
-        private void OnTriggerExit2D(Collider2D other)
+        protected virtual void OnTriggerExit2D(Collider2D other)
         {
             TriggerExit(other.gameObject);
         }
 
-        private void TriggerExit(GameObject other)
+        protected virtual void TriggerExit(GameObject other)
         {
             if (attacker != null && attacker.GetGameObject() == other)
                 return;

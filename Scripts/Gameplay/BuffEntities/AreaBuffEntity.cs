@@ -5,13 +5,13 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class AreaBuffEntity : BaseBuffEntity
+    public partial class AreaBuffEntity : BaseBuffEntity
     {
         public UnityEvent onDestroy;
 
-        private float applyDuration;
-        private float lastAppliedTime;
-        private readonly Dictionary<uint, BaseCharacterEntity> receivingBuffCharacters = new Dictionary<uint, BaseCharacterEntity>();
+        protected float applyDuration;
+        protected float lastAppliedTime;
+        protected readonly Dictionary<uint, BaseCharacterEntity> receivingBuffCharacters = new Dictionary<uint, BaseCharacterEntity>();
 
         protected override void Awake()
         {
@@ -19,12 +19,12 @@ namespace MultiplayerARPG
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
-        private void Start()
+        protected virtual void Start()
         {
             lastAppliedTime = Time.unscaledTime;
         }
 
-        public void Setup(
+        public virtual void Setup(
             BaseCharacterEntity buffApplier,
             BaseSkill skill,
             short skillLevel,
@@ -36,7 +36,7 @@ namespace MultiplayerARPG
             this.applyDuration = applyDuration;
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (Time.unscaledTime - lastAppliedTime >= applyDuration)
             {
@@ -51,17 +51,17 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnTriggerEnter(Collider other)
+        protected virtual void OnTriggerEnter(Collider other)
         {
             TriggerEnter(other.gameObject);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        protected virtual void OnTriggerEnter2D(Collider2D other)
         {
             TriggerEnter(other.gameObject);
         }
 
-        private void TriggerEnter(GameObject other)
+        protected virtual void TriggerEnter(GameObject other)
         {
             BaseCharacterEntity target = other.GetComponent<BaseCharacterEntity>();
             if (target == null)
@@ -73,17 +73,17 @@ namespace MultiplayerARPG
             receivingBuffCharacters.Add(target.ObjectId, target);
         }
 
-        private void OnTriggerExit(Collider other)
+        protected virtual void OnTriggerExit(Collider other)
         {
             TriggerExit(other.gameObject);
         }
 
-        private void OnTriggerExit2D(Collider2D other)
+        protected virtual void OnTriggerExit2D(Collider2D other)
         {
             TriggerExit(other.gameObject);
         }
 
-        private void TriggerExit(GameObject other)
+        protected virtual void TriggerExit(GameObject other)
         {
             BaseCharacterEntity target = other.GetComponent<BaseCharacterEntity>();
             if (target == null)
