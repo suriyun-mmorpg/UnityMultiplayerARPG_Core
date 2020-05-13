@@ -95,7 +95,6 @@ namespace MultiplayerARPG
                 return null;
             }
         }
-        public bool IsEditingBuilding { get; protected set; }
         protected int buildingItemIndex;
         protected UsingSkillData queueUsingSkill;
 
@@ -195,7 +194,6 @@ namespace MultiplayerARPG
 
         public virtual void DeselectBuilding()
         {
-            IsEditingBuilding = false;
             TargetEntity = null;
         }
 

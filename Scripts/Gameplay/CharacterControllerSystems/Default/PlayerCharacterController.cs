@@ -15,9 +15,10 @@ namespace MultiplayerARPG
 
         public enum TargetActionType
         {
-            Undefined,
+            Activate,
             Attack,
             UseSkill,
+            ViewOptions,
         }
         
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
@@ -59,7 +60,7 @@ namespace MultiplayerARPG
         protected bool isMouseDragDetected;
         protected bool isMouseHoldDetected;
         protected bool isMouseHoldAndNotDrag;
-        protected BaseCharacterEntity targetCharacter;
+        protected DamageableEntity targetDamageable;
         protected BasePlayerCharacterEntity targetPlayer;
         protected BaseMonsterCharacterEntity targetMonster;
         protected NpcEntity targetNpc;
@@ -199,59 +200,49 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool TryGetAttackingCharacter(out BaseCharacterEntity character)
+        public bool TryGetAttackingEntity<T>(out T entity)
+            where T : DamageableEntity
         {
-            character = null;
-            if (targetActionType != TargetActionType.Attack)
+            if (!TryGetDoActionEntity(out entity, TargetActionType.Attack))
                 return false;
-
-            if (TargetEntity != null)
+            if (entity == PlayerCharacterEntity || !entity.CanReceiveDamageFrom(PlayerCharacterEntity))
             {
-                character = TargetEntity as BaseCharacterEntity;
-                if (character != null &&
-                    character != PlayerCharacterEntity &&
-                    character.CanReceiveDamageFrom(PlayerCharacterEntity))
-                    return true;
-                else
-                    character = null;
+                entity = null;
+                return false;
             }
-            return false;
+            return true;
         }
 
-        public bool TryGetUsingSkillCharacter(out BaseCharacterEntity character)
+        public bool TryGetUsingSkillEntity<T>(out T entity)
+            where T : DamageableEntity
         {
-            character = null;
-            if (targetActionType != TargetActionType.UseSkill ||
-                queueUsingSkill.skill == null)
+            if (!TryGetDoActionEntity(out entity, TargetActionType.UseSkill))
                 return false;
-
-            if (TargetEntity != null)
+            if (queueUsingSkill.skill == null)
             {
-                character = TargetEntity as BaseCharacterEntity;
-                if (character != null)
-                    return true;
-                else
-                    character = null;
+                entity = null;
+                return false;
             }
-            return false;
+            return true;
         }
 
-        public bool TryGetDoActionEntity<T>(out T entity)
+        public bool TryGetDoActionEntity<T>(out T entity, TargetActionType actionType = TargetActionType.Activate)
             where T : BaseGameEntity
         {
             entity = null;
-            if (targetActionType != TargetActionType.Undefined)
+            if (targetActionType != actionType)
                 return false;
+            if (TargetEntity == null)
+                return false;
+            entity = TargetEntity as T;
+            if (entity == null)
+                return false;
+            return true;
+        }
 
-            if (TargetEntity != null)
-            {
-                entity = TargetEntity as T;
-                if (entity != null)
-                    return true;
-                else
-                    entity = null;
-            }
-            return false;
+        public bool EntityIsHideOrDead(DamageableEntity entity)
+        {
+            return entity.IsDead() || (entity is BaseCharacterEntity && (entity as BaseCharacterEntity).IsHideOrDead);
         }
 
         public bool TryGetTargetCharacter(out BaseCharacterEntity character)

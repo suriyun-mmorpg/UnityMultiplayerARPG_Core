@@ -209,8 +209,8 @@ namespace MultiplayerARPG
                             targetBuilding = tempBuildingMaterial.TargetEntity;
                         if (targetBuilding && !targetBuilding.IsDead())
                         {
-                            SetTarget(targetBuilding, TargetActionType.Undefined);
-                            IsEditingBuilding = true;
+                            SetTarget(targetBuilding, TargetActionType.ViewOptions);
+                            isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
                         }
@@ -247,7 +247,7 @@ namespace MultiplayerARPG
                         else if (targetNpc)
                         {
                             // Found activating entity as npc entity
-                            SetTarget(targetNpc, TargetActionType.Undefined);
+                            SetTarget(targetNpc, TargetActionType.Activate);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
                         else if (targetItemDrop)
                         {
                             // Found activating entity as item drop entity
-                            SetTarget(targetItemDrop, TargetActionType.Undefined);
+                            SetTarget(targetItemDrop, TargetActionType.Activate);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -263,7 +263,7 @@ namespace MultiplayerARPG
                         else if (targetHarvestable && !targetHarvestable.IsDead())
                         {
                             // Found activating entity as harvestable entity
-                            SetTarget(targetHarvestable, TargetActionType.Undefined);
+                            SetTarget(targetHarvestable, TargetActionType.Attack);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -271,16 +271,15 @@ namespace MultiplayerARPG
                         else if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
                         {
                             // Found activating entity as building entity
-                            SetTarget(targetBuilding, TargetActionType.Undefined);
+                            SetTarget(targetBuilding, TargetActionType.Activate);
                             isFollowingTarget = true;
-                            IsEditingBuilding = false;
                             tempHasMapPosition = false;
                             break;
                         }
                         else if (targetVehicle)
                         {
                             // Found activating entity as vehicle entity
-                            SetTarget(targetVehicle, TargetActionType.Undefined);
+                            SetTarget(targetVehicle, TargetActionType.Activate);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -360,7 +359,7 @@ namespace MultiplayerARPG
             TargetEntity = null;
             PlayerCharacterEntity.SetTargetEntity(null);
             targetPosition = null;
-            targetActionType = TargetActionType.Undefined;
+            targetActionType = TargetActionType.Activate;
         }
 
         public override void DeselectBuilding()
@@ -416,7 +415,7 @@ namespace MultiplayerARPG
 
             if (wasdLockAttackTarget)
             {
-                if (!TryGetAttackingCharacter(out targetEntity) || targetEntity.IsHideOrDead)
+                if (!TryGetAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead)
                 {
                     // Find nearest target and move to the target
                     targetEntity = PlayerCharacterEntity
@@ -496,7 +495,7 @@ namespace MultiplayerARPG
 
                 if (wasdLockAttackTarget)
                 {
-                    if (!TryGetAttackingCharacter(out targetEntity) || targetEntity.IsHideOrDead)
+                    if (!TryGetAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead)
                     {
                         targetEntity = PlayerCharacterEntity
                             .FindNearestAliveCharacter<BaseCharacterEntity>(
@@ -591,9 +590,9 @@ namespace MultiplayerARPG
             if (!isFollowingTarget)
                 return;
 
-            if (TryGetAttackingCharacter(out targetCharacter))
+            if (TryGetAttackingEntity(out targetDamageable))
             {
-                if (targetCharacter.IsHideOrDead)
+                if (EntityIsHideOrDead(targetDamageable))
                 {
                     ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
@@ -603,11 +602,11 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-                AttackOrMoveToEntity(targetCharacter, attackDistance, CurrentGameInstance.characterLayer.Mask);
+                AttackOrMoveToEntity(targetDamageable, attackDistance, CurrentGameInstance.characterLayer.Mask);
             }
-            else if (TryGetUsingSkillCharacter(out targetCharacter))
+            else if (TryGetUsingSkillEntity(out targetDamageable))
             {
-                if (queueUsingSkill.skill.IsAttack() && targetCharacter.IsHideOrDead)
+                if (queueUsingSkill.skill.IsAttack() && EntityIsHideOrDead(targetDamageable))
                 {
                     ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
@@ -617,11 +616,11 @@ namespace MultiplayerARPG
                 float castDistance = 0f;
                 float castFov = 0f;
                 GetUseSkillDistanceAndFov(out castDistance, out castFov);
-                UseSkillOrMoveToEntity(targetCharacter, castDistance);
+                UseSkillOrMoveToEntity(targetDamageable, castDistance);
             }
-            else if (TryGetDoActionEntity(out targetCharacter))
+            else if (TryGetDoActionEntity(out targetPlayer))
             {
-                DoActionOrMoveToEntity(targetCharacter, CurrentGameInstance.conversationDistance, () =>
+                DoActionOrMoveToEntity(targetPlayer, CurrentGameInstance.conversationDistance, () =>
                 {
                     // TODO: Do something
                 });
@@ -645,35 +644,19 @@ namespace MultiplayerARPG
                     ClearTarget();
                 });
             }
-            else if (TryGetDoActionEntity(out targetBuilding))
+            else if (TryGetDoActionEntity(out targetBuilding, TargetActionType.Activate))
             {
                 DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
                 {
-                    if (!IsEditingBuilding)
-                    {
-                        ActivateBuilding(targetBuilding);
-                    }
-                    else
-                    {
-                        ShowCurrentBuildingDialog();
-                    }
+                    ActivateBuilding(targetBuilding);
                 });
             }
-            else if (TryGetDoActionEntity(out targetHarvestable))
+            else if (TryGetDoActionEntity(out targetBuilding, TargetActionType.ViewOptions))
             {
-                if (targetHarvestable.IsDead())
+                DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
                 {
-                    ClearQueueUsingSkill();
-                    PlayerCharacterEntity.StopMove();
-                    ClearTarget();
-                    return;
-                }
-                
-                // Find attack distance and fov, from weapon
-                float attackDistance = 0f;
-                float attackFov = 0f;
-                GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-                AttackOrMoveToEntity(targetHarvestable, attackDistance, CurrentGameInstance.harvestableLayer.Mask);
+                    ShowCurrentBuildingDialog();
+                });
             }
             else if (TryGetDoActionEntity(out targetVehicle))
             {
@@ -749,7 +732,7 @@ namespace MultiplayerARPG
                     Vector3.Distance(measuringPosition, targetPosition) <= distance)
                 {
                     // Set next frame target action type
-                    targetActionType = queueUsingSkill.skill.IsAttack() ? TargetActionType.Attack : TargetActionType.Undefined;
+                    targetActionType = queueUsingSkill.skill.IsAttack() ? TargetActionType.Attack : TargetActionType.Activate;
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
                     // Turn character to attacking target
@@ -768,7 +751,7 @@ namespace MultiplayerARPG
             else
             {
                 // Can't use skill
-                targetActionType = TargetActionType.Undefined;
+                targetActionType = TargetActionType.Activate;
                 ClearQueueUsingSkill();
                 return;
             }
