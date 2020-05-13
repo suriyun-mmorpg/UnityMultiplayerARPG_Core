@@ -72,10 +72,6 @@ namespace MultiplayerARPG
         protected short reloadingAmmoAmount;
         public bool IsHideOrDead { get { return this.GetCaches().IsHide || IsDead(); } }
         public bool IsAttackingOrUsingSkill { get; protected set; }
-        public bool IsCastingSkillCanBeInterrupted { get; protected set; }
-        public bool IsCastingSkillInterrupted { get; protected set; }
-        public float CastingSkillDuration { get; protected set; }
-        public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         public float RespawnGroundedCheckCountDown { get; protected set; }
         protected float lastMountTime;
