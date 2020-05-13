@@ -1,4 +1,5 @@
 ﻿using LiteNetLibManager;
+using StandardAssets.Characters.Physics;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
+    [RequireComponent(typeof(OpenCharacterController))]
     [RequireComponent(typeof(LiteNetLibTransform))]
     public class RigidBodyEntityMovement : BaseEntityMovement
     {
@@ -18,13 +20,11 @@ namespace MultiplayerARPG
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
         public float backwardMoveSpeedRate = 0.75f;
-        public float groundCheckDistance = 0.1f; // distance for checking if the controller is grounded ( 0.01f seems to work best for this )
-        public float groundCheckDistanceWhileJump = 0.01f; // distance for checking if the controller is grounded while jumping
-        public float stickToGroundHelperDistance = 0.5f; // distance for checking if the controller is grounded while moving on slopes
+        public float gravity = 9.81f;
+        public float maxFallVelocity = 40f;
         [Range(0.1f, 1f)]
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
-        public bool useNavMeshForKeyMovement;
 
         [Header("Root Motion Settings")]
         public bool useRootMotionForMovement;
@@ -36,6 +36,7 @@ namespace MultiplayerARPG
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public Rigidbody CacheRigidbody { get; private set; }
         public CapsuleCollider CacheCapsuleCollider { get; private set; }
+        public OpenCharacterController CacheOpenCharacterController { get; private set; }
 
         public override float StoppingDistance
         {
@@ -49,7 +50,6 @@ namespace MultiplayerARPG
         }
 
         // Movement codes
-        private bool isGrounded;
         private bool isUnderWater;
         private bool isJumping;
         private Collider waterCollider;
@@ -62,13 +62,12 @@ namespace MultiplayerARPG
         private Vector3 tempMoveVelocity;
         private Vector3 tempTargetPosition;
         private Vector3 tempCurrentPosition;
-        private Vector3 groundContactNormal;
         private Vector3 tempPredictPosition;
+        private float tempVerticalVelocity;
         private float tempSqrMagnitude;
         private float tempPredictSqrMagnitude;
         private float tempTargetDistance;
-        private bool previouslyGrounded;
-        private bool applyingJump;
+        private CollisionFlags collisionFlags;
 
         public override void EntityAwake()
         {
@@ -86,8 +85,14 @@ namespace MultiplayerARPG
             CacheCapsuleCollider = GetComponent<CapsuleCollider>();
             if (CacheCapsuleCollider == null)
                 CacheCapsuleCollider = gameObject.AddComponent<CapsuleCollider>();
+            // Prepare open character controller
+            CacheOpenCharacterController = GetComponent<OpenCharacterController>();
+            if (CacheOpenCharacterController == null)
+            {
+                CacheOpenCharacterController = gameObject.AddComponent<OpenCharacterController>();
+                CacheOpenCharacterController.SetHeightAndCenter(CacheCapsuleCollider.height, CacheCapsuleCollider.center, true, true);
+            }
             // Setup
-            CacheRigidbody.useGravity = false;
             StopMove();
         }
 
@@ -111,13 +116,18 @@ namespace MultiplayerARPG
         public override void ComponentOnEnable()
         {
             CacheNetTransform.enabled = true;
-            CacheRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            CacheNetTransform.onTeleport += OnTeleport;
         }
 
         public override void ComponentOnDisable()
         {
             CacheNetTransform.enabled = false;
-            CacheRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            CacheNetTransform.onTeleport -= OnTeleport;
+        }
+
+        protected void OnTeleport(Vector3 position, Quaternion rotation)
+        {
+            CacheOpenCharacterController.SetPosition(position, true);
         }
 
         protected void OnAnimatorMove()
@@ -161,7 +171,7 @@ namespace MultiplayerARPG
             if (tempInputDirection.sqrMagnitude > 0)
                 navPaths = null;
             if (!isJumping)
-                isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
+                isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -206,7 +216,6 @@ namespace MultiplayerARPG
         public override void StopMove()
         {
             navPaths = null;
-            CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
             if (IsOwnerClient && !IsServer)
                 CacheEntity.CallNetFunction(StopMove, FunctionReceivers.Server);
         }
@@ -215,12 +224,6 @@ namespace MultiplayerARPG
         {
             if (!CacheEntity.CanMove())
                 return;
-
-            if (useNavMeshForKeyMovement && moveDirection.sqrMagnitude > 0.25f)
-            {
-                PointClickMovement(CacheTransform.position + moveDirection);
-                return;
-            }
 
             switch (CacheEntity.MovementSecure)
             {
@@ -235,7 +238,7 @@ namespace MultiplayerARPG
                     if (tempInputDirection.sqrMagnitude > 0)
                         navPaths = null;
                     if (!isJumping)
-                        isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
+                        isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
                     break;
             }
         }
@@ -294,27 +297,11 @@ namespace MultiplayerARPG
             result = fromPosition;
         }
 
-        public override void EntityFixedUpdate()
+        public override void EntityUpdate()
         {
-            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
-            {
-                if (CacheRigidbody.useGravity)
-                    CacheRigidbody.useGravity = false;
+            if ((CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
+                (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
                 return;
-            }
-
-            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
-            {
-                if (CacheRigidbody.useGravity)
-                    CacheRigidbody.useGravity = false;
-                return;
-            }
-
-            // Turn Use Gravity when this is allowed to update
-            if (!useRootMotionForFall && CacheRigidbody.useGravity != !isUnderWater)
-                CacheRigidbody.useGravity = !isUnderWater;
-            if (useRootMotionForFall && CacheRigidbody.useGravity)
-                CacheRigidbody.useGravity = false;
 
             tempMoveDirection = Vector3.zero;
             tempTargetDistance = -1f;
@@ -342,35 +329,12 @@ namespace MultiplayerARPG
             }
             UpdateMovement(Time.deltaTime);
 
-            tempMovementState = CacheRigidbody.velocity.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
+            tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
             if (isUnderWater)
                 tempMovementState |= MovementState.IsUnderWater;
-            if (isGrounded)
+            if (CacheOpenCharacterController.isGrounded)
                 tempMovementState |= MovementState.IsGrounded;
             CacheEntity.SetMovement(tempMovementState);
-        }
-
-        private int GetGroundDetectionLayerMask()
-        {
-            int layerMask = CurrentGameInstance.characterLayer.Mask | CurrentGameInstance.itemDropLayer.Mask;
-            return ~layerMask;
-        }
-
-        private void StickToGroundHelper()
-        {
-            float maxDistance = CacheCapsuleCollider.bounds.extents.y + stickToGroundHelperDistance;
-            // BoxCast to find ground to stick the character
-            RaycastHit hitInfo;
-            if (Physics.BoxCast(CacheCapsuleCollider.bounds.center + Vector3.up * CacheCapsuleCollider.bounds.extents.y,
-                CacheCapsuleCollider.bounds.extents,
-                Vector3.down, out hitInfo,
-                CacheTransform.rotation, maxDistance,
-                GetGroundDetectionLayerMask(),
-                QueryTriggerInteraction.Ignore))
-            {
-                if (Mathf.Abs(Vector3.Angle(hitInfo.normal, Vector3.up)) < 85f)
-                    CacheRigidbody.velocity = Vector3.ProjectOnPlane(CacheRigidbody.velocity, hitInfo.normal);
-            }
         }
 
         private void WaterCheck()
@@ -386,40 +350,10 @@ namespace MultiplayerARPG
             isUnderWater = currentThreshold >= underWaterThreshold;
         }
 
-        private void GroundCheck()
-        {
-            previouslyGrounded = isGrounded;
-            if (isUnderWater)
-                applyingJump = false;
-            float maxDistance = CacheCapsuleCollider.bounds.extents.y + (applyingJump ? groundCheckDistanceWhileJump : groundCheckDistance);
-            // BoxCast to find ground
-            RaycastHit hitInfo;
-            if (Physics.BoxCast(CacheCapsuleCollider.bounds.center + Vector3.up * CacheCapsuleCollider.bounds.extents.y,
-                CacheCapsuleCollider.bounds.extents,
-                Vector3.down, out hitInfo,
-                CacheTransform.rotation, maxDistance,
-                GetGroundDetectionLayerMask(),
-                QueryTriggerInteraction.Ignore))
-            {
-                isGrounded = true;
-                groundContactNormal = hitInfo.normal;
-            }
-            else
-            {
-                isGrounded = false;
-                groundContactNormal = Vector3.up;
-            }
-
-            if (!previouslyGrounded && isGrounded && applyingJump)
-            {
-                applyingJump = false;
-            }
-        }
-
         private void UpdateMovement(float deltaTime)
         {
+            tempMoveVelocity = Vector3.zero;
             WaterCheck();
-            GroundCheck();
 
             // If move by WASD keys, set move direction to input direction
             if (tempInputDirection.sqrMagnitude > 0f)
@@ -450,13 +384,22 @@ namespace MultiplayerARPG
                 }
             }
 
+            // Calculate vertical velocity by gravity
+            if (!CacheOpenCharacterController.isGrounded)
+                tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, -maxFallVelocity, gravity * deltaTime);
+            else
+                tempVerticalVelocity = 0f;
+
+            // Jumping 
+            if (CacheOpenCharacterController.isGrounded && isJumping)
+            {
+                RequestTriggerJump();
+                if (!useRootMotionForJump)
+                    tempVerticalVelocity = CalculateJumpVerticalSpeed();
+            }
+
             if (tempMoveDirection.sqrMagnitude > 0f)
             {
-                if (!isUnderWater)
-                {
-                    // always move along the camera forward as it is the direction that it being aimed at
-                    tempMoveDirection = Vector3.ProjectOnPlane(tempMoveDirection, groundContactNormal);
-                }
                 tempMoveDirection.Normalize();
 
                 float currentTargetSpeed = CacheEntity.GetMoveSpeed();
@@ -485,64 +428,28 @@ namespace MultiplayerARPG
                     tempMoveVelocity = tempMoveDirection * currentTargetSpeed;
                 }
 
-                if (isUnderWater)
-                {
-                    // Update velocity while under water
-                    CacheRigidbody.velocity = tempMoveVelocity;
-                }
-                else
+                if (!isUnderWater)
                 {
                     // Update velocity while not under water
-                    if (isGrounded && !useRootMotionForMovement)
-                        CacheRigidbody.velocity = tempMoveVelocity;
-                    else if (!isGrounded && !useRootMotionForAirMovement)
-                        CacheRigidbody.velocity = new Vector3(tempMoveVelocity.x, CacheRigidbody.velocity.y, tempMoveVelocity.z);
+                    if ((CacheOpenCharacterController.isGrounded && !useRootMotionForMovement) ||
+                        (!CacheOpenCharacterController.isGrounded && !useRootMotionForAirMovement))
+                        tempMoveVelocity.y = tempVerticalVelocity;
                 }
             }
             else
             {
-                if (isUnderWater)
-                    CacheRigidbody.velocity = Vector3.zero;
-                else
-                    CacheRigidbody.velocity = new Vector3(0f, CacheRigidbody.velocity.y, 0f);
+                // Update fall
+                if (!isUnderWater)
+                    tempMoveVelocity.y = tempVerticalVelocity;
             }
 
-            if (isUnderWater)
+            collisionFlags = CacheOpenCharacterController.Move(tempMoveVelocity * deltaTime);
+            if ((collisionFlags & CollisionFlags.CollidedAbove) == CollisionFlags.CollidedAbove)
             {
-                CacheRigidbody.drag = 10f;
+                // Hit something above, falling in next frame
+                tempVerticalVelocity = 0f;
             }
-            else if (isGrounded)
-            {
-                CacheRigidbody.drag = 5f;
 
-                if (isJumping)
-                {
-                    RequestTriggerJump();
-                    if (!useRootMotionForJump)
-                    {
-                        CacheRigidbody.drag = 0f;
-                        CacheRigidbody.velocity = new Vector3(CacheRigidbody.velocity.x, 0f, CacheRigidbody.velocity.z);
-                        CacheRigidbody.AddForce(new Vector3(0f, CalculateJumpVerticalSpeed(), 0f), ForceMode.Impulse);
-                    }
-                    applyingJump = true;
-                }
-
-                if (!applyingJump &&
-                    Mathf.Abs(tempMoveDirection.x) < float.Epsilon &&
-                    Mathf.Abs(tempMoveDirection.z) < float.Epsilon &&
-                    CacheRigidbody.velocity.sqrMagnitude < 1f)
-                {
-                    CacheRigidbody.Sleep();
-                }
-            }
-            else
-            {
-                CacheRigidbody.drag = 0f;
-                if (previouslyGrounded && !applyingJump)
-                {
-                    StickToGroundHelper();
-                }
-            }
             isJumping = false;
         }
 
@@ -572,7 +479,7 @@ namespace MultiplayerARPG
         {
             // From the jump height and gravity we deduce the upwards speed 
             // for the character to reach at the apex.
-            return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y);
+            return Mathf.Sqrt(2f * jumpHeight * gravity);
         }
 
         private void OnTriggerEnter(Collider other)
