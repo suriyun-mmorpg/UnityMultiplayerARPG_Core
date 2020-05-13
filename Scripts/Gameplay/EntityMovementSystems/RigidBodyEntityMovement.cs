@@ -499,5 +499,20 @@ namespace MultiplayerARPG
                 waterCollider = null;
             }
         }
+
+        [ContextMenu("Set Height And Center By Collider Settings")]
+        public void SetHeightAndCenterByColliderSettings()
+        {
+            CapsuleCollider collider = GetComponent<CapsuleCollider>();
+            if (collider == null)
+                collider = gameObject.AddComponent<CapsuleCollider>();
+            // Prepare open character controller
+            OpenCharacterController controller = GetComponent<OpenCharacterController>();
+            if (controller == null)
+            {
+                controller = gameObject.AddComponent<OpenCharacterController>();
+                controller.SetHeightAndCenter(collider.height, collider.center, true, true);
+            }
+        }
     }
 }
