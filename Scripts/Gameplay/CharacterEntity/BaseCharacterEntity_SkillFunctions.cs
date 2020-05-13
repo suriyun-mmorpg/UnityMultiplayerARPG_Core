@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -7,6 +8,12 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        protected CancellationTokenSource skillCancellationTokenSource;
+        public bool IsCastingSkillCanBeInterrupted { get; protected set; }
+        public bool IsCastingSkillInterrupted { get; protected set; }
+        public float CastingSkillDuration { get; protected set; }
+        public float CastingSkillCountDown { get; protected set; }
+
         public virtual void GetUsingSkillData(
             BaseSkill skill,
             ref bool isLeftHand,
@@ -132,6 +139,8 @@ namespace MultiplayerARPG
         {
             IsAttackingOrUsingSkill = false;
             CastingSkillDuration = CastingSkillCountDown = 0;
+            if (skillCancellationTokenSource != null)
+                skillCancellationTokenSource.Cancel();
             CharacterModel.StopActionAnimation();
             CharacterModel.StopSkillCastAnimation();
             if (FpsModel && FpsModel.gameObject.activeSelf)
@@ -187,32 +196,32 @@ namespace MultiplayerARPG
             // Set doing action data
             IsCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
             IsCastingSkillInterrupted = false;
+            skillCancellationTokenSource = new CancellationTokenSource();
             // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
-            if (CastingSkillDuration > 0f)
+            try
             {
-                // Tell clients that character is casting
-                if (IsClient)
+                if (CastingSkillDuration > 0f)
                 {
-                    // Play special effect
-                    CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
-                    // Play casting animation
-                    CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
-                    if (FpsModel && FpsModel.gameObject.activeSelf)
+                    // Tell clients that character is casting
+                    if (IsClient)
                     {
                         // Play special effect
-                        FpsModel.InstantiateEffect(skill.GetSkillCastEffect());
+                        CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
                         // Play casting animation
-                        FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        if (FpsModel && FpsModel.gameObject.activeSelf)
+                        {
+                            // Play special effect
+                            FpsModel.InstantiateEffect(skill.GetSkillCastEffect());
+                            // Play casting animation
+                            FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        }
                     }
+                    // Wait until end of cast duration
+                    await Task.Delay((int)(CastingSkillDuration * 1000f), skillCancellationTokenSource.Token);
                 }
-                // Wait until end of cast duration
-                await Task.Delay((int)(CastingSkillDuration * 1000f));
-            }
 
-            // Continue skill activating action or not?
-            if (!IsCastingSkillInterrupted || !IsCastingSkillCanBeInterrupted)
-            {
                 // Animations will plays on clients only
                 if (IsClient)
                 {
@@ -228,7 +237,7 @@ namespace MultiplayerARPG
                     // Play special effects after trigger duration
                     tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
-                    await Task.Delay((int)(tempTriggerDuration / playSpeedMultiplier * 1000f));
+                    await Task.Delay((int)(tempTriggerDuration / playSpeedMultiplier * 1000f), skillCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -262,13 +271,21 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await Task.Delay((int)(remainsDuration / playSpeedMultiplier * 1000f));
+                    await Task.Delay((int)(remainsDuration / playSpeedMultiplier * 1000f), skillCancellationTokenSource.Token);
                 }
             }
-
+            catch
+            {
+                // Catch the cancellation
+            }
+            finally
+            {
+                skillCancellationTokenSource.Dispose();
+            }
             // Set doing action state to none at clients and server
             animActionType = AnimActionType.None;
             IsAttackingOrUsingSkill = false;
+            skillCancellationTokenSource = null;
         }
     }
 }
