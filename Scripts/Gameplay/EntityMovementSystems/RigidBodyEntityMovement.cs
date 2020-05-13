@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             if (CacheOpenCharacterController == null)
             {
                 CacheOpenCharacterController = gameObject.AddComponent<OpenCharacterController>();
-                CacheOpenCharacterController.SetHeightAndCenter(CacheCapsuleCollider.height, CacheCapsuleCollider.center, true, true);
+                CacheOpenCharacterController.InitRadiusHeightAndCenter(CacheCapsuleCollider.radius, CacheCapsuleCollider.height, CacheCapsuleCollider.center);
             }
             // Setup
             StopMove();
@@ -500,8 +500,9 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Set Height And Center By Collider Settings")]
-        public void SetHeightAndCenterByColliderSettings()
+#if UNITY_EDITOR
+        [ContextMenu("Applies Collider Settings To Controller")]
+        public void AppliesColliderSettingsToController()
         {
             CapsuleCollider collider = GetComponent<CapsuleCollider>();
             if (collider == null)
@@ -509,10 +510,9 @@ namespace MultiplayerARPG
             // Prepare open character controller
             OpenCharacterController controller = GetComponent<OpenCharacterController>();
             if (controller == null)
-            {
                 controller = gameObject.AddComponent<OpenCharacterController>();
-                controller.SetHeightAndCenter(collider.height, collider.center, true, true);
-            }
+            controller.InitRadiusHeightAndCenter(collider.radius, collider.height, collider.center);
         }
+#endif
     }
 }

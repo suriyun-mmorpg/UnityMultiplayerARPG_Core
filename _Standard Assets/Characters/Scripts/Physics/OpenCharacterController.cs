@@ -1110,6 +1110,21 @@ namespace StandardAssets.Characters.Physics
 			m_DefaultCenter = m_Center;
 		}
 
+		/// <summary>
+		/// Init the capsule's radius, height and center. Call this before start
+		/// </summary>
+		/// <param name="newRadius"></param>
+		/// <param name="newHeight"></param>
+		/// <param name="newCenter"></param>
+		public void InitRadiusHeightAndCenter(float newRadius, float newHeight, Vector3 newCenter)
+		{
+			m_Radius = newRadius;
+			m_Height = newHeight;
+			m_Center = newCenter;
+			if (Application.isPlaying)
+				Awake();
+		}
+
 		// Call this when the capsule's values change.
 		// 		updateCapsuleCollider: Update the capsule collider's values (e.g. center, height, radius)?
 		//		currentPosition: position of the character
