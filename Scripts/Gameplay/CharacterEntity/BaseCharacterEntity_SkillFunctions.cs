@@ -8,7 +8,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected CancellationTokenSource skillCancellationTokenSource;
+        protected readonly List<CancellationTokenSource> skillCancellationTokenSources = new List<CancellationTokenSource>();
         public bool IsCastingSkillCanBeInterrupted { get; protected set; }
         public bool IsCastingSkillInterrupted { get; protected set; }
         public float CastingSkillDuration { get; protected set; }
@@ -137,10 +137,18 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void NetFuncSkillCastingInterrupted()
         {
+            IsCastingSkillInterrupted = true;
             IsAttackingOrUsingSkill = false;
             CastingSkillDuration = CastingSkillCountDown = 0;
-            if (skillCancellationTokenSource != null)
-                skillCancellationTokenSource.Cancel();
+            if (skillCancellationTokenSources.Count > 0)
+            {
+                List<CancellationTokenSource> cancellationSources = new List<CancellationTokenSource>(skillCancellationTokenSources);
+                foreach (CancellationTokenSource cancellationSource in cancellationSources)
+                {
+                    if (!cancellationSource.IsCancellationRequested)
+                        cancellationSource.Cancel();
+                }
+            }
             CharacterModel.StopActionAnimation();
             CharacterModel.StopSkillCastAnimation();
             if (FpsModel && FpsModel.gameObject.activeSelf)
@@ -196,7 +204,8 @@ namespace MultiplayerARPG
             // Set doing action data
             IsCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
             IsCastingSkillInterrupted = false;
-            skillCancellationTokenSource = new CancellationTokenSource();
+            CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
+            skillCancellationTokenSources.Add(skillCancellationTokenSource);
             // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
             try
@@ -280,13 +289,12 @@ namespace MultiplayerARPG
             }
             finally
             {
-                // Set doing action state to none at clients and server
-                animActionType = AnimActionType.None;
-                IsAttackingOrUsingSkill = false;
-                if (skillCancellationTokenSource != null)
-                    skillCancellationTokenSource.Dispose();
-                skillCancellationTokenSource = null;
+                skillCancellationTokenSources.Remove(skillCancellationTokenSource);
+                skillCancellationTokenSource.Dispose();
             }
+            // Set doing action state to none at clients and server
+            animActionType = AnimActionType.None;
+            IsAttackingOrUsingSkill = false;
         }
     }
 }
