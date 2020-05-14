@@ -280,12 +280,13 @@ namespace MultiplayerARPG
             }
             finally
             {
-                skillCancellationTokenSource.Dispose();
+                // Set doing action state to none at clients and server
+                animActionType = AnimActionType.None;
+                IsAttackingOrUsingSkill = false;
+                if (skillCancellationTokenSource != null)
+                    skillCancellationTokenSource.Dispose();
+                skillCancellationTokenSource = null;
             }
-            // Set doing action state to none at clients and server
-            animActionType = AnimActionType.None;
-            IsAttackingOrUsingSkill = false;
-            skillCancellationTokenSource = null;
         }
     }
 }
