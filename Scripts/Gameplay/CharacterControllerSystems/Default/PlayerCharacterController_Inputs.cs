@@ -477,6 +477,7 @@ namespace MultiplayerARPG
             short skillLevel = queueUsingSkill.level;
             Vector3? aimPosition = queueUsingSkill.aimPosition;
             BaseCharacterEntity targetEntity;
+            // Point click mode always lock on target
             bool wasdLockAttackTarget = this.wasdLockAttackTarget || controllerMode == PlayerCharacterControllerMode.PointClick;
 
             if (skill.HasCustomAimControls())
@@ -490,13 +491,11 @@ namespace MultiplayerARPG
 
             if (skill.IsAttack())
             {
-                if (TryGetSelectedTargetAsAttackingEntity(out targetEntity))
-                    SetTarget(targetEntity, TargetActionType.UseSkill, false);
-
                 if (wasdLockAttackTarget)
                 {
-                    if (!TryGetAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead)
+                    if (!TryGetSelectedTargetAsAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead)
                     {
+                        // Try find nearby enemy if no selected target or selected taget is not enemy or target is hide or dead
                         targetEntity = PlayerCharacterEntity
                             .FindNearestAliveCharacter<BaseCharacterEntity>(
                             Mathf.Max(skill.GetCastDistance(PlayerCharacterEntity, skillLevel, isLeftHandAttacking), lockAttackTargetDistance),
@@ -518,7 +517,7 @@ namespace MultiplayerARPG
                         isFollowingTarget = false;
                     }
                 }
-                else if (!wasdLockAttackTarget)
+                else
                 {
                     // Find nearest target and set selected target to show character hp/mp UIs
                     SelectedEntity = PlayerCharacterEntity

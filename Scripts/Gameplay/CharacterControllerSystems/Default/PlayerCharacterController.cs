@@ -190,12 +190,14 @@ namespace MultiplayerARPG
             if (SelectedEntity != null)
             {
                 character = SelectedEntity as BaseCharacterEntity;
-                if (character != null &&
-                    character != PlayerCharacterEntity &&
-                    character.CanReceiveDamageFrom(PlayerCharacterEntity))
-                    return true;
-                else
+                if (character == null ||
+                    character == PlayerCharacterEntity ||
+                    !character.CanReceiveDamageFrom(PlayerCharacterEntity))
+                {
                     character = null;
+                    return false;
+                }
+                return true;
             }
             return false;
         }
