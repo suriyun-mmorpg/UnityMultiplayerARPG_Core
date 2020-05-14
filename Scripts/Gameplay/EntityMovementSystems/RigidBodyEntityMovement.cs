@@ -13,6 +13,9 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public class RigidBodyEntityMovement : BaseEntityMovement
     {
+        // Buffer to avoid character fall underground when teleport
+        public const float GROUND_BUFFER = 0.16f;
+
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
@@ -94,6 +97,13 @@ namespace MultiplayerARPG
             }
             // Setup
             StopMove();
+        }
+
+        public override void EntityStart()
+        {
+            tempCurrentPosition = CacheTransform.position;
+            tempCurrentPosition.y += GROUND_BUFFER;
+            CacheTransform.position = tempCurrentPosition;
         }
 
         public override void EntityLateUpdate()
@@ -288,7 +298,7 @@ namespace MultiplayerARPG
 
         public override void Teleport(Vector3 position)
         {
-            CacheNetTransform.Teleport(position, Quaternion.Euler(0, CacheEntity.MovementTransform.eulerAngles.y, 0));
+            CacheNetTransform.Teleport(position + Vector3.up * GROUND_BUFFER, Quaternion.Euler(0, CacheEntity.MovementTransform.eulerAngles.y, 0));
         }
 
         public override void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -391,7 +401,7 @@ namespace MultiplayerARPG
                 tempVerticalVelocity = 0f;
 
             // Jumping 
-            if (CacheOpenCharacterController.isGrounded && isJumping)
+            if (CacheOpenCharacterController.isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
             {
                 RequestTriggerJump();
                 if (!useRootMotionForJump)
