@@ -324,10 +324,15 @@ namespace MultiplayerARPG
                     if (!PlayerCharacterEntity.IsPlayingActionAnimation())
                     {
                         destination = targetPosition.Value;
-                        PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
+                        PlayerCharacterEntity.PointClickMovement(SetGroundPosition(targetPosition.Value));
                     }
                 }
             }
+        }
+
+        protected virtual Vector3 SetGroundPosition(Vector3 pickedPosition)
+        {
+            return pickedPosition;
         }
 
         protected virtual void SetTarget(BaseGameEntity entity, TargetActionType targetActionType, bool checkControllerMode = true)
@@ -667,7 +672,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void DoActionOrMoveToEntity(BaseGameEntity entity, float distance, System.Action action)
+        protected virtual void DoActionOrMoveToEntity(BaseGameEntity entity, float distance, System.Action action)
         {
             Vector3 measuringPosition = MovementTransform.position;
             Vector3 targetPosition = entity.CacheTransform.position;
@@ -692,7 +697,7 @@ namespace MultiplayerARPG
 
         }
 
-        protected void AttackOrMoveToEntity(IDamageableEntity entity, float distance, int layerMask)
+        protected virtual void AttackOrMoveToEntity(IDamageableEntity entity, float distance, int layerMask)
         {
             Transform damageTransform = PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
             Vector3 measuringPosition = damageTransform.position;
@@ -720,7 +725,7 @@ namespace MultiplayerARPG
 
         }
 
-        protected void UseSkillOrMoveToEntity(IDamageableEntity entity, float distance)
+        protected virtual void UseSkillOrMoveToEntity(IDamageableEntity entity, float distance)
         {
             if (queueUsingSkill.skill != null)
             {
@@ -761,7 +766,7 @@ namespace MultiplayerARPG
 
         }
 
-        protected void UpdateTargetEntityPosition(Vector3 measuringPosition, Vector3 targetPosition, float distance)
+        protected virtual void UpdateTargetEntityPosition(Vector3 measuringPosition, Vector3 targetPosition, float distance)
         {
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
