@@ -37,6 +37,7 @@ namespace MultiplayerARPG
 
         [Header("Building Settings")]
         public bool buildGridSnap;
+        public Vector3 buildGridOffsets = Vector3.zero;
         public float buildGridSize = 4f;
         public bool buildRotationSnap;
         public float buildRotateAngle = 45f;
@@ -170,7 +171,7 @@ namespace MultiplayerARPG
         private Vector3 GetBuildingPlacePosition(Vector3 position)
         {
             if (buildGridSnap)
-                position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize);
+                position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize) + buildGridOffsets;
             return position;
         }
 
