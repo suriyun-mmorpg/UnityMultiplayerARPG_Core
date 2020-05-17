@@ -144,9 +144,12 @@ namespace MultiplayerARPG
 
         public static float BoundsDistance(Bounds a, Bounds b)
         {
-            Vector3 closestA = b.ClosestPoint(a.center);
-            Vector3 closestB = a.ClosestPoint(b.center);
-            return Vector3.Distance(closestA, closestB);
+            return Vector3.Distance(a.ClosestPoint(b.center), b.ClosestPoint(a.center));
+        }
+
+        public static float BoundsDistance(Bounds a, Vector3 b)
+        {
+            return Vector3.Distance(a.ClosestPoint(b), b);
         }
     }
 }
