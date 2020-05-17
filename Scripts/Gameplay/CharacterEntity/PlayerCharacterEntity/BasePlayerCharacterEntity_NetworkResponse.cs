@@ -174,7 +174,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, buildingEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the building
                 return;
@@ -362,7 +362,7 @@ namespace MultiplayerARPG
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, targetCharacterEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, targetCharacterEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
@@ -390,7 +390,7 @@ namespace MultiplayerARPG
                 StopDealing();
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, DealingCharacter.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, DealingCharacter.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 StopDealing();
@@ -746,7 +746,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, storageEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, storageEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the storage
                 return;
@@ -781,7 +781,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, doorEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the door
                 return;
@@ -808,7 +808,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, doorEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the door
                 return;
@@ -829,7 +829,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, campfireEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, campfireEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the door
                 return;
@@ -850,7 +850,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, campfireEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, campfireEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the door
                 return;
@@ -871,7 +871,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, workbenchEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, workbenchEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the workbench
                 return;
@@ -916,7 +916,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, buildingEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the building
                 return;
@@ -950,7 +950,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, buildingEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the building
                 return;
@@ -983,7 +983,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Vector3.Distance(CacheTransform.position, buildingEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance)
+            if (GameplayUtils.BoundsDistance(WorldBounds, buildingEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
             {
                 // Too far from the building
                 return;

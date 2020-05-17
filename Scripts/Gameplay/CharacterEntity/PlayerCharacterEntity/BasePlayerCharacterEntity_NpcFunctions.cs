@@ -15,7 +15,7 @@ namespace MultiplayerARPG
             if (!this.TryGetEntityByObjectId(objectId, out npcEntity))
                 return;
 
-            if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > CurrentGameInstance.conversationDistance + 5f)
+            if (GameplayUtils.BoundsDistance(WorldBounds, npcEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
                 return;
 
             CurrentNpcDialog = npcEntity.StartDialog;
