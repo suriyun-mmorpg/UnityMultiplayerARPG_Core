@@ -88,12 +88,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform CacheTransform { get { return entity.CacheTransform; } }
+        public Transform CacheTransform { get; private set; }
 
         private void Awake()
         {
             gameObject.tag = GameInstance.Singleton.buildingTag;
             gameObject.layer = GameInstance.Singleton.buildingLayer;
+
+            CacheTransform = transform;
 
             meshRenderer = GetComponent<MeshRenderer>();
             if (meshRenderer != null)
@@ -167,3 +169,4 @@ namespace MultiplayerARPG
         }
     }
 }
+;
