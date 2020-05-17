@@ -85,6 +85,7 @@ namespace MultiplayerARPG
             return Quaternion.identity;
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             Gizmos.color = gizmosColor;
@@ -99,6 +100,7 @@ namespace MultiplayerARPG
                     break;
             }
         }
+#endif
 
         public virtual int GroundLayerMask { get { return -1; } }
     }
