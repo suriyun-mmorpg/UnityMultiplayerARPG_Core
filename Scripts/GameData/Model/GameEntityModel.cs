@@ -67,9 +67,9 @@ namespace MultiplayerARPG
 
         protected virtual void OnValidate() { }
 
+#if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
-#if UNITY_EDITOR
             if (effectContainers != null)
             {
                 foreach (EffectContainer effectContainer in effectContainers)
@@ -80,8 +80,8 @@ namespace MultiplayerARPG
                     Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
                 }
             }
-#endif
         }
+#endif
 
         [ContextMenu("Set Effect Containers By Setters")]
         public void SetEffectContainersBySetters()

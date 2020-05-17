@@ -167,9 +167,9 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR
         protected override void OnDrawGizmos()
         {
-#if UNITY_EDITOR
             base.OnDrawGizmos();
             if (equipmentContainers != null)
             {
@@ -181,8 +181,8 @@ namespace MultiplayerARPG
                     Handles.Label(equipmentContainer.transform.position, equipmentContainer.equipSocket + "(Equipment)");
                 }
             }
-#endif
         }
+#endif
 
         [ContextMenu("Set Equipment Containers By Setters")]
         public void SetEquipmentContainersBySetters()
