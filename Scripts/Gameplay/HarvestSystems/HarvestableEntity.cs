@@ -157,10 +157,13 @@ namespace MultiplayerARPG
                 CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage);
         }
 
-        private void OnDrawGizmos()
+#if UNITY_EDITOR
+        protected override void OnDrawGizmos()
         {
+            base.OnDrawGizmos();
             Gizmos.color = Color.magenta;
             Gizmos.DrawWireSphere(transform.position, colliderDetectionRadius);
         }
+#endif
     }
 }

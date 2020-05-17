@@ -167,8 +167,9 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        private void OnDrawGizmos()
+        protected override void OnDrawGizmos()
         {
+            base.OnDrawGizmos();
             if (debugDamagePosition.HasValue && debugDamageRotation.HasValue)
             {
                 float atkHalfFov = GetAttackFov(false) * 0.5f;
