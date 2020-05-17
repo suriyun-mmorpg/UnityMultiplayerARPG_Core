@@ -66,6 +66,10 @@ namespace MultiplayerARPG
         {
             get { return model; }
         }
+
+        public Bounds LocalBounds { get; protected set; }
+
+        public Bounds WorldBounds { get { return new Bounds(CacheTransform.position + LocalBounds.center, LocalBounds.size); } }
         
         public Transform CacheTransform { get; private set; }
 
@@ -310,9 +314,23 @@ namespace MultiplayerARPG
             if (fpsCameraTargetTransform == null)
                 fpsCameraTargetTransform = CacheTransform;
             Movement = GetComponent<BaseEntityMovement>();
+            LocalBounds = MakeLocalBounds();
+        }
+
+        public virtual Bounds MakeLocalBounds()
+        {
+            return GameplayUtils.MakeLocalBoundsByCollider(CacheTransform);
         }
 
         protected virtual void EntityAwake() { }
+
+#if UNITY_EDITOR
+        protected virtual void OnDrawGizmos()
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(WorldBounds.center, WorldBounds.size);
+        }
+#endif
 
         private void Start()
         {

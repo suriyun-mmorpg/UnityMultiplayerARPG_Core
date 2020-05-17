@@ -55,26 +55,25 @@ namespace MultiplayerARPG
         public static Vector3 GetDirectionByAxes(Transform cameraTransform, float xAxis, float yAxis)
         {
             Vector3 aimDirection = Vector3.zero;
-            switch (GameInstance.Singleton.DimensionType)
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
             {
-                case DimensionType.Dimension3D:
-                    Vector3 forward = cameraTransform.forward;
-                    Vector3 right = cameraTransform.right;
-                    forward.y = 0f;
-                    right.y = 0f;
-                    forward.Normalize();
-                    right.Normalize();
-                    aimDirection += forward * yAxis;
-                    aimDirection += right * xAxis;
-                    // normalize input if it exceeds 1 in combined length:
-                    if (aimDirection.sqrMagnitude > 1)
-                        aimDirection.Normalize();
-                    break;
-                case DimensionType.Dimension2D:
-                    aimDirection = new Vector2(xAxis, yAxis);
-                    break;
+                Vector3 forward = cameraTransform.forward;
+                Vector3 right = cameraTransform.right;
+                forward.y = 0f;
+                right.y = 0f;
+                forward.Normalize();
+                right.Normalize();
+                aimDirection += forward * yAxis;
+                aimDirection += right * xAxis;
+                // normalize input if it exceeds 1 in combined length:
+                if (aimDirection.sqrMagnitude > 1)
+                    aimDirection.Normalize();
+                return aimDirection;
             }
-            return aimDirection;
+            else
+            {
+                return new Vector2(xAxis, yAxis);
+            }
         }
 
         public static DirectionType2D GetDirectionTypeByVector2(Vector2 direction)
@@ -117,6 +116,30 @@ namespace MultiplayerARPG
                 return result;
             }
             return DirectionType2D.Down;
+        }
+
+        public static Bounds MakeLocalBoundsByCollider(Transform transform)
+        {
+            Bounds result = new Bounds();
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
+            {
+                Collider col = transform.GetComponent<Collider>();
+                if (col != null)
+                {
+                    result = col.bounds;
+                    result.center = result.center - transform.position;
+                }
+            }
+            else
+            {
+                Collider2D col2d = transform.GetComponent<Collider2D>();
+                if (col2d != null)
+                {
+                    result = col2d.bounds;
+                    result.center = result.center - transform.position;
+                }
+            }
+            return result;
         }
     }
 }
