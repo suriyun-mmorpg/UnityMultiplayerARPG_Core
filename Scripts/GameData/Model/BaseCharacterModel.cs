@@ -211,6 +211,7 @@ namespace MultiplayerARPG
             {
                 if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out tempContainer))
                     continue;
+                tempContainer.DeactivateAllInstantiatedObjects();
                 tempContainer.SetActiveDefaultModel(false);
             }
 
@@ -232,6 +233,7 @@ namespace MultiplayerARPG
                     Destroy(oldModels[equipSocket]);
                     if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out tempContainer))
                         continue;
+                    tempContainer.DeactivateAllInstantiatedObjects();
                     tempContainer.SetActiveDefaultModel(true);
                 }
                 cacheModels.Remove(equipPosition);
@@ -359,14 +361,27 @@ namespace MultiplayerARPG
                     continue;
                 if (!CacheEquipmentModelContainers.TryGetValue(tempEquipmentModel.equipSocket, out tempContainer))
                     continue;
-                // Setup transform and activate model
-                tempEquipmentObject = Instantiate(tempEquipmentModel.model, tempContainer.transform);
-                tempEquipmentObject.transform.localPosition = Vector3.zero;
-                tempEquipmentObject.transform.localEulerAngles = Vector3.zero;
-                tempEquipmentObject.transform.localScale = Vector3.one;
-                tempEquipmentObject.gameObject.SetActive(true);
-                tempEquipmentObject.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
-                tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
+                if (tempEquipmentModel.useInstantiatedObject)
+                {
+                    // Activate the instantiated object
+                    if (tempContainer.ActivateInstantiatedObject(tempEquipmentModel.instantiatedObjectIndex))
+                        tempContainer.SetActiveDefaultModel(false);
+                    else
+                        tempContainer.SetActiveDefaultModel(true);
+                }
+                else
+                {
+                    // Instantiate model, setup transform and activate game object
+                    tempEquipmentObject = Instantiate(tempEquipmentModel.model, tempContainer.transform);
+                    tempEquipmentObject.transform.localPosition = Vector3.zero;
+                    tempEquipmentObject.transform.localEulerAngles = Vector3.zero;
+                    tempEquipmentObject.transform.localScale = Vector3.one;
+                    tempEquipmentObject.gameObject.SetActive(true);
+                    tempEquipmentObject.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
+                    tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
+                    AddingNewModel(tempEquipmentObject, tempContainer);
+                    tempCreatingModels.Add(tempEquipmentModel.equipSocket, tempEquipmentObject);
+                }
                 // Setup equipment entity (if exists)
                 tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                 if (tempEquipmentEntity != null)
@@ -376,8 +391,6 @@ namespace MultiplayerARPG
                     if (equipmentEntity == null)
                         equipmentEntity = tempEquipmentEntity;
                 }
-                AddingNewModel(tempEquipmentObject, tempContainer);
-                tempCreatingModels.Add(tempEquipmentModel.equipSocket, tempEquipmentObject);
             }
             CreateCacheModel(equipPosition, tempCreatingModels);
         }
@@ -599,17 +612,40 @@ namespace MultiplayerARPG
         public string equipSocket;
         public GameObject defaultModel;
         public Transform transform;
+        public GameObject[] instantiatedObjects;
 
         public void SetActiveDefaultModel(bool isActive)
         {
-            if (defaultModel == null)
+            if (defaultModel == null || defaultModel.activeSelf == isActive)
                 return;
-
             defaultModel.SetActive(isActive);
-            foreach (Renderer renderer in defaultModel.GetComponentsInChildren<Renderer>(true))
+        }
+
+        public void DeactivateAllInstantiatedObjects()
+        {
+            if (instantiatedObjects == null || instantiatedObjects.Length == 0)
+                return;
+            // Deactivate all objects
+            foreach (GameObject instantiatedObject in instantiatedObjects)
             {
-                renderer.enabled = isActive;
+                if (instantiatedObject == null || !instantiatedObject.activeSelf) continue;
+                instantiatedObject.SetActive(false);
             }
+        }
+
+        public bool ActivateInstantiatedObject(int index)
+        {
+            if (instantiatedObjects == null || instantiatedObjects.Length == 0)
+                return false;
+            // Deactivate all objects
+            DeactivateAllInstantiatedObjects();
+            if (index < 0 || instantiatedObjects.Length <= index)
+                return false;
+            // Activate only one object
+            if (instantiatedObjects[index] == null || instantiatedObjects[index].activeSelf)
+                return false;
+            instantiatedObjects[index].SetActive(true);
+            return true;
         }
     }
 }
