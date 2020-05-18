@@ -9,7 +9,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public sealed class HarvestableEntity : DamageableEntity
+    public partial class HarvestableEntity : DamageableEntity
     {
         public int maxHp = 100;
         public Harvestable harvestable;
@@ -23,8 +23,8 @@ namespace MultiplayerARPG
 
         public override string Title { get { return harvestable.Title; } set { } }
         public override int MaxHp { get { return maxHp; } }
-        public HarvestableSpawnArea spawnArea { get; private set; }
-        public Vector3 spawnPosition { get; private set; }
+        public HarvestableSpawnArea spawnArea { get; protected set; }
+        public Vector3 spawnPosition { get; protected set; }
 
         protected override void EntityAwake()
         {
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             InitStats();
         }
 
-        private void InitStats()
+        protected virtual void InitStats()
         {
             if (IsServer)
             {
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetSpawnArea(HarvestableSpawnArea spawnArea, Vector3 spawnPosition)
+        public virtual void SetSpawnArea(HarvestableSpawnArea spawnArea, Vector3 spawnPosition)
         {
             this.spawnArea = spawnArea;
             this.spawnPosition = spawnPosition;
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             InitStats();
         }
 
-        private void NetFuncOnHarvestableDestroy()
+        protected virtual void NetFuncOnHarvestableDestroy()
         {
             if (onHarvestableDestroy != null)
                 onHarvestableDestroy.Invoke();
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
             NetworkDestroy(destroyDelay);
         }
 
-        private IEnumerator RespawnRoutine()
+        protected IEnumerator RespawnRoutine()
         {
             yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
             InitStats();
