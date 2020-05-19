@@ -24,7 +24,7 @@ namespace MultiplayerARPG
 
         GameObject GetRaycastObject(int index);
 
-        int OverlapObjects(Vector3 position, float distance, int layerMask, bool sort = false);
+        int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false);
 
         GameObject GetOverlapObject(int index);
     }

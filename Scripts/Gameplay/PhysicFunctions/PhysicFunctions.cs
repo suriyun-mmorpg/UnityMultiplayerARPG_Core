@@ -61,10 +61,10 @@ namespace MultiplayerARPG
             return raycasts[index].transform.gameObject;
         }
 
-        public int OverlapObjects(Vector3 position, float distance, int layerMask, bool sort = false)
+        public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false)
         {
-            return sort ? PhysicUtils.SortedOverlapSphereNonAlloc(position, distance, overlapColliders, layerMask) :
-                Physics.OverlapSphereNonAlloc(position, distance, overlapColliders, layerMask);
+            return sort ? PhysicUtils.SortedOverlapSphereNonAlloc(position, radius, overlapColliders, layerMask) :
+                Physics.OverlapSphereNonAlloc(position, radius, overlapColliders, layerMask);
         }
 
         public GameObject GetOverlapObject(int index)
