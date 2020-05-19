@@ -53,7 +53,7 @@ namespace MultiplayerARPG
         protected Vector3? targetPosition;
         protected TargetActionType targetActionType;
 
-        protected PhysicFunctions physicFunctions;
+        protected IPhysicFunctions physicFunctions;
 
         // Optimizing garbage collection
         protected bool getMouseUp;
@@ -119,7 +119,14 @@ namespace MultiplayerARPG
             EnemyEntityDetector.findOnlyAliveMonsters = true;
             EnemyEntityDetector.findMonsterToAttack = true;
             // Initial physic functions
-            physicFunctions = new PhysicFunctions(512);
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+            {
+                physicFunctions = new PhysicFunctions(512);
+            }
+            else
+            {
+                physicFunctions = new PhysicFunctions2D(512);
+            }
         }
 
         protected override void OnDestroy()

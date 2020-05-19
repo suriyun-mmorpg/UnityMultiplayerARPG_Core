@@ -238,14 +238,14 @@ namespace MultiplayerARPG
                         IDamageableEntity selectedTarget = null;
                         bool hasSelectedTarget = attacker.TryGetTargetEntity(out selectedTarget);
                         // If hit only selected target, find selected character (only 1 character) to apply damage
-                        int tempOverlapSize = attacker.OverlapObjects_ForAttackFunctions(damagePosition, hitDistance, damageableLayerMask);
+                        int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         if (tempOverlapSize == 0)
                             return;
 
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
-                            tempGameObject = attacker.GetOverlapObject_ForAttackFunctions(tempLoopCounter);
+                            tempGameObject = attacker.AttackPhysicFunctions.GetOverlapObject(tempLoopCounter);
                             // Skip unhittable entities
                             if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
@@ -290,14 +290,14 @@ namespace MultiplayerARPG
                     else
                     {
                         // If not hit only selected target, find characters within hit fov to applies damages
-                        int tempOverlapSize = attacker.OverlapObjects_ForAttackFunctions(damagePosition, hitDistance, damageableLayerMask);
+                        int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         if (tempOverlapSize == 0)
                             return;
 
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
-                            tempGameObject = attacker.GetOverlapObject_ForAttackFunctions(tempLoopCounter);
+                            tempGameObject = attacker.AttackPhysicFunctions.GetOverlapObject(tempLoopCounter);
                             // Skip unhittable entities
                             if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
@@ -346,7 +346,7 @@ namespace MultiplayerARPG
                 case DamageType.Raycast:
                     float minDistance = missileDistance;
                     // Just raycast to any entity to apply damage
-                    int tempRaycastSize = attacker.RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, missileDistance, Physics.DefaultRaycastLayers);
+                    int tempRaycastSize = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, Physics.DefaultRaycastLayers);
                     if (tempRaycastSize > 0)
                     {
                         // Sort index
@@ -357,7 +357,10 @@ namespace MultiplayerARPG
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
                         {
-                            tempGameObject = attacker.GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal, out distance).gameObject;
+                            point = attacker.AttackPhysicFunctions.GetRaycastPoint(tempLoopCounter);
+                            normal = attacker.AttackPhysicFunctions.GetRaycastNormal(tempLoopCounter);
+                            distance = attacker.AttackPhysicFunctions.GetRaycastDistance(tempLoopCounter);
+                            tempGameObject = attacker.AttackPhysicFunctions.GetRaycastObject(tempLoopCounter);
 
                             // Skip layers
                             if (tempGameObject.layer == PhysicLayers.TransparentFX ||

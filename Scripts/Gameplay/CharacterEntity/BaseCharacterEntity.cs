@@ -80,14 +80,8 @@ namespace MultiplayerARPG
         protected readonly Dictionary<int, float> requestUseSkillErrorTime = new Dictionary<int, float>();
         #endregion
 
-        #region Temp data
-        protected Collider[] overlapColliders_ForAttackFunctions;
-        protected Collider2D[] overlapColliders2D_ForAttackFunctions;
-        protected RaycastHit[] raycasts_ForAttackFunctions;
-        protected RaycastHit2D[] raycasts2D_ForAttackFunctions;
-        protected Collider[] overlapColliders_ForFindFunctions;
-        protected Collider2D[] overlapColliders2D_ForFindFunctions;
-        #endregion
+        public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
+        public IPhysicFunctions FindPhysicFunctions { get; protected set; }
 
         public override sealed int MaxHp { get { return this.GetCaches().MaxHp; } }
         public int MaxMp { get { return this.GetCaches().MaxMp; } }
@@ -133,17 +127,15 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.layer = CurrentGameInstance.characterLayer;
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
-                overlapColliders2D_ForAttackFunctions = new Collider2D[512];
-                raycasts2D_ForAttackFunctions = new RaycastHit2D[512];
-                overlapColliders2D_ForFindFunctions = new Collider2D[512];
+                AttackPhysicFunctions = new PhysicFunctions(512);
+                FindPhysicFunctions = new PhysicFunctions(512);
             }
             else
             {
-                overlapColliders_ForAttackFunctions = new Collider[512];
-                raycasts_ForAttackFunctions = new RaycastHit[512];
-                overlapColliders_ForFindFunctions = new Collider[512];
+                AttackPhysicFunctions = new PhysicFunctions2D(512);
+                FindPhysicFunctions = new PhysicFunctions2D(512);
             }
             animActionType = AnimActionType.None;
             isRecaching = true;
@@ -884,77 +876,6 @@ namespace MultiplayerARPG
         #endregion
 
         #region Find objects helpers
-        public int RaycastObjects_ForAttackFunctions(Vector3 origin, Vector3 direction, float distance, int layerMask)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return PhysicUtils.SortedRaycastNonAlloc2D(origin, direction, raycasts2D_ForAttackFunctions, distance, layerMask);
-            return PhysicUtils.SortedRaycastNonAlloc3D(origin, direction, raycasts_ForAttackFunctions, distance, layerMask);
-        }
-
-        public Transform GetRaycastObject_ForAttackFunctions(int index, out Vector3 point, out Vector3 normal, out float distance)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                point = raycasts2D_ForAttackFunctions[index].point;
-                normal = raycasts2D_ForAttackFunctions[index].normal;
-                distance = raycasts2D_ForAttackFunctions[index].distance;
-                return raycasts2D_ForAttackFunctions[index].transform;
-            }
-            point = raycasts_ForAttackFunctions[index].point;
-            normal = raycasts_ForAttackFunctions[index].normal;
-            distance = raycasts_ForAttackFunctions[index].distance;
-            return raycasts_ForAttackFunctions[index].transform;
-        }
-
-        public bool GetRaycastObjectIsTrigger_ForAttackFunctions(int index)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return raycasts2D_ForAttackFunctions[index].collider.isTrigger;
-            return raycasts_ForAttackFunctions[index].collider.isTrigger;
-        }
-
-        public int OverlapObjects_ForAttackFunctions(Vector3 position, float distance, int layerMask)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return PhysicUtils.SortedOverlapCircleNonAlloc(position, distance, overlapColliders2D_ForAttackFunctions, layerMask);
-            return PhysicUtils.SortedOverlapSphereNonAlloc(position, distance, overlapColliders_ForAttackFunctions, layerMask);
-        }
-
-        public GameObject GetOverlapObject_ForAttackFunctions(int index)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return overlapColliders2D_ForAttackFunctions[index].gameObject;
-            return overlapColliders_ForAttackFunctions[index].gameObject;
-        }
-
-        public bool GetOverlapObjectIsTrigger_ForAttackFunctions(int index)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return overlapColliders2D_ForAttackFunctions[index].isTrigger;
-            return overlapColliders_ForAttackFunctions[index].isTrigger;
-        }
-
-        public int OverlapObjects_ForFindFunctions(Vector3 position, float distance, int layerMask)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return Physics2D.OverlapCircleNonAlloc(position, distance, overlapColliders2D_ForFindFunctions, layerMask);
-            return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders_ForFindFunctions, layerMask);
-        }
-
-        public GameObject GetOverlapObject_ForFindFunctions(int index)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return overlapColliders2D_ForFindFunctions[index].gameObject;
-            return overlapColliders_ForFindFunctions[index].gameObject;
-        }
-
-        public bool GetOverlapObjectIsTrigger_ForFindFunctions(int index)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return overlapColliders2D_ForFindFunctions[index].isTrigger;
-            return overlapColliders_ForFindFunctions[index].isTrigger;
-        }
-
         public bool IsPositionInFov(float fov, Vector3 position)
         {
             return IsPositionInFov(fov, position, CacheTransform.forward);
@@ -993,7 +914,7 @@ namespace MultiplayerARPG
             where T : class, IDamageableEntity
         {
             List<T> result = new List<T>();
-            int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, layerMask);
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, layerMask);
             if (tempOverlapSize == 0)
                 return result;
             GameObject tempGameObject;
@@ -1001,7 +922,7 @@ namespace MultiplayerARPG
             T tempEntity;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                tempGameObject = GetOverlapObject_ForFindFunctions(tempLoopCounter);
+                tempGameObject = FindPhysicFunctions.GetOverlapObject(tempLoopCounter);
                 tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
                 if (tempBaseEntity == null)
                     continue;
@@ -1029,7 +950,7 @@ namespace MultiplayerARPG
             where T : BaseCharacterEntity
         {
             List<T> result = new List<T>();
-            int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
             if (tempOverlapSize == 0)
                 return result;
             GameObject tempGameObject;
@@ -1037,7 +958,7 @@ namespace MultiplayerARPG
             T tempEntity;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                tempGameObject = GetOverlapObject_ForFindFunctions(tempLoopCounter);
+                tempGameObject = FindPhysicFunctions.GetOverlapObject(tempLoopCounter);
                 tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
                 if (tempBaseEntity == null)
                     continue;
@@ -1060,7 +981,7 @@ namespace MultiplayerARPG
         public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            int tempOverlapSize = OverlapObjects_ForFindFunctions(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
             if (tempOverlapSize == 0)
                 return null;
             GameObject tempGameObject;
@@ -1071,7 +992,7 @@ namespace MultiplayerARPG
             T nearestEntity = null;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                tempGameObject = GetOverlapObject_ForFindFunctions(tempLoopCounter);
+                tempGameObject = FindPhysicFunctions.GetOverlapObject(tempLoopCounter);
                 tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
                 if (tempBaseEntity == null)
                     continue;
