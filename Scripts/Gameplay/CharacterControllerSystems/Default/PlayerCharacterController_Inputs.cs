@@ -626,7 +626,7 @@ namespace MultiplayerARPG
                 }
                 float castDistance = 0f;
                 float castFov = 0f;
-                GetUseSkillDistanceAndFov(out castDistance, out castFov);
+                GetUseSkillDistanceAndFov(isLeftHandAttacking, out castDistance, out castFov);
                 UseSkillOrMoveToEntity(targetDamageable, castDistance);
             }
             else if (TryGetDoActionEntity(out targetPlayer))
@@ -745,7 +745,7 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkill.skill != null)
             {
-                Transform applyTransform = queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, false);
+                Transform applyTransform = queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, isLeftHandAttacking);
                 Vector3 measuringPosition = applyTransform.position;
                 Vector3 targetPosition = entity.OpponentAimTransform.position;
                 if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() /* Applying skill to user? */ ||

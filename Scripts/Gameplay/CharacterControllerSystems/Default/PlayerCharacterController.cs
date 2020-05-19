@@ -269,24 +269,18 @@ namespace MultiplayerARPG
         {
             attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHand);
             attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHand);
-
-            if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
-            {
-                // If skill is attack skill, set distance and fov by skill
-                GetUseSkillDistanceAndFov(out attackDistance, out attackFov);
-            }
             attackDistance -= PlayerCharacterEntity.StoppingDistance;
         }
 
-        public void GetUseSkillDistanceAndFov(out float castDistance, out float castFov)
+        public void GetUseSkillDistanceAndFov(bool isLeftHand, out float castDistance, out float castFov)
         {
             castDistance = CurrentGameInstance.conversationDistance;
             castFov = 360f;
             if (queueUsingSkill.skill != null)
             {
                 // If skill is attack skill, set distance and fov by skill
-                castDistance = queueUsingSkill.skill.GetCastDistance(PlayerCharacterEntity, queueUsingSkill.level, false);
-                castFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, false);
+                castDistance = queueUsingSkill.skill.GetCastDistance(PlayerCharacterEntity, queueUsingSkill.level, isLeftHand);
+                castFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, isLeftHand);
             }
             castDistance -= PlayerCharacterEntity.StoppingDistance;
         }
