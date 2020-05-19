@@ -201,7 +201,7 @@ namespace MultiplayerARPG
                 int tempCount = FindClickObjects(out tempVector3);
                 for (int tempCounter = tempCount - 1; tempCounter >= 0; --tempCounter)
                 {
-                    tempTransform = GetRaycastTransform(tempCounter);
+                    tempTransform = physicFunctions.GetRaycastTransform(tempCounter);
                     // When holding on target, or already enter edit building mode
                     if (isMouseHoldAndNotDrag)
                     {
@@ -286,11 +286,11 @@ namespace MultiplayerARPG
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (!GetRaycastIsTrigger(tempCounter))
+                        else if (!physicFunctions.GetRaycastIsTrigger(tempCounter))
                         {
                             // Set clicked map position, it will be used if no activating entity found
                             tempHasMapPosition = true;
-                            tempMapPosition = GetRaycastPoint(tempCounter);
+                            tempMapPosition = physicFunctions.GetRaycastPoint(tempCounter);
                             if (tempMapPosition.y > tempHighestY)
                                 tempHighestY = tempMapPosition.y;
                         }
@@ -685,12 +685,12 @@ namespace MultiplayerARPG
             if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
                 return true;
             // Target is far from controlling entity, try overlap the entity
-            int count = OverlapObjects(measuringPosition, distance, CurrentGameInstance.GetTargetLayerMask());
+            int count = physicFunctions.OverlapObjects(measuringPosition, distance, CurrentGameInstance.GetTargetLayerMask());
             GameObject obj;
             IGameEntity comp;
             for (int i = 0; i < count; ++i)
             {
-                obj = GetOverlapObject(i);
+                obj = physicFunctions.GetOverlapObject(i);
                 comp = obj.GetComponent<IGameEntity>();
                 if (comp != null && comp.Entity == entity)
                     return true;
@@ -796,7 +796,7 @@ namespace MultiplayerARPG
         {
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
-            
+
             Vector3 direction = (targetPosition - measuringPosition).normalized;
             Vector3 position = targetPosition - (direction * (distance - StoppingDistance));
             if (Vector3.Distance(MovementTransform.position, position) > MIN_START_MOVE_DISTANCE &&
