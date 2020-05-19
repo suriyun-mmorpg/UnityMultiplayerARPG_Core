@@ -33,6 +33,8 @@ namespace MultiplayerARPG
         protected IDamageableEntity tempTargetEnemy;
         protected BaseSkill queueSkill;
         protected short queueSkillLevel;
+        protected bool alreadySetActionState;
+        protected bool isLeftHandAttacking;
 
         public override void EntityUpdate()
         {
@@ -134,6 +136,7 @@ namespace MultiplayerARPG
             if (!CacheEntity.TryGetTargetEntity(out tempTargetEnemy))
             {
                 // No target, stop attacking
+                ClearActionState();
                 return false;
             }
 
@@ -143,13 +146,23 @@ namespace MultiplayerARPG
             {
                 // If target is dead or in safe area stop attacking
                 CacheEntity.SetTargetEntity(null);
+                ClearActionState();
                 return false;
             }
 
             // If it has target then go to target
+            if (tempTargetEnemy != null && !CacheEntity.IsPlayingActionAnimation() && !alreadySetActionState)
+            {
+                // Random action state to do next time
+                MonsterDatabase.RandomSkill(CacheEntity, out queueSkill, out queueSkillLevel);
+                isLeftHandAttacking = !isLeftHandAttacking;
+                alreadySetActionState = true;
+                return true;
+            }
+
             Vector3 targetPosition = tempTargetEnemy.GetTransform().position;
-            float attackDistance = CacheEntity.GetAttackDistance(false);
-            if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
+            float attackDistance = GetAttackDistance();
+            if (OverlappedEntity(tempTargetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
                 startedFollowEnemy = false;
                 CacheEntity.StopMove();
@@ -173,19 +186,21 @@ namespace MultiplayerARPG
                     }
                 }
 
-                if (queueSkill != null || MonsterDatabase.RandomSkill(CacheEntity, out queueSkill, out queueSkillLevel))
+                if (CacheEntity.IsPlayingActionAnimation())
+                    return true;
+
+                if (queueSkill != null && CacheEntity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) < 0)
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
                     CacheEntity.RequestUseSkill(queueSkill.DataId, false, tempTargetEnemy.OpponentAimTransform.position);
-                    // Clear queue skill to random using skill later
-                    queueSkill = null;
                 }
-
-                if (queueSkill == null)
+                else
                 {
                     // Attack when no queue skill
                     CacheEntity.RequestAttack(false);
                 }
+
+                ClearActionState();
             }
             else
             {
@@ -324,6 +339,34 @@ namespace MultiplayerARPG
             }
 
             return false;
+        }
+
+        protected virtual void ClearActionState()
+        {
+            queueSkill = null;
+            isLeftHandAttacking = false;
+            alreadySetActionState = false;
+        }
+
+        protected Transform GetDamageTransform()
+        {
+            return queueSkill != null ? queueSkill.GetApplyTransform(CacheEntity, isLeftHandAttacking) :
+                CacheEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(CacheEntity, isLeftHandAttacking);
+        }
+
+        protected float GetAttackDistance()
+        {
+            return queueSkill != null ? queueSkill.GetCastDistance(CacheEntity, queueSkillLevel, isLeftHandAttacking) :
+                CacheEntity.GetAttackDistance(isLeftHandAttacking);
+        }
+
+        protected virtual bool OverlappedEntity<T>(T entity, Vector3 measuringPosition, Vector3 targetPosition, float distance)
+            where T : BaseGameEntity
+        {
+            if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
+                return true;
+            // Target is far from controlling entity, try overlap the entity
+            return CacheEntity.FindPhysicFunctions.OverlapEntity(entity, measuringPosition, distance, CurrentGameInstance.GetTargetLayerMask());
         }
     }
 }
