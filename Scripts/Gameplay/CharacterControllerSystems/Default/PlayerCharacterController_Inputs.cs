@@ -685,17 +685,7 @@ namespace MultiplayerARPG
             if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
                 return true;
             // Target is far from controlling entity, try overlap the entity
-            int count = physicFunctions.OverlapObjects(measuringPosition, distance, CurrentGameInstance.GetTargetLayerMask());
-            GameObject obj;
-            IGameEntity comp;
-            for (int i = 0; i < count; ++i)
-            {
-                obj = physicFunctions.GetOverlapObject(i);
-                comp = obj.GetComponent<IGameEntity>();
-                if (comp != null && comp.Entity == entity)
-                    return true;
-            }
-            return false;
+            return physicFunctions.OverlapEntity(entity, measuringPosition, distance, CurrentGameInstance.GetTargetLayerMask());
         }
 
         protected virtual void DoActionOrMoveToEntity(BaseGameEntity entity, float distance, System.Action action)
