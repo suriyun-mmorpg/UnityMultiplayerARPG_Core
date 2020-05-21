@@ -335,7 +335,7 @@ namespace MultiplayerARPG
             }
             UpdateMovement(Time.deltaTime);
 
-            tempMovementState = CacheRigidbody.velocity.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
+            tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
             if (isUnderWater)
                 tempMovementState |= MovementState.IsUnderWater;
             if (isGrounded)
