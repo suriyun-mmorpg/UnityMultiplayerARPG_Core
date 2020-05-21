@@ -284,6 +284,19 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
+        [ContextMenu("Copy Default Animations")]
+        public void CopyDefaultAnimations()
+        {
+            CharacterModelDataManager.CopyDefaultAnimations(defaultAnimations);
+        }
+
+        [ContextMenu("Paste Default Animations")]
+        public void PasteDefaultAnimations()
+        {
+            defaultAnimations = CharacterModelDataManager.PasteDefaultAnimations();
+            EditorUtility.SetDirty(this);
+        }
+
         [ContextMenu("Copy Weapon Animations")]
         public void CopyWeaponAnimations()
         {

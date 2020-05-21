@@ -4,8 +4,14 @@ namespace MultiplayerARPG
 {
     public class CharacterModelDataManager
     {
+        private static DefaultAnimations defaultAnimations;
         private static WeaponAnimations[] copyingWeaponAnimations;
         private static SkillAnimations[] copyingSkillAnimations;
+
+        public static void CopyDefaultAnimations(DefaultAnimations data)
+        {
+            defaultAnimations = data;
+        }
 
         public static void CopyWeaponAnimations(WeaponAnimations[] data)
         {
@@ -15,6 +21,11 @@ namespace MultiplayerARPG
         public static void CopySkillAnimations(SkillAnimations[] data)
         {
             copyingSkillAnimations = data;
+        }
+
+        public static DefaultAnimations PasteDefaultAnimations()
+        {
+            return defaultAnimations;
         }
 
         public static WeaponAnimations[] PasteWeaponAnimations()
