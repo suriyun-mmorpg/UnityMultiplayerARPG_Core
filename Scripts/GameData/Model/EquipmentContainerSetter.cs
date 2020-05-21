@@ -2,12 +2,24 @@
 using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
     public class EquipmentContainerSetter : MonoBehaviour
     {
         public GameObject defaultModel;
+        public GameObject[] instantiatedObjects;
+#if UNITY_EDITOR
+        [Header("Set Default Model Tool")]
+        public int childIndex;
+        [InspectorButton("SetDefaultModelByChildIndex")]
+        public bool setDefaultModelByChildIndex;
+        [InspectorButton("SetInstantiatedObjectsByContainersChildren")]
+        public bool setInstantiatedObjectsByContainersChildren;
+#endif
 
         public void ApplyToCharacterModel(BaseCharacterModel characterModel)
         {
@@ -18,7 +30,9 @@ namespace MultiplayerARPG
             }
             bool hasChanges = false;
             bool isFound = false;
-            List<EquipmentContainer> equipmentContainers = new List<EquipmentContainer>(characterModel.equipmentContainers);
+            List<EquipmentContainer> equipmentContainers = new List<EquipmentContainer>();
+            if (characterModel.equipmentContainers != null)
+                equipmentContainers.AddRange(characterModel.equipmentContainers);
             for (int i = 0; i < equipmentContainers.Count; ++i)
             {
                 EquipmentContainer equipmentContainer = equipmentContainers[i];
@@ -27,8 +41,9 @@ namespace MultiplayerARPG
                     isFound = true;
                     hasChanges = true;
                     equipmentContainer.equipSocket = name;
-                    equipmentContainer.defaultModel = defaultModel;
                     equipmentContainer.transform = transform;
+                    equipmentContainer.defaultModel = defaultModel;
+                    equipmentContainer.instantiatedObjects = instantiatedObjects;
                     equipmentContainers[i] = equipmentContainer;
                     break;
                 }
@@ -38,8 +53,9 @@ namespace MultiplayerARPG
                 hasChanges = true;
                 EquipmentContainer newEquipmentContainer = new EquipmentContainer();
                 newEquipmentContainer.equipSocket = name;
-                newEquipmentContainer.defaultModel = defaultModel;
                 newEquipmentContainer.transform = transform;
+                newEquipmentContainer.defaultModel = defaultModel;
+                newEquipmentContainer.instantiatedObjects = instantiatedObjects;
                 equipmentContainers.Add(newEquipmentContainer);
             }
             if (hasChanges)
@@ -47,5 +63,37 @@ namespace MultiplayerARPG
                 characterModel.equipmentContainers = equipmentContainers.ToArray();
             }
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Set Default Model By Child Index")]
+        public virtual void SetDefaultModelByChildIndex()
+        {
+            if (childIndex < 0 || childIndex >= transform.childCount)
+            {
+                Logging.LogError(ToString(), "Can't set default model, invalid wrong child index.");
+                return;
+            }
+            defaultModel = transform.GetChild(childIndex).gameObject;
+            EditorUtility.SetDirty(this);
+        }
+
+        [ContextMenu("Set Instantiated Objects By Containers Children")]
+        public void SetInstantiatedObjectsByContainersChildren()
+        {
+            if (transform == null || transform.childCount == 0)
+                return;
+            List<GameObject> instantiatedObjects = new List<GameObject>();
+            int containersChildCount = transform.childCount;
+            for (int i = 0; i < containersChildCount; ++i)
+            {
+                if (transform.GetChild(i) == null ||
+                    transform.GetChild(i).gameObject == defaultModel)
+                    continue;
+                instantiatedObjects.Add(transform.GetChild(i).gameObject);
+            }
+            this.instantiatedObjects = instantiatedObjects.ToArray();
+            EditorUtility.SetDirty(this);
+        }
+#endif
     }
 }
