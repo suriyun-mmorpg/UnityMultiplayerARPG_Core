@@ -31,9 +31,11 @@ namespace MultiplayerARPG
 
         [Header("Effect Containers")]
         public EffectContainer[] effectContainers;
+#if UNITY_EDITOR
         [InspectorButton("SetEffectContainersBySetters")]
         public bool setEffectContainersBySetters;
-        
+#endif
+
         public Transform CacheTransform { get; private set; }
 
         private Dictionary<string, EffectContainer> cacheEffectContainers = null;
@@ -83,6 +85,7 @@ namespace MultiplayerARPG
         }
 #endif
 
+#if UNITY_EDITOR
         [ContextMenu("Set Effect Containers By Setters")]
         public void SetEffectContainersBySetters()
         {
@@ -95,10 +98,9 @@ namespace MultiplayerARPG
                 }
             }
             this.InvokeInstanceDevExtMethods("SetEffectContainersBySetters");
-#if UNITY_EDITOR
             EditorUtility.SetDirty(this);
-#endif
         }
+#endif
 
         public void SetVisibleState(EVisibleState visibleState)
         {
