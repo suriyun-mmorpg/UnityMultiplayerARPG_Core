@@ -327,8 +327,11 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireCube(WorldBounds.center, WorldBounds.size);
+            if (Application.isPlaying)
+            {
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireCube(WorldBounds.center, WorldBounds.size);
+            }
         }
 #endif
 
