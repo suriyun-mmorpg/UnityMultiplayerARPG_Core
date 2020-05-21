@@ -337,6 +337,8 @@ namespace MultiplayerARPG
 
         public virtual void SendNotifyRewardItem(long connectionId, int dataId, short amount)
         {
+            if (amount <= 0)
+                return;
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardItem, (writer) =>
             {
                 writer.Put(dataId);
