@@ -18,8 +18,14 @@ namespace MultiplayerARPG
 
         [Header("Equipment Containers")]
         public EquipmentContainer[] equipmentContainers;
+#if UNITY_EDITOR
         [InspectorButton("SetEquipmentContainersBySetters")]
         public bool setEquipmentContainersBySetters;
+        [InspectorButton("DeactivateInstantiatedObjects")]
+        public bool deactivateInstantiatedObjects;
+        [InspectorButton("ActivateInstantiateObject")]
+        public bool activateInstantiateObject;
+#endif
 
         private Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers = null;
         /// <summary>
@@ -184,6 +190,7 @@ namespace MultiplayerARPG
         }
 #endif
 
+#if UNITY_EDITOR
         [ContextMenu("Set Equipment Containers By Setters")]
         public void SetEquipmentContainersBySetters()
         {
@@ -196,27 +203,35 @@ namespace MultiplayerARPG
                 }
             }
             this.InvokeInstanceDevExtMethods("SetEquipmentContainersBySetters");
-#if UNITY_EDITOR
             EditorUtility.SetDirty(this);
-#endif
         }
 
-        private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)
+        [ContextMenu("Deactivate Instantiated Objects")]
+        public void DeactivateInstantiatedObjects()
         {
-            if (models == null)
-                return;
-
-            EquipmentContainer tempContainer;
-            foreach (string equipSocket in models.Keys)
+            if (equipmentContainers != null && equipmentContainers.Length > 0)
             {
-                if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out tempContainer))
-                    continue;
-                tempContainer.DeactivateAllInstantiatedObjects();
-                tempContainer.SetActiveDefaultModel(false);
+                for (int i = 0; i < equipmentContainers.Length; ++i)
+                {
+                    equipmentContainers[i].DeactivateInstantiatedObjects();
+                    equipmentContainers[i].SetActiveDefaultModel(true);
+                }
             }
-
-            cacheModels[equipPosition] = models;
         }
+
+        [ContextMenu("Activate Instantiate Object")]
+        public void ActivateInstantiateObject()
+        {
+            if (equipmentContainers != null && equipmentContainers.Length > 0)
+            {
+                for (int i = 0; i < equipmentContainers.Length; ++i)
+                {
+                    equipmentContainers[i].SetActiveDefaultModel(false);
+                    equipmentContainers[i].ActivateInstantiatedObject(equipmentContainers[i].activatingInstantiateObjectIndex);
+                }
+            }
+        }
+#endif
 
         private void DestroyCacheModel(string equipPosition)
         {
@@ -230,10 +245,11 @@ namespace MultiplayerARPG
                 EquipmentContainer tempContainer;
                 foreach (string equipSocket in oldModels.Keys)
                 {
-                    Destroy(oldModels[equipSocket]);
+                    if (oldModels[equipSocket] != null)
+                        Destroy(oldModels[equipSocket]);
                     if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out tempContainer))
                         continue;
-                    tempContainer.DeactivateAllInstantiatedObjects();
+                    tempContainer.DeactivateInstantiatedObjects();
                     tempContainer.SetActiveDefaultModel(true);
                 }
                 cacheModels.Remove(equipPosition);
@@ -357,21 +373,27 @@ namespace MultiplayerARPG
             for (i = 0; i < equipmentModels.Length; ++i)
             {
                 tempEquipmentModel = equipmentModels[i];
-                if (string.IsNullOrEmpty(tempEquipmentModel.equipSocket) || tempEquipmentModel.model == null)
+                if (string.IsNullOrEmpty(tempEquipmentModel.equipSocket))
                     continue;
                 if (!CacheEquipmentModelContainers.TryGetValue(tempEquipmentModel.equipSocket, out tempContainer))
                     continue;
                 if (tempEquipmentModel.useInstantiatedObject)
                 {
                     // Activate the instantiated object
-                    if (tempContainer.ActivateInstantiatedObject(tempEquipmentModel.instantiatedObjectIndex))
-                        tempContainer.SetActiveDefaultModel(false);
-                    else
-                        tempContainer.SetActiveDefaultModel(true);
+                    if (!tempContainer.ActivateInstantiatedObject(tempEquipmentModel.instantiatedObjectIndex))
+                        continue;
+                    tempContainer.SetActiveDefaultModel(false);
+                    tempEquipmentObject = tempContainer.instantiatedObjects[tempEquipmentModel.instantiatedObjectIndex];
+                    tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
+                    tempCreatingModels.Add(tempEquipmentModel.equipSocket, null);
                 }
                 else
                 {
+                    if (tempEquipmentModel.model == null)
+                        continue;
                     // Instantiate model, setup transform and activate game object
+                    tempContainer.DeactivateInstantiatedObjects();
+                    tempContainer.SetActiveDefaultModel(false);
                     tempEquipmentObject = Instantiate(tempEquipmentModel.model, tempContainer.transform);
                     tempEquipmentObject.transform.localPosition = Vector3.zero;
                     tempEquipmentObject.transform.localEulerAngles = Vector3.zero;
@@ -379,11 +401,11 @@ namespace MultiplayerARPG
                     tempEquipmentObject.gameObject.SetActive(true);
                     tempEquipmentObject.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
                     tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
+                    tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     AddingNewModel(tempEquipmentObject, tempContainer);
                     tempCreatingModels.Add(tempEquipmentModel.equipSocket, tempEquipmentObject);
                 }
                 // Setup equipment entity (if exists)
-                tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                 if (tempEquipmentEntity != null)
                 {
                     tempEquipmentEntity.Level = itemLevel;
@@ -392,7 +414,8 @@ namespace MultiplayerARPG
                         equipmentEntity = tempEquipmentEntity;
                 }
             }
-            CreateCacheModel(equipPosition, tempCreatingModels);
+            // Cache Models
+            cacheModels[equipPosition] = tempCreatingModels;
         }
 
         private void CreateCacheEffect(string buffId, List<GameEffect> effects)
@@ -610,9 +633,14 @@ namespace MultiplayerARPG
     public struct EquipmentContainer
     {
         public string equipSocket;
-        public GameObject defaultModel;
         public Transform transform;
+        public GameObject defaultModel;
         public GameObject[] instantiatedObjects;
+#if UNITY_EDITOR
+        [Header("Testing tools")]
+        [Tooltip("Index of instantiate object which you want to test activation by character model's context menu")]
+        public int activatingInstantiateObjectIndex;
+#endif
 
         public void SetActiveDefaultModel(bool isActive)
         {
@@ -621,7 +649,7 @@ namespace MultiplayerARPG
             defaultModel.SetActive(isActive);
         }
 
-        public void DeactivateAllInstantiatedObjects()
+        public void DeactivateInstantiatedObjects()
         {
             if (instantiatedObjects == null || instantiatedObjects.Length == 0)
                 return;
@@ -638,7 +666,7 @@ namespace MultiplayerARPG
             if (instantiatedObjects == null || instantiatedObjects.Length == 0)
                 return false;
             // Deactivate all objects
-            DeactivateAllInstantiatedObjects();
+            DeactivateInstantiatedObjects();
             if (index < 0 || instantiatedObjects.Length <= index)
                 return false;
             // Activate only one object
