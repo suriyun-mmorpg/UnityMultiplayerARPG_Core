@@ -126,6 +126,7 @@ namespace MultiplayerARPG
         public override void ComponentOnEnable()
         {
             CacheNetTransform.enabled = true;
+            CacheOpenCharacterController.enabled = true;
             CacheOpenCharacterController.SetPosition(CacheTransform.position, true);
             CacheNetTransform.onTeleport += OnTeleport;
         }
@@ -133,6 +134,7 @@ namespace MultiplayerARPG
         public override void ComponentOnDisable()
         {
             CacheNetTransform.enabled = false;
+            CacheOpenCharacterController.enabled = false;
             CacheNetTransform.onTeleport -= OnTeleport;
         }
 
