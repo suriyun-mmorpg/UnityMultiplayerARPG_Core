@@ -144,6 +144,14 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            // Update remains duration
+            if (Character != null && Skill != null)
+            {
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
+                if (indexOfSkillUsage >= 0)
+                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+            }
+
             if (Level <= 0)
             {
                 onSetLevelZeroData.Invoke();

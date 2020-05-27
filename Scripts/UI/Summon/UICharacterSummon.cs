@@ -72,6 +72,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             tempSummonData = null;
+            // Update remains duration
             summonRemainsDuration = CharacterSummon.summonRemainsDuration;
 
             switch (Data.type)
