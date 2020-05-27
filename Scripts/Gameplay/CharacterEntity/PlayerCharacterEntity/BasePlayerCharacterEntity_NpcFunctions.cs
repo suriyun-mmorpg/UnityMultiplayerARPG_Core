@@ -12,7 +12,7 @@ namespace MultiplayerARPG
                 return;
 
             NpcEntity npcEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out npcEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out npcEntity))
                 return;
 
             if (GameplayUtils.BoundsDistance(WorldBounds, npcEntity.WorldBounds) > CurrentGameInstance.conversationDistance)

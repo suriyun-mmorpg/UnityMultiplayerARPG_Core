@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                 SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CannotSendPartyInvitation);
                 return false;
             }
-            if (!inviteCharacterEntity.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
                 SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return false;
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
                 SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CannotSendGuildInvitation);
                 return false;
             }
-            if (!inviteCharacterEntity.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
+            if (!this.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
                 SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return false;

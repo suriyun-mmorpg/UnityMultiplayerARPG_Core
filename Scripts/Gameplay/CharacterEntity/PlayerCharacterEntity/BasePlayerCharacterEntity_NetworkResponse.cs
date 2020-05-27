@@ -150,7 +150,7 @@ namespace MultiplayerARPG
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;
             BuildingEntity parentBuildingEntity;
-            if (this.TryGetEntityByObjectId(parentObjectId, out parentBuildingEntity))
+            if (Manager.TryGetEntityByObjectId(parentObjectId, out parentBuildingEntity))
                 buildingSaveData.ParentId = parentBuildingEntity.Id;
             buildingSaveData.DataId = buildingEntity.DataId;
             buildingSaveData.CurrentHp = buildingEntity.maxHp;
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
                 return;
 
             BuildingEntity buildingEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
                 // Can't find the building
                 return;
@@ -195,7 +195,7 @@ namespace MultiplayerARPG
                 return;
 
             BuildingEntity buildingEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
                 return;
 
             if (buildingEntity != null && buildingEntity is StorageEntity)
@@ -352,7 +352,7 @@ namespace MultiplayerARPG
         protected void NetFuncSendDealingRequest(PackedUInt objectId)
         {
             BasePlayerCharacterEntity targetCharacterEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return;
@@ -376,7 +376,7 @@ namespace MultiplayerARPG
         protected void NetFuncReceiveDealingRequest(PackedUInt objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowDealingRequestDialog != null)
                 onShowDealingRequestDialog.Invoke(playerCharacterEntity);
@@ -417,7 +417,7 @@ namespace MultiplayerARPG
         protected void NetFuncAcceptedDealingRequest(PackedUInt objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowDealingDialog != null)
                 onShowDealingDialog.Invoke(playerCharacterEntity);
@@ -581,7 +581,7 @@ namespace MultiplayerARPG
         protected void NetFuncReceivePartyInvitation(PackedUInt objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowPartyInvitationDialog != null)
                 onShowPartyInvitationDialog.Invoke(playerCharacterEntity);
@@ -652,7 +652,7 @@ namespace MultiplayerARPG
         protected void NetFuncReceiveGuildInvitation(PackedUInt objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowGuildInvitationDialog != null)
                 onShowGuildInvitationDialog.Invoke(playerCharacterEntity);
@@ -740,7 +740,7 @@ namespace MultiplayerARPG
                 return;
 
             StorageEntity storageEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out storageEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out storageEntity))
             {
                 // Can't find the storage
                 return;
@@ -775,7 +775,7 @@ namespace MultiplayerARPG
                 return;
 
             DoorEntity doorEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out doorEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out doorEntity))
             {
                 // Can't find the door
                 return;
@@ -802,7 +802,7 @@ namespace MultiplayerARPG
                 return;
 
             DoorEntity doorEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out doorEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out doorEntity))
             {
                 // Can't find the door
                 return;
@@ -823,7 +823,7 @@ namespace MultiplayerARPG
                 return;
 
             CampFireEntity campfireEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out campfireEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out campfireEntity))
             {
                 // Can't find the door
                 return;
@@ -844,7 +844,7 @@ namespace MultiplayerARPG
                 return;
 
             CampFireEntity campfireEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out campfireEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out campfireEntity))
             {
                 // Can't find the door
                 return;
@@ -865,7 +865,7 @@ namespace MultiplayerARPG
                 return;
 
             WorkbenchEntity workbenchEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out workbenchEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out workbenchEntity))
             {
                 // Can't find the workbench
                 return;
@@ -910,7 +910,7 @@ namespace MultiplayerARPG
                 return;
 
             BuildingEntity buildingEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
                 // Can't find the building
                 return;
@@ -944,7 +944,7 @@ namespace MultiplayerARPG
                 return;
 
             BuildingEntity buildingEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
                 // Can't find the building
                 return;
@@ -977,7 +977,7 @@ namespace MultiplayerARPG
                 return;
 
             BuildingEntity buildingEntity = null;
-            if (!this.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
                 // Can't find the building
                 return;
