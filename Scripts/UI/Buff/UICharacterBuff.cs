@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public UIBuff uiBuff;
 
         protected float buffRemainsDuration;
+        protected BaseGameData tempGameData;
 
         private void OnDisable()
         {
@@ -74,18 +75,20 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            BaseGameData buffData = null;
+            tempGameData = null;
+            buffRemainsDuration = CharacterBuff.buffRemainsDuration;
+
             switch (Data.type)
             {
                 case BuffType.SkillBuff:
                 case BuffType.SkillDebuff:
-                    buffData = Data.GetSkill();
+                    tempGameData = Data.GetSkill();
                     break;
                 case BuffType.PotionBuff:
-                    buffData = Data.GetItem();
+                    tempGameData = Data.GetItem();
                     break;
                 case BuffType.GuildSkillBuff:
-                    buffData = Data.GetGuildSkill();
+                    tempGameData = Data.GetGuildSkill();
                     break;
             }
 
@@ -93,19 +96,19 @@ namespace MultiplayerARPG
             {
                 uiTextTitle.text = string.Format(
                     LanguageManager.GetText(formatKeyTitle),
-                    buffData == null ? LanguageManager.GetUnknowTitle() : buffData.Title);
+                    tempGameData == null ? LanguageManager.GetUnknowTitle() : tempGameData.Title);
             }
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = buffData == null ? null : buffData.icon;
+                Sprite iconSprite = tempGameData == null ? null : tempGameData.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
 
             if (uiBuff != null)
             {
-                if (buffData == null)
+                if (tempGameData == null)
                     uiBuff.Hide();
                 else
                 {
