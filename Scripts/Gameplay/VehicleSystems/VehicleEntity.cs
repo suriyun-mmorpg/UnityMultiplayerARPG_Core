@@ -111,6 +111,22 @@ namespace MultiplayerARPG
             return Seats[seatIndex].canAttack;
         }
 
+        public List<BaseGameEntity> GetAllPassengers()
+        {
+            List<BaseGameEntity> result = new List<BaseGameEntity>();
+            foreach (BaseGameEntity passenger in passengers.Values)
+            {
+                if (passenger)
+                    result.Add(passenger);
+            }
+            return result;
+        }
+
+        public BaseGameEntity GetPassenger(byte seatIndex)
+        {
+            return passengers[seatIndex];
+        }
+
         public void SetPassenger(byte seatIndex, BaseGameEntity gameEntity)
         {
             if (!IsServer)
@@ -124,10 +140,28 @@ namespace MultiplayerARPG
                 return false;
             if (seatIndex < syncPassengerIds.Count)
             {
+                BaseGameEntity passenger;
+                if (Manager.TryGetEntityByObjectId(syncPassengerIds[seatIndex], out passenger))
+                {
+                    passenger.ExitedVehicle(
+                        Seats[seatIndex].exitTransform != null ?
+                        Seats[seatIndex].exitTransform.position :
+                        passenger.CacheTransform.position);
+                }
                 syncPassengerIds[seatIndex] = 0;
                 return true;
             }
             return false;
+        }
+
+        public void RemoveAllPassengers()
+        {
+            if (!IsServer)
+                return;
+            for (byte i = 0; i < syncPassengerIds.Count; ++i)
+            {
+                RemovePassenger(i);
+            }
         }
 
         public bool IsSeatAvailable(byte seatIndex)

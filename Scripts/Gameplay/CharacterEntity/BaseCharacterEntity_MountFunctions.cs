@@ -14,9 +14,9 @@ namespace MultiplayerARPG
 
             lastMountTime = Time.unscaledTime;
 
-            Vector3 enterPosition = CacheTransform.position;
-            if (PassengingVehicle.objectId > 0)
-                enterPosition = ExitVehicle();
+            Vector3 enterPosition = PassengingVehicleEntity != null ?
+                PassengingVehicleEntity.GetTransform().position :
+                CacheTransform.position;
 
             // Instantiate new mount entity
             GameObject spawnObj = Instantiate(mountEntityPrefab.gameObject, enterPosition, Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0));

@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         public Bounds LocalBounds { get; protected set; }
 
         public Bounds WorldBounds { get { return new Bounds(CacheTransform.position + LocalBounds.center, LocalBounds.size); } }
-        
+
         public Transform CacheTransform { get; private set; }
 
         [Tooltip("Transform for position which camera will look at and follow while playing in TPS view mode")]
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                 {
                     passengingVehicleEntity = null;
                     LiteNetLibIdentity identity;
-                    if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(PassengingVehicle.objectId, out identity))
+                    if (Manager.Assets.TryGetSpawnedObject(PassengingVehicle.objectId, out identity))
                     {
                         foundPassengingVehicleEntity = true;
                         passengingVehicleEntity = identity.GetComponent<IVehicleEntity>();
@@ -569,7 +569,7 @@ namespace MultiplayerARPG
         {
             // Call this function at server
             LiteNetLibIdentity identity;
-            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
+            if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
             {
                 IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
                 byte seatIndex;
@@ -583,7 +583,7 @@ namespace MultiplayerARPG
         {
             // Call this function at server
             LiteNetLibIdentity identity;
-            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
+            if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
             {
                 IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
                 if (vehicleEntity != null)
@@ -849,13 +849,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected Vector3 ExitVehicle()
+        protected void ExitVehicle()
         {
-            Vector3 exitPosition = CacheTransform.position;
             if (!IsServer || PassengingVehicleEntity == null)
-                return exitPosition;
+                return;
 
-            BaseGameEntity vehicleEntity = PassengingVehicleEntity.Entity;
             bool isDriver = PassengingVehicleEntity.IsDriver(PassengingVehicle.seatIndex);
             bool isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicle.seatIndex);
 
@@ -863,14 +861,29 @@ namespace MultiplayerARPG
             if (PassengingVehicleEntity.IsDriver(PassengingVehicle.seatIndex))
                 Manager.Assets.SetObjectOwner(PassengingVehicleEntity.GetObjectId(), -1);
 
-            // Remove this from vehicle
-            PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
+            BaseGameEntity vehicleEntity = PassengingVehicleEntity.Entity;
+            if (isDestroying)
+            {
+                // Remove all entity from vehicle
+                PassengingVehicleEntity.RemoveAllPassengers();
+                // Destroy vehicle entity
+                vehicleEntity.NetworkDestroy();
+            }
+            else
+            {
+                // Remove this from vehicle
+                PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
+                // Stop move if driver exit (if not driver continue move by driver controls)
+                if (isDriver)
+                    vehicleEntity.StopMove();
+            }
+        }
 
-            Transform vehicleTransform = PassengingVehicleEntity.GetTransform();
-            exitPosition = vehicleTransform != null ? vehicleTransform.position : CacheTransform.position;
-            if (PassengingVehicleSeat.exitTransform != null)
-                exitPosition = PassengingVehicleSeat.exitTransform.position;
-
+        /// <summary>
+        /// This function will be called by Vehicle Entity to inform that this entity exited vehicle
+        /// </summary>
+        public void ExitedVehicle(Vector3 exitPosition)
+        {
             // Clear passenging vehicle data
             PassengingVehicle = default(PassengingVehicle);
 
@@ -879,19 +892,6 @@ namespace MultiplayerARPG
 
             // Teleport to exit transform
             Teleport(exitPosition);
-
-            if (isDestroying)
-            {
-                // Destroy vehicle entity
-                vehicleEntity.NetworkDestroy();
-            }
-            else if (isDriver)
-            {
-                // Just exit vehicle entity
-                vehicleEntity.StopMove();
-            }
-
-            return exitPosition;
         }
     }
 }
