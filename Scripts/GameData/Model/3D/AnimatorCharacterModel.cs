@@ -499,18 +499,31 @@ namespace MultiplayerARPG
             float moveAnimationSpeedMultiplier = this.moveAnimationSpeedMultiplier;
 
             // Set move speed based on inputs
-            float moveSpeed = 0;
+            bool moving = false;
+            float moveSpeed = 0f;
             if (movementState.HasFlag(MovementState.Forward))
+            {
                 moveSpeed = 1f;
+                moving = true;
+            }
             else if (movementState.HasFlag(MovementState.Backward))
+            {
                 moveSpeed = -1f;
+                moving = true;
+            }
 
             // Set side move speed based on inputs
-            float sideMoveSpeed = 0;
+                float sideMoveSpeed = 0f;
             if (movementState.HasFlag(MovementState.Right))
+            {
                 sideMoveSpeed = 1f;
+                moving = true;
+            }
             else if (movementState.HasFlag(MovementState.Left))
+            {
                 sideMoveSpeed = -1f;
+                moving = true;
+            }
 
             int moveType = 0;
             switch (extraMovementState)
@@ -541,9 +554,14 @@ namespace MultiplayerARPG
             if (movementState.HasFlag(MovementState.IsUnderWater))
                 moveAnimationSpeedMultiplier *= swimMoveAnimSpeedRate;
 
+            // Character may attacking, set character to idle state, 
             // Character is idle, so set move animation speed multiplier to 1
-            if (moveSpeed == 0 && sideMoveSpeed == 0)
+            if (moveAnimationSpeedMultiplier <= 0f || !moving)
+            {
+                moveSpeed = 0f;
+                sideMoveSpeed = 0f;
                 moveAnimationSpeedMultiplier = 1f;
+            }
 
             // Set animator parameters
             float deltaTime = animator.updateMode == AnimatorUpdateMode.AnimatePhysics ? Time.fixedDeltaTime : Time.deltaTime;
