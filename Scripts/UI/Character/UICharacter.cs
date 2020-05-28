@@ -236,16 +236,6 @@ namespace MultiplayerARPG
             cacheDamages = GameDataHelpers.CombineDamages(cacheDamages, showDamageWithBuffs ? Data.GetIncreaseDamages(true, true, cacheSkills) : Data.GetIncreaseDamages(true, false, null));
             cacheStats = cacheStats + (showStatsWithBuffs ? Data.GetStats(true, true, cacheSkills) : Data.GetStats(true, false, null));
 
-            if (!showStatsWithBuffs)
-            {
-                // Prepare base stats, it will be multiplied with increase stats rate
-                CharacterStats baseStats = new CharacterStats();
-                if (Data.GetDatabase() != null)
-                    baseStats += Data.GetDatabase().GetCharacterStats(Data.Level);
-                Dictionary<Attribute, float> baseAttributes = Data.GetCharacterAttributes();
-                baseStats += GameDataHelpers.GetStatsFromAttributes(baseAttributes);
-            }
-
             if (uiTextWeightLimit != null)
             {
                 uiTextWeightLimit.text = string.Format(
@@ -354,7 +344,7 @@ namespace MultiplayerARPG
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {
-                int tempIndexOfAttribute = -1;
+                int tempIndexOfAttribute;
                 CharacterAttribute tempCharacterAttribute;
                 float tempAmount;
                 foreach (Attribute attribute in CacheUICharacterAttributes.Keys)
