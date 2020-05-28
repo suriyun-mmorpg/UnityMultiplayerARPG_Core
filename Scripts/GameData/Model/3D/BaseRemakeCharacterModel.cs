@@ -87,6 +87,231 @@ namespace MultiplayerARPG
         [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillAnimations[] skillAnimations;
 
+        protected override void Awake()
+        {
+            PrepareMissingMovementAnimations();
+            base.Awake();
+        }
+
+        public void PrepareMissingMovementAnimations()
+        {
+            DefaultAnimations tempDefaultAnimations = defaultAnimations;
+            // Move
+            if (tempDefaultAnimations.moveForwardLeftClip == null)
+                tempDefaultAnimations.moveForwardLeftClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.moveForwardRightClip == null)
+                tempDefaultAnimations.moveForwardRightClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.moveLeftClip == null)
+                tempDefaultAnimations.moveLeftClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.moveRightClip == null)
+                tempDefaultAnimations.moveRightClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.moveBackwardClip == null)
+                tempDefaultAnimations.moveBackwardClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.moveBackwardLeftClip == null)
+                tempDefaultAnimations.moveBackwardLeftClip = tempDefaultAnimations.moveBackwardClip;
+            if (tempDefaultAnimations.moveBackwardRightClip == null)
+                tempDefaultAnimations.moveBackwardRightClip = tempDefaultAnimations.moveBackwardClip;
+            // Sprint
+            if (tempDefaultAnimations.sprintClip == null)
+                tempDefaultAnimations.sprintClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.sprintForwardLeftClip == null)
+                tempDefaultAnimations.sprintForwardLeftClip = tempDefaultAnimations.sprintClip;
+            if (tempDefaultAnimations.sprintForwardRightClip == null)
+                tempDefaultAnimations.sprintForwardRightClip = tempDefaultAnimations.sprintClip;
+            if (tempDefaultAnimations.sprintLeftClip == null)
+                tempDefaultAnimations.sprintLeftClip = tempDefaultAnimations.sprintClip;
+            if (tempDefaultAnimations.sprintRightClip == null)
+                tempDefaultAnimations.sprintRightClip = tempDefaultAnimations.sprintClip;
+            if (tempDefaultAnimations.sprintBackwardClip == null)
+                tempDefaultAnimations.sprintBackwardClip = tempDefaultAnimations.sprintClip;
+            if (tempDefaultAnimations.sprintBackwardLeftClip == null)
+                tempDefaultAnimations.sprintBackwardLeftClip = tempDefaultAnimations.sprintBackwardClip;
+            if (tempDefaultAnimations.sprintBackwardRightClip == null)
+                tempDefaultAnimations.sprintBackwardRightClip = tempDefaultAnimations.sprintBackwardClip;
+            // Walk
+            if (tempDefaultAnimations.walkClip == null)
+                tempDefaultAnimations.walkClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.walkForwardLeftClip == null)
+                tempDefaultAnimations.walkForwardLeftClip = tempDefaultAnimations.walkClip;
+            if (tempDefaultAnimations.walkForwardRightClip == null)
+                tempDefaultAnimations.walkForwardRightClip = tempDefaultAnimations.walkClip;
+            if (tempDefaultAnimations.walkLeftClip == null)
+                tempDefaultAnimations.walkLeftClip = tempDefaultAnimations.walkClip;
+            if (tempDefaultAnimations.walkRightClip == null)
+                tempDefaultAnimations.walkRightClip = tempDefaultAnimations.walkClip;
+            if (tempDefaultAnimations.walkBackwardClip == null)
+                tempDefaultAnimations.walkBackwardClip = tempDefaultAnimations.walkClip;
+            if (tempDefaultAnimations.walkBackwardLeftClip == null)
+                tempDefaultAnimations.walkBackwardLeftClip = tempDefaultAnimations.walkBackwardClip;
+            if (tempDefaultAnimations.walkBackwardRightClip == null)
+                tempDefaultAnimations.walkBackwardRightClip = tempDefaultAnimations.walkBackwardClip;
+            // Crouch
+            if (tempDefaultAnimations.crouchMoveClip == null)
+                tempDefaultAnimations.crouchMoveClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.crouchMoveForwardLeftClip == null)
+                tempDefaultAnimations.crouchMoveForwardLeftClip = tempDefaultAnimations.crouchMoveClip;
+            if (tempDefaultAnimations.crouchMoveForwardRightClip == null)
+                tempDefaultAnimations.crouchMoveForwardRightClip = tempDefaultAnimations.crouchMoveClip;
+            if (tempDefaultAnimations.crouchMoveLeftClip == null)
+                tempDefaultAnimations.crouchMoveLeftClip = tempDefaultAnimations.crouchMoveClip;
+            if (tempDefaultAnimations.crouchMoveRightClip == null)
+                tempDefaultAnimations.crouchMoveRightClip = tempDefaultAnimations.crouchMoveClip;
+            if (tempDefaultAnimations.crouchMoveBackwardClip == null)
+                tempDefaultAnimations.crouchMoveBackwardClip = tempDefaultAnimations.crouchMoveClip;
+            if (tempDefaultAnimations.crouchMoveBackwardLeftClip == null)
+                tempDefaultAnimations.crouchMoveBackwardLeftClip = tempDefaultAnimations.crouchMoveBackwardClip;
+            if (tempDefaultAnimations.crouchMoveBackwardRightClip == null)
+                tempDefaultAnimations.crouchMoveBackwardRightClip = tempDefaultAnimations.crouchMoveBackwardClip;
+            // Crawl
+            if (tempDefaultAnimations.crawlMoveClip == null)
+                tempDefaultAnimations.crawlMoveClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.crawlMoveForwardLeftClip == null)
+                tempDefaultAnimations.crawlMoveForwardLeftClip = tempDefaultAnimations.crawlMoveClip;
+            if (tempDefaultAnimations.crawlMoveForwardRightClip == null)
+                tempDefaultAnimations.crawlMoveForwardRightClip = tempDefaultAnimations.crawlMoveClip;
+            if (tempDefaultAnimations.crawlMoveLeftClip == null)
+                tempDefaultAnimations.crawlMoveLeftClip = tempDefaultAnimations.crawlMoveClip;
+            if (tempDefaultAnimations.crawlMoveRightClip == null)
+                tempDefaultAnimations.crawlMoveRightClip = tempDefaultAnimations.crawlMoveClip;
+            if (tempDefaultAnimations.crawlMoveBackwardClip == null)
+                tempDefaultAnimations.crawlMoveBackwardClip = tempDefaultAnimations.crawlMoveClip;
+            if (tempDefaultAnimations.crawlMoveBackwardLeftClip == null)
+                tempDefaultAnimations.crawlMoveBackwardLeftClip = tempDefaultAnimations.crawlMoveBackwardClip;
+            if (tempDefaultAnimations.crawlMoveBackwardRightClip == null)
+                tempDefaultAnimations.crawlMoveBackwardRightClip = tempDefaultAnimations.crawlMoveBackwardClip;
+            // Swim
+            if (tempDefaultAnimations.swimMoveClip == null)
+                tempDefaultAnimations.swimMoveClip = tempDefaultAnimations.moveClip;
+            if (tempDefaultAnimations.swimMoveForwardLeftClip == null)
+                tempDefaultAnimations.swimMoveForwardLeftClip = tempDefaultAnimations.swimMoveClip;
+            if (tempDefaultAnimations.swimMoveForwardRightClip == null)
+                tempDefaultAnimations.swimMoveForwardRightClip = tempDefaultAnimations.swimMoveClip;
+            if (tempDefaultAnimations.swimMoveLeftClip == null)
+                tempDefaultAnimations.swimMoveLeftClip = tempDefaultAnimations.swimMoveClip;
+            if (tempDefaultAnimations.swimMoveRightClip == null)
+                tempDefaultAnimations.swimMoveRightClip = tempDefaultAnimations.swimMoveClip;
+            if (tempDefaultAnimations.swimMoveBackwardClip == null)
+                tempDefaultAnimations.swimMoveBackwardClip = tempDefaultAnimations.swimMoveClip;
+            if (tempDefaultAnimations.swimMoveBackwardLeftClip == null)
+                tempDefaultAnimations.swimMoveBackwardLeftClip = tempDefaultAnimations.swimMoveBackwardClip;
+            if (tempDefaultAnimations.swimMoveBackwardRightClip == null)
+                tempDefaultAnimations.swimMoveBackwardRightClip = tempDefaultAnimations.swimMoveBackwardClip;
+            // Apply
+            defaultAnimations = tempDefaultAnimations;
+
+            // Weapon Animations
+            if (weaponAnimations != null && weaponAnimations.Length > 0)
+            {
+                WeaponAnimations tempWeaponAnimations;
+                for (int i = 0; i < weaponAnimations.Length; ++i)
+                {
+                    tempWeaponAnimations = weaponAnimations[i];
+                    // Move
+                    if (tempWeaponAnimations.moveForwardLeftClip == null)
+                        tempWeaponAnimations.moveForwardLeftClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.moveForwardRightClip == null)
+                        tempWeaponAnimations.moveForwardRightClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.moveLeftClip == null)
+                        tempWeaponAnimations.moveLeftClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.moveRightClip == null)
+                        tempWeaponAnimations.moveRightClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.moveBackwardClip == null)
+                        tempWeaponAnimations.moveBackwardClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.moveBackwardLeftClip == null)
+                        tempWeaponAnimations.moveBackwardLeftClip = tempWeaponAnimations.moveBackwardClip;
+                    if (tempWeaponAnimations.moveBackwardRightClip == null)
+                        tempWeaponAnimations.moveBackwardRightClip = tempWeaponAnimations.moveBackwardClip;
+                    // Sprint
+                    if (tempWeaponAnimations.sprintClip == null)
+                        tempWeaponAnimations.sprintClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.sprintForwardLeftClip == null)
+                        tempWeaponAnimations.sprintForwardLeftClip = tempWeaponAnimations.sprintClip;
+                    if (tempWeaponAnimations.sprintForwardRightClip == null)
+                        tempWeaponAnimations.sprintForwardRightClip = tempWeaponAnimations.sprintClip;
+                    if (tempWeaponAnimations.sprintLeftClip == null)
+                        tempWeaponAnimations.sprintLeftClip = tempWeaponAnimations.sprintClip;
+                    if (tempWeaponAnimations.sprintRightClip == null)
+                        tempWeaponAnimations.sprintRightClip = tempWeaponAnimations.sprintClip;
+                    if (tempWeaponAnimations.sprintBackwardClip == null)
+                        tempWeaponAnimations.sprintBackwardClip = tempWeaponAnimations.sprintClip;
+                    if (tempWeaponAnimations.sprintBackwardLeftClip == null)
+                        tempWeaponAnimations.sprintBackwardLeftClip = tempWeaponAnimations.sprintBackwardClip;
+                    if (tempWeaponAnimations.sprintBackwardRightClip == null)
+                        tempWeaponAnimations.sprintBackwardRightClip = tempWeaponAnimations.sprintBackwardClip;
+                    // Walk
+                    if (tempWeaponAnimations.walkClip == null)
+                        tempWeaponAnimations.walkClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.walkForwardLeftClip == null)
+                        tempWeaponAnimations.walkForwardLeftClip = tempWeaponAnimations.walkClip;
+                    if (tempWeaponAnimations.walkForwardRightClip == null)
+                        tempWeaponAnimations.walkForwardRightClip = tempWeaponAnimations.walkClip;
+                    if (tempWeaponAnimations.walkLeftClip == null)
+                        tempWeaponAnimations.walkLeftClip = tempWeaponAnimations.walkClip;
+                    if (tempWeaponAnimations.walkRightClip == null)
+                        tempWeaponAnimations.walkRightClip = tempWeaponAnimations.walkClip;
+                    if (tempWeaponAnimations.walkBackwardClip == null)
+                        tempWeaponAnimations.walkBackwardClip = tempWeaponAnimations.walkClip;
+                    if (tempWeaponAnimations.walkBackwardLeftClip == null)
+                        tempWeaponAnimations.walkBackwardLeftClip = tempWeaponAnimations.walkBackwardClip;
+                    if (tempWeaponAnimations.walkBackwardRightClip == null)
+                        tempWeaponAnimations.walkBackwardRightClip = tempWeaponAnimations.walkBackwardClip;
+                    // Crouch
+                    if (tempWeaponAnimations.crouchMoveClip == null)
+                        tempWeaponAnimations.crouchMoveClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.crouchMoveForwardLeftClip == null)
+                        tempWeaponAnimations.crouchMoveForwardLeftClip = tempWeaponAnimations.crouchMoveClip;
+                    if (tempWeaponAnimations.crouchMoveForwardRightClip == null)
+                        tempWeaponAnimations.crouchMoveForwardRightClip = tempWeaponAnimations.crouchMoveClip;
+                    if (tempWeaponAnimations.crouchMoveLeftClip == null)
+                        tempWeaponAnimations.crouchMoveLeftClip = tempWeaponAnimations.crouchMoveClip;
+                    if (tempWeaponAnimations.crouchMoveRightClip == null)
+                        tempWeaponAnimations.crouchMoveRightClip = tempWeaponAnimations.crouchMoveClip;
+                    if (tempWeaponAnimations.crouchMoveBackwardClip == null)
+                        tempWeaponAnimations.crouchMoveBackwardClip = tempWeaponAnimations.crouchMoveClip;
+                    if (tempWeaponAnimations.crouchMoveBackwardLeftClip == null)
+                        tempWeaponAnimations.crouchMoveBackwardLeftClip = tempWeaponAnimations.crouchMoveBackwardClip;
+                    if (tempWeaponAnimations.crouchMoveBackwardRightClip == null)
+                        tempWeaponAnimations.crouchMoveBackwardRightClip = tempWeaponAnimations.crouchMoveBackwardClip;
+                    // Crawl
+                    if (tempWeaponAnimations.crawlMoveClip == null)
+                        tempWeaponAnimations.crawlMoveClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.crawlMoveForwardLeftClip == null)
+                        tempWeaponAnimations.crawlMoveForwardLeftClip = tempWeaponAnimations.crawlMoveClip;
+                    if (tempWeaponAnimations.crawlMoveForwardRightClip == null)
+                        tempWeaponAnimations.crawlMoveForwardRightClip = tempWeaponAnimations.crawlMoveClip;
+                    if (tempWeaponAnimations.crawlMoveLeftClip == null)
+                        tempWeaponAnimations.crawlMoveLeftClip = tempWeaponAnimations.crawlMoveClip;
+                    if (tempWeaponAnimations.crawlMoveRightClip == null)
+                        tempWeaponAnimations.crawlMoveRightClip = tempWeaponAnimations.crawlMoveClip;
+                    if (tempWeaponAnimations.crawlMoveBackwardClip == null)
+                        tempWeaponAnimations.crawlMoveBackwardClip = tempWeaponAnimations.crawlMoveClip;
+                    if (tempWeaponAnimations.crawlMoveBackwardLeftClip == null)
+                        tempWeaponAnimations.crawlMoveBackwardLeftClip = tempWeaponAnimations.crawlMoveBackwardClip;
+                    if (tempWeaponAnimations.crawlMoveBackwardRightClip == null)
+                        tempWeaponAnimations.crawlMoveBackwardRightClip = tempWeaponAnimations.crawlMoveBackwardClip;
+                    // Swim
+                    if (tempWeaponAnimations.swimMoveClip == null)
+                        tempWeaponAnimations.swimMoveClip = tempWeaponAnimations.moveClip;
+                    if (tempWeaponAnimations.swimMoveForwardLeftClip == null)
+                        tempWeaponAnimations.swimMoveForwardLeftClip = tempWeaponAnimations.swimMoveClip;
+                    if (tempWeaponAnimations.swimMoveForwardRightClip == null)
+                        tempWeaponAnimations.swimMoveForwardRightClip = tempWeaponAnimations.swimMoveClip;
+                    if (tempWeaponAnimations.swimMoveLeftClip == null)
+                        tempWeaponAnimations.swimMoveLeftClip = tempWeaponAnimations.swimMoveClip;
+                    if (tempWeaponAnimations.swimMoveRightClip == null)
+                        tempWeaponAnimations.swimMoveRightClip = tempWeaponAnimations.swimMoveClip;
+                    if (tempWeaponAnimations.swimMoveBackwardClip == null)
+                        tempWeaponAnimations.swimMoveBackwardClip = tempWeaponAnimations.swimMoveClip;
+                    if (tempWeaponAnimations.swimMoveBackwardLeftClip == null)
+                        tempWeaponAnimations.swimMoveBackwardLeftClip = tempWeaponAnimations.swimMoveBackwardClip;
+                    if (tempWeaponAnimations.swimMoveBackwardRightClip == null)
+                        tempWeaponAnimations.swimMoveBackwardRightClip = tempWeaponAnimations.swimMoveBackwardClip;
+                    // Apply
+                    weaponAnimations[i] = tempWeaponAnimations;
+                }
+            }
+        }
+
         public override void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer)
         {
             base.AddingNewModel(newModel, equipmentContainer);
