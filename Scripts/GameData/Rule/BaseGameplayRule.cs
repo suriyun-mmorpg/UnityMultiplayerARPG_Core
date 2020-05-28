@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public abstract float GetDecreasingWaterPerSeconds(BaseCharacterEntity character);
         public abstract float GetExpLostPercentageWhenDeath(BaseCharacterEntity character);
         public abstract float GetSprintMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetWalkMoveSpeedRate(BaseGameEntity gameEntity);
         public abstract float GetCrouchMoveSpeedRate(BaseGameEntity gameEntity);
         public abstract float GetCrawlMoveSpeedRate(BaseGameEntity gameEntity);
         public abstract float GetSwimMoveSpeedRate(BaseGameEntity gameEntity);

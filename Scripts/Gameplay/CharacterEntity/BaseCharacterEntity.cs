@@ -825,6 +825,9 @@ namespace MultiplayerARPG
                     case ExtraMovementState.IsSprinting:
                         moveSpeed *= CurrentGameplayRule.GetSprintMoveSpeedRate(this);
                         break;
+                    case ExtraMovementState.IsWalking:
+                        moveSpeed *= CurrentGameplayRule.GetWalkMoveSpeedRate(this);
+                        break;
                     case ExtraMovementState.IsCrouching:
                         moveSpeed *= CurrentGameplayRule.GetCrouchMoveSpeedRate(this);
                         break;

@@ -228,13 +228,13 @@ namespace MultiplayerARPG
         {
             Vector3 direction = (destination - CacheEntity.MovementTransform.position).normalized;
             Vector3 position = destination - (direction * (distance - CacheEntity.StoppingDistance));
-            CacheEntity.IsWandering = false;
+            CacheEntity.SetExtraMovement(ExtraMovementState.None);
             CacheEntity.PointClickMovement(position);
         }
 
         public void SetWanderDestination(Vector3 destination)
         {
-            CacheEntity.IsWandering = true;
+            CacheEntity.SetExtraMovement(ExtraMovementState.IsWalking);
             CacheEntity.PointClickMovement(destination);
         }
 

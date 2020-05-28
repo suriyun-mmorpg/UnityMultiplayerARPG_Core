@@ -18,6 +18,8 @@ namespace MultiplayerARPG
         public float staminaDecreasePerSeconds = 5;
         [FormerlySerializedAs("moveSpeedRateWhileSprint")]
         public float moveSpeedRateWhileSprinting = 1.5f;
+        [Header("Walk")]
+        public float moveSpeedRateWhileWalking = 0.5f;
         [Header("Crouch")]
         public float moveSpeedRateWhileCrouching = 0.35f;
         [Header("Crawl")]
@@ -233,6 +235,14 @@ namespace MultiplayerARPG
         {
             // For some gameplay rule, move speed rate may difference for specific entiy type.
             return moveSpeedRateWhileSprinting;
+        }
+
+        public override float GetWalkMoveSpeedRate(BaseGameEntity gameEntity)
+        {
+            // For some gameplay rule, move speed rate may difference for specific entiy type.
+            if (gameEntity is BaseMonsterCharacterEntity)
+                return (gameEntity as BaseMonsterCharacterEntity).MonsterDatabase.wanderMoveSpeed;
+            return moveSpeedRateWhileWalking;
         }
 
         public override float GetCrouchMoveSpeedRate(BaseGameEntity gameEntity)

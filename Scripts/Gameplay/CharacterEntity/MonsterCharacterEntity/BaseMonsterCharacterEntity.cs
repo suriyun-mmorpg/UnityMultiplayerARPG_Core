@@ -78,7 +78,6 @@ namespace MultiplayerARPG
         public override int DataId { get { return MonsterDatabase.DataId; } set { } }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
-        public bool IsWandering { get; set; }
 
         private readonly HashSet<uint> looters = new HashSet<uint>();
 
@@ -182,13 +181,6 @@ namespace MultiplayerARPG
             SetTargetEntity(target.Entity);
         }
 
-        public override float GetMoveSpeed()
-        {
-            if (IsWandering)
-                return MonsterDatabase.wanderMoveSpeed;
-            return base.GetMoveSpeed();
-        }
-        
         public override void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
