@@ -240,8 +240,6 @@ namespace MultiplayerARPG
         public override float GetWalkMoveSpeedRate(BaseGameEntity gameEntity)
         {
             // For some gameplay rule, move speed rate may difference for specific entiy type.
-            if (gameEntity is BaseMonsterCharacterEntity)
-                return (gameEntity as BaseMonsterCharacterEntity).MonsterDatabase.wanderMoveSpeed;
             return moveSpeedRateWhileWalking;
         }
 

@@ -181,6 +181,13 @@ namespace MultiplayerARPG
             SetTargetEntity(target.Entity);
         }
 
+        public override float GetMoveSpeed()
+        {
+            if (ExtraMovementState.HasFlag(ExtraMovementState.IsWalking))
+                return MonsterDatabase.wanderMoveSpeed;
+            return base.GetMoveSpeed();
+        }
+
         public override void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
