@@ -344,7 +344,7 @@ namespace MultiplayerARPG
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {
-                int tempIndexOfAttribute;
+                int tempIndexOfAttribute = -1;
                 CharacterAttribute tempCharacterAttribute;
                 float tempAmount;
                 foreach (Attribute attribute in CacheUICharacterAttributes.Keys)

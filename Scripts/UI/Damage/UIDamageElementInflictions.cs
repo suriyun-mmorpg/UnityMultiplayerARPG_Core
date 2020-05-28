@@ -67,14 +67,11 @@ namespace MultiplayerARPG
                 string tempAmountText;
                 foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
-                    if (dataEntry.Key == null || dataEntry.Value == 0)
+                    if (dataEntry.Key == null)
                         continue;
                     // Set temp data
                     tempElement = dataEntry.Key;
                     tempInfliction = dataEntry.Value;
-                    // Add new line if text is not empty
-                    if (!string.IsNullOrEmpty(tempAllText))
-                        tempAllText += "\n";
                     // Set current elemental damage infliction text
                     tempAmountText = string.Format(
                         tempElement == GameInstance.Singleton.DefaultDamageElement ?
@@ -83,7 +80,13 @@ namespace MultiplayerARPG
                         tempElement.Title,
                         (tempInfliction * 100f).ToString("N0"));
                     // Append current elemental damage infliction text
-                    tempAllText += tempAmountText;
+                    if (dataEntry.Value != 0)
+                    {
+                        // Add new line if text is not empty
+                        if (!string.IsNullOrEmpty(tempAllText))
+                            tempAllText += "\n";
+                        tempAllText += tempAmountText;
+                    }
                     // Set current elemental damage infliction text to UI
                     TextWrapper textDamages;
                     if (CacheTextInflictions.TryGetValue(dataEntry.Key, out textDamages))

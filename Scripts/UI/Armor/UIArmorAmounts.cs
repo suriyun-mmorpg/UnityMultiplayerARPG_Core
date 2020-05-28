@@ -66,14 +66,11 @@ namespace MultiplayerARPG
                 TextWrapper tempTextWarpper;
                 foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
-                    if (dataEntry.Key == null || dataEntry.Value == 0)
+                    if (dataEntry.Key == null)
                         continue;
                     // Set temp data
                     tempElement = dataEntry.Key;
                     tempAmount = dataEntry.Value;
-                    // Add new line if text is not empty
-                    if (!string.IsNullOrEmpty(tempAllText))
-                        tempAllText += "\n";
                     // Set current elemental armor text
                     if (isBonus)
                         tempValue = tempAmount.ToBonusString("N0");
@@ -84,7 +81,13 @@ namespace MultiplayerARPG
                         tempElement.Title,
                         tempValue);
                     // Append current elemental armor text
-                    tempAllText += tempAmountText;
+                    if (dataEntry.Value != 0)
+                    {
+                        // Add new line if text is not empty
+                        if (!string.IsNullOrEmpty(tempAllText))
+                            tempAllText += "\n";
+                        tempAllText += tempAmountText;
+                    }
                     // Set current elemental armor text to UI
                     if (CacheTextAmounts.TryGetValue(dataEntry.Key, out tempTextWarpper))
                         tempTextWarpper.text = tempAmountText;

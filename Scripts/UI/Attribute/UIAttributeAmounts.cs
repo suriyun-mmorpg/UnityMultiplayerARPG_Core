@@ -78,15 +78,12 @@ namespace MultiplayerARPG
                 TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<Attribute, float> dataEntry in Data)
                 {
-                    if (dataEntry.Key == null || dataEntry.Value == 0)
+                    if (dataEntry.Key == null)
                         continue;
                     // Set temp data
                     tempAttribute = dataEntry.Key;
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
-                    // Add new line if text is not empty
-                    if (!string.IsNullOrEmpty(tempAllText))
-                        tempAllText += "\n";
                     // Get attribute amount from character
                     if (owningCharacter != null)
                         owningCharacter.GetCaches().Attributes.TryGetValue(tempAttribute, out tempCurrentAmount);
@@ -126,7 +123,13 @@ namespace MultiplayerARPG
                             break;
                     }
                     // Append current attribute amount text
-                    tempAllText += tempAmountText;
+                    if (dataEntry.Value != 0)
+                    {
+                        // Add new line if text is not empty
+                        if (!string.IsNullOrEmpty(tempAllText))
+                            tempAllText += "\n";
+                        tempAllText += tempAmountText;
+                    }
                     // Set current attribute text to UI
                     if (CacheTextAmounts.TryGetValue(tempAttribute, out tempTextWrapper))
                         tempTextWrapper.text = tempAmountText;

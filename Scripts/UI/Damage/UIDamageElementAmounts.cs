@@ -81,14 +81,11 @@ namespace MultiplayerARPG
                 TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> dataEntry in Data)
                 {
-                    if (dataEntry.Key == null || (dataEntry.Value.min == 0 && dataEntry.Value.max == 0))
+                    if (dataEntry.Key == null)
                         continue;
                     // Set temp data
                     tempElement = dataEntry.Key;
                     tempAmount = dataEntry.Value;
-                    // Add new line if text is not empty
-                    if (!string.IsNullOrEmpty(tempAllText))
-                        tempAllText += "\n";
                     // Set current elemental damage text
                     if (isBonus)
                         tempMinValue = tempAmount.min.ToBonusString("N0");
@@ -101,7 +98,13 @@ namespace MultiplayerARPG
                         tempMinValue,
                         tempMaxValue);
                     // Append current elemental damage text
-                    tempAllText += tempAmountText;
+                    if (dataEntry.Value.min != 0 || dataEntry.Value.max != 0)
+                    {
+                        // Add new line if text is not empty
+                        if (!string.IsNullOrEmpty(tempAllText))
+                            tempAllText += "\n";
+                        tempAllText += tempAmountText;
+                    }
                     // Set current elemental damage text to UI
                     if (CacheTextDamages.TryGetValue(dataEntry.Key, out tempTextWrapper))
                         tempTextWrapper.text = tempAmountText;

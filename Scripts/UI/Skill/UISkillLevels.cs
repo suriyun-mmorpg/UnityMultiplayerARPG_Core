@@ -73,7 +73,7 @@ namespace MultiplayerARPG
                 TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<BaseSkill, short> dataEntry in Data)
                 {
-                    if (dataEntry.Key == null || dataEntry.Value == 0)
+                    if (dataEntry.Key == null)
                         continue;
                     // Set temp data
                     tempSkill = dataEntry.Key;
@@ -81,9 +81,6 @@ namespace MultiplayerARPG
                     tempTargetLevel = dataEntry.Value;
                     string tempCurrentValue;
                     string tempTargetValue;
-                    // Add new line if text is not empty
-                    if (!string.IsNullOrEmpty(tempAllText))
-                        tempAllText += "\n";
                     // Get skill level from character
                     if (owningCharacter != null)
                         owningCharacter.GetCaches().Skills.TryGetValue(tempSkill, out tempCurrentLevel);
@@ -112,7 +109,13 @@ namespace MultiplayerARPG
                             break;
                     }
                     // Append current skill level text
-                    tempAllText += tempLevelText;
+                    if (dataEntry.Value != 0)
+                    {
+                        // Add new line if text is not empty
+                        if (!string.IsNullOrEmpty(tempAllText))
+                            tempAllText += "\n";
+                        tempAllText += tempLevelText;
+                    }
                     // Set current skill text to UI
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempTextWrapper))
                         tempTextWrapper.text = tempLevelText;

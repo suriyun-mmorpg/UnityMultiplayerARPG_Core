@@ -74,15 +74,12 @@ namespace MultiplayerARPG
                 TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<BaseItem, short> dataEntry in Data)
                 {
-                    if (dataEntry.Key == null || dataEntry.Value == 0)
+                    if (dataEntry.Key == null)
                         continue;
                     // Set temp data
                     tempItem = dataEntry.Key;
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
-                    // Add new line if text is not empty
-                    if (!string.IsNullOrEmpty(tempAllText))
-                        tempAllText += "\n";
                     // Get item amount from character
                     if (owningCharacter != null)
                         tempCurrentAmount = owningCharacter.CountNonEquipItems(tempItem.DataId);
@@ -104,7 +101,13 @@ namespace MultiplayerARPG
                             tempTargetAmount.ToString("N0"));
                     }
                     // Append current item amount text
-                    tempAllText += tempAmountText;
+                    if (dataEntry.Value != 0)
+                    {
+                        // Add new line if text is not empty
+                        if (!string.IsNullOrEmpty(tempAllText))
+                            tempAllText += "\n";
+                        tempAllText += tempAmountText;
+                    }
                     // Set current item text to UI
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempTextWrapper))
                         tempTextWrapper.text = tempAmountText;
