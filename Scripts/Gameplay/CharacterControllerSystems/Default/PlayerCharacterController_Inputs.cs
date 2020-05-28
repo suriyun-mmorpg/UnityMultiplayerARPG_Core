@@ -414,8 +414,7 @@ namespace MultiplayerARPG
             MovementState movementState = MovementState.Forward;
             if (InputManager.GetButtonDown("Jump"))
                 movementState |= MovementState.IsJump;
-            if (moveDirection.sqrMagnitude > 0f)
-                PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
+            PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 
         protected void UpdateWASDAttack()
