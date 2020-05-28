@@ -65,7 +65,9 @@ namespace MultiplayerARPG
 
         public override void SetDefaultAnimations()
         {
-            SetupClips(defaultAnimations.idleClip,
+            SetupClips(
+                // Move
+                defaultAnimations.idleClip,
                 defaultAnimations.moveClip,
                 defaultAnimations.moveBackwardClip,
                 defaultAnimations.moveLeftClip,
@@ -74,6 +76,7 @@ namespace MultiplayerARPG
                 defaultAnimations.moveForwardRightClip,
                 defaultAnimations.moveBackwardLeftClip,
                 defaultAnimations.moveBackwardRightClip,
+                // Sprint
                 defaultAnimations.sprintClip,
                 defaultAnimations.sprintBackwardClip,
                 defaultAnimations.sprintLeftClip,
@@ -82,6 +85,16 @@ namespace MultiplayerARPG
                 defaultAnimations.sprintForwardRightClip,
                 defaultAnimations.sprintBackwardLeftClip,
                 defaultAnimations.sprintBackwardRightClip,
+                // Walk
+                defaultAnimations.walkClip,
+                defaultAnimations.walkBackwardClip,
+                defaultAnimations.walkLeftClip,
+                defaultAnimations.walkRightClip,
+                defaultAnimations.walkForwardLeftClip,
+                defaultAnimations.walkForwardRightClip,
+                defaultAnimations.walkBackwardLeftClip,
+                defaultAnimations.walkBackwardRightClip,
+                // Crouch
                 defaultAnimations.crouchIdleClip,
                 defaultAnimations.crouchMoveClip,
                 defaultAnimations.crouchMoveBackwardClip,
@@ -91,6 +104,7 @@ namespace MultiplayerARPG
                 defaultAnimations.crouchMoveForwardRightClip,
                 defaultAnimations.crouchMoveBackwardLeftClip,
                 defaultAnimations.crouchMoveBackwardRightClip,
+                // Crawl
                 defaultAnimations.crawlIdleClip,
                 defaultAnimations.crawlMoveClip,
                 defaultAnimations.crawlMoveBackwardClip,
@@ -100,6 +114,7 @@ namespace MultiplayerARPG
                 defaultAnimations.crawlMoveForwardRightClip,
                 defaultAnimations.crawlMoveBackwardLeftClip,
                 defaultAnimations.crawlMoveBackwardRightClip,
+                // Swim
                 defaultAnimations.swimIdleClip,
                 defaultAnimations.swimMoveClip,
                 defaultAnimations.swimMoveBackwardClip,
@@ -109,6 +124,7 @@ namespace MultiplayerARPG
                 defaultAnimations.swimMoveForwardRightClip,
                 defaultAnimations.swimMoveBackwardLeftClip,
                 defaultAnimations.swimMoveBackwardRightClip,
+                // Other
                 defaultAnimations.jumpClip,
                 defaultAnimations.fallClip,
                 defaultAnimations.hurtClip,
@@ -117,58 +133,74 @@ namespace MultiplayerARPG
         }
 
         private void SetupClips(
-                AnimationClip idleClip,
-                AnimationClip moveClip,
-                AnimationClip moveBackwardClip,
-                AnimationClip moveLeftClip,
-                AnimationClip moveRightClip,
-                AnimationClip moveForwardLeftClip,
-                AnimationClip moveForwardRightClip,
-                AnimationClip moveBackwardLeftClip,
-                AnimationClip moveBackwardRightClip,
-                AnimationClip sprintClip,
-                AnimationClip sprintBackwardClip,
-                AnimationClip sprintLeftClip,
-                AnimationClip sprintRightClip,
-                AnimationClip sprintForwardLeftClip,
-                AnimationClip sprintForwardRightClip,
-                AnimationClip sprintBackwardLeftClip,
-                AnimationClip sprintBackwardRightClip,
-                AnimationClip crouchIdleClip,
-                AnimationClip crouchMoveClip,
-                AnimationClip crouchMoveBackwardClip,
-                AnimationClip crouchMoveLeftClip,
-                AnimationClip crouchMoveRightClip,
-                AnimationClip crouchMoveForwardLeftClip,
-                AnimationClip crouchMoveForwardRightClip,
-                AnimationClip crouchMoveBackwardLeftClip,
-                AnimationClip crouchMoveBackwardRightClip,
-                AnimationClip crawlIdleClip,
-                AnimationClip crawlMoveClip,
-                AnimationClip crawlMoveBackwardClip,
-                AnimationClip crawlMoveLeftClip,
-                AnimationClip crawlMoveRightClip,
-                AnimationClip crawlMoveForwardLeftClip,
-                AnimationClip crawlMoveForwardRightClip,
-                AnimationClip crawlMoveBackwardLeftClip,
-                AnimationClip crawlMoveBackwardRightClip,
-                AnimationClip swimIdleClip,
-                AnimationClip swimMoveClip,
-                AnimationClip swimMoveBackwardClip,
-                AnimationClip swimMoveLeftClip,
-                AnimationClip swimMoveRightClip,
-                AnimationClip swimMoveForwardLeftClip,
-                AnimationClip swimMoveForwardRightClip,
-                AnimationClip swimMoveBackwardLeftClip,
-                AnimationClip swimMoveBackwardRightClip,
-                AnimationClip jumpClip,
-                AnimationClip fallClip,
-                AnimationClip hurtClip,
-                AnimationClip deadClip)
+            // Move
+            AnimationClip idleClip,
+            AnimationClip moveClip,
+            AnimationClip moveBackwardClip,
+            AnimationClip moveLeftClip,
+            AnimationClip moveRightClip,
+            AnimationClip moveForwardLeftClip,
+            AnimationClip moveForwardRightClip,
+            AnimationClip moveBackwardLeftClip,
+            AnimationClip moveBackwardRightClip,
+            // Sprint
+            AnimationClip sprintClip,
+            AnimationClip sprintBackwardClip,
+            AnimationClip sprintLeftClip,
+            AnimationClip sprintRightClip,
+            AnimationClip sprintForwardLeftClip,
+            AnimationClip sprintForwardRightClip,
+            AnimationClip sprintBackwardLeftClip,
+            AnimationClip sprintBackwardRightClip,
+            // Walk
+            AnimationClip walkClip,
+            AnimationClip walkBackwardClip,
+            AnimationClip walkLeftClip,
+            AnimationClip walkRightClip,
+            AnimationClip walkForwardLeftClip,
+            AnimationClip walkForwardRightClip,
+            AnimationClip walkBackwardLeftClip,
+            AnimationClip walkBackwardRightClip,
+            // Crouch
+            AnimationClip crouchIdleClip,
+            AnimationClip crouchMoveClip,
+            AnimationClip crouchMoveBackwardClip,
+            AnimationClip crouchMoveLeftClip,
+            AnimationClip crouchMoveRightClip,
+            AnimationClip crouchMoveForwardLeftClip,
+            AnimationClip crouchMoveForwardRightClip,
+            AnimationClip crouchMoveBackwardLeftClip,
+            AnimationClip crouchMoveBackwardRightClip,
+            // Crawl
+            AnimationClip crawlIdleClip,
+            AnimationClip crawlMoveClip,
+            AnimationClip crawlMoveBackwardClip,
+            AnimationClip crawlMoveLeftClip,
+            AnimationClip crawlMoveRightClip,
+            AnimationClip crawlMoveForwardLeftClip,
+            AnimationClip crawlMoveForwardRightClip,
+            AnimationClip crawlMoveBackwardLeftClip,
+            AnimationClip crawlMoveBackwardRightClip,
+            // Swim
+            AnimationClip swimIdleClip,
+            AnimationClip swimMoveClip,
+            AnimationClip swimMoveBackwardClip,
+            AnimationClip swimMoveLeftClip,
+            AnimationClip swimMoveRightClip,
+            AnimationClip swimMoveForwardLeftClip,
+            AnimationClip swimMoveForwardRightClip,
+            AnimationClip swimMoveBackwardLeftClip,
+            AnimationClip swimMoveBackwardRightClip,
+            // Other
+            AnimationClip jumpClip,
+            AnimationClip fallClip,
+            AnimationClip hurtClip,
+            AnimationClip deadClip)
         {
             if (legacyAnimation == null)
                 return;
             // Remove clips
+            // Move
             if (legacyAnimation.GetClip(CLIP_IDLE) != null)
                 legacyAnimation.RemoveClip(CLIP_IDLE);
             if (legacyAnimation.GetClip(CLIP_MOVE) != null)
@@ -187,6 +219,7 @@ namespace MultiplayerARPG
                 legacyAnimation.RemoveClip(CLIP_MOVE_BACKWARD_LEFT);
             if (legacyAnimation.GetClip(CLIP_MOVE_BACKWARD_RIGHT) != null)
                 legacyAnimation.RemoveClip(CLIP_MOVE_BACKWARD_RIGHT);
+            // Sprint
             if (legacyAnimation.GetClip(CLIP_SPRINT) != null)
                 legacyAnimation.RemoveClip(CLIP_SPRINT);
             if (legacyAnimation.GetClip(CLIP_SPRINT_BACKWARD) != null)
@@ -203,6 +236,24 @@ namespace MultiplayerARPG
                 legacyAnimation.RemoveClip(CLIP_SPRINT_BACKWARD_LEFT);
             if (legacyAnimation.GetClip(CLIP_SPRINT_BACKWARD_RIGHT) != null)
                 legacyAnimation.RemoveClip(CLIP_SPRINT_BACKWARD_RIGHT);
+            // Walk
+            if (legacyAnimation.GetClip(CLIP_WALK) != null)
+                legacyAnimation.RemoveClip(CLIP_WALK);
+            if (legacyAnimation.GetClip(CLIP_WALK_BACKWARD) != null)
+                legacyAnimation.RemoveClip(CLIP_WALK_BACKWARD);
+            if (legacyAnimation.GetClip(CLIP_WALK_LEFT) != null)
+                legacyAnimation.RemoveClip(CLIP_WALK_LEFT);
+            if (legacyAnimation.GetClip(CLIP_WALK_RIGHT) != null)
+                legacyAnimation.RemoveClip(CLIP_WALK_RIGHT);
+            if (legacyAnimation.GetClip(CLIP_WALK_FORWARD_LEFT) != null)
+                legacyAnimation.RemoveClip(CLIP_WALK_FORWARD_LEFT);
+            if (legacyAnimation.GetClip(CLIP_WALK_FORWARD_RIGHT) != null)
+                legacyAnimation.RemoveClip(CLIP_WALK_FORWARD_RIGHT);
+            if (legacyAnimation.GetClip(CLIP_WALK_BACKWARD_LEFT) != null)
+                legacyAnimation.RemoveClip(CLIP_WALK_BACKWARD_LEFT);
+            if (legacyAnimation.GetClip(CLIP_WALK_BACKWARD_RIGHT) != null)
+                legacyAnimation.RemoveClip(CLIP_WALK_BACKWARD_RIGHT);
+            // Crouch
             if (legacyAnimation.GetClip(CLIP_CROUCH_IDLE) != null)
                 legacyAnimation.RemoveClip(CLIP_CROUCH_IDLE);
             if (legacyAnimation.GetClip(CLIP_CROUCH_MOVE) != null)
@@ -221,6 +272,7 @@ namespace MultiplayerARPG
                 legacyAnimation.RemoveClip(CLIP_CROUCH_MOVE_BACKWARD_LEFT);
             if (legacyAnimation.GetClip(CLIP_CROUCH_MOVE_BACKWARD_RIGHT) != null)
                 legacyAnimation.RemoveClip(CLIP_CROUCH_MOVE_BACKWARD_RIGHT);
+            // Crawl
             if (legacyAnimation.GetClip(CLIP_CRAWL_IDLE) != null)
                 legacyAnimation.RemoveClip(CLIP_CRAWL_IDLE);
             if (legacyAnimation.GetClip(CLIP_CRAWL_MOVE) != null)
@@ -239,6 +291,7 @@ namespace MultiplayerARPG
                 legacyAnimation.RemoveClip(CLIP_CRAWL_MOVE_BACKWARD_LEFT);
             if (legacyAnimation.GetClip(CLIP_CRAWL_MOVE_BACKWARD_RIGHT) != null)
                 legacyAnimation.RemoveClip(CLIP_CRAWL_MOVE_BACKWARD_RIGHT);
+            // Swim
             if (legacyAnimation.GetClip(CLIP_SWIM_IDLE) != null)
                 legacyAnimation.RemoveClip(CLIP_SWIM_IDLE);
             if (legacyAnimation.GetClip(CLIP_SWIM_MOVE) != null)
@@ -257,6 +310,7 @@ namespace MultiplayerARPG
                 legacyAnimation.RemoveClip(CLIP_SWIM_MOVE_BACKWARD_LEFT);
             if (legacyAnimation.GetClip(CLIP_SWIM_MOVE_BACKWARD_RIGHT) != null)
                 legacyAnimation.RemoveClip(CLIP_SWIM_MOVE_BACKWARD_RIGHT);
+            // Other
             if (legacyAnimation.GetClip(CLIP_JUMP) != null)
                 legacyAnimation.RemoveClip(CLIP_JUMP);
             if (legacyAnimation.GetClip(CLIP_FALL) != null)
@@ -266,6 +320,7 @@ namespace MultiplayerARPG
             if (legacyAnimation.GetClip(CLIP_DEAD) != null)
                 legacyAnimation.RemoveClip(CLIP_DEAD);
             // Setup generic clips
+            // Move
             legacyAnimation.AddClip(idleClip != null ? idleClip : defaultAnimations.idleClip, CLIP_IDLE);
             legacyAnimation.AddClip(moveClip != null ? moveClip : defaultAnimations.moveClip, CLIP_MOVE);
             legacyAnimation.AddClip(moveBackwardClip != null ? moveBackwardClip : defaultAnimations.moveBackwardClip, CLIP_MOVE_BACKWARD);
@@ -275,6 +330,7 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(moveForwardRightClip != null ? moveForwardRightClip : defaultAnimations.moveForwardRightClip, CLIP_MOVE_FORWARD_RIGHT);
             legacyAnimation.AddClip(moveBackwardLeftClip != null ? moveBackwardLeftClip : defaultAnimations.moveBackwardLeftClip, CLIP_MOVE_BACKWARD_LEFT);
             legacyAnimation.AddClip(moveBackwardRightClip != null ? moveBackwardRightClip : defaultAnimations.moveBackwardRightClip, CLIP_MOVE_BACKWARD_RIGHT);
+            // Sprint
             legacyAnimation.AddClip(sprintClip != null ? sprintClip : defaultAnimations.sprintClip, CLIP_SPRINT);
             legacyAnimation.AddClip(sprintBackwardClip != null ? sprintBackwardClip : defaultAnimations.sprintBackwardClip, CLIP_SPRINT_BACKWARD);
             legacyAnimation.AddClip(sprintLeftClip != null ? sprintLeftClip : defaultAnimations.sprintLeftClip, CLIP_SPRINT_LEFT);
@@ -283,6 +339,16 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(sprintForwardRightClip != null ? sprintForwardRightClip : defaultAnimations.sprintForwardRightClip, CLIP_SPRINT_FORWARD_RIGHT);
             legacyAnimation.AddClip(sprintBackwardLeftClip != null ? sprintBackwardLeftClip : defaultAnimations.sprintBackwardLeftClip, CLIP_SPRINT_BACKWARD_LEFT);
             legacyAnimation.AddClip(sprintBackwardRightClip != null ? sprintBackwardRightClip : defaultAnimations.sprintBackwardRightClip, CLIP_SPRINT_BACKWARD_RIGHT);
+            // Walk
+            legacyAnimation.AddClip(walkClip != null ? walkClip : defaultAnimations.walkClip, CLIP_WALK);
+            legacyAnimation.AddClip(walkBackwardClip != null ? walkBackwardClip : defaultAnimations.walkBackwardClip, CLIP_WALK_BACKWARD);
+            legacyAnimation.AddClip(walkLeftClip != null ? walkLeftClip : defaultAnimations.walkLeftClip, CLIP_WALK_LEFT);
+            legacyAnimation.AddClip(walkRightClip != null ? walkRightClip : defaultAnimations.walkRightClip, CLIP_WALK_RIGHT);
+            legacyAnimation.AddClip(walkForwardLeftClip != null ? walkForwardLeftClip : defaultAnimations.walkForwardLeftClip, CLIP_WALK_FORWARD_LEFT);
+            legacyAnimation.AddClip(walkForwardRightClip != null ? walkForwardRightClip : defaultAnimations.walkForwardRightClip, CLIP_WALK_FORWARD_RIGHT);
+            legacyAnimation.AddClip(walkBackwardLeftClip != null ? walkBackwardLeftClip : defaultAnimations.walkBackwardLeftClip, CLIP_WALK_BACKWARD_LEFT);
+            legacyAnimation.AddClip(walkBackwardRightClip != null ? walkBackwardRightClip : defaultAnimations.walkBackwardRightClip, CLIP_WALK_BACKWARD_RIGHT);
+            // Crouch
             legacyAnimation.AddClip(crouchIdleClip != null ? crouchIdleClip : defaultAnimations.crouchIdleClip, CLIP_CROUCH_IDLE);
             legacyAnimation.AddClip(crouchMoveClip != null ? crouchMoveClip : defaultAnimations.crouchMoveClip, CLIP_CROUCH_MOVE);
             legacyAnimation.AddClip(crouchMoveBackwardClip != null ? crouchMoveBackwardClip : defaultAnimations.crouchMoveBackwardClip, CLIP_CROUCH_MOVE_BACKWARD);
@@ -292,6 +358,7 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(crouchMoveForwardRightClip != null ? crouchMoveForwardRightClip : defaultAnimations.crouchMoveForwardRightClip, CLIP_CROUCH_MOVE_FORWARD_RIGHT);
             legacyAnimation.AddClip(crouchMoveBackwardLeftClip != null ? crouchMoveBackwardLeftClip : defaultAnimations.crouchMoveBackwardLeftClip, CLIP_CROUCH_MOVE_BACKWARD_LEFT);
             legacyAnimation.AddClip(crouchMoveBackwardRightClip != null ? crouchMoveBackwardRightClip : defaultAnimations.crouchMoveBackwardRightClip, CLIP_CROUCH_MOVE_BACKWARD_RIGHT);
+            // Crawl
             legacyAnimation.AddClip(crawlIdleClip != null ? crawlIdleClip : defaultAnimations.crawlIdleClip, CLIP_CRAWL_IDLE);
             legacyAnimation.AddClip(crawlMoveClip != null ? crawlMoveClip : defaultAnimations.crawlMoveClip, CLIP_CRAWL_MOVE);
             legacyAnimation.AddClip(crawlMoveBackwardClip != null ? crawlMoveBackwardClip : defaultAnimations.crawlMoveBackwardClip, CLIP_CRAWL_MOVE_BACKWARD);
@@ -301,6 +368,7 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(crawlMoveForwardRightClip != null ? crawlMoveForwardRightClip : defaultAnimations.crawlMoveForwardRightClip, CLIP_CRAWL_MOVE_FORWARD_RIGHT);
             legacyAnimation.AddClip(crawlMoveBackwardLeftClip != null ? crawlMoveBackwardLeftClip : defaultAnimations.crawlMoveBackwardLeftClip, CLIP_CRAWL_MOVE_BACKWARD_LEFT);
             legacyAnimation.AddClip(crawlMoveBackwardRightClip != null ? crawlMoveBackwardRightClip : defaultAnimations.crawlMoveBackwardRightClip, CLIP_CRAWL_MOVE_BACKWARD_RIGHT);
+            // Swim
             legacyAnimation.AddClip(swimIdleClip != null ? swimIdleClip : defaultAnimations.swimIdleClip, CLIP_SWIM_IDLE);
             legacyAnimation.AddClip(swimMoveClip != null ? swimMoveClip : defaultAnimations.swimMoveClip, CLIP_SWIM_MOVE);
             legacyAnimation.AddClip(swimMoveBackwardClip != null ? swimMoveBackwardClip : defaultAnimations.swimMoveBackwardClip, CLIP_SWIM_MOVE_BACKWARD);
@@ -310,6 +378,7 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(swimMoveForwardRightClip != null ? swimMoveForwardRightClip : defaultAnimations.swimMoveForwardRightClip, CLIP_SWIM_MOVE_FORWARD_RIGHT);
             legacyAnimation.AddClip(swimMoveBackwardLeftClip != null ? swimMoveBackwardLeftClip : defaultAnimations.swimMoveBackwardLeftClip, CLIP_SWIM_MOVE_BACKWARD_LEFT);
             legacyAnimation.AddClip(swimMoveBackwardRightClip != null ? swimMoveBackwardRightClip : defaultAnimations.swimMoveBackwardRightClip, CLIP_SWIM_MOVE_BACKWARD_RIGHT);
+            // Other
             legacyAnimation.AddClip(jumpClip != null ? jumpClip : defaultAnimations.jumpClip, CLIP_JUMP);
             legacyAnimation.AddClip(fallClip != null ? fallClip : defaultAnimations.fallClip, CLIP_FALL);
             legacyAnimation.AddClip(hurtClip != null ? hurtClip : defaultAnimations.hurtClip, CLIP_HURT);
@@ -335,7 +404,9 @@ namespace MultiplayerARPG
             WeaponAnimations weaponAnimations = default(WeaponAnimations);
             GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
 
-            SetupClips(weaponAnimations.idleClip,
+            SetupClips(
+                // Move
+                weaponAnimations.idleClip,
                 weaponAnimations.moveClip,
                 weaponAnimations.moveBackwardClip,
                 weaponAnimations.moveLeftClip,
@@ -344,6 +415,7 @@ namespace MultiplayerARPG
                 weaponAnimations.moveForwardRightClip,
                 weaponAnimations.moveBackwardLeftClip,
                 weaponAnimations.moveBackwardRightClip,
+                // Sprint
                 weaponAnimations.sprintClip,
                 weaponAnimations.sprintBackwardClip,
                 weaponAnimations.sprintLeftClip,
@@ -352,6 +424,16 @@ namespace MultiplayerARPG
                 weaponAnimations.sprintForwardRightClip,
                 weaponAnimations.sprintBackwardLeftClip,
                 weaponAnimations.sprintBackwardRightClip,
+                // Walk
+                weaponAnimations.walkClip,
+                weaponAnimations.walkBackwardClip,
+                weaponAnimations.walkLeftClip,
+                weaponAnimations.walkRightClip,
+                weaponAnimations.walkForwardLeftClip,
+                weaponAnimations.walkForwardRightClip,
+                weaponAnimations.walkBackwardLeftClip,
+                weaponAnimations.walkBackwardRightClip,
+                // Crouch
                 weaponAnimations.crouchIdleClip,
                 weaponAnimations.crouchMoveClip,
                 weaponAnimations.crouchMoveBackwardClip,
@@ -361,6 +443,7 @@ namespace MultiplayerARPG
                 weaponAnimations.crouchMoveForwardRightClip,
                 weaponAnimations.crouchMoveBackwardLeftClip,
                 weaponAnimations.crouchMoveBackwardRightClip,
+                // Crawl
                 weaponAnimations.crawlIdleClip,
                 weaponAnimations.crawlMoveClip,
                 weaponAnimations.crawlMoveBackwardClip,
@@ -370,6 +453,7 @@ namespace MultiplayerARPG
                 weaponAnimations.crawlMoveForwardRightClip,
                 weaponAnimations.crawlMoveBackwardLeftClip,
                 weaponAnimations.crawlMoveBackwardRightClip,
+                // Swim
                 weaponAnimations.swimIdleClip,
                 weaponAnimations.swimMoveClip,
                 weaponAnimations.swimMoveBackwardClip,
@@ -379,6 +463,7 @@ namespace MultiplayerARPG
                 weaponAnimations.swimMoveForwardRightClip,
                 weaponAnimations.swimMoveBackwardLeftClip,
                 weaponAnimations.swimMoveBackwardRightClip,
+                // Other
                 weaponAnimations.jumpClip,
                 weaponAnimations.fallClip,
                 weaponAnimations.hurtClip,
@@ -412,6 +497,10 @@ namespace MultiplayerARPG
                         case ExtraMovementState.IsSprinting:
                             CrossFadeMoveAnimaton(CLIP_IDLE, CLIP_SPRINT, CLIP_SPRINT_BACKWARD, CLIP_SPRINT_LEFT, CLIP_SPRINT_RIGHT,
                                 CLIP_SPRINT_FORWARD_LEFT, CLIP_SPRINT_FORWARD_RIGHT, CLIP_SPRINT_BACKWARD_LEFT, CLIP_SPRINT_BACKWARD_RIGHT);
+                            break;
+                        case ExtraMovementState.IsWalking:
+                            CrossFadeMoveAnimaton(CLIP_IDLE, CLIP_WALK, CLIP_WALK_BACKWARD, CLIP_WALK_LEFT, CLIP_WALK_RIGHT,
+                                CLIP_WALK_FORWARD_LEFT, CLIP_WALK_FORWARD_RIGHT, CLIP_WALK_BACKWARD_LEFT, CLIP_WALK_BACKWARD_RIGHT);
                             break;
                         case ExtraMovementState.IsCrouching:
                             CrossFadeMoveAnimaton(CLIP_CROUCH_IDLE, CLIP_CROUCH_MOVE, CLIP_CROUCH_MOVE_BACKWARD, CLIP_CROUCH_MOVE_LEFT, CLIP_CROUCH_MOVE_RIGHT,

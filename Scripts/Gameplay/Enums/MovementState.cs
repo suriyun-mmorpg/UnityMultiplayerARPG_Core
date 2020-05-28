@@ -18,7 +18,8 @@
     {
         None = 0,
         IsSprinting = 1 << 0,
-        IsCrouching = 1 << 1,
-        IsCrawling = 1 << 2,
+        IsWalking = 1 << 1,
+        IsCrouching = 1 << 2,
+        IsCrawling = 1 << 3,
     }
 }

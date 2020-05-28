@@ -63,6 +63,7 @@ namespace MultiplayerARPG
         private bool isSetupComponent;
         private float moveAnimSpeedRate;
         private float sprintAnimSpeedRate;
+        private float walkAnimSpeedRate;
         private float crouchMoveAnimSpeedRate;
         private float crawlMoveAnimSpeedRate;
         private float swimMoveAnimSpeedRate;
@@ -155,7 +156,9 @@ namespace MultiplayerARPG
 
         public override void SetDefaultAnimations()
         {
-            SetupClips(defaultAnimations.idleClip,
+            SetupClips(
+                // Move
+                defaultAnimations.idleClip,
                 defaultAnimations.moveClip,
                 defaultAnimations.moveBackwardClip,
                 defaultAnimations.moveLeftClip,
@@ -164,6 +167,7 @@ namespace MultiplayerARPG
                 defaultAnimations.moveForwardRightClip,
                 defaultAnimations.moveBackwardLeftClip,
                 defaultAnimations.moveBackwardRightClip,
+                // Sprint
                 defaultAnimations.sprintClip,
                 defaultAnimations.sprintBackwardClip,
                 defaultAnimations.sprintLeftClip,
@@ -172,6 +176,16 @@ namespace MultiplayerARPG
                 defaultAnimations.sprintForwardRightClip,
                 defaultAnimations.sprintBackwardLeftClip,
                 defaultAnimations.sprintBackwardRightClip,
+                // Walk
+                defaultAnimations.walkClip,
+                defaultAnimations.walkBackwardClip,
+                defaultAnimations.walkLeftClip,
+                defaultAnimations.walkRightClip,
+                defaultAnimations.walkForwardLeftClip,
+                defaultAnimations.walkForwardRightClip,
+                defaultAnimations.walkBackwardLeftClip,
+                defaultAnimations.walkBackwardRightClip,
+                // Crouch
                 defaultAnimations.crouchIdleClip,
                 defaultAnimations.crouchMoveClip,
                 defaultAnimations.crouchMoveBackwardClip,
@@ -181,6 +195,7 @@ namespace MultiplayerARPG
                 defaultAnimations.crouchMoveForwardRightClip,
                 defaultAnimations.crouchMoveBackwardLeftClip,
                 defaultAnimations.crouchMoveBackwardRightClip,
+                // Crawl
                 defaultAnimations.crawlIdleClip,
                 defaultAnimations.crawlMoveClip,
                 defaultAnimations.crawlMoveBackwardClip,
@@ -190,6 +205,7 @@ namespace MultiplayerARPG
                 defaultAnimations.crawlMoveForwardRightClip,
                 defaultAnimations.crawlMoveBackwardLeftClip,
                 defaultAnimations.crawlMoveBackwardRightClip,
+                // Swim
                 defaultAnimations.swimIdleClip,
                 defaultAnimations.swimMoveClip,
                 defaultAnimations.swimMoveBackwardClip,
@@ -199,12 +215,15 @@ namespace MultiplayerARPG
                 defaultAnimations.swimMoveForwardRightClip,
                 defaultAnimations.swimMoveBackwardLeftClip,
                 defaultAnimations.swimMoveBackwardRightClip,
+                // Other
                 defaultAnimations.jumpClip,
                 defaultAnimations.fallClip,
                 defaultAnimations.hurtClip,
                 defaultAnimations.deadClip,
+                // Speed Rate
                 defaultAnimations.moveAnimSpeedRate,
                 defaultAnimations.sprintAnimSpeedRate,
+                defaultAnimations.walkAnimSpeedRate,
                 defaultAnimations.crouchMoveAnimSpeedRate,
                 defaultAnimations.crawlMoveAnimSpeedRate,
                 defaultAnimations.swimMoveAnimSpeedRate);
@@ -212,62 +231,80 @@ namespace MultiplayerARPG
         }
 
         private void SetupClips(
-                AnimationClip idleClip,
-                AnimationClip moveClip,
-                AnimationClip moveBackwardClip,
-                AnimationClip moveLeftClip,
-                AnimationClip moveRightClip,
-                AnimationClip moveForwardLeftClip,
-                AnimationClip moveForwardRightClip,
-                AnimationClip moveBackwardLeftClip,
-                AnimationClip moveBackwardRightClip,
-                AnimationClip sprintClip,
-                AnimationClip sprintBackwardClip,
-                AnimationClip sprintLeftClip,
-                AnimationClip sprintRightClip,
-                AnimationClip sprintForwardLeftClip,
-                AnimationClip sprintForwardRightClip,
-                AnimationClip sprintBackwardLeftClip,
-                AnimationClip sprintBackwardRightClip,
-                AnimationClip crouchIdleClip,
-                AnimationClip crouchMoveClip,
-                AnimationClip crouchMoveBackwardClip,
-                AnimationClip crouchMoveLeftClip,
-                AnimationClip crouchMoveRightClip,
-                AnimationClip crouchMoveForwardLeftClip,
-                AnimationClip crouchMoveForwardRightClip,
-                AnimationClip crouchMoveBackwardLeftClip,
-                AnimationClip crouchMoveBackwardRightClip,
-                AnimationClip crawlIdleClip,
-                AnimationClip crawlMoveClip,
-                AnimationClip crawlMoveBackwardClip,
-                AnimationClip crawlMoveLeftClip,
-                AnimationClip crawlMoveRightClip,
-                AnimationClip crawlMoveForwardLeftClip,
-                AnimationClip crawlMoveForwardRightClip,
-                AnimationClip crawlMoveBackwardLeftClip,
-                AnimationClip crawlMoveBackwardRightClip,
-                AnimationClip swimIdleClip,
-                AnimationClip swimMoveClip,
-                AnimationClip swimMoveBackwardClip,
-                AnimationClip swimMoveLeftClip,
-                AnimationClip swimMoveRightClip,
-                AnimationClip swimMoveForwardLeftClip,
-                AnimationClip swimMoveForwardRightClip,
-                AnimationClip swimMoveBackwardLeftClip,
-                AnimationClip swimMoveBackwardRightClip,
-                AnimationClip jumpClip,
-                AnimationClip fallClip,
-                AnimationClip hurtClip,
-                AnimationClip deadClip,
-                float moveAnimSpeedRate,
-                float sprintAnimSpeedRate,
-                float crouchMoveAnimSpeedRate,
-                float crawlMoveAnimSpeedRate,
-                float swimMoveAnimSpeedRate)
+            // Move
+            AnimationClip idleClip,
+            AnimationClip moveClip,
+            AnimationClip moveBackwardClip,
+            AnimationClip moveLeftClip,
+            AnimationClip moveRightClip,
+            AnimationClip moveForwardLeftClip,
+            AnimationClip moveForwardRightClip,
+            AnimationClip moveBackwardLeftClip,
+            AnimationClip moveBackwardRightClip,
+            // Sprint
+            AnimationClip sprintClip,
+            AnimationClip sprintBackwardClip,
+            AnimationClip sprintLeftClip,
+            AnimationClip sprintRightClip,
+            AnimationClip sprintForwardLeftClip,
+            AnimationClip sprintForwardRightClip,
+            AnimationClip sprintBackwardLeftClip,
+            AnimationClip sprintBackwardRightClip,
+            // Walk
+            AnimationClip walkClip,
+            AnimationClip walkBackwardClip,
+            AnimationClip walkLeftClip,
+            AnimationClip walkRightClip,
+            AnimationClip walkForwardLeftClip,
+            AnimationClip walkForwardRightClip,
+            AnimationClip walkBackwardLeftClip,
+            AnimationClip walkBackwardRightClip,
+            // Crouch
+            AnimationClip crouchIdleClip,
+            AnimationClip crouchMoveClip,
+            AnimationClip crouchMoveBackwardClip,
+            AnimationClip crouchMoveLeftClip,
+            AnimationClip crouchMoveRightClip,
+            AnimationClip crouchMoveForwardLeftClip,
+            AnimationClip crouchMoveForwardRightClip,
+            AnimationClip crouchMoveBackwardLeftClip,
+            AnimationClip crouchMoveBackwardRightClip,
+            // Crawl
+            AnimationClip crawlIdleClip,
+            AnimationClip crawlMoveClip,
+            AnimationClip crawlMoveBackwardClip,
+            AnimationClip crawlMoveLeftClip,
+            AnimationClip crawlMoveRightClip,
+            AnimationClip crawlMoveForwardLeftClip,
+            AnimationClip crawlMoveForwardRightClip,
+            AnimationClip crawlMoveBackwardLeftClip,
+            AnimationClip crawlMoveBackwardRightClip,
+            // Swim
+            AnimationClip swimIdleClip,
+            AnimationClip swimMoveClip,
+            AnimationClip swimMoveBackwardClip,
+            AnimationClip swimMoveLeftClip,
+            AnimationClip swimMoveRightClip,
+            AnimationClip swimMoveForwardLeftClip,
+            AnimationClip swimMoveForwardRightClip,
+            AnimationClip swimMoveBackwardLeftClip,
+            AnimationClip swimMoveBackwardRightClip,
+            // Other
+            AnimationClip jumpClip,
+            AnimationClip fallClip,
+            AnimationClip hurtClip,
+            AnimationClip deadClip,
+            // Speed rate
+            float moveAnimSpeedRate,
+            float sprintAnimSpeedRate,
+            float walkAnimSpeedRate,
+            float crouchMoveAnimSpeedRate,
+            float crawlMoveAnimSpeedRate,
+            float swimMoveAnimSpeedRate)
         {
             if (CacheAnimatorController == null)
                 return;
+            // Move
             CacheAnimatorController[CLIP_IDLE] = idleClip != null ? idleClip : defaultAnimations.idleClip;
             CacheAnimatorController[CLIP_MOVE] = moveClip != null ? moveClip : defaultAnimations.moveClip;
             CacheAnimatorController[CLIP_MOVE_BACKWARD] = moveBackwardClip != null ? moveBackwardClip : defaultAnimations.moveBackwardClip;
@@ -277,6 +314,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_MOVE_FORWARD_RIGHT] = moveForwardRightClip != null ? moveForwardRightClip : defaultAnimations.moveForwardRightClip;
             CacheAnimatorController[CLIP_MOVE_BACKWARD_LEFT] = moveBackwardLeftClip != null ? moveBackwardLeftClip : defaultAnimations.moveBackwardLeftClip;
             CacheAnimatorController[CLIP_MOVE_BACKWARD_RIGHT] = moveBackwardRightClip != null ? moveBackwardRightClip : defaultAnimations.moveBackwardRightClip;
+            // Sprint
             CacheAnimatorController[CLIP_SPRINT] = sprintClip != null ? sprintClip : defaultAnimations.sprintClip;
             CacheAnimatorController[CLIP_SPRINT_BACKWARD] = sprintBackwardClip != null ? sprintBackwardClip : defaultAnimations.sprintBackwardClip;
             CacheAnimatorController[CLIP_SPRINT_LEFT] = sprintLeftClip != null ? sprintLeftClip : defaultAnimations.sprintLeftClip;
@@ -285,6 +323,16 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_SPRINT_FORWARD_RIGHT] = sprintForwardRightClip != null ? sprintForwardRightClip : defaultAnimations.sprintForwardRightClip;
             CacheAnimatorController[CLIP_SPRINT_BACKWARD_LEFT] = sprintBackwardLeftClip != null ? sprintBackwardLeftClip : defaultAnimations.sprintBackwardLeftClip;
             CacheAnimatorController[CLIP_SPRINT_BACKWARD_RIGHT] = sprintBackwardRightClip != null ? sprintBackwardRightClip : defaultAnimations.sprintBackwardRightClip;
+            // Walk
+            CacheAnimatorController[CLIP_WALK] = walkClip != null ? walkClip : defaultAnimations.walkClip;
+            CacheAnimatorController[CLIP_WALK_BACKWARD] = walkBackwardClip != null ? walkBackwardClip : defaultAnimations.walkBackwardClip;
+            CacheAnimatorController[CLIP_WALK_LEFT] = walkLeftClip != null ? walkLeftClip : defaultAnimations.walkLeftClip;
+            CacheAnimatorController[CLIP_WALK_RIGHT] = walkRightClip != null ? walkRightClip : defaultAnimations.walkRightClip;
+            CacheAnimatorController[CLIP_WALK_FORWARD_LEFT] = walkForwardLeftClip != null ? walkForwardLeftClip : defaultAnimations.walkForwardLeftClip;
+            CacheAnimatorController[CLIP_WALK_FORWARD_RIGHT] = walkForwardRightClip != null ? walkForwardRightClip : defaultAnimations.walkForwardRightClip;
+            CacheAnimatorController[CLIP_WALK_BACKWARD_LEFT] = walkBackwardLeftClip != null ? walkBackwardLeftClip : defaultAnimations.walkBackwardLeftClip;
+            CacheAnimatorController[CLIP_WALK_BACKWARD_RIGHT] = walkBackwardRightClip != null ? walkBackwardRightClip : defaultAnimations.walkBackwardRightClip;
+            // Crouch
             CacheAnimatorController[CLIP_CROUCH_IDLE] = crouchIdleClip != null ? crouchIdleClip : defaultAnimations.crouchIdleClip;
             CacheAnimatorController[CLIP_CROUCH_MOVE] = crouchMoveClip != null ? crouchMoveClip : defaultAnimations.crouchMoveClip;
             CacheAnimatorController[CLIP_CROUCH_MOVE_BACKWARD] = crouchMoveBackwardClip != null ? crouchMoveBackwardClip : defaultAnimations.crouchMoveBackwardClip;
@@ -294,6 +342,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_CROUCH_MOVE_FORWARD_RIGHT] = crouchMoveForwardRightClip != null ? crouchMoveForwardRightClip : defaultAnimations.crouchMoveForwardRightClip;
             CacheAnimatorController[CLIP_CROUCH_MOVE_BACKWARD_LEFT] = crouchMoveBackwardLeftClip != null ? crouchMoveBackwardLeftClip : defaultAnimations.crouchMoveBackwardLeftClip;
             CacheAnimatorController[CLIP_CROUCH_MOVE_BACKWARD_RIGHT] = crouchMoveBackwardRightClip != null ? crouchMoveBackwardRightClip : defaultAnimations.crouchMoveBackwardRightClip;
+            // Crawl
             CacheAnimatorController[CLIP_CRAWL_IDLE] = crawlIdleClip != null ? crawlIdleClip : defaultAnimations.crawlIdleClip;
             CacheAnimatorController[CLIP_CRAWL_MOVE] = crawlMoveClip != null ? crawlMoveClip : defaultAnimations.crawlMoveClip;
             CacheAnimatorController[CLIP_CRAWL_MOVE_BACKWARD] = crawlMoveBackwardClip != null ? crawlMoveBackwardClip : defaultAnimations.crawlMoveBackwardClip;
@@ -303,6 +352,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_CRAWL_MOVE_FORWARD_RIGHT] = crawlMoveForwardRightClip != null ? crawlMoveForwardRightClip : defaultAnimations.crawlMoveForwardRightClip;
             CacheAnimatorController[CLIP_CRAWL_MOVE_BACKWARD_LEFT] = crawlMoveBackwardLeftClip != null ? crawlMoveBackwardLeftClip : defaultAnimations.crawlMoveBackwardLeftClip;
             CacheAnimatorController[CLIP_CRAWL_MOVE_BACKWARD_RIGHT] = crawlMoveBackwardRightClip != null ? crawlMoveBackwardRightClip : defaultAnimations.crawlMoveBackwardRightClip;
+            // Swim
             CacheAnimatorController[CLIP_SWIM_IDLE] = swimIdleClip != null ? swimIdleClip : defaultAnimations.swimIdleClip;
             CacheAnimatorController[CLIP_SWIM_MOVE] = swimMoveClip != null ? swimMoveClip : defaultAnimations.swimMoveClip;
             CacheAnimatorController[CLIP_SWIM_MOVE_BACKWARD] = swimMoveBackwardClip != null ? swimMoveBackwardClip : defaultAnimations.swimMoveBackwardClip;
@@ -312,14 +362,18 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_SWIM_MOVE_FORWARD_RIGHT] = swimMoveForwardRightClip != null ? swimMoveForwardRightClip : defaultAnimations.swimMoveForwardRightClip;
             CacheAnimatorController[CLIP_SWIM_MOVE_BACKWARD_LEFT] = swimMoveBackwardLeftClip != null ? swimMoveBackwardLeftClip : defaultAnimations.swimMoveBackwardLeftClip;
             CacheAnimatorController[CLIP_SWIM_MOVE_BACKWARD_RIGHT] = swimMoveBackwardRightClip != null ? swimMoveBackwardRightClip : defaultAnimations.swimMoveBackwardRightClip;
+            // Other
             CacheAnimatorController[CLIP_JUMP] = jumpClip != null ? jumpClip : defaultAnimations.jumpClip;
             CacheAnimatorController[CLIP_FALL] = fallClip != null ? fallClip : defaultAnimations.fallClip;
             CacheAnimatorController[CLIP_HURT] = hurtClip != null ? hurtClip : defaultAnimations.hurtClip;
             CacheAnimatorController[CLIP_DEAD] = deadClip != null ? deadClip : defaultAnimations.deadClip;
+            // Speed Rate
             this.moveAnimSpeedRate = moveAnimSpeedRate > 0f ? moveAnimSpeedRate :
                 defaultAnimations.moveAnimSpeedRate > 0f ? defaultAnimations.moveAnimSpeedRate : 1f;
             this.sprintAnimSpeedRate = sprintAnimSpeedRate > 0f ? sprintAnimSpeedRate :
                 defaultAnimations.sprintAnimSpeedRate > 0f ? defaultAnimations.sprintAnimSpeedRate : 1f;
+            this.walkAnimSpeedRate = walkAnimSpeedRate > 0f ? walkAnimSpeedRate :
+                defaultAnimations.walkAnimSpeedRate > 0f ? defaultAnimations.walkAnimSpeedRate : 1f;
             this.crouchMoveAnimSpeedRate = crouchMoveAnimSpeedRate > 0f ? crouchMoveAnimSpeedRate :
                 defaultAnimations.crouchMoveAnimSpeedRate > 0f ? defaultAnimations.crouchMoveAnimSpeedRate : 1f;
             this.crawlMoveAnimSpeedRate = crawlMoveAnimSpeedRate > 0f ? crawlMoveAnimSpeedRate :
@@ -352,7 +406,9 @@ namespace MultiplayerARPG
             WeaponAnimations weaponAnimations = default(WeaponAnimations);
             GetAnims().CacheWeaponAnimations.TryGetValue(weaponType.DataId, out weaponAnimations);
 
-            SetupClips(weaponAnimations.idleClip,
+            SetupClips(
+                // Move
+                weaponAnimations.idleClip,
                 weaponAnimations.moveClip,
                 weaponAnimations.moveBackwardClip,
                 weaponAnimations.moveLeftClip,
@@ -361,6 +417,7 @@ namespace MultiplayerARPG
                 weaponAnimations.moveForwardRightClip,
                 weaponAnimations.moveBackwardLeftClip,
                 weaponAnimations.moveBackwardRightClip,
+                // Sprint
                 weaponAnimations.sprintClip,
                 weaponAnimations.sprintBackwardClip,
                 weaponAnimations.sprintLeftClip,
@@ -369,6 +426,16 @@ namespace MultiplayerARPG
                 weaponAnimations.sprintForwardRightClip,
                 weaponAnimations.sprintBackwardLeftClip,
                 weaponAnimations.sprintBackwardRightClip,
+                // Walk
+                weaponAnimations.walkClip,
+                weaponAnimations.walkBackwardClip,
+                weaponAnimations.walkLeftClip,
+                weaponAnimations.walkRightClip,
+                weaponAnimations.walkForwardLeftClip,
+                weaponAnimations.walkForwardRightClip,
+                weaponAnimations.walkBackwardLeftClip,
+                weaponAnimations.walkBackwardRightClip,
+                // Crouch
                 weaponAnimations.crouchIdleClip,
                 weaponAnimations.crouchMoveClip,
                 weaponAnimations.crouchMoveBackwardClip,
@@ -378,6 +445,7 @@ namespace MultiplayerARPG
                 weaponAnimations.crouchMoveForwardRightClip,
                 weaponAnimations.crouchMoveBackwardLeftClip,
                 weaponAnimations.crouchMoveBackwardRightClip,
+                // Crawl
                 weaponAnimations.crawlIdleClip,
                 weaponAnimations.crawlMoveClip,
                 weaponAnimations.crawlMoveBackwardClip,
@@ -387,6 +455,7 @@ namespace MultiplayerARPG
                 weaponAnimations.crawlMoveForwardRightClip,
                 weaponAnimations.crawlMoveBackwardLeftClip,
                 weaponAnimations.crawlMoveBackwardRightClip,
+                // Swim
                 weaponAnimations.swimIdleClip,
                 weaponAnimations.swimMoveClip,
                 weaponAnimations.swimMoveBackwardClip,
@@ -396,12 +465,15 @@ namespace MultiplayerARPG
                 weaponAnimations.swimMoveForwardRightClip,
                 weaponAnimations.swimMoveBackwardLeftClip,
                 weaponAnimations.swimMoveBackwardRightClip,
+                // Other
                 weaponAnimations.jumpClip,
                 weaponAnimations.fallClip,
                 weaponAnimations.hurtClip,
                 weaponAnimations.deadClip,
+                // Speed rate
                 weaponAnimations.moveAnimSpeedRate,
                 weaponAnimations.sprintAnimSpeedRate,
+                weaponAnimations.walkAnimSpeedRate,
                 weaponAnimations.crouchMoveAnimSpeedRate,
                 weaponAnimations.crawlMoveAnimSpeedRate,
                 weaponAnimations.swimMoveAnimSpeedRate);
@@ -427,18 +499,18 @@ namespace MultiplayerARPG
             float moveAnimationSpeedMultiplier = this.moveAnimationSpeedMultiplier;
 
             // Set move speed based on inputs
-            int moveSpeed = 0;
+            float moveSpeed = 0;
             if (movementState.HasFlag(MovementState.Forward))
-                moveSpeed = 1;
+                moveSpeed = 1f;
             else if (movementState.HasFlag(MovementState.Backward))
-                moveSpeed = -1;
+                moveSpeed = -1f;
 
             // Set side move speed based on inputs
-            int sideMoveSpeed = 0;
+            float sideMoveSpeed = 0;
             if (movementState.HasFlag(MovementState.Right))
-                sideMoveSpeed = 1;
+                sideMoveSpeed = 1f;
             else if (movementState.HasFlag(MovementState.Left))
-                sideMoveSpeed = -1;
+                sideMoveSpeed = -1f;
 
             int moveType = 0;
             switch (extraMovementState)
@@ -455,6 +527,11 @@ namespace MultiplayerARPG
                     moveSpeed *= 2;
                     sideMoveSpeed *= 2;
                     moveAnimationSpeedMultiplier *= sprintAnimSpeedRate;
+                    break;
+                case ExtraMovementState.IsWalking:
+                    moveSpeed *= 0.5f;
+                    sideMoveSpeed *= 0.5f;
+                    moveAnimationSpeedMultiplier *= walkAnimSpeedRate;
                     break;
                 default:
                     moveAnimationSpeedMultiplier *= moveAnimSpeedRate;

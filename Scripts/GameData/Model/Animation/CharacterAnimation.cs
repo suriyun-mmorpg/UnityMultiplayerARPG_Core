@@ -101,6 +101,7 @@ namespace MultiplayerARPG
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float moveAnimSpeedRate;
 
+        [Header("Movements while standing (sprint)")]
         public AnimationClip sprintClip;
         public AnimationClip sprintBackwardClip;
         public AnimationClip sprintLeftClip;
@@ -111,6 +112,18 @@ namespace MultiplayerARPG
         public AnimationClip sprintBackwardRightClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float sprintAnimSpeedRate;
+
+        [Header("Movements while standing (walk)")]
+        public AnimationClip walkClip;
+        public AnimationClip walkBackwardClip;
+        public AnimationClip walkLeftClip;
+        public AnimationClip walkRightClip;
+        public AnimationClip walkForwardLeftClip;
+        public AnimationClip walkForwardRightClip;
+        public AnimationClip walkBackwardLeftClip;
+        public AnimationClip walkBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float walkAnimSpeedRate;
 
         [Header("Movements while crouching")]
         public AnimationClip crouchIdleClip;
@@ -198,6 +211,7 @@ namespace MultiplayerARPG
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float moveAnimSpeedRate;
 
+        [Header("Movements while standing (sprint)")]
         public AnimationClip sprintClip;
         public AnimationClip sprintBackwardClip;
         public AnimationClip sprintLeftClip;
@@ -208,6 +222,18 @@ namespace MultiplayerARPG
         public AnimationClip sprintBackwardRightClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float sprintAnimSpeedRate;
+
+        [Header("Movements while standing (walk)")]
+        public AnimationClip walkClip;
+        public AnimationClip walkBackwardClip;
+        public AnimationClip walkLeftClip;
+        public AnimationClip walkRightClip;
+        public AnimationClip walkForwardLeftClip;
+        public AnimationClip walkForwardRightClip;
+        public AnimationClip walkBackwardLeftClip;
+        public AnimationClip walkBackwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float walkAnimSpeedRate;
 
         [Header("Movements while crouching")]
         public AnimationClip crouchIdleClip;
