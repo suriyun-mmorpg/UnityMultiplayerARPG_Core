@@ -72,13 +72,13 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get skill data
             AnimActionType animActionType;
-            int animatonDataId;
+            int animActionDataId;
             CharacterItem weapon;
             GetUsingSkillData(
                 item.UsingSkill,
                 ref isLeftHand,
                 out animActionType,
-                out animatonDataId,
+                out animActionDataId,
                 out weapon);
 
             // Validate ammo
@@ -91,7 +91,7 @@ namespace MultiplayerARPG
             float totalDuration;
             GetRandomAnimationData(
                 animActionType,
-                animatonDataId,
+                animActionDataId,
                 out animationIndex,
                 out triggerDurations,
                 out totalDuration);

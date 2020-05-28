@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using LiteNetLib;
+using LiteNetLibManager;
 using StandardAssets.Characters.Physics;
 using System.Collections;
 using System.Collections.Generic;
@@ -103,7 +104,7 @@ namespace MultiplayerARPG
         {
             tempCurrentPosition = CacheTransform.position;
             tempCurrentPosition.y += GROUND_BUFFER;
-            CacheTransform.position = tempCurrentPosition;
+            CacheOpenCharacterController.SetPosition(tempCurrentPosition, true);
         }
 
         public override void EntityLateUpdate()
@@ -243,7 +244,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector3(moveDirection), movementState);
+                    CacheEntity.CallNetFunction(NetFuncKeyMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, new DirectionVector3(moveDirection), movementState);
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
@@ -283,7 +284,7 @@ namespace MultiplayerARPG
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
-                    CacheEntity.CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
+                    CacheEntity.CallNetFunction(NetFuncUpdateYRotation, DeliveryMethod.Sequenced, FunctionReceivers.Server, (short)eulerAngles.y);
                     break;
                 case MovementSecure.NotSecure:
                     eulerAngles.x = 0;
@@ -401,7 +402,7 @@ namespace MultiplayerARPG
             if (!CacheOpenCharacterController.isGrounded)
                 tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, -maxFallVelocity, gravity * deltaTime);
             else
-                tempVerticalVelocity = 0f;
+                tempVerticalVelocity = -0.1f;
 
             // Jumping 
             if (CacheOpenCharacterController.isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
@@ -456,14 +457,11 @@ namespace MultiplayerARPG
                     tempMoveVelocity.y = tempVerticalVelocity;
             }
 
-            if (tempMoveVelocity.sqrMagnitude > 0f)
+            collisionFlags = CacheOpenCharacterController.Move(tempMoveVelocity * deltaTime);
+            if ((collisionFlags & CollisionFlags.CollidedAbove) == CollisionFlags.CollidedAbove)
             {
-                collisionFlags = CacheOpenCharacterController.Move(tempMoveVelocity * deltaTime);
-                if ((collisionFlags & CollisionFlags.CollidedAbove) == CollisionFlags.CollidedAbove)
-                {
-                    // Hit something above, falling in next frame
-                    tempVerticalVelocity = 0f;
-                }
+                // Hit something above, falling in next frame
+                tempVerticalVelocity = 0f;
             }
 
             isJumping = false;

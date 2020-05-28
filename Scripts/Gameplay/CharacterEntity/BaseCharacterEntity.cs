@@ -66,10 +66,12 @@ namespace MultiplayerARPG
 #endif
 
         #region Protected data
-        protected UICharacterEntity uiCharacterEntity;
-        protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
-        protected AnimActionType animActionType;
-        protected short reloadingAmmoAmount;
+        public UICharacterEntity UICharacterEntity { get; protected set; }
+        public BaseSkill UsingSkill { get; protected set; }
+        public short UsingSkillLevel { get; protected set; }
+        public AnimActionType AnimActionType { get; protected set; }
+        public int AnimActionDataId { get; protected set; }
+        public short ReloadingAmmoAmount { get; protected set; }
         public bool IsHideOrDead { get { return this.GetCaches().IsHide || IsDead(); } }
         public bool IsAttackingOrUsingSkill { get; protected set; }
         public float MoveSpeedRateWhileAttackOrUseSkill { get; protected set; }
@@ -78,6 +80,7 @@ namespace MultiplayerARPG
         protected float lastActionTime;
         protected float lastCombatantErrorTime;
         protected readonly Dictionary<int, float> requestUseSkillErrorTime = new Dictionary<int, float>();
+        protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -137,8 +140,44 @@ namespace MultiplayerARPG
                 AttackPhysicFunctions = new PhysicFunctions2D(512);
                 FindPhysicFunctions = new PhysicFunctions2D(512);
             }
-            animActionType = AnimActionType.None;
+            ClearActionStates();
             isRecaching = true;
+        }
+
+        protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
+        {
+            ClearActionStates();
+            AnimActionType = animActionType;
+            AnimActionDataId = animActionDataId;
+            IsAttackingOrUsingSkill = true;
+        }
+
+        protected virtual void SetUseSkillActionStates(AnimActionType animActionType, int animActionDataId, BaseSkill usingSkill, short usingSkillLevel)
+        {
+            ClearActionStates();
+            AnimActionType = animActionType;
+            AnimActionDataId = animActionDataId;
+            UsingSkill = usingSkill;
+            UsingSkillLevel = usingSkillLevel;
+            IsAttackingOrUsingSkill = true;
+        }
+
+        protected virtual void SetReloadActionStates(AnimActionType animActionType, short reloadingAmmoAmount)
+        {
+            ClearActionStates();
+            AnimActionType = animActionType;
+            ReloadingAmmoAmount = reloadingAmmoAmount;
+            IsAttackingOrUsingSkill = true;
+        }
+
+        protected virtual void ClearActionStates()
+        {
+            AnimActionType = AnimActionType.None;
+            AnimActionDataId = 0;
+            UsingSkill = null;
+            UsingSkillLevel = 0;
+            ReloadingAmmoAmount = 0;
+            IsAttackingOrUsingSkill = false;
         }
 
         protected override void OnValidate()
@@ -234,8 +273,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 // Clear action states when character dead
-                animActionType = AnimActionType.None;
-                IsAttackingOrUsingSkill = false;
+                ClearActionStates();
                 InterruptCastingSkill();
                 ExitVehicle();
             }
@@ -296,11 +334,11 @@ namespace MultiplayerARPG
         {
             if (prefab == null)
                 return;
-            if (uiCharacterEntity != null)
-                Destroy(uiCharacterEntity.gameObject);
-            uiCharacterEntity = Instantiate(prefab, CharacterUITransform);
-            uiCharacterEntity.transform.localPosition = Vector3.zero;
-            uiCharacterEntity.Data = this;
+            if (UICharacterEntity != null)
+                Destroy(UICharacterEntity.gameObject);
+            UICharacterEntity = Instantiate(prefab, CharacterUITransform);
+            UICharacterEntity.transform.localPosition = Vector3.zero;
+            UICharacterEntity.Data = this;
         }
         #endregion
 
@@ -748,11 +786,11 @@ namespace MultiplayerARPG
         #region Allowed abilities
         public virtual bool IsPlayingActionAnimation()
         {
-            return animActionType == AnimActionType.AttackRightHand ||
-                animActionType == AnimActionType.AttackLeftHand ||
-                animActionType == AnimActionType.SkillRightHand ||
-                animActionType == AnimActionType.ReloadRightHand ||
-                animActionType == AnimActionType.ReloadLeftHand;
+            return AnimActionType == AnimActionType.AttackRightHand ||
+                AnimActionType == AnimActionType.AttackLeftHand ||
+                AnimActionType == AnimActionType.SkillRightHand ||
+                AnimActionType == AnimActionType.ReloadRightHand ||
+                AnimActionType == AnimActionType.ReloadLeftHand;
         }
 
         public virtual bool CanDoActions()

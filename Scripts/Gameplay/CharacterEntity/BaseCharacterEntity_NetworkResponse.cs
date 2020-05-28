@@ -30,14 +30,13 @@ namespace MultiplayerARPG
             }
             else
             {
-                animActionType = AnimActionType.None;
-                IsAttackingOrUsingSkill = false;
+                ClearActionStates();
             }
         }
 
-        protected void NetFuncPlayReload(bool isLeftHand)
+        protected void NetFuncPlayReload(bool isLeftHand, short reloadingAmmoAmount)
         {
-            ReloadRoutine(isLeftHand);
+            ReloadRoutine(isLeftHand, reloadingAmmoAmount);
         }
 
         /// <summary>
@@ -377,14 +376,14 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncOnDead()
         {
-            animActionType = AnimActionType.None;
+            ClearActionStates();
             if (onDead != null)
                 onDead.Invoke();
         }
 
         protected virtual void NetFuncOnRespawn()
         {
-            animActionType = AnimActionType.None;
+            ClearActionStates();
             if (onRespawn != null)
                 onRespawn.Invoke();
         }

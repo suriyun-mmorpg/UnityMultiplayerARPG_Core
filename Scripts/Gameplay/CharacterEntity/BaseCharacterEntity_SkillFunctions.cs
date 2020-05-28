@@ -160,6 +160,30 @@ namespace MultiplayerARPG
 
         protected async void UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3? skillAimPosition)
         {
+            // Prepare requires data and get skill data
+            AnimActionType animActionType;
+            int animActionDataId;
+            CharacterItem weapon;
+            GetUsingSkillData(
+                skill,
+                ref isLeftHand,
+                out animActionType,
+                out animActionDataId,
+                out weapon);
+
+            // Prepare requires data and get animation data
+            float[] triggerDurations;
+            float totalDuration;
+            GetAnimationData(
+                animActionType,
+                animActionDataId,
+                animationIndex,
+                out triggerDurations,
+                out totalDuration);
+
+            // Set doing action state at clients and server
+            SetUseSkillActionStates(animActionType, animActionDataId, skill, skillLevel);
+
             // Update skill usage states at server only
             if (IsServer)
             {
@@ -168,39 +192,16 @@ namespace MultiplayerARPG
                 skillUsages.Add(newSkillUsage);
             }
 
-            // Prepare requires data and get skill data
-            int animationDataId;
-            CharacterItem weapon;
-            GetUsingSkillData(
-                skill,
-                ref isLeftHand,
-                out animActionType,
-                out animationDataId,
-                out weapon);
-
-            // Prepare requires data and get animation data
-            float[] triggerDurations;
-            float totalDuration;
-            GetAnimationData(
-                animActionType,
-                animationDataId,
-                animationIndex,
-                out triggerDurations,
-                out totalDuration);
-
             // Prepare requires data and get damages data
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
-            
-            // Set doing action state at clients and server
-            IsAttackingOrUsingSkill = true;
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(animActionType, skill);
+            MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, skill);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
-            float playSpeedMultiplier = GetAnimSpeedRate(animActionType);
-            
+            float playSpeedMultiplier = GetAnimSpeedRate(AnimActionType);
+
             // Set doing action data
             IsCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
             IsCastingSkillInterrupted = false;
@@ -234,9 +235,9 @@ namespace MultiplayerARPG
                 // Animations will plays on clients only
                 if (IsClient)
                 {
-                    CharacterModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
+                    CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, playSpeedMultiplier);
                     if (FpsModel && FpsModel.gameObject.activeSelf)
-                        FpsModel.PlayActionAnimation(animActionType, animationDataId, animationIndex, playSpeedMultiplier);
+                        FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, playSpeedMultiplier);
                 }
 
                 float remainsDuration = totalDuration;
@@ -251,9 +252,9 @@ namespace MultiplayerARPG
                     // Special effects will plays on clients only
                     if (IsClient)
                     {
-                        CharacterModel.PlayWeaponLaunchEffect(animActionType);
+                        CharacterModel.PlayWeaponLaunchEffect(AnimActionType);
                         if (FpsModel && FpsModel.gameObject.activeSelf)
-                            FpsModel.PlayWeaponLaunchEffect(animActionType);
+                            FpsModel.PlayWeaponLaunchEffect(AnimActionType);
                     }
 
                     // Get aim position by character's forward
@@ -292,9 +293,8 @@ namespace MultiplayerARPG
                 skillCancellationTokenSources.Remove(skillCancellationTokenSource);
                 skillCancellationTokenSource.Dispose();
             }
-            // Set doing action state to none at clients and server
-            animActionType = AnimActionType.None;
-            IsAttackingOrUsingSkill = false;
+            // Clear action states at clients and server
+            ClearActionStates();
         }
     }
 }

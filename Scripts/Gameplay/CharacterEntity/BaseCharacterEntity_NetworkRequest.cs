@@ -120,11 +120,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestPlayReloadAnimation(bool isLeftHand)
+        public bool RequestPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
         {
             if (IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayReload, FunctionReceivers.All, isLeftHand);
+            CallNetFunction(NetFuncPlayReload, FunctionReceivers.All, isLeftHand, reloadingAmmoAmount);
             return true;
         }
 
