@@ -885,7 +885,7 @@ namespace MultiplayerARPG
             characterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
             characterEntity.onHotkeysOperation += OnHotkeysOperation;
             characterEntity.onQuestsOperation += OnQuestsOperation;
-            characterEntity.onStorageItemsOperation += OnStorageItemsOperation;
+            characterEntity.onStorageItemsChange += OnStorageItemsChange;
 
             UpdateCharacter();
             UpdateSkills();
@@ -928,7 +928,7 @@ namespace MultiplayerARPG
             characterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
             characterEntity.onHotkeysOperation -= OnHotkeysOperation;
             characterEntity.onQuestsOperation -= OnQuestsOperation;
-            characterEntity.onStorageItemsOperation -= OnStorageItemsOperation;
+            characterEntity.onStorageItemsChange -= OnStorageItemsChange;
         }
 
         #region Sync data changes callback
@@ -1005,7 +1005,7 @@ namespace MultiplayerARPG
             UpdateQuests();
         }
 
-        protected void OnStorageItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        protected void OnStorageItemsChange(CharacterItem[] storageItems)
         {
             UpdateStorageItems();
         }

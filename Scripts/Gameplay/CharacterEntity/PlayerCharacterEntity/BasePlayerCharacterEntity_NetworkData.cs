@@ -109,17 +109,12 @@ namespace MultiplayerARPG
         /// This value will be used by server only to define character using storage state
         /// </summary>
         public StorageId CurrentStorageId { get; protected set; }
-        protected SyncListCharacterItem storageItems = new SyncListCharacterItem();
+        protected SyncFieldArray<CharacterItem> storageItems = new SyncFieldArray<CharacterItem>();
 
-        public IList<CharacterItem> StorageItems
+        public CharacterItem[] StorageItems
         {
             get { return storageItems; }
-            set
-            {
-                storageItems.Clear();
-                foreach (CharacterItem entry in value)
-                    storageItems.Add(entry);
-            }
+            set { storageItems.Value = value; }
         }
         #endregion
 
@@ -274,10 +269,10 @@ namespace MultiplayerARPG
                 onQuestsOperation.Invoke(operation, index);
         }
 
-        protected virtual void OnStorageItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        protected virtual void OnStorageItemsChange(bool isInitial, CharacterItem[] storageItems)
         {
-            if (onStorageItemsOperation != null)
-                onStorageItemsOperation.Invoke(operation, index);
+            if (onStorageItemsChange != null)
+                onStorageItemsChange.Invoke(storageItems);
         }
         #endregion
     }

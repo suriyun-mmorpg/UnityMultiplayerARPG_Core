@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             // Sync lists
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
-            storageItems.forOwnerOnly = true;
+            storageItems.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
         }
 
         public override void OnSetup()
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
-            storageItems.onOperation += OnStorageItemsOperation;
+            storageItems.onChange += OnStorageItemsChange;
             // Register Network functions
             RegisterNetFunction<short>(NetFuncUseItem);
             RegisterNetFunction<short, bool>(NetFuncUseSkillItem);
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
             quests.onOperation -= OnQuestsOperation;
-            storageItems.onOperation -= OnStorageItemsOperation;
+            storageItems.onChange -= OnStorageItemsChange;
 
             if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
                 Destroy(BasePlayerCharacterController.Singleton.gameObject);

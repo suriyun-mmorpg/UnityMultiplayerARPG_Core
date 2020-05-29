@@ -696,7 +696,7 @@ namespace MultiplayerARPG
         protected void NetFuncMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
         {
             if (IsDead() ||
-                storageItemIndex >= storageItems.Count)
+                storageItemIndex >= storageItems.Length)
                 return;
 
             CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, nonEquipIndex);
@@ -705,8 +705,8 @@ namespace MultiplayerARPG
         protected void NetFuncSwapOrMergeStorageItem(short fromIndex, short toIndex)
         {
             if (IsDead() ||
-                fromIndex >= storageItems.Count ||
-                toIndex >= storageItems.Count)
+                fromIndex >= storageItems.Length ||
+                toIndex >= storageItems.Length)
                 return;
 
             CurrentGameManager.SwapOrMergeStorageItem(this, CurrentStorageId, fromIndex, toIndex);

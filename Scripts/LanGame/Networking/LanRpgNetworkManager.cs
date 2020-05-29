@@ -508,14 +508,14 @@ namespace MultiplayerARPG
             short slotLimit = storage.slotLimit;
             storageItems[playerCharacterEntity.CurrentStorageId].FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage items
-            playerCharacterEntity.StorageItems = storageItems[playerCharacterEntity.CurrentStorageId];
+            playerCharacterEntity.StorageItems = storageItems[playerCharacterEntity.CurrentStorageId].ToArray();
         }
 
         public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
-            playerCharacterEntity.StorageItems.Clear();
+            playerCharacterEntity.StorageItems = new CharacterItem[0];
         }
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
@@ -741,7 +741,7 @@ namespace MultiplayerARPG
                 if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
                 {
                     // Update storage items
-                    playerCharacterEntity.StorageItems = storageItems;
+                    playerCharacterEntity.StorageItems = storageItems.ToArray();
                 }
             }
         }
