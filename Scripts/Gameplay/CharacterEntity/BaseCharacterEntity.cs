@@ -80,7 +80,6 @@ namespace MultiplayerARPG
         protected float lastActionTime;
         protected float lastCombatantErrorTime;
         protected readonly Dictionary<int, float> requestUseSkillErrorTime = new Dictionary<int, float>();
-        protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -651,29 +650,6 @@ namespace MultiplayerARPG
                 // Apply debuff if character is not dead
                 if (skill != null && skill.IsDebuff())
                     ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, attacker);
-            }
-        }
-        #endregion
-
-        #region Keys indexes update functions
-        protected void UpdateEquipItemIndexes()
-        {
-            equipItemIndexes.Clear();
-            CharacterItem tempEquipItem;
-            IArmorItem tempArmor;
-            string tempEquipPosition;
-            for (int i = 0; i < equipItems.Count; ++i)
-            {
-                tempEquipItem = equipItems[i];
-                tempArmor = tempEquipItem.GetArmorItem();
-                if (tempEquipItem.IsEmptySlot() || tempArmor == null)
-                    continue;
-
-                tempEquipPosition = GetEquipPosition(tempArmor.EquipPosition, tempEquipItem.equipSlotIndex);
-                if (equipItemIndexes.ContainsKey(tempEquipPosition))
-                    continue;
-
-                equipItemIndexes[tempEquipPosition] = i;
             }
         }
         #endregion

@@ -164,8 +164,7 @@ namespace MultiplayerARPG
             set
             {
                 hotkeys.Clear();
-                foreach (CharacterHotkey entry in value)
-                    hotkeys.Add(entry);
+                hotkeys.AddRange(value);
             }
         }
 
@@ -175,8 +174,7 @@ namespace MultiplayerARPG
             set
             {
                 quests.Clear();
-                foreach (CharacterQuest entry in value)
-                    quests.Add(entry);
+                quests.AddRange(value);
             }
         }
         #endregion

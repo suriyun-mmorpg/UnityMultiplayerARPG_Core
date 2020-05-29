@@ -251,8 +251,6 @@ namespace MultiplayerARPG
             // Can equip the item when there is no equipped item or able to unequip the equipped item
             equippingItem.equipSlotIndex = equipSlotIndex;
             equipItems.Add(equippingItem);
-            // Update equip item indexes
-            equipItemIndexes[GetEquipPosition(equippingItem.GetArmorItem().EquipPosition, equipSlotIndex)] = equipItems.Count - 1;
             // Update inventory
             if (unEquippedIndex >= 0)
             {
@@ -363,7 +361,6 @@ namespace MultiplayerARPG
                 return false;
             }
             equipItems.RemoveAt(index);
-            UpdateEquipItemIndexes();
 
             if (unEquipItem.NotEmptySlot())
             {

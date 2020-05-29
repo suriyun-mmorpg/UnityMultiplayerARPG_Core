@@ -81,8 +81,7 @@ namespace MultiplayerARPG
             set
             {
                 selectableWeaponSets.Clear();
-                foreach (EquipWeapons entry in value)
-                    selectableWeaponSets.Add(entry);
+                selectableWeaponSets.AddRange(value);
             }
         }
 
@@ -92,8 +91,7 @@ namespace MultiplayerARPG
             set
             {
                 attributes.Clear();
-                foreach (CharacterAttribute entry in value)
-                    attributes.Add(entry);
+                attributes.AddRange(value);
             }
         }
 
@@ -103,8 +101,7 @@ namespace MultiplayerARPG
             set
             {
                 skills.Clear();
-                foreach (CharacterSkill entry in value)
-                    skills.Add(entry);
+                skills.AddRange(value);
             }
         }
 
@@ -114,8 +111,7 @@ namespace MultiplayerARPG
             set
             {
                 skillUsages.Clear();
-                foreach (CharacterSkillUsage entry in value)
-                    skillUsages.Add(entry);
+                skillUsages.AddRange(value);
             }
         }
 
@@ -125,8 +121,7 @@ namespace MultiplayerARPG
             set
             {
                 buffs.Clear();
-                foreach (CharacterBuff entry in value)
-                    buffs.Add(entry);
+                buffs.AddRange(value);
             }
         }
 
@@ -135,25 +130,35 @@ namespace MultiplayerARPG
             get { return equipItems; }
             set
             {
-                equipItemIndexes.Clear();
-                equipItems.Clear();
-                CharacterItem tempEquipItem;
+                // Validate items
+                HashSet<string> equipPositions = new HashSet<string>();
                 IArmorItem tempArmor;
                 string tempEquipPosition;
-                for (int i = 0; i < value.Count; ++i)
+                for (int i = value.Count - 1; i >= 0; --i)
                 {
-                    tempEquipItem = value[i];
-                    tempArmor = tempEquipItem.GetArmorItem();
-                    if (tempEquipItem.IsEmptySlot() || tempArmor == null)
+                    // Remove empty slot
+                    if (value[i].IsEmptySlot())
+                    {
+                        value.RemoveAt(i);
                         continue;
-
-                    tempEquipPosition = GetEquipPosition(tempArmor.EquipPosition, tempEquipItem.equipSlotIndex);
-                    if (equipItemIndexes.ContainsKey(tempEquipPosition))
+                    }
+                    // Remove non-armor item
+                    tempArmor = value[i].GetArmorItem();
+                    if (tempArmor == null)
+                    {
+                        value.RemoveAt(i);
                         continue;
-
-                    equipItemIndexes[tempEquipPosition] = i;
-                    equipItems.Add(tempEquipItem);
+                    }
+                    tempEquipPosition = GetEquipPosition(tempArmor.EquipPosition, value[i].equipSlotIndex);
+                    if (equipPositions.Contains(tempEquipPosition))
+                    {
+                        value.RemoveAt(i);
+                        continue;
+                    }
+                    equipPositions.Add(tempEquipPosition);
                 }
+                equipItems.Clear();
+                equipItems.AddRange(value);
             }
         }
 
@@ -163,8 +168,7 @@ namespace MultiplayerARPG
             set
             {
                 nonEquipItems.Clear();
-                foreach (CharacterItem entry in value)
-                    nonEquipItems.Add(entry);
+                nonEquipItems.AddRange(value);
             }
         }
 
@@ -174,8 +178,7 @@ namespace MultiplayerARPG
             set
             {
                 summons.Clear();
-                foreach (CharacterSummon entry in value)
-                    summons.Add(entry);
+                summons.AddRange(value);
             }
         }
         #endregion
