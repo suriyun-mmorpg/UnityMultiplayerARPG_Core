@@ -11,7 +11,7 @@ public enum SummonType : byte
 }
 
 [System.Serializable]
-public class CharacterSummon : INetSerializableWithElement
+public class CharacterSummon : INetSerializable
 {
     public static readonly CharacterSummon Empty = new CharacterSummon();
     public SummonType type;
@@ -48,14 +48,6 @@ public class CharacterSummon : INetSerializableWithElement
                 BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out cacheEntity);
             return cacheEntity;
         }
-    }
-
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
     }
 
     private void MakeCache()
@@ -182,7 +174,7 @@ public class CharacterSummon : INetSerializableWithElement
             writer.PutPackedInt(exp);
             writer.PutPackedInt(currentHp);
             writer.PutPackedInt(currentMp);
-}
+        }
     }
 
     public void Deserialize(NetDataReader reader)

@@ -13,7 +13,7 @@ public enum BuffType : byte
 }
 
 [System.Serializable]
-public class CharacterBuff : INetSerializableWithElement
+public class CharacterBuff : INetSerializable
 {
     public static readonly CharacterBuff Empty = new CharacterBuff();
     public BuffType type;
@@ -64,14 +64,6 @@ public class CharacterBuff : INetSerializableWithElement
     private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
     [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
-
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
 
     public IGameEntity BuffApplier { get; private set; }
 

@@ -7,14 +7,6 @@ public class EquipWeapons : INetSerializableWithElement
     public CharacterItem rightHand;
     public CharacterItem leftHand;
 
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
-
     public EquipWeapons()
     {
         rightHand = new CharacterItem();
@@ -28,18 +20,16 @@ public class EquipWeapons : INetSerializableWithElement
 
         if (leftHand == null)
             leftHand = new CharacterItem();
-
-        rightHand.Element = Element;
-        leftHand.Element = Element;
     }
 
     public void Serialize(NetDataWriter writer)
     {
-        Validate();
-        // Right hand
-        rightHand.Serialize(writer);
-        // Left hand
-        leftHand.Serialize(writer);
+        Serialize(writer, true);
+    }
+
+    public void Serialize(NetDataWriter writer, LiteNetLibElement element)
+    {
+        Serialize(writer, element == null || element.SendingConnectionId == element.ConnectionId);
     }
 
     public void Serialize(NetDataWriter writer, bool isOwnerClient)
@@ -59,10 +49,15 @@ public class EquipWeapons : INetSerializableWithElement
         // Left hand
         leftHand.Deserialize(reader);
     }
+
+    public void Deserialize(NetDataReader reader, LiteNetLibElement element)
+    {
+        Deserialize(reader);
+    }
 }
 
 [System.Serializable]
-public class SyncFieldEquipWeapons : LiteNetLibSyncField<EquipWeapons>
+public class SyncFieldEquipWeapons : LiteNetLibSyncFieldWithElement<EquipWeapons>
 {
     protected override bool IsValueChanged(EquipWeapons newValue)
     {
@@ -72,6 +67,6 @@ public class SyncFieldEquipWeapons : LiteNetLibSyncField<EquipWeapons>
 
 
 [System.Serializable]
-public class SyncListEquipWeapons : LiteNetLibSyncList<EquipWeapons>
+public class SyncListEquipWeapons : LiteNetLibSyncListWithElement<EquipWeapons>
 {
 }

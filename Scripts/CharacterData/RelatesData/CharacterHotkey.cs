@@ -9,20 +9,12 @@ public enum HotkeyType : byte
 }
 
 [System.Serializable]
-public class CharacterHotkey : INetSerializableWithElement
+public class CharacterHotkey : INetSerializable
 {
     public static readonly CharacterHotkey Empty = new CharacterHotkey();
     public string hotkeyId;
     public HotkeyType type;
     public string relateId;
-
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
 
     public void Serialize(NetDataWriter writer)
     {

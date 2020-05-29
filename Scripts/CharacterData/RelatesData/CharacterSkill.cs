@@ -4,7 +4,7 @@ using LiteNetLibManager;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterSkill : INetSerializableWithElement
+public class CharacterSkill : INetSerializable
 {
     public static readonly CharacterSkill Empty = new CharacterSkill();
     public int dataId;
@@ -17,14 +17,6 @@ public class CharacterSkill : INetSerializableWithElement
 
     [System.NonSerialized]
     private BaseSkill cacheSkill;
-
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
 
     private void MakeCache()
     {

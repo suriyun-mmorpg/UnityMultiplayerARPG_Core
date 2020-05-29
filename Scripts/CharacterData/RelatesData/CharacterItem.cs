@@ -51,14 +51,6 @@ public class CharacterItem : INetSerializableWithElement
     [System.NonSerialized]
     private ISkillItem cacheSkillItem;
 
-    [System.NonSerialized]
-    private LiteNetLibElement element;
-    public LiteNetLibElement Element
-    {
-        get { return element; }
-        set { element = value; }
-    }
-
     public List<int> Sockets
     {
         get
@@ -514,7 +506,12 @@ public class CharacterItem : INetSerializableWithElement
 
     public void Serialize(NetDataWriter writer)
     {
-        Serialize(writer, Element == null || Element.SendingConnectionId == Element.ConnectionId);
+        Serialize(writer, true);
+    }
+
+    public void Serialize(NetDataWriter writer, LiteNetLibElement element)
+    {
+        Serialize(writer, element == null || element.SendingConnectionId == element.ConnectionId);
     }
 
     public void Serialize(NetDataWriter writer, bool isOwnerClient)
@@ -619,9 +616,14 @@ public class CharacterItem : INetSerializableWithElement
             }
         }
     }
+
+    public void Deserialize(NetDataReader reader, LiteNetLibElement element)
+    {
+        Deserialize(reader);
+    }
 }
 
 [System.Serializable]
-public class SyncListCharacterItem : LiteNetLibSyncList<CharacterItem>
+public class SyncListCharacterItem : LiteNetLibSyncListWithElement<CharacterItem>
 {
 }
