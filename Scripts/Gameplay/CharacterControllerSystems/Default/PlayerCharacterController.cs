@@ -33,6 +33,8 @@ namespace MultiplayerARPG
         public float wasdClearTargetDistance = 15f;
         [Tooltip("Set this to TRUE to move to target immediately when clicked on target, if this is FALSE it will not move to target immediately")]
         public bool pointClickSetTargetImmediately;
+        [Tooltip("Set this to TRUE to interrupt casting skill when click on ground to move")]
+        public bool pointClickInterruptCastingSkill;
         public GameObject targetObjectPrefab;
 
         [Header("Building Settings")]

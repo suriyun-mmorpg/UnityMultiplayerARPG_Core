@@ -323,8 +323,15 @@ namespace MultiplayerARPG
                     HideNpcDialog();
                     ClearQueueUsingSkill();
                     isFollowingTarget = false;
-                    if (!PlayerCharacterEntity.IsPlayingActionAnimation())
+                    if (PlayerCharacterEntity.IsPlayingActionAnimation())
+                    {
+                        if (pointClickInterruptCastingSkill)
+                            PlayerCharacterEntity.RequestSkillCastingInterrupt();
+                    }
+                    else
+                    {
                         OnPointClickOnGround(targetPosition.Value);
+                    }
                 }
             }
         }

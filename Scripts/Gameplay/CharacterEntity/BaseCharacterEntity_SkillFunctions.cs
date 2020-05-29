@@ -133,6 +133,14 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// This will be called at server by owner client to stop playing skill casting
+        /// </summary>
+        protected virtual void NetFuncSkillCastingInterrupt()
+        {
+            InterruptCastingSkill();
+        }
+
+        /// <summary>
         /// This will be called at clients to stop playing skill casting
         /// </summary>
         protected virtual void NetFuncSkillCastingInterrupted()

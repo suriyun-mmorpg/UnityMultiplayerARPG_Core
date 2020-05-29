@@ -128,6 +128,14 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool RequestSkillCastingInterrupt()
+        {
+            if (IsDead())
+                return false;
+            CallNetFunction(NetFuncSkillCastingInterrupt, FunctionReceivers.Server);
+            return true;
+        }
+
         public bool RequestSkillCastingInterrupted()
         {
             if (IsDead())
