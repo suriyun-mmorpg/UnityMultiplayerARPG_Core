@@ -7,6 +7,18 @@ namespace MultiplayerARPG
     public class PoolSystem
     {
         private static Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>> m_Pools = new Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>>();
+#if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
+        private static Transform poolingTransform;
+        private static Transform PoolingTransform
+        {
+            get
+            {
+                if (poolingTransform == null)
+                    poolingTransform = new GameObject("_PoolingTransform").transform;
+                return poolingTransform;
+            }
+        }
+#endif
 
         public static void Clear()
         {
@@ -41,6 +53,9 @@ namespace MultiplayerARPG
             for (int i = 0; i < prefab.PoolSize; ++i)
             {
                 obj = Object.Instantiate(prefab.gameObject).GetComponent<IPoolDescriptor>();
+#if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
+                obj.transform.SetParent(PoolingTransform);
+#endif
                 obj.ObjectPrefab = prefab;
                 obj.gameObject.SetActive(false);
                 queue.Enqueue(obj);
@@ -75,6 +90,9 @@ namespace MultiplayerARPG
                 else
                 {
                     obj = Object.Instantiate(prefab.gameObject).GetComponent<IPoolDescriptor>();
+#if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
+                    obj.transform.SetParent(PoolingTransform);
+#endif
                 }
                 obj.transform.position = position;
                 obj.transform.rotation = rotation;
