@@ -302,11 +302,6 @@ namespace MultiplayerARPG
                         // If character is null or cannot receive damage from monster, skip it
                         continue;
                     }
-                    if (!CacheEntity.IsEnemy(characterEntity))
-                    {
-                        // If character is not enemy, skip it
-                        continue;
-                    }
                     // Found target, attack it
                     CacheEntity.SetAttackTarget(characterEntity);
                     return true;
