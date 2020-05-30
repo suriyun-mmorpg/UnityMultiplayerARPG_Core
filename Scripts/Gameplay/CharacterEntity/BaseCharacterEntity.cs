@@ -580,17 +580,11 @@ namespace MultiplayerARPG
             bool isBlocked = false;
             if (attackerCharacter != null)
             {
-                // Calculate chance to critical
-                isCritical = Random.value <= CurrentGameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
-
-                // If miss, return don't calculate damages
-                if (!isCritical && Random.value > CurrentGameInstance.GameplayRule.GetHitChance(attackerCharacter, this))
+                if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(attackerCharacter, this, out isCritical, out isBlocked))
                 {
                     ReceivedDamage(attackerCharacter, CombatAmountType.Miss, 0);
                     return;
                 }
-
-                isBlocked = Random.value <= CurrentGameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
             }
 
             // Calculate damages

@@ -56,6 +56,8 @@ namespace MultiplayerARPG
         public float missDecreaseWeaponDurability = 0f;
         public float missDecreaseShieldDurability = 0;
         public float missDecreaseArmorDurability = 0f;
+        [Header("Damage Occurs")]
+        public bool alwaysHitWhenCriticalOccurs = true;
         [Header("Fall Damage")]
         [Tooltip("Character will receive damage 1% of Max Hp, when fall distance = min distance")]
         public float fallDamageMinDistance = 5;
@@ -67,6 +69,22 @@ namespace MultiplayerARPG
         public bool recoverFoodWhenLevelUp;
         public bool recoverWaterWhenLevelUp;
         public bool recoverStaminaWhenLevelUp;
+
+        public override bool RandomAttackHitOccurs(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, out bool isCritical, out bool isBlocked)
+        {
+            bool isHit = false;
+            isCritical = false;
+            isBlocked = false;
+            if (attacker != null)
+            {
+                isCritical = Random.value <= GetCriticalChance(attacker, damageReceiver);
+                isHit = Random.value <= GetHitChance(attacker, damageReceiver);
+                if (!isHit && isCritical && alwaysHitWhenCriticalOccurs)
+                    isHit = true;
+                isBlocked = Random.value <= GetBlockChance(attacker, damageReceiver);
+            }
+            return isHit;
+        }
 
         public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
