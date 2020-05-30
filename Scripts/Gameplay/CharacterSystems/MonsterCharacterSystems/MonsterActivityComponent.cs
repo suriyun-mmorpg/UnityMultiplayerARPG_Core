@@ -351,7 +351,7 @@ namespace MultiplayerARPG
 
         protected float GetAttackDistance()
         {
-            return queueSkill != null ? queueSkill.GetCastDistance(CacheEntity, queueSkillLevel, isLeftHandAttacking) :
+            return queueSkill != null && queueSkill.IsAttack() ? queueSkill.GetCastDistance(CacheEntity, queueSkillLevel, isLeftHandAttacking) :
                 CacheEntity.GetAttackDistance(isLeftHandAttacking);
         }
 
