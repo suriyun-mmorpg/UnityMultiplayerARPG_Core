@@ -93,18 +93,18 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             if (IsSummoned)
             {
-                if (Summoner)
+                if (!Summoner || Summoner.IsDead())
+                {
+                    // Summoner disappear so destroy it
+                    UnSummon();
+                }
+                else
                 {
                     if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > CurrentGameInstance.maxFollowSummonerDistance)
                     {
                         // Teleport to summoner if too far from summoner
                         Teleport(Summoner.GetSummonPosition());
                     }
-                }
-                else
-                {
-                    // Summoner disappear so destroy it
-                    UnSummon();
                 }
             }
             Profiler.EndSample();
