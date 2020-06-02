@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         public bool useRootMotionForAirMovement;
         public bool useRootMotionForJump;
         public bool useRootMotionForFall;
+        public bool useRootMotionWhileNotMoving;
 
         public Animator CacheAnimator { get; private set; }
         public LiteNetLibTransform CacheNetTransform { get; private set; }
@@ -71,6 +72,8 @@ namespace MultiplayerARPG
         private float tempSqrMagnitude;
         private float tempPredictSqrMagnitude;
         private float tempTargetDistance;
+        private float tempEntityMoveSpeed;
+        private float tempCurrentMoveSpeed;
         private CollisionFlags collisionFlags;
 
         public override void EntityAwake()
@@ -149,7 +152,8 @@ namespace MultiplayerARPG
             if (!CacheAnimator)
                 return;
 
-            if (!CacheEntity.MovementState.HasFlag(MovementState.Forward) &&
+            if (useRootMotionWhileNotMoving &&
+                !CacheEntity.MovementState.HasFlag(MovementState.Forward) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Backward) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Left) &&
                 !CacheEntity.MovementState.HasFlag(MovementState.Right) &&
@@ -311,36 +315,12 @@ namespace MultiplayerARPG
             result = fromPosition;
         }
 
-        public override void EntityUpdate()
+        public override void EntityFixedUpdate()
         {
             if ((CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
                 (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
                 return;
 
-            tempMoveDirection = Vector3.zero;
-            tempTargetDistance = -1f;
-
-            if (HasNavPaths)
-            {
-                tempTargetPosition = navPaths.Peek();
-                tempCurrentPosition = CacheTransform.position;
-                tempTargetPosition.y = 0;
-                tempCurrentPosition.y = 0;
-                tempMoveDirection = tempTargetPosition - tempCurrentPosition;
-                tempMoveDirection.Normalize();
-                tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
-                if (tempTargetDistance < StoppingDistance)
-                {
-                    navPaths.Dequeue();
-                    if (!HasNavPaths)
-                        StopMove();
-                }
-                else
-                {
-                    // Turn character to destination
-                    CacheTransform.rotation = Quaternion.LookRotation(tempMoveDirection);
-                }
-            }
             UpdateMovement(Time.deltaTime);
 
             tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
@@ -367,11 +347,39 @@ namespace MultiplayerARPG
         private void UpdateMovement(float deltaTime)
         {
             tempMoveVelocity = Vector3.zero;
+            tempMoveDirection = Vector3.zero;
+            tempTargetDistance = -1f;
             WaterCheck();
+
+            if (HasNavPaths)
+            {
+                // Set `tempTargetPosition` and `tempCurrentPosition`
+                tempTargetPosition = navPaths.Peek();
+                tempCurrentPosition = CacheTransform.position;
+                tempTargetPosition.y = 0;
+                tempCurrentPosition.y = 0;
+                tempMoveDirection = tempTargetPosition - tempCurrentPosition;
+                tempMoveDirection.Normalize();
+                tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
+                if (tempTargetDistance < StoppingDistance)
+                {
+                    navPaths.Dequeue();
+                    if (!HasNavPaths)
+                        StopMove();
+                }
+                else
+                {
+                    // Turn character to destination
+                    CacheTransform.rotation = Quaternion.LookRotation(tempMoveDirection);
+                }
+            }
 
             // If move by WASD keys, set move direction to input direction
             if (tempInputDirection.sqrMagnitude > 0f)
+            {
                 tempMoveDirection = tempInputDirection;
+                tempMoveDirection.Normalize();
+            }
 
             if (!CacheEntity.CanMove())
             {
@@ -379,30 +387,19 @@ namespace MultiplayerARPG
                 isJumping = false;
             }
 
-            if (isUnderWater)
-            {
-                // Move up to surface while under water
-                float footToSurfaceDist = waterCollider.bounds.max.y - CacheCapsuleCollider.bounds.min.y;
-                float currentThreshold = footToSurfaceDist / (CacheCapsuleCollider.bounds.max.y - CacheCapsuleCollider.bounds.min.y);
-                if (autoSwimToSurface)
-                {
-                    if (currentThreshold > underWaterThreshold)
-                        tempMoveDirection.y = 1f;
-                    else
-                        tempMoveDirection.y = 0f;
-                }
-                else
-                {
-                    if (tempMoveDirection.y > 0f && currentThreshold <= underWaterThreshold)
-                        tempMoveDirection.y = 0f;
-                }
-            }
-
             // Calculate vertical velocity by gravity
-            if (!CacheOpenCharacterController.isGrounded)
-                tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, -maxFallVelocity, gravity * deltaTime);
+            if (!CacheOpenCharacterController.isGrounded && !isUnderWater)
+            {
+                if (!useRootMotionForFall)
+                    tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, -maxFallVelocity, gravity * deltaTime);
+                else
+                    tempVerticalVelocity = 0f;
+            }
             else
-                tempVerticalVelocity = -0.1f;
+            {
+                // Grounded, v-velocity reset to 0
+                tempVerticalVelocity = 0f;
+            }
 
             // Jumping 
             if (CacheOpenCharacterController.isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
@@ -412,49 +409,74 @@ namespace MultiplayerARPG
                     tempVerticalVelocity = CalculateJumpVerticalSpeed();
             }
 
+            tempEntityMoveSpeed = CacheEntity.GetMoveSpeed();
+            tempCurrentMoveSpeed = tempEntityMoveSpeed;
+            // Updating horizontal movement (WASD inputs)
             if (tempMoveDirection.sqrMagnitude > 0f)
             {
-                tempMoveDirection.Normalize();
+                // Calculate only horizontal move direction
+                tempHorizontalMoveDirection = tempMoveDirection;
+                tempHorizontalMoveDirection.y = 0;
+                tempHorizontalMoveDirection.Normalize();
 
-                float currentTargetSpeed = CacheEntity.GetMoveSpeed();
                 // If character move backward
-                if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
-                    currentTargetSpeed *= backwardMoveSpeedRate;
+                if (Vector3.Angle(tempHorizontalMoveDirection, CacheTransform.forward) > 120)
+                    tempCurrentMoveSpeed *= backwardMoveSpeedRate;
 
                 if (HasNavPaths)
                 {
-                    tempHorizontalMoveDirection = tempMoveDirection;
-                    tempHorizontalMoveDirection.y = 0;
+                    // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
-                    tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * currentTargetSpeed * deltaTime);
+                    tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * tempCurrentMoveSpeed * deltaTime);
                     tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
                     // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
                     // rigidbody will reaching target and character is moving pass it,
                     // so adjust move speed by distance and time (with physic formula: v=s/t)
                     if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                        currentTargetSpeed *= tempTargetDistance / deltaTime / currentTargetSpeed;
-                    tempMoveVelocity = tempMoveDirection * currentTargetSpeed;
+                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                    tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
                 }
                 else
                 {
                     // Move with wasd keys so it does not have to adjust speed
-                    tempMoveVelocity = tempMoveDirection * currentTargetSpeed;
+                    tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
                 }
-
-                if (!isUnderWater)
+            }
+            // Updating vertical movement (Fall, WASD inputs under water)
+            if (isUnderWater)
+            {
+                tempCurrentMoveSpeed = tempEntityMoveSpeed;
+                // Move up to surface while under water
+                if (autoSwimToSurface || tempMoveDirection.y > 0)
                 {
-                    // Update velocity while not under water
-                    if ((CacheOpenCharacterController.isGrounded && !useRootMotionForMovement) ||
-                        (!CacheOpenCharacterController.isGrounded && !useRootMotionForAirMovement))
-                        tempMoveVelocity.y = tempVerticalVelocity;
+                    if (autoSwimToSurface)
+                        tempMoveDirection.y = 1f;
+                    tempTargetPosition = Vector3.up * (waterCollider.bounds.max.y - (CacheCapsuleCollider.bounds.size.y * underWaterThreshold));
+                    tempCurrentPosition = Vector3.up * CacheTransform.position.y;
+                    tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
+                    tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
+                    tempPredictPosition = tempCurrentPosition + (Vector3.up * tempMoveDirection.y * tempCurrentMoveSpeed * deltaTime);
+                    tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
+                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                    // rigidbody will reaching target and character is moving pass it,
+                    // so adjust move speed by distance and time (with physic formula: v=s/t)
+                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                    // Swim up to surface
+                    tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
+                }
+                else
+                {
+                    // Dive down under water
+                    tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
                 }
             }
             else
             {
-                // Update fall
-                if (!isUnderWater)
-                    tempMoveVelocity.y = tempVerticalVelocity;
+                // Update velocity while not under water
+                tempMoveVelocity.y = tempVerticalVelocity;
             }
 
             collisionFlags = CacheOpenCharacterController.Move(tempMoveVelocity * deltaTime);

@@ -21,6 +21,7 @@ namespace MultiplayerARPG
             bool useRootMotionForAirMovement = false;
             bool useRootMotionForJump = false;
             bool useRootMotionForFall = false;
+            bool useRootMotionWhileNotMoving = false;
             RigidBodyEntityMovement newMovementSystem = GetComponent<RigidBodyEntityMovement>();
             if (newMovementSystem != null)
             {
@@ -33,6 +34,7 @@ namespace MultiplayerARPG
                 useRootMotionForAirMovement = newMovementSystem.useRootMotionForAirMovement;
                 useRootMotionForJump = newMovementSystem.useRootMotionForJump;
                 useRootMotionForFall = newMovementSystem.useRootMotionForFall;
+                useRootMotionWhileNotMoving = newMovementSystem.useRootMotionWhileNotMoving;
                 DestroyImmediate(newMovementSystem);
                 Debug.Log("[LegacyRigidBodyEntityMovement] Removed `RigidBodyEntityMovement`");
             }
@@ -56,6 +58,7 @@ namespace MultiplayerARPG
                 oldMovementSystem.useRootMotionForAirMovement = useRootMotionForAirMovement;
                 oldMovementSystem.useRootMotionForJump = useRootMotionForJump;
                 oldMovementSystem.useRootMotionForFall = useRootMotionForFall;
+                oldMovementSystem.useRootMotionWhileNotMoving = useRootMotionWhileNotMoving;
             }
             Debug.Log("[LegacyRigidBodyEntityMovement] Converted");
         }
