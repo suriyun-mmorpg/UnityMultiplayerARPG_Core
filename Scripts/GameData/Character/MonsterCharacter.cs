@@ -286,7 +286,6 @@ namespace MultiplayerARPG
         public void RandomItems(System.Action<BaseItem, short> onRandomItem)
         {
             ItemDrop randomItem;
-
             for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
             {
                 randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
