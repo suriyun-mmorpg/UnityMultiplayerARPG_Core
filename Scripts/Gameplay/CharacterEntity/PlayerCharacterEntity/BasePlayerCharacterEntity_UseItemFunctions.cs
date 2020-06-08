@@ -51,6 +51,7 @@ namespace MultiplayerARPG
 
         protected void UseItemSkill(short itemIndex, bool isLeftHand, Vector3? aimPosition)
         {
+            GameMessage.Type gameMessageType;
             if (!CanUseItem() || !CanUseSkill())
                 return;
 
@@ -62,11 +63,10 @@ namespace MultiplayerARPG
                 return;
 
             ISkillItem item = characterItem.GetSkillItem();
-            if (!CanUseItem() || !CanUseSkill() || item == null || item.UsingSkill == null || !this.DecreaseItemsByIndex(itemIndex, 1))
+            if (!CanUseItem() || !CanUseSkill() || item == null || item.UsingSkill == null)
                 return;
 
-            // Validate mp amount, skill level, 
-            GameMessage.Type gameMessageType;
+            // Validate mp amount, skill level
             if (!item.UsingSkill.CanUse(this, item.UsingSkillLevel, isLeftHand, out gameMessageType, true))
                 return;
 
@@ -95,6 +95,11 @@ namespace MultiplayerARPG
                 out animationIndex,
                 out triggerDurations,
                 out totalDuration);
+
+            // Validate skill item
+            if (!this.DecreaseItemsByIndex(itemIndex, 1))
+                return;
+            this.FillEmptySlots();
 
             // Start use skill routine
             IsAttackingOrUsingSkill = true;

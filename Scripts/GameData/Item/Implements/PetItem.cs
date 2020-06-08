@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         {
             if (!characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1))
                 return;
+            characterEntity.FillEmptySlots();
             // Clear all summoned pets
             CharacterSummon tempSummon;
             for (int i = 0; i < characterEntity.Summons.Count; ++i)

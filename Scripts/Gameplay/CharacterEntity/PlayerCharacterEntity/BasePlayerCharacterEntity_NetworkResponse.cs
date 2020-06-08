@@ -146,6 +146,7 @@ namespace MultiplayerARPG
                 !this.DecreaseItemsByIndex(itemIndex, 1))
                 return;
 
+            this.FillEmptySlots();
             BuildingSaveData buildingSaveData = new BuildingSaveData();
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;
@@ -159,7 +160,6 @@ namespace MultiplayerARPG
             buildingSaveData.CreatorId = Id;
             buildingSaveData.CreatorName = CharacterName;
             CurrentGameManager.CreateBuildingEntity(buildingSaveData, false);
-
         }
 
         protected void NetFuncDestroyBuilding(PackedUInt objectId)
@@ -222,8 +222,10 @@ namespace MultiplayerARPG
                 return;
 
             BaseItem item = nonEquipItem.GetItem();
-            if (this.DecreaseItemsByIndex(index, amount))
-                CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
+            if (!this.DecreaseItemsByIndex(index, amount))
+                return;
+            this.FillEmptySlots();
+            CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
         }
 
         protected void NetFuncDismantleItem(short index)

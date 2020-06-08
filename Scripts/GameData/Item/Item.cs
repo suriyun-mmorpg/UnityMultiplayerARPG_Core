@@ -510,6 +510,7 @@ namespace MultiplayerARPG
         {
             if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1))
                 return;
+            character.FillEmptySlots();
             character.ApplyBuff(DataId, BuffType.PotionBuff, level, character);
         }
 
@@ -517,6 +518,7 @@ namespace MultiplayerARPG
         {
             if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1))
                 return;
+            character.FillEmptySlots();
             // Clear all summoned pets
             CharacterSummon tempSummon;
             for (int i = 0; i < character.Summons.Count; ++i)

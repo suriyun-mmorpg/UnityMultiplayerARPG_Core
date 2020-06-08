@@ -108,6 +108,7 @@ namespace MultiplayerARPG
                 Dictionary<CharacterItem, short> decreaseAmmoItems;
                 if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out decreaseAmmoItems))
                 {
+                    this.FillEmptySlots();
                     CharacterItem ammoCharacterItem = decreaseAmmoItems.FirstOrDefault().Key;
                     IAmmoItem ammoItem = ammoCharacterItem.GetAmmoItem();
                     if (ammoItem != null)
@@ -201,6 +202,7 @@ namespace MultiplayerARPG
                 Dictionary<CharacterItem, short> decreaseItems;
                 if (IsServer && this.DecreaseAmmos(reloadingWeaponItem.WeaponType.RequireAmmoType, ReloadingAmmoAmount, out decreaseItems))
                 {
+                    this.FillEmptySlots();
                     reloadingWeapon.ammo += ReloadingAmmoAmount;
                     if (isLeftHand)
                         equipWeapons.leftHand = reloadingWeapon;

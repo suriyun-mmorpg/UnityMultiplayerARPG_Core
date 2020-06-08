@@ -612,8 +612,13 @@ public static partial class PlayerCharacterDataExtension
             characterAtttribute = CharacterAttribute.Create(attribute, 0);
             if (!attribute.CanIncreaseAmount(characterData, (short)(characterAtttribute.amount + amount - 1), out gameMessageType, itemIndex < 0))
                 return false;
-            if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
-                return false;
+            if (itemIndex >= 0)
+            {
+                if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                    characterData.FillEmptySlots();
+                else
+                    return false;
+            }
             characterAtttribute.amount += amount;
             characterData.Attributes.Add(characterAtttribute);
         }
@@ -622,8 +627,13 @@ public static partial class PlayerCharacterDataExtension
             characterAtttribute = characterData.Attributes[index];
             if (!attribute.CanIncreaseAmount(characterData, (short)(characterAtttribute.amount + amount - 1), out gameMessageType, itemIndex < 0))
                 return false;
-            if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
-                return false;
+            if (itemIndex >= 0)
+            {
+                if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                    characterData.FillEmptySlots();
+                else
+                    return false;
+            }
             characterAtttribute.amount += amount;
             characterData.Attributes[index] = characterAtttribute;
         }
@@ -632,8 +642,13 @@ public static partial class PlayerCharacterDataExtension
 
     public static bool ResetAttributes(this IPlayerCharacterData characterData, short itemIndex = -1)
     {
-        if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
-            return false;
+        if (itemIndex >= 0)
+        {
+            if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                characterData.FillEmptySlots();
+            else
+                return false;
+        }
 
         short countStatPoint = 0;
         CharacterAttribute characterAttribute;
@@ -661,8 +676,13 @@ public static partial class PlayerCharacterDataExtension
             characterSkill = CharacterSkill.Create(skill, 0);
             if (!skill.CanLevelUp(characterData, (short)(characterSkill.level + level - 1), out gameMessageType, itemIndex < 0))
                 return false;
-            if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
-                return false;
+            if (itemIndex >= 0)
+            {
+                if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                    characterData.FillEmptySlots();
+                else
+                    return false;
+            }
             characterSkill.level += level;
             characterData.Skills.Add(characterSkill);
         }
@@ -671,8 +691,13 @@ public static partial class PlayerCharacterDataExtension
             characterSkill = characterData.Skills[index];
             if (!skill.CanLevelUp(characterData, (short)(characterSkill.level + level - 1), out gameMessageType, itemIndex < 0))
                 return false;
-            if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
-                return false;
+            if (itemIndex >= 0)
+            {
+                if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                    characterData.FillEmptySlots();
+                else
+                    return false;
+            }
             characterSkill.level += level;
             characterData.Skills[index] = characterSkill;
         }
@@ -681,8 +706,13 @@ public static partial class PlayerCharacterDataExtension
 
     public static bool ResetSkills(this IPlayerCharacterData characterData, short itemIndex = -1)
     {
-        if (itemIndex >= 0 && !characterData.DecreaseItemsByIndex(itemIndex, 1))
-            return false;
+        if (itemIndex >= 0)
+        {
+            if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                characterData.FillEmptySlots();
+            else
+                return false;
+        }
 
         short countSkillPoint = 0;
         CharacterSkill characterSkill;

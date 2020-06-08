@@ -554,6 +554,7 @@ namespace MultiplayerARPG
                 {
                     // Decrease from inventory
                     playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
+                    playerCharacterEntity.FillEmptySlots();
                 }
             }
             else
