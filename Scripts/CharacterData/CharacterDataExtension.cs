@@ -783,6 +783,17 @@ public static partial class CharacterDataExtension
             data.GetCaches().LimitItemSlot);
     }
 
+    public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<CharacterItem> increasingItems)
+    {
+        return new List<CharacterItem>(data.NonEquipItems).IncreasingItemsWillOverwhelming(
+            increasingItems,
+            true,
+            data.GetCaches().LimitItemWeight,
+            data.GetCaches().TotalItemWeight,
+            GameInstance.Singleton.IsLimitInventorySlot,
+            data.GetCaches().LimitItemSlot);
+    }
+
     public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> characterItems, IEnumerable<ItemAmount> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
     {
         if (characterItems == null || increasingItems == null)
@@ -806,6 +817,34 @@ public static partial class CharacterDataExtension
             {
                 // Add item to temp list to check it will overwhelming or not later
                 characterItems.AddOrSetItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
+            }
+        }
+        return false;
+    }
+
+    public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> characterItems, IEnumerable<CharacterItem> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
+    {
+        if (characterItems == null || increasingItems == null)
+            return false;
+        foreach (CharacterItem receiveItem in increasingItems)
+        {
+            if (receiveItem.IsEmptySlot()) continue;
+            if (characterItems.IncreasingItemsWillOverwhelming(
+                receiveItem.dataId,
+                receiveItem.amount,
+                isLimitWeight,
+                weightLimit,
+                totalItemWeight,
+                isLimitSlot,
+                slotLimit))
+            {
+                // Overwhelming
+                return true;
+            }
+            else
+            {
+                // Add item to temp list to check it will overwhelming or not later
+                characterItems.AddOrSetItems(CharacterItem.Create(receiveItem.dataId, receiveItem.level, receiveItem.amount));
             }
         }
         return false;
@@ -911,24 +950,37 @@ public static partial class CharacterDataExtension
         return true;
     }
 
-    public static bool IncreaseItems(this ICharacterData data, CharacterItem addingItem, int minSlotIndex = 0)
+    public static bool IncreaseItems(this ICharacterData data, CharacterItem addingItem, int minSlotIndex = 0, System.Action<int, short, short> onIncrease = null)
     {
         if (data.NonEquipItems.IncreaseItems(addingItem, minSlotIndex))
         {
-            data.FillEmptySlots();
+            if (onIncrease != null)
+                onIncrease.Invoke(addingItem.dataId, addingItem.level, addingItem.amount);
             return true;
         }
         return false;
     }
 
-    public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, int minSlotIndex = 0)
+    public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, int minSlotIndex = 0, System.Action<int, short, short> onIncrease = null)
     {
         foreach (ItemAmount increasingItem in increasingItems)
         {
-            if (!increasingItem.item) continue;
+            if (increasingItem.item == null || increasingItem.amount <= 0) continue;
             data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount), minSlotIndex);
+            if (onIncrease != null)
+                onIncrease.Invoke(increasingItem.item.DataId, 1, increasingItem.amount);
         }
-        data.FillEmptySlots();
+    }
+
+    public static void IncreaseItems(this ICharacterData data, IEnumerable<CharacterItem> increasingItems, int minSlotIndex = 0, System.Action<int, short, short> onIncrease = null)
+    {
+        foreach (CharacterItem increasingItem in increasingItems)
+        {
+            if (increasingItem.IsEmptySlot()) continue;
+            data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.dataId, increasingItem.level, increasingItem.amount), minSlotIndex);
+            if (onIncrease != null)
+                onIncrease.Invoke(increasingItem.dataId, increasingItem.level, increasingItem.amount);
+        }
     }
     #endregion
 
@@ -937,7 +989,7 @@ public static partial class CharacterDataExtension
     {
         decreaseItems = new Dictionary<CharacterItem, short>();
         Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
-        short tempDecresingAmount = 0;
+        short tempDecresingAmount;
         CharacterItem tempItem;
         for (int i = itemList.Count - 1; i >= 0; --i)
         {
@@ -981,10 +1033,11 @@ public static partial class CharacterDataExtension
     {
         decreaseItems = new Dictionary<CharacterItem, short>();
         Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
-        short tempDecresingAmount = 0;
+        CharacterItem nonEquipItem;
+        short tempDecresingAmount;
         for (int i = data.NonEquipItems.Count - 1; i >= 0; --i)
         {
-            CharacterItem nonEquipItem = data.NonEquipItems[i];
+            nonEquipItem = data.NonEquipItems[i];
             if (nonEquipItem.GetAmmoItem() != null && nonEquipItem.GetAmmoItem().AmmoType == ammoType)
             {
                 if (amount - nonEquipItem.amount > 0)
@@ -1040,10 +1093,7 @@ public static partial class CharacterDataExtension
     public static bool DecreaseItemsByIndex(this ICharacterData data, int index, short amount)
     {
         if (data.NonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot))
-        {
-            data.FillEmptySlots();
             return true;
-        }
         return false;
     }
     #endregion
