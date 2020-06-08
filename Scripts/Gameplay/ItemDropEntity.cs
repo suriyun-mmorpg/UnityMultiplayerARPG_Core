@@ -9,11 +9,46 @@ namespace MultiplayerARPG
     public sealed class ItemDropEntity : BaseGameEntity
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
-        public CharacterItem dropData;
-        public HashSet<uint> looters;
-        public Transform modelContainer;
-        private float dropTime;
+        [Header("Generic settings")]
+        [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
+        [SerializeField]
+        private Transform modelContainer;
+        [Header("Respawn settings")]
+        [SerializeField]
+        private bool autoRespawn;
+        [SerializeField]
+        private float respawnDelay;
+        [Header("Drop items settings")]
+        [Tooltip("Max kind of items that will be dropped in ground")]
+        [SerializeField]
+        private byte maxDropItems = 5;
+        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [SerializeField]
+        private ItemDrop[] randomItems;
+        [SerializeField]
+        private ItemDropTable itemDropTable;
+
+        [System.NonSerialized]
+        private List<ItemDrop> cacheRandomItems;
+        public List<ItemDrop> CacheRandomItems
+        {
+            get
+            {
+                if (cacheRandomItems == null)
+                {
+                    cacheRandomItems = new List<ItemDrop>(randomItems);
+                    if (itemDropTable != null)
+                        cacheRandomItems.AddRange(itemDropTable.randomItems);
+                }
+                return cacheRandomItems;
+            }
+        }
+        public List<CharacterItem> DropItems { get; private set; }
+        public HashSet<uint> Looters { get; private set; }
+
+        private int? characterDropItemId;
         private bool isPickedUp;
+        private float dropTime;
 
         [SerializeField]
         private SyncFieldInt itemDataId = new SyncFieldInt();
@@ -61,12 +96,30 @@ namespace MultiplayerARPG
             base.EntityStart();
             if (IsServer)
             {
-                int id = dropData.dataId;
-                dropTime = Time.unscaledTime;
-                if (!GameInstance.Items.ContainsKey(id))
-                    NetworkDestroy();
-                itemDataId.Value = id;
-                NetworkDestroy(CurrentGameInstance.itemAppearDuration);
+                if (characterDropItemId.HasValue)
+                {
+                    // Item drop from character, so set item data id to instantiate drop model at clients
+                    if (!GameInstance.Items.ContainsKey(characterDropItemId.Value))
+                        NetworkDestroy();
+                    itemDataId.Value = characterDropItemId.Value;
+                    NetworkDestroy(CurrentGameInstance.itemAppearDuration);
+                }
+                else
+                {
+                    // Random drop items
+                    DropItems = new List<CharacterItem>();
+                    Looters = new HashSet<uint>();
+                    ItemDrop randomItem;
+                    for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
+                    {
+                        randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
+                        if (randomItem.item == null ||
+                            randomItem.amount == 0 ||
+                            Random.value > randomItem.dropRate)
+                            continue;
+                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
+                    }
+                }
             }
         }
 
@@ -91,8 +144,10 @@ namespace MultiplayerARPG
 
         private void OnItemDataIdChange(bool isInitial, int itemDataId)
         {
+            if (!IsClient)
+                return;
             BaseItem item;
-            if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.DropModel != null)
+            if (CacheModelContainer != null && GameInstance.Items.TryGetValue(itemDataId, out item) && item.DropModel != null)
             {
                 GameObject model = Instantiate(item.DropModel, CacheModelContainer);
                 model.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
@@ -104,15 +159,15 @@ namespace MultiplayerARPG
 
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
-            if (looters == null ||
-                looters.Contains(baseCharacterEntity.ObjectId) ||
-                Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration ||
-                isPickedUp)
+            if ((Looters == null ||
+                Looters.Contains(baseCharacterEntity.ObjectId) ||
+                Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration) &&
+                !isPickedUp)
                 return true;
             return false;
         }
 
-        public void MarkAsPickedUp()
+        public void PickedUp()
         {
             isPickedUp = true;
         }
@@ -171,8 +226,11 @@ namespace MultiplayerARPG
             }
             GameObject spawnObj = Instantiate(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();
-            itemDropEntity.dropData = dropData;
-            itemDropEntity.looters = new HashSet<uint>(looters);
+            itemDropEntity.DropItems = new List<CharacterItem> { dropData };
+            itemDropEntity.Looters = new HashSet<uint>(looters);
+            itemDropEntity.characterDropItemId = dropData.dataId;
+            itemDropEntity.isPickedUp = false;
+            itemDropEntity.dropTime = Time.unscaledTime;
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemDropEntity;
         }

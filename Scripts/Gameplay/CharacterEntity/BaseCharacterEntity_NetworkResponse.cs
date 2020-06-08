@@ -61,25 +61,18 @@ namespace MultiplayerARPG
                 return;
             }
 
-            CharacterItem itemDropData = itemDropEntity.dropData;
-            if (itemDropData.IsEmptySlot())
-            {
-                // Destroy item drop entity without item add because this is not valid
-                itemDropEntity.MarkAsPickedUp();
-                itemDropEntity.NetworkDestroy();
-                return;
-            }
-            if (this.IncreasingItemsWillOverwhelming(itemDropData.dataId, itemDropData.amount))
+            if (this.IncreasingItemsWillOverwhelming(itemDropEntity.DropItems))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
 
-            this.IncreaseItems(itemDropData);
+            this.IncreaseItems(itemDropEntity.DropItems, 0, (dataId, level, amount) =>
+            {
+                CurrentGameManager.SendNotifyRewardItem(ConnectionId, dataId, amount);
+            });
             this.FillEmptySlots();
-            CurrentGameManager.SendNotifyRewardItem(ConnectionId, itemDropData.dataId, itemDropData.amount);
-            itemDropEntity.MarkAsPickedUp();
-            itemDropEntity.NetworkDestroy();
+            itemDropEntity.PickedUp();
         }
 
         /// <summary>
@@ -97,13 +90,14 @@ namespace MultiplayerARPG
             if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
-            if (this.DecreaseItemsByIndex(index, amount))
-            {
-                // Drop item to the ground
-                CharacterItem dropData = nonEquipItem.Clone();
-                dropData.amount = amount;
-                ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
-            }
+            if (!this.DecreaseItemsByIndex(index, amount))
+                return;
+
+            this.FillEmptySlots();
+            // Drop item to the ground
+            CharacterItem dropData = nonEquipItem.Clone();
+            dropData.amount = amount;
+            ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
         }
 
         /// <summary>
