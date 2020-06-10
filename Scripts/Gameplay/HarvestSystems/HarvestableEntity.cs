@@ -122,6 +122,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 CurrentHp = 0;
+                // Tell clients that the harvestable destroy to play animation at client
                 CallNetFunction(NetFuncOnHarvestableDestroy, FunctionReceivers.All);
                 DestroyAndRespawn();
             }
