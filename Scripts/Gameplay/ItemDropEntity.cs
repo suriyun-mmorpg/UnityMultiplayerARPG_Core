@@ -1,32 +1,43 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
 
 namespace MultiplayerARPG
 {
-    public sealed class ItemDropEntity : BaseGameEntity
+    public class ItemDropEntity : BaseGameEntity
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
         [Header("Generic settings")]
+        [Header("Monster Character Settings")]
+        [Tooltip("The title which will be used with item drop entity which placed into the scene (not drops from characters)")]
+        [SerializeField]
+        protected string itemTitle;
+        [Tooltip("Item titles by language keys")]
+        [SerializeField]
+        protected LanguageData[] itemTitles;
         [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
         [SerializeField]
-        private Transform modelContainer;
+        protected Transform modelContainer;
         [Header("Respawn settings")]
+        [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
         [SerializeField]
-        private bool autoRespawn;
+        protected float destroyDelay = 0f;
         [SerializeField]
-        private float respawnDelay;
+        protected float destroyRespawnDelay = 5f;
+        [SerializeField]
+        protected UnityEvent onItemDropDestroy;
         [Header("Drop items settings")]
         [Tooltip("Max kind of items that will be dropped in ground")]
         [SerializeField]
-        private byte maxDropItems = 5;
+        protected byte maxDropItems = 5;
         [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         [SerializeField]
-        private ItemDrop[] randomItems;
+        protected ItemDrop[] randomItems;
         [SerializeField]
-        private ItemDropTable itemDropTable;
+        protected ItemDropTable itemDropTable;
 
         [System.NonSerialized]
         private List<ItemDrop> cacheRandomItems;
@@ -43,15 +54,15 @@ namespace MultiplayerARPG
                 return cacheRandomItems;
             }
         }
-        public List<CharacterItem> DropItems { get; private set; }
-        public HashSet<uint> Looters { get; private set; }
+        public List<CharacterItem> DropItems { get; protected set; }
+        public HashSet<uint> Looters { get; protected set; }
 
-        private int? characterDropItemId;
-        private bool isPickedUp;
-        private float dropTime;
+        protected int? characterDropItemId;
+        protected bool isPickedUp;
+        protected float dropTime;
 
         [SerializeField]
-        private SyncFieldInt itemDataId = new SyncFieldInt();
+        protected SyncFieldInt itemDataId = new SyncFieldInt();
 
         public BaseItem Item
         {
@@ -64,12 +75,17 @@ namespace MultiplayerARPG
             }
         }
 
+        public string ItemTitle
+        {
+            get { return Language.GetText(itemTitles, itemTitle); }
+        }
+
         public override string Title
         {
             get
             {
                 BaseItem item = Item;
-                return item == null ? LanguageManager.GetUnknowTitle() : item.Title;
+                return item == null ? ItemTitle : item.Title;
             }
             set { }
         }
@@ -134,6 +150,13 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             itemDataId.onChange += OnItemDataIdChange;
+            RegisterNetFunction(NetFuncOnItemDropDestroy);
+        }
+
+        protected virtual void NetFuncOnItemDropDestroy()
+        {
+            if (onItemDropDestroy != null)
+                onItemDropDestroy.Invoke();
         }
 
         protected override void EntityOnDestroy()
@@ -142,7 +165,7 @@ namespace MultiplayerARPG
             itemDataId.onChange -= OnItemDataIdChange;
         }
 
-        private void OnItemDataIdChange(bool isInitial, int itemDataId)
+        protected virtual void OnItemDataIdChange(bool isInitial, int itemDataId)
         {
             if (!IsClient)
                 return;
@@ -169,7 +192,31 @@ namespace MultiplayerARPG
 
         public void PickedUp()
         {
+            if (!IsServer)
+                return;
+
+            // Mark as picked up
             isPickedUp = true;
+
+            // Tell clients that the item drop destroy to play animation at client
+            CallNetFunction(NetFuncOnItemDropDestroy, FunctionReceivers.All);
+
+            // Destroy and Respawn
+            if (Identity.IsSceneObject)
+            {
+                // Respawning
+                Manager.StartCoroutine(RespawnRoutine());
+            }
+            NetworkDestroy(destroyDelay);
+        }
+
+        private IEnumerator RespawnRoutine()
+        {
+            yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
+            Manager.Assets.NetworkSpawnScene(
+                Identity.ObjectId,
+                CacheTransform.position,
+                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
         public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
