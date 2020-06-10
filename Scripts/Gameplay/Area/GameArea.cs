@@ -34,7 +34,7 @@ namespace MultiplayerARPG
                             randomedPosition = Random.insideUnitSphere * randomRadius;
                             break;
                         case GameAreaType.Square:
-                            randomedPosition = new Vector3(Random.Range(-squareSizeX / 2f, squareSizeX / 2f), 0, Random.Range(-squareSizeZ / 2f, squareSizeZ / 2f));
+                            randomedPosition = new Vector3(Random.Range(-squareSizeX * 0.5f, squareSizeX * 0.5f), 0, Random.Range(-squareSizeZ * 0.5f, squareSizeZ * 0.5f));
                             break;
                     }
                     randomedPosition = transform.position + new Vector3(randomedPosition.x, 0, randomedPosition.z);
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
                             randomedPosition = Random.insideUnitCircle * randomRadius;
                             break;
                         case GameAreaType.Square:
-                            randomedPosition = new Vector3(Random.Range(-squareSizeX / 2f, squareSizeX / 2f), Random.Range(-squareSizeZ / 2f, squareSizeZ / 2f));
+                            randomedPosition = new Vector3(Random.Range(-squareSizeX * 0.5f, squareSizeX * 0.5f), Random.Range(-squareSizeZ * 0.5f, squareSizeZ * 0.5f));
                             break;
                     }
                     randomedPosition = transform.position + new Vector3(randomedPosition.x, randomedPosition.y);
