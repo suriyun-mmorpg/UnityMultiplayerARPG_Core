@@ -107,6 +107,7 @@ namespace MultiplayerARPG
         {
             tempCurrentPosition = CacheTransform.position;
             tempCurrentPosition.y += GROUND_BUFFER;
+            tempVerticalVelocity = -maxFallVelocity;
             CacheOpenCharacterController.SetPosition(tempCurrentPosition, true);
         }
 
@@ -397,8 +398,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Grounded, v-velocity reset to 0
-                tempVerticalVelocity = 0f;
+                // Grounded, fall to zero
+                tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, 0f, gravity * deltaTime);
             }
 
             // Jumping 
