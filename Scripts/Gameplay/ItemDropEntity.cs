@@ -167,6 +167,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnItemDataIdChange(bool isInitial, int itemDataId)
         {
+            // Instantiate model at clients
             if (!IsClient)
                 return;
             BaseItem item;
