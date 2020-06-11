@@ -135,7 +135,7 @@ namespace MultiplayerARPG
 
             if (spawnArea != null)
                 spawnArea.Spawn(destroyDelay + destroyRespawnDelay);
-            else
+            else if (Identity.IsSceneObject)
                 Manager.StartCoroutine(RespawnRoutine());
 
             NetworkDestroy(destroyDelay);
