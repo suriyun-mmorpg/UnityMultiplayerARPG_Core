@@ -57,6 +57,19 @@ namespace MultiplayerARPG
                 }
             }
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            // Add items
+            if (harvestEffectivenesses != null && harvestEffectivenesses.Length > 0)
+            {
+                foreach (HarvestEffectiveness harvestEffectiveness in harvestEffectivenesses)
+                {
+                    GameInstance.AddItems(harvestEffectiveness.items);
+                }
+            }
+        }
     }
 
     [System.Serializable]
