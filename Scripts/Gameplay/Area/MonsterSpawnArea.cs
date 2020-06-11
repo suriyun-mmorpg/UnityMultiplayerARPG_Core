@@ -37,6 +37,12 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void RegisterAssets()
+        {
+            base.RegisterAssets();
+            GameInstance.AddCharacterEntities(new BaseMonsterCharacterEntity[] { asset });
+        }
+
         protected override void SpawnInternal()
         {
             Vector3 spawnPosition = GetRandomPosition();

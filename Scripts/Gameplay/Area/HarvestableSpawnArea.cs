@@ -39,6 +39,12 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void RegisterAssets()
+        {
+            base.RegisterAssets();
+            GameInstance.AddHarvestableEntities(new HarvestableEntity[] { asset });
+        }
+
         protected override void SpawnInternal()
         {
             float colliderDetectionRadius = harvestableEntity.colliderDetectionRadius;
