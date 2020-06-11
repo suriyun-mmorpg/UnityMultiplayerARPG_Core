@@ -26,6 +26,8 @@ namespace MultiplayerARPG
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
+        [Tooltip("Delay before character change from grounded state to airborne")]
+        public float airborneDelay = 0.01f;
         [Range(0.1f, 1f)]
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
@@ -55,6 +57,7 @@ namespace MultiplayerARPG
         }
 
         // Movement codes
+        private float airborneElapsed;
         private bool isUnderWater;
         private bool isJumping;
         private Collider waterCollider;
@@ -107,8 +110,8 @@ namespace MultiplayerARPG
         {
             tempCurrentPosition = CacheTransform.position;
             tempCurrentPosition.y += GROUND_BUFFER;
-            tempVerticalVelocity = -maxFallVelocity;
             CacheOpenCharacterController.SetPosition(tempCurrentPosition, true);
+            tempVerticalVelocity = 0;
         }
 
         public override void EntityLateUpdate()
@@ -133,6 +136,7 @@ namespace MultiplayerARPG
             CacheNetTransform.enabled = true;
             CacheOpenCharacterController.enabled = true;
             CacheOpenCharacterController.SetPosition(CacheTransform.position, true);
+            tempVerticalVelocity = 0;
             CacheNetTransform.onTeleport += OnTeleport;
         }
 
@@ -146,6 +150,7 @@ namespace MultiplayerARPG
         protected void OnTeleport(Vector3 position, Quaternion rotation)
         {
             CacheOpenCharacterController.SetPosition(position, true);
+            tempVerticalVelocity = 0;
         }
 
         protected void OnAnimatorMove()
@@ -327,7 +332,7 @@ namespace MultiplayerARPG
             tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
             if (isUnderWater)
                 tempMovementState |= MovementState.IsUnderWater;
-            if (CacheOpenCharacterController.isGrounded)
+            if (CacheOpenCharacterController.isGrounded || airborneElapsed < airborneDelay)
                 tempMovementState |= MovementState.IsGrounded;
             CacheEntity.SetMovement(tempMovementState);
         }
@@ -351,6 +356,12 @@ namespace MultiplayerARPG
             tempMoveDirection = Vector3.zero;
             tempTargetDistance = -1f;
             WaterCheck();
+
+            // Update airborne elasped
+            if (CacheOpenCharacterController.isGrounded)
+                airborneElapsed = 0f;
+            else
+                airborneElapsed += deltaTime;
 
             if (HasNavPaths)
             {
@@ -399,12 +410,16 @@ namespace MultiplayerARPG
             else
             {
                 // Grounded, fall to zero
-                tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, 0f, gravity * deltaTime);
+                if (!useRootMotionForFall)
+                    tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, 0f, gravity * deltaTime);
+                else
+                    tempVerticalVelocity = 0f;
             }
 
             // Jumping 
             if (CacheOpenCharacterController.isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
             {
+                airborneElapsed = airborneDelay;
                 RequestTriggerJump();
                 if (!useRootMotionForJump)
                     tempVerticalVelocity = CalculateJumpVerticalSpeed();
