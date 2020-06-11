@@ -262,7 +262,7 @@ namespace MultiplayerARPG
                 return cacheSkillLevels;
             }
         }
-        
+
         private readonly List<MonsterSkill> tempRandomSkills = new List<MonsterSkill>();
 
         public int RandomExp()
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
                     randomItem.amount == 0 ||
                     Random.value > randomItem.dropRate)
                     continue;
-                
+
                 onRandomItem.Invoke(randomItem.item, randomItem.amount);
             }
         }
@@ -337,6 +337,15 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             DamageInfo.PrepareRelatesData();
+            // Add items from drop table
+            List<BaseItem> items = new List<BaseItem>();
+            foreach (var randomItem in CacheRandomItems)
+            {
+                if (randomItem.item == null)
+                    continue;
+                items.Add(randomItem.item);
+            }
+            GameInstance.AddItems(items);
         }
     }
 }
