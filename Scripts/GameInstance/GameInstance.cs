@@ -202,6 +202,7 @@ namespace MultiplayerARPG
 
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
+        public static readonly Dictionary<int, Harvestable> Harvestables = new Dictionary<int, Harvestable>();
         public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
         public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
@@ -594,6 +595,48 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddItems(IEnumerable<ItemAmount> itemAmounts)
+        {
+            if (itemAmounts == null)
+                return;
+            List<BaseItem> items = new List<BaseItem>();
+            foreach (ItemAmount itemAmount in itemAmounts)
+            {
+                if (itemAmount.item == null)
+                    continue;
+                items.Add(itemAmount.item);
+            }
+            AddItems(items);
+        }
+
+        public static void AddItems(IEnumerable<ItemDrop> itemDrops)
+        {
+            if (itemDrops == null)
+                return;
+            List<BaseItem> items = new List<BaseItem>();
+            foreach (ItemDrop itemDrop in itemDrops)
+            {
+                if (itemDrop.item == null)
+                    continue;
+                items.Add(itemDrop.item);
+            }
+            AddItems(items);
+        }
+
+        public static void AddItems(IEnumerable<ItemDropByWeight> itemDrops)
+        {
+            if (itemDrops == null)
+                return;
+            List<BaseItem> items = new List<BaseItem>();
+            foreach (ItemDropByWeight itemDrop in itemDrops)
+            {
+                if (itemDrop.item == null)
+                    continue;
+                items.Add(itemDrop.item);
+            }
+            AddItems(items);
+        }
+
         public static void AddItems(IEnumerable<BaseItem> items)
         {
             if (items == null)
@@ -605,6 +648,20 @@ namespace MultiplayerARPG
                 item.Validate();
                 Items[item.DataId] = item;
                 item.PrepareRelatesData();
+            }
+        }
+
+        public static void AddHarvestables(IEnumerable<Harvestable> harvestables)
+        {
+            if (harvestables == null)
+                return;
+            foreach (Harvestable harvestable in harvestables)
+            {
+                if (harvestable == null || Items.ContainsKey(harvestable.DataId))
+                    continue;
+                harvestable.Validate();
+                Harvestables[harvestable.DataId] = harvestable;
+                harvestable.PrepareRelatesData();
             }
         }
 
@@ -657,6 +714,40 @@ namespace MultiplayerARPG
                 }
             }
             AddCharacters(characters);
+        }
+
+        public static void AddItemDropEntities(IEnumerable<ItemDropEntity> itemDropEntities)
+        {
+            if (itemDropEntities == null)
+                return;
+            List<BaseItem> items = new List<BaseItem>();
+            foreach (ItemDropEntity itemDropEntity in itemDropEntities)
+            {
+                if (itemDropEntity == null)
+                    continue;
+                // Add items from drop table
+                foreach (var randomItem in itemDropEntity.CacheRandomItems)
+                {
+                    if (randomItem.item == null)
+                        continue;
+                    items.Add(randomItem.item);
+                }
+            }
+            AddItems(items);
+        }
+
+        public static void AddHarvestableEntities(IEnumerable<HarvestableEntity> harvestableEntities)
+        {
+            if (harvestableEntities == null)
+                return;
+            List<Harvestable> harvestables = new List<Harvestable>();
+            foreach (HarvestableEntity harvestableEntity in harvestableEntities)
+            {
+                if (harvestableEntity == null || harvestableEntity.harvestable == null)
+                    continue;
+                harvestables.Add(harvestableEntity.harvestable);
+            }
+            AddHarvestables(harvestables);
         }
 
         public static void AddVehicleEntities(IEnumerable<VehicleEntity> vehicleEntities)
