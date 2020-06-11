@@ -56,6 +56,8 @@ namespace MultiplayerARPG
         }
         public List<CharacterItem> DropItems { get; protected set; }
         public HashSet<uint> Looters { get; protected set; }
+        public ItemDropSpawnArea spawnArea { get; protected set; }
+        public Vector3 spawnPosition { get; protected set; }
 
         protected int? characterDropItemId;
         protected bool isPickedUp;
@@ -146,6 +148,12 @@ namespace MultiplayerARPG
             itemDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
+        public virtual void SetSpawnArea(ItemDropSpawnArea spawnArea, Vector3 spawnPosition)
+        {
+            this.spawnArea = spawnArea;
+            this.spawnPosition = spawnPosition;
+        }
+
         public override void OnSetup()
         {
             base.OnSetup();
@@ -203,11 +211,11 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncOnItemDropDestroy, FunctionReceivers.All);
 
             // Destroy and Respawn
-            if (Identity.IsSceneObject)
-            {
-                // Respawning
+            if (spawnArea != null)
+                spawnArea.Spawn(destroyDelay + destroyRespawnDelay);
+            else if (Identity.IsSceneObject)
                 Manager.StartCoroutine(RespawnRoutine());
-            }
+
             NetworkDestroy(destroyDelay);
         }
 
