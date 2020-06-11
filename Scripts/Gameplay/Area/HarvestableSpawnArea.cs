@@ -1,43 +1,46 @@
 ﻿using System.Collections;
 using LiteNetLibManager;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
-    public class HarvestableSpawnArea : GameArea
+    public class HarvestableSpawnArea : GameSpawnArea<HarvestableEntity>
     {
-        [Header("Spawning Data")]
+        [Tooltip("This is deprecated, might be removed in future version, set your asset to `Asset` instead.")]
+        [ReadOnlyField]
         public HarvestableEntity harvestableEntity;
-        public short amount = 1;
         // Private data
         private int pending;
 
-        public void RegisterAssets()
+        private void Awake()
         {
-            if (harvestableEntity != null)
-                BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(harvestableEntity.Identity);
+            MigrateAsset();
         }
 
-        public void SpawnAll()
+#if UNITY_EDITOR
+        private void OnValidate()
         {
-            if (harvestableEntity != null)
+            MigrateAsset();
+        }
+#endif
+
+        private void MigrateAsset()
+        {
+            if (asset == null && harvestableEntity != null)
             {
-                for (int i = 0; i < amount; ++i)
-                {
-                    Spawn(0);
-                }
+                asset = harvestableEntity;
+                harvestableEntity = null;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this);
+#endif
             }
         }
 
-        public void Spawn(float delay)
+        protected override void SpawnInternal()
         {
-            StartCoroutine(SpawnRoutine(delay));
-        }
-
-        IEnumerator SpawnRoutine(float delay)
-        {
-            yield return new WaitForSecondsRealtime(delay);
-
             float colliderDetectionRadius = harvestableEntity.colliderDetectionRadius;
             Vector3 spawnPosition = GetRandomPosition();
             Quaternion spawnRotation = GetRandomRotation();

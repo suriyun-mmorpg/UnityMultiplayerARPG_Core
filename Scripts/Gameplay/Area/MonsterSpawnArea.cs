@@ -1,43 +1,47 @@
 ﻿using System.Collections;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
-    public class MonsterSpawnArea : GameArea
+    public class MonsterSpawnArea : GameSpawnArea<BaseMonsterCharacterEntity>
     {
-        [Header("Spawning Data")]
+        [Tooltip("This is deprecated, might be removed in future version, set your asset to `Asset` instead.")]
+        [ReadOnlyField]
         public BaseMonsterCharacterEntity monsterCharacterEntity;
         public short level = 1;
-        public short amount = 1;
 
-        public void RegisterAssets()
+        private void Awake()
         {
-            if (monsterCharacterEntity != null)
-                BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(monsterCharacterEntity.Identity);
+            MigrateAsset();
         }
 
-        public virtual void SpawnAll()
+#if UNITY_EDITOR
+        private void OnValidate()
         {
-            if (monsterCharacterEntity != null)
+            MigrateAsset();
+        }
+#endif
+
+        private void MigrateAsset()
+        {
+            if (asset == null && monsterCharacterEntity != null)
             {
-                for (int i = 0; i < amount; ++i)
-                {
-                    Spawn(0);
-                }
+                asset = monsterCharacterEntity;
+                monsterCharacterEntity = null;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this);
+#endif
             }
         }
 
-        public virtual void Spawn(float delay)
+        protected override void SpawnInternal()
         {
-            StartCoroutine(SpawnRoutine(delay));
-        }
-
-        IEnumerator SpawnRoutine(float delay)
-        {
-            yield return new WaitForSecondsRealtime(delay);
             Vector3 spawnPosition = GetRandomPosition();
             Quaternion spawnRotation = GetRandomRotation();
-            GameObject spawnObj = Instantiate(monsterCharacterEntity.gameObject, spawnPosition, spawnRotation);
+            GameObject spawnObj = Instantiate(asset.gameObject, spawnPosition, spawnRotation);
             BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             entity.Level = level;
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
