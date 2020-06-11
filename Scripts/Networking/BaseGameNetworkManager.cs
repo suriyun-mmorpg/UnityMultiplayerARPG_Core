@@ -841,6 +841,17 @@ namespace MultiplayerARPG
                 harvestableSpawnArea.RegisterAssets();
             }
 
+            ItemDropSpawnArea[] itemDropSpawnAreas = FindObjectsOfType<ItemDropSpawnArea>();
+            foreach (ItemDropSpawnArea itemDropSpawnArea in itemDropSpawnAreas)
+            {
+                itemDropSpawnArea.RegisterAssets();
+            }
+
+            // Register scene entities
+            GameInstance.AddCharacterEntities(FindObjectsOfType<BaseMonsterCharacterEntity>());
+            GameInstance.AddHarvestableEntities(FindObjectsOfType<HarvestableEntity>());
+            GameInstance.AddItemDropEntities(FindObjectsOfType<ItemDropEntity>());
+
             PoolSystem.Clear();
             foreach (IPoolDescriptor poolingObject in GameInstance.PoolingObjectPrefabs)
             {
