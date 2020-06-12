@@ -32,7 +32,6 @@ namespace MultiplayerARPG
             if (asset == null && harvestableEntity != null)
             {
                 asset = harvestableEntity;
-                harvestableEntity = null;
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(this);
 #endif
@@ -47,7 +46,7 @@ namespace MultiplayerARPG
 
         protected override void SpawnInternal()
         {
-            float colliderDetectionRadius = harvestableEntity.colliderDetectionRadius;
+            float colliderDetectionRadius = asset.colliderDetectionRadius;
             Vector3 spawnPosition = GetRandomPosition();
             Quaternion spawnRotation = GetRandomRotation();
             bool overlapEntities = false;
@@ -65,7 +64,7 @@ namespace MultiplayerARPG
             }
             if (!overlapEntities)
             {
-                GameObject spawnObj = Instantiate(harvestableEntity.gameObject, spawnPosition, spawnRotation);
+                GameObject spawnObj = Instantiate(asset.gameObject, spawnPosition, spawnRotation);
                 HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
                 entity.SetSpawnArea(this, spawnPosition);
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);

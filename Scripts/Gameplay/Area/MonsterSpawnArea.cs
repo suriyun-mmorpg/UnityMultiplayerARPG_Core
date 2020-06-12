@@ -30,7 +30,6 @@ namespace MultiplayerARPG
             if (asset == null && monsterCharacterEntity != null)
             {
                 asset = monsterCharacterEntity;
-                monsterCharacterEntity = null;
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(this);
 #endif
