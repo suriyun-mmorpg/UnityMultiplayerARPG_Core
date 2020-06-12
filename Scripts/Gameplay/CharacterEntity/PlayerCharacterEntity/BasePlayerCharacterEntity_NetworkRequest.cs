@@ -185,6 +185,14 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool RequestShowNpcRepairItem()
+        {
+            if (IsDead())
+                return false;
+            CallNetFunction(NetFuncShowNpcRepairItem, ConnectionId);
+            return true;
+        }
+
         public bool RequestSelectNpcDialogMenu(byte menuIndex)
         {
             if (IsDead())

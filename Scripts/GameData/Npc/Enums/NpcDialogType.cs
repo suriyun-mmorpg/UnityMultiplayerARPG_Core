@@ -12,5 +12,6 @@
         PlayerStorage,
         GuildStorage,
         DismantleItem,
+        RepairItem,
     }
 }

@@ -52,6 +52,17 @@ namespace MultiplayerARPG
                 onShowNpcDismantleItem.Invoke();
         }
 
+        protected void NetFuncShowNpcRepairItem()
+        {
+            // Hide npc dialog
+            if (onShowNpcDialog != null)
+                onShowNpcDialog.Invoke(0);
+
+            // Show dismantle dialog
+            if (onShowNpcRepairItem != null)
+                onShowNpcRepairItem.Invoke();
+        }
+
         protected void NetFuncSelectNpcDialogMenu(byte menuIndex)
         {
             if (CurrentNpcDialog == null)

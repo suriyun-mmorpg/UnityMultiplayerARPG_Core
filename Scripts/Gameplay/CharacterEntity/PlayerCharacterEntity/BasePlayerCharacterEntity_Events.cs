@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         public System.Action<int> onShowNpcDialog;
         public System.Action onShowNpcRefineItem;
         public System.Action onShowNpcDismantleItem;
+        public System.Action onShowNpcRepairItem;
         // Dealing dialog events
         public System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
         public System.Action<BasePlayerCharacterEntity> onShowDealingDialog;

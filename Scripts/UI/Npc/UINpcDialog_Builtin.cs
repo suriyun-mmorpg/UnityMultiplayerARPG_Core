@@ -160,6 +160,22 @@ namespace MultiplayerARPG
             get { return Language.GetText(messageGuildStorageCancelTitles, messageGuildStorageCancel); }
         }
 
+        [Header("Repair Item Confirm Menu Title")]
+        public string messageRepairItemConfirm = "Repair Item";
+        public LanguageData[] messageRepairItemConfirmTitles;
+        public string MessageRepairItemConfirm
+        {
+            get { return Language.GetText(messageRepairItemConfirmTitles, messageRepairItemConfirm); }
+        }
+
+        [Header("Repair Item Cancel Menu Title")]
+        public string messageRepairItemCancel = "Cancel";
+        public LanguageData[] messageRepairItemCancelTitles;
+        public string MessageRepairItemCancel
+        {
+            get { return Language.GetText(messageRepairItemCancelTitles, messageRepairItemCancel); }
+        }
+
         [Header("Event")]
         public UnityEvent onSwitchToNormalDialog;
         public UnityEvent onSwitchToQuestDialog;
@@ -171,6 +187,7 @@ namespace MultiplayerARPG
         public UnityEvent onSwitchToDismantleItemDialog;
         public UnityEvent onSwitchToPlayerStorageDialog;
         public UnityEvent onSwitchToGuildStorageDialog;
+        public UnityEvent onSwitchToRepairItemDialog;
 
         private UIList cacheMenuList;
         public UIList CacheMenuList

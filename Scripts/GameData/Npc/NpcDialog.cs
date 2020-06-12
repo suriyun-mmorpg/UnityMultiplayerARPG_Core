@@ -60,12 +60,15 @@ namespace MultiplayerARPG
         // Refine Item
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog refineItemCancelDialog;
-        // Refine Item
+        // Dismantle Item
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog dismantleItemCancelDialog;
         // Storage
         [Output(connectionType = ConnectionType.Override)]
         public NpcDialog storageCancelDialog;
+        // Repair Item
+        [Output(connectionType = ConnectionType.Override)]
+        public NpcDialog repairItemCancelDialog;
 
         public override void PrepareRelatesData()
         {
@@ -278,6 +281,18 @@ namespace MultiplayerARPG
                     menuActions.Add(guildStorageConfirmAction);
                     menuActions.Add(guildStorageCancelAction);
                     break;
+                case NpcDialogType.RepairItem:
+                    if (uiNpcDialog.onSwitchToRepairItemDialog != null)
+                        uiNpcDialog.onSwitchToRepairItemDialog.Invoke();
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = uiNpcDialog.MessageRepairItemConfirm;
+                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = uiNpcDialog.MessageRepairItemCancel;
+                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
+                    break;
             }
 
             // Menu
@@ -471,6 +486,17 @@ namespace MultiplayerARPG
                             break;
                     }
                     break;
+                case NpcDialogType.RepairItem:
+                    switch (menuIndex)
+                    {
+                        case CONFIRM_MENU_INDEX:
+                            characterEntity.RequestShowNpcRepairItem();
+                            return null;
+                        case CANCEL_MENU_INDEX:
+                            nextDialog = repairItemCancelDialog;
+                            break;
+                    }
+                    break;
             }
 
             if (nextDialog == null || !nextDialog.ValidateDialog(characterEntity))
@@ -530,6 +556,9 @@ namespace MultiplayerARPG
 
             if (from.fieldName.Equals(this.GetMemberName(a => a.storageCancelDialog)))
                 storageCancelDialog = dialog;
+
+            if (from.fieldName.Equals(this.GetMemberName(a => a.repairItemCancelDialog)))
+                repairItemCancelDialog = dialog;
         }
 
         public override bool IsShop
