@@ -118,6 +118,7 @@ namespace MultiplayerARPG
             if (Level <= 0)
                 Level = MonsterDatabase.defaultLevel;
 
+            ForceMakeCaches();
             CharacterStats stats = this.GetCaches().Stats;
             CurrentHp = (int)stats.hp;
             CurrentMp = (int)stats.mp;
