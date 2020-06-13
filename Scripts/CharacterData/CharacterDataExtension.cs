@@ -1577,8 +1577,6 @@ public static partial class CharacterDataExtension
             resultIncreaseDamages.Clear();
             resultEquipmentSets.Clear();
         }
-        // Prepare equipment set bonus
-        data.GetEquipmentSetBonus(ref resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets, true);
         // Set results values
         resultSkills = GameDataHelpers.CombineSkills(resultSkills, data.GetSkills(true));
         resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes(true, true, resultSkills));
@@ -1586,6 +1584,8 @@ public static partial class CharacterDataExtension
         resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.GetArmors(true, true, resultSkills));
         resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages(true, true, resultSkills));
         resultStats = resultStats + data.GetStats(true, true, resultSkills);
+        // Prepare equipment set bonus
+        data.GetEquipmentSetBonus(ref resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets, true);
         // Separated stats results
         resultMaxHp = (int)resultStats.hp;
         resultMaxMp = (int)resultStats.mp;
