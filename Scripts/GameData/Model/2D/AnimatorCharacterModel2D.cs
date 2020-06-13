@@ -36,6 +36,15 @@ namespace MultiplayerARPG
         public const string CLIP_MOVE_DOWN_RIGHT = "__MoveDownRight";
         public const string CLIP_MOVE_UP_LEFT = "__MoveUpLeft";
         public const string CLIP_MOVE_UP_RIGHT = "__MoveUpRight";
+        // Run
+        public const string CLIP_RUN_DOWN = "__RunDown";
+        public const string CLIP_RUN_UP = "__RunUp";
+        public const string CLIP_RUN_LEFT = "__RunLeft";
+        public const string CLIP_RUN_RIGHT = "__RunRight";
+        public const string CLIP_RUN_DOWN_LEFT = "__RunDownLeft";
+        public const string CLIP_RUN_DOWN_RIGHT = "__RunDownRight";
+        public const string CLIP_RUN_UP_LEFT = "__RunUpLeft";
+        public const string CLIP_RUN_UP_RIGHT = "__RunUpRight";
         // Dead
         public const string CLIP_DEAD_DOWN = "__DeadDown";
         public const string CLIP_DEAD_UP = "__DeadUp";
@@ -76,6 +85,7 @@ namespace MultiplayerARPG
         [Header("2D Animations")]
         public AnimatorCharacterAnimation2D idleAnimation2D;
         public AnimatorCharacterAnimation2D moveAnimation2D;
+        public AnimatorCharacterAnimation2D runAnimation2D;
         public AnimatorCharacterAnimation2D deadAnimation2D;
         public AnimatorActionAnimation2D defaultAttackAnimation2D;
         [FormerlySerializedAs("defaultSkillCastClip2D")]
@@ -200,6 +210,15 @@ namespace MultiplayerARPG
                 CacheAnimatorController[CLIP_MOVE_DOWN_RIGHT] = moveAnimation2D.downRight;
                 CacheAnimatorController[CLIP_MOVE_UP_LEFT] = moveAnimation2D.upLeft;
                 CacheAnimatorController[CLIP_MOVE_UP_RIGHT] = moveAnimation2D.upRight;
+                // Run
+                CacheAnimatorController[CLIP_RUN_DOWN] = runAnimation2D.down;
+                CacheAnimatorController[CLIP_RUN_UP] = runAnimation2D.up;
+                CacheAnimatorController[CLIP_RUN_LEFT] = runAnimation2D.left;
+                CacheAnimatorController[CLIP_RUN_RIGHT] = runAnimation2D.right;
+                CacheAnimatorController[CLIP_RUN_DOWN_LEFT] = runAnimation2D.downLeft;
+                CacheAnimatorController[CLIP_RUN_DOWN_RIGHT] = runAnimation2D.downRight;
+                CacheAnimatorController[CLIP_RUN_UP_LEFT] = runAnimation2D.upLeft;
+                CacheAnimatorController[CLIP_RUN_UP_RIGHT] = runAnimation2D.upRight;
                 // Dead
                 CacheAnimatorController[CLIP_DEAD_DOWN] = deadAnimation2D.down;
                 CacheAnimatorController[CLIP_DEAD_UP] = deadAnimation2D.up;
@@ -235,7 +254,12 @@ namespace MultiplayerARPG
                 movementState.HasFlag(MovementState.Backward) ||
                 movementState.HasFlag(MovementState.Right) ||
                 movementState.HasFlag(MovementState.Left))
-                moveSpeed = 1;
+            {
+                if (extraMovementState.HasFlag(ExtraMovementState.IsSprinting))
+                    moveSpeed = 2;
+                else
+                    moveSpeed = 1;
+            }
             // Set animator parameters
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);

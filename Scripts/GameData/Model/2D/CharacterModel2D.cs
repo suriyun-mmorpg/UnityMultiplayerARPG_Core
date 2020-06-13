@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         {
             Idle,
             Move,
+            Run,
             Dead,
             DefaultAttack,
             DefaultSkillCast,
@@ -23,6 +24,7 @@ namespace MultiplayerARPG
         public SpriteRenderer spriteRenderer;
         public CharacterAnimation2D idleAnimation2D;
         public CharacterAnimation2D moveAnimation2D;
+        public CharacterAnimation2D runAnimation2D;
         public CharacterAnimation2D deadAnimation2D;
         public ActionAnimation2D defaultAttackAnimation2D;
         [FormerlySerializedAs("defaultSkillCastClip2D")]
@@ -124,6 +126,9 @@ namespace MultiplayerARPG
                 case SampleAnimation.Move:
                     Play(moveAnimation2D, sampleDirection);
                     break;
+                case SampleAnimation.Run:
+                    Play(runAnimation2D, sampleDirection);
+                    break;
                 case SampleAnimation.Dead:
                     Play(deadAnimation2D, sampleDirection);
                     break;
@@ -189,9 +194,16 @@ namespace MultiplayerARPG
                 movementState.HasFlag(MovementState.Backward) ||
                 movementState.HasFlag(MovementState.Right) ||
                 movementState.HasFlag(MovementState.Left))
-                Play(moveAnimation2D, DirectionType2D);
+            {
+                if (extraMovementState.HasFlag(ExtraMovementState.IsSprinting))
+                    Play(runAnimation2D, DirectionType2D);
+                else
+                    Play(moveAnimation2D, DirectionType2D);
+            }
             else
+            {
                 Play(idleAnimation2D, DirectionType2D);
+            }
         }
 
         private ActionAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)
