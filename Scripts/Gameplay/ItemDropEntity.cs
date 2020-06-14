@@ -56,8 +56,8 @@ namespace MultiplayerARPG
         }
         public List<CharacterItem> DropItems { get; protected set; }
         public HashSet<uint> Looters { get; protected set; }
-        public ItemDropSpawnArea spawnArea { get; protected set; }
-        public Vector3 spawnPosition { get; protected set; }
+        public ItemDropSpawnArea SpawnArea { get; protected set; }
+        public Vector3 SpawnPosition { get; protected set; }
 
         protected int? characterDropItemId;
         protected bool isPickedUp;
@@ -100,6 +100,20 @@ namespace MultiplayerARPG
                     modelContainer = GetComponent<Transform>();
                 return modelContainer;
             }
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            // Add items from drop table
+            List<BaseItem> items = new List<BaseItem>();
+            foreach (var randomItem in CacheRandomItems)
+            {
+                if (randomItem.item == null)
+                    continue;
+                items.Add(randomItem.item);
+            }
+            GameInstance.AddItems(items);
         }
 
         protected override void EntityAwake()
@@ -150,8 +164,8 @@ namespace MultiplayerARPG
 
         public virtual void SetSpawnArea(ItemDropSpawnArea spawnArea, Vector3 spawnPosition)
         {
-            this.spawnArea = spawnArea;
-            this.spawnPosition = spawnPosition;
+            this.SpawnArea = spawnArea;
+            this.SpawnPosition = spawnPosition;
         }
 
         public override void OnSetup()
@@ -211,8 +225,8 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncOnItemDropDestroy, FunctionReceivers.All);
 
             // Destroy and Respawn
-            if (spawnArea != null)
-                spawnArea.Spawn(destroyDelay + destroyRespawnDelay);
+            if (SpawnArea != null)
+                SpawnArea.Spawn(destroyDelay + destroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 Manager.StartCoroutine(RespawnRoutine());
 

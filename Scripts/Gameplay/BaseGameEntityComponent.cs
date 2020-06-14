@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
     public interface IGameEntityComponent
     {
         bool Enabled { get; set; }
-        void EntityOnSetup();
         void EntityAwake();
         void EntityStart();
         void EntityUpdate();
@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         void EntityOnDestroy();
     }
 
-    public abstract class BaseGameEntityComponent<T> : MonoBehaviour, IGameEntityComponent
+    public abstract class BaseGameEntityComponent<T> : LiteNetLibBehaviour, IGameEntityComponent
         where T : BaseGameEntity
     {
         private bool isFoundEntity;
@@ -36,9 +36,6 @@ namespace MultiplayerARPG
         public BaseGameplayRule CurrentGameplayRule { get { return CacheEntity.CurrentGameplayRule; } }
         public BaseGameNetworkManager CurrentGameManager { get { return CacheEntity.CurrentGameManager; } }
         public Transform CacheTransform { get { return CacheEntity.CacheTransform; } }
-        public bool IsOwnerClient { get { return CacheEntity.IsOwnerClient; } }
-        public bool IsServer { get { return CacheEntity.IsServer; } }
-        public bool IsClient { get { return CacheEntity.IsClient; } }
 
         private bool isEnabled;
         public bool Enabled
@@ -54,10 +51,6 @@ namespace MultiplayerARPG
                 else
                     ComponentOnDisable();
             }
-        }
-
-        public virtual void EntityOnSetup()
-        {
         }
 
         public virtual void EntityAwake()

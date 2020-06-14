@@ -287,8 +287,6 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            InitialRequiredComponents();
-
             EntityComponents = GetComponents<IGameEntityComponent>();
             for (int i = 0; i < EntityComponents.Length; ++i)
             {
@@ -302,8 +300,9 @@ namespace MultiplayerARPG
 
         /// <summary>
         /// Override this function to initial required components
+        /// This function will be called by GameInstance when adding the entity
         /// </summary>
-        public virtual void InitialRequiredComponents()
+        public virtual void Validate()
         {
             // Cache components
             CacheTransform = transform;
@@ -315,6 +314,11 @@ namespace MultiplayerARPG
                 fpsCameraTargetTransform = CacheTransform;
             Movement = GetComponent<BaseEntityMovement>();
             LocalBounds = MakeLocalBounds();
+        }
+
+        public virtual void PrepareRelatesData()
+        {
+
         }
 
         public virtual Bounds MakeLocalBounds()
@@ -521,12 +525,6 @@ namespace MultiplayerARPG
             RegisterNetFunction<MovementState>(NetFuncSetMovement);
             RegisterNetFunction<ExtraMovementState>(NetFuncSetExtraMovement);
             RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
-
-            // Setup entity movement here to make it able to register net elements / functions
-            for (int i = 0; i < EntityComponents.Length; ++i)
-            {
-                EntityComponents[i].EntityOnSetup();
-            }
 
             if (teleportingPosition.HasValue)
             {

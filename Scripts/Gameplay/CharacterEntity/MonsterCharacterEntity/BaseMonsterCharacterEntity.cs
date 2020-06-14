@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Serialization;
 using LiteNetLibManager;
 using LiteNetLib;
 
@@ -19,7 +20,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected LanguageData[] characterTitles;
         [SerializeField]
-        protected MonsterCharacter monsterCharacter;
+        [FormerlySerializedAs("monsterCharacter")]
+        protected MonsterCharacter characterDatabase;
         [SerializeField]
         protected float destroyDelay = 2f;
         [SerializeField]
@@ -43,7 +45,7 @@ namespace MultiplayerARPG
                 // Return title (Can set in prefab) if it is not empty
                 if (!string.IsNullOrEmpty(CharacterTitle))
                     return CharacterTitle;
-                return !MonsterDatabase || string.IsNullOrEmpty(MonsterDatabase.Title) ? LanguageManager.GetUnknowTitle() : MonsterDatabase.Title;
+                return !CharacterDatabase || string.IsNullOrEmpty(CharacterDatabase.Title) ? LanguageManager.GetUnknowTitle() : CharacterDatabase.Title;
             }
             set { }
         }
@@ -74,12 +76,18 @@ namespace MultiplayerARPG
 
         public MonsterSpawnArea SpawnArea { get; protected set; }
         public Vector3 SpawnPosition { get; protected set; }
-        public MonsterCharacter MonsterDatabase { get { return monsterCharacter; } }
-        public override int DataId { get { return MonsterDatabase.DataId; } set { } }
+        public MonsterCharacter CharacterDatabase { get { return characterDatabase; } }
+        public override int DataId { get { return CharacterDatabase.DataId; } set { } }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
         private readonly HashSet<uint> looters = new HashSet<uint>();
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddCharacters(new MonsterCharacter[] { CharacterDatabase });
+        }
 
         protected override void EntityAwake()
         {
@@ -116,7 +124,7 @@ namespace MultiplayerARPG
                 return;
 
             if (Level <= 0)
-                Level = MonsterDatabase.defaultLevel;
+                Level = CharacterDatabase.defaultLevel;
 
             ForceMakeCaches();
             CharacterStats stats = this.GetCaches().Stats;
@@ -185,7 +193,7 @@ namespace MultiplayerARPG
         public override float GetMoveSpeed()
         {
             if (ExtraMovementState.HasFlag(ExtraMovementState.IsWalking))
-                return MonsterDatabase.wanderMoveSpeed;
+                return CharacterDatabase.wanderMoveSpeed;
             return base.GetMoveSpeed();
         }
 
@@ -273,12 +281,12 @@ namespace MultiplayerARPG
 
         public override float GetAttackDistance(bool isLeftHand)
         {
-            return MonsterDatabase.DamageInfo.GetDistance();
+            return CharacterDatabase.DamageInfo.GetDistance();
         }
 
         public override float GetAttackFov(bool isLeftHand)
         {
-            return MonsterDatabase.DamageInfo.GetFov();
+            return CharacterDatabase.DamageInfo.GetFov();
         }
 
         public override void ReceivedDamage(IGameEntity attacker, CombatAmountType damageAmountType, int damage)
@@ -319,7 +327,7 @@ namespace MultiplayerARPG
             if (IsSummoned)
                 return;
 
-            Reward reward = CurrentGameplayRule.MakeMonsterReward(MonsterDatabase);
+            Reward reward = CurrentGameplayRule.MakeMonsterReward(CharacterDatabase);
             // Temp data which will be in-use in loop
             BaseCharacterEntity tempCharacterEntity;
             BasePlayerCharacterEntity tempPlayerCharacterEntity;
@@ -472,7 +480,7 @@ namespace MultiplayerARPG
             }   // End count recived damage record count
             receivedDamageRecords.Clear();
             // Drop items
-            MonsterDatabase.RandomItems(OnRandomDropItem);
+            CharacterDatabase.RandomItems(OnRandomDropItem);
             // Clear looters because they are already set to dropped items
             looters.Clear();
 
@@ -546,10 +554,10 @@ namespace MultiplayerARPG
 
         protected override void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
-            if (MonsterDatabase.characteristic != MonsterCharacteristic.Assist)
+            if (CharacterDatabase.characteristic != MonsterCharacteristic.Assist)
                 return;
             // Warn that this character received damage to nearby characters
-            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(MonsterDatabase.visualRange, true, false, false);
+            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(CharacterDatabase.visualRange, true, false, false);
             if (foundCharacters == null || foundCharacters.Count == 0) return;
             foreach (BaseCharacterEntity foundCharacter in foundCharacters)
             {
@@ -560,7 +568,7 @@ namespace MultiplayerARPG
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
         {
             if ((Summoner && Summoner == ally) ||
-                MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
+                CharacterDatabase.characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
 
@@ -570,7 +578,7 @@ namespace MultiplayerARPG
             {
                 case AnimActionType.AttackRightHand:
                 case AnimActionType.AttackLeftHand:
-                    return MonsterDatabase.MoveSpeedRateWhileAttacking;
+                    return CharacterDatabase.MoveSpeedRateWhileAttacking;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
                     // Calculate move speed rate while doing action at clients and server

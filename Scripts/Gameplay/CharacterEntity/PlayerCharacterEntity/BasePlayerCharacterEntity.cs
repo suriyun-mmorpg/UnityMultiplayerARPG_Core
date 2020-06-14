@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -16,10 +17,10 @@ namespace MultiplayerARPG
         [Tooltip("Character titles by language keys")]
         [SerializeField]
         protected LanguageData[] characterTitles;
-        
         [Tooltip("This is list which used as choice of character classes when create character")]
         [SerializeField]
-        protected PlayerCharacter[] playerCharacters;
+        [FormerlySerializedAs("playerCharacters")]
+        protected PlayerCharacter[] characterDatabases;
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected BasePlayerCharacterController controllerPrefab;
@@ -29,14 +30,20 @@ namespace MultiplayerARPG
             get { return Language.GetText(characterTitles, characterTitle); }
         }
 
-        public PlayerCharacter[] PlayerCharacters
+        public PlayerCharacter[] CharacterDatabases
         {
-            get { return playerCharacters; }
+            get { return characterDatabases; }
         }
 
         public BasePlayerCharacterController ControllerPrefab
         {
             get { return controllerPrefab; }
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddCharacters(CharacterDatabases);
         }
 
         protected override void EntityAwake()

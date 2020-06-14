@@ -46,7 +46,7 @@ namespace MultiplayerARPG
 
         protected override void SpawnInternal()
         {
-            float colliderDetectionRadius = asset.colliderDetectionRadius;
+            float colliderDetectionRadius = asset.ColliderDetectionRadius;
             Vector3 spawnPosition = GetRandomPosition();
             Quaternion spawnRotation = GetRandomRotation();
             bool overlapEntities = false;

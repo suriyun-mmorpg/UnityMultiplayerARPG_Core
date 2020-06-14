@@ -44,6 +44,7 @@ namespace MultiplayerARPG
 
         public override void PrepareRelatesData()
         {
+            base.PrepareRelatesData();
             if (CacheItemCrafts.Count > 0)
             {
                 List<BaseItem> items = new List<BaseItem>();

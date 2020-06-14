@@ -1166,7 +1166,7 @@ public static partial class CharacterDataExtension
         {
             BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
             isLeftHand = false;
-            return monsterCharacterEntity.MonsterDatabase.DamageInfo;
+            return monsterCharacterEntity.CharacterDatabase.DamageInfo;
         }
         else
         {
@@ -1180,7 +1180,7 @@ public static partial class CharacterDataExtension
         {
             BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
             isLeftHand = false;
-            return monsterCharacterEntity.MonsterDatabase.DamageInfo.GetDamageTransform(characterEntity, isLeftHand);
+            return monsterCharacterEntity.CharacterDatabase.DamageInfo.GetDamageTransform(characterEntity, isLeftHand);
         }
         else
         {
@@ -1194,7 +1194,7 @@ public static partial class CharacterDataExtension
         {
             BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
             isLeftHand = false;
-            return GameDataHelpers.MakeDamage(monsterCharacterEntity.MonsterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
+            return GameDataHelpers.MakeDamage(monsterCharacterEntity.CharacterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
         }
         else
         {

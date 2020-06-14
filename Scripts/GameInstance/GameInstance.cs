@@ -693,61 +693,50 @@ namespace MultiplayerARPG
         {
             if (characterEntities == null)
                 return;
-            List<BaseCharacter> characters = new List<BaseCharacter>();
             foreach (BaseCharacterEntity characterEntity in characterEntities)
             {
                 if (characterEntity == null || CharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
                     continue;
-
+                characterEntity.Validate();
                 CharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
                 if (characterEntity is BasePlayerCharacterEntity)
                 {
                     BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
                     PlayerCharacterEntities[characterEntity.Identity.HashAssetId] = playerCharacterEntity;
-                    characters.AddRange(playerCharacterEntity.PlayerCharacters);
                 }
                 else if (characterEntity is BaseMonsterCharacterEntity)
                 {
                     BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                     MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = monsterCharacterEntity;
-                    characters.Add(monsterCharacterEntity.MonsterDatabase);
                 }
+                characterEntity.PrepareRelatesData();
             }
-            AddCharacters(characters);
         }
 
         public static void AddItemDropEntities(IEnumerable<ItemDropEntity> itemDropEntities)
         {
             if (itemDropEntities == null)
                 return;
-            List<BaseItem> items = new List<BaseItem>();
             foreach (ItemDropEntity itemDropEntity in itemDropEntities)
             {
                 if (itemDropEntity == null)
                     continue;
-                // Add items from drop table
-                foreach (var randomItem in itemDropEntity.CacheRandomItems)
-                {
-                    if (randomItem.item == null)
-                        continue;
-                    items.Add(randomItem.item);
-                }
+                itemDropEntity.Validate();
+                itemDropEntity.PrepareRelatesData();
             }
-            AddItems(items);
         }
 
         public static void AddHarvestableEntities(IEnumerable<HarvestableEntity> harvestableEntities)
         {
             if (harvestableEntities == null)
                 return;
-            List<Harvestable> harvestables = new List<Harvestable>();
             foreach (HarvestableEntity harvestableEntity in harvestableEntities)
             {
-                if (harvestableEntity == null || harvestableEntity.harvestable == null)
+                if (harvestableEntity == null)
                     continue;
-                harvestables.Add(harvestableEntity.harvestable);
+                harvestableEntity.Validate();
+                harvestableEntity.PrepareRelatesData();
             }
-            AddHarvestables(harvestables);
         }
 
         public static void AddVehicleEntities(IEnumerable<VehicleEntity> vehicleEntities)
@@ -758,7 +747,9 @@ namespace MultiplayerARPG
             {
                 if (vehicleEntity == null || VehicleEntities.ContainsKey(vehicleEntity.Identity.HashAssetId))
                     continue;
+                vehicleEntity.Validate();
                 VehicleEntities[vehicleEntity.Identity.HashAssetId] = vehicleEntity;
+                vehicleEntity.PrepareRelatesData();
             }
         }
 
@@ -840,6 +831,7 @@ namespace MultiplayerARPG
             {
                 if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
                     continue;
+                buildingEntity.Validate();
                 BuildingEntities[buildingEntity.DataId] = buildingEntity;
                 buildingEntity.PrepareRelatesData();
             }
@@ -853,7 +845,9 @@ namespace MultiplayerARPG
             {
                 if (warpPortalEntity == null || WarpPortalEntities.ContainsKey(warpPortalEntity.Identity.HashAssetId))
                     continue;
+                warpPortalEntity.Validate();
                 WarpPortalEntities[warpPortalEntity.Identity.HashAssetId] = warpPortalEntity;
+                warpPortalEntity.PrepareRelatesData();
             }
         }
 
@@ -865,7 +859,9 @@ namespace MultiplayerARPG
             {
                 if (npcEntity == null || NpcEntities.ContainsKey(npcEntity.Identity.HashAssetId))
                     continue;
+                npcEntity.Validate();
                 NpcEntities[npcEntity.Identity.HashAssetId] = npcEntity;
+                npcEntity.PrepareRelatesData();
             }
         }
 

@@ -9,9 +9,9 @@ namespace MultiplayerARPG
     /// </summary>
     public partial class MonsterCharacterEntity2D : BaseMonsterCharacterEntity
     {
-        public override void InitialRequiredComponents()
+        public override void Validate()
         {
-            base.InitialRequiredComponents();
+            base.Validate();
             if (Movement == null)
                 Logging.LogError(ToString(), "Did not setup entity movement component to this entity.");
         }

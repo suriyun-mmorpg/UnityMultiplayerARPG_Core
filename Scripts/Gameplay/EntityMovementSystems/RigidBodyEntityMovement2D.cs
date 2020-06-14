@@ -77,12 +77,12 @@ namespace MultiplayerARPG
             CacheRigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
         }
 
-        public override void EntityOnSetup()
+        public override void OnSetup()
         {
             // Register Network functions
-            CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            CacheEntity.RegisterNetFunction<DirectionVector2>(NetFuncKeyMovement);
-            CacheEntity.RegisterNetFunction(StopMove);
+            RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
+            RegisterNetFunction<DirectionVector2>(NetFuncKeyMovement);
+            RegisterNetFunction(StopMove);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)

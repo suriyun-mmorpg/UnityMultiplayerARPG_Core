@@ -11,20 +11,34 @@ namespace MultiplayerARPG
 {
     public partial class HarvestableEntity : DamageableEntity
     {
-        public int maxHp = 100;
-        public Harvestable harvestable;
-        public HarvestableCollectType collectType;
+        [SerializeField]
+        protected int maxHp = 100;
+        [SerializeField]
+        protected Harvestable harvestable;
+        [SerializeField]
+        protected HarvestableCollectType collectType;
+        [SerializeField]
         [Tooltip("Radius to detect other entities to avoid spawn this harvestable nearby other entities")]
-        public float colliderDetectionRadius = 2f;
+        protected float colliderDetectionRadius = 2f;
+        [SerializeField]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onHarvestableDestroy` event before it's going to be destroyed from the game.")]
-        public float destroyDelay = 2f;
-        public float destroyRespawnDelay = 5f;
-        public UnityEvent onHarvestableDestroy;
+        protected float destroyDelay = 2f;
+        [SerializeField]
+        protected float destroyRespawnDelay = 5f;
+        [SerializeField]
+        protected UnityEvent onHarvestableDestroy;
 
         public override string Title { get { return harvestable.Title; } set { } }
         public override int MaxHp { get { return maxHp; } }
-        public HarvestableSpawnArea spawnArea { get; protected set; }
-        public Vector3 spawnPosition { get; protected set; }
+        public float ColliderDetectionRadius { get { return colliderDetectionRadius; } }
+        public HarvestableSpawnArea SpawnArea { get; protected set; }
+        public Vector3 SpawnPosition { get; protected set; }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddHarvestables(new Harvestable[] { harvestable });
+        }
 
         protected override void EntityAwake()
         {
@@ -43,8 +57,8 @@ namespace MultiplayerARPG
         {
             if (IsServer)
             {
-                if (spawnArea == null)
-                    spawnPosition = CacheTransform.position;
+                if (SpawnArea == null)
+                    SpawnPosition = CacheTransform.position;
 
                 CurrentHp = maxHp;
             }
@@ -52,8 +66,8 @@ namespace MultiplayerARPG
 
         public virtual void SetSpawnArea(HarvestableSpawnArea spawnArea, Vector3 spawnPosition)
         {
-            this.spawnArea = spawnArea;
-            this.spawnPosition = spawnPosition;
+            SpawnArea = spawnArea;
+            SpawnPosition = spawnPosition;
         }
 
         public override void OnSetup()
@@ -133,8 +147,8 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            if (spawnArea != null)
-                spawnArea.Spawn(destroyDelay + destroyRespawnDelay);
+            if (SpawnArea != null)
+                SpawnArea.Spawn(destroyDelay + destroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 Manager.StartCoroutine(RespawnRoutine());
 
@@ -147,7 +161,7 @@ namespace MultiplayerARPG
             InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
-                spawnPosition,
+                SpawnPosition,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 

@@ -145,13 +145,13 @@ namespace MultiplayerARPG
                 CacheAnimator.ApplyBuiltinRootMotion();
         }
 
-        public override void EntityOnSetup()
+        public override void OnSetup()
         {
             // Register Network functions
-            CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            CacheEntity.RegisterNetFunction<DirectionVector3, MovementState>(NetFuncKeyMovement);
-            CacheEntity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
-            CacheEntity.RegisterNetFunction(StopMove);
+            RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
+            RegisterNetFunction<DirectionVector3, MovementState>(NetFuncKeyMovement);
+            RegisterNetFunction<short>(NetFuncUpdateYRotation);
+            RegisterNetFunction(StopMove);
         }
 
         protected void NetFuncKeyMovement(DirectionVector3 inputDirection, MovementState movementState)
