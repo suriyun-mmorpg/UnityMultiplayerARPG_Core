@@ -149,6 +149,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return false;
             CallNetFunction(NetFuncPickupItem, FunctionReceivers.Server, new PackedUInt(objectId));
+            TriggerPickup();
             return true;
         }
 
