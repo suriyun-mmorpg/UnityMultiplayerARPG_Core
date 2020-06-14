@@ -287,22 +287,22 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
+            InitialRequiredComponents();
             EntityComponents = GetComponents<IGameEntityComponent>();
             for (int i = 0; i < EntityComponents.Length; ++i)
             {
                 EntityComponents[i].EntityAwake();
                 EntityComponents[i].Enabled = true;
             }
-
             EntityAwake();
             this.InvokeInstanceDevExtMethods("Awake");
         }
 
         /// <summary>
         /// Override this function to initial required components
-        /// This function will be called by GameInstance when adding the entity
+        /// This function will be called by this entity when awake
         /// </summary>
-        public virtual void Validate()
+        public virtual void InitialRequiredComponents()
         {
             // Cache components
             CacheTransform = transform;
@@ -316,6 +316,19 @@ namespace MultiplayerARPG
             LocalBounds = MakeLocalBounds();
         }
 
+        /// <summary>
+        /// Override this function to add required components
+        /// This function will be called by GameInstance when adding the entity
+        /// </summary>
+        public virtual void Validate()
+        {
+
+        }
+
+        /// <summary>
+        /// Override this function to add relates game data to game instance
+        /// This function will be called by GameInstance when adding the entity
+        /// </summary>
         public virtual void PrepareRelatesData()
         {
 

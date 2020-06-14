@@ -38,9 +38,9 @@ namespace MultiplayerARPG
         // Temp data
         private GameEffect[] pendingHitEffects;
 
-        public override void Validate()
+        public override void InitialRequiredComponents()
         {
-            base.Validate();
+            base.InitialRequiredComponents();
             // Cache components
             if (combatTextTransform == null)
                 combatTextTransform = CacheTransform;

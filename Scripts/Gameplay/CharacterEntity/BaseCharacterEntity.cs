@@ -107,9 +107,9 @@ namespace MultiplayerARPG
             get { return ModelManager.FpsModel; }
         }
 
-        public override void Validate()
+        public override void InitialRequiredComponents()
         {
-            base.Validate();
+            base.InitialRequiredComponents();
             // Cache components
             if (meleeDamageTransform == null)
                 meleeDamageTransform = CacheTransform;

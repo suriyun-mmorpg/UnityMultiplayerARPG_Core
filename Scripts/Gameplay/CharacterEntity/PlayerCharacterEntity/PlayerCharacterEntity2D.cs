@@ -9,9 +9,9 @@ namespace MultiplayerARPG
     /// </summary>
     public partial class PlayerCharacterEntity2D : BasePlayerCharacterEntity
     {
-        public override void Validate()
+        public override void InitialRequiredComponents()
         {
-            base.Validate();
+            base.InitialRequiredComponents();
             if (Movement == null)
                 Logging.LogError(ToString(), "Did not setup entity movement component to this entity.");
         }
