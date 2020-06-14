@@ -37,14 +37,14 @@ namespace MultiplayerARPG
         public const string CLIP_MOVE_UP_LEFT = "__MoveUpLeft";
         public const string CLIP_MOVE_UP_RIGHT = "__MoveUpRight";
         // Run
-        public const string CLIP_RUN_DOWN = "__RunDown";
-        public const string CLIP_RUN_UP = "__RunUp";
-        public const string CLIP_RUN_LEFT = "__RunLeft";
-        public const string CLIP_RUN_RIGHT = "__RunRight";
-        public const string CLIP_RUN_DOWN_LEFT = "__RunDownLeft";
-        public const string CLIP_RUN_DOWN_RIGHT = "__RunDownRight";
-        public const string CLIP_RUN_UP_LEFT = "__RunUpLeft";
-        public const string CLIP_RUN_UP_RIGHT = "__RunUpRight";
+        public const string CLIP_SPRINT_DOWN = "__SprintDown";
+        public const string CLIP_SPRINT_UP = "__SprintUp";
+        public const string CLIP_SPRINT_LEFT = "__SprintLeft";
+        public const string CLIP_SPRINT_RIGHT = "__SprintRight";
+        public const string CLIP_SPRINT_DOWN_LEFT = "__SprintDownLeft";
+        public const string CLIP_SPRINT_DOWN_RIGHT = "__SprintDownRight";
+        public const string CLIP_SPRINT_UP_LEFT = "__SprintUpLeft";
+        public const string CLIP_SPRINT_UP_RIGHT = "__SprintUpRight";
         // Dead
         public const string CLIP_DEAD_DOWN = "__DeadDown";
         public const string CLIP_DEAD_UP = "__DeadUp";
@@ -211,14 +211,14 @@ namespace MultiplayerARPG
                 CacheAnimatorController[CLIP_MOVE_UP_LEFT] = moveAnimation2D.upLeft;
                 CacheAnimatorController[CLIP_MOVE_UP_RIGHT] = moveAnimation2D.upRight;
                 // Run
-                CacheAnimatorController[CLIP_RUN_DOWN] = runAnimation2D.down;
-                CacheAnimatorController[CLIP_RUN_UP] = runAnimation2D.up;
-                CacheAnimatorController[CLIP_RUN_LEFT] = runAnimation2D.left;
-                CacheAnimatorController[CLIP_RUN_RIGHT] = runAnimation2D.right;
-                CacheAnimatorController[CLIP_RUN_DOWN_LEFT] = runAnimation2D.downLeft;
-                CacheAnimatorController[CLIP_RUN_DOWN_RIGHT] = runAnimation2D.downRight;
-                CacheAnimatorController[CLIP_RUN_UP_LEFT] = runAnimation2D.upLeft;
-                CacheAnimatorController[CLIP_RUN_UP_RIGHT] = runAnimation2D.upRight;
+                CacheAnimatorController[CLIP_SPRINT_DOWN] = runAnimation2D.down;
+                CacheAnimatorController[CLIP_SPRINT_UP] = runAnimation2D.up;
+                CacheAnimatorController[CLIP_SPRINT_LEFT] = runAnimation2D.left;
+                CacheAnimatorController[CLIP_SPRINT_RIGHT] = runAnimation2D.right;
+                CacheAnimatorController[CLIP_SPRINT_DOWN_LEFT] = runAnimation2D.downLeft;
+                CacheAnimatorController[CLIP_SPRINT_DOWN_RIGHT] = runAnimation2D.downRight;
+                CacheAnimatorController[CLIP_SPRINT_UP_LEFT] = runAnimation2D.upLeft;
+                CacheAnimatorController[CLIP_SPRINT_UP_RIGHT] = runAnimation2D.upRight;
                 // Dead
                 CacheAnimatorController[CLIP_DEAD_DOWN] = deadAnimation2D.down;
                 CacheAnimatorController[CLIP_DEAD_UP] = deadAnimation2D.up;
