@@ -1150,24 +1150,8 @@ namespace MultiplayerARPG
 
         public override sealed bool CanReceiveDamageFrom(IGameEntity attacker)
         {
-            if (IsInSafeArea)
-            {
-                // If this character is in safe area it will not receives damages
+            if (!base.CanReceiveDamageFrom(attacker))
                 return false;
-            }
-
-            if (attacker == null || attacker.Entity == null)
-            {
-                // If attacker is unknow entity, can receive damages
-                return true;
-            }
-
-            if (attacker.Entity.IsInSafeArea)
-            {
-                // If attacker is in safe area, it will not receives damages
-                return false;
-            }
-
             // If this character is not ally so it is enemy and also can receive damage
             return !IsAlly(attacker.Entity as BaseCharacterEntity);
         }
