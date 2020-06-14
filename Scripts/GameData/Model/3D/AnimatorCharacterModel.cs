@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_IS_CASTING_SKILL_ALL_LAYERS = Animator.StringToHash("IsCastingSkillAllLayers");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
         public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
+        public static readonly int ANIM_PICKUP = Animator.StringToHash("Pickup");
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
         public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
         public static readonly int ANIM_MOVE_TYPE = Animator.StringToHash("MoveType");
@@ -367,6 +368,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_FALL] = fallClip != null ? fallClip : defaultAnimations.fallClip;
             CacheAnimatorController[CLIP_HURT] = hurtClip != null ? hurtClip : defaultAnimations.hurtClip;
             CacheAnimatorController[CLIP_DEAD] = deadClip != null ? deadClip : defaultAnimations.deadClip;
+            CacheAnimatorController[CLIP_PICKUP] = defaultAnimations.pickupClip;
             // Speed Rate
             this.moveAnimSpeedRate = moveAnimSpeedRate > 0f ? moveAnimSpeedRate :
                 defaultAnimations.moveAnimSpeedRate > 0f ? defaultAnimations.moveAnimSpeedRate : 1f;
@@ -680,6 +682,18 @@ namespace MultiplayerARPG
             yield return null;
             animator.ResetTrigger(ANIM_JUMP);
             animator.SetTrigger(ANIM_JUMP);
+        }
+
+        public override void PlayPickupAnimation()
+        {
+            StartCoroutine(PlayPickUpAnimationRoutine());
+        }
+
+        IEnumerator PlayPickUpAnimationRoutine()
+        {
+            yield return null;
+            animator.ResetTrigger(ANIM_PICKUP);
+            animator.SetTrigger(ANIM_PICKUP);
         }
 
 #if UNITY_EDITOR

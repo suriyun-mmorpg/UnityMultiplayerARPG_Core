@@ -516,6 +516,8 @@ namespace MultiplayerARPG
             RegisterNetFunction<PackedUInt, byte>(NetFuncEnterVehicleToSeat);
             RegisterNetFunction(NetFuncExitVehicle);
             RegisterNetFunction(NetFuncExitVehicleResponse);
+            RegisterNetFunction(NetFuncTriggerJump);
+            RegisterNetFunction(NetFuncTriggerPickUp);
             RegisterNetFunction<MovementState>(NetFuncSetMovement);
             RegisterNetFunction<ExtraMovementState>(NetFuncSetExtraMovement);
             RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
@@ -602,6 +604,26 @@ namespace MultiplayerARPG
             // Call this function at client
             foundPassengingVehicleEntity = true;
             passengingVehicleEntity = null;
+        }
+
+        protected void NetFuncTriggerJump()
+        {
+            // Not play jump animation on owner client when running in not secure mode
+            if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
+                return;
+            // Play jump animation on non owner clients
+            if (Model && Model is IJumppableModel)
+                (Model as IJumppableModel).PlayJumpAnimation();
+        }
+
+        protected void NetFuncTriggerPickUp()
+        {
+            // Not play pick up animation on owner client when running in not secure mode
+            if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
+                return;
+            // Play pick up animation on non owner clients
+            if (Model && Model is IPickupableModel)
+                (Model as IPickupableModel).PlayPickupAnimation();
         }
 
         protected void NetFuncSetMovement(MovementState movementState)
@@ -750,6 +772,24 @@ namespace MultiplayerARPG
             result = CacheTransform.position;
             if (ActiveMovement != null)
                 ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
+        }
+
+        public void TriggerJump()
+        {
+            // Play jump animation immediately on owner client, if not running in server
+            if (IsOwnerClient && !IsServer && Model && Model is IJumppableModel)
+                (Model as IJumppableModel).PlayJumpAnimation();
+            // Play jump animation on other clients
+            CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
+        }
+
+        public void TriggerPickup()
+        {
+            // Play pick up animation immediately on owner client, if not running in server
+            if (IsOwnerClient && !IsServer && Model && Model is IPickupableModel)
+                (Model as IPickupableModel).PlayPickupAnimation();
+            // Play pick up animation on other clients
+            CallNetFunction(NetFuncTriggerPickUp, FunctionReceivers.All);
         }
 
         public void SetMovement(MovementState movementState)

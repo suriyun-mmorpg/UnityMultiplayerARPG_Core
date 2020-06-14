@@ -279,6 +279,7 @@ namespace MultiplayerARPG
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
         public AnimationClip deadClip;
+        public AnimationClip pickupClip;
 
         [Header("Attack movements")]
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]

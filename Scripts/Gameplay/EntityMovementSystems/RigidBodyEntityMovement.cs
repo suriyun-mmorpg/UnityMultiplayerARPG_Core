@@ -179,7 +179,6 @@ namespace MultiplayerARPG
         public override void EntityOnSetup()
         {
             // Register Network functions
-            CacheEntity.RegisterNetFunction(NetFuncTriggerJump);
             CacheEntity.RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             CacheEntity.RegisterNetFunction<DirectionVector3, MovementState>(NetFuncKeyMovement);
             CacheEntity.RegisterNetFunction<short>(NetFuncUpdateYRotation);
@@ -212,29 +211,6 @@ namespace MultiplayerARPG
                 return;
             if (!HasNavPaths)
                 CacheTransform.eulerAngles = new Vector3(0, (float)yRotation, 0);
-        }
-
-        protected void NetFuncTriggerJump()
-        {
-            if (!CacheEntity.CanMove())
-                return;
-            // Not play jump animation on owner client when running in not secure mode
-            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
-                return;
-            // Play jump animation on non owner clients
-            if (CacheEntity.Model && CacheEntity.Model is IJumppableModel)
-                (CacheEntity.Model as IJumppableModel).PlayJumpAnimation();
-        }
-
-        public void RequestTriggerJump()
-        {
-            if (!CacheEntity.CanMove())
-                return;
-            // Play jump animation immediately on owner client, if not running in server
-            if (IsOwnerClient && !IsServer && CacheEntity.Model && CacheEntity.Model is IJumppableModel)
-                (CacheEntity.Model as IJumppableModel).PlayJumpAnimation();
-            // Play jump animation on other clients
-            CacheEntity.CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
         }
 
         public override void StopMove()
@@ -420,7 +396,7 @@ namespace MultiplayerARPG
             if (CacheOpenCharacterController.isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
             {
                 airborneElapsed = airborneDelay;
-                RequestTriggerJump();
+                CacheEntity.TriggerJump();
                 if (!useRootMotionForJump)
                     tempVerticalVelocity = CalculateJumpVerticalSpeed();
             }

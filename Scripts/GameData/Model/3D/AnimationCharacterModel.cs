@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         public float fallClipFadeLength = 0.1f;
         public float hurtClipFadeLength = 0.1f;
         public float deadClipFadeLength = 0.1f;
+        public float pickupClipFadeLength = 0.1f;
 
         [Header("Relates Components")]
         public Animation legacyAnimation;
@@ -319,6 +320,8 @@ namespace MultiplayerARPG
                 legacyAnimation.RemoveClip(CLIP_HURT);
             if (legacyAnimation.GetClip(CLIP_DEAD) != null)
                 legacyAnimation.RemoveClip(CLIP_DEAD);
+            if (legacyAnimation.GetClip(CLIP_PICKUP) != null)
+                legacyAnimation.RemoveClip(CLIP_PICKUP);
             // Setup generic clips
             // Move
             legacyAnimation.AddClip(idleClip != null ? idleClip : defaultAnimations.idleClip, CLIP_IDLE);
@@ -383,6 +386,7 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(fallClip != null ? fallClip : defaultAnimations.fallClip, CLIP_FALL);
             legacyAnimation.AddClip(hurtClip != null ? hurtClip : defaultAnimations.hurtClip, CLIP_HURT);
             legacyAnimation.AddClip(deadClip != null ? deadClip : defaultAnimations.deadClip, CLIP_DEAD);
+            legacyAnimation.AddClip(defaultAnimations.pickupClip, CLIP_PICKUP);
             CrossFadeLegacyAnimation(CLIP_IDLE, 0f, WrapMode.Loop);
         }
 
@@ -632,6 +636,11 @@ namespace MultiplayerARPG
         public override void PlayJumpAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_JUMP, jumpClipFadeLength, WrapMode.Once);
+        }
+
+        public override void PlayPickupAnimation()
+        {
+            CrossFadeLegacyAnimation(CLIP_PICKUP, pickupClipFadeLength, WrapMode.Once);
         }
     }
 }

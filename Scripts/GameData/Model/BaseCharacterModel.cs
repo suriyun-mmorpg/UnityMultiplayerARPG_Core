@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel
+    public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel
     {
         [SerializeField]
         private CharacterModelManager modelManager;
@@ -613,6 +613,11 @@ namespace MultiplayerARPG
         /// Use this function to play jump animation
         /// </summary>
         public virtual void PlayJumpAnimation() { }
+
+        /// <summary>
+        /// Use this function to play pickup animation
+        /// </summary>
+        public virtual void PlayPickupAnimation() { }
 
         public abstract void PlayMoveAnimation();
         public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
