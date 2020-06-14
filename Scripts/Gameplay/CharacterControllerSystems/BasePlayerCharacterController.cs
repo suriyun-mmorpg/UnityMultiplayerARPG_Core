@@ -32,11 +32,6 @@ namespace MultiplayerARPG
         public static BasePlayerCharacterController Singleton { get; protected set; }
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
 
-        [SerializeField]
-        private FollowCameraControls gameplayCameraPrefab;
-        [SerializeField]
-        private FollowCameraControls minimapCameraPrefab;
-
         public System.Action<BasePlayerCharacterController> onSetup;
         public System.Action<BasePlayerCharacterController> onDesetup;
 
@@ -75,12 +70,6 @@ namespace MultiplayerARPG
             get { return PlayerCharacterEntity.StoppingDistance; }
         }
 
-        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
-        public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
-        public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
-        public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
-        public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
-        public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
         public BaseUISceneGameplay CacheUISceneGameplay { get; protected set; }
         public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         public BaseGameEntity SelectedEntity { get; protected set; }
@@ -102,44 +91,24 @@ namespace MultiplayerARPG
         {
             Singleton = this;
             this.InvokeInstanceDevExtMethods("Awake");
-
-            if (gameplayCameraPrefab != null)
-                CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
-            if (minimapCameraPrefab != null)
-                CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
             if (CurrentGameInstance.UISceneGameplayPrefab != null)
                 CacheUISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
         }
 
         protected virtual void Update()
         {
-            // Instantiate Minimap camera, it will render to render texture
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = CameraTargetTransform;
-
-            // Instantiate Minimap camera, it will render to render texture
-            if (CacheMinimapCameraControls != null)
-                CacheMinimapCameraControls.target = CameraTargetTransform;
         }
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
-            // Instantiate gameplay UI
             if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.OnControllerSetup(characterEntity);
-
             if (onSetup != null)
                 onSetup.Invoke(this);
         }
 
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
         {
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = null;
-
-            if (CacheMinimapCameraControls != null)
-                CacheMinimapCameraControls.target = null;
-
             if (onDesetup != null)
                 onDesetup.Invoke(this);
         }
@@ -148,11 +117,6 @@ namespace MultiplayerARPG
         {
             Desetup(PlayerCharacterEntity);
             this.InvokeInstanceDevExtMethods("OnDestroy");
-
-            if (CacheGameplayCameraControls != null)
-                Destroy(CacheGameplayCameraControls.gameObject);
-            if (CacheMinimapCameraControls != null)
-                Destroy(CacheMinimapCameraControls.gameObject);
             if (CacheUISceneGameplay != null)
                 Destroy(CacheUISceneGameplay.gameObject);
         }
@@ -179,7 +143,7 @@ namespace MultiplayerARPG
         public virtual BuildingEntity InstantiateConstructingBuilding(BuildingEntity prefab)
         {
             ConstructingBuildingEntity = Instantiate(prefab);
-            ConstructingBuildingEntity.SetupAsBuildMode();
+            ConstructingBuildingEntity.SetupAsBuildMode(PlayerCharacterEntity);
             ConstructingBuildingEntity.CacheTransform.parent = null;
             return ConstructingBuildingEntity;
         }

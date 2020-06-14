@@ -23,7 +23,14 @@ namespace MultiplayerARPG
         
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
-        
+
+        [Header("Camera Controls Prefabs")]
+        [SerializeField]
+        private FollowCameraControls gameplayCameraPrefab;
+        [SerializeField]
+        private FollowCameraControls minimapCameraPrefab;
+
+        [Header("Controller Settings")]
         public PlayerCharacterControllerMode controllerMode;
         [Tooltip("Set this to `TRUE` to find nearby enemy and follow it to attack while `Controller Mode` is `WASD`")]
         public bool wasdLockAttackTarget;
@@ -51,6 +58,12 @@ namespace MultiplayerARPG
         protected bool isMouseDragOrHoldOrOverUI;
         protected uint lastNpcObjectId;
 
+        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
+        public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
+        public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
+        public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
+        public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
+        public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
         public GameObject CacheTargetObject { get; protected set; }
         protected Vector3? targetPosition;
         protected TargetActionType targetActionType;
@@ -84,6 +97,10 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
+            if (gameplayCameraPrefab != null)
+                CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
+            if (minimapCameraPrefab != null)
+                CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
             buildingItemIndex = -1;
             findingEnemyIndex = -1;
             isLeftHandAttacking = false;
@@ -131,9 +148,24 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void Desetup(BasePlayerCharacterEntity characterEntity)
+        {
+            base.Desetup(characterEntity);
+
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = null;
+
+            if (CacheMinimapCameraControls != null)
+                CacheMinimapCameraControls.target = null;
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            if (CacheGameplayCameraControls != null)
+                Destroy(CacheGameplayCameraControls.gameObject);
+            if (CacheMinimapCameraControls != null)
+                Destroy(CacheMinimapCameraControls.gameObject);
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
             if (ActivatableEntityDetector != null)
@@ -149,7 +181,11 @@ namespace MultiplayerARPG
             if (PlayerCharacterEntity == null || !PlayerCharacterEntity.IsOwnerClient)
                 return;
 
-            base.Update();
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = CameraTargetTransform;
+
+            if (CacheMinimapCameraControls != null)
+                CacheMinimapCameraControls.target = CameraTargetTransform;
 
             if (CacheTargetObject != null)
                 CacheTargetObject.gameObject.SetActive(destination.HasValue);

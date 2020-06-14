@@ -33,6 +33,13 @@ namespace MultiplayerARPG
             UseSkill,
         }
 
+        [Header("Camera Controls Prefabs")]
+        [SerializeField]
+        private FollowCameraControls gameplayCameraPrefab;
+        [SerializeField]
+        private FollowCameraControls minimapCameraPrefab;
+
+        [Header("Controller Settings")]
         [SerializeField]
         private ControllerMode mode;
         [SerializeField]
@@ -90,6 +97,12 @@ namespace MultiplayerARPG
         private float fpsFarClipPlane = 1000f;
 
         public bool IsBlockController { get; protected set; }
+        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
+        public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
+        public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
+        public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
+        public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
+        public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
 
         public ControllerMode Mode
         {
@@ -206,7 +219,12 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
+            if (gameplayCameraPrefab != null)
+                CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
+            if (minimapCameraPrefab != null)
+                CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
             buildingItemIndex = -1;
+            isLeftHandAttacking = false;
             ConstructingBuildingEntity = null;
             activateInput = new InputStateManager("Activate");
             pickupItemInput = new InputStateManager("PickUpItem");
@@ -223,9 +241,7 @@ namespace MultiplayerARPG
                 return;
 
             tempLookAt = characterEntity.GetLookRotation();
-
             SetupEquipWeapons(characterEntity.EquipWeapons);
-
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
             characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraTransform);
@@ -236,11 +252,28 @@ namespace MultiplayerARPG
         {
             base.Desetup(characterEntity);
 
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = null;
+
+            if (CacheMinimapCameraControls != null)
+                CacheMinimapCameraControls.target = null;
+
             if (characterEntity == null)
                 return;
 
             characterEntity.onEquipWeaponSetChange -= SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation -= SetupEquipWeapons;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (CacheGameplayCameraControls != null)
+                Destroy(CacheGameplayCameraControls.gameObject);
+            if (CacheMinimapCameraControls != null)
+                Destroy(CacheMinimapCameraControls.gameObject);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         protected void SetupEquipWeapons(byte equipWeaponSet)
@@ -282,19 +315,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-
         protected override void Update()
         {
             if (PlayerCharacterEntity == null || !PlayerCharacterEntity.IsOwnerClient)
                 return;
 
-            base.Update();
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = CameraTargetTransform;
+
+            if (CacheMinimapCameraControls != null)
+                CacheMinimapCameraControls.target = CameraTargetTransform;
 
             if (PlayerCharacterEntity.IsDead())
             {
