@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         
         public BaseGameEntity Entity
         {
-            get { return entity == null ? null : entity.Entity; }
+            get { return entity; }
         }
         
         private void Start()
