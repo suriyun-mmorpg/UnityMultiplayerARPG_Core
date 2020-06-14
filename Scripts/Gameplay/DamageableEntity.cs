@@ -108,6 +108,24 @@ namespace MultiplayerARPG
 
         public virtual bool CanReceiveDamageFrom(IGameEntity attacker)
         {
+            if (IsInSafeArea)
+            {
+                // If this entity is in safe area it will not receives damages
+                return false;
+            }
+
+            if (attacker == null || attacker.Entity == null)
+            {
+                // If attacker is unknow entity, can receive damages
+                return true;
+            }
+
+            if (attacker.Entity.IsInSafeArea)
+            {
+                // If attacker is in safe area, it will not receives damages
+                return false;
+            }
+
             return true;
         }
 
