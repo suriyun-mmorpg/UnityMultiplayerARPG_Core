@@ -517,7 +517,7 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncExitVehicle);
             RegisterNetFunction(NetFuncExitVehicleResponse);
             RegisterNetFunction(NetFuncTriggerJump);
-            RegisterNetFunction(NetFuncTriggerPickUp);
+            RegisterNetFunction(NetFuncTriggerPickup);
             RegisterNetFunction<MovementState>(NetFuncSetMovement);
             RegisterNetFunction<ExtraMovementState>(NetFuncSetExtraMovement);
             RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
@@ -616,7 +616,7 @@ namespace MultiplayerARPG
                 (Model as IJumppableModel).PlayJumpAnimation();
         }
 
-        protected void NetFuncTriggerPickUp()
+        protected void NetFuncTriggerPickup()
         {
             // Not play pick up animation on owner client when running in not secure mode
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
@@ -789,7 +789,7 @@ namespace MultiplayerARPG
             if (IsOwnerClient && !IsServer && Model && Model is IPickupableModel)
                 (Model as IPickupableModel).PlayPickupAnimation();
             // Play pick up animation on other clients
-            CallNetFunction(NetFuncTriggerPickUp, FunctionReceivers.All);
+            CallNetFunction(NetFuncTriggerPickup, FunctionReceivers.All);
         }
 
         public void SetMovement(MovementState movementState)
