@@ -79,6 +79,7 @@ namespace MultiplayerARPG
 
         public override void OnSetup()
         {
+            base.OnSetup();
             // Register Network functions
             RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             RegisterNetFunction<DirectionVector2>(NetFuncKeyMovement);
@@ -107,7 +108,7 @@ namespace MultiplayerARPG
             currentDestination = null;
             CacheRigidbody2D.velocity = Vector2.zero;
             if (IsOwnerClient && !IsServer)
-                CacheEntity.CallNetFunction(StopMove, FunctionReceivers.Server);
+                CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -120,7 +121,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector2(moveDirection));
+                    CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector2(moveDirection));
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
@@ -138,7 +139,7 @@ namespace MultiplayerARPG
             switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
+                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
                     currentDestination = position;

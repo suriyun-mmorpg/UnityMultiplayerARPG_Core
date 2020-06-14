@@ -178,6 +178,7 @@ namespace MultiplayerARPG
 
         public override void OnSetup()
         {
+            base.OnSetup();
             // Register Network functions
             RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             RegisterNetFunction<DirectionVector3, MovementState>(NetFuncKeyMovement);
@@ -217,7 +218,7 @@ namespace MultiplayerARPG
         {
             navPaths = null;
             if (IsOwnerClient && !IsServer)
-                CacheEntity.CallNetFunction(StopMove, FunctionReceivers.Server);
+                CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -230,7 +231,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CacheEntity.CallNetFunction(NetFuncKeyMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, new DirectionVector3(moveDirection), movementState);
+                    CallNetFunction(NetFuncKeyMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, new DirectionVector3(moveDirection), movementState);
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
@@ -251,7 +252,7 @@ namespace MultiplayerARPG
             switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
+                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
                     tempMovementState = MovementState.Forward;
@@ -270,7 +271,7 @@ namespace MultiplayerARPG
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
-                    CacheEntity.CallNetFunction(NetFuncUpdateYRotation, DeliveryMethod.Sequenced, FunctionReceivers.Server, (short)eulerAngles.y);
+                    CallNetFunction(NetFuncUpdateYRotation, DeliveryMethod.Sequenced, FunctionReceivers.Server, (short)eulerAngles.y);
                     break;
                 case MovementSecure.NotSecure:
                     eulerAngles.x = 0;

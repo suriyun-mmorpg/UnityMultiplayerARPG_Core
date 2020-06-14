@@ -62,6 +62,7 @@ namespace MultiplayerARPG
 
         public override void OnSetup()
         {
+            base.OnSetup();
             // Register Network functions
             RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             RegisterNetFunction<short>(NetFuncUpdateYRotation);
@@ -96,7 +97,7 @@ namespace MultiplayerARPG
             switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
+                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
                     SetMovePaths(position);
@@ -122,7 +123,7 @@ namespace MultiplayerARPG
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
-                    CacheEntity.CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
+                    CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
                     break;
                 case MovementSecure.NotSecure:
                     eulerAngles.x = 0;
