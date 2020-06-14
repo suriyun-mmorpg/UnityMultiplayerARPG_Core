@@ -111,6 +111,7 @@ namespace MultiplayerARPG
         public virtual bool Activatable { get { return false; } }
         public virtual bool Lockable { get { return false; } }
         public bool IsBuildMode { get; private set; }
+        public BasePlayerCharacterEntity Builder { get; private set; }
 
         private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
         private readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
@@ -218,6 +219,8 @@ namespace MultiplayerARPG
         {
             if (BuildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
                 return false;
+            if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
+                return false;
             return buildingTypes.Contains(BuildingArea.buildingType);
         }
 
@@ -277,7 +280,7 @@ namespace MultiplayerARPG
             NetworkDestroy(destroyDelay);
         }
 
-        public void SetupAsBuildMode()
+        public void SetupAsBuildMode(BasePlayerCharacterEntity builder)
         {
             Collider[] colliders = GetComponentsInChildren<Collider>(true);
             foreach (Collider collider in colliders)
@@ -304,6 +307,7 @@ namespace MultiplayerARPG
                 rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
             }
             IsBuildMode = true;
+            Builder = builder;
         }
 
         public void TriggerEnterEntity(BaseGameEntity networkEntity)
