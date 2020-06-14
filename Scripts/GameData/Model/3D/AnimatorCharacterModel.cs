@@ -662,6 +662,8 @@ namespace MultiplayerARPG
 
         public override void PlayHitAnimation()
         {
+            if (CacheAnimatorController[CLIP_HURT] == null)
+                return;
             StartCoroutine(PlayHitAnimationRoutine());
         }
 
@@ -674,6 +676,8 @@ namespace MultiplayerARPG
 
         public override void PlayJumpAnimation()
         {
+            if (CacheAnimatorController[CLIP_JUMP] == null)
+                return;
             StartCoroutine(PlayJumpAnimationRoutine());
         }
 
@@ -686,6 +690,8 @@ namespace MultiplayerARPG
 
         public override void PlayPickupAnimation()
         {
+            if (CacheAnimatorController[CLIP_PICKUP] == null)
+                return;
             StartCoroutine(PlayPickUpAnimationRoutine());
         }
 
