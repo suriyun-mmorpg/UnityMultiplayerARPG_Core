@@ -22,7 +22,10 @@ namespace MultiplayerARPG
             if (!IsVisible())
                 return;
 
-            if (activated && (CharacterItem.IsEmptySlot() || !CharacterItem.id.Equals(activeItemId)))
+            // Store data to variable so it won't lookup for data from property again
+            CharacterItem characterItem = CharacterItem;
+
+            if (activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(activeItemId)))
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
@@ -32,18 +35,18 @@ namespace MultiplayerARPG
 
             if (uiCharacterItem != null)
             {
-                if (CharacterItem.IsEmptySlot())
+                if (characterItem.IsEmptySlot())
                 {
                     uiCharacterItem.Hide();
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), base.OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, Level, InventoryType), base.OwningCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }
 
-            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(CharacterItem);
+            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(characterItem);
             // Multiplies with dismantle item amount
             ItemAmount tempReturningItem;
             for (int i = 0; i < returningItems.Count; ++i)
@@ -54,7 +57,7 @@ namespace MultiplayerARPG
             }
             if (uiReturnItems != null)
             {
-                if (CharacterItem.IsEmptySlot() || returningItems.Count == 0)
+                if (characterItem.IsEmptySlot() || returningItems.Count == 0)
                 {
                     uiReturnItems.Hide();
                 }
@@ -68,7 +71,7 @@ namespace MultiplayerARPG
 
             if (uiTextReturnGold != null)
             {
-                if (CharacterItem.IsEmptySlot())
+                if (characterItem.IsEmptySlot())
                 {
                     uiTextReturnGold.text = string.Format(
                             LanguageManager.GetText(formatKeyReturnGold),
@@ -78,7 +81,7 @@ namespace MultiplayerARPG
                 {
                     uiTextReturnGold.text = string.Format(
                             LanguageManager.GetText(formatKeyReturnGold),
-                            (CharacterItem.GetItem().DismantleReturnGold * Amount).ToString("N0"));
+                            (characterItem.GetItem().DismantleReturnGold * Amount).ToString("N0"));
                 }
             }
         }

@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-	public class UIEnhanceSocketItem : BaseUICharacterItemByIndex
-	{
+    public class UIEnhanceSocketItem : BaseUICharacterItemByIndex
+    {
         public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public bool CanEnhance { get { return EquipmentItem != null && EquipmentItem.MaxSocket > 0 && CharacterItem.Sockets.Count < EquipmentItem.MaxSocket; } }
-		public int SelectedEnhancerId
+        public int SelectedEnhancerId
         {
             get
             {
@@ -30,7 +30,10 @@ namespace MultiplayerARPG
             if (!IsVisible())
                 return;
 
-            if (activated && (CharacterItem.IsEmptySlot() || !CharacterItem.id.Equals(activeItemId)))
+            // Store data to variable so it won't lookup for data from property again
+            CharacterItem characterItem = CharacterItem;
+
+            if (activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(activeItemId)))
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
@@ -40,13 +43,13 @@ namespace MultiplayerARPG
 
             if (uiCharacterItem != null)
             {
-                if (CharacterItem.IsEmptySlot())
+                if (characterItem.IsEmptySlot())
                 {
                     uiCharacterItem.Hide();
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, Level, InventoryType), OwningCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }
@@ -80,5 +83,5 @@ namespace MultiplayerARPG
             activeItemId = CharacterItem.id;
             OwningCharacter.RequestEnhanceSocketItem(InventoryType, (short)IndexOfData, SelectedEnhancerId);
         }
-	}
+    }
 }
