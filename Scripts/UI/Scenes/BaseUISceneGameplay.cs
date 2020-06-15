@@ -144,11 +144,13 @@ namespace MultiplayerARPG
         public abstract bool IsShopDialogVisible();
         public abstract bool IsRefineItemDialogVisible();
         public abstract bool IsDismantleItemDialogVisible();
+        public abstract bool IsRepairItemDialogVisible();
         public abstract bool IsEnhanceSocketItemDialogVisible();
         public abstract bool IsStorageDialogVisible();
         public abstract bool IsDealingDialogVisibleWithDealingState();
         public abstract void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
+        public abstract void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity);
         public abstract void OnControllerSetup(BasePlayerCharacterEntity characterEntity);

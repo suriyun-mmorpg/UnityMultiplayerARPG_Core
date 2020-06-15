@@ -53,6 +53,7 @@ namespace MultiplayerARPG
         public UINpcDialog uiNpcDialog;
         public UIRefineItem uiRefineItem;
         public UIDismantleItem uiDismantleItem;
+        public UIRepairItem uiRepairItem;
         public UIEnhanceSocketItem uiEnhanceSocketItem;
         public UIConstructBuilding uiConstructBuilding;
         public UICurrentBuilding uiCurrentBuilding;
@@ -805,6 +806,12 @@ namespace MultiplayerARPG
                 uiDismantleItem.IsVisible();
         }
 
+        public override bool IsRepairItemDialogVisible()
+        {
+            return uiRepairItem != null &&
+                uiRepairItem.IsVisible();
+        }
+
         public override bool IsEnhanceSocketItemDialogVisible()
         {
             return uiEnhanceSocketItem != null &&
@@ -839,6 +846,14 @@ namespace MultiplayerARPG
                 return;
             uiDismantleItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
             uiDismantleItem.Show();
+        }
+
+        public override void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData)
+        {
+            if (uiRepairItem == null)
+                return;
+            uiRepairItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
+            uiRepairItem.Show();
         }
 
         public override void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData)

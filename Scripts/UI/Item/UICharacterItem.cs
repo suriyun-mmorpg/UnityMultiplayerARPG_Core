@@ -127,6 +127,8 @@ namespace MultiplayerARPG
         public UnityEvent onRefineItemDialogDisappear;
         public UnityEvent onDismantleItemDialogAppear;
         public UnityEvent onDismantleItemDialogDisappear;
+        public UnityEvent onRepairItemDialogAppear;
+        public UnityEvent onRepairItemDialogDisappear;
         public UnityEvent onEnhanceSocketItemDialogAppear;
         public UnityEvent onEnhanceSocketItemDialogDisappear;
         public UnityEvent onStorageDialogAppear;
@@ -146,6 +148,7 @@ namespace MultiplayerARPG
         private bool isSellItemDialogAppeared;
         private bool isRefineItemDialogAppeared;
         private bool isDismantleItemDialogAppeared;
+        private bool isRepairItemDialogAppeared;
         private bool isEnhanceSocketItemDialogAppeared;
         private bool isStorageDialogAppeared;
         private bool isDealingStateEntered;
@@ -203,6 +206,7 @@ namespace MultiplayerARPG
             UpdateShopUIVisibility(false);
             UpdateRefineItemUIVisibility(false);
             UpdateDismantleItemUIVisibility(false);
+            UpdateRepairItemUIVisibility(false);
             UpdateEnhanceSocketUIVisibility(false);
             UpdateStorageUIVisibility(false);
             UpdateDealingState(false);
@@ -717,6 +721,7 @@ namespace MultiplayerARPG
             UpdateShopUIVisibility(true);
             UpdateRefineItemUIVisibility(true);
             UpdateDismantleItemUIVisibility(true);
+            UpdateRepairItemUIVisibility(true);
             UpdateEnhanceSocketUIVisibility(true);
             UpdateStorageUIVisibility(true);
             UpdateDealingState(true);
@@ -822,6 +827,41 @@ namespace MultiplayerARPG
                     isDismantleItemDialogAppeared = false;
                     if (onDismantleItemDialogDisappear != null)
                         onDismantleItemDialogDisappear.Invoke();
+                }
+            }
+        }
+
+        private void UpdateRepairItemUIVisibility(bool initData)
+        {
+            if (!IsOwningCharacter())
+            {
+                if (initData || isRepairItemDialogAppeared)
+                {
+                    isRepairItemDialogAppeared = false;
+                    if (onRepairItemDialogDisappear != null)
+                        onRepairItemDialogDisappear.Invoke();
+                }
+                return;
+            }
+            // Check visible item dialog
+            if (BaseUISceneGameplay.Singleton.IsRepairItemDialogVisible() &&
+                Data.characterItem.GetEquipmentItem() != null &&
+                InventoryType == InventoryType.NonEquipItems)
+            {
+                if (initData || !isRepairItemDialogAppeared)
+                {
+                    isRepairItemDialogAppeared = true;
+                    if (onRepairItemDialogAppear != null)
+                        onRepairItemDialogAppear.Invoke();
+                }
+            }
+            else
+            {
+                if (initData || isRepairItemDialogAppeared)
+                {
+                    isRepairItemDialogAppeared = false;
+                    if (onRepairItemDialogDisappear != null)
+                        onRepairItemDialogDisappear.Invoke();
                 }
             }
         }
@@ -1146,10 +1186,26 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Set Repair Item Functions
+        public void OnClickSetRepairItem()
+        {
+            // Only owning character can refine item
+            if (!IsOwningCharacter())
+                return;
+
+            if (CharacterItem.GetEquipmentItem() != null)
+            {
+                BaseUISceneGameplay.Singleton.ShowRepairItemDialog(InventoryType, IndexOfData);
+                if (selectionManager != null)
+                    selectionManager.DeselectSelectedUI();
+            }
+        }
+        #endregion
+
         #region Set Enhance Socket Item Functions
         public void OnClickSetEnhanceSocketItem()
         {
-            // Only owning character can refine item
+            // Only owning character can enhance item
             if (!IsOwningCharacter())
                 return;
             
