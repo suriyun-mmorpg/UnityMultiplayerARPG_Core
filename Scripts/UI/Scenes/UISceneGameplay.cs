@@ -93,6 +93,8 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onUpdateQuests;
         public System.Action<BasePlayerCharacterEntity> onUpdateStorageItems;
 
+        private readonly List<UIBase> npcDialogs = new List<UIBase>();
+
         protected override void Awake()
         {
             base.Awake();
@@ -220,6 +222,8 @@ namespace MultiplayerARPG
                 uiRefineItem.OnUpdateCharacterItems();
             if (uiDismantleItem != null)
                 uiDismantleItem.OnUpdateCharacterItems();
+            if (uiRepairItem != null)
+                uiRepairItem.OnUpdateCharacterItems();
             if (uiEnhanceSocketItem != null)
                 uiEnhanceSocketItem.OnUpdateCharacterItems();
             if (onUpdateEquipItems != null)
@@ -253,6 +257,8 @@ namespace MultiplayerARPG
                 uiRefineItem.OnUpdateCharacterItems();
             if (uiDismantleItem != null)
                 uiDismantleItem.OnUpdateCharacterItems();
+            if (uiRepairItem != null)
+                uiRepairItem.OnUpdateCharacterItems();
             if (uiEnhanceSocketItem != null)
                 uiEnhanceSocketItem.OnUpdateCharacterItems();
             if (onUpdateNonEquipItems != null)
@@ -512,6 +518,8 @@ namespace MultiplayerARPG
             // Don't select any item yet, wait player to select the item
             uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
             uiRefineItem.Show();
+            if (!npcDialogs.Contains(uiRefineItem))
+                npcDialogs.Add(uiRefineItem);
         }
 
         public void OnShowNpcDismantleItem()
@@ -521,6 +529,19 @@ namespace MultiplayerARPG
             // Don't select any item yet, wait player to select the item
             uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
             uiDismantleItem.Show();
+            if (!npcDialogs.Contains(uiDismantleItem))
+                npcDialogs.Add(uiDismantleItem);
+        }
+
+        public void OnShowNpcRepairItem()
+        {
+            if (uiRepairItem == null)
+                return;
+            // Don't select any item yet, wait player to select the item
+            uiRepairItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+            uiRepairItem.Show();
+            if (!npcDialogs.Contains(uiRepairItem))
+                npcDialogs.Add(uiRepairItem);
         }
 
         public void OnShowDealingRequest(BasePlayerCharacterEntity playerCharacter)
@@ -776,14 +797,12 @@ namespace MultiplayerARPG
             if (uiBuildingCampfireItems != null &&
                 uiBuildingCampfireItems.IsVisible())
                 uiBuildingCampfireItems.Hide();
-            if (!GameInstance.Singleton.canRefineItemByPlayer &&
-                uiRefineItem != null &&
-                uiRefineItem.IsVisible())
-                uiRefineItem.Hide();
-            if (!GameInstance.Singleton.canDismantleItemByPlayer &&
-                uiDismantleItem != null &&
-                uiDismantleItem.IsVisible())
-                uiDismantleItem.Hide();
+            for (int i = npcDialogs.Count - 1; i >= 0; --i)
+            {
+                if (npcDialogs[i].IsVisible())
+                    npcDialogs[i].Hide();
+                npcDialogs.RemoveAt(i);
+            }
         }
 
         public override bool IsShopDialogVisible()
@@ -875,6 +894,7 @@ namespace MultiplayerARPG
             characterEntity.onShowNpcDialog += ShowNpcDialog;
             characterEntity.onShowNpcRefineItem += OnShowNpcRefineItem;
             characterEntity.onShowNpcDismantleItem += OnShowNpcDismantleItem;
+            characterEntity.onShowNpcRepairItem += OnShowNpcRepairItem;
             characterEntity.onDead += OnCharacterDead;
             characterEntity.onRespawn += OnCharacterRespawn;
             characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
@@ -918,6 +938,7 @@ namespace MultiplayerARPG
             characterEntity.onShowNpcDialog -= ShowNpcDialog;
             characterEntity.onShowNpcRefineItem -= OnShowNpcRefineItem;
             characterEntity.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
+            characterEntity.onShowNpcRepairItem -= OnShowNpcRepairItem;
             characterEntity.onDead -= OnCharacterDead;
             characterEntity.onRespawn -= OnCharacterRespawn;
             characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;

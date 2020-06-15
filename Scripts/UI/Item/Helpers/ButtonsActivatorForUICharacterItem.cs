@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public Button buttonUse;
         public Button buttonRefine;
         public Button buttonDismantle;
+        public Button buttonRepair;
         public Button buttonSocketEnhance;
         public Button buttonSell;
         public Button buttonOffer;
@@ -29,6 +30,8 @@ namespace MultiplayerARPG
             ui.onRefineItemDialogDisappear.AddListener(OnRefineItemDialogDisappear);
             ui.onDismantleItemDialogAppear.AddListener(OnDismantleItemDialogAppear);
             ui.onDismantleItemDialogDisappear.AddListener(OnDismantleItemDialogDisappear);
+            ui.onRepairItemDialogAppear.AddListener(OnRepairItemDialogAppear);
+            ui.onRepairItemDialogDisappear.AddListener(OnRepairItemDialogDisappear);
             ui.onNpcSellItemDialogAppear.AddListener(OnNpcSellItemDialogAppear);
             ui.onNpcSellItemDialogDisappear.AddListener(OnNpcSellItemDialogDisappear);
             ui.onStorageDialogAppear.AddListener(OnStorageDialogAppear);
@@ -51,6 +54,8 @@ namespace MultiplayerARPG
                 buttonRefine.gameObject.SetActive(false);
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(false);
+            if (buttonRepair)
+                buttonRepair.gameObject.SetActive(false);
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(false);
             if (buttonSell)
@@ -72,6 +77,8 @@ namespace MultiplayerARPG
                 buttonUnEquip.gameObject.SetActive(true);
             if (buttonRefine)
                 buttonRefine.gameObject.SetActive(GameInstance.Singleton.canRefineItemByPlayer);
+            if (buttonRepair)
+                buttonRepair.gameObject.SetActive(GameInstance.Singleton.canRepairItemByPlayer);
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
         }
@@ -85,6 +92,8 @@ namespace MultiplayerARPG
                 buttonRefine.gameObject.SetActive(GameInstance.Singleton.canRefineItemByPlayer);
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
+            if (buttonRepair)
+                buttonRepair.gameObject.SetActive(GameInstance.Singleton.canRepairItemByPlayer);
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
             if (buttonDrop)
@@ -152,6 +161,23 @@ namespace MultiplayerARPG
 
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(false);
+        }
+        public void OnRepairItemDialogAppear()
+        {
+            if (GameInstance.Singleton.canRepairItemByPlayer)
+                return;
+
+            if (buttonRepair)
+                buttonRepair.gameObject.SetActive(true);
+        }
+
+        public void OnRepairItemDialogDisappear()
+        {
+            if (GameInstance.Singleton.canRepairItemByPlayer)
+                return;
+
+            if (buttonRepair)
+                buttonRepair.gameObject.SetActive(false);
         }
 
         public void OnNpcSellItemDialogAppear()

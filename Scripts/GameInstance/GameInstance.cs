@@ -148,6 +148,8 @@ namespace MultiplayerARPG
         public bool canRefineItemByPlayer;
         [Tooltip("If this is `TRUE`, player will be able to dismantle an items by themself, doesn't have to talk to NPCs")]
         public bool canDismantleItemByPlayer;
+        [Tooltip("If this is `TRUE`, player will be able to repair an items by themself, doesn't have to talk to NPCs")]
+        public bool canRepairItemByPlayer;
         public InventorySystem inventorySystem;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
         public short baseSlotLimit;
