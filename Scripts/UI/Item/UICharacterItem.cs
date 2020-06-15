@@ -93,6 +93,12 @@ namespace MultiplayerARPG
         public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
         public UIEquipmentSockets uiEquipmentSockets;
+        [Tooltip("Use this component to show refine info, if you are going to refine when click button, use `OnClickRefineItem` function")]
+        public UIRefineItem uiRefineItem;
+        [Tooltip("Use this component to show dismantle info, if you are going to dismantle when click button, use `OnClickDismantleItem` function")]
+        public UIDismantleItem uiDismantleItem;
+        [Tooltip("Use this component to show repair info, if you are going to repair when click button, use `OnClickRepairItem` function")]
+        public UIRepairItem uiRepairItem;
 
         [Header("Armor/Shield - UI Elements")]
         public UIArmorAmount uiArmorAmount;
@@ -559,7 +565,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiEquipmentSet.Show();
-                    int equippedCount = 0;
+                    int equippedCount;
                     Character.GetCaches().EquipmentSets.TryGetValue(EquipmentItem.EquipmentSet, out equippedCount);
                     uiEquipmentSet.Data = new UIEquipmentSetData(EquipmentItem.EquipmentSet, equippedCount);
                 }
@@ -575,6 +581,45 @@ namespace MultiplayerARPG
                 {
                     uiEquipmentSockets.Show();
                     uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.MaxSocket);
+                }
+            }
+
+            if (uiRefineItem != null)
+            {
+                if (EquipmentItem == null)
+                {
+                    uiRefineItem.Hide();
+                }
+                else
+                {
+                    uiRefineItem.Show();
+                    uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
+                }
+            }
+
+            if (uiDismantleItem != null)
+            {
+                if (!GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
+                {
+                    uiDismantleItem.Hide();
+                }
+                else
+                {
+                    uiDismantleItem.Show();
+                    uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
+                }
+            }
+
+            if (uiRepairItem != null)
+            {
+                if (EquipmentItem == null)
+                {
+                    uiRepairItem.Hide();
+                }
+                else
+                {
+                    uiRepairItem.Show();
+                    uiRepairItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
                 }
             }
 
@@ -775,7 +820,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             if (BaseUISceneGameplay.Singleton.IsRefineItemDialogVisible() &&
-                Data.characterItem.GetEquipmentItem() != null &&
+                EquipmentItem != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isRefineItemDialogAppeared)
@@ -845,7 +890,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             if (BaseUISceneGameplay.Singleton.IsRepairItemDialogVisible() &&
-                Data.characterItem.GetEquipmentItem() != null &&
+                EquipmentItem != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isRepairItemDialogAppeared)
@@ -880,7 +925,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             if (BaseUISceneGameplay.Singleton.IsEnhanceSocketItemDialogVisible() &&
-                Data.characterItem.GetEquipmentItem() != null &&
+                EquipmentItem != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isEnhanceSocketItemDialogAppeared)
@@ -1151,22 +1196,46 @@ namespace MultiplayerARPG
         #endregion
 
         #region Set Refine Item Functions
+        /// <summary>
+        /// Use this function to set item which you want to refine to `UIRefineItem` instance
+        /// </summary>
         public void OnClickSetRefineItem()
         {
             // Only owning character can refine item
             if (!IsOwningCharacter())
                 return;
             
-            if (CharacterItem.GetEquipmentItem() != null)
+            if (EquipmentItem == null)
             {
                 BaseUISceneGameplay.Singleton.ShowRefineItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
         }
+
+        /// <summary>
+        /// Use this function to refine the item
+        /// </summary>
+        public void OnClickRefineItem()
+        {
+            if (!GameInstance.Singleton.canRefineItemByPlayer)
+                return;
+
+            // Only owning character can refine item
+            if (!IsOwningCharacter())
+                return;
+
+            if (EquipmentItem != null)
+            {
+                OwningCharacter.RequestRefineItem(InventoryType, (short)IndexOfData);
+            }
+        }
         #endregion
 
         #region Set Dismantle Item Functions
+        /// <summary>
+        /// Use this function to set item which you want to dismantle to `UIDismantleItem` instance
+        /// </summary>
         public void OnClickSetDismantleItem()
         {
             // Only items in inventory will be able to dismantle
@@ -1184,32 +1253,78 @@ namespace MultiplayerARPG
                     selectionManager.DeselectSelectedUI();
             }
         }
-        #endregion
 
-        #region Set Repair Item Functions
-        public void OnClickSetRepairItem()
+        /// <summary>
+        /// Use this function to dismantle the item
+        /// </summary>
+        public void OnClickDismantleItem()
         {
-            // Only owning character can refine item
+            if (!GameInstance.Singleton.canDismantleItemByPlayer)
+                return;
+
+            // Only items in inventory will be able to dismantle
+            if (InventoryType != InventoryType.NonEquipItems)
+                return;
+
+            // Only owning character can repair item
             if (!IsOwningCharacter())
                 return;
 
-            if (CharacterItem.GetEquipmentItem() != null)
+            if (GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
+            {
+                OwningCharacter.RequestDismantleItem((short)IndexOfData);
+            }
+        }
+        #endregion
+
+        #region Set Repair Item Functions
+        /// <summary>
+        /// Use this function to set item which you want to repair to `UIRepairItem` instance
+        /// </summary>
+        public void OnClickSetRepairItem()
+        {
+            // Only owning character can repair item
+            if (!IsOwningCharacter())
+                return;
+
+            if (EquipmentItem != null)
             {
                 BaseUISceneGameplay.Singleton.ShowRepairItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
         }
+
+        /// <summary>
+        /// Use this function to repair the item
+        /// </summary>
+        public void OnClickRepairItem()
+        {
+            if (!GameInstance.Singleton.canRepairItemByPlayer)
+                return;
+
+            // Only owning character can repair item
+            if (!IsOwningCharacter())
+                return;
+
+            if (EquipmentItem != null)
+            {
+                OwningCharacter.RequestRepairItem(InventoryType, (short)IndexOfData);
+            }
+        }
         #endregion
 
         #region Set Enhance Socket Item Functions
+        /// <summary>
+        /// Use this function to set item which you want to enhance (by socket) to `UIEnhanceSocketItem` instance
+        /// </summary>
         public void OnClickSetEnhanceSocketItem()
         {
             // Only owning character can enhance item
             if (!IsOwningCharacter())
                 return;
             
-            if (CharacterItem.GetEquipmentItem() != null)
+            if (EquipmentItem != null)
             {
                 BaseUISceneGameplay.Singleton.ShowEnhanceSocketItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
