@@ -93,6 +93,9 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onUpdateQuests;
         public System.Action<BasePlayerCharacterEntity> onUpdateStorageItems;
 
+        /// <summary>
+        /// List of dialogs which open by activate on NPCs or Building Entites
+        /// </summary>
         private readonly List<UIBase> npcDialogs = new List<UIBase>();
 
         protected override void Awake()
@@ -509,6 +512,7 @@ namespace MultiplayerARPG
             }
             uiNpcDialog.Data = npcDialog;
             uiNpcDialog.Show();
+            AddNpcDialog(uiNpcDialog);
         }
 
         public void OnShowNpcRefineItem()
@@ -518,8 +522,7 @@ namespace MultiplayerARPG
             // Don't select any item yet, wait player to select the item
             uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
             uiRefineItem.Show();
-            if (!npcDialogs.Contains(uiRefineItem))
-                npcDialogs.Add(uiRefineItem);
+            AddNpcDialog(uiRefineItem);
         }
 
         public void OnShowNpcDismantleItem()
@@ -529,8 +532,7 @@ namespace MultiplayerARPG
             // Don't select any item yet, wait player to select the item
             uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
             uiDismantleItem.Show();
-            if (!npcDialogs.Contains(uiDismantleItem))
-                npcDialogs.Add(uiDismantleItem);
+            AddNpcDialog(uiDismantleItem);
         }
 
         public void OnShowNpcRepairItem()
@@ -540,8 +542,7 @@ namespace MultiplayerARPG
             // Don't select any item yet, wait player to select the item
             uiRepairItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
             uiRepairItem.Show();
-            if (!npcDialogs.Contains(uiRepairItem))
-                npcDialogs.Add(uiRepairItem);
+            AddNpcDialog(uiRepairItem);
         }
 
         public void OnShowDealingRequest(BasePlayerCharacterEntity playerCharacter)
@@ -637,6 +638,7 @@ namespace MultiplayerARPG
                     {
                         uiPlayerStorageItems.Show(storageType, null, weightLimit, slotLimit);
                         uiPlayerStorageItems.UpdateData();
+                        AddNpcDialog(uiPlayerStorageItems);
                     }
                     break;
                 case StorageType.Guild:
@@ -644,6 +646,7 @@ namespace MultiplayerARPG
                     {
                         uiGuildStorageItems.Show(storageType, null, weightLimit, slotLimit);
                         uiGuildStorageItems.UpdateData();
+                        AddNpcDialog(uiGuildStorageItems);
                     }
                     break;
                 case StorageType.Building:
@@ -657,6 +660,7 @@ namespace MultiplayerARPG
                         {
                             uiBuildingCampfireItems.Show(storageType, buildingEntity, weightLimit, slotLimit);
                             uiBuildingCampfireItems.UpdateData();
+                            AddNpcDialog(uiBuildingCampfireItems);
                         }
                     }
                     else if (buildingEntity is StorageEntity)
@@ -665,6 +669,7 @@ namespace MultiplayerARPG
                         {
                             uiBuildingStorageItems.Show(storageType, buildingEntity, weightLimit, slotLimit);
                             uiBuildingStorageItems.UpdateData();
+                            AddNpcDialog(uiBuildingStorageItems);
                         }
                     }
                     break;
@@ -779,24 +784,6 @@ namespace MultiplayerARPG
 
         public override void HideNpcDialog()
         {
-            if (uiNpcDialog != null &&
-                uiNpcDialog.IsVisible())
-                uiNpcDialog.Hide();
-            if (uiPlayerStorageItems != null &&
-                uiPlayerStorageItems.IsVisible())
-                uiPlayerStorageItems.Hide();
-            if (uiGuildStorageItems != null &&
-                uiGuildStorageItems.IsVisible())
-                uiGuildStorageItems.Hide();
-            if (uiBuildingStorageItems != null &&
-                uiBuildingStorageItems.IsVisible())
-                uiBuildingStorageItems.Hide();
-            if (uiBuildingCraftItems != null &&
-                uiBuildingCraftItems.IsVisible())
-                uiBuildingCraftItems.Hide();
-            if (uiBuildingCampfireItems != null &&
-                uiBuildingCampfireItems.IsVisible())
-                uiBuildingCampfireItems.Hide();
             for (int i = npcDialogs.Count - 1; i >= 0; --i)
             {
                 if (npcDialogs[i].IsVisible())
@@ -885,8 +872,16 @@ namespace MultiplayerARPG
 
         public override void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity)
         {
-            if (uiBuildingCraftItems != null)
-                uiBuildingCraftItems.Show(CrafterType.Workbench, workbenchEntity);
+            if (uiBuildingCraftItems == null)
+                return;
+            uiBuildingCraftItems.Show(CrafterType.Workbench, workbenchEntity);
+            AddNpcDialog(uiBuildingCraftItems);
+        }
+
+        protected void AddNpcDialog(UIBase npcDialog)
+        {
+            if (!npcDialogs.Contains(npcDialog))
+                npcDialogs.Add(npcDialog);
         }
 
         public override void OnControllerSetup(BasePlayerCharacterEntity characterEntity)
