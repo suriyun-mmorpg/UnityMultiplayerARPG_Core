@@ -212,10 +212,13 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
+        public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
         public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
+        public static readonly Dictionary<int, ItemDropEntity> ItemDropEntities = new Dictionary<int, ItemDropEntity>();
+        public static readonly Dictionary<int, HarvestableEntity> HarvestableEntities = new Dictionary<int, HarvestableEntity>();
         public static readonly Dictionary<int, VehicleEntity> VehicleEntities = new Dictionary<int, VehicleEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
@@ -300,7 +303,7 @@ namespace MultiplayerARPG
                     expTree = value;
             }
         }
-        
+
         public ArmorType DefaultArmorType { get; private set; }
         public WeaponType DefaultWeaponType { get; private set; }
 
@@ -323,7 +326,7 @@ namespace MultiplayerARPG
         {
             get { return newCharacterSetting != null; }
         }
-        
+
         public HashSet<int> NonTargetLayersValues { get; private set; }
         #endregion
 
@@ -375,7 +378,7 @@ namespace MultiplayerARPG
             // Setup save system if not existed
             if (saveSystem == null)
                 saveSystem = ScriptableObject.CreateInstance<DefaultGameSaveSystem>();
-            
+
             // Setup gameplay rule if not existed
             if (gameplayRule == null)
                 gameplayRule = ScriptableObject.CreateInstance<DefaultGameplayRule>();
@@ -581,17 +584,14 @@ namespace MultiplayerARPG
             return ~layerMask;
         }
 
+        #region Add game data functions
         public static void AddAttributes(IEnumerable<Attribute> attributes)
         {
             if (attributes == null)
                 return;
             foreach (Attribute attribute in attributes)
             {
-                if (attribute == null || Attributes.ContainsKey(attribute.DataId))
-                    continue;
-                attribute.Validate();
-                Attributes[attribute.DataId] = attribute;
-                attribute.PrepareRelatesData();
+                AddGameData(Attributes, attribute);
             }
         }
 
@@ -643,11 +643,7 @@ namespace MultiplayerARPG
                 return;
             foreach (BaseItem item in items)
             {
-                if (item == null || Items.ContainsKey(item.DataId))
-                    continue;
-                item.Validate();
-                Items[item.DataId] = item;
-                item.PrepareRelatesData();
+                AddGameData(Items, item);
             }
         }
 
@@ -657,99 +653,7 @@ namespace MultiplayerARPG
                 return;
             foreach (Harvestable harvestable in harvestables)
             {
-                if (harvestable == null || Items.ContainsKey(harvestable.DataId))
-                    continue;
-                harvestable.Validate();
-                Harvestables[harvestable.DataId] = harvestable;
-                harvestable.PrepareRelatesData();
-            }
-        }
-
-        public static void AddCharacters(IEnumerable<BaseCharacter> characters)
-        {
-            if (characters == null)
-                return;
-            foreach (BaseCharacter character in characters)
-            {
-                if (character == null || Characters.ContainsKey(character.DataId))
-                    continue;
-                character.Validate();
-                Characters[character.DataId] = character;
-                character.PrepareRelatesData();
-                if (character is PlayerCharacter)
-                {
-                    PlayerCharacter playerCharacter = character as PlayerCharacter;
-                    PlayerCharacters[character.DataId] = playerCharacter;
-                }
-                else if (character is MonsterCharacter)
-                {
-                    MonsterCharacter monsterCharacter = character as MonsterCharacter;
-                    MonsterCharacters[character.DataId] = monsterCharacter;
-                }
-            }
-        }
-
-        public static void AddCharacterEntities(IEnumerable<BaseCharacterEntity> characterEntities)
-        {
-            if (characterEntities == null)
-                return;
-            foreach (BaseCharacterEntity characterEntity in characterEntities)
-            {
-                if (characterEntity == null || CharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
-                    continue;
-                characterEntity.Validate();
-                CharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
-                if (characterEntity is BasePlayerCharacterEntity)
-                {
-                    BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                    PlayerCharacterEntities[characterEntity.Identity.HashAssetId] = playerCharacterEntity;
-                }
-                else if (characterEntity is BaseMonsterCharacterEntity)
-                {
-                    BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-                    MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = monsterCharacterEntity;
-                }
-                characterEntity.PrepareRelatesData();
-            }
-        }
-
-        public static void AddItemDropEntities(IEnumerable<ItemDropEntity> itemDropEntities)
-        {
-            if (itemDropEntities == null)
-                return;
-            foreach (ItemDropEntity itemDropEntity in itemDropEntities)
-            {
-                if (itemDropEntity == null)
-                    continue;
-                itemDropEntity.Validate();
-                itemDropEntity.PrepareRelatesData();
-            }
-        }
-
-        public static void AddHarvestableEntities(IEnumerable<HarvestableEntity> harvestableEntities)
-        {
-            if (harvestableEntities == null)
-                return;
-            foreach (HarvestableEntity harvestableEntity in harvestableEntities)
-            {
-                if (harvestableEntity == null)
-                    continue;
-                harvestableEntity.Validate();
-                harvestableEntity.PrepareRelatesData();
-            }
-        }
-
-        public static void AddVehicleEntities(IEnumerable<VehicleEntity> vehicleEntities)
-        {
-            if (vehicleEntities == null)
-                return;
-            foreach (VehicleEntity vehicleEntity in vehicleEntities)
-            {
-                if (vehicleEntity == null || VehicleEntities.ContainsKey(vehicleEntity.Identity.HashAssetId))
-                    continue;
-                vehicleEntity.Validate();
-                VehicleEntities[vehicleEntity.Identity.HashAssetId] = vehicleEntity;
-                vehicleEntity.PrepareRelatesData();
+                AddGameData(Harvestables, harvestable);
             }
         }
 
@@ -773,11 +677,7 @@ namespace MultiplayerARPG
                 return;
             foreach (BaseSkill skill in skills)
             {
-                if (skill == null || Skills.ContainsKey(skill.DataId))
-                    continue;
-                skill.Validate();
-                Skills[skill.DataId] = skill;
-                skill.PrepareRelatesData();
+                AddGameData(Skills, skill);
             }
         }
 
@@ -801,11 +701,7 @@ namespace MultiplayerARPG
                 return;
             foreach (Quest quest in quests)
             {
-                if (quest == null || Quests.ContainsKey(quest.DataId))
-                    continue;
-                quest.Validate();
-                Quests[quest.DataId] = quest;
-                quest.PrepareRelatesData();
+                AddGameData(Quests, quest);
             }
         }
 
@@ -815,53 +711,24 @@ namespace MultiplayerARPG
                 return;
             foreach (GuildSkill guildSkill in guildSkills)
             {
-                if (guildSkill == null || GuildSkills.ContainsKey(guildSkill.DataId))
-                    continue;
-                guildSkill.Validate();
-                GuildSkills[guildSkill.DataId] = guildSkill;
-                guildSkill.PrepareRelatesData();
-            }
-        }
-        
-        public static void AddBuildingEntities(IEnumerable<BuildingEntity> buildingEntities)
-        {
-            if (buildingEntities == null)
-                return;
-            foreach (BuildingEntity buildingEntity in buildingEntities)
-            {
-                if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
-                    continue;
-                buildingEntity.Validate();
-                BuildingEntities[buildingEntity.DataId] = buildingEntity;
-                buildingEntity.PrepareRelatesData();
+                AddGameData(GuildSkills, guildSkill);
             }
         }
 
-        public static void AddWarpPortalEntities(IEnumerable<WarpPortalEntity> warpPortalEntities)
+        public static void AddCharacters(IEnumerable<BaseCharacter> characters)
         {
-            if (warpPortalEntities == null)
+            if (characters == null)
                 return;
-            foreach (WarpPortalEntity warpPortalEntity in warpPortalEntities)
+            foreach (BaseCharacter character in characters)
             {
-                if (warpPortalEntity == null || WarpPortalEntities.ContainsKey(warpPortalEntity.Identity.HashAssetId))
+                if (character == null)
                     continue;
-                warpPortalEntity.Validate();
-                WarpPortalEntities[warpPortalEntity.Identity.HashAssetId] = warpPortalEntity;
-                warpPortalEntity.PrepareRelatesData();
-            }
-        }
-
-        public static void AddNpcEntities(IEnumerable<NpcEntity> npcEntities)
-        {
-            if (npcEntities == null)
-                return;
-            foreach (NpcEntity npcEntity in npcEntities)
-            {
-                if (npcEntity == null || NpcEntities.ContainsKey(npcEntity.Identity.HashAssetId))
-                    continue;
-                npcEntity.Validate();
-                NpcEntities[npcEntity.Identity.HashAssetId] = npcEntity;
-                npcEntity.PrepareRelatesData();
+                if (!Characters.ContainsKey(character.DataId))
+                    Characters[character.DataId] = character;
+                if (character is PlayerCharacter)
+                    AddGameData(PlayerCharacters, character as PlayerCharacter);
+                else if (character is MonsterCharacter)
+                    AddGameData(MonsterCharacters, character as MonsterCharacter);
             }
         }
 
@@ -871,11 +738,7 @@ namespace MultiplayerARPG
                 return;
             foreach (ArmorType armorType in armorTypes)
             {
-                if (armorType == null || ArmorTypes.ContainsKey(armorType.DataId))
-                    continue;
-                armorType.Validate();
-                ArmorTypes[armorType.DataId] = armorType;
-                armorType.PrepareRelatesData();
+                AddGameData(ArmorTypes, armorType);
             }
         }
 
@@ -885,11 +748,7 @@ namespace MultiplayerARPG
                 return;
             foreach (WeaponType weaponType in weaponTypes)
             {
-                if (weaponType == null || WeaponTypes.ContainsKey(weaponType.DataId))
-                    continue;
-                weaponType.Validate();
-                WeaponTypes[weaponType.DataId] = weaponType;
-                weaponType.PrepareRelatesData();
+                AddGameData(WeaponTypes, weaponType);
             }
         }
 
@@ -963,14 +822,10 @@ namespace MultiplayerARPG
                 return;
             foreach (Faction faction in factions)
             {
-                if (faction == null || Factions.ContainsKey(faction.DataId))
-                    continue;
-                faction.Validate();
-                Factions[faction.DataId] = faction;
-                faction.PrepareRelatesData();
+                AddGameData(Factions, faction);
             }
         }
-        
+
         public static void AddDamageElements(IEnumerable<DamageAmount> damageAmounts)
         {
             if (damageAmounts == null)
@@ -984,7 +839,7 @@ namespace MultiplayerARPG
             }
             AddDamageElements(elements);
         }
-        
+
         public static void AddDamageElements(IEnumerable<DamageIncremental> damageIncrementals)
         {
             if (damageIncrementals == null)
@@ -1005,12 +860,89 @@ namespace MultiplayerARPG
                 return;
             foreach (DamageElement damageElement in damageElements)
             {
-                if (damageElement == null || Skills.ContainsKey(damageElement.DataId))
-                    continue;
-                damageElement.Validate();
-                damageElement.PrepareRelatesData();
+                AddGameData(DamageElements, damageElement);
             }
         }
+        #endregion
+
+        #region Add game entity functions
+        public static void AddCharacterEntities(IEnumerable<BaseCharacterEntity> characterEntities)
+        {
+            if (characterEntities == null)
+                return;
+            foreach (BaseCharacterEntity characterEntity in characterEntities)
+            {
+                if (characterEntity == null)
+                    continue;
+                if (!characterEntity.Identity.IsSceneObject && !CharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
+                    CharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
+                if (characterEntity is BasePlayerCharacterEntity)
+                    AddGameEntity(PlayerCharacterEntities, characterEntity as BasePlayerCharacterEntity);
+                else if (characterEntity is BaseMonsterCharacterEntity)
+                    AddGameEntity(MonsterCharacterEntities, characterEntity as BaseMonsterCharacterEntity);
+            }
+        }
+
+        public static void AddItemDropEntities(IEnumerable<ItemDropEntity> itemDropEntities)
+        {
+            if (itemDropEntities == null)
+                return;
+            foreach (ItemDropEntity itemDropEntity in itemDropEntities)
+            {
+                AddGameEntity(ItemDropEntities, itemDropEntity);
+            }
+        }
+
+        public static void AddHarvestableEntities(IEnumerable<HarvestableEntity> harvestableEntities)
+        {
+            if (harvestableEntities == null)
+                return;
+            foreach (HarvestableEntity harvestableEntity in harvestableEntities)
+            {
+                AddGameEntity(HarvestableEntities, harvestableEntity);
+            }
+        }
+
+        public static void AddVehicleEntities(IEnumerable<VehicleEntity> vehicleEntities)
+        {
+            if (vehicleEntities == null)
+                return;
+            foreach (VehicleEntity vehicleEntity in vehicleEntities)
+            {
+                AddGameEntity(VehicleEntities, vehicleEntity);
+            }
+        }
+
+        public static void AddBuildingEntities(IEnumerable<BuildingEntity> buildingEntities)
+        {
+            if (buildingEntities == null)
+                return;
+            foreach (BuildingEntity buildingEntity in buildingEntities)
+            {
+                AddGameEntity(BuildingEntities, buildingEntity);
+            }
+        }
+
+        public static void AddWarpPortalEntities(IEnumerable<WarpPortalEntity> warpPortalEntities)
+        {
+            if (warpPortalEntities == null)
+                return;
+            foreach (WarpPortalEntity warpPortalEntity in warpPortalEntities)
+            {
+                AddGameEntity(WarpPortalEntities, warpPortalEntity);
+            }
+        }
+
+        public static void AddNpcEntities(IEnumerable<NpcEntity> npcEntities)
+        {
+            if (npcEntities == null)
+                return;
+            foreach (NpcEntity npcEntity in npcEntities)
+            {
+                AddGameEntity(NpcEntities, npcEntity);
+            }
+        }
+        #endregion
 
         public static void AddPoolingObjects(IEnumerable<IPoolDescriptor> poolingObjects)
         {
@@ -1021,6 +953,35 @@ namespace MultiplayerARPG
                 if (poolingObject == null || PoolingObjectPrefabs.Contains(poolingObject))
                     continue;
                 PoolingObjectPrefabs.Add(poolingObject);
+            }
+        }
+
+        private static void AddGameData<T>(Dictionary<int, T> dict, T data)
+            where T : BaseGameData
+        {
+            if (data == null)
+                return;
+            if (!dict.ContainsKey(data.DataId))
+            {
+                data.Validate();
+                dict[data.DataId] = data;
+                data.PrepareRelatesData();
+            }
+        }
+
+        private static void AddGameEntity<T>(Dictionary<int, T> dict, T entity)
+            where T : BaseGameEntity
+        {
+            if (entity == null)
+                return;
+            if (!entity.Identity.IsSceneObject && !dict.ContainsKey(entity.Identity.HashAssetId))
+            {
+                dict[entity.Identity.HashAssetId] = entity;
+                entity.PrepareRelatesData();
+            }
+            else if (entity.Identity.IsSceneObject)
+            {
+                entity.PrepareRelatesData();
             }
         }
     }
