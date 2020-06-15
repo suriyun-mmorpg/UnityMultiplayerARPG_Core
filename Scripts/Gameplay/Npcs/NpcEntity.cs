@@ -83,8 +83,10 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddNpcDialogs(new NpcDialog[] { startDialog });
-            GameInstance.AddNpcDialogs(graph.GetDialogs());
+            if (startDialog != null)
+                GameInstance.AddNpcDialogs(new NpcDialog[] { startDialog });
+            if (graph != null)
+                GameInstance.AddNpcDialogs(graph.GetDialogs());
         }
 
         protected override void EntityAwake()
