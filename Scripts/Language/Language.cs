@@ -833,7 +833,7 @@ namespace MultiplayerARPG
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_SKILL.ToString(), "Skill");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_RARITY.ToString(), "Rarity: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_STACK.ToString(), "{0}/{1}");
-            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_DURABILITY.ToString(), "Durability: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_DURABILITY.ToString(), "Durability: {0}/{1}");
             // Format - Social
             Texts.Add(UIFormatKeys.UI_FORMAT_SOCIAL_LEADER.ToString(), "Leader: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT.ToString(), "Member: {0}/{1}");
