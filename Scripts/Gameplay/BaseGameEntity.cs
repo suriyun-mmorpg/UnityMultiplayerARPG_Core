@@ -317,15 +317,6 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this function to add required components
-        /// This function will be called by GameInstance when adding the entity
-        /// </summary>
-        public virtual void Validate()
-        {
-
-        }
-
-        /// <summary>
         /// Override this function to add relates game data to game instance
         /// This function will be called by GameInstance when adding the entity
         /// </summary>
