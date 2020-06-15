@@ -479,9 +479,9 @@ namespace MultiplayerARPG
 
         public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage)
         {
-            float decreaseWeaponDurability = normalDecreaseWeaponDurability;
-            float decreaseShieldDurability = normalDecreaseShieldDurability;
-            float decreaseArmorDurability = normalDecreaseArmorDurability;
+            float decreaseWeaponDurability;
+            float decreaseShieldDurability;
+            float decreaseArmorDurability;
             GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
             // Decrease Weapon Durability
             if (attacker != null)
@@ -494,9 +494,9 @@ namespace MultiplayerARPG
 
         public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage)
         {
-            float decreaseWeaponDurability = normalDecreaseWeaponDurability;
-            float decreaseShieldDurability = normalDecreaseShieldDurability;
-            float decreaseArmorDurability = normalDecreaseArmorDurability;
+            float decreaseWeaponDurability;
+            float decreaseShieldDurability;
+            float decreaseArmorDurability;
             GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
             // Decrease Weapon Durability
             DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
@@ -529,7 +529,7 @@ namespace MultiplayerARPG
 
         private void DecreaseEquipWeaponsDurability(BaseCharacterEntity entity, float decreaseDurability)
         {
-            bool tempDestroy = false;
+            bool tempDestroy;
             EquipWeapons equipWeapons = entity.EquipWeapons;
             CharacterItem rightHand = equipWeapons.rightHand;
             CharacterItem leftHand = equipWeapons.leftHand;
@@ -554,7 +554,7 @@ namespace MultiplayerARPG
 
         private void DecreaseEquipShieldsDurability(BaseCharacterEntity entity, float decreaseDurability)
         {
-            bool tempDestroy = false;
+            bool tempDestroy;
             EquipWeapons equipWeapons = entity.EquipWeapons;
             CharacterItem rightHand = equipWeapons.rightHand;
             CharacterItem leftHand = equipWeapons.leftHand;
@@ -579,7 +579,7 @@ namespace MultiplayerARPG
 
         private void DecreaseEquipItemsDurability(BaseCharacterEntity entity, float decreaseDurability)
         {
-            bool tempDestroy = false;
+            bool tempDestroy;
             int count = entity.EquipItems.Count;
             for (int i = count - 1; i >= 0; --i)
             {
