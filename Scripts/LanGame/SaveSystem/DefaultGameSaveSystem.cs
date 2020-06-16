@@ -88,7 +88,7 @@ namespace MultiplayerARPG
                 {
                     Id = buildingEntity.Id,
                     ParentId = buildingEntity.ParentId,
-                    DataId = buildingEntity.DataId,
+                    EntityId = buildingEntity.EntityId,
                     Position = buildingEntity.Position,
                     Rotation = buildingEntity.Rotation,
                     CurrentHp = buildingEntity.CurrentHp,

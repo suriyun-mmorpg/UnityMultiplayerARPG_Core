@@ -51,7 +51,6 @@ namespace MultiplayerARPG
 
         #region Fields/Interface implementation
         public string Id { get { return id.Value; } set { id.Value = value; } }
-        public int EntityId { get { return Identity.HashAssetId; } set { } }
         public string CharacterName { get { return syncTitle.Value; } set { syncTitle.Value = value; } }
         public short Level { get { return level.Value; } set { level.Value = value; } }
         public int Exp { get { return exp.Value; } set { exp.Value = value; } }

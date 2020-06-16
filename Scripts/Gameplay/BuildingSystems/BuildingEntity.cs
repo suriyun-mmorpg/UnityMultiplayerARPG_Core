@@ -102,12 +102,6 @@ namespace MultiplayerARPG
             set { }
         }
 
-        public int DataId
-        {
-            get { return dataId; }
-            set { }
-        }
-
         public virtual bool Activatable { get { return false; } }
         public virtual bool Lockable { get { return false; } }
         public bool IsBuildMode { get; private set; }
@@ -222,20 +216,6 @@ namespace MultiplayerARPG
             if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
                 return false;
             return buildingTypes.Contains(BuildingArea.buildingType);
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-#if UNITY_EDITOR
-            if (Application.isPlaying)
-                return;
-            if (dataId != name.GenerateHashId())
-            {
-                dataId = name.GenerateHashId();
-                EditorUtility.SetDirty(this);
-            }
-#endif
         }
 
         public override void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)

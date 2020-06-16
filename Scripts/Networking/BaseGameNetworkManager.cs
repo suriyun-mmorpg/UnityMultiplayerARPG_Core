@@ -1055,9 +1055,9 @@ namespace MultiplayerARPG
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
-            if (GameInstance.BuildingEntities.ContainsKey(saveData.DataId))
+            if (GameInstance.BuildingEntities.ContainsKey(saveData.EntityId))
             {
-                GameObject spawnObj = Instantiate(GameInstance.BuildingEntities[saveData.DataId].gameObject, saveData.position, saveData.Rotation);
+                GameObject spawnObj = Instantiate(GameInstance.BuildingEntities[saveData.EntityId].gameObject, saveData.position, saveData.Rotation);
                 BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;

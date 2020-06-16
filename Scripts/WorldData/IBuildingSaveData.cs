@@ -4,7 +4,7 @@ public interface IBuildingSaveData
 {
     string Id { get; set; }
     string ParentId { get; set; }
-    int DataId { get; set; }
+    int EntityId { get; set; }
     int CurrentHp { get; set; }
     bool IsLocked { get; set; }
     string LockPassword { get; set; }

@@ -142,7 +142,7 @@ namespace MultiplayerARPG
             if (nonEquipItem.IsEmptySlot() ||
                 nonEquipItem.GetBuildingItem() == null ||
                 nonEquipItem.GetBuildingItem().BuildingEntity == null ||
-                !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.DataId, out buildingEntity) ||
+                !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.EntityId, out buildingEntity) ||
                 !this.DecreaseItemsByIndex(itemIndex, 1))
                 return;
 
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
             BuildingEntity parentBuildingEntity;
             if (Manager.TryGetEntityByObjectId(parentObjectId, out parentBuildingEntity))
                 buildingSaveData.ParentId = parentBuildingEntity.Id;
-            buildingSaveData.DataId = buildingEntity.DataId;
+            buildingSaveData.EntityId = buildingEntity.EntityId;
             buildingSaveData.CurrentHp = buildingEntity.maxHp;
             buildingSaveData.Position = position;
             buildingSaveData.Rotation = rotation;

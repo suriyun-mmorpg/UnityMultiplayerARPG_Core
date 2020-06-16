@@ -11,6 +11,12 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibIdentity))]
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
+        public int EntityId
+        {
+            get { return Identity.HashAssetId; }
+            set { }
+        }
+
         [Header("Game Entity Settings")]
         [SerializeField]
         private Text textTitle;

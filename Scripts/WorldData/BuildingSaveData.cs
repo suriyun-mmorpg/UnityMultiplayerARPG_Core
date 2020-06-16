@@ -8,7 +8,7 @@ public partial struct BuildingSaveData : IBuildingSaveData, INetSerializable
 {
     public string id;
     public string parentId;
-    public int dataId;
+    public int entityId;
     public int currentHp;
     public bool isLocked;
     public string lockPassword;
@@ -30,10 +30,10 @@ public partial struct BuildingSaveData : IBuildingSaveData, INetSerializable
         set { parentId = value; }
     }
 
-    public int DataId
+    public int EntityId
     {
-        get { return dataId; }
-        set { dataId = value; }
+        get { return entityId; }
+        set { entityId = value; }
     }
 
     public int CurrentHp

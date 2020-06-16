@@ -17,7 +17,7 @@ public static partial class BuildingSaveDataExtension
     {
         to.Id = from.Id;
         to.ParentId = from.ParentId;
-        to.DataId = from.DataId;
+        to.EntityId = from.EntityId;
         to.CurrentHp = from.CurrentHp;
         to.Position = from.Position;
         to.Rotation = from.Rotation;
@@ -34,7 +34,7 @@ public static partial class BuildingSaveDataExtension
     {
         writer.Put(buildingSaveData.Id);
         writer.Put(buildingSaveData.ParentId);
-        writer.Put(buildingSaveData.DataId);
+        writer.Put(buildingSaveData.EntityId);
         writer.Put(buildingSaveData.CurrentHp);
         writer.Put(buildingSaveData.IsLocked);
         writer.Put(buildingSaveData.LockPassword);
@@ -51,7 +51,7 @@ public static partial class BuildingSaveDataExtension
         BuildingSaveData result = new BuildingSaveData();
         result.Id = reader.GetString();
         result.ParentId = reader.GetString();
-        result.DataId = reader.GetInt();
+        result.EntityId = reader.GetInt();
         result.CurrentHp = reader.GetInt();
         result.IsLocked = reader.GetBool();
         result.LockPassword = reader.GetString();
