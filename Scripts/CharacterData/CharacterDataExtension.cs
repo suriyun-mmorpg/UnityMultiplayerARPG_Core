@@ -852,13 +852,10 @@ public static partial class CharacterDataExtension
     #endregion
 
     #region Increase Items
-    public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem addingItem, int minSlotIndex = 0)
+    public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem addingItem)
     {
         // If item not valid
         if (addingItem.IsEmptySlot()) return false;
-
-        if (minSlotIndex < 0)
-            minSlotIndex = 0;
 
         BaseItem itemData = addingItem.GetItem();
         short amount = addingItem.amount;
@@ -868,7 +865,7 @@ public static partial class CharacterDataExtension
         Dictionary<int, CharacterItem> changes = new Dictionary<int, CharacterItem>();
         // Loop to all slots to add amount to any slots that item amount not max in stack
         CharacterItem tempNonEquipItem;
-        for (int i = minSlotIndex; i < itemList.Count; ++i)
+        for (int i = 0; i < itemList.Count; ++i)
         {
             tempNonEquipItem = itemList[i];
             if (tempNonEquipItem.IsEmptySlot())
@@ -931,7 +928,7 @@ public static partial class CharacterDataExtension
         while (amount > 0)
         {
             tempNewItem = addingItem.Clone();
-            short addAmount = 0;
+            short addAmount;
             if (amount - maxStack >= 0)
             {
                 addAmount = maxStack;
@@ -950,9 +947,9 @@ public static partial class CharacterDataExtension
         return true;
     }
 
-    public static bool IncreaseItems(this ICharacterData data, CharacterItem addingItem, int minSlotIndex = 0, System.Action<int, short, short> onIncrease = null)
+    public static bool IncreaseItems(this ICharacterData data, CharacterItem addingItem, System.Action<int, short, short> onIncrease = null)
     {
-        if (data.NonEquipItems.IncreaseItems(addingItem, minSlotIndex))
+        if (data.NonEquipItems.IncreaseItems(addingItem))
         {
             if (onIncrease != null)
                 onIncrease.Invoke(addingItem.dataId, addingItem.level, addingItem.amount);
@@ -961,23 +958,23 @@ public static partial class CharacterDataExtension
         return false;
     }
 
-    public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, int minSlotIndex = 0, System.Action<int, short, short> onIncrease = null)
+    public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, System.Action<int, short, short> onIncrease = null)
     {
         foreach (ItemAmount increasingItem in increasingItems)
         {
             if (increasingItem.item == null || increasingItem.amount <= 0) continue;
-            data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount), minSlotIndex);
+            data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount));
             if (onIncrease != null)
                 onIncrease.Invoke(increasingItem.item.DataId, 1, increasingItem.amount);
         }
     }
 
-    public static void IncreaseItems(this ICharacterData data, IEnumerable<CharacterItem> increasingItems, int minSlotIndex = 0, System.Action<int, short, short> onIncrease = null)
+    public static void IncreaseItems(this ICharacterData data, IEnumerable<CharacterItem> increasingItems, System.Action<int, short, short> onIncrease = null)
     {
         foreach (CharacterItem increasingItem in increasingItems)
         {
             if (increasingItem.IsEmptySlot()) continue;
-            data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.dataId, increasingItem.level, increasingItem.amount), minSlotIndex);
+            data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.dataId, increasingItem.level, increasingItem.amount));
             if (onIncrease != null)
                 onIncrease.Invoke(increasingItem.dataId, increasingItem.level, increasingItem.amount);
         }

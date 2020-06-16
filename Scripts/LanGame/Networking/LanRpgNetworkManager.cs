@@ -618,7 +618,7 @@ namespace MultiplayerARPG
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
+        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
             if (addingItem.IsEmptySlot())
             {
@@ -632,12 +632,16 @@ namespace MultiplayerARPG
             List<CharacterItem> storageItemList = storageItems[storageId];
             // Prepare storage data
             Storage storage = GetStorage(storageId);
+            bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
+            short weightLimit = storage.weightLimit;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
-            bool increaseResult = storageItemList.IncreaseItems(addingItem, minSlotIndex);
+            bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
+                storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
             if (callback != null)
-                callback.Invoke(increaseResult);
+                callback.Invoke(!isOverwhelming && storageItemList.IncreaseItems(addingItem));
             // Update slots
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);

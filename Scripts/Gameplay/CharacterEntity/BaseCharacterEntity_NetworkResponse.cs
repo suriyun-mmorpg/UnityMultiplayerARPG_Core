@@ -67,7 +67,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            this.IncreaseItems(itemDropEntity.DropItems, 0, (dataId, level, amount) =>
+            this.IncreaseItems(itemDropEntity.DropItems, (dataId, level, amount) =>
             {
                 CurrentGameManager.SendNotifyRewardItem(ConnectionId, dataId, amount);
             });
