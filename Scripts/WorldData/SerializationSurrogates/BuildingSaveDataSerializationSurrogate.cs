@@ -52,7 +52,7 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         try
         {
             int dataId = info.GetInt32("dataId");
-            foreach (var prefab in GameInstance.BuildingEntities.Values)
+            foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
             {
                 if (dataId == prefab.name.GenerateHashId())
                 {
