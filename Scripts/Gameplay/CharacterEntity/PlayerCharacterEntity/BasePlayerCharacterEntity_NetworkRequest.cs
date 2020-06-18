@@ -63,20 +63,11 @@ namespace MultiplayerARPG
 
             int dataId = skill.DataId;
             float currentTime = Time.unscaledTime;
-            if (!requestUseSkillErrorTime.ContainsKey(dataId))
-                requestUseSkillErrorTime[dataId] = currentTime;
 
             GameMessage.Type gameMessageType;
             if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessageType, true))
             {
-                if (!IsOwnerClient)
-                    return false;
-
-                if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
-                {
-                    requestUseSkillErrorTime[dataId] = currentTime;
-                    CurrentGameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
-                }
+                QueueGameMessage(gameMessageType);
                 return false;
             }
 

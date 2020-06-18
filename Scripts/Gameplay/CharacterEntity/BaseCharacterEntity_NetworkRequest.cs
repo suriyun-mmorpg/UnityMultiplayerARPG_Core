@@ -21,17 +21,9 @@ namespace MultiplayerARPG
             CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
             if (!ValidateAmmo(weapon))
             {
-                if (Time.unscaledTime - lastCombatantErrorTime >= COMBATANT_MESSAGE_DELAY)
-                {
-                    if (!IsOwnerClient)
-                        return false;
-
-                    lastCombatantErrorTime = Time.unscaledTime;
-                    CurrentGameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
-                }
+                QueueGameMessage(GameMessage.Type.NoAmmo);
                 return false;
             }
-
             return true;
         }
 
@@ -59,24 +51,12 @@ namespace MultiplayerARPG
                 !this.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return false;
 
-            float currentTime = Time.unscaledTime;
-            if (!requestUseSkillErrorTime.ContainsKey(dataId))
-                requestUseSkillErrorTime[dataId] = currentTime;
-
             GameMessage.Type gameMessageType;
             if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessageType))
             {
-                if (!IsOwnerClient)
-                    return false;
-
-                if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
-                {
-                    requestUseSkillErrorTime[dataId] = currentTime;
-                    CurrentGameManager.ClientReceiveGameMessage(new GameMessage() { type = gameMessageType });
-                }
+                QueueGameMessage(gameMessageType);
                 return false;
             }
-            
             return true;
         }
 

@@ -78,8 +78,8 @@ namespace MultiplayerARPG
         public float RespawnGroundedCheckCountDown { get; protected set; }
         protected float lastMountTime;
         protected float lastActionTime;
-        protected float lastCombatantErrorTime;
-        protected readonly Dictionary<int, float> requestUseSkillErrorTime = new Dictionary<int, float>();
+        protected float pushGameMessageCountDown;
+        protected readonly Queue<GameMessage.Type> pushingGameMessages = new Queue<GameMessage.Type>();
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -233,6 +233,7 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             MakeCaches();
+            float deltaTime = Time.deltaTime;
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 // Ground check / ground damage will be calculated at server while dimension type is 3d only
@@ -265,7 +266,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                RespawnGroundedCheckCountDown -= Time.deltaTime;
+                RespawnGroundedCheckCountDown -= deltaTime;
             }
 
             // Clear data when character dead
@@ -292,11 +293,7 @@ namespace MultiplayerARPG
             model = ModelManager.ActiveModel;
             // Update casting skill count down, will show gage at clients
             if (CastingSkillCountDown > 0)
-            {
-                CastingSkillCountDown -= Time.deltaTime;
-                if (CastingSkillCountDown < 0)
-                    CastingSkillCountDown = 0;
-            }
+                CastingSkillCountDown -= deltaTime;
             // Set character model hide state
             ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
             // Update model animations
@@ -317,6 +314,18 @@ namespace MultiplayerARPG
                     FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                     // Update movement animation
                     FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D);
+                }
+            }
+
+            if (IsOwnerClient)
+            {
+                // Pushing combatatnt errors on screen
+                if (pushGameMessageCountDown > 0)
+                    pushGameMessageCountDown -= deltaTime;
+                if (pushGameMessageCountDown <= 0 && pushingGameMessages.Count > 0)
+                {
+                    pushGameMessageCountDown = COMBATANT_MESSAGE_DELAY;
+                    CurrentGameManager.ClientReceiveGameMessage(new GameMessage() { type = pushingGameMessages.Dequeue() });
                 }
             }
         }
@@ -1168,6 +1177,18 @@ namespace MultiplayerARPG
             if (CurrentMapInfo == null)
                 return false;
             return CurrentMapInfo.IsEnemy(this, targetCharacter);
+        }
+
+        public void QueueGameMessage(GameMessage.Type error)
+        {
+            if (!IsOwnerClient)
+                return;
+            // Last error must be different
+            if (pushingGameMessages.Count > 0 &&
+                pushingGameMessages.Peek() == error)
+                return;
+            // Enqueue error, it will be pushing on screen in Update()
+            pushingGameMessages.Enqueue(error);
         }
 
         public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
