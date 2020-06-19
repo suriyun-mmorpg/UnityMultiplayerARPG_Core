@@ -982,9 +982,9 @@ public static partial class CharacterDataExtension
     #endregion
 
     #region Decrease Items
-    public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitInventorySlot, out Dictionary<CharacterItem, short> decreaseItems)
+    public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitInventorySlot, out Dictionary<int, short> decreaseItems)
     {
-        decreaseItems = new Dictionary<CharacterItem, short>();
+        decreaseItems = new Dictionary<int, short>();
         Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
         short tempDecresingAmount;
         CharacterItem tempItem;
@@ -1007,20 +1007,20 @@ public static partial class CharacterDataExtension
             return false;
         foreach (KeyValuePair<int, short> decreasingItem in decreasingItemIndexes)
         {
-            decreaseItems.Add(itemList[decreasingItem.Key], decreasingItem.Value);
+            decreaseItems.Add(decreasingItem.Key, decreasingItem.Value);
             itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value, isLimitInventorySlot);
         }
         return true;
     }
 
-    public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, bool isLimitInventorySlot, out Dictionary<CharacterItem, short> decreaseItems)
+    public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, bool isLimitInventorySlot, out Dictionary<int, short> decreaseItems)
     {
         return data.NonEquipItems.DecreaseItems(dataId, amount, isLimitInventorySlot, out decreaseItems);
     }
 
     public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, bool isLimitInventorySlot)
     {
-        Dictionary<CharacterItem, short> decreaseItems;
+        Dictionary<int, short> decreaseItems;
         return DecreaseItems(data, dataId, amount, isLimitInventorySlot, out decreaseItems);
     }
     #endregion

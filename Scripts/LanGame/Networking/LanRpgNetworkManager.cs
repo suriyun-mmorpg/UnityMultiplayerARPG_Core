@@ -647,7 +647,7 @@ namespace MultiplayerARPG
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
@@ -657,7 +657,7 @@ namespace MultiplayerARPG
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
-            Dictionary<CharacterItem, short> decreaseItems;
+            Dictionary<int, short> decreaseItems;
             bool decreaseResult = storageItemList.DecreaseItems(dataId, amount, isLimitSlot, out decreaseItems);
             if (callback != null)
                 callback.Invoke(decreaseResult, decreaseItems);

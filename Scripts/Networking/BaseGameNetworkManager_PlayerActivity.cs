@@ -890,7 +890,7 @@ namespace MultiplayerARPG
         public abstract void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex);
 
         /// <summary>
-        /// 
+        /// Increase items to storage
         /// </summary>
         /// <param name="playerCharacterEntity"></param>
         /// <param name="storageId"></param>
@@ -898,20 +898,21 @@ namespace MultiplayerARPG
         public abstract void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, System.Action<bool> callback);
 
         /// <summary>
-        /// 
+        /// Decrease items from storage
         /// </summary>
         /// <param name="storageId"></param>
         /// <param name="dataId"></param>
         /// <param name="amount"></param>
         /// <param name="decreaseItems"></param>
-        public abstract void DecreaseStorageItems(StorageId storageId, int dataId, short amount, System.Action<bool, Dictionary<CharacterItem, short>> callback);
+        public abstract void DecreaseStorageItems(StorageId storageId, int dataId, short amount, System.Action<bool, Dictionary<int, short>> callback);
 
         /// <summary>
         /// Swap or merge storage item
         /// </summary>
         /// <param name="playerCharacterEntity"></param>
-        /// <param name="storageId"></param>
-        /// <param name="storageItemIndex"></param>
+        /// <param name="storageId">Storage id</param>
+        /// <param name="storageItemIndex">Index of storage</param>
+        /// <param name="nonEquipIndex">Index of inventory</param>
         public abstract void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex);
 
         /// <summary>
