@@ -37,5 +37,18 @@ namespace MultiplayerARPG
             writer.Put(currentMp);
             writer.Put(maxMp);
         }
+
+        public static SocialCharacterData Create(IPlayerCharacterData characterEntity)
+        {
+            return new SocialCharacterData()
+            {
+                id = characterEntity.Id,
+                characterName = characterEntity.CharacterName,
+                dataId = characterEntity.DataId,
+                level = characterEntity.Level,
+                currentHp = characterEntity.CurrentHp,
+                currentMp = characterEntity.CurrentMp,
+            };
+        }
     }
 }
