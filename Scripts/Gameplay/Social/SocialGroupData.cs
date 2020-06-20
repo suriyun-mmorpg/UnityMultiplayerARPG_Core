@@ -33,16 +33,7 @@ namespace MultiplayerARPG
 
         public SocialCharacterData CreateMemberData(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            tempMemberData = new SocialCharacterData();
-            tempMemberData.id = playerCharacterEntity.Id;
-            tempMemberData.characterName = playerCharacterEntity.CharacterName;
-            tempMemberData.dataId = playerCharacterEntity.DataId;
-            tempMemberData.level = playerCharacterEntity.Level;
-            tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
-            tempMemberData.maxHp = playerCharacterEntity.MaxHp;
-            tempMemberData.currentMp = playerCharacterEntity.CurrentMp;
-            tempMemberData.maxMp = playerCharacterEntity.MaxMp;
-            return tempMemberData;
+            return SocialCharacterData.Create(playerCharacterEntity);
         }
 
         public void AddMember(BasePlayerCharacterEntity playerCharacterEntity)
