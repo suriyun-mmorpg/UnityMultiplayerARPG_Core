@@ -154,7 +154,15 @@ namespace MultiplayerARPG
             if (tempTargetEnemy != null && !CacheEntity.IsPlayingActionAnimation() && !alreadySetActionState)
             {
                 // Random action state to do next time
-                MonsterDatabase.RandomSkill(CacheEntity, out queueSkill, out queueSkillLevel);
+                if (MonsterDatabase.RandomSkill(CacheEntity, out queueSkill, out queueSkillLevel) && queueSkill != null)
+                {
+                    // Cooling down
+                    if (CacheEntity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) >= 0)
+                    {
+                        queueSkill = null;
+                        queueSkillLevel = 0;
+                    }
+                }
                 isLeftHandAttacking = !isLeftHandAttacking;
                 alreadySetActionState = true;
                 return true;
@@ -162,6 +170,7 @@ namespace MultiplayerARPG
 
             Vector3 targetPosition = tempTargetEnemy.GetTransform().position;
             float attackDistance = GetAttackDistance();
+            Debug.LogError("dist " + attackDistance);
             if (OverlappedEntity(tempTargetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
                 startedFollowEnemy = false;
