@@ -18,7 +18,4 @@
 	url = https://github.com/insthync/unity3d-serialization-surrogates
 [submodule "xNode"]
 	path = xNode
-	url = https://github.com/Siccity/xNode.git
-[submodule "SerializableCallback"]
-	path = SerializableCallback
-	url = https://github.com/Siccity/SerializableCallback.git
+	url = https://github.com/insthync/xNode.git
