@@ -19,6 +19,3 @@
 [submodule "xNode"]
 	path = xNode
 	url = https://github.com/insthync/xNode.git
-[submodule "SerializableCallback"]
-	path = SerializableCallback
-	url = https://github.com/insthync/SerializableCallback
