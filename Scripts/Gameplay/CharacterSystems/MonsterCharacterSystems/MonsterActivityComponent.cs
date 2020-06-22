@@ -170,7 +170,6 @@ namespace MultiplayerARPG
 
             Vector3 targetPosition = tempTargetEnemy.GetTransform().position;
             float attackDistance = GetAttackDistance();
-            Debug.LogError("dist " + attackDistance);
             if (OverlappedEntity(tempTargetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
                 startedFollowEnemy = false;
