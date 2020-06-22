@@ -255,11 +255,10 @@ public static partial class PlayerCharacterDataExtension
         character.CurrentWater = (int)stats.water;
         character.Gold = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startGold : gameInstance.startGold;
         // Position
-        BaseMapInfo startMap = playerCharacter.StartMap;
-        character.CurrentMapName = startMap.Id;
-        character.RespawnMapName = startMap.Id;
-        character.CurrentPosition = startMap.StartPosition;
-        character.RespawnPosition = startMap.StartPosition;
+        character.CurrentMapName = playerCharacter.StartMap.Id;
+        character.RespawnMapName = playerCharacter.StartMap.Id;
+        character.CurrentPosition = playerCharacter.StartPosition;
+        character.RespawnPosition = playerCharacter.StartPosition;
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId, entityId);
         return character;
     }

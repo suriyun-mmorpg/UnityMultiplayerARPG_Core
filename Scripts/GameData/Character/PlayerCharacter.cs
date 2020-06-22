@@ -38,6 +38,15 @@ namespace MultiplayerARPG
                 return startMap;
             }
         }
+        public bool useOverrideStartPosition;
+        public Vector3 overrideStartPosition;
+        public Vector3 StartPosition
+        {
+            get
+            {
+                return useOverrideStartPosition ? overrideStartPosition : StartMap.StartPosition;
+            }
+        }
 
         public SkillLevel[] SkillLevels
         {
