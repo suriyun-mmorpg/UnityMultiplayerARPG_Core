@@ -150,6 +150,8 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
+            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
+            CacheItemSelectionManager.DeselectSelectedUI();
             // Clear slots data
             UICharacterItem equipSlot;
             foreach (string equipPosition in CacheEquipItemSlots.Keys)
@@ -173,12 +175,16 @@ namespace MultiplayerARPG
                     continue;
 
                 if (CacheEquipItemSlots.TryGetValue(GetEquipPosition(tempArmorItem.EquipPosition, tempEquipItem.equipSlotIndex), out tempSlot))
+                {
                     tempSlot.Setup(new UICharacterItemData(tempEquipItem, tempEquipItem.level, InventoryType.EquipItems), character, i);
+                    if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(tempEquipItem.id))
+                        tempSlot.OnClickSelect();
+                }
             }
 
             for (i = 0; i < character.SelectableWeaponSets.Count; ++i)
             {
-                SetEquipWeapons(character.SelectableWeaponSets[i], (byte)i);
+                SetEquipWeapons(selectedId, character.SelectableWeaponSets[i], (byte)i);
             };
         }
 
@@ -201,13 +207,13 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.Add(slot);
         }
 
-        private void SetEquipWeapons(EquipWeapons equipWeapons, byte equipWeaponSet)
+        private void SetEquipWeapons(string selectedId, EquipWeapons equipWeapons, byte equipWeaponSet)
         {
-            SetEquipWeapon(equipWeapons.rightHand, false, equipWeaponSet);
-            SetEquipWeapon(equipWeapons.leftHand, true, equipWeaponSet);
+            SetEquipWeapon(selectedId, equipWeapons.rightHand, false, equipWeaponSet);
+            SetEquipWeapon(selectedId, equipWeapons.leftHand, true, equipWeaponSet);
         }
 
-        private void SetEquipWeapon(CharacterItem equipWeapon, bool isLeftHand, byte equipWeaponSet)
+        private void SetEquipWeapon(string selectedId, CharacterItem equipWeapon, bool isLeftHand, byte equipWeaponSet)
         {
             string tempPosition = GetEquipPosition(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeaponSet);
             UICharacterItem tempSlot;
@@ -217,6 +223,8 @@ namespace MultiplayerARPG
                 {
                     equipWeapon.equipSlotIndex = equipWeaponSet;
                     tempSlot.Setup(new UICharacterItemData(equipWeapon, equipWeapon.level, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), character, 0);
+                    if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(equipWeapon.id))
+                        tempSlot.OnClickSelect();
                 }
             }
         }
