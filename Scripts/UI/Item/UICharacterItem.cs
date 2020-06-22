@@ -1205,7 +1205,7 @@ namespace MultiplayerARPG
             if (!IsOwningCharacter())
                 return;
             
-            if (EquipmentItem == null)
+            if (EquipmentItem != null)
             {
                 BaseUISceneGameplay.Singleton.ShowRefineItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
