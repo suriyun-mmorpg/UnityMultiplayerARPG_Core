@@ -93,7 +93,7 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-            int selectedIdx = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.IndexOf(CacheItemSelectionManager.SelectedUI) : -1;
+            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                         if (dragHandler != null)
                             dragHandler.SetupForNonEquipItems(tempUiCharacterItem);
                         CacheItemSelectionManager.Add(tempUiCharacterItem);
-                        if (selectedIdx == index)
+                        if (!string.IsNullOrEmpty(selectedId) &&  selectedId.Equals(nonEquipItem.id))
                             tempUiCharacterItem.OnClickSelect();
                     }
                     else

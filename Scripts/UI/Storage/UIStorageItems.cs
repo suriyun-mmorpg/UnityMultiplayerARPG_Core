@@ -19,32 +19,32 @@ namespace MultiplayerARPG
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
 
-        private UIList cacheCharacterItemList;
-        public UIList CacheCharacterItemList
+        private UIList cacheItemList;
+        public UIList CacheItemList
         {
             get
             {
-                if (cacheCharacterItemList == null)
+                if (cacheItemList == null)
                 {
-                    cacheCharacterItemList = gameObject.AddComponent<UIList>();
-                    cacheCharacterItemList.uiPrefab = uiCharacterItemPrefab.gameObject;
-                    cacheCharacterItemList.uiContainer = uiCharacterItemContainer;
+                    cacheItemList = gameObject.AddComponent<UIList>();
+                    cacheItemList.uiPrefab = uiCharacterItemPrefab.gameObject;
+                    cacheItemList.uiContainer = uiCharacterItemContainer;
                 }
-                return cacheCharacterItemList;
+                return cacheItemList;
             }
         }
 
-        private UICharacterItemSelectionManager cacheCharacterItemSelectionManager;
-        public UICharacterItemSelectionManager CacheCharacterItemSelectionManager
+        private UICharacterItemSelectionManager cacheItemSelectionManager;
+        public UICharacterItemSelectionManager CacheItemSelectionManager
         {
             get
             {
-                if (cacheCharacterItemSelectionManager == null)
-                    cacheCharacterItemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
-                if (cacheCharacterItemSelectionManager == null)
-                    cacheCharacterItemSelectionManager = gameObject.AddComponent<UICharacterItemSelectionManager>();
-                cacheCharacterItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheCharacterItemSelectionManager;
+                if (cacheItemSelectionManager == null)
+                    cacheItemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
+                if (cacheItemSelectionManager == null)
+                    cacheItemSelectionManager = gameObject.AddComponent<UICharacterItemSelectionManager>();
+                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheItemSelectionManager;
             }
         }
 
@@ -57,10 +57,10 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            CacheCharacterItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheCharacterItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            CacheCharacterItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
-            CacheCharacterItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
             base.Show();
         }
 
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             WeightLimit = 0;
             SlotLimit = 0;
             // Hide
-            CacheCharacterItemSelectionManager.DeselectSelectedUI();
+            CacheItemSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -92,12 +92,12 @@ namespace MultiplayerARPG
         {
             if (ui.Data.characterItem.IsEmptySlot())
             {
-                CacheCharacterItemSelectionManager.DeselectSelectedUI();
+                CacheItemSelectionManager.DeselectSelectedUI();
                 return;
             }
             if (uiItemDialog != null)
             {
-                uiItemDialog.selectionManager = CacheCharacterItemSelectionManager;
+                uiItemDialog.selectionManager = CacheItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, ui.IndexOfData);
                 uiItemDialog.Show();
             }
@@ -132,15 +132,14 @@ namespace MultiplayerARPG
         {
             if (StorageType == StorageType.None)
                 return;
-
-            int selectedIdx = CacheCharacterItemSelectionManager.SelectedUI != null ? CacheCharacterItemSelectionManager.IndexOf(CacheCharacterItemSelectionManager.SelectedUI) : -1;
-            CacheCharacterItemSelectionManager.DeselectSelectedUI();
-            CacheCharacterItemSelectionManager.Clear();
+            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
+            CacheItemSelectionManager.DeselectSelectedUI();
+            CacheItemSelectionManager.Clear();
             TotalWeight = 0;
             UsedSlots = 0;
             IList<CharacterItem> characterItems = BasePlayerCharacterController.OwningCharacter.StorageItems;
             UICharacterItem tempUiCharacterItem;
-            CacheCharacterItemList.Generate(characterItems, (index, characterItem, ui) =>
+            CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
                 tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
@@ -153,8 +152,8 @@ namespace MultiplayerARPG
                 UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
                     dragHandler.SetupForStorageItems(tempUiCharacterItem);
-                CacheCharacterItemSelectionManager.Add(tempUiCharacterItem);
-                if (selectedIdx == index)
+                CacheItemSelectionManager.Add(tempUiCharacterItem);
+                if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
                     tempUiCharacterItem.OnClickSelect();
             });
         }
