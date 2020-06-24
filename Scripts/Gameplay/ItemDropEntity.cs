@@ -123,11 +123,11 @@ namespace MultiplayerARPG
             gameObject.layer = CurrentGameInstance.itemDropLayer;
         }
 
-        protected override void EntityStart()
+        protected virtual void InitDropItems()
         {
-            base.EntityStart();
             if (IsServer)
             {
+                isPickedUp = false;
                 if (characterDropItemId.HasValue)
                 {
                     // Item drop from character, so set item data id to instantiate drop model at clients
@@ -173,6 +173,7 @@ namespace MultiplayerARPG
             base.OnSetup();
             itemDataId.onChange += OnItemDataIdChange;
             RegisterNetFunction(NetFuncOnItemDropDestroy);
+            InitDropItems();
         }
 
         protected virtual void NetFuncOnItemDropDestroy()
@@ -236,6 +237,7 @@ namespace MultiplayerARPG
         private IEnumerator RespawnRoutine()
         {
             yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
+            InitDropItems();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 CacheTransform.position,
