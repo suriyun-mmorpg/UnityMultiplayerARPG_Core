@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         public const string CLIP_DEAD = "__Dead";
         public const string CLIP_ACTION = "__Action";
         public const string CLIP_CAST_SKILL = "__CastSkill";
-        public const string CLIP_PICKUP = "__PICKUP";
+        public const string CLIP_PICKUP = "__Pickup";
 
         [Header("Renderer")]
         [Tooltip("This will be used to apply bone weights when equip an equipments")]
