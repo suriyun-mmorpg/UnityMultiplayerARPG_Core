@@ -1002,7 +1002,21 @@ namespace MultiplayerARPG
             {
                 harvestableSpawnAreas[i].SpawnAll();
                 await Task.Yield();
-                progress = 0.75f + ((float)i / (float)harvestableSpawnAreas.Length * 0.25f);
+                progress = 0.75f + ((float)i / (float)harvestableSpawnAreas.Length * 0.125f);
+                onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+            }
+            await Task.Yield();
+            progress = 0.875f;
+            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+            // Spawn item drop entities
+            if (LogInfo)
+                Logging.Log("Spawning harvestables");
+            ItemDropSpawnArea[] itemDropSpawnAreas = FindObjectsOfType<ItemDropSpawnArea>();
+            for (i = 0; i < itemDropSpawnAreas.Length; ++i)
+            {
+                itemDropSpawnAreas[i].SpawnAll();
+                await Task.Yield();
+                progress = 0.875f + ((float)i / (float)itemDropSpawnAreas.Length * 0.125f);
                 onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             }
             await Task.Yield();
