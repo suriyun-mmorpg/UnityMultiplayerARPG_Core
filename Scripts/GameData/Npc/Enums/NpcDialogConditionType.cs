@@ -9,6 +9,6 @@
         QuestTasksCompleted,
         QuestCompleted,
         FactionIs,
-        Custom = 255
+        Custom = byte.MaxValue
     }
 }
