@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -75,9 +76,11 @@ namespace MultiplayerARPG
         [Header("Other Settings")]
         public UIToggleUI[] toggleUis;
         [Tooltip("These GameObject (s) will ignore click / touch detection when click or touch on screen")]
-        public List<GameObject> ignorePointerDetectionUis;
+        [FormerlySerializedAs("ignorePointerDetectionUis")]
+        public List<GameObject> ignorePointerOverUIObjects;
         [Tooltip("These UI (s) will block character controller inputs while visible")]
-        public List<UIBase> blockControllerUIs;
+        [FormerlySerializedAs("blockControllerUIs")]
+        public List<UIBase> blockControllerUis;
 
         [Header("Events")]
         public UnityEvent onCharacterDead;
@@ -107,6 +110,17 @@ namespace MultiplayerARPG
                 uiCurrentStorage = uiCurrentBuilding;
             if (uiCurrentWorkbench == null)
                 uiCurrentWorkbench = uiCurrentBuilding;
+            if (blockControllerUis != null && blockControllerUis.Count > 0)
+            {
+                foreach (UIBase ui in blockControllerUis)
+                {
+                    if (!ui)
+                        continue;
+                    if (ui.gameObject.GetComponent<UIBlockController>())
+                        continue;
+                    ui.gameObject.AddComponent<UIBlockController>();
+                }
+            }
             MigrateNewUIs();
         }
 
@@ -221,14 +235,6 @@ namespace MultiplayerARPG
                 if (ui != null)
                     ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
             }
-            if (uiRefineItem != null)
-                uiRefineItem.OnUpdateCharacterItems();
-            if (uiDismantleItem != null)
-                uiDismantleItem.OnUpdateCharacterItems();
-            if (uiRepairItem != null)
-                uiRepairItem.OnUpdateCharacterItems();
-            if (uiEnhanceSocketItem != null)
-                uiEnhanceSocketItem.OnUpdateCharacterItems();
             if (onUpdateEquipItems != null)
                 onUpdateEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
@@ -239,8 +245,6 @@ namespace MultiplayerARPG
         /// </summary>
         public void UpdateEquipWeapons()
         {
-            if (uiAmmoAmount != null)
-                uiAmmoAmount.UpdateData(BasePlayerCharacterController.OwningCharacter);
             if (onUpdateEquipWeapons != null)
                 onUpdateEquipWeapons.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
@@ -256,6 +260,16 @@ namespace MultiplayerARPG
                 if (ui != null)
                     ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
             }
+            if (onUpdateNonEquipItems != null)
+                onUpdateNonEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class
+        /// To update activating item UIs 
+        /// </summary>
+        public void UpdateActivatingItem()
+        {
             if (uiRefineItem != null)
                 uiRefineItem.OnUpdateCharacterItems();
             if (uiDismantleItem != null)
@@ -264,8 +278,14 @@ namespace MultiplayerARPG
                 uiRepairItem.OnUpdateCharacterItems();
             if (uiEnhanceSocketItem != null)
                 uiEnhanceSocketItem.OnUpdateCharacterItems();
-            if (onUpdateNonEquipItems != null)
-                onUpdateNonEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class
+        /// To update ammo amount UIs 
+        /// </summary>
+        public void UpdateAmmoAmount()
+        {
             if (uiAmmoAmount != null)
                 uiAmmoAmount.UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
@@ -344,7 +364,6 @@ namespace MultiplayerARPG
                 uiBuildingStorageItems.UpdateData();
             if (uiBuildingCampfireItems != null)
                 uiBuildingCampfireItems.UpdateData();
-
             if (onUpdateStorageItems != null)
                 onUpdateStorageItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
@@ -694,36 +713,18 @@ namespace MultiplayerARPG
             eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             List<RaycastResult> results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-            // If it's not mobile ui, assume it's over UI
-            if (ignorePointerDetectionUis != null && ignorePointerDetectionUis.Count > 0)
+            // If it's not mobile ui, assume that it's over UI
+            if (ignorePointerOverUIObjects != null && ignorePointerOverUIObjects.Count > 0)
             {
                 foreach (RaycastResult result in results)
                 {
-                    if (!ignorePointerDetectionUis.Contains(result.gameObject))
+                    if (!ignorePointerOverUIObjects.Contains(result.gameObject))
                         return true;
                 }
             }
             else
             {
                 return results.Count > 0;
-            }
-            return false;
-        }
-
-        public override bool IsBlockController()
-        {
-            if (base.IsBlockController())
-                return true;
-
-            if (blockControllerUIs != null && blockControllerUIs.Count > 0)
-            {
-                foreach (UIBase ui in blockControllerUIs)
-                {
-                    if (!ui)
-                        continue;
-                    if (ui.IsVisible())
-                        return true;
-                }
             }
             return false;
         }
@@ -904,7 +905,7 @@ namespace MultiplayerARPG
             characterEntity.onShowGuildInvitationDialog += OnShowGuildInvitation;
             characterEntity.onShowStorage += OnShowStorage;
             characterEntity.onIsWarpingChange += OnIsWarpingChange;
-            characterEntity.onIdChange += OnIdChange;
+            characterEntity.onDataIdChange += OnDataIdChange;
             characterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
             characterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
             characterEntity.onAttributesOperation += OnAttributesOperation;
@@ -948,7 +949,7 @@ namespace MultiplayerARPG
             characterEntity.onShowGuildInvitationDialog -= OnShowGuildInvitation;
             characterEntity.onShowStorage -= OnShowStorage;
             characterEntity.onIsWarpingChange -= OnIsWarpingChange;
-            characterEntity.onIdChange -= OnIdChange;
+            characterEntity.onDataIdChange -= OnDataIdChange;
             characterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
             characterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
             characterEntity.onAttributesOperation -= OnAttributesOperation;
@@ -963,7 +964,7 @@ namespace MultiplayerARPG
         }
 
         #region Sync data changes callback
-        protected void OnIdChange(string id)
+        protected void OnDataIdChange(int dataId)
         {
             UpdateCharacter();
             UpdateSkills();
@@ -976,6 +977,8 @@ namespace MultiplayerARPG
             UpdateCharacter();
             UpdateEquipItems();
             UpdateEquipWeapons();
+            UpdateActivatingItem();
+            UpdateAmmoAmount();
             UpdateSkills();
             UpdateHotkeys();
         }
@@ -985,6 +988,8 @@ namespace MultiplayerARPG
             UpdateCharacter();
             UpdateEquipItems();
             UpdateEquipWeapons();
+            UpdateActivatingItem();
+            UpdateAmmoAmount();
             UpdateSkills();
             UpdateHotkeys();
         }
@@ -1002,6 +1007,7 @@ namespace MultiplayerARPG
 
         protected void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
+            UpdateCharacter();
             UpdateSummons();
         }
 
@@ -1014,6 +1020,7 @@ namespace MultiplayerARPG
         {
             UpdateCharacter();
             UpdateEquipItems();
+            UpdateActivatingItem();
             UpdateSkills();
             UpdateHotkeys();
         }
@@ -1022,8 +1029,9 @@ namespace MultiplayerARPG
         {
             UpdateCharacter();
             UpdateNonEquipItems();
+            UpdateActivatingItem();
+            UpdateAmmoAmount();
             UpdateHotkeys();
-            UpdateQuests();
         }
 
         protected void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
