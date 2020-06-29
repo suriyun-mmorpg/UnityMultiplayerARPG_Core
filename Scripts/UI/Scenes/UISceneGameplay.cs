@@ -29,19 +29,6 @@ namespace MultiplayerARPG
         public UICharacterQuests[] uiCharacterQuests;
         public UIAmmoAmount uiAmmoAmount;
 
-        [HideInInspector]
-        public UIEquipItems uiEquipItems;
-        [HideInInspector]
-        public UINonEquipItems uiNonEquipItems;
-        [HideInInspector]
-        public UICharacterSkills uiSkills;
-        [HideInInspector]
-        public UICharacterSummons uiSummons;
-        [HideInInspector]
-        public UICharacterHotkeys uiHotkeys;
-        [HideInInspector]
-        public UICharacterQuests uiQuests;
-
         [Header("Selected Target UIs")]
         public UICharacter uiTargetCharacter;
         public UIBaseGameEntity uiTargetNpc;
@@ -95,6 +82,10 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onUpdateHotkeys;
         public System.Action<BasePlayerCharacterEntity> onUpdateQuests;
         public System.Action<BasePlayerCharacterEntity> onUpdateStorageItems;
+        public System.Action<BuildingEntity> onShowConstructBuildingDialog;
+        public System.Action onHideConstructBuildingDialog;
+        public System.Action<BuildingEntity> onShowCurrentBuildingDialog;
+        public System.Action onHideCurrentBuildingDialog;
 
         /// <summary>
         /// List of dialogs which open by activate on NPCs or Building Entites
@@ -121,75 +112,12 @@ namespace MultiplayerARPG
                     ui.gameObject.AddComponent<UIBlockController>();
                 }
             }
-            MigrateNewUIs();
+            this.InvokeInstanceDevExtMethods("Awake");
         }
 
-        private void OnValidate()
+        protected void OnDestroy()
         {
-#if UNITY_EDITOR
-            if (MigrateNewUIs())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateNewUIs()
-        {
-            bool hasChanges = false;
-            if (uiEquipItems != null)
-            {
-                List<UIEquipItems> list = uiCharacterEquipItems == null ? new List<UIEquipItems>() : new List<UIEquipItems>(uiCharacterEquipItems);
-                list.Add(uiEquipItems);
-                uiCharacterEquipItems = list.ToArray();
-                uiEquipItems = null;
-                hasChanges = true;
-            }
-
-            if (uiNonEquipItems != null)
-            {
-                List<UINonEquipItems> list = uiCharacterNonEquipItems == null ? new List<UINonEquipItems>() : new List<UINonEquipItems>(uiCharacterNonEquipItems);
-                list.Add(uiNonEquipItems);
-                uiCharacterNonEquipItems = list.ToArray();
-                uiNonEquipItems = null;
-                hasChanges = true;
-            }
-
-            if (uiSkills != null)
-            {
-                List<UICharacterSkills> list = uiCharacterSkills == null ? new List<UICharacterSkills>() : new List<UICharacterSkills>(uiCharacterSkills);
-                list.Add(uiSkills);
-                uiCharacterSkills = list.ToArray();
-                uiSkills = null;
-                hasChanges = true;
-            }
-
-            if (uiSummons != null)
-            {
-                List<UICharacterSummons> list = uiCharacterSummons == null ? new List<UICharacterSummons>() : new List<UICharacterSummons>(uiCharacterSummons);
-                list.Add(uiSummons);
-                uiCharacterSummons = list.ToArray();
-                uiSummons = null;
-                hasChanges = true;
-            }
-
-            if (uiHotkeys != null)
-            {
-                List<UICharacterHotkeys> list = uiCharacterHotkeys == null ? new List<UICharacterHotkeys>() : new List<UICharacterHotkeys>(uiCharacterHotkeys);
-                list.Add(uiHotkeys);
-                uiCharacterHotkeys = list.ToArray();
-                uiHotkeys = null;
-                hasChanges = true;
-            }
-
-            if (uiQuests != null)
-            {
-                List<UICharacterQuests> list = uiCharacterQuests == null ? new List<UICharacterQuests>() : new List<UICharacterQuests>(uiCharacterQuests);
-                list.Add(uiQuests);
-                uiCharacterQuests = list.ToArray();
-                uiQuests = null;
-                hasChanges = true;
-            }
-
-            return hasChanges;
+            this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 
         protected override void Update()
@@ -736,12 +664,16 @@ namespace MultiplayerARPG
                 return;
             if (!uiConstructBuilding.IsVisible())
                 uiConstructBuilding.Show();
+            if (onShowConstructBuildingDialog != null)
+                onShowConstructBuildingDialog.Invoke(buildingEntity);
         }
 
         public override void HideConstructBuildingDialog()
         {
             if (uiConstructBuilding.IsVisible())
                 uiConstructBuilding.Hide();
+            if (onHideConstructBuildingDialog != null)
+                onHideConstructBuildingDialog.Invoke();
         }
 
         public override void ShowCurrentBuildingDialog(BuildingEntity buildingEntity)
@@ -769,6 +701,8 @@ namespace MultiplayerARPG
                 if (!uiCurrentBuilding.IsVisible())
                     uiCurrentBuilding.Show();
             }
+            if (onShowCurrentBuildingDialog != null)
+                onShowCurrentBuildingDialog.Invoke(buildingEntity);
         }
 
         public override void HideCurrentBuildingDialog()
@@ -781,6 +715,8 @@ namespace MultiplayerARPG
                 uiCurrentWorkbench.Hide();
             if (uiCurrentBuilding.IsVisible())
                 uiCurrentBuilding.Hide();
+            if (onHideCurrentBuildingDialog != null)
+                onHideCurrentBuildingDialog.Invoke();
         }
 
         public override void HideNpcDialog()
