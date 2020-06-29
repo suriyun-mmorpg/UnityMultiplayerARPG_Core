@@ -91,9 +91,9 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             Singleton = this;
-            this.InvokeInstanceDevExtMethods("Awake");
             if (CurrentGameInstance.UISceneGameplayPrefab != null)
                 CacheUISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
+            this.InvokeInstanceDevExtMethods("Awake");
         }
 
         protected virtual void Update()
@@ -117,9 +117,9 @@ namespace MultiplayerARPG
         protected virtual void OnDestroy()
         {
             Desetup(PlayerCharacterEntity);
-            this.InvokeInstanceDevExtMethods("OnDestroy");
             if (CacheUISceneGameplay != null)
                 Destroy(CacheUISceneGameplay.gameObject);
+            this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 
         public virtual void ConfirmBuild()
