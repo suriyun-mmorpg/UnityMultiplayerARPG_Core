@@ -34,6 +34,8 @@ namespace MultiplayerARPG
 
         IEnumerator LoadSceneRoutine(string sceneName)
         {
+            if (SceneManager.GetActiveScene().name.Equals(sceneName))
+                yield break;
             if (rootObject != null)
                 rootObject.SetActive(true);
             if (uiTextProgress != null)
