@@ -674,6 +674,13 @@ namespace MultiplayerARPG
             animator.SetTrigger(ANIM_HURT);
         }
 
+        public override float GetJumpAnimationDuration()
+        {
+            if (CacheAnimatorController[CLIP_JUMP] == null)
+                return 0f;
+            return CacheAnimatorController[CLIP_JUMP].length;
+        }
+
         public override void PlayJumpAnimation()
         {
             if (CacheAnimatorController[CLIP_JUMP] == null)

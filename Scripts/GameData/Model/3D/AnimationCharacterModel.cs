@@ -630,16 +630,29 @@ namespace MultiplayerARPG
 
         public override void PlayHitAnimation()
         {
+            if (legacyAnimation.GetClip(CLIP_HURT) == null)
+                return;
             CrossFadeLegacyAnimation(CLIP_HURT, hurtClipFadeLength, WrapMode.Once);
+        }
+
+        public override float GetJumpAnimationDuration()
+        {
+            if (legacyAnimation.GetClip(CLIP_JUMP) == null)
+                return 0f;
+            return legacyAnimation.GetClip(CLIP_JUMP).length;
         }
 
         public override void PlayJumpAnimation()
         {
+            if (legacyAnimation.GetClip(CLIP_JUMP) == null)
+                return;
             CrossFadeLegacyAnimation(CLIP_JUMP, jumpClipFadeLength, WrapMode.Once);
         }
 
         public override void PlayPickupAnimation()
         {
+            if (legacyAnimation.GetClip(CLIP_PICKUP) == null)
+                return;
             CrossFadeLegacyAnimation(CLIP_PICKUP, pickupClipFadeLength, WrapMode.Once);
         }
     }

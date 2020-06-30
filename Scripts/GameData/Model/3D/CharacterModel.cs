@@ -740,6 +740,19 @@ namespace MultiplayerARPG
             animator.SetTrigger(ANIM_HURT);
         }
 
+        public override float GetJumpAnimationDuration()
+        {
+            if (animatorType == AnimatorType.LegacyAnimtion)
+            {
+                if (legacyAnimation.GetClip(CLIP_JUMP) == null)
+                    return 0f;
+                return legacyAnimation.GetClip(CLIP_JUMP).length;
+            }
+            if (CacheAnimatorController[CLIP_JUMP] == null)
+                return 0f;
+            return CacheAnimatorController[CLIP_JUMP].length;
+        }
+
         public override void PlayJumpAnimation()
         {
             if (animatorType == AnimatorType.LegacyAnimtion)

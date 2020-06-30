@@ -610,6 +610,15 @@ namespace MultiplayerARPG
         public virtual void PlayHitAnimation() { }
 
         /// <summary>
+        /// Use this to get jump animation duration
+        /// </summary>
+        /// <returns></returns>
+        public virtual float GetJumpAnimationDuration()
+        {
+            return 0f;
+        }
+
+        /// <summary>
         /// Use this function to play jump animation
         /// </summary>
         public virtual void PlayJumpAnimation() { }
