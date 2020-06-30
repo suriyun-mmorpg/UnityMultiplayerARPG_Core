@@ -17,6 +17,7 @@ namespace MultiplayerARPG
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
+        public bool applyJumpForceAfterAnimation = true;
         public float backwardMoveSpeedRate = 0.75f;
         public float groundCheckDistance = 0.1f; // distance for checking if the controller is grounded ( 0.01f seems to work best for this )
         public float groundCheckDistanceWhileJump = 0.01f; // distance for checking if the controller is grounded while jumping
@@ -71,6 +72,8 @@ namespace MultiplayerARPG
         private float tempCurrentMoveSpeed;
         private bool previouslyGrounded;
         private bool applyingJump;
+        private bool applyingJumpForce;
+        private float applyJumpForceCountDown;
 
         public override void EntityAwake()
         {
@@ -163,7 +166,7 @@ namespace MultiplayerARPG
             tempMovementState = movementState;
             if (tempInputDirection.sqrMagnitude > 0)
                 navPaths = null;
-            if (!isJumping)
+            if (!isJumping && !applyingJumpForce)
                 isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
         }
 
@@ -208,7 +211,7 @@ namespace MultiplayerARPG
                     tempMovementState = movementState;
                     if (tempInputDirection.sqrMagnitude > 0)
                         navPaths = null;
-                    if (!isJumping)
+                    if (!isJumping && !applyingJumpForce)
                         isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
                     break;
             }
@@ -407,10 +410,13 @@ namespace MultiplayerARPG
             {
                 tempMoveDirection = Vector3.zero;
                 isJumping = false;
+                applyingJumpForce = false;
             }
 
-            tempEntityMoveSpeed = CacheEntity.GetMoveSpeed();
+            // Prepare movement speed
+            tempEntityMoveSpeed = applyingJumpForce ? 0f : CacheEntity.GetMoveSpeed();
             tempCurrentMoveSpeed = tempEntityMoveSpeed;
+
             // Updating horizontal movement (WASD inputs)
             if (tempMoveDirection.sqrMagnitude > 0f)
             {
@@ -512,13 +518,31 @@ namespace MultiplayerARPG
                 if (isJumping)
                 {
                     CacheEntity.TriggerJump();
-                    if (!useRootMotionForJump)
+                    applyingJumpForce = true;
+                    if (applyJumpForceAfterAnimation)
                     {
-                        CacheRigidbody.drag = 0f;
-                        CacheRigidbody.velocity = new Vector3(CacheRigidbody.velocity.x, 0f, CacheRigidbody.velocity.z);
-                        CacheRigidbody.AddForce(new Vector3(0f, CalculateJumpVerticalSpeed(), 0f), ForceMode.Impulse);
+                        applyJumpForceCountDown = 0f;
+                        if (CacheEntity.Model is IJumppableModel)
+                        {
+                            applyJumpForceCountDown = (CacheEntity.Model as IJumppableModel).GetJumpAnimationDuration();
+                        }
                     }
-                    applyingJump = true;
+                }
+
+                if (applyingJumpForce)
+                {
+                    applyJumpForceCountDown -= Time.deltaTime;
+                    if (applyJumpForceCountDown <= 0f)
+                    {
+                        applyingJumpForce = false;
+                        if (!useRootMotionForJump)
+                        {
+                            CacheRigidbody.drag = 0f;
+                            CacheRigidbody.velocity = new Vector3(CacheRigidbody.velocity.x, 0f, CacheRigidbody.velocity.z);
+                            CacheRigidbody.AddForce(new Vector3(0f, CalculateJumpVerticalSpeed(), 0f), ForceMode.Impulse);
+                        }
+                        applyingJump = true;
+                    }
                 }
 
                 if (!applyingJump &&

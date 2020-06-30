@@ -23,6 +23,7 @@ namespace MultiplayerARPG
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
+        public bool applyJumpForceAfterAnimation = true;
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
@@ -60,6 +61,8 @@ namespace MultiplayerARPG
         private float airborneElapsed;
         private bool isUnderWater;
         private bool isJumping;
+        private bool applyingJumpForce;
+        private float applyJumpForceCountDown;
         private Collider waterCollider;
 
         // Optimize garbage collector
@@ -194,7 +197,7 @@ namespace MultiplayerARPG
             tempMovementState = movementState;
             if (tempInputDirection.sqrMagnitude > 0)
                 navPaths = null;
-            if (!isJumping)
+            if (!isJumping && !applyingJumpForce)
                 isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
         }
 
@@ -238,7 +241,7 @@ namespace MultiplayerARPG
                     tempMovementState = movementState;
                     if (tempInputDirection.sqrMagnitude > 0)
                         navPaths = null;
-                    if (!isJumping)
+                    if (!isJumping && !applyingJumpForce)
                         isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
                     break;
             }
@@ -340,6 +343,8 @@ namespace MultiplayerARPG
             else
                 airborneElapsed += deltaTime;
 
+            bool isGrounded = CacheOpenCharacterController.isGrounded || airborneElapsed < airborneDelay;
+
             if (HasNavPaths)
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
@@ -374,10 +379,15 @@ namespace MultiplayerARPG
             {
                 tempMoveDirection = Vector3.zero;
                 isJumping = false;
+                applyingJumpForce = false;
             }
 
+            // Prepare movement speed
+            tempEntityMoveSpeed = applyingJumpForce ? 0f : CacheEntity.GetMoveSpeed();
+            tempCurrentMoveSpeed = tempEntityMoveSpeed;
+
             // Calculate vertical velocity by gravity
-            if (!CacheOpenCharacterController.isGrounded && !isUnderWater)
+            if (!isGrounded && !isUnderWater)
             {
                 if (!useRootMotionForFall)
                     tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, -maxFallVelocity, gravity * deltaTime);
@@ -394,16 +404,31 @@ namespace MultiplayerARPG
             }
 
             // Jumping 
-            if (CacheOpenCharacterController.isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
+            if (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
             {
                 airborneElapsed = airborneDelay;
                 CacheEntity.TriggerJump();
-                if (!useRootMotionForJump)
-                    tempVerticalVelocity = CalculateJumpVerticalSpeed();
+                applyingJumpForce = true;
+                if (applyJumpForceAfterAnimation)
+                {
+                    applyJumpForceCountDown = 0f;
+                    if (CacheEntity.Model is IJumppableModel)
+                    {
+                        applyJumpForceCountDown = (CacheEntity.Model as IJumppableModel).GetJumpAnimationDuration();
+                    }
+                }
             }
 
-            tempEntityMoveSpeed = CacheEntity.GetMoveSpeed();
-            tempCurrentMoveSpeed = tempEntityMoveSpeed;
+            if (applyingJumpForce)
+            {
+                applyJumpForceCountDown -= Time.deltaTime;
+                if (applyJumpForceCountDown <= 0f)
+                {
+                    applyingJumpForce = false;
+                    if (!useRootMotionForJump)
+                        tempVerticalVelocity = CalculateJumpVerticalSpeed();
+                }
+            }
             // Updating horizontal movement (WASD inputs)
             if (tempMoveDirection.sqrMagnitude > 0f)
             {
