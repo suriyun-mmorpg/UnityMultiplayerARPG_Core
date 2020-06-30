@@ -24,11 +24,9 @@ namespace MultiplayerARPG
             get { return weaponType; }
         }
 
-        [SerializeField]
-        private WeaponItemEquipType equipType;
         public WeaponItemEquipType EquipType
         {
-            get { return equipType; }
+            get { return WeaponType.EquipType; }
         }
 
         [SerializeField]
