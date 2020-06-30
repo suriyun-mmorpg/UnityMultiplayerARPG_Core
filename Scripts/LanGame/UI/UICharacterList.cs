@@ -60,8 +60,10 @@ namespace MultiplayerARPG
             CacheCharacterSelectionManager.Clear();
             CacheCharacterList.HideAll();
             // Unenabled buttons
-            buttonStart.gameObject.SetActive(false);
-            buttonDelete.gameObject.SetActive(false);
+            if (buttonStart)
+                buttonStart.gameObject.SetActive(false);
+            if (buttonDelete)
+                buttonDelete.gameObject.SetActive(false);
             // Remove all models
             characterModelContainer.RemoveChildren();
             CharacterModelById.Clear();
@@ -117,18 +119,23 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            buttonStart.onClick.RemoveListener(OnClickStart);
-            buttonStart.onClick.AddListener(OnClickStart);
-            buttonDelete.onClick.RemoveListener(OnClickDelete);
-            buttonDelete.onClick.AddListener(OnClickDelete);
+            if (buttonStart)
+            {
+                buttonStart.onClick.RemoveListener(OnClickStart);
+                buttonStart.onClick.AddListener(OnClickStart);
+                buttonStart.gameObject.SetActive(false);
+            }
+            if (buttonDelete)
+            {
+                buttonDelete.onClick.RemoveListener(OnClickDelete);
+                buttonDelete.onClick.AddListener(OnClickDelete);
+                buttonDelete.gameObject.SetActive(false);
+            }
             // Clear selection
             CacheCharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             CacheCharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
             CacheCharacterSelectionManager.Clear();
             CacheCharacterList.HideAll();
-            // Unenabled buttons
-            buttonStart.gameObject.SetActive(false);
-            buttonDelete.gameObject.SetActive(false);
             // Load characters
             LoadCharacters();
             base.Show();
@@ -147,8 +154,10 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
         {
-            buttonStart.gameObject.SetActive(true);
-            buttonDelete.gameObject.SetActive(true);
+            if (buttonStart)
+                buttonStart.gameObject.SetActive(true);
+            if (buttonDelete)
+                buttonDelete.gameObject.SetActive(true);
             characterModelContainer.SetChildrenActive(false);
             PlayerCharacterDataById.TryGetValue(playerCharacterData.Id, out selectedPlayerCharacterData);
             CharacterModelById.TryGetValue(playerCharacterData.Id, out selectedModel);
@@ -157,7 +166,7 @@ namespace MultiplayerARPG
                 SelectedModel.gameObject.SetActive(true);
         }
 
-        protected virtual void OnClickStart()
+        public virtual void OnClickStart()
         {
             UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
@@ -184,7 +193,7 @@ namespace MultiplayerARPG
             networkManager.StartGame();
         }
 
-        protected virtual void OnClickDelete()
+        public virtual void OnClickDelete()
         {
             UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
