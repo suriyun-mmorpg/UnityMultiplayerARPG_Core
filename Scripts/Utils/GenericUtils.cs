@@ -4,6 +4,9 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+#if USE_TEXT_MESH_PRO
+using TMPro;
+#endif
 
 public static class GenericUtils
 {
