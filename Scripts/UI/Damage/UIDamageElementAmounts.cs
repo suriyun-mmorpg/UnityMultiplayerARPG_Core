@@ -47,27 +47,27 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            // Reset number
+            if (uiTextSumDamage != null)
+            {
+                uiTextSumDamage.text = string.Format(
+                    LanguageManager.GetText(formatKeySumDamage),
+                    isBonus ? "+0" : "0",
+                    "0");
+            }
+            foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextDamages)
+            {
+                entry.Value.text = string.Format(
+                    LanguageManager.GetText(formatKeyDamage),
+                    entry.Key.Title,
+                    isBonus ? "+0" : "0",
+                    "0");
+            }
+            // Set number by updated data
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllDamages != null)
                     uiTextAllDamages.gameObject.SetActive(false);
-
-                if (uiTextSumDamage != null)
-                {
-                    uiTextSumDamage.text = string.Format(
-                        LanguageManager.GetText(formatKeySumDamage),
-                        isBonus ? "+0" : "0",
-                        "0");
-                }
-
-                foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextDamages)
-                {
-                    entry.Value.text = string.Format(
-                        LanguageManager.GetText(formatKeyDamage),
-                        entry.Key.Title,
-                        isBonus ? "+0" : "0",
-                        "0");
-                }
             }
             else
             {

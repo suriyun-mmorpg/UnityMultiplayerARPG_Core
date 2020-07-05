@@ -43,18 +43,19 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            // Reset number
+            foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextAmounts)
+            {
+                entry.Value.text = string.Format(
+                        LanguageManager.GetText(formatKeyAmount),
+                        entry.Key.Title,
+                        isBonus ? "+0" : "0");
+            }
+            // Set number by updated data
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
-
-                foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextAmounts)
-                {
-                    entry.Value.text = string.Format(
-                            LanguageManager.GetText(formatKeyAmount),
-                            entry.Key.Title,
-                            isBonus ? "+0" : "0");
-                }
             }
             else
             {

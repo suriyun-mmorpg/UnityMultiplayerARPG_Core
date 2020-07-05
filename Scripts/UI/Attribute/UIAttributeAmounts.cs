@@ -54,16 +54,16 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            // Reset number
+            foreach (KeyValuePair<Attribute, TextWrapper> entry in CacheTextAmounts)
+            {
+                SetDefaultText(entry.Value, entry.Key.Title);
+            }
+            // Set number by updated data
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
-
-                foreach (KeyValuePair<Attribute, TextWrapper> entry in CacheTextAmounts)
-                {
-                    SetDefaultText(entry.Value, entry.Key.Title);
-                }
             }
             else
             {
@@ -85,8 +85,8 @@ namespace MultiplayerARPG
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
                     // Get attribute amount from character
-                    if (owningCharacter != null)
-                        owningCharacter.GetCaches().Attributes.TryGetValue(tempAttribute, out tempCurrentAmount);
+                    if (BasePlayerCharacterController.OwningCharacter != null)
+                        BasePlayerCharacterController.OwningCharacter.GetCaches().Attributes.TryGetValue(tempAttribute, out tempCurrentAmount);
                     // Use difference format by option 
                     switch (displayType)
                     {
