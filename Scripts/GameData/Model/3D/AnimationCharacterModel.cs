@@ -132,11 +132,15 @@ namespace MultiplayerARPG
                 defaultAnimations.deadClip,
                 defaultAnimations.pickupClip,
                 // Speed Rate
+                defaultAnimations.idleAnimSpeedRate,
                 defaultAnimations.moveAnimSpeedRate,
                 defaultAnimations.sprintAnimSpeedRate,
                 defaultAnimations.walkAnimSpeedRate,
+                defaultAnimations.crouchIdleAnimSpeedRate,
                 defaultAnimations.crouchMoveAnimSpeedRate,
+                defaultAnimations.crawlIdleAnimSpeedRate,
                 defaultAnimations.crawlMoveAnimSpeedRate,
+                defaultAnimations.swimIdleAnimSpeedRate,
                 defaultAnimations.swimMoveAnimSpeedRate,
                 defaultAnimations.jumpAnimSpeedRate,
                 defaultAnimations.fallAnimSpeedRate,
@@ -212,11 +216,15 @@ namespace MultiplayerARPG
             AnimationClip deadClip,
             AnimationClip pickupClip,
             // Speed rate
+            float idleAnimSpeedRate,
             float moveAnimSpeedRate,
             float sprintAnimSpeedRate,
             float walkAnimSpeedRate,
+            float crouchIdleAnimSpeedRate,
             float crouchMoveAnimSpeedRate,
+            float crawlIdleAnimSpeedRate,
             float crawlMoveAnimSpeedRate,
+            float swimIdleAnimSpeedRate,
             float swimMoveAnimSpeedRate,
             float jumpAnimSpeedRate,
             float fallAnimSpeedRate,
@@ -414,6 +422,8 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(deadClip != null ? deadClip : defaultAnimations.deadClip, CLIP_DEAD);
             legacyAnimation.AddClip(pickupClip != null ? pickupClip : defaultAnimations.pickupClip, CLIP_PICKUP);
             // Set speed
+            // Idle
+            legacyAnimation[CLIP_IDLE].speed = idleAnimSpeedRate > 0f ? idleAnimSpeedRate : 1f;
             // Move
             legacyAnimation[CLIP_MOVE].speed =
                 legacyAnimation[CLIP_MOVE_BACKWARD].speed =
@@ -442,6 +452,9 @@ namespace MultiplayerARPG
                 legacyAnimation[CLIP_WALK_BACKWARD_LEFT].speed =
                 legacyAnimation[CLIP_WALK_BACKWARD_RIGHT].speed = walkAnimSpeedRate > 0f ? walkAnimSpeedRate : 1f;
             // Crouch
+            // Idle
+            legacyAnimation[CLIP_CROUCH_IDLE].speed = crouchIdleAnimSpeedRate > 0f ? crouchIdleAnimSpeedRate : 1f;
+            // Move
             legacyAnimation[CLIP_CROUCH_MOVE].speed =
                 legacyAnimation[CLIP_CROUCH_MOVE_BACKWARD].speed =
                 legacyAnimation[CLIP_CROUCH_MOVE_LEFT].speed =
@@ -451,6 +464,9 @@ namespace MultiplayerARPG
                 legacyAnimation[CLIP_CROUCH_MOVE_BACKWARD_LEFT].speed =
                 legacyAnimation[CLIP_CROUCH_MOVE_BACKWARD_RIGHT].speed = crouchMoveAnimSpeedRate > 0f ? crouchMoveAnimSpeedRate : 1f;
             // Crawl
+            // Idle
+            legacyAnimation[CLIP_CRAWL_IDLE].speed = crawlIdleAnimSpeedRate > 0f ? crawlIdleAnimSpeedRate : 1f;
+            // Move
             legacyAnimation[CLIP_CRAWL_MOVE].speed =
                 legacyAnimation[CLIP_CRAWL_MOVE_BACKWARD].speed =
                 legacyAnimation[CLIP_CRAWL_MOVE_LEFT].speed =
@@ -460,6 +476,9 @@ namespace MultiplayerARPG
                 legacyAnimation[CLIP_CRAWL_MOVE_BACKWARD_LEFT].speed =
                 legacyAnimation[CLIP_CRAWL_MOVE_BACKWARD_RIGHT].speed = crawlMoveAnimSpeedRate > 0f ? crawlMoveAnimSpeedRate : 1f;
             // Swim
+            // Idle
+            legacyAnimation[CLIP_SWIM_IDLE].speed = swimIdleAnimSpeedRate > 0f ? swimIdleAnimSpeedRate : 1f;
+            // Move
             legacyAnimation[CLIP_SWIM_MOVE].speed =
                 legacyAnimation[CLIP_SWIM_MOVE_BACKWARD].speed =
                 legacyAnimation[CLIP_SWIM_MOVE_LEFT].speed =
@@ -562,11 +581,15 @@ namespace MultiplayerARPG
                 weaponAnimations.deadClip,
                 weaponAnimations.pickupClip,
                 // Speed rate
+                weaponAnimations.idleAnimSpeedRate,
                 weaponAnimations.moveAnimSpeedRate,
                 weaponAnimations.sprintAnimSpeedRate,
                 weaponAnimations.walkAnimSpeedRate,
+                weaponAnimations.crouchIdleAnimSpeedRate,
                 weaponAnimations.crouchMoveAnimSpeedRate,
+                weaponAnimations.crawlIdleAnimSpeedRate,
                 weaponAnimations.crawlMoveAnimSpeedRate,
+                weaponAnimations.swimIdleAnimSpeedRate,
                 weaponAnimations.swimMoveAnimSpeedRate,
                 weaponAnimations.jumpAnimSpeedRate,
                 weaponAnimations.fallAnimSpeedRate,

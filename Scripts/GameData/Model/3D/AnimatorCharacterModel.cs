@@ -67,11 +67,15 @@ namespace MultiplayerARPG
 
         // Private state validater
         private bool isSetupComponent;
+        private float idleAnimSpeedRate;
         private float moveAnimSpeedRate;
         private float sprintAnimSpeedRate;
         private float walkAnimSpeedRate;
+        private float crouchIdleAnimSpeedRate;
         private float crouchMoveAnimSpeedRate;
+        private float crawlIdleAnimSpeedRate;
         private float crawlMoveAnimSpeedRate;
+        private float swimIdleAnimSpeedRate;
         private float swimMoveAnimSpeedRate;
         private float jumpAnimSpeedRate;
         private float fallAnimSpeedRate;
@@ -233,11 +237,15 @@ namespace MultiplayerARPG
                 defaultAnimations.deadClip,
                 defaultAnimations.pickupClip,
                 // Speed Rate
+                defaultAnimations.idleAnimSpeedRate,
                 defaultAnimations.moveAnimSpeedRate,
                 defaultAnimations.sprintAnimSpeedRate,
                 defaultAnimations.walkAnimSpeedRate,
+                defaultAnimations.crouchIdleAnimSpeedRate,
                 defaultAnimations.crouchMoveAnimSpeedRate,
+                defaultAnimations.crawlIdleAnimSpeedRate,
                 defaultAnimations.crawlMoveAnimSpeedRate,
+                defaultAnimations.swimIdleAnimSpeedRate,
                 defaultAnimations.swimMoveAnimSpeedRate,
                 defaultAnimations.jumpAnimSpeedRate,
                 defaultAnimations.fallAnimSpeedRate,
@@ -313,11 +321,15 @@ namespace MultiplayerARPG
             AnimationClip deadClip,
             AnimationClip pickupClip,
             // Speed rate
+            float idleAnimSpeedRate,
             float moveAnimSpeedRate,
             float sprintAnimSpeedRate,
             float walkAnimSpeedRate,
+            float crouchIdleAnimSpeedRate,
             float crouchMoveAnimSpeedRate,
+            float crawlIdleAnimSpeedRate,
             float crawlMoveAnimSpeedRate,
+            float swimIdleAnimSpeedRate,
             float swimMoveAnimSpeedRate,
             float jumpAnimSpeedRate,
             float fallAnimSpeedRate,
@@ -392,18 +404,31 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_DEAD] = deadClip != null ? deadClip : defaultAnimations.deadClip;
             CacheAnimatorController[CLIP_PICKUP] = pickupClip != null ? pickupClip : defaultAnimations.pickupClip;
             // Speed Rate
+            // Stand move
+            this.idleAnimSpeedRate = idleAnimSpeedRate > 0f ? idleAnimSpeedRate :
+                defaultAnimations.idleAnimSpeedRate > 0f ? defaultAnimations.idleAnimSpeedRate : 1f;
             this.moveAnimSpeedRate = moveAnimSpeedRate > 0f ? moveAnimSpeedRate :
                 defaultAnimations.moveAnimSpeedRate > 0f ? defaultAnimations.moveAnimSpeedRate : 1f;
             this.sprintAnimSpeedRate = sprintAnimSpeedRate > 0f ? sprintAnimSpeedRate :
                 defaultAnimations.sprintAnimSpeedRate > 0f ? defaultAnimations.sprintAnimSpeedRate : 1f;
             this.walkAnimSpeedRate = walkAnimSpeedRate > 0f ? walkAnimSpeedRate :
                 defaultAnimations.walkAnimSpeedRate > 0f ? defaultAnimations.walkAnimSpeedRate : 1f;
+            // Crouch move
+            this.crouchIdleAnimSpeedRate = crouchIdleAnimSpeedRate > 0f ? crouchIdleAnimSpeedRate :
+                defaultAnimations.crouchIdleAnimSpeedRate > 0f ? defaultAnimations.crouchIdleAnimSpeedRate : 1f;
             this.crouchMoveAnimSpeedRate = crouchMoveAnimSpeedRate > 0f ? crouchMoveAnimSpeedRate :
                 defaultAnimations.crouchMoveAnimSpeedRate > 0f ? defaultAnimations.crouchMoveAnimSpeedRate : 1f;
+            // Crawl move
+            this.crawlIdleAnimSpeedRate = crawlIdleAnimSpeedRate > 0f ? crawlIdleAnimSpeedRate :
+                defaultAnimations.crawlIdleAnimSpeedRate > 0f ? defaultAnimations.crawlIdleAnimSpeedRate : 1f;
             this.crawlMoveAnimSpeedRate = crawlMoveAnimSpeedRate > 0f ? crawlMoveAnimSpeedRate :
                 defaultAnimations.crawlMoveAnimSpeedRate > 0f ? defaultAnimations.crawlMoveAnimSpeedRate : 1f;
+            // Swim move
+            this.swimIdleAnimSpeedRate = swimIdleAnimSpeedRate > 0f ? swimIdleAnimSpeedRate :
+                defaultAnimations.swimIdleAnimSpeedRate > 0f ? defaultAnimations.swimIdleAnimSpeedRate : 1f;
             this.swimMoveAnimSpeedRate = swimMoveAnimSpeedRate > 0f ? swimMoveAnimSpeedRate :
                 defaultAnimations.swimMoveAnimSpeedRate > 0f ? defaultAnimations.swimMoveAnimSpeedRate : 1f;
+            // Other
             this.jumpAnimSpeedRate = jumpAnimSpeedRate > 0f ? jumpAnimSpeedRate :
                 defaultAnimations.jumpAnimSpeedRate > 0f ? defaultAnimations.jumpAnimSpeedRate : 1f;
             this.fallAnimSpeedRate = fallAnimSpeedRate > 0f ? fallAnimSpeedRate :
@@ -506,11 +531,15 @@ namespace MultiplayerARPG
                 weaponAnimations.deadClip,
                 weaponAnimations.pickupClip,
                 // Speed rate
+                weaponAnimations.idleAnimSpeedRate,
                 weaponAnimations.moveAnimSpeedRate,
                 weaponAnimations.sprintAnimSpeedRate,
                 weaponAnimations.walkAnimSpeedRate,
+                weaponAnimations.crouchIdleAnimSpeedRate,
                 weaponAnimations.crouchMoveAnimSpeedRate,
+                weaponAnimations.crawlIdleAnimSpeedRate,
                 weaponAnimations.crawlMoveAnimSpeedRate,
+                weaponAnimations.swimIdleAnimSpeedRate,
                 weaponAnimations.swimMoveAnimSpeedRate,
                 weaponAnimations.jumpAnimSpeedRate,
                 weaponAnimations.fallAnimSpeedRate,
@@ -537,6 +566,7 @@ namespace MultiplayerARPG
             }
 
             float moveAnimationSpeedMultiplier = this.moveAnimationSpeedMultiplier;
+            float idleAnimationSpeedMultiplier;
 
             // Set move speed based on inputs
             bool moving = false;
@@ -571,23 +601,28 @@ namespace MultiplayerARPG
                 case ExtraMovementState.IsCrouching:
                     moveType = 1;
                     moveAnimationSpeedMultiplier *= crouchMoveAnimSpeedRate;
+                    idleAnimationSpeedMultiplier = crouchIdleAnimSpeedRate;
                     break;
                 case ExtraMovementState.IsCrawling:
                     moveType = 2;
                     moveAnimationSpeedMultiplier *= crawlMoveAnimSpeedRate;
+                    idleAnimationSpeedMultiplier = crawlIdleAnimSpeedRate;
                     break;
                 case ExtraMovementState.IsSprinting:
                     moveSpeed *= 2;
                     sideMoveSpeed *= 2;
                     moveAnimationSpeedMultiplier *= sprintAnimSpeedRate;
+                    idleAnimationSpeedMultiplier = idleAnimSpeedRate;
                     break;
                 case ExtraMovementState.IsWalking:
                     moveSpeed *= 0.5f;
                     sideMoveSpeed *= 0.5f;
                     moveAnimationSpeedMultiplier *= walkAnimSpeedRate;
+                    idleAnimationSpeedMultiplier = idleAnimSpeedRate;
                     break;
                 default:
                     moveAnimationSpeedMultiplier *= moveAnimSpeedRate;
+                    idleAnimationSpeedMultiplier = idleAnimSpeedRate;
                     break;
             }
 
@@ -600,7 +635,7 @@ namespace MultiplayerARPG
             {
                 moveSpeed = 0f;
                 sideMoveSpeed = 0f;
-                moveAnimationSpeedMultiplier = 1f;
+                moveAnimationSpeedMultiplier = idleAnimationSpeedMultiplier;
             }
 
             // Set animator parameters

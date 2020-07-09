@@ -90,6 +90,8 @@ namespace MultiplayerARPG
 
         [Header("Movements while standing")]
         public AnimationClip idleClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float idleAnimSpeedRate;
         public AnimationClip moveClip;
         public AnimationClip moveBackwardClip;
         public AnimationClip moveLeftClip;
@@ -127,6 +129,8 @@ namespace MultiplayerARPG
 
         [Header("Movements while crouching")]
         public AnimationClip crouchIdleClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float crouchIdleAnimSpeedRate;
         public AnimationClip crouchMoveClip;
         public AnimationClip crouchMoveBackwardClip;
         public AnimationClip crouchMoveLeftClip;
@@ -140,6 +144,8 @@ namespace MultiplayerARPG
 
         [Header("Movements while crawling")]
         public AnimationClip crawlIdleClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float crawlIdleAnimSpeedRate;
         public AnimationClip crawlMoveClip;
         public AnimationClip crawlMoveBackwardClip;
         public AnimationClip crawlMoveLeftClip;
@@ -153,6 +159,8 @@ namespace MultiplayerARPG
 
         [Header("Movements while swimming")]
         public AnimationClip swimIdleClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float swimIdleAnimSpeedRate;
         public AnimationClip swimMoveClip;
         public AnimationClip swimMoveBackwardClip;
         public AnimationClip swimMoveLeftClip;
@@ -164,16 +172,29 @@ namespace MultiplayerARPG
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float swimMoveAnimSpeedRate;
 
-        [Header("Other movements")]
+        [Header("Jump")]
         public AnimationClip jumpClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float jumpAnimSpeedRate;
+
+        [Header("Fall")]
         public AnimationClip fallClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float fallAnimSpeedRate;
+
+        [Header("Hurt")]
         public AnimationClip hurtClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float hurtAnimSpeedRate;
+
+        [Header("Dead")]
         public AnimationClip deadClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float deadAnimSpeedRate;
+
+        [Header("Pickup")]
         public AnimationClip pickupClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
@@ -206,6 +227,8 @@ namespace MultiplayerARPG
     {
         [Header("Movements while standing")]
         public AnimationClip idleClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float idleAnimSpeedRate;
         public AnimationClip moveClip;
         public AnimationClip moveBackwardClip;
         public AnimationClip moveLeftClip;
@@ -243,6 +266,8 @@ namespace MultiplayerARPG
 
         [Header("Movements while crouching")]
         public AnimationClip crouchIdleClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float crouchIdleAnimSpeedRate;
         public AnimationClip crouchMoveClip;
         public AnimationClip crouchMoveBackwardClip;
         public AnimationClip crouchMoveLeftClip;
@@ -256,6 +281,8 @@ namespace MultiplayerARPG
 
         [Header("Movements while crawling")]
         public AnimationClip crawlIdleClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float crawlIdleAnimSpeedRate;
         public AnimationClip crawlMoveClip;
         public AnimationClip crawlMoveBackwardClip;
         public AnimationClip crawlMoveLeftClip;
@@ -269,6 +296,8 @@ namespace MultiplayerARPG
 
         [Header("Movements while swimming")]
         public AnimationClip swimIdleClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float swimIdleAnimSpeedRate;
         public AnimationClip swimMoveClip;
         public AnimationClip swimMoveBackwardClip;
         public AnimationClip swimMoveLeftClip;
@@ -280,16 +309,29 @@ namespace MultiplayerARPG
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float swimMoveAnimSpeedRate;
 
-        [Header("Other movements")]
+        [Header("Jump")]
         public AnimationClip jumpClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float jumpAnimSpeedRate;
+
+        [Header("Fall")]
         public AnimationClip fallClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float fallAnimSpeedRate;
+
+        [Header("Hurt")]
         public AnimationClip hurtClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float hurtAnimSpeedRate;
+
+        [Header("Dead")]
         public AnimationClip deadClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float deadAnimSpeedRate;
+
+        [Header("Pickup")]
         public AnimationClip pickupClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
