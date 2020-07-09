@@ -166,9 +166,15 @@ namespace MultiplayerARPG
 
         [Header("Other movements")]
         public AnimationClip jumpClip;
+        public float jumpAnimSpeedRate;
         public AnimationClip fallClip;
+        public float fallAnimSpeedRate;
         public AnimationClip hurtClip;
+        public float hurtAnimSpeedRate;
         public AnimationClip deadClip;
+        public float deadAnimSpeedRate;
+        public AnimationClip pickupClip;
+        public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
@@ -276,10 +282,15 @@ namespace MultiplayerARPG
 
         [Header("Other movements")]
         public AnimationClip jumpClip;
+        public float jumpAnimSpeedRate;
         public AnimationClip fallClip;
+        public float fallAnimSpeedRate;
         public AnimationClip hurtClip;
+        public float hurtAnimSpeedRate;
         public AnimationClip deadClip;
+        public float deadAnimSpeedRate;
         public AnimationClip pickupClip;
+        public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
         [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]

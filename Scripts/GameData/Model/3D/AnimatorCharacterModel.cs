@@ -31,6 +31,11 @@ namespace MultiplayerARPG
         public static readonly int ANIM_PICKUP = Animator.StringToHash("Pickup");
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
         public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
+        public static readonly int ANIM_HURT_CLIP_MULTIPLIER = Animator.StringToHash("HurtSpeedMultiplier");
+        public static readonly int ANIM_DEAD_CLIP_MULTIPLIER = Animator.StringToHash("DeadSpeedMultiplier");
+        public static readonly int ANIM_JUMP_CLIP_MULTIPLIER = Animator.StringToHash("JumpSpeedMultiplier");
+        public static readonly int ANIM_FALL_CLIP_MULTIPLIER = Animator.StringToHash("FallSpeedMultiplier");
+        public static readonly int ANIM_PICKUP_CLIP_MULTIPLIER = Animator.StringToHash("PickupSpeedMultiplier");
         public static readonly int ANIM_MOVE_TYPE = Animator.StringToHash("MoveType");
 
         [Header("Settings")]
@@ -68,6 +73,11 @@ namespace MultiplayerARPG
         private float crouchMoveAnimSpeedRate;
         private float crawlMoveAnimSpeedRate;
         private float swimMoveAnimSpeedRate;
+        private float jumpAnimSpeedRate;
+        private float fallAnimSpeedRate;
+        private float hurtAnimSpeedRate;
+        private float deadAnimSpeedRate;
+        private float pickupAnimSpeedRate;
 
         protected override void Awake()
         {
@@ -221,13 +231,19 @@ namespace MultiplayerARPG
                 defaultAnimations.fallClip,
                 defaultAnimations.hurtClip,
                 defaultAnimations.deadClip,
+                defaultAnimations.pickupClip,
                 // Speed Rate
                 defaultAnimations.moveAnimSpeedRate,
                 defaultAnimations.sprintAnimSpeedRate,
                 defaultAnimations.walkAnimSpeedRate,
                 defaultAnimations.crouchMoveAnimSpeedRate,
                 defaultAnimations.crawlMoveAnimSpeedRate,
-                defaultAnimations.swimMoveAnimSpeedRate);
+                defaultAnimations.swimMoveAnimSpeedRate,
+                defaultAnimations.jumpAnimSpeedRate,
+                defaultAnimations.fallAnimSpeedRate,
+                defaultAnimations.hurtAnimSpeedRate,
+                defaultAnimations.deadAnimSpeedRate,
+                defaultAnimations.pickupAnimSpeedRate);
             base.SetDefaultAnimations();
         }
 
@@ -295,13 +311,19 @@ namespace MultiplayerARPG
             AnimationClip fallClip,
             AnimationClip hurtClip,
             AnimationClip deadClip,
+            AnimationClip pickupClip,
             // Speed rate
             float moveAnimSpeedRate,
             float sprintAnimSpeedRate,
             float walkAnimSpeedRate,
             float crouchMoveAnimSpeedRate,
             float crawlMoveAnimSpeedRate,
-            float swimMoveAnimSpeedRate)
+            float swimMoveAnimSpeedRate,
+            float jumpAnimSpeedRate,
+            float fallAnimSpeedRate,
+            float hurtAnimSpeedRate,
+            float deadAnimSpeedRate,
+            float pickupAnimSpeedRate)
         {
             if (CacheAnimatorController == null)
                 return;
@@ -368,7 +390,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_FALL] = fallClip != null ? fallClip : defaultAnimations.fallClip;
             CacheAnimatorController[CLIP_HURT] = hurtClip != null ? hurtClip : defaultAnimations.hurtClip;
             CacheAnimatorController[CLIP_DEAD] = deadClip != null ? deadClip : defaultAnimations.deadClip;
-            CacheAnimatorController[CLIP_PICKUP] = defaultAnimations.pickupClip;
+            CacheAnimatorController[CLIP_PICKUP] = pickupClip != null ? pickupClip : defaultAnimations.pickupClip;
             // Speed Rate
             this.moveAnimSpeedRate = moveAnimSpeedRate > 0f ? moveAnimSpeedRate :
                 defaultAnimations.moveAnimSpeedRate > 0f ? defaultAnimations.moveAnimSpeedRate : 1f;
@@ -382,6 +404,16 @@ namespace MultiplayerARPG
                 defaultAnimations.crawlMoveAnimSpeedRate > 0f ? defaultAnimations.crawlMoveAnimSpeedRate : 1f;
             this.swimMoveAnimSpeedRate = swimMoveAnimSpeedRate > 0f ? swimMoveAnimSpeedRate :
                 defaultAnimations.swimMoveAnimSpeedRate > 0f ? defaultAnimations.swimMoveAnimSpeedRate : 1f;
+            this.jumpAnimSpeedRate = jumpAnimSpeedRate > 0f ? jumpAnimSpeedRate :
+                defaultAnimations.jumpAnimSpeedRate > 0f ? defaultAnimations.jumpAnimSpeedRate : 1f;
+            this.fallAnimSpeedRate = fallAnimSpeedRate > 0f ? fallAnimSpeedRate :
+                defaultAnimations.fallAnimSpeedRate > 0f ? defaultAnimations.fallAnimSpeedRate : 1f;
+            this.hurtAnimSpeedRate = hurtAnimSpeedRate > 0f ? hurtAnimSpeedRate :
+                defaultAnimations.hurtAnimSpeedRate > 0f ? defaultAnimations.hurtAnimSpeedRate : 1f;
+            this.deadAnimSpeedRate = deadAnimSpeedRate > 0f ? deadAnimSpeedRate :
+                defaultAnimations.deadAnimSpeedRate > 0f ? defaultAnimations.deadAnimSpeedRate : 1f;
+            this.pickupAnimSpeedRate = pickupAnimSpeedRate > 0f ? pickupAnimSpeedRate :
+                defaultAnimations.pickupAnimSpeedRate > 0f ? defaultAnimations.pickupAnimSpeedRate : 1f;
         }
 
         public override void SetEquipWeapons(EquipWeapons equipWeapons)
@@ -405,7 +437,7 @@ namespace MultiplayerARPG
 
         protected void SetClipBasedOnWeaponType(WeaponType weaponType)
         {
-            WeaponAnimations weaponAnimations = default(WeaponAnimations);
+            WeaponAnimations weaponAnimations;
             GetAnims().CacheWeaponAnimations.TryGetValue(weaponType.DataId, out weaponAnimations);
 
             SetupClips(
@@ -472,13 +504,19 @@ namespace MultiplayerARPG
                 weaponAnimations.fallClip,
                 weaponAnimations.hurtClip,
                 weaponAnimations.deadClip,
+                weaponAnimations.pickupClip,
                 // Speed rate
                 weaponAnimations.moveAnimSpeedRate,
                 weaponAnimations.sprintAnimSpeedRate,
                 weaponAnimations.walkAnimSpeedRate,
                 weaponAnimations.crouchMoveAnimSpeedRate,
                 weaponAnimations.crawlMoveAnimSpeedRate,
-                weaponAnimations.swimMoveAnimSpeedRate);
+                weaponAnimations.swimMoveAnimSpeedRate,
+                weaponAnimations.jumpAnimSpeedRate,
+                weaponAnimations.fallAnimSpeedRate,
+                weaponAnimations.hurtAnimSpeedRate,
+                weaponAnimations.deadAnimSpeedRate,
+                weaponAnimations.pickupAnimSpeedRate);
         }
 
         public override void PlayMoveAnimation()
@@ -515,7 +553,7 @@ namespace MultiplayerARPG
             }
 
             // Set side move speed based on inputs
-                float sideMoveSpeed = 0f;
+            float sideMoveSpeed = 0f;
             if (movementState.HasFlag(MovementState.Right))
             {
                 sideMoveSpeed = 1f;
@@ -570,6 +608,11 @@ namespace MultiplayerARPG
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed, movementDampingTme, deltaTime);
             animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : sideMoveSpeed, movementDampingTme, deltaTime);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);
+            animator.SetFloat(ANIM_HURT_CLIP_MULTIPLIER, hurtAnimSpeedRate);
+            animator.SetFloat(ANIM_DEAD_CLIP_MULTIPLIER, deadAnimSpeedRate);
+            animator.SetFloat(ANIM_JUMP_CLIP_MULTIPLIER, jumpAnimSpeedRate);
+            animator.SetFloat(ANIM_FALL_CLIP_MULTIPLIER, fallAnimSpeedRate);
+            animator.SetFloat(ANIM_PICKUP_CLIP_MULTIPLIER, pickupAnimSpeedRate);
             animator.SetBool(ANIM_IS_DEAD, isDead);
             animator.SetBool(ANIM_IS_GROUNDED, !movementState.HasFlag(MovementState.IsUnderWater) && movementState.HasFlag(MovementState.IsGrounded));
             animator.SetBool(ANIM_IS_UNDER_WATER, movementState.HasFlag(MovementState.IsUnderWater));
@@ -678,7 +721,7 @@ namespace MultiplayerARPG
         {
             if (CacheAnimatorController[CLIP_JUMP] == null)
                 return 0f;
-            return CacheAnimatorController[CLIP_JUMP].length;
+            return CacheAnimatorController[CLIP_JUMP].length / jumpAnimSpeedRate;
         }
 
         public override void PlayJumpAnimation()

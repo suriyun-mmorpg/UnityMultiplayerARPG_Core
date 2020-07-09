@@ -129,7 +129,20 @@ namespace MultiplayerARPG
                 defaultAnimations.jumpClip,
                 defaultAnimations.fallClip,
                 defaultAnimations.hurtClip,
-                defaultAnimations.deadClip);
+                defaultAnimations.deadClip,
+                defaultAnimations.pickupClip,
+                // Speed Rate
+                defaultAnimations.moveAnimSpeedRate,
+                defaultAnimations.sprintAnimSpeedRate,
+                defaultAnimations.walkAnimSpeedRate,
+                defaultAnimations.crouchMoveAnimSpeedRate,
+                defaultAnimations.crawlMoveAnimSpeedRate,
+                defaultAnimations.swimMoveAnimSpeedRate,
+                defaultAnimations.jumpAnimSpeedRate,
+                defaultAnimations.fallAnimSpeedRate,
+                defaultAnimations.hurtAnimSpeedRate,
+                defaultAnimations.deadAnimSpeedRate,
+                defaultAnimations.pickupAnimSpeedRate);
             base.SetDefaultAnimations();
         }
 
@@ -196,7 +209,20 @@ namespace MultiplayerARPG
             AnimationClip jumpClip,
             AnimationClip fallClip,
             AnimationClip hurtClip,
-            AnimationClip deadClip)
+            AnimationClip deadClip,
+            AnimationClip pickupClip,
+            // Speed rate
+            float moveAnimSpeedRate,
+            float sprintAnimSpeedRate,
+            float walkAnimSpeedRate,
+            float crouchMoveAnimSpeedRate,
+            float crawlMoveAnimSpeedRate,
+            float swimMoveAnimSpeedRate,
+            float jumpAnimSpeedRate,
+            float fallAnimSpeedRate,
+            float hurtAnimSpeedRate,
+            float deadAnimSpeedRate,
+            float pickupAnimSpeedRate)
         {
             if (legacyAnimation == null)
                 return;
@@ -386,7 +412,69 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(fallClip != null ? fallClip : defaultAnimations.fallClip, CLIP_FALL);
             legacyAnimation.AddClip(hurtClip != null ? hurtClip : defaultAnimations.hurtClip, CLIP_HURT);
             legacyAnimation.AddClip(deadClip != null ? deadClip : defaultAnimations.deadClip, CLIP_DEAD);
-            legacyAnimation.AddClip(defaultAnimations.pickupClip, CLIP_PICKUP);
+            legacyAnimation.AddClip(pickupClip != null ? pickupClip : defaultAnimations.pickupClip, CLIP_PICKUP);
+            // Set speed
+            // Move
+            legacyAnimation[CLIP_MOVE].speed =
+                legacyAnimation[CLIP_MOVE_BACKWARD].speed =
+                legacyAnimation[CLIP_MOVE_LEFT].speed =
+                legacyAnimation[CLIP_MOVE_RIGHT].speed =
+                legacyAnimation[CLIP_MOVE_FORWARD_LEFT].speed =
+                legacyAnimation[CLIP_MOVE_FORWARD_RIGHT].speed =
+                legacyAnimation[CLIP_MOVE_BACKWARD_LEFT].speed =
+                legacyAnimation[CLIP_MOVE_BACKWARD_RIGHT].speed = moveAnimSpeedRate > 0f ? moveAnimSpeedRate : 1f;
+            // Sprint
+            legacyAnimation[CLIP_SPRINT].speed =
+                legacyAnimation[CLIP_SPRINT_BACKWARD].speed =
+                legacyAnimation[CLIP_SPRINT_LEFT].speed =
+                legacyAnimation[CLIP_SPRINT_RIGHT].speed =
+                legacyAnimation[CLIP_SPRINT_FORWARD_LEFT].speed =
+                legacyAnimation[CLIP_SPRINT_FORWARD_RIGHT].speed =
+                legacyAnimation[CLIP_SPRINT_BACKWARD_LEFT].speed =
+                legacyAnimation[CLIP_SPRINT_BACKWARD_RIGHT].speed = sprintAnimSpeedRate > 0f ? sprintAnimSpeedRate : 1f;
+            // Walk
+            legacyAnimation[CLIP_WALK].speed =
+                legacyAnimation[CLIP_WALK_BACKWARD].speed =
+                legacyAnimation[CLIP_WALK_LEFT].speed =
+                legacyAnimation[CLIP_WALK_RIGHT].speed =
+                legacyAnimation[CLIP_WALK_FORWARD_LEFT].speed =
+                legacyAnimation[CLIP_WALK_FORWARD_RIGHT].speed =
+                legacyAnimation[CLIP_WALK_BACKWARD_LEFT].speed =
+                legacyAnimation[CLIP_WALK_BACKWARD_RIGHT].speed = walkAnimSpeedRate > 0f ? walkAnimSpeedRate : 1f;
+            // Crouch
+            legacyAnimation[CLIP_CROUCH_MOVE].speed =
+                legacyAnimation[CLIP_CROUCH_MOVE_BACKWARD].speed =
+                legacyAnimation[CLIP_CROUCH_MOVE_LEFT].speed =
+                legacyAnimation[CLIP_CROUCH_MOVE_RIGHT].speed =
+                legacyAnimation[CLIP_CROUCH_MOVE_FORWARD_LEFT].speed =
+                legacyAnimation[CLIP_CROUCH_MOVE_FORWARD_RIGHT].speed =
+                legacyAnimation[CLIP_CROUCH_MOVE_BACKWARD_LEFT].speed =
+                legacyAnimation[CLIP_CROUCH_MOVE_BACKWARD_RIGHT].speed = crouchMoveAnimSpeedRate > 0f ? crouchMoveAnimSpeedRate : 1f;
+            // Crawl
+            legacyAnimation[CLIP_CRAWL_MOVE].speed =
+                legacyAnimation[CLIP_CRAWL_MOVE_BACKWARD].speed =
+                legacyAnimation[CLIP_CRAWL_MOVE_LEFT].speed =
+                legacyAnimation[CLIP_CRAWL_MOVE_RIGHT].speed =
+                legacyAnimation[CLIP_CRAWL_MOVE_FORWARD_LEFT].speed =
+                legacyAnimation[CLIP_CRAWL_MOVE_FORWARD_RIGHT].speed =
+                legacyAnimation[CLIP_CRAWL_MOVE_BACKWARD_LEFT].speed =
+                legacyAnimation[CLIP_CRAWL_MOVE_BACKWARD_RIGHT].speed = crawlMoveAnimSpeedRate > 0f ? crawlMoveAnimSpeedRate : 1f;
+            // Swim
+            legacyAnimation[CLIP_SWIM_MOVE].speed =
+                legacyAnimation[CLIP_SWIM_MOVE_BACKWARD].speed =
+                legacyAnimation[CLIP_SWIM_MOVE_LEFT].speed =
+                legacyAnimation[CLIP_SWIM_MOVE_RIGHT].speed =
+                legacyAnimation[CLIP_SWIM_MOVE_FORWARD_LEFT].speed =
+                legacyAnimation[CLIP_SWIM_MOVE_FORWARD_RIGHT].speed =
+                legacyAnimation[CLIP_SWIM_MOVE_BACKWARD_LEFT].speed =
+                legacyAnimation[CLIP_SWIM_MOVE_BACKWARD_RIGHT].speed = swimMoveAnimSpeedRate > 0f ? swimMoveAnimSpeedRate : 1f;
+            // Other
+            legacyAnimation[CLIP_JUMP].speed = jumpAnimSpeedRate;
+            legacyAnimation[CLIP_FALL].speed = fallAnimSpeedRate;
+            legacyAnimation[CLIP_HURT].speed = hurtAnimSpeedRate;
+            legacyAnimation[CLIP_DEAD].speed = deadAnimSpeedRate;
+            legacyAnimation[CLIP_PICKUP].speed = pickupAnimSpeedRate;
+            // Change state to idle
             CrossFadeLegacyAnimation(CLIP_IDLE, 0f, WrapMode.Loop);
         }
 
@@ -405,7 +493,7 @@ namespace MultiplayerARPG
             IWeaponItem weaponItem = equipWeapons.GetRightHandWeaponItem();
             if (weaponItem == null)
                 weaponItem = GameInstance.Singleton.DefaultWeaponItem;
-            WeaponAnimations weaponAnimations = default(WeaponAnimations);
+            WeaponAnimations weaponAnimations;
             GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
 
             SetupClips(
@@ -471,7 +559,20 @@ namespace MultiplayerARPG
                 weaponAnimations.jumpClip,
                 weaponAnimations.fallClip,
                 weaponAnimations.hurtClip,
-                weaponAnimations.deadClip);
+                weaponAnimations.deadClip,
+                weaponAnimations.pickupClip,
+                // Speed rate
+                weaponAnimations.moveAnimSpeedRate,
+                weaponAnimations.sprintAnimSpeedRate,
+                weaponAnimations.walkAnimSpeedRate,
+                weaponAnimations.crouchMoveAnimSpeedRate,
+                weaponAnimations.crawlMoveAnimSpeedRate,
+                weaponAnimations.swimMoveAnimSpeedRate,
+                weaponAnimations.jumpAnimSpeedRate,
+                weaponAnimations.fallAnimSpeedRate,
+                weaponAnimations.hurtAnimSpeedRate,
+                weaponAnimations.deadAnimSpeedRate,
+                weaponAnimations.pickupAnimSpeedRate);
         }
 
         public override void PlayMoveAnimation()
@@ -524,9 +625,9 @@ namespace MultiplayerARPG
         }
 
         private void CrossFadeMoveAnimaton(string clipIdle,
-            string clipMove, string clipMoveBackward, string clipMoveLeft, string clipMoveRight,
-            string clipMoveForwardLeft, string clipMoveForwardRight,
-            string clipMoveBackwardLeft, string clipMoveBackwardRight)
+        string clipMove, string clipMoveBackward, string clipMoveLeft, string clipMoveRight,
+        string clipMoveForwardLeft, string clipMoveForwardRight,
+        string clipMoveBackwardLeft, string clipMoveBackwardRight)
         {
             // Forward Right
             if (movementState.HasFlag(MovementState.Forward) && movementState.HasFlag(MovementState.Right))
@@ -639,7 +740,7 @@ namespace MultiplayerARPG
         {
             if (legacyAnimation.GetClip(CLIP_JUMP) == null)
                 return 0f;
-            return legacyAnimation.GetClip(CLIP_JUMP).length;
+            return legacyAnimation.GetClip(CLIP_JUMP).length / legacyAnimation[CLIP_JUMP].speed;
         }
 
         public override void PlayJumpAnimation()
