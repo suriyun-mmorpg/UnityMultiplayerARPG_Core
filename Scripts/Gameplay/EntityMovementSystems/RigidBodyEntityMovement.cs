@@ -23,7 +23,8 @@ namespace MultiplayerARPG
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
-        public bool applyJumpForceAfterAnimation = true;
+        public ApplyJumpForceMode applyJumpForceMode = ApplyJumpForceMode.ApplyImmediately;
+        public float applyJumpForceFixedDuration;
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
@@ -409,13 +410,16 @@ namespace MultiplayerARPG
                 airborneElapsed = airborneDelay;
                 CacheEntity.TriggerJump();
                 applyingJumpForce = true;
-                if (applyJumpForceAfterAnimation)
+                applyJumpForceCountDown = 0f;
+                switch (applyJumpForceMode)
                 {
-                    applyJumpForceCountDown = 0f;
-                    if (CacheEntity.Model is IJumppableModel)
-                    {
-                        applyJumpForceCountDown = (CacheEntity.Model as IJumppableModel).GetJumpAnimationDuration();
-                    }
+                    case ApplyJumpForceMode.ApplyAfterFixedDuration:
+                        applyJumpForceCountDown = applyJumpForceFixedDuration;
+                        break;
+                    case ApplyJumpForceMode.ApplyAfterJumpDuration:
+                        if (CacheEntity.Model is IJumppableModel)
+                            applyJumpForceCountDown = (CacheEntity.Model as IJumppableModel).GetJumpAnimationDuration();
+                        break;
                 }
             }
 

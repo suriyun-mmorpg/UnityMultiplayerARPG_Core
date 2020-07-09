@@ -17,7 +17,8 @@ namespace MultiplayerARPG
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
-        public bool applyJumpForceAfterAnimation = true;
+        public ApplyJumpForceMode applyJumpForceMode = ApplyJumpForceMode.ApplyImmediately;
+        public float applyJumpForceFixedDuration;
         public float backwardMoveSpeedRate = 0.75f;
         public float groundCheckDistance = 0.1f; // distance for checking if the controller is grounded ( 0.01f seems to work best for this )
         public float groundCheckDistanceWhileJump = 0.01f; // distance for checking if the controller is grounded while jumping
@@ -519,13 +520,16 @@ namespace MultiplayerARPG
                 {
                     CacheEntity.TriggerJump();
                     applyingJumpForce = true;
-                    if (applyJumpForceAfterAnimation)
+                    applyJumpForceCountDown = 0f;
+                    switch (applyJumpForceMode)
                     {
-                        applyJumpForceCountDown = 0f;
-                        if (CacheEntity.Model is IJumppableModel)
-                        {
-                            applyJumpForceCountDown = (CacheEntity.Model as IJumppableModel).GetJumpAnimationDuration();
-                        }
+                        case ApplyJumpForceMode.ApplyAfterFixedDuration:
+                            applyJumpForceCountDown = applyJumpForceFixedDuration;
+                            break;
+                        case ApplyJumpForceMode.ApplyAfterJumpDuration:
+                            if (CacheEntity.Model is IJumppableModel)
+                                applyJumpForceCountDown = (CacheEntity.Model as IJumppableModel).GetJumpAnimationDuration();
+                            break;
                     }
                 }
 
