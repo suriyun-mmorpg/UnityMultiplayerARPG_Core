@@ -54,7 +54,11 @@ namespace MultiplayerARPG
         private bool isGrounded;
         private bool isUnderWater;
         private bool isJumping;
+        private bool applyingJump;
+        private bool applyingJumpForce;
+        private float applyJumpForceCountDown;
         private Collider waterCollider;
+        private float yRotation;
 
         // Optimize garbage collector
         private MovementState tempMovementState;
@@ -72,9 +76,6 @@ namespace MultiplayerARPG
         private float tempEntityMoveSpeed;
         private float tempCurrentMoveSpeed;
         private bool previouslyGrounded;
-        private bool applyingJump;
-        private bool applyingJumpForce;
-        private float applyJumpForceCountDown;
 
         public override void EntityAwake()
         {
@@ -184,7 +185,10 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
             if (!HasNavPaths)
-                CacheTransform.eulerAngles = new Vector3(0, (float)yRotation, 0);
+            {
+                this.yRotation = yRotation;
+                UpdateRotation();
+            }
         }
 
         public override void StopMove()
@@ -240,25 +244,22 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
 
-            Vector3 eulerAngles = rotation.eulerAngles;
             switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
-                    CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
+                    CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)rotation.eulerAngles.y);
                     break;
                 case MovementSecure.NotSecure:
-                    eulerAngles.x = 0;
-                    eulerAngles.z = 0;
                     if (!HasNavPaths)
-                        CacheTransform.eulerAngles = eulerAngles;
+                        yRotation = rotation.eulerAngles.y;
                     break;
             }
         }
 
         public override Quaternion GetLookRotation()
         {
-            return CacheTransform.rotation;
+            return Quaternion.Euler(0f, yRotation, 0f);
         }
 
         public override void Teleport(Vector3 position)
@@ -268,8 +269,10 @@ namespace MultiplayerARPG
 
         public override void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            // TODO: implement this
             result = fromPosition;
+            RaycastHit hit;
+            if (Physics.Raycast(fromPosition, Vector3.down, out hit, findDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                result = hit.point;
         }
 
         public override void EntityFixedUpdate()
@@ -396,7 +399,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Turn character to destination
-                    CacheTransform.rotation = Quaternion.LookRotation(tempMoveDirection);
+                    yRotation = tempMoveDirection.y;
                 }
             }
 
@@ -565,7 +568,14 @@ namespace MultiplayerARPG
                     StickToGroundHelper();
                 }
             }
+
+            UpdateRotation();
             isJumping = false;
+        }
+
+        protected void UpdateRotation()
+        {
+            CacheTransform.eulerAngles = new Vector3(0f, yRotation, 0f);
         }
 
         protected void SetMovePaths(Vector3 position, bool useNavMesh)
