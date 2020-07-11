@@ -176,6 +176,7 @@ namespace MultiplayerARPG
         Vector3 cameraRight;
         float inputV;
         float inputH;
+        Vector2 normalizedInput;
         Vector3 moveLookDirection;
         Vector3 targetLookDirection;
         Quaternion tempLookAt;
@@ -246,6 +247,7 @@ namespace MultiplayerARPG
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
             characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraTransform);
             characterEntity.ModelManager.SetIsFps(ViewMode == ControllerViewMode.Fps);
+            UpdateCameraSettings();
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -637,6 +639,7 @@ namespace MultiplayerARPG
             moveDirection = Vector3.zero;
             inputV = InputManager.GetAxis("Vertical", raw);
             inputH = InputManager.GetAxis("Horizontal", raw);
+            normalizedInput = new Vector2(inputV, inputH).normalized;
             moveDirection += cameraForward * inputV;
             moveDirection += cameraRight * inputH;
             if (moveDirection.sqrMagnitude > 0f)
@@ -649,19 +652,19 @@ namespace MultiplayerARPG
             switch (Mode)
             {
                 case ControllerMode.Adventure:
-                    if (inputV > 0.5f || inputV < -0.5f || inputH > 0.5f || inputH < -0.5f)
+                    if (normalizedInput.x > 0.5f || normalizedInput.x < -0.5f || normalizedInput.y > 0.5f || normalizedInput.y < -0.5f)
                         movementState = MovementState.Forward;
                     moveLookDirection = moveDirection;
                     moveLookDirection.y = 0f;
                     break;
                 case ControllerMode.Combat:
-                    if (inputV > 0.5f)
+                    if (normalizedInput.x > 0.5f)
                         movementState |= MovementState.Forward;
-                    else if (inputV < -0.5f)
+                    else if (normalizedInput.x < -0.5f)
                         movementState |= MovementState.Backward;
-                    if (inputH > 0.5f)
+                    if (normalizedInput.y > 0.5f)
                         movementState |= MovementState.Right;
-                    else if (inputH < -0.5f)
+                    else if (normalizedInput.y < -0.5f)
                         movementState |= MovementState.Left;
                     moveLookDirection = cameraForward;
                     break;
@@ -767,13 +770,13 @@ namespace MultiplayerARPG
                     calculatedTurnDuration = (180f - tempCalculateAngle) / 180f * turnToTargetDuration;
                     targetLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
                     // Set movement state by inputs
-                    if (inputV > 0.5f)
+                    if (normalizedInput.x > 0.5f)
                         movementState |= MovementState.Forward;
-                    else if (inputV < -0.5f)
+                    else if (normalizedInput.x < -0.5f)
                         movementState |= MovementState.Backward;
-                    if (inputH > 0.5f)
+                    if (normalizedInput.y > 0.5f)
                         movementState |= MovementState.Right;
-                    else if (inputH < -0.5f)
+                    else if (normalizedInput.y < -0.5f)
                         movementState |= MovementState.Left;
                 }
                 else
