@@ -91,8 +91,6 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             Singleton = this;
-            if (CurrentGameInstance.UISceneGameplayPrefab != null)
-                CacheUISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
             this.InvokeInstanceDevExtMethods("Awake");
         }
 
@@ -102,6 +100,8 @@ namespace MultiplayerARPG
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
+            if (CurrentGameInstance.UISceneGameplayPrefab != null)
+                CacheUISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
             if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.OnControllerSetup(characterEntity);
             if (onSetup != null)
@@ -110,6 +110,8 @@ namespace MultiplayerARPG
 
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
         {
+            if (CacheUISceneGameplay != null)
+                Destroy(CacheUISceneGameplay.gameObject);
             if (onDesetup != null)
                 onDesetup.Invoke(this);
         }
@@ -117,8 +119,6 @@ namespace MultiplayerARPG
         protected virtual void OnDestroy()
         {
             Desetup(PlayerCharacterEntity);
-            if (CacheUISceneGameplay != null)
-                Destroy(CacheUISceneGameplay.gameObject);
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 
