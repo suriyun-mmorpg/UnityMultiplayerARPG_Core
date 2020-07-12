@@ -24,7 +24,7 @@ namespace MultiplayerARPG
 
         public void Setup(UICharacterHotkeys uiCharacterHotkeys, UICharacterHotkeyAssigner uiCharacterHotkeyAssigner, CharacterHotkey data, int indexOfData)
         {
-            this.UICharacterHotkeys = uiCharacterHotkeys;
+            UICharacterHotkeys = uiCharacterHotkeys;
             if (this.uiCharacterHotkeyAssigner == null)
                 this.uiCharacterHotkeyAssigner = uiCharacterHotkeyAssigner;
             this.indexOfData = indexOfData;
