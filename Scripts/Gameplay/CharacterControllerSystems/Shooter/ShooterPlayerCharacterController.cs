@@ -1241,7 +1241,6 @@ namespace MultiplayerARPG
             from.y = 0f;
             Vector3 to = CacheTransform.position - position;
             to.y = 0;
-            Debug.LogError(Vector3.Angle(from, to));
             return Vector3.Angle(from, to) > 135f;
         }
 
