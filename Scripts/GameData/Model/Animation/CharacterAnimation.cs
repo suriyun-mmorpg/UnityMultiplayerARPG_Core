@@ -19,6 +19,8 @@ namespace MultiplayerARPG
     {
         public AnimationClip clip;
         public bool playClipAllLayers;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float animSpeedRate;
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float triggerDurationRate;
