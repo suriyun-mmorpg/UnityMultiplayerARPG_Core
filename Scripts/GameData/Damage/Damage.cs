@@ -224,7 +224,7 @@ namespace MultiplayerARPG
             Quaternion damageEffectRotation;
             GetDamagePositionAndRotation(attacker, isLeftHand, true, aimPosition, stagger, out damageEffectPosition, out damageEffectDirection, out damageEffectRotation);
 #if UNITY_EDITOR
-            attacker.SetDebugDamage(damagePosition, damageRotation);
+            attacker.SetDebugDamage(damagePosition, damageDirection, damageRotation);
 #endif
 
             GameObject tempGameObject;

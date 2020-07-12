@@ -61,6 +61,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         [Header("Character Attack Debug")]
         public Vector3? debugDamagePosition;
+        public Vector3? debugDamageDirection;
         public Quaternion? debugDamageRotation;
         public Color debugFovColor = new Color(0, 1, 0, 0.04f);
 #endif
@@ -200,7 +201,9 @@ namespace MultiplayerARPG
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
-            if (debugDamagePosition.HasValue && debugDamageRotation.HasValue)
+            if (debugDamagePosition.HasValue &&
+                debugDamageDirection.HasValue &&
+                debugDamageRotation.HasValue)
             {
                 float atkHalfFov = GetAttackFov(false) * 0.5f;
                 float atkDist = GetAttackDistance(false);
@@ -210,7 +213,6 @@ namespace MultiplayerARPG
                 Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
                 Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkHalfFov, atkDist);
 
-                Handles.color = new Color(1, 0, 0, debugFovColor.a);
                 Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, 0);
                 Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkHalfFov, 0);
                 Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, 0);
@@ -226,6 +228,9 @@ namespace MultiplayerARPG
                 Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkHalfFov, 0);
                 Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
                 Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkHalfFov, atkDist);
+
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(debugDamagePosition.Value, debugDamageDirection.Value * atkDist);
             }
         }
 #endif
@@ -754,9 +759,10 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        public void SetDebugDamage(Vector3 damagePosition, Quaternion damageRotation)
+        public void SetDebugDamage(Vector3 damagePosition, Vector3 damageDirection, Quaternion damageRotation)
         {
             debugDamagePosition = damagePosition;
+            debugDamageDirection = damageDirection;
             debugDamageRotation = damageRotation;
         }
 #endif
