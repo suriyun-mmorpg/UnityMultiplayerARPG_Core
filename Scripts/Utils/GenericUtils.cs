@@ -221,12 +221,12 @@ public static class GenericUtils
     public static void SetAndStretchToParentSize(this RectTransform rect, RectTransform parentRect)
     {
         rect.SetParent(parentRect);
-        rect.anchorMin = new Vector2(0, 0);
-        rect.anchorMax = new Vector2(1, 1);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = parentRect.rect.size;
-        rect.anchoredPosition = Vector2.zero;
         rect.localScale = Vector2.one;
+        rect.anchoredPosition = Vector2.zero;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.pivot = Vector2.one * 0.5f;
+        rect.sizeDelta = Vector3.zero;
     }
 
     public static Color SetAlpha(this Color color, float alpha)
