@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             get { return ItemType.Weapon; }
         }
 
+        [Header("Weapon Configs")]
         [SerializeField]
         private WeaponType weaponType;
         public WeaponType WeaponType

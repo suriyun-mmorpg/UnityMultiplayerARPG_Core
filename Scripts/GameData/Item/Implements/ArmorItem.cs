@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             get { return ItemType.Armor; }
         }
 
+        [Header("Armor Configs")]
         [SerializeField]
         private ArmorType armorType;
         public ArmorType ArmorType

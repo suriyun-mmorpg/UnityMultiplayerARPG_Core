@@ -6,6 +6,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseEquipmentItem : BaseItem, IEquipmentItem
     {
+        [Header("Equipment Configs")]
         [SerializeField]
         private EquipmentRequirement requirement;
         public EquipmentRequirement Requirement
