@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
         public float destroyDelay = 2f;
         public UnityEvent onBuildingDestroy;
+        public UnityEvent onBuildingConstruct;
 
         public override int MaxHp { get { return maxHp; } }
 
@@ -162,6 +163,7 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             RegisterNetFunction(NetFuncOnBuildingDestroy);
+            RegisterNetFunction(NetFuncOnBuildingConstruct);
             parentId.onChange += OnParentIdChange;
         }
 
@@ -169,6 +171,22 @@ namespace MultiplayerARPG
         {
             if (onBuildingDestroy != null)
                 onBuildingDestroy.Invoke();
+        }
+
+        public void RequestOnBuildingDestroy()
+        {
+            CallNetFunction(NetFuncOnBuildingDestroy, FunctionReceivers.All);
+        }
+
+        private void NetFuncOnBuildingConstruct()
+        {
+            if (onBuildingConstruct != null)
+                onBuildingConstruct.Invoke();
+        }
+
+        public void RequestOnBuildingConstruct()
+        {
+            CallNetFunction(NetFuncOnBuildingConstruct, FunctionReceivers.All);
         }
 
         protected override void EntityOnDestroy()
@@ -247,7 +265,7 @@ namespace MultiplayerARPG
         public void Destroy()
         {
             CurrentHp = 0;
-            CallNetFunction(NetFuncOnBuildingDestroy, FunctionReceivers.All);
+            RequestOnBuildingDestroy();
             if (droppingItems != null && droppingItems.Count > 0)
             {
                 foreach (ItemAmount droppingItem in droppingItems)

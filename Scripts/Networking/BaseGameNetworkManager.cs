@@ -1082,6 +1082,7 @@ namespace MultiplayerARPG
                 buildingEntity.CreatorName = saveData.CreatorName;
                 Assets.NetworkSpawn(spawnObj);
                 buildingEntities[buildingEntity.Id] = buildingEntity;
+                buildingEntity.RequestOnBuildingConstruct();
                 return buildingEntity;
             }
             return null;
