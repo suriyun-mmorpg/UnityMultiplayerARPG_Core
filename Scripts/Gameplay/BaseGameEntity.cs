@@ -341,6 +341,10 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
+        }
+
+        protected virtual void OnDrawGizmosSelected()
+        {
             if (Application.isPlaying)
             {
                 Gizmos.color = Color.cyan;

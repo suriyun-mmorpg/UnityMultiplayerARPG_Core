@@ -179,7 +179,7 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        protected override void OnDrawGizmos()
+        protected override void OnDrawGizmosSelected()
         {
             base.OnDrawGizmos();
             Gizmos.color = Color.magenta;
