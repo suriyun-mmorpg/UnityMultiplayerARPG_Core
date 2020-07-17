@@ -447,12 +447,8 @@ namespace MultiplayerARPG
             // Add skills
             GameInstance.AddSkills(increaseSkillLevels);
             GameInstance.AddSkills(new SkillLevel[] { skillLevel });
-            // Validate equipment set
-            if (equipmentSet != null)
-            {
-                equipmentSet.Validate();
-                equipmentSet.PrepareRelatesData();
-            }
+            // Add equipment sets
+            GameInstance.AddEquipmentSets(new EquipmentSet[] { equipmentSet });
         }
 
         public Item GenerateDefaultItem(WeaponType type)

@@ -124,12 +124,8 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(increaseDamages);
             // Add skills
             GameInstance.AddSkills(increaseSkillLevels);
-            // Validate equipment set
-            if (equipmentSet != null)
-            {
-                equipmentSet.Validate();
-                equipmentSet.PrepareRelatesData();
-            }
+            // Add equipment sets
+            GameInstance.AddEquipmentSets(new EquipmentSet[] { equipmentSet });
         }
     }
 }

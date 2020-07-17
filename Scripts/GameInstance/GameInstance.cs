@@ -215,6 +215,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
         public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
+        public static readonly Dictionary<int, EquipmentSet> EquipmentSets = new Dictionary<int, EquipmentSet>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
         public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
@@ -863,6 +864,15 @@ namespace MultiplayerARPG
             foreach (DamageElement damageElement in damageElements)
             {
                 AddGameData(DamageElements, damageElement);
+            }
+        }
+        public static void AddEquipmentSets(IEnumerable<EquipmentSet> equipmentSets)
+        {
+            if (equipmentSets == null)
+                return;
+            foreach (EquipmentSet equipmentSet in equipmentSets)
+            {
+                AddGameData(EquipmentSets, equipmentSet);
             }
         }
         #endregion
