@@ -7,33 +7,27 @@ namespace MultiplayerARPG
     {
         public bool IsRecaching { get; private set; }
         private CharacterStats stats;
-        public CharacterStats Stats { get { return stats; } }
-        private Dictionary<Attribute, float> attributes;
-        public Dictionary<Attribute, float> Attributes { get { return attributes; } }
-        private Dictionary<BaseSkill, short> skills;
-        public Dictionary<BaseSkill, short> Skills { get { return skills; } }
-        private Dictionary<DamageElement, float> resistances;
-        public Dictionary<DamageElement, float> Resistances { get { return resistances; } }
-        private Dictionary<DamageElement, float> armors;
-        public Dictionary<DamageElement, float> Armors { get { return armors; } }
-        private Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get { return increaseDamages; } }
-        private Dictionary<EquipmentSet, int> equipmentSets;
-        public Dictionary<EquipmentSet, int> EquipmentSets { get { return equipmentSets; } }
+        public CharacterStats Stats => stats;
+        public Dictionary<Attribute, float> Attributes { get; }
+        public Dictionary<BaseSkill, short> Skills { get; }
+        public Dictionary<DamageElement, float> Resistances { get; }
+        public Dictionary<DamageElement, float> Armors { get; }
+        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; }
+        public Dictionary<EquipmentSet, int> EquipmentSets { get; }
         private int maxHp;
-        public int MaxHp { get { return maxHp; } }
+        public int MaxHp => maxHp;
         private int maxMp;
-        public int MaxMp { get { return maxMp; } }
+        public int MaxMp => maxMp;
         private int maxStamina;
-        public int MaxStamina { get { return maxStamina; } }
+        public int MaxStamina => maxStamina;
         private int maxFood;
-        public int MaxFood { get { return maxFood; } }
+        public int MaxFood => maxFood;
         private int maxWater;
-        public int MaxWater { get { return maxWater; } }
+        public int MaxWater => maxWater;
         private float atkSpeed;
-        public float AtkSpeed { get { return atkSpeed; } }
+        public float AtkSpeed => atkSpeed;
         private float moveSpeed;
-        public float MoveSpeed { get { return moveSpeed; } }
+        public float MoveSpeed => moveSpeed;
         public float BaseMoveSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
         public short TotalItemSlot { get; private set; }
@@ -48,12 +42,12 @@ namespace MultiplayerARPG
 
         public CharacterDataCache()
         {
-            attributes = new Dictionary<Attribute, float>();
-            resistances = new Dictionary<DamageElement, float>();
-            armors = new Dictionary<DamageElement, float>();
-            increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            skills = new Dictionary<BaseSkill, short>();
-            equipmentSets = new Dictionary<EquipmentSet, int>();
+            Attributes = new Dictionary<Attribute, float>();
+            Resistances = new Dictionary<DamageElement, float>();
+            Armors = new Dictionary<DamageElement, float>();
+            IncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            Skills = new Dictionary<BaseSkill, short>();
+            EquipmentSets = new Dictionary<EquipmentSet, int>();
         }
 
         public CharacterDataCache MarkToMakeCaches()
@@ -72,12 +66,12 @@ namespace MultiplayerARPG
 
             characterData.GetAllStats(
                 ref stats,
-                attributes,
-                resistances,
-                armors,
-                increaseDamages,
-                skills,
-                equipmentSets,
+                Attributes,
+                Resistances,
+                Armors,
+                IncreaseDamages,
+                Skills,
+                EquipmentSets,
                 out maxHp,
                 out maxMp,
                 out maxStamina,
@@ -128,5 +122,85 @@ namespace MultiplayerARPG
 
             return this;
         }
+
+        #region Helper functions to get stats amount
+        public float GetAttribute(string nameId)
+        {
+            return GetAttribute(nameId.GenerateHashId());
+        }
+
+        public float GetAttribute(int dataId)
+        {
+            if (GameInstance.Attributes.TryGetValue(dataId, out Attribute data) &&
+                Attributes.TryGetValue(data, out float result))
+                return result;
+            return 0f;
+        }
+
+        public short GetSkill(string nameId)
+        {
+            return GetSkill(nameId.GenerateHashId());
+        }
+
+        public short GetSkill(int dataId)
+        {
+            if (GameInstance.Skills.TryGetValue(dataId, out BaseSkill data) &&
+                Skills.TryGetValue(data, out short result))
+                return result;
+            return 0;
+        }
+
+        public float GetResistance(string nameId)
+        {
+            return GetResistance(nameId.GenerateHashId());
+        }
+
+        public float GetResistance(int dataId)
+        {
+            if (GameInstance.DamageElements.TryGetValue(dataId, out DamageElement data) &&
+                Resistances.TryGetValue(data, out float result))
+                return result;
+            return 0f;
+        }
+
+        public float GetArmor(string nameId)
+        {
+            return GetArmor(nameId.GenerateHashId());
+        }
+
+        public float GetArmor(int dataId)
+        {
+            if (GameInstance.DamageElements.TryGetValue(dataId, out DamageElement data) &&
+                Armors.TryGetValue(data, out float result))
+                return result;
+            return 0f;
+        }
+
+        public MinMaxFloat GetIncreaseDamage(string nameId)
+        {
+            return GetIncreaseDamage(nameId.GenerateHashId());
+        }
+
+        public MinMaxFloat GetIncreaseDamage(int dataId)
+        {
+            if (GameInstance.DamageElements.TryGetValue(dataId, out DamageElement data) &&
+                IncreaseDamages.TryGetValue(data, out MinMaxFloat result))
+                return result;
+            return default;
+        }
+
+        public int GetEquipmentSet(string nameId)
+        {
+            return GetEquipmentSet(nameId.GenerateHashId());
+        }
+
+        public int GetEquipmentSet(int dataId)
+        {
+            if (GameInstance.EquipmentSets.TryGetValue(dataId, out EquipmentSet data) &&
+                EquipmentSets.TryGetValue(data, out int result))
+                return result;
+            return 0;
+        }
+        #endregion
     }
 }
