@@ -21,16 +21,13 @@ namespace MultiplayerARPG
                 if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
                 {
                     tempText = GetEquipmentBonusText((tempItem as ISocketEnhancerItem).SocketEnhanceEffect);
-                    if (!string.IsNullOrEmpty(tempText))
-                    {
-                        if (!string.IsNullOrEmpty(allBonusText))
-                            allBonusText += "\n";
-                        allBonusText += string.Format(
-                            LanguageManager.GetText(formatKeySocketFilled),
-                            i + 1,
-                            tempItem.Title,
-                            tempText);
-                    }
+                    if (!string.IsNullOrEmpty(allBonusText))
+                        allBonusText += "\n";
+                    allBonusText += string.Format(
+                        LanguageManager.GetText(formatKeySocketFilled),
+                        i + 1,
+                        tempItem.Title,
+                        tempText);
                 }
                 else
                 {
