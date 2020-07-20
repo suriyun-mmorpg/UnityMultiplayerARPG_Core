@@ -167,12 +167,12 @@ namespace MultiplayerARPG
                     Instantiate(obj, MiniMapUITransform.position, MiniMapUITransform.rotation, MiniMapUITransform);
                 }
             }
-
+            // UI which show monster information
             if (CurrentGameInstance.monsterCharacterUI != null)
                 InstantiateUI(CurrentGameInstance.monsterCharacterUI);
 
+            // Initial default data
             InitStats();
-
             if (SpawnArea == null)
                 SpawnPosition = CacheTransform.position;
         }
