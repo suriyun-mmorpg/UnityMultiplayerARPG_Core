@@ -368,7 +368,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Turn character to destination
-                    yRotation = tempMoveDirection.y;
+                    yRotation = Quaternion.LookRotation(tempMoveDirection).eulerAngles.y;
                 }
             }
 
