@@ -10,12 +10,15 @@ namespace MultiplayerARPG
         [SerializeField]
         private BaseItem craftingItem;
         [SerializeField]
+        private short amount;
+        [SerializeField]
         [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         private ItemAmount[] craftRequirements;
         [SerializeField]
         private int requireGold;
 
         public BaseItem CraftingItem { get { return craftingItem; } }
+        public short Amount { get { return amount; } }
 
         [System.NonSerialized]
         private Dictionary<BaseItem, short> cacheCraftRequirements;
@@ -38,6 +41,9 @@ namespace MultiplayerARPG
 
         public bool CanCraft(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
         {
+            // Mininmum amount is 1
+            if (amount <= 0)
+                amount = 1;
             gameMessageType = GameMessage.Type.None;
             if (craftingItem == null)
             {
@@ -49,7 +55,7 @@ namespace MultiplayerARPG
                 gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
             }
-            if (character.IncreasingItemsWillOverwhelming(craftingItem.DataId, 1))
+            if (character.IncreasingItemsWillOverwhelming(craftingItem.DataId, amount))
             {
                 gameMessageType = GameMessage.Type.CannotCarryAnymore;
                 return false;
@@ -72,7 +78,10 @@ namespace MultiplayerARPG
 
         public void CraftItem(IPlayerCharacterData character)
         {
-            if (character.IncreaseItems(CharacterItem.Create(craftingItem)))
+            // Mininmum amount is 1
+            if (amount <= 0)
+                amount = 1;
+            if (character.IncreaseItems(CharacterItem.Create(craftingItem, 1, amount)))
             {
                 // Reduce item when able to increase craft item
                 foreach (ItemAmount craftRequirement in craftRequirements)

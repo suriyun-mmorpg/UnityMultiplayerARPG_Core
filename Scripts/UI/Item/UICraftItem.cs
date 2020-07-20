@@ -7,6 +7,7 @@ namespace MultiplayerARPG
         public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
         public ItemCraft ItemCraft { get { return Data; } }
         public BaseItem CraftingItem { get { return ItemCraft.CraftingItem; } }
+        public short Amount { get { return ItemCraft.Amount; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
@@ -84,7 +85,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiCraftingItem.Show();
-                    uiCraftingItem.Data = new UICharacterItemData(CharacterItem.Create(CraftingItem), 1, InventoryType.NonEquipItems);
+                    uiCraftingItem.Data = new UICharacterItemData(CharacterItem.Create(CraftingItem, 1, Amount), 1, InventoryType.NonEquipItems);
                 }
             }
         }
