@@ -108,18 +108,21 @@ namespace MultiplayerARPG
         public bool IsBuildMode { get; private set; }
         public BasePlayerCharacterEntity Builder { get; private set; }
 
+        // Private variables
         private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
         private readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
         private readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
         private readonly List<BuildingEntity> children = new List<BuildingEntity>();
         private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
         private bool parentFound;
+        private bool isDestroyed;
 
         protected override void EntityAwake()
         {
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.buildingTag;
             gameObject.layer = CurrentGameInstance.buildingLayer;
+            isDestroyed = false;
 
             if (buildingTypes == null)
                 buildingTypes = new List<string>();
@@ -264,7 +267,13 @@ namespace MultiplayerARPG
 
         public void Destroy()
         {
+            if (!IsServer)
+                return;
             CurrentHp = 0;
+            if (isDestroyed)
+                return;
+            isDestroyed = true;
+            // Tell clients that the building destroy to play animation at client
             RequestOnBuildingDestroy();
             if (droppingItems != null && droppingItems.Count > 0)
             {
