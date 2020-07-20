@@ -1,10 +1,9 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using LiteNetLibManager;
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 namespace MultiplayerARPG
@@ -34,6 +33,9 @@ namespace MultiplayerARPG
         public HarvestableSpawnArea SpawnArea { get; protected set; }
         public Vector3 SpawnPosition { get; protected set; }
 
+        // Private variables
+        private bool isDestroyed;
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -45,23 +47,15 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.harvestableTag;
             gameObject.layer = CurrentGameInstance.harvestableLayer;
-        }
-
-        protected override void EntityStart()
-        {
-            base.EntityStart();
-            InitStats();
+            isDestroyed = false;
         }
 
         protected virtual void InitStats()
         {
-            if (IsServer)
-            {
-                if (SpawnArea == null)
-                    SpawnPosition = CacheTransform.position;
+            if (!IsServer)
+                return;
 
-                CurrentHp = maxHp;
-            }
+            CurrentHp = maxHp;
         }
 
         public virtual void SetSpawnArea(HarvestableSpawnArea spawnArea, Vector3 spawnPosition)
@@ -74,13 +68,21 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             RegisterNetFunction(NetFuncOnHarvestableDestroy);
+            // Initial default data
             InitStats();
+            if (SpawnArea == null)
+                SpawnPosition = CacheTransform.position;
         }
 
         protected virtual void NetFuncOnHarvestableDestroy()
         {
             if (onHarvestableDestroy != null)
                 onHarvestableDestroy.Invoke();
+        }
+
+        public void RequestOnHarvestableDestroy()
+        {
+            CallNetFunction(NetFuncOnHarvestableDestroy, FunctionReceivers.All);
         }
 
         public override void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
@@ -134,19 +136,19 @@ namespace MultiplayerARPG
             ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
 
             if (IsDead())
-            {
-                CurrentHp = 0;
-                // Tell clients that the harvestable destroy to play animation at client
-                CallNetFunction(NetFuncOnHarvestableDestroy, FunctionReceivers.All);
                 DestroyAndRespawn();
-            }
         }
 
         public void DestroyAndRespawn()
         {
             if (!IsServer)
                 return;
-
+            CurrentHp = 0;
+            if (isDestroyed)
+                return;
+            isDestroyed = true;
+            // Tell clients that the harvestable destroy to play animation at client
+            RequestOnHarvestableDestroy();
             if (SpawnArea != null)
                 SpawnArea.Spawn(destroyDelay + destroyRespawnDelay);
             else if (Identity.IsSceneObject)
@@ -158,6 +160,7 @@ namespace MultiplayerARPG
         protected IEnumerator RespawnRoutine()
         {
             yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
+            isDestroyed = false;
             InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
