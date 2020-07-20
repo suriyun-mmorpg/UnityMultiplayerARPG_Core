@@ -131,8 +131,10 @@ namespace MultiplayerARPG
 
         public float GetAttribute(int dataId)
         {
-            if (GameInstance.Attributes.TryGetValue(dataId, out Attribute data) &&
-                Attributes.TryGetValue(data, out float result))
+            Attribute data;
+            float result;
+            if (GameInstance.Attributes.TryGetValue(dataId, out data) &&
+                Attributes.TryGetValue(data, out result))
                 return result;
             return 0f;
         }
@@ -144,8 +146,10 @@ namespace MultiplayerARPG
 
         public short GetSkill(int dataId)
         {
-            if (GameInstance.Skills.TryGetValue(dataId, out BaseSkill data) &&
-                Skills.TryGetValue(data, out short result))
+            BaseSkill data;
+            short result;
+            if (GameInstance.Skills.TryGetValue(dataId, out data) &&
+                Skills.TryGetValue(data, out result))
                 return result;
             return 0;
         }
@@ -157,8 +161,10 @@ namespace MultiplayerARPG
 
         public float GetResistance(int dataId)
         {
-            if (GameInstance.DamageElements.TryGetValue(dataId, out DamageElement data) &&
-                Resistances.TryGetValue(data, out float result))
+            DamageElement data;
+            float result;
+            if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
+                Resistances.TryGetValue(data, out result))
                 return result;
             return 0f;
         }
@@ -170,8 +176,10 @@ namespace MultiplayerARPG
 
         public float GetArmor(int dataId)
         {
-            if (GameInstance.DamageElements.TryGetValue(dataId, out DamageElement data) &&
-                Armors.TryGetValue(data, out float result))
+            DamageElement data;
+            float result;
+            if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
+                Armors.TryGetValue(data, out result))
                 return result;
             return 0f;
         }
@@ -183,10 +191,12 @@ namespace MultiplayerARPG
 
         public MinMaxFloat GetIncreaseDamage(int dataId)
         {
-            if (GameInstance.DamageElements.TryGetValue(dataId, out DamageElement data) &&
-                IncreaseDamages.TryGetValue(data, out MinMaxFloat result))
+            DamageElement data;
+            MinMaxFloat result;
+            if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
+                IncreaseDamages.TryGetValue(data, out result))
                 return result;
-            return default;
+            return default(MinMaxFloat);
         }
 
         public int GetEquipmentSet(string nameId)
@@ -196,8 +206,10 @@ namespace MultiplayerARPG
 
         public int GetEquipmentSet(int dataId)
         {
-            if (GameInstance.EquipmentSets.TryGetValue(dataId, out EquipmentSet data) &&
-                EquipmentSets.TryGetValue(data, out int result))
+            EquipmentSet data;
+            int result;
+            if (GameInstance.EquipmentSets.TryGetValue(dataId, out data) &&
+                EquipmentSets.TryGetValue(data, out result))
                 return result;
             return 0;
         }
