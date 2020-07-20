@@ -48,10 +48,16 @@ namespace MultiplayerARPG
         public Animator animator;
         [Tooltip("You can set this when animator controller type is `Custom`")]
         public RuntimeAnimatorController animatorController;
+
+        [Header("Action State Settings")]
         [Tooltip("Which layer in Animator controller that you use it to play action animations, You can set this when animator controller type is `Custom`")]
         public int actionStateLayer;
+        public string[] actionStateNames = new string[] { "Action", "Action" };
+
+        [Header("Cast Skill State Settings")]
         [Tooltip("Which layer in Animator controller that you use it to play cast skill animations, You can set this when animator controller type is `Custom`")]
         public int castSkillStateLayer;
+        public string[] castSkillStateNames = new string[] { "CastSkill", "CastSkill" };
 
 #if UNITY_EDITOR
         [Header("Animation Test Tool")]
@@ -65,6 +71,8 @@ namespace MultiplayerARPG
 
         public AnimatorOverrideController CacheAnimatorController { get; private set; }
         private Dictionary<string, AnimationClip> animationClipOverrides = new Dictionary<string, AnimationClip>();
+        private int[] actionStateNameHashes;
+        private int[] castSkillStateNameHashes;
 
         // Private state validater
         private bool isSetupComponent;
@@ -123,6 +131,11 @@ namespace MultiplayerARPG
                         castSkillStateLayer = 0;
                         hasChanges = true;
                     }
+                    if (hasChanges)
+                    {
+                        actionStateNames = new string[] { "Action" };
+                        castSkillStateNames = new string[] { "CastSkill" };
+                    }
                     break;
                 case AnimatorControllerType.Advance:
                     changingAnimatorController = Resources.Load("__Animator/__AdvanceCharacter") as RuntimeAnimatorController;
@@ -141,6 +154,11 @@ namespace MultiplayerARPG
                     {
                         castSkillStateLayer = 1;
                         hasChanges = true;
+                    }
+                    if (hasChanges)
+                    {
+                        actionStateNames = new string[] { "Action", "Action" };
+                        castSkillStateNames = new string[] { "CastSkill", "CastSkill" };
                     }
                     break;
             }
@@ -167,6 +185,15 @@ namespace MultiplayerARPG
             // Use override controller as animator
             if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
                 animator.runtimeAnimatorController = CacheAnimatorController;
+            // Setup action state name hashes
+            int indexCounter;
+            actionStateNameHashes = new int[actionStateNames.Length];
+            for (indexCounter = 0; indexCounter < actionStateNames.Length; ++indexCounter)
+                actionStateNameHashes[indexCounter] = Animator.StringToHash(actionStateNames[indexCounter]);
+            // Setup cast skill state name hashes
+            castSkillStateNameHashes = new int[castSkillStateNames.Length];
+            for (indexCounter = 0; indexCounter < castSkillStateNames.Length; ++indexCounter)
+                castSkillStateNameHashes[indexCounter] = Animator.StringToHash(castSkillStateNames[indexCounter]);
             SetDefaultAnimations();
         }
 
@@ -637,7 +664,10 @@ namespace MultiplayerARPG
             }
 
             if (movementState.HasFlag(MovementState.IsUnderWater))
+            {
                 moveAnimationSpeedMultiplier *= swimMoveAnimSpeedRate;
+                idleAnimationSpeedMultiplier = swimIdleAnimSpeedRate;
+            }
 
             // Character may attacking, set character to idle state, 
             // Character is idle, so set move animation speed multiplier to 1
@@ -674,16 +704,13 @@ namespace MultiplayerARPG
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             playSpeedMultiplier *= (tempActionAnimation.animSpeedRate > 0f ? tempActionAnimation.animSpeedRate : 1f);
-            if (tempActionAnimation.clip)
-            {
-                CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
-                yield return 0;
-            }
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-            if (tempActionAnimation.clip)
+            bool hasClip = tempActionAnimation.clip != null;
+            if (hasClip)
             {
+                CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
                 animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, tempActionAnimation.playClipAllLayers);
@@ -691,17 +718,17 @@ namespace MultiplayerARPG
                 {
                     for (int i = 0; i < animator.layerCount; ++i)
                     {
-                        animator.Play(0, i, 0f);
+                        animator.Play(actionStateNameHashes[i], i, 0f);
                     }
                 }
                 else
                 {
-                    animator.Play(0, actionStateLayer, 0f);
+                    animator.Play(actionStateNameHashes[actionStateLayer], actionStateLayer, 0f);
                 }
             }
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-            if (tempActionAnimation.clip)
+            if (hasClip)
             {
                 animator.SetBool(ANIM_DO_ACTION, false);
                 animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
@@ -718,25 +745,31 @@ namespace MultiplayerARPG
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
         {
             AnimationClip castClip = GetSkillCastClip(dataId);
-            bool playAllLayers = IsSkillCastClipPlayingAllLayers(dataId);
-            CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
-            yield return 0;
-            animator.SetBool(ANIM_IS_CASTING_SKILL, true);
-            animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, playAllLayers);
-            if (playAllLayers)
+            bool hasClip = castClip != null;
+            if (hasClip)
             {
-                for (int i = 0; i < animator.layerCount; ++i)
+                bool playAllLayers = IsSkillCastClipPlayingAllLayers(dataId);
+                CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
+                animator.SetBool(ANIM_IS_CASTING_SKILL, true);
+                animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, playAllLayers);
+                if (playAllLayers)
                 {
-                    animator.Play(0, i, 0f);
+                    for (int i = 0; i < animator.layerCount; ++i)
+                    {
+                        animator.Play(castSkillStateNameHashes[i], i, 0f);
+                    }
+                }
+                else
+                {
+                    animator.Play(castSkillStateNameHashes[castSkillStateLayer], castSkillStateLayer, 0f);
                 }
             }
-            else
-            {
-                animator.Play(0, castSkillStateLayer, 0f);
-            }
             yield return new WaitForSecondsRealtime(duration);
-            animator.SetBool(ANIM_IS_CASTING_SKILL, false);
-            animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
+            if (hasClip)
+            {
+                animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+                animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
+            }
         }
 
         public override void StopActionAnimation()
