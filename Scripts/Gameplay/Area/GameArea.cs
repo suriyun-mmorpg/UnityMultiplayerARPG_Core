@@ -10,7 +10,9 @@ namespace MultiplayerARPG
 
     public class GameArea : MonoBehaviour
     {
-        public const float GROUND_DETECTION_DISTANCE = 512f;
+        public const float GROUND_DETECTION_DISTANCE = 100f;
+        public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
+        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
         public Color gizmosColor = Color.magenta;
         public GameAreaType type;
         [Header("Radius Area")]
@@ -37,29 +39,7 @@ namespace MultiplayerARPG
                             randomedPosition = new Vector3(Random.Range(-squareSizeX * 0.5f, squareSizeX * 0.5f), 0, Random.Range(-squareSizeZ * 0.5f, squareSizeZ * 0.5f));
                             break;
                     }
-                    randomedPosition = transform.position + new Vector3(randomedPosition.x, 0, randomedPosition.z);
-
-                    // Raycast to find hit floor
-                    Vector3? aboveHitPoint = null;
-                    Vector3? underHitPoint = null;
-                    int raycastLayerMask = GroundLayerMask;
-                    RaycastHit tempHit;
-                    if (Physics.Raycast(randomedPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                        aboveHitPoint = tempHit.point;
-                    if (Physics.Raycast(randomedPosition, Vector3.down, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                        underHitPoint = tempHit.point;
-                    // Set drop position to nearest hit point
-                    if (aboveHitPoint.HasValue && underHitPoint.HasValue)
-                    {
-                        if (Vector3.Distance(randomedPosition, aboveHitPoint.Value) < Vector3.Distance(randomedPosition, underHitPoint.Value))
-                            randomedPosition = aboveHitPoint.Value;
-                        else
-                            randomedPosition = underHitPoint.Value;
-                    }
-                    else if (aboveHitPoint.HasValue)
-                        randomedPosition = aboveHitPoint.Value;
-                    else if (underHitPoint.HasValue)
-                        randomedPosition = underHitPoint.Value;
+                    randomedPosition = PhysicUtils.FindGroundedPosition(transform.position + new Vector3(randomedPosition.x, 0, randomedPosition.z), findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GroundLayerMask);
                     break;
                 case DimensionType.Dimension2D:
                     switch (type)

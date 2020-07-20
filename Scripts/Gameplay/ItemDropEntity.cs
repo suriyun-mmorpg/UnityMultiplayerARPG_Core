@@ -10,6 +10,8 @@ namespace MultiplayerARPG
     public class ItemDropEntity : BaseGameEntity
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
+        public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
+        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
         [Header("Generic settings")]
         [Header("Monster Character Settings")]
         [Tooltip("The title which will be used with item drop entity which placed into the scene (not drops from characters)")]
@@ -273,28 +275,8 @@ namespace MultiplayerARPG
 
             if (gameInstance.DimensionType == DimensionType.Dimension3D)
             {
-                // Random drop position around character
-                // Raycast to find hit floor
-                Vector3? aboveHitPoint = null;
-                Vector3? underHitPoint = null;
-                int raycastLayerMask = gameInstance.GetItemDropGroundDetectionLayerMask();
-                RaycastHit tempHit;
-                if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                    aboveHitPoint = tempHit.point;
-                if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                    underHitPoint = tempHit.point;
-                // Set drop position to nearest hit point
-                if (aboveHitPoint.HasValue && underHitPoint.HasValue)
-                {
-                    if (Vector3.Distance(dropPosition, aboveHitPoint.Value) < Vector3.Distance(dropPosition, underHitPoint.Value))
-                        dropPosition = aboveHitPoint.Value;
-                    else
-                        dropPosition = underHitPoint.Value;
-                }
-                else if (aboveHitPoint.HasValue)
-                    dropPosition = aboveHitPoint.Value;
-                else if (underHitPoint.HasValue)
-                    dropPosition = underHitPoint.Value;
+                // Find drop position on ground
+                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, gameInstance.GetItemDropGroundDetectionLayerMask());
             }
             GameObject spawnObj = Instantiate(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();

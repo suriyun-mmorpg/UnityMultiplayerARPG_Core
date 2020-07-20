@@ -49,6 +49,44 @@ public static class PhysicUtils
         return count;
     }
 
+    public static Vector3 FindGroundedPosition(Vector3 origin, RaycastHit[] results, float distance, int layerMask)
+    {
+        // Raycast to find hit floor
+        Vector3? aboveHitPoint = null;
+        Vector3? underHitPoint = null;
+        int hitCount = Physics.RaycastNonAlloc(origin, Vector3.up, results, distance, layerMask);
+        if (hitCount > 0)
+        {
+            for (int i = 0; i < hitCount; ++i)
+            {
+                if (!aboveHitPoint.HasValue || aboveHitPoint.Value.y < results[i].point.y)
+                    aboveHitPoint = results[i].point;
+            }
+        }
+        hitCount = Physics.RaycastNonAlloc(origin, Vector3.down, results, distance, layerMask);
+        if (hitCount > 0)
+        {
+            for (int i = 0; i < hitCount; ++i)
+            {
+                if (!underHitPoint.HasValue || underHitPoint.Value.y < results[i].point.y)
+                    underHitPoint = results[i].point;
+            }
+        }
+        // Set drop position to nearest hit point
+        if (aboveHitPoint.HasValue && underHitPoint.HasValue)
+        {
+            if (Vector3.Distance(origin, aboveHitPoint.Value) < Vector3.Distance(origin, underHitPoint.Value))
+                origin = aboveHitPoint.Value;
+            else
+                origin = underHitPoint.Value;
+        }
+        else if (aboveHitPoint.HasValue)
+            origin = aboveHitPoint.Value;
+        else if (underHitPoint.HasValue)
+            origin = underHitPoint.Value;
+        return origin;
+    }
+
     public struct ColliderComparer : IComparer<Collider>, IComparer<Collider2D>
     {
         private Vector3 position;
