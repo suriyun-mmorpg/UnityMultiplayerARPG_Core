@@ -189,6 +189,7 @@ namespace MultiplayerARPG
             {
                 // Clear target
                 ClearTarget(true);
+                didActionOnTarget = false;
                 // Prepare temp variables
                 Transform tempTransform;
                 Vector3 tempVector3;
@@ -229,7 +230,6 @@ namespace MultiplayerARPG
                         if (tempBuildingMaterial != null && tempBuildingMaterial.TargetEntity != null)
                             targetBuilding = tempBuildingMaterial.TargetEntity;
                         targetVehicle = tempTransform.GetComponent<VehicleEntity>();
-                        lastNpcObjectId = 0;
                         if (targetPlayer && !targetPlayer.IsHideOrDead)
                         {
                             // Found activating entity as player character entity
@@ -647,10 +647,10 @@ namespace MultiplayerARPG
             {
                 DoActionOrMoveToEntity(targetNpc, CurrentGameInstance.conversationDistance, () =>
                 {
-                    if (lastNpcObjectId != targetNpc.ObjectId)
+                    if (!didActionOnTarget)
                     {
+                        didActionOnTarget = true;
                         PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
-                        lastNpcObjectId = targetNpc.ObjectId;
                     }
                 });
             }
@@ -666,14 +666,22 @@ namespace MultiplayerARPG
             {
                 DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
                 {
-                    ActivateBuilding(targetBuilding);
+                    if (!didActionOnTarget)
+                    {
+                        didActionOnTarget = true;
+                        ActivateBuilding(targetBuilding);
+                    }
                 });
             }
             else if (TryGetDoActionEntity(out targetBuilding, TargetActionType.ViewOptions))
             {
                 DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
                 {
-                    ShowCurrentBuildingDialog();
+                    if (!didActionOnTarget)
+                    {
+                        didActionOnTarget = true;
+                        ShowCurrentBuildingDialog();
+                    }
                 });
             }
             else if (TryGetDoActionEntity(out targetVehicle))

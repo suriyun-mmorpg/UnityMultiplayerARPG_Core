@@ -56,7 +56,6 @@ namespace MultiplayerARPG
         protected Vector3 mouseDownPosition;
         protected float mouseDownTime;
         protected bool isMouseDragOrHoldOrOverUI;
-        protected uint lastNpcObjectId;
 
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
@@ -93,6 +92,7 @@ namespace MultiplayerARPG
         protected int findingEnemyIndex;
         protected bool isLeftHandAttacking;
         protected bool isFollowingTarget;
+        protected bool didActionOnTarget;
 
         protected override void Awake()
         {
