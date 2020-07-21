@@ -27,7 +27,6 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         BuildingSaveData data = (BuildingSaveData)obj;
         data.id = info.GetString("id");
         data.parentId = info.GetString("parentId");
-        data.entityId = info.GetInt32("entityId");
         data.currentHp = info.GetInt32("currentHp");
         data.position = (Vector3)info.GetValue("position", typeof(Vector3));
         data.rotation = (Quaternion)info.GetValue("rotation", typeof(Quaternion));
@@ -47,6 +46,11 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         try
         {
             data.extraData = info.GetString("extraData");
+        }
+        catch { }
+        try
+        {
+            data.entityId = info.GetInt32("entityId");
         }
         catch { }
         try
