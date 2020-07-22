@@ -61,6 +61,8 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
             CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
             CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
             base.Show();
         }
 
@@ -84,8 +86,15 @@ namespace MultiplayerARPG
             WeightLimit = 0;
             SlotLimit = 0;
             // Hide
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
             base.Hide();
+        }
+
+        protected void OnItemDialogHide()
+        {
+            CacheItemSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
@@ -106,7 +115,11 @@ namespace MultiplayerARPG
         protected void OnDeselectCharacterItem(UICharacterItem ui)
         {
             if (uiItemDialog != null)
+            {
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
                 uiItemDialog.Hide();
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
+            }
         }
 
         protected virtual void Update()
