@@ -446,13 +446,13 @@ namespace MultiplayerARPG
                 toggleCrouchOn = false;
                 toggleCrawlOn = false;
             }
-            else if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
+            if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
             {
                 extraMovementState = ExtraMovementState.IsCrouching;
                 toggleSprintOn = false;
                 toggleCrawlOn = false;
             }
-            else if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
+            if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
             {
                 extraMovementState = ExtraMovementState.IsCrawling;
                 toggleSprintOn = false;
