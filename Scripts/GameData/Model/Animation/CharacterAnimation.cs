@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float triggerDurationRate;
-        [Tooltip("If this length more than 1, will use each entry for trigger duration rate")]
+        [Tooltip("If this length more than 1, will use each entry as trigger duration rate")]
         [Range(0f, 1f)]
         public float[] multiHitTriggerDurationRates;
         [Tooltip("How animation duration defined")]
