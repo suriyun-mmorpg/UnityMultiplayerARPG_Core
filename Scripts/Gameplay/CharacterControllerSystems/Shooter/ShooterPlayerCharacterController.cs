@@ -166,7 +166,6 @@ namespace MultiplayerARPG
         InputStateManager switchEquipWeaponSetInput;
         // Temp data
         ControllerViewMode dirtyViewMode;
-        BuildingMaterial tempBuildingMaterial;
         IDamageableEntity tempDamageableEntity;
         BaseGameEntity tempEntity;
         Ray centerRay;
