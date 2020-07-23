@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (itemRefine == null)
+                if (itemRefine == null || itemRefine.titleColor.a == 0)
                     return base.Title;
                 return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + base.Title + "</color>";
             }
