@@ -46,8 +46,6 @@ namespace MultiplayerARPG
         private SyncFieldString creatorId = new SyncFieldString();
         [SerializeField]
         private SyncFieldString creatorName = new SyncFieldString();
-        [SerializeField]
-        private int dataId;
 
         public string Id
         {
