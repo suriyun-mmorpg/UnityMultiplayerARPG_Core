@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     public partial class ItemRefine : BaseGameData
     {
         [Header("Item Refine Configs")]
-        public Color titleColor = Color.white;
+        public Color titleColor = Color.clear;
         [Tooltip("This is refine level, each level have difference success rate, required items, required gold")]
         public ItemRefineLevel[] levels;
         [Tooltip("This is repair prices, should order from high to low durability rate")]
