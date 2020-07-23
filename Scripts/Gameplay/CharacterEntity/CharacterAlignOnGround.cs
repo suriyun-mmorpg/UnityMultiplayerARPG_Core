@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     public class CharacterAlignOnGround : MonoBehaviour
     {
         public Transform rootBoneTransform;
+        public Vector3 rootBoneRotation;
         public float alignOnGroundDistance = 1f;
         public LayerMask alignOnGroundLayerMask = ~0;
         public float alignSpeed = 20f;
@@ -29,7 +30,7 @@ namespace MultiplayerARPG
                 aligningQuaternion = Quaternion.Slerp(aligningQuaternion, Quaternion.FromToRotation(Vector3.up, raycastHit.normal), Time.deltaTime * alignSpeed);
             else
                 aligningQuaternion = Quaternion.Slerp(aligningQuaternion, Quaternion.identity, Time.deltaTime * alignSpeed);
-            CacheTransform.rotation = aligningQuaternion * Quaternion.AngleAxis(CacheTransform.eulerAngles.y, Vector3.up);
+            rootBoneTransform.rotation = aligningQuaternion * Quaternion.AngleAxis(CacheTransform.eulerAngles.y, Vector3.up) * Quaternion.Euler(rootBoneRotation);
         }
     }
 }
