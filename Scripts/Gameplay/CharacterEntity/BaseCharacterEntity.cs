@@ -120,9 +120,7 @@ namespace MultiplayerARPG
                 characterUITransform = CacheTransform;
             if (miniMapUITransform == null)
                 miniMapUITransform = CacheTransform;
-            ModelManager = GetComponent<CharacterModelManager>();
-            if (ModelManager == null)
-                ModelManager = gameObject.AddComponent<CharacterModelManager>();
+            ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
             HitBoxes = GetComponentsInChildren<CharacterHitBox>();
         }
 
@@ -186,9 +184,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
             if (Application.isPlaying)
                 return;
-            ModelManager = GetComponent<CharacterModelManager>();
-            if (ModelManager == null)
-                ModelManager = gameObject.AddComponent<CharacterModelManager>();
+            ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
             if (model != ModelManager.ActiveModel)
             {
                 model = ModelManager.ActiveModel;

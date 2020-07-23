@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+#if USE_TEXT_MESH_PRO
+using TMPro;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -12,9 +15,9 @@ namespace MultiplayerARPG
         public float lifeTime = 2f;
         public string format = "{0}";
         public bool showPositiveSign;
-        
+
         public UIFollowWorldObject CacheObjectFollower { get; private set; }
-        
+
         public TextWrapper CacheText { get; private set; }
 
         private int amount;
@@ -42,13 +45,13 @@ namespace MultiplayerARPG
                 return;
 
             CacheObjectFollower = GetComponent<UIFollowWorldObject>();
-            CacheText = GetComponent<TextWrapper>();
-            if (CacheText == null)
+            CacheText = gameObject.GetOrAddComponent<TextWrapper>((comp) =>
             {
-                CacheText = gameObject.AddComponent<TextWrapper>();
-                CacheText.unityText = GetComponent<Text>();
-            }
-
+                comp.unityText = GetComponent<Text>();
+#if USE_TEXT_MESH_PRO
+                comp.textMeshText = GetComponent<TextMeshProUGUI>();
+#endif
+            });
             AlreadyCachedComponents = true;
         }
     }

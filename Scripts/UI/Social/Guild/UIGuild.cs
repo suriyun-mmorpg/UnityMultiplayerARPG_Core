@@ -64,9 +64,7 @@ namespace MultiplayerARPG
             get
             {
                 if (roleSelectionManager == null)
-                    roleSelectionManager = GetComponent<UIGuildRoleSelectionManager>();
-                if (roleSelectionManager == null)
-                    roleSelectionManager = gameObject.AddComponent<UIGuildRoleSelectionManager>();
+                    roleSelectionManager = gameObject.GetOrAddComponent<UIGuildRoleSelectionManager>();
                 roleSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return roleSelectionManager;
             }
@@ -93,9 +91,7 @@ namespace MultiplayerARPG
             get
             {
                 if (skillSelectionManager == null)
-                    skillSelectionManager = GetComponent<UIGuildSkillSelectionManager>();
-                if (skillSelectionManager == null)
-                    skillSelectionManager = gameObject.AddComponent<UIGuildSkillSelectionManager>();
+                    skillSelectionManager = gameObject.GetOrAddComponent<UIGuildSkillSelectionManager>();
                 skillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return skillSelectionManager;
             }

@@ -294,9 +294,7 @@ namespace MultiplayerARPG
             {
                 collider.isTrigger = true;
                 // Use rigidbody to detect trigger events
-                Rigidbody rigidbody = collider.GetComponent<Rigidbody>();
-                if (rigidbody == null)
-                    rigidbody = collider.gameObject.AddComponent<Rigidbody>();
+                Rigidbody rigidbody = collider.gameObject.GetOrAddComponent<Rigidbody>();
                 rigidbody.useGravity = false;
                 rigidbody.isKinematic = true;
                 rigidbody.constraints = RigidbodyConstraints.FreezeAll;
@@ -306,9 +304,7 @@ namespace MultiplayerARPG
             {
                 collider.isTrigger = true;
                 // Use rigidbody to detect trigger events
-                Rigidbody2D rigidbody = collider.GetComponent<Rigidbody2D>();
-                if (rigidbody == null)
-                    rigidbody = collider.gameObject.AddComponent<Rigidbody2D>();
+                Rigidbody2D rigidbody = collider.gameObject.GetOrAddComponent<Rigidbody2D>();
                 rigidbody.gravityScale = 0;
                 rigidbody.isKinematic = true;
                 rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;

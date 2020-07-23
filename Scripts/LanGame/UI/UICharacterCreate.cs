@@ -85,9 +85,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheCharacterSelectionManager == null)
-                    cacheCharacterSelectionManager = GetComponent<UICharacterSelectionManager>();
-                if (cacheCharacterSelectionManager == null)
-                    cacheCharacterSelectionManager = gameObject.AddComponent<UICharacterSelectionManager>();
+                    cacheCharacterSelectionManager = gameObject.GetOrAddComponent<UICharacterSelectionManager>();
                 cacheCharacterSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return cacheCharacterSelectionManager;
             }
@@ -99,9 +97,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheCharacterClassSelectionManager == null)
-                    cacheCharacterClassSelectionManager = GetComponent<UICharacterClassSelectionManager>();
-                if (cacheCharacterClassSelectionManager == null)
-                    cacheCharacterClassSelectionManager = gameObject.AddComponent<UICharacterClassSelectionManager>();
+                    cacheCharacterClassSelectionManager = gameObject.GetOrAddComponent<UICharacterClassSelectionManager>();
                 cacheCharacterClassSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return cacheCharacterClassSelectionManager;
             }

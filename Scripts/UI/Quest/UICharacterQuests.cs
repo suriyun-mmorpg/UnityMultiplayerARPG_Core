@@ -46,9 +46,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheQuestSelectionManager == null)
-                    cacheQuestSelectionManager = GetComponent<UICharacterQuestSelectionManager>();
-                if (cacheQuestSelectionManager == null)
-                    cacheQuestSelectionManager = gameObject.AddComponent<UICharacterQuestSelectionManager>();
+                    cacheQuestSelectionManager = gameObject.GetOrAddComponent<UICharacterQuestSelectionManager>();
                 cacheQuestSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheQuestSelectionManager;
             }

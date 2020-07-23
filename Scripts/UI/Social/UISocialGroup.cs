@@ -63,9 +63,7 @@ namespace MultiplayerARPG
             get
             {
                 if (memberSelectionManager == null)
-                    memberSelectionManager = GetComponent<UISocialCharacterSelectionManager>();
-                if (memberSelectionManager == null)
-                    memberSelectionManager = gameObject.AddComponent<UISocialCharacterSelectionManager>();
+                    memberSelectionManager = gameObject.GetOrAddComponent<UISocialCharacterSelectionManager>();
                 memberSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return memberSelectionManager;
             }

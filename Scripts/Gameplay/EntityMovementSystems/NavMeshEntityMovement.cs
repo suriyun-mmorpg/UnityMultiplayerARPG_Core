@@ -22,13 +22,9 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             // Prepare network transform component
-            CacheNetTransform = GetComponent<LiteNetLibTransform>();
-            if (CacheNetTransform == null)
-                CacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
+            CacheNetTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
             // Prepare nav mesh agent component
-            CacheNavMeshAgent = GetComponent<NavMeshAgent>();
-            if (CacheNavMeshAgent == null)
-                CacheNavMeshAgent = gameObject.AddComponent<NavMeshAgent>();
+            CacheNavMeshAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
         }
 
         public override void EntityLateUpdate()

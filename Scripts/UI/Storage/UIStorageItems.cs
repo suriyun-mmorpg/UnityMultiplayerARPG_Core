@@ -40,9 +40,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.AddComponent<UICharacterItemSelectionManager>();
+                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
                 cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheItemSelectionManager;
             }

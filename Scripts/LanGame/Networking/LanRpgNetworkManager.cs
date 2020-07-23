@@ -48,9 +48,7 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            CacheDiscovery = GetComponent<LiteNetLibDiscovery>();
-            if (CacheDiscovery == null)
-                CacheDiscovery = gameObject.AddComponent<LiteNetLibDiscovery>();
+            CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
         }
 
         public void StartGame()

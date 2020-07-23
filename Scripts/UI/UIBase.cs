@@ -49,13 +49,8 @@ public class UIBase : MonoBehaviour
 
         if (root == null)
             root = gameObject;
-        CacheRootCanvas = CacheRoot.GetComponent<Canvas>();
-        if (CacheRootCanvas == null)
-            CacheRootCanvas = CacheRoot.AddComponent<Canvas>();
-        CacheGraphicRaycaster = CacheRoot.GetComponent<GraphicRaycaster>();
-        if (CacheGraphicRaycaster == null)
-            CacheGraphicRaycaster = CacheRoot.AddComponent<GraphicRaycaster>();
-
+        CacheRootCanvas = CacheRoot.GetOrAddComponent<Canvas>();
+        CacheGraphicRaycaster = CacheRoot.GetOrAddComponent<GraphicRaycaster>();
         AlreadyCachedComponents = true;
     }
 

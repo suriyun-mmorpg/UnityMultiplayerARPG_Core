@@ -89,24 +89,16 @@ namespace MultiplayerARPG
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
             // Prepare network transform component
-            CacheNetTransform = GetComponent<LiteNetLibTransform>();
-            if (CacheNetTransform == null)
-                CacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
+            CacheNetTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
             // Prepare rigidbody component
-            CacheRigidbody = GetComponent<Rigidbody>();
-            if (CacheRigidbody == null)
-                CacheRigidbody = gameObject.AddComponent<Rigidbody>();
+            CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
             // Prepare collider component
-            CacheCapsuleCollider = GetComponent<CapsuleCollider>();
-            if (CacheCapsuleCollider == null)
-                CacheCapsuleCollider = gameObject.AddComponent<CapsuleCollider>();
+            CacheCapsuleCollider = gameObject.GetOrAddComponent<CapsuleCollider>();
             // Prepare open character controller
-            CacheOpenCharacterController = GetComponent<OpenCharacterController>();
-            if (CacheOpenCharacterController == null)
+            CacheOpenCharacterController = gameObject.GetOrAddComponent<OpenCharacterController>((comp) =>
             {
-                CacheOpenCharacterController = gameObject.AddComponent<OpenCharacterController>();
-                CacheOpenCharacterController.InitRadiusHeightAndCenter(CacheCapsuleCollider.radius, CacheCapsuleCollider.height, CacheCapsuleCollider.center);
-            }
+                comp.InitRadiusHeightAndCenter(CacheCapsuleCollider.radius, CacheCapsuleCollider.height, CacheCapsuleCollider.center);
+            });
             // Setup
             StopMove();
         }

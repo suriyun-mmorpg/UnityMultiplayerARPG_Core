@@ -1057,9 +1057,7 @@ namespace MultiplayerARPG
 
         private void ConvertToAnimatorCharacterModel()
         {
-            AnimatorCharacterModel model = gameObject.GetComponent<AnimatorCharacterModel>();
-            if (!model)
-                model = gameObject.AddComponent<AnimatorCharacterModel>();
+            AnimatorCharacterModel model = gameObject.GetOrAddComponent<AnimatorCharacterModel>();
             model.skinnedMeshRenderer = skinnedMeshRenderer;
             model.weaponAnimations = weaponAnimations;
             model.skillAnimations = skillAnimations;
@@ -1096,9 +1094,7 @@ namespace MultiplayerARPG
 
         private void ConvertToAnimationCharacterModel()
         {
-            AnimationCharacterModel model = gameObject.GetComponent<AnimationCharacterModel>();
-            if (!model)
-                model = gameObject.AddComponent<AnimationCharacterModel>();
+            AnimationCharacterModel model = gameObject.GetOrAddComponent<AnimationCharacterModel>();
             model.skinnedMeshRenderer = skinnedMeshRenderer;
             model.weaponAnimations = weaponAnimations;
             model.skillAnimations = skillAnimations;

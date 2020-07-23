@@ -92,6 +92,19 @@ public static class GenericUtils
         return result;
     }
 
+    public static T GetOrAddComponent<T>(this GameObject gameObject, System.Action<T> onAddComponent) where T : Component
+    {
+        if (gameObject == null)
+            return null;
+        T result = gameObject.GetComponent<T>();
+        if (result == null)
+        {
+            result = gameObject.AddComponent<T>();
+            onAddComponent.Invoke(result);
+        }
+        return result;
+    }
+
     public static void RemoveChildren(this Transform transform)
     {
         if (transform == null)

@@ -58,9 +58,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheCharacterHotkeySelectionManager == null)
-                    cacheCharacterHotkeySelectionManager = GetComponent<UICharacterHotkeySelectionManager>();
-                if (cacheCharacterHotkeySelectionManager == null)
-                    cacheCharacterHotkeySelectionManager = gameObject.AddComponent<UICharacterHotkeySelectionManager>();
+                    cacheCharacterHotkeySelectionManager = gameObject.GetOrAddComponent<UICharacterHotkeySelectionManager>();
                 cacheCharacterHotkeySelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheCharacterHotkeySelectionManager;
             }

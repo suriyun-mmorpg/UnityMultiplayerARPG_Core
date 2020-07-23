@@ -36,13 +36,9 @@ namespace MultiplayerARPG
         public override void EntityAwake()
         {
             // Prepare network transform component
-            CacheNetTransform = GetComponent<LiteNetLibTransform>();
-            if (CacheNetTransform == null)
-                CacheNetTransform = gameObject.AddComponent<LiteNetLibTransform>();
+            CacheNetTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
             // Prepare rigidbody component
-            CacheRigidbody2D = GetComponent<Rigidbody2D>();
-            if (CacheRigidbody2D == null)
-                CacheRigidbody2D = gameObject.AddComponent<Rigidbody2D>();
+            CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
             // Setup
             CacheRigidbody2D.gravityScale = 0;
             StopMove();
