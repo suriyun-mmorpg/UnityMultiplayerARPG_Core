@@ -11,6 +11,7 @@ namespace MultiplayerARPG
     public class GameArea : MonoBehaviour
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
+        public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
         public Color gizmosColor = Color.magenta;
@@ -33,25 +34,24 @@ namespace MultiplayerARPG
                     switch (type)
                     {
                         case GameAreaType.Radius:
-                            randomedPosition = Random.insideUnitSphere * randomRadius;
+                            randomedPosition += new Vector3(Random.Range(-1f, 1f) * randomRadius, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * randomRadius);
                             break;
                         case GameAreaType.Square:
-                            randomedPosition = new Vector3(Random.Range(-squareSizeX * 0.5f, squareSizeX * 0.5f), 0, Random.Range(-squareSizeZ * 0.5f, squareSizeZ * 0.5f));
+                            randomedPosition += new Vector3(Random.Range(-0.5f, 0.5f) * squareSizeX, GROUND_DETECTION_Y_OFFSETS, Random.Range(-0.5f, 0.5f) * squareSizeZ);
                             break;
                     }
-                    randomedPosition = PhysicUtils.FindGroundedPosition(transform.position + new Vector3(randomedPosition.x, 0, randomedPosition.z), findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GroundLayerMask);
+                    randomedPosition = PhysicUtils.FindGroundedPosition(randomedPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GroundLayerMask);
                     break;
                 case DimensionType.Dimension2D:
                     switch (type)
                     {
                         case GameAreaType.Radius:
-                            randomedPosition = Random.insideUnitCircle * randomRadius;
+                            randomedPosition += new Vector3(Random.Range(-1f, 1f) * randomRadius, Random.Range(-1f, 1f) * randomRadius);
                             break;
                         case GameAreaType.Square:
-                            randomedPosition = new Vector3(Random.Range(-squareSizeX * 0.5f, squareSizeX * 0.5f), Random.Range(-squareSizeZ * 0.5f, squareSizeZ * 0.5f));
+                            randomedPosition += new Vector3(Random.Range(-0.5f, 0.5f) * squareSizeX, Random.Range(-0.5f, 0.5f) * squareSizeZ);
                             break;
                     }
-                    randomedPosition = transform.position + new Vector3(randomedPosition.x, randomedPosition.y);
                     break;
             }
 

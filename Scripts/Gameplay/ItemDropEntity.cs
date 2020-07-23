@@ -10,6 +10,7 @@ namespace MultiplayerARPG
     public class ItemDropEntity : BaseGameEntity
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
+        public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
         [Header("Generic settings")]
@@ -253,15 +254,15 @@ namespace MultiplayerARPG
             Quaternion dropRotation = Quaternion.identity;
             switch (gameInstance.DimensionType)
             {
-                case DimensionType.Dimension2D:
-                    // Random position around character
-                    dropPosition = dropPosition + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
-                    break;
                 case DimensionType.Dimension3D:
-                    // Random position around character
-                    dropPosition = dropPosition + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+                    // Random position around dropper with its height
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * gameInstance.dropDistance);
                     // Random rotation
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
+                    break;
+                case DimensionType.Dimension2D:
+                    // Random position around dropper
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
                     break;
             }
             return DropItem(dropPosition, dropRotation, dropData, looters);
