@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             get { return ItemType.Skill; }
         }
 
+        [Header("Skill Configs")]
         [SerializeField]
         private BaseSkill usingSkill;
         public BaseSkill UsingSkill

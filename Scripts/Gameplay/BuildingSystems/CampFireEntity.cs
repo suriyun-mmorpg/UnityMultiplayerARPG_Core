@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 {
     public class CampFireEntity : StorageEntity
     {
-        [Header("Campfire data")]
+        [Header("Campfire Settings")]
         public ConvertItem[] convertItems;
         public UnityEvent onInitialTurnOn;
         public UnityEvent onInitialTurnOff;

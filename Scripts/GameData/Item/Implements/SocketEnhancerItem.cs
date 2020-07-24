@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Socket Enhancer Item", menuName = "Create GameData/Item/Socket Enhancer Item", order = -4880)]
+    [CreateAssetMenu(fileName = "Socket Enhancer Item", menuName = "Create GameData/Item/Socket Enhancer Item", order = -4881)]
     public partial class SocketEnhancerItem : BaseItem, ISocketEnhancerItem
     {
         public override string TypeTitle
@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             get { return ItemType.SocketEnhancer; }
         }
 
+        [Header("Socket Enhancer Configs")]
         [SerializeField]
         private EquipmentBonus socketEnhanceEffect;
         public EquipmentBonus SocketEnhanceEffect

@@ -823,6 +823,7 @@ namespace MultiplayerARPG
             }
             else if (pickupItemInput.IsPress)
             {
+                Debug.LogError("Pick");
                 // Find for item to pick up
                 if (SelectedEntity != null && SelectedEntity is ItemDropEntity)
                     PlayerCharacterEntity.RequestPickupItem(SelectedEntity.ObjectId);

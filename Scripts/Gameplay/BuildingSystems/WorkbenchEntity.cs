@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public class WorkbenchEntity : BuildingEntity
     {
-        [Header("Workbench data")]
+        [Header("Workbench Settings")]
         public ItemCraft[] itemCrafts;
         public override bool Activatable { get { return true; } }
 

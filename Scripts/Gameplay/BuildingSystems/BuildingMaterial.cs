@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         private Material[] defaultMaterials;
         private Color defaultColor;
 
-        [Header("Materials settings (for 3D)")]
+        [Header("Materials Settings (for 3D)")]
         public Material[] canBuildMaterials;
         public Material[] cannotBuildMaterials;
 

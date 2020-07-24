@@ -13,18 +13,18 @@ namespace MultiplayerARPG
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
-        [Header("Generic settings")]
-        [Header("Monster Character Settings")]
+        [Header("Placeholder Settings")]
+        [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
+        [SerializeField]
+        protected Transform modelContainer;
+        [Header("Place On Scene Settings")]
         [Tooltip("The title which will be used with item drop entity which placed into the scene (not drops from characters)")]
         [SerializeField]
         protected string itemTitle;
         [Tooltip("Item titles by language keys")]
         [SerializeField]
         protected LanguageData[] itemTitles;
-        [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
-        [SerializeField]
-        protected Transform modelContainer;
-        [Header("Respawn settings")]
+        [Header("Respawn Settings")]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
         [SerializeField]
         protected float destroyDelay = 0f;
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         protected float destroyRespawnDelay = 5f;
         [SerializeField]
         protected UnityEvent onItemDropDestroy;
-        [Header("Drop items settings")]
+        [Header("Drop Settings")]
         [Tooltip("Max kind of items that will be dropped in ground")]
         [SerializeField]
         protected byte maxDropItems = 5;

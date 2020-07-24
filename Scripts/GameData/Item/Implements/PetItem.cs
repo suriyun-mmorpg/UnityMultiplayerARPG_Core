@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             get { return ItemType.Pet; }
         }
 
+        [Header("Pet Configs")]
         [SerializeField]
         private BaseMonsterCharacterEntity petEntity;
         public BaseMonsterCharacterEntity PetEntity

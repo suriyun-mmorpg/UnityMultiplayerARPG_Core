@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             get { return ItemType.Building; }
         }
 
+        [Header("Building Configs")]
         [SerializeField]
         private BuildingEntity buildingEntity;
         public BuildingEntity BuildingEntity

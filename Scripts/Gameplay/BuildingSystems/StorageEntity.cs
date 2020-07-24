@@ -9,7 +9,7 @@ namespace MultiplayerARPG
 {
     public class StorageEntity : BuildingEntity
     {
-        [Header("Storage data")]
+        [Header("Storage Settings")]
         public Storage storage;
         public bool lockable;
         public UnityEvent onInitialOpen;

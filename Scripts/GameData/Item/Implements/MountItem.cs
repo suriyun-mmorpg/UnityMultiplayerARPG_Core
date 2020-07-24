@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             get { return ItemType.Mount; }
         }
 
+        [Header("Mount Configs")]
         [SerializeField]
         private VehicleEntity mountEntity;
         public VehicleEntity MountEntity

@@ -9,7 +9,7 @@ namespace MultiplayerARPG
 {
     public class DoorEntity : BuildingEntity
     {
-        [Header("Door data")]
+        [Header("Door Settings")]
         public bool lockable;
         public UnityEvent onInitialOpen;
         public UnityEvent onInitialClose;

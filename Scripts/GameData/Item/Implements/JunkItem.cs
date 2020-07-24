@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Junk Item", menuName = "Create GameData/Item/Junk Item", order = -4881)]
+    [CreateAssetMenu(fileName = "Junk Item", menuName = "Create GameData/Item/Junk Item", order = -4890)]
     public partial class JunkItem : BaseItem
     {
         public override string TypeTitle
