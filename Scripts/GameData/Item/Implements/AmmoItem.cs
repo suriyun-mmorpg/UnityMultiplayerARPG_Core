@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Socket Enhancer Item", menuName = "Create GameData/Item/Socket Enhancer Item", order = -4880)]
+    [CreateAssetMenu(fileName = "Ammo Item", menuName = "Create GameData/Item/Ammo Item", order = -4880)]
     public class AmmoItem : BaseItem, IAmmoItem
     {
         public override string TypeTitle
@@ -14,9 +14,10 @@ namespace MultiplayerARPG
 
         public override ItemType ItemType
         {
-            get { return ItemType.Armor; }
+            get { return ItemType.Ammo; }
         }
 
+        [Header("Ammo Configs")]
         [SerializeField]
         private AmmoType ammoType;
         public AmmoType AmmoType
