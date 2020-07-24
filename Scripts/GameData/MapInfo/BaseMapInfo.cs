@@ -15,9 +15,9 @@ namespace MultiplayerARPG
         [SerializeField]
         private float deadY = -100f;
 
-        public UnityScene Scene { get { return scene; } }
-        public Vector3 StartPosition { get { return startPosition; } }
-        public float DeadY { get { return deadY; } }
+        public virtual UnityScene Scene { get { return scene; } }
+        public virtual Vector3 StartPosition { get { return startPosition; } }
+        public virtual float DeadY { get { return deadY; } }
 
         public virtual void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position)
         {
