@@ -104,19 +104,19 @@ namespace MultiplayerARPG
                 }
             }
 
-            InitialEventToUIs<UICharacter, UIOwningCharacter>(uiCharacters);
-            InitialEventToUIs<UIEquipItems, UIOwningEquipItems>(uiCharacterEquipItems);
-            InitialEventToUIs<UINonEquipItems, UIOwningNonEquipItems>(uiCharacterNonEquipItems);
-            InitialEventToUIs<UICharacterSkills, UIOwningSkills>(uiCharacterSkills);
-            InitialEventToUIs<UICharacterSummons, UIOwningSummons>(uiCharacterSummons);
-            InitialEventToUIs<UICharacterHotkeys, UIOwningHotkeys>(uiCharacterHotkeys);
-            InitialEventToUIs<UICharacterQuests, UIOwningQuests>(uiCharacterQuests);
-            InitialEventToUI<UIAmmoAmount, UIOwningAmmoAmount>(uiAmmoAmount);
+            RegisterEventToUIs<UICharacter, UIOwningCharacter>(uiCharacters);
+            RegisterEventToUIs<UIEquipItems, UIOwningEquipItems>(uiCharacterEquipItems);
+            RegisterEventToUIs<UINonEquipItems, UIOwningNonEquipItems>(uiCharacterNonEquipItems);
+            RegisterEventToUIs<UICharacterSkills, UIOwningSkills>(uiCharacterSkills);
+            RegisterEventToUIs<UICharacterSummons, UIOwningSummons>(uiCharacterSummons);
+            RegisterEventToUIs<UICharacterHotkeys, UIOwningHotkeys>(uiCharacterHotkeys);
+            RegisterEventToUIs<UICharacterQuests, UIOwningQuests>(uiCharacterQuests);
+            RegisterEventToUI<UIAmmoAmount, UIOwningAmmoAmount>(uiAmmoAmount);
 
             this.InvokeInstanceDevExtMethods("Awake");
         }
 
-        protected void InitialEventToUIs<TUI, TEvent>(TUI[] uis)
+        protected void RegisterEventToUIs<TUI, TEvent>(TUI[] uis)
             where TUI : UIBase
             where TEvent : Component
         {
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void InitialEventToUI<TUI, TEvent>(TUI ui)
+        protected void RegisterEventToUI<TUI, TEvent>(TUI ui)
             where TUI : UIBase
             where TEvent : Component
         {
