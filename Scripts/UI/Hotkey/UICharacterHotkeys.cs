@@ -6,9 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterHotkeys : UIBase
     {
-        public const string HOTKEY_AXIS_X = "HotkeyAxisX";
-        public const string HOTKEY_AXIS_Y = "HotkeyAxisY";
-
         public IPlayerCharacterData character { get; protected set; }
         public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Building, ItemType.Pet, ItemType.Mount, ItemType.Skill };
         public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active, SkillType.CraftItem };
@@ -40,7 +37,7 @@ namespace MultiplayerARPG
                 return otherHotkey;
             }
         }
-        private static readonly List<UICharacterHotkeyJoystickEventHandler> hotkeyJoysticks = new List<UICharacterHotkeyJoystickEventHandler>();
+        private static readonly List<IHotkeyJoystickEventHandler> hotkeyJoysticks = new List<IHotkeyJoystickEventHandler>();
 
         private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys;
         public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
@@ -179,7 +176,7 @@ namespace MultiplayerARPG
                 if (hotkeyJoysticks[i] == null)
                     continue;
                 hotkeyJoysticks[i].UpdateEvent();
-                if (UsingHotkey == hotkeyJoysticks[i].CacheHotkey)
+                if (UsingHotkey == hotkeyJoysticks[i].UICharacterHotkey)
                     HotkeyAimPosition = hotkeyJoysticks[i].AimPosition;
                 if (hotkeyJoysticks[i].IsDragging)
                     isAnyHotkeyJoyStickDragging = true;
@@ -205,7 +202,7 @@ namespace MultiplayerARPG
             HotkeyAimPosition = null;
         }
 
-        public void RegisterHotkeyJoystick(UICharacterHotkeyJoystickEventHandler hotkeyJoystick)
+        public void RegisterHotkeyJoystick(IHotkeyJoystickEventHandler hotkeyJoystick)
         {
             if (!hotkeyJoysticks.Contains(hotkeyJoystick))
                 hotkeyJoysticks.Add(hotkeyJoystick);
@@ -213,7 +210,7 @@ namespace MultiplayerARPG
 
         public static bool IsAnyHotkeyJoyStickDragging()
         {
-            foreach (UICharacterHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
+            foreach (IHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
             {
                 if (hotkeyJoystick == null)
                     continue;

@@ -1,38 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UICharacterHotkey))]
-    public class UICharacterHotkeyJoystickEventHandler : MonoBehaviour
+    public class UICharacterHotkeyJoystickEventHandler : MonoBehaviour, IHotkeyJoystickEventHandler
     {
-        public static readonly List<UICharacterHotkeyJoystickEventHandler> Joysticks = new List<UICharacterHotkeyJoystickEventHandler>();
-        public UICharacterHotkey CacheHotkey { get; private set; }
+        public const string HOTKEY_AXIS_X = "HotkeyAxisX";
+        public const string HOTKEY_AXIS_Y = "HotkeyAxisY";
+        public UICharacterHotkey UICharacterHotkey { get; private set; }
         private MobileMovementJoystick joystick;
         private string hotkeyAxisNameX;
         private string hotkeyAxisNameY;
         private RectTransform hotkeyCancelArea;
         private Vector2 hotkeyAxes;
         private bool hotkeyCancel;
-        public bool Interactable { get { return CacheHotkey.IsAssigned(); } }
+        public bool Interactable { get { return UICharacterHotkey.IsAssigned(); } }
         public bool IsDragging { get; private set; }
         public Vector3? AimPosition { get; private set; }
 
         private void Start()
         {
-            CacheHotkey = GetComponent<UICharacterHotkey>();
-            joystick = Instantiate(CacheHotkey.UICharacterHotkeys.hotkeyAimJoyStickPrefab, CacheHotkey.transform.parent);
+            UICharacterHotkey = GetComponent<UICharacterHotkey>();
+            joystick = Instantiate(UICharacterHotkey.UICharacterHotkeys.hotkeyAimJoyStickPrefab, UICharacterHotkey.transform.parent);
             joystick.gameObject.SetActive(true);
-            joystick.transform.localPosition = CacheHotkey.transform.localPosition;
-            joystick.axisXName = hotkeyAxisNameX = UICharacterHotkeys.HOTKEY_AXIS_X + "_" + CacheHotkey.hotkeyId;
-            joystick.axisYName = hotkeyAxisNameY = UICharacterHotkeys.HOTKEY_AXIS_Y + "_" + CacheHotkey.hotkeyId;
+            joystick.transform.localPosition = UICharacterHotkey.transform.localPosition;
+            joystick.axisXName = hotkeyAxisNameX = HOTKEY_AXIS_X + "_" + UICharacterHotkey.hotkeyId;
+            joystick.axisYName = hotkeyAxisNameY = HOTKEY_AXIS_Y + "_" + UICharacterHotkey.hotkeyId;
             joystick.SetAsLastSiblingOnDrag = true;
             joystick.HideWhileIdle = true;
             joystick.Interactable = true;
-            CacheHotkey.UICharacterHotkeys.RegisterHotkeyJoystick(this);
-            hotkeyCancelArea = CacheHotkey.UICharacterHotkeys.hotkeyCancelArea;
+            UICharacterHotkey.UICharacterHotkeys.RegisterHotkeyJoystick(this);
+            hotkeyCancelArea = UICharacterHotkey.UICharacterHotkeys.hotkeyCancelArea;
         }
 
         public void UpdateEvent()
@@ -41,14 +41,14 @@ namespace MultiplayerARPG
 
             if (!IsDragging && joystick.IsDragging)
             {
-                UICharacterHotkeys.SetUsingHotkey(CacheHotkey);
+                UICharacterHotkeys.SetUsingHotkey(UICharacterHotkey);
                 IsDragging = true;
             }
 
             // Can dragging only 1 hotkey each time, so check with latest dragging hotkey
             // If it's not this hotkey then set dragging state to false 
             // To check joystick's started dragging state next time
-            if (UICharacterHotkeys.UsingHotkey != CacheHotkey)
+            if (UICharacterHotkeys.UsingHotkey != UICharacterHotkey)
             {
                 IsDragging = false;
                 return;
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
 
             if (IsDragging && joystick.IsDragging)
             {
-                AimPosition = CacheHotkey.UpdateAimControls(hotkeyAxes);
+                AimPosition = UICharacterHotkey.UpdateAimControls(hotkeyAxes);
             }
 
             if (IsDragging && !joystick.IsDragging)
