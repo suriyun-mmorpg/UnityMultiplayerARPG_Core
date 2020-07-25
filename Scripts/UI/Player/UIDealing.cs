@@ -82,6 +82,29 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            UpdateData();
+            BasePlayerCharacterController.OwningCharacter.onUpdateDealingState += UpdateDealingState;
+            BasePlayerCharacterController.OwningCharacter.onUpdateDealingGold += UpdateDealingGold;
+            BasePlayerCharacterController.OwningCharacter.onUpdateDealingItems += UpdateDealingItems;
+            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingState += UpdateAnotherDealingState;
+            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingGold += UpdateAnotherDealingGold;
+            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingItems += UpdateAnotherDealingItems;
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            BasePlayerCharacterController.OwningCharacter.onUpdateDealingState -= UpdateDealingState;
+            BasePlayerCharacterController.OwningCharacter.onUpdateDealingGold -= UpdateDealingGold;
+            BasePlayerCharacterController.OwningCharacter.onUpdateDealingItems -= UpdateDealingItems;
+            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingState -= UpdateAnotherDealingState;
+            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingGold -= UpdateAnotherDealingGold;
+            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingItems -= UpdateAnotherDealingItems;
+        }
+
         public override void Show()
         {
             CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
@@ -143,7 +166,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             BasePlayerCharacterEntity anotherCharacter = Data;
 
             if (uiAnotherCharacter != null)
