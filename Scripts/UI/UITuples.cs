@@ -37,11 +37,11 @@ namespace MultiplayerARPG
         }
     }
 
-    public struct UICharacterItemByIndexData
+    public struct UIOwningCharacterItemData
     {
         public InventoryType inventoryType;
         public int indexOfData;
-        public UICharacterItemByIndexData(InventoryType inventoryType, int indexOfData)
+        public UIOwningCharacterItemData(InventoryType inventoryType, int indexOfData)
         {
             this.inventoryType = inventoryType;
             this.indexOfData = indexOfData;
