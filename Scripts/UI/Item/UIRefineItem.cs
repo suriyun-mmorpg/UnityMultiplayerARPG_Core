@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public partial class UIRefineItem : BaseUICharacterItemByIndex
+    public partial class UIRefineItem : UIBaseOwningCharacterItem
     {
         public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public bool CanRefine { get; private set; }
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public void OnUpdateCharacterItems()
+        public override void OnUpdateCharacterItems()
         {
             if (!IsVisible())
                 return;
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
-                Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+                Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
                 return;
             }
 
@@ -167,7 +167,7 @@ namespace MultiplayerARPG
         public override void Hide()
         {
             base.Hide();
-            Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+            Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
         }
 
         public void OnClickRefine()

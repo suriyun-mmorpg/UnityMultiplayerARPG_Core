@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-	public abstract class BaseUICharacterItemByIndex : UISelectionEntry<UICharacterItemByIndexData>
+	public abstract class UIBaseOwningCharacterItem : UISelectionEntry<UIOwningCharacterItemData>
 	{
         public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
 		public InventoryType InventoryType { get { return Data.inventoryType; } }
@@ -37,7 +38,45 @@ namespace MultiplayerARPG
         public UICharacterItem uiCharacterItem;
         [Tooltip("These objects will be activated while item is not set")]
         public GameObject[] noItemObjects;
-        
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
+            OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
+            OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+        }
+
+        protected void OnEquipWeaponSetChange(byte equipWeaponSet)
+        {
+            OnUpdateCharacterItems();
+        }
+
+        protected void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            OnUpdateCharacterItems();
+        }
+
+        protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            OnUpdateCharacterItems();
+        }
+
+        protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            OnUpdateCharacterItems();
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -67,5 +106,8 @@ namespace MultiplayerARPG
                 }
             }
         }
-	}
+
+        public abstract void OnUpdateCharacterItems();
+
+    }
 }

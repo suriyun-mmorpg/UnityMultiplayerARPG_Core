@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class UIDismantleItem : BaseUICharacterItemByIndex
+    public partial class UIDismantleItem : UIBaseOwningCharacterItem
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Return Gold Amount}")]
@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         protected bool activated;
         protected string activeItemId;
 
-        public void OnUpdateCharacterItems()
+        public override void OnUpdateCharacterItems()
         {
             if (!IsVisible())
                 return;
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
-                Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+                Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
                 return;
             }
 
@@ -96,7 +96,7 @@ namespace MultiplayerARPG
         public override void Hide()
         {
             base.Hide();
-            Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+            Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
         }
 
         public void OnClickDismantle()

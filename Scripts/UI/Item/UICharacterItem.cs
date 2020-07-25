@@ -593,7 +593,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRefineItem.Show();
-                    uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
+                    uiRefineItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData);
                 }
             }
 
@@ -606,7 +606,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiDismantleItem.Show();
-                    uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
+                    uiDismantleItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData);
                 }
             }
 
@@ -619,7 +619,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRepairItem.Show();
-                    uiRepairItem.Data = new UICharacterItemByIndexData(InventoryType, IndexOfData);
+                    uiRepairItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData);
                 }
             }
 

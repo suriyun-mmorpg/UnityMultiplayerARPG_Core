@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public partial class UIRepairItem : BaseUICharacterItemByIndex
+    public partial class UIRepairItem : UIBaseOwningCharacterItem
     {
         public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public bool CanRepair { get; private set; }
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         protected bool activated;
         protected string activeItemId;
 
-        public void OnUpdateCharacterItems()
+        public override void OnUpdateCharacterItems()
         {
             if (!IsVisible())
                 return;
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
-                Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+                Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
                 return;
             }
 
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
         public override void Hide()
         {
             base.Hide();
-            Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+            Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
         }
 
         public void OnClickRepair()
