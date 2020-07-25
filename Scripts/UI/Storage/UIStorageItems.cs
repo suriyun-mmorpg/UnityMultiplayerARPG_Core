@@ -53,6 +53,22 @@ namespace MultiplayerARPG
         public float TotalWeight { get; private set; }
         public short UsedSlots { get; private set; }
 
+        private void OnEnable()
+        {
+            UpdateData();
+            BasePlayerCharacterController.OwningCharacter.onStorageItemsChange += OnStorageItemsChange;
+        }
+
+        private void OnDisable()
+        {
+            BasePlayerCharacterController.OwningCharacter.onStorageItemsChange -= OnStorageItemsChange;
+        }
+
+        private void OnStorageItemsChange(CharacterItem[] storageItems)
+        {
+            UpdateData();
+        }
+
         public override void Show()
         {
             CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
