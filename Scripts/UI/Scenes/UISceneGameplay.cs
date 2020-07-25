@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using LiteNetLibManager;
+using UnityEngine.UIElements;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -73,15 +74,6 @@ namespace MultiplayerARPG
         public UnityEvent onCharacterDead;
         public UnityEvent onCharacterRespawn;
 
-        public System.Action<BasePlayerCharacterEntity> onUpdateCharacter;
-        public System.Action<BasePlayerCharacterEntity> onUpdateEquipItems;
-        public System.Action<BasePlayerCharacterEntity> onUpdateEquipWeapons;
-        public System.Action<BasePlayerCharacterEntity> onUpdateNonEquipItems;
-        public System.Action<BasePlayerCharacterEntity> onUpdateSkills;
-        public System.Action<BasePlayerCharacterEntity> onUpdateSummons;
-        public System.Action<BasePlayerCharacterEntity> onUpdateHotkeys;
-        public System.Action<BasePlayerCharacterEntity> onUpdateQuests;
-        public System.Action<BasePlayerCharacterEntity> onUpdateStorageItems;
         public System.Action<BuildingEntity> onShowConstructBuildingDialog;
         public System.Action onHideConstructBuildingDialog;
         public System.Action<BuildingEntity> onShowCurrentBuildingDialog;
@@ -112,7 +104,40 @@ namespace MultiplayerARPG
                     ui.gameObject.AddComponent<UIBlockController>();
                 }
             }
+
+            InitialEventToUIs<UICharacter, UIOwningCharacter>(uiCharacters);
+            InitialEventToUIs<UIEquipItems, UIOwningEquipItems>(uiCharacterEquipItems);
+            InitialEventToUIs<UINonEquipItems, UIOwningNonEquipItems>(uiCharacterNonEquipItems);
+            InitialEventToUIs<UICharacterSkills, UIOwningSkills>(uiCharacterSkills);
+            InitialEventToUIs<UICharacterSummons, UIOwningSummons>(uiCharacterSummons);
+            InitialEventToUIs<UICharacterHotkeys, UIOwningHotkeys>(uiCharacterHotkeys);
+            InitialEventToUIs<UICharacterQuests, UIOwningQuests>(uiCharacterQuests);
+            InitialEventToUI<UIAmmoAmount, UIOwningAmmoAmount>(uiAmmoAmount);
+
             this.InvokeInstanceDevExtMethods("Awake");
+        }
+
+        protected void InitialEventToUIs<TUI, TEvent>(TUI[] uis)
+            where TUI : UIBase
+            where TEvent : Component
+        {
+            if (uis != null && uis.Length > 0)
+            {
+                for (int i = 0; i < uis.Length; ++i)
+                {
+                    uis[i].gameObject.GetOrAddComponent<TEvent>();
+                }
+            }
+        }
+
+        protected void InitialEventToUI<TUI, TEvent>(TUI ui)
+            where TUI : UIBase
+            where TEvent : Component
+        {
+            if (ui != null)
+            {
+                ui.gameObject.GetOrAddComponent<TEvent>();
+            }
         }
 
         protected void OnDestroy()
@@ -135,165 +160,6 @@ namespace MultiplayerARPG
                     ui.Toggle();
                 }
             }
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character UIs when owning character data updated
-        /// </summary>
-        public void UpdateCharacter()
-        {
-            foreach (UICharacter ui in uiCharacters)
-            {
-                if (ui != null)
-                    ui.Data = BasePlayerCharacterController.OwningCharacter;
-            }
-            if (onUpdateCharacter != null)
-                onUpdateCharacter.Invoke(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character equip items UIs when owning character equip items updated
-        /// </summary>
-        public void UpdateEquipItems()
-        {
-            foreach (UIEquipItems ui in uiCharacterEquipItems)
-            {
-                if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
-            }
-            if (onUpdateEquipItems != null)
-                onUpdateEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character equip weapons UIs when owning character equip weapons updated
-        /// </summary>
-        public void UpdateEquipWeapons()
-        {
-            if (onUpdateEquipWeapons != null)
-                onUpdateEquipWeapons.Invoke(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character non equip items UIs when owning character non equip items updated
-        /// </summary>
-        public void UpdateNonEquipItems()
-        {
-            foreach (UINonEquipItems ui in uiCharacterNonEquipItems)
-            {
-                if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
-            }
-            if (onUpdateNonEquipItems != null)
-                onUpdateNonEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class
-        /// To update activating item UIs 
-        /// </summary>
-        public void UpdateActivatingItem()
-        {
-            if (uiRefineItem != null)
-                uiRefineItem.OnUpdateCharacterItems();
-            if (uiDismantleItem != null)
-                uiDismantleItem.OnUpdateCharacterItems();
-            if (uiRepairItem != null)
-                uiRepairItem.OnUpdateCharacterItems();
-            if (uiEnhanceSocketItem != null)
-                uiEnhanceSocketItem.OnUpdateCharacterItems();
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class
-        /// To update ammo amount UIs 
-        /// </summary>
-        public void UpdateAmmoAmount()
-        {
-            if (uiAmmoAmount != null)
-                uiAmmoAmount.UpdateData(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character skills UIs when owning character skills updated
-        /// </summary>
-        public void UpdateSkills()
-        {
-            foreach (UICharacterSkills ui in uiCharacterSkills)
-            {
-                if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
-            }
-            if (onUpdateSkills != null)
-                onUpdateSkills.Invoke(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character summons UIs when owning character summons updated
-        /// </summary>
-        public void UpdateSummons()
-        {
-            foreach (UICharacterSummons ui in uiCharacterSummons)
-            {
-                if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
-            }
-            if (onUpdateSummons != null)
-                onUpdateSummons.Invoke(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character hotkeys UIs when owning character hotkeys updated
-        /// </summary>
-        public void UpdateHotkeys()
-        {
-            foreach (UICharacterHotkeys ui in uiCharacterHotkeys)
-            {
-                if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
-            }
-            if (onUpdateHotkeys != null)
-                onUpdateHotkeys.Invoke(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character quests UIs when owning character quests updated
-        /// </summary>
-        public void UpdateQuests()
-        {
-            foreach (UICharacterQuests ui in uiCharacterQuests)
-            {
-                if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
-            }
-            if (onUpdateQuests != null)
-                onUpdateQuests.Invoke(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        /// <summary>
-        /// This will be called from `BasePlayerCharacterController` class 
-        /// To update character storage items UIs when owning character storage items updated
-        /// </summary>
-        public void UpdateStorageItems()
-        {
-            if (uiPlayerStorageItems != null)
-                uiPlayerStorageItems.UpdateData();
-            if (uiGuildStorageItems != null)
-                uiGuildStorageItems.UpdateData();
-            if (uiBuildingStorageItems != null)
-                uiBuildingStorageItems.UpdateData();
-            if (uiBuildingCampfireItems != null)
-                uiBuildingCampfireItems.UpdateData();
-            if (onUpdateStorageItems != null)
-                onUpdateStorageItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         /// <summary>
@@ -467,7 +333,7 @@ namespace MultiplayerARPG
             if (uiRefineItem == null)
                 return;
             // Don't select any item yet, wait player to select the item
-            uiRefineItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+            uiRefineItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
             uiRefineItem.Show();
             AddNpcDialog(uiRefineItem);
         }
@@ -477,7 +343,7 @@ namespace MultiplayerARPG
             if (uiDismantleItem == null)
                 return;
             // Don't select any item yet, wait player to select the item
-            uiDismantleItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+            uiDismantleItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
             uiDismantleItem.Show();
             AddNpcDialog(uiDismantleItem);
         }
@@ -487,7 +353,7 @@ namespace MultiplayerARPG
             if (uiRepairItem == null)
                 return;
             // Don't select any item yet, wait player to select the item
-            uiRepairItem.Data = new UICharacterItemByIndexData(InventoryType.NonEquipItems, -1);
+            uiRepairItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
             uiRepairItem.Show();
             AddNpcDialog(uiRepairItem);
         }
@@ -506,48 +372,6 @@ namespace MultiplayerARPG
                 return;
             uiDealing.Data = playerCharacter;
             uiDealing.Show();
-        }
-
-        public void OnUpdateDealingState(DealingState state)
-        {
-            if (uiDealing == null)
-                return;
-            uiDealing.UpdateDealingState(state);
-        }
-
-        public void OnUpdateAnotherDealingState(DealingState state)
-        {
-            if (uiDealing == null)
-                return;
-            uiDealing.UpdateAnotherDealingState(state);
-        }
-
-        public void OnUpdateDealingGold(int gold)
-        {
-            if (uiDealing == null)
-                return;
-            uiDealing.UpdateDealingGold(gold);
-        }
-
-        public void OnUpdateAnotherDealingGold(int gold)
-        {
-            if (uiDealing == null)
-                return;
-            uiDealing.UpdateAnotherDealingGold(gold);
-        }
-
-        public void OnUpdateDealingItems(DealingCharacterItems items)
-        {
-            if (uiDealing == null)
-                return;
-            uiDealing.UpdateDealingItems(items);
-        }
-
-        public void OnUpdateAnotherDealingItems(DealingCharacterItems items)
-        {
-            if (uiDealing == null)
-                return;
-            uiDealing.UpdateAnotherDealingItems(items);
         }
 
         public void OnShowPartyInvitation(BasePlayerCharacterEntity playerCharacter)
@@ -779,7 +603,7 @@ namespace MultiplayerARPG
         {
             if (uiRefineItem == null)
                 return;
-            uiRefineItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
+            uiRefineItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData);
             uiRefineItem.Show();
         }
 
@@ -787,7 +611,7 @@ namespace MultiplayerARPG
         {
             if (uiDismantleItem == null)
                 return;
-            uiDismantleItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
+            uiDismantleItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData);
             uiDismantleItem.Show();
         }
 
@@ -795,7 +619,7 @@ namespace MultiplayerARPG
         {
             if (uiRepairItem == null)
                 return;
-            uiRepairItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
+            uiRepairItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData);
             uiRepairItem.Show();
         }
 
@@ -803,7 +627,7 @@ namespace MultiplayerARPG
         {
             if (uiEnhanceSocketItem == null)
                 return;
-            uiEnhanceSocketItem.Data = new UICharacterItemByIndexData(inventoryType, indexOfData);
+            uiEnhanceSocketItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData);
             uiEnhanceSocketItem.Show();
         }
 
@@ -831,38 +655,10 @@ namespace MultiplayerARPG
             characterEntity.onRespawn += OnCharacterRespawn;
             characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
             characterEntity.onShowDealingDialog += OnShowDealing;
-            characterEntity.onUpdateDealingState += OnUpdateDealingState;
-            characterEntity.onUpdateDealingGold += OnUpdateDealingGold;
-            characterEntity.onUpdateDealingItems += OnUpdateDealingItems;
-            characterEntity.onUpdateAnotherDealingState += OnUpdateAnotherDealingState;
-            characterEntity.onUpdateAnotherDealingGold += OnUpdateAnotherDealingGold;
-            characterEntity.onUpdateAnotherDealingItems += OnUpdateAnotherDealingItems;
             characterEntity.onShowPartyInvitationDialog += OnShowPartyInvitation;
             characterEntity.onShowGuildInvitationDialog += OnShowGuildInvitation;
             characterEntity.onShowStorage += OnShowStorage;
             characterEntity.onIsWarpingChange += OnIsWarpingChange;
-            characterEntity.onDataIdChange += OnDataIdChange;
-            characterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            characterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            characterEntity.onAttributesOperation += OnAttributesOperation;
-            characterEntity.onSkillsOperation += OnSkillsOperation;
-            characterEntity.onSummonsOperation += OnSummonsOperation;
-            characterEntity.onBuffsOperation += OnBuffsOperation;
-            characterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            characterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
-            characterEntity.onHotkeysOperation += OnHotkeysOperation;
-            characterEntity.onQuestsOperation += OnQuestsOperation;
-            characterEntity.onStorageItemsChange += OnStorageItemsChange;
-
-            UpdateCharacter();
-            UpdateSkills();
-            UpdateSummons();
-            UpdateEquipItems();
-            UpdateEquipWeapons();
-            UpdateNonEquipItems();
-            UpdateHotkeys();
-            UpdateQuests();
-            UpdateStorageItems();
         }
 
         public override void OnControllerDesetup(BasePlayerCharacterEntity characterEntity)
@@ -875,115 +671,10 @@ namespace MultiplayerARPG
             characterEntity.onRespawn -= OnCharacterRespawn;
             characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;
             characterEntity.onShowDealingDialog -= OnShowDealing;
-            characterEntity.onUpdateDealingState -= OnUpdateDealingState;
-            characterEntity.onUpdateDealingGold -= OnUpdateDealingGold;
-            characterEntity.onUpdateDealingItems -= OnUpdateDealingItems;
-            characterEntity.onUpdateAnotherDealingState -= OnUpdateAnotherDealingState;
-            characterEntity.onUpdateAnotherDealingGold -= OnUpdateAnotherDealingGold;
-            characterEntity.onUpdateAnotherDealingItems -= OnUpdateAnotherDealingItems;
             characterEntity.onShowPartyInvitationDialog -= OnShowPartyInvitation;
             characterEntity.onShowGuildInvitationDialog -= OnShowGuildInvitation;
             characterEntity.onShowStorage -= OnShowStorage;
             characterEntity.onIsWarpingChange -= OnIsWarpingChange;
-            characterEntity.onDataIdChange -= OnDataIdChange;
-            characterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            characterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            characterEntity.onAttributesOperation -= OnAttributesOperation;
-            characterEntity.onSkillsOperation -= OnSkillsOperation;
-            characterEntity.onSummonsOperation -= OnSummonsOperation;
-            characterEntity.onBuffsOperation -= OnBuffsOperation;
-            characterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-            characterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-            characterEntity.onHotkeysOperation -= OnHotkeysOperation;
-            characterEntity.onQuestsOperation -= OnQuestsOperation;
-            characterEntity.onStorageItemsChange -= OnStorageItemsChange;
         }
-
-        #region Sync data changes callback
-        protected void OnDataIdChange(int dataId)
-        {
-            UpdateCharacter();
-            UpdateSkills();
-            UpdateEquipItems();
-            UpdateNonEquipItems();
-        }
-
-        protected void OnEquipWeaponSetChange(byte equipWeaponSet)
-        {
-            UpdateCharacter();
-            UpdateEquipItems();
-            UpdateEquipWeapons();
-            UpdateActivatingItem();
-            UpdateAmmoAmount();
-            UpdateSkills();
-            UpdateHotkeys();
-        }
-
-        protected void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateCharacter();
-            UpdateEquipItems();
-            UpdateEquipWeapons();
-            UpdateActivatingItem();
-            UpdateAmmoAmount();
-            UpdateSkills();
-            UpdateHotkeys();
-        }
-
-        protected void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateCharacter();
-        }
-
-        protected void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateCharacter();
-            UpdateSkills();
-        }
-
-        protected void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateCharacter();
-            UpdateSummons();
-        }
-
-        protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateCharacter();
-        }
-
-        protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateCharacter();
-            UpdateEquipItems();
-            UpdateActivatingItem();
-            UpdateSkills();
-            UpdateHotkeys();
-        }
-
-        protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateCharacter();
-            UpdateNonEquipItems();
-            UpdateActivatingItem();
-            UpdateAmmoAmount();
-            UpdateHotkeys();
-        }
-
-        protected void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateHotkeys();
-        }
-
-        protected void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateQuests();
-        }
-
-        protected void OnStorageItemsChange(CharacterItem[] storageItems)
-        {
-            UpdateStorageItems();
-        }
-        #endregion
     }
 }
