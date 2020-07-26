@@ -280,7 +280,11 @@ namespace MultiplayerARPG
             for (int i = entities.Count - 1; i >= 0; i--)
             {
                 if (entities[i] == null)
+                {
                     entities.RemoveAt(i);
+                    if (onUpdateList != null)
+                        onUpdateList.Invoke();
+                }
             }
             for (int i = 0; i < entities.Count; i++)
             {
