@@ -6,6 +6,7 @@ public interface IBuildingSaveData
     string ParentId { get; set; }
     int EntityId { get; set; }
     int CurrentHp { get; set; }
+    float RemainsLifeTime { get; set; }
     bool IsLocked { get; set; }
     string LockPassword { get; set; }
     Vector3 Position { get; set; }

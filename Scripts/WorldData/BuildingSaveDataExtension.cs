@@ -19,13 +19,14 @@ public static partial class BuildingSaveDataExtension
         to.ParentId = from.ParentId;
         to.EntityId = from.EntityId;
         to.CurrentHp = from.CurrentHp;
-        to.Position = from.Position;
-        to.Rotation = from.Rotation;
+        to.RemainsLifeTime = from.RemainsLifeTime;
         to.IsLocked = from.IsLocked;
         to.LockPassword = from.LockPassword;
         to.CreatorId = from.CreatorId;
         to.CreatorName = from.CreatorName;
         to.ExtraData = from.ExtraData;
+        to.Position = from.Position;
+        to.Rotation = from.Rotation;
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);
         return to;
     }
@@ -36,6 +37,7 @@ public static partial class BuildingSaveDataExtension
         writer.Put(buildingSaveData.ParentId);
         writer.Put(buildingSaveData.EntityId);
         writer.Put(buildingSaveData.CurrentHp);
+        writer.Put(buildingSaveData.RemainsLifeTime);
         writer.Put(buildingSaveData.IsLocked);
         writer.Put(buildingSaveData.LockPassword);
         writer.PutVector3(buildingSaveData.Position);
@@ -53,6 +55,7 @@ public static partial class BuildingSaveDataExtension
         result.ParentId = reader.GetString();
         result.EntityId = reader.GetInt();
         result.CurrentHp = reader.GetInt();
+        result.RemainsLifeTime = reader.GetFloat();
         result.IsLocked = reader.GetBool();
         result.LockPassword = reader.GetString();
         result.Position = reader.GetVector3();

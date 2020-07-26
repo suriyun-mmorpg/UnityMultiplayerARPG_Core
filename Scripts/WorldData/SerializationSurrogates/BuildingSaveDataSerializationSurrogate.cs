@@ -13,6 +13,7 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         info.AddValue("parentId", data.parentId);
         info.AddValue("entityId", data.entityId);
         info.AddValue("currentHp", data.currentHp);
+        info.AddValue("remainsLifeTime", data.remainsLifeTime);
         info.AddValue("position", data.position);
         info.AddValue("rotation", data.rotation);
         info.AddValue("isLocked", data.isLocked);
@@ -33,6 +34,11 @@ public class BuildingSaveDataSerializationSurrogate : ISerializationSurrogate
         data.creatorId = info.GetString("creatorId");
         data.creatorName = info.GetString("creatorName");
         // TODO: Backward compatible, this will be removed in future version
+        try
+        {
+            data.remainsLifeTime = info.GetSingle("remainsLifeTime");
+        }
+        catch { }
         try
         {
             data.isLocked = info.GetBoolean("isLocked");

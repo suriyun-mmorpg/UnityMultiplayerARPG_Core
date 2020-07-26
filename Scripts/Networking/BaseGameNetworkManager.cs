@@ -1076,6 +1076,7 @@ namespace MultiplayerARPG
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;
                 buildingEntity.CurrentHp = saveData.CurrentHp;
+                buildingEntity.RemainsLifeTime = saveData.RemainsLifeTime;
                 buildingEntity.IsLocked = saveData.IsLocked;
                 buildingEntity.LockPassword = saveData.LockPassword;
                 buildingEntity.CreatorId = saveData.CreatorId;

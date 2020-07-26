@@ -21,7 +21,11 @@ namespace MultiplayerARPG
         public float buildDistance = 5f;
         [Tooltip("If this is value `TRUE`, this entity will be destroyed when its parent building entity was destroyed")]
         public bool destroyWhenParentDestroyed;
+        [Tooltip("Building's max HP. If its HP <= 0, it will be destroyed")]
         public int maxHp = 100;
+        [Tooltip("If life time is <= 0, it's unlimit lifetime")]
+        public float lifeTime = 0f;
+        [Tooltip("Items which will be dropped when building destroyed")]
         public List<ItemAmount> droppingItems;
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
         public float destroyDelay = 2f;
@@ -41,6 +45,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private SyncFieldString parentId = new SyncFieldString();
         [SerializeField]
+        private SyncFieldFloat remainsLifeTime = new SyncFieldFloat();
+        [SerializeField]
         private SyncFieldBool isLocked = new SyncFieldBool();
         [SerializeField]
         private SyncFieldString creatorId = new SyncFieldString();
@@ -57,6 +63,12 @@ namespace MultiplayerARPG
         {
             get { return parentId; }
             set { parentId.Value = value; }
+        }
+
+        public float RemainsLifeTime
+        {
+            get { return remainsLifeTime; }
+            set { remainsLifeTime.Value = value; }
         }
 
         public bool IsLocked
@@ -127,6 +139,37 @@ namespace MultiplayerARPG
 
             if (!string.IsNullOrEmpty(buildingType) && !buildingTypes.Contains(buildingType))
                 buildingTypes.Add(buildingType);
+        }
+
+        protected override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            Profiler.BeginSample("BuildingEntity - Update");
+            if (IsBuildMode)
+            {
+                if (BuildingArea != null && BuildingArea.snapBuildingObject)
+                {
+                    CacheTransform.position = BuildingArea.transform.position;
+                    CacheTransform.rotation = BuildingArea.transform.rotation;
+                }
+                bool canBuild = CanBuild();
+                foreach (BuildingMaterial buildingMaterial in buildingMaterials)
+                {
+                    if (!buildingMaterial) continue;
+                    buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
+                }
+            }
+            else
+            {
+                if (lifeTime > 0f && RemainsLifeTime > 0f)
+                {
+                    // Reduce remains life time
+                    RemainsLifeTime -= Time.deltaTime;
+                    if (RemainsLifeTime < 0)
+                        RemainsLifeTime = 0f;
+                }
+            }
+            Profiler.EndSample();
         }
 
         protected override void EntityLateUpdate()
@@ -205,27 +248,6 @@ namespace MultiplayerARPG
         {
             if (!children.Contains(buildingEntity))
                 children.Add(buildingEntity);
-        }
-
-        protected override void EntityUpdate()
-        {
-            base.EntityUpdate();
-            Profiler.BeginSample("BuildingEntity - Update");
-            if (IsBuildMode)
-            {
-                if (BuildingArea != null && BuildingArea.snapBuildingObject)
-                {
-                    CacheTransform.position = BuildingArea.transform.position;
-                    CacheTransform.rotation = BuildingArea.transform.rotation;
-                }
-                bool canBuild = CanBuild();
-                foreach (BuildingMaterial buildingMaterial in buildingMaterials)
-                {
-                    if (!buildingMaterial) continue;
-                    buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
-                }
-            }
-            Profiler.EndSample();
         }
 
         public bool CanBuild()

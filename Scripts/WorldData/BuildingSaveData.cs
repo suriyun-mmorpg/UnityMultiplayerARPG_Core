@@ -10,6 +10,7 @@ public partial struct BuildingSaveData : IBuildingSaveData, INetSerializable
     public string parentId;
     public int entityId;
     public int currentHp;
+    public float remainsLifeTime;
     public bool isLocked;
     public string lockPassword;
     public Vector3 position;
@@ -40,6 +41,12 @@ public partial struct BuildingSaveData : IBuildingSaveData, INetSerializable
     {
         get { return currentHp; }
         set { currentHp = value; }
+    }
+
+    public float RemainsLifeTime
+    {
+        get { return remainsLifeTime; }
+        set { remainsLifeTime = value; }
     }
 
     public bool IsLocked

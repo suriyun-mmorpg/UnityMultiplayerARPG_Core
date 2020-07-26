@@ -155,6 +155,7 @@ namespace MultiplayerARPG
                 buildingSaveData.ParentId = parentBuildingEntity.Id;
             buildingSaveData.EntityId = buildingEntity.EntityId;
             buildingSaveData.CurrentHp = buildingEntity.maxHp;
+            buildingSaveData.RemainsLifeTime = buildingEntity.lifeTime;
             buildingSaveData.Position = position;
             buildingSaveData.Rotation = rotation;
             buildingSaveData.CreatorId = Id;
