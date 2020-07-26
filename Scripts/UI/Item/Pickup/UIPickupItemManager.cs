@@ -1,48 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIPickupItemManager : UIBase
+    public class UIPickupItemManager : MonoBehaviour
     {
-        public UICharacterItem uiCharacterItemPrefab;
-        public Transform uiCharacterItemContainer;
-        public bool pickUpOnSelect;
-
-        private UIList cacheItemList;
-        public UIList CacheItemList
-        {
-            get
-            {
-                if (cacheItemList == null)
-                {
-                    cacheItemList = gameObject.AddComponent<UIList>();
-                    cacheItemList.uiPrefab = uiCharacterItemPrefab.gameObject;
-                    cacheItemList.uiContainer = uiCharacterItemContainer;
-                }
-                return cacheItemList;
-            }
-        }
-
-        private UICharacterItemSelectionManager cacheItemSelectionManager;
-        public UICharacterItemSelectionManager CacheItemSelectionManager
-        {
-            get
-            {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
-            }
-        }
-
+        public UIPickupItemList uiList;
+        public GameObject[] signalObjects;
         public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
             GameObject tempGameObject = new GameObject("_ItemDropEntityDetector");
             ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
             ItemDropEntityDetector.detectingRadius = GameInstance.Singleton.pickUpItemDistance;
@@ -59,30 +28,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void Show()
-        {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            base.Show();
-        }
-
-        protected void OnSelectCharacterItem(UICharacterItem ui)
-        {
-            if (ui.Data.characterItem.IsEmptySlot())
-            {
-                CacheItemSelectionManager.DeselectSelectedUI();
-                return;
-            }
-            if (pickUpOnSelect)
-                OnClickPickUpSelectedItem();
-        }
-
         private void OnUpdate()
         {
-            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
-            CacheItemSelectionManager.DeselectSelectedUI();
-            CacheItemSelectionManager.Clear();
-
+            // Prepare dropped items
             List<CharacterItem> droppedItems = new List<CharacterItem>();
             string tempEntryId;
             CharacterItem tempCharacterItem;
@@ -98,25 +46,20 @@ namespace MultiplayerARPG
                 tempCharacterItem.id = tempEntryId;
                 droppedItems.Add(tempCharacterItem);
             }
-
-            BaseItem tempItem;
-            UICharacterItem tempUiCharacterItem;
-            CacheItemList.Generate(droppedItems, (index, characterItem, ui) =>
+            // Update list
+            if (uiList != null)
+                uiList.UpdateData(droppedItems);
+            // Update signal objects
+            if (signalObjects != null && signalObjects.Length > 0)
             {
-                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
-                tempItem = characterItem.GetItem();
-                CacheItemSelectionManager.Add(tempUiCharacterItem);
-                if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
-                    tempUiCharacterItem.OnClickSelect();
-            });
-        }
-
-        public void OnClickPickUpSelectedItem()
-        {
-            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
-            if (string.IsNullOrEmpty(selectedId))
-                return;
-            BasePlayerCharacterController.OwningCharacter.RequestPickupItem(uint.Parse(selectedId));
+                foreach (GameObject signalObject in signalObjects)
+                {
+                    signalObject.SetActive(droppedItems.Count > 0);
+                }
+            }
+            // Hide list if no drop items nearby
+            if (droppedItems.Count == 0 && uiList != null && uiList.IsVisible())
+                uiList.Hide();
         }
     }
 }
