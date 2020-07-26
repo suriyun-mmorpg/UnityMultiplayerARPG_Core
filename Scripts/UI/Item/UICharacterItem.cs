@@ -171,8 +171,9 @@ namespace MultiplayerARPG
             EquipSlotIndex = equipSlotIndex;
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             lockRemainsDuration = 0f;
         }
 

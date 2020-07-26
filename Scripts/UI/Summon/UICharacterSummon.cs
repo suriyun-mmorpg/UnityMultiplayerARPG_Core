@@ -34,8 +34,9 @@ namespace MultiplayerARPG
         protected float summonRemainsDuration;
         private BaseGameData tempSummonData;
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             summonRemainsDuration = 0f;
         }
 

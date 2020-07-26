@@ -26,8 +26,9 @@ namespace MultiplayerARPG
         protected float buffRemainsDuration;
         protected BaseGameData tempGameData;
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             buffRemainsDuration = 0f;
         }
 

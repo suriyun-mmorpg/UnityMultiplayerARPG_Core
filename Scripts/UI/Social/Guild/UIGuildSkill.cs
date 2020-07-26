@@ -56,8 +56,9 @@ namespace MultiplayerARPG
 
         protected float coolDownRemainsDuration;
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             coolDownRemainsDuration = 0f;
         }
 
