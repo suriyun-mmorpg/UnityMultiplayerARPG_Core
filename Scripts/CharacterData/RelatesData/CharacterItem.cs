@@ -490,7 +490,7 @@ public class CharacterItem : INetSerializableWithElement
         newItem.exp = 0;
         newItem.lockRemainsDuration = 0f;
         newItem.ammo = 0;
-        BaseItem tempItem = null;
+        BaseItem tempItem;
         if (GameInstance.Items.TryGetValue(dataId, out tempItem) && tempItem is IEquipmentItem)
         {
             newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
