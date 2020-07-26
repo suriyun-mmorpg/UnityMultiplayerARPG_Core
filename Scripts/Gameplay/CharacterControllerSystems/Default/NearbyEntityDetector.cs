@@ -33,6 +33,8 @@ namespace MultiplayerARPG
         private SphereCollider cacheCollider;
         private CircleCollider2D cacheCollider2D;
 
+        public System.Action onUpdateList;
+
         private void Awake()
         {
             CacheTransform = transform;
@@ -88,14 +90,22 @@ namespace MultiplayerARPG
             if (excludeColliders.Contains(other))
                 return;
             if (!AddEntity(other.gameObject))
+            {
                 excludeColliders.Add(other);
+                return;
+            }
+            if (onUpdateList != null)
+                onUpdateList.Invoke();
         }
 
         private void OnTriggerExit(Collider other)
         {
             if (excludeColliders.Contains(other))
                 return;
-            RemoveEntity(other.gameObject);
+            if (!RemoveEntity(other.gameObject))
+                return;
+            if (onUpdateList != null)
+                onUpdateList.Invoke();
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -103,14 +113,22 @@ namespace MultiplayerARPG
             if (excludeCollider2Ds.Contains(other))
                 return;
             if (!AddEntity(other.gameObject))
+            {
                 excludeCollider2Ds.Add(other);
+                return;
+            }
+            if (onUpdateList != null)
+                onUpdateList.Invoke();
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
             if (excludeCollider2Ds.Contains(other))
                 return;
-            RemoveEntity(other.gameObject);
+            if (!RemoveEntity(other.gameObject))
+                return;
+            if (onUpdateList != null)
+                onUpdateList.Invoke();
         }
 
         private bool AddEntity(GameObject other)
