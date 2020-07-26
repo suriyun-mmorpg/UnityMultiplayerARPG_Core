@@ -62,24 +62,6 @@ namespace MultiplayerARPG
         public ItemDropSpawnArea SpawnArea { get; protected set; }
         public Vector3 SpawnPosition { get; protected set; }
 
-        protected int? characterDropItemId;
-        protected bool isPickedUp;
-        protected float dropTime;
-
-        [SerializeField]
-        protected SyncFieldInt itemDataId = new SyncFieldInt();
-
-        public BaseItem Item
-        {
-            get
-            {
-                BaseItem item;
-                if (GameInstance.Items.TryGetValue(itemDataId, out item))
-                    return item;
-                return null;
-            }
-        }
-
         public string ItemTitle
         {
             get { return Language.GetText(itemTitles, itemTitle); }
@@ -89,7 +71,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                BaseItem item = Item;
+                BaseItem item = PlaceHolderItem;
                 return item == null ? ItemTitle : item.Title;
             }
             set { }
@@ -104,6 +86,35 @@ namespace MultiplayerARPG
                 return modelContainer;
             }
         }
+
+        #region Placeholder item (It's actually should be other name)
+        protected CharacterItem placeHolderDropItem;
+
+        [SerializeField]
+        protected SyncFieldInt placeHolderDataId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldShort placeHolderLevel = new SyncFieldShort();
+        [SerializeField]
+        protected SyncFieldShort placeHolderAmount = new SyncFieldShort();
+
+        public BaseItem PlaceHolderItem
+        {
+            get
+            {
+                BaseItem item;
+                if (GameInstance.Items.TryGetValue(placeHolderDataId, out item))
+                    return item;
+                return null;
+            }
+        }
+        public short PlaceHolderLevel { get { return placeHolderLevel; } }
+        public short PlaceHolderAmount { get { return placeHolderAmount; } }
+        #endregion
+
+        #region State
+        protected bool isPickedUp;
+        protected float dropTime;
+        #endregion
 
         public override void PrepareRelatesData()
         {
@@ -131,12 +142,14 @@ namespace MultiplayerARPG
             if (IsServer)
             {
                 isPickedUp = false;
-                if (characterDropItemId.HasValue)
+                if (placeHolderDropItem != null)
                 {
                     // Item drop from character, so set item data id to instantiate drop model at clients
-                    if (!GameInstance.Items.ContainsKey(characterDropItemId.Value))
+                    if (!GameInstance.Items.ContainsKey(placeHolderDropItem.dataId))
                         NetworkDestroy();
-                    itemDataId.Value = characterDropItemId.Value;
+                    placeHolderDataId.Value = placeHolderDropItem.dataId;
+                    placeHolderLevel.Value = placeHolderDropItem.level;
+                    placeHolderAmount.Value = placeHolderDropItem.amount;
                     NetworkDestroy(CurrentGameInstance.itemAppearDuration);
                 }
                 else
@@ -161,8 +174,8 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            itemDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            itemDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            placeHolderDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            placeHolderDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
         public virtual void SetSpawnArea(ItemDropSpawnArea spawnArea, Vector3 spawnPosition)
@@ -174,7 +187,7 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            itemDataId.onChange += OnItemDataIdChange;
+            placeHolderDataId.onChange += OnItemDataIdChange;
             RegisterNetFunction(NetFuncOnItemDropDestroy);
             InitDropItems();
         }
@@ -188,7 +201,7 @@ namespace MultiplayerARPG
         protected override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
-            itemDataId.onChange -= OnItemDataIdChange;
+            placeHolderDataId.onChange -= OnItemDataIdChange;
         }
 
         protected virtual void OnItemDataIdChange(bool isInitial, int itemDataId)
@@ -268,7 +281,7 @@ namespace MultiplayerARPG
             return DropItem(dropPosition, dropRotation, dropData, looters);
         }
 
-        public static ItemDropEntity DropItem(Vector3 dropPosition, Quaternion dropRotation, CharacterItem dropData, IEnumerable<uint> looters = null)
+        public static ItemDropEntity DropItem(Vector3 dropPosition, Quaternion dropRotation, CharacterItem dropItem, IEnumerable<uint> looters = null)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             if (gameInstance.itemDropEntityPrefab == null)
@@ -281,9 +294,9 @@ namespace MultiplayerARPG
             }
             GameObject spawnObj = Instantiate(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();
-            itemDropEntity.DropItems = new List<CharacterItem> { dropData };
+            itemDropEntity.DropItems = new List<CharacterItem> { dropItem };
             itemDropEntity.Looters = new HashSet<uint>(looters);
-            itemDropEntity.characterDropItemId = dropData.dataId;
+            itemDropEntity.placeHolderDropItem = dropItem;
             itemDropEntity.isPickedUp = false;
             itemDropEntity.dropTime = Time.unscaledTime;
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
