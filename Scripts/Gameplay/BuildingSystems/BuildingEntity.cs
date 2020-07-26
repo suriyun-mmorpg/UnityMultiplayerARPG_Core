@@ -166,7 +166,11 @@ namespace MultiplayerARPG
                     // Reduce remains life time
                     RemainsLifeTime -= Time.deltaTime;
                     if (RemainsLifeTime < 0)
+                    {
+                        // Destroy building
                         RemainsLifeTime = 0f;
+                        Destroy();
+                    }
                 }
             }
             Profiler.EndSample();
