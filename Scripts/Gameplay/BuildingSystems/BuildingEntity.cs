@@ -161,7 +161,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (lifeTime > 0f && RemainsLifeTime > 0f)
+                if (IsServer && lifeTime > 0f && RemainsLifeTime > 0f)
                 {
                     // Reduce remains life time
                     RemainsLifeTime -= Time.deltaTime;
