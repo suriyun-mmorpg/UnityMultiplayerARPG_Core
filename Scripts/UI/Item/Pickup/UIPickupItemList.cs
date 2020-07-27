@@ -60,12 +60,10 @@ namespace MultiplayerARPG
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
-            BaseItem tempItem;
             UICharacterItem tempUiCharacterItem;
             CacheItemList.Generate(droppedItems, (index, characterItem, ui) =>
             {
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
-                tempItem = characterItem.GetItem();
                 tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), null, -1);
                 tempUiCharacterItem.Show();
                 CacheItemSelectionManager.Add(tempUiCharacterItem);
