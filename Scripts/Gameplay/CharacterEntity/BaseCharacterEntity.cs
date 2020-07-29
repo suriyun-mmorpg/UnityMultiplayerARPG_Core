@@ -405,6 +405,8 @@ namespace MultiplayerARPG
             CurrentStamina = this.GetCaches().MaxStamina;
             CurrentFood = this.GetCaches().MaxFood;
             CurrentWater = this.GetCaches().MaxWater;
+            lastGrounded = true;
+            lastGroundedPosition = CacheTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
             // Send OnRespawn to owner player only
             RequestOnRespawn();
