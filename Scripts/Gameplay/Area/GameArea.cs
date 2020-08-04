@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         [Header("Square Area")]
         public float squareSizeX;
         public float squareSizeZ;
+        public float squareGizmosHeight = 5f;
 
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
@@ -75,8 +76,8 @@ namespace MultiplayerARPG
                     Gizmos.DrawWireSphere(transform.position, randomRadius);
                     break;
                 case GameAreaType.Square:
-                    float height = (squareSizeX + squareSizeZ) / 2;
-                    Gizmos.DrawWireCube(transform.position, new Vector3(squareSizeX, height, squareSizeZ));
+                    Gizmos.DrawWireCube(transform.position + Vector3.up * squareGizmosHeight * 0.5f * 0.5f, new Vector3(squareSizeX, squareGizmosHeight * 0.5f, squareSizeZ));
+                    Gizmos.DrawWireCube(transform.position + Vector3.down * squareGizmosHeight * 0.5f * 0.5f, new Vector3(squareSizeX, squareGizmosHeight * 0.5f, squareSizeZ));
                     break;
             }
         }
