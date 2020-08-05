@@ -25,14 +25,6 @@ namespace MultiplayerARPG
             Hold
         }
 
-        public enum TurningState
-        {
-            None,
-            Attack,
-            Activate,
-            UseSkill,
-        }
-
         [Header("Camera Controls Prefabs")]
         [SerializeField]
         private FollowCameraControls gameplayCameraPrefab;
@@ -53,11 +45,6 @@ namespace MultiplayerARPG
         [SerializeField]
         private ExtraMoveActiveMode crawlActiveMode;
         [SerializeField]
-        private float angularSpeed = 800f;
-        [Range(0, 1f)]
-        [SerializeField]
-        private float turnToTargetDuration = 0.1f;
-        [SerializeField]
         private float findTargetRaycastDistance = 16f;
         [SerializeField]
         private bool showConfirmConstructionUI = false;
@@ -76,13 +63,17 @@ namespace MultiplayerARPG
         [SerializeField]
         private Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
         [SerializeField]
+        private Vector3 tpsTargetOffsetWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
+        [SerializeField]
+        private Vector3 tpsTargetOffsetWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
+        [SerializeField]
         private float tpsFov = 60f;
         [SerializeField]
         private float tpsNearClipPlane = 0.3f;
         [SerializeField]
         private float tpsFarClipPlane = 1000f;
         [SerializeField]
-        private bool turnForwardWhileDoingAction;
+        private bool turnForwardWhileDoingAction = true;
 
         [Header("FPS Settings")]
         [SerializeField]
@@ -140,7 +131,25 @@ namespace MultiplayerARPG
 
         public Vector3 CameraTargetOffset
         {
-            get { return ViewMode == ControllerViewMode.Tps ? tpsTargetOffset : fpsTargetOffset; }
+            get
+            {
+                if (ViewMode == ControllerViewMode.Tps)
+                {
+                    if (PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+                    {
+                        return tpsTargetOffsetWhileCrouching;
+                    }
+                    else if (PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+                    {
+                        return tpsTargetOffsetWhileCrawling;
+                    }
+                    else
+                    {
+                        return tpsTargetOffset;
+                    }
+                }
+                return fpsTargetOffset;
+            }
         }
 
         public float CameraFov
@@ -178,11 +187,7 @@ namespace MultiplayerARPG
         Vector2 normalizedInput;
         Vector3 moveLookDirection;
         Vector3 targetLookDirection;
-        Quaternion tempLookAt;
-        TurningState turningState;
         float tempDeltaTime;
-        float calculatedTurnDuration;
-        float tempCalculateAngle;
         bool tempPressAttackRight;
         bool tempPressAttackLeft;
         bool tempPressWeaponAbility;
@@ -240,7 +245,6 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            tempLookAt = characterEntity.GetLookRotation();
             SetupEquipWeapons(characterEntity.EquipWeapons);
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
@@ -348,12 +352,17 @@ namespace MultiplayerARPG
             {
                 dirtyViewMode = viewMode;
                 UpdateCameraSettings();
+                // Update camera zoom distance when change view mode only, to allow zoom controls
+                CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
+                CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
+                CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
             }
+            CacheGameplayCameraControls.targetOffset = CameraTargetOffset;
+            CacheGameplayCameraControls.enableWallHitSpring = viewMode == ControllerViewMode.Tps ? true : false;
             CacheGameplayCameraControls.target = ViewMode == ControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
 
             // Set temp data
             tempDeltaTime = Time.deltaTime;
-            calculatedTurnDuration += tempDeltaTime;
 
             // Update inputs
             activateInput.OnUpdate(tempDeltaTime);
@@ -533,10 +542,9 @@ namespace MultiplayerARPG
                     tempPressWeaponAbility = GetSecondaryAttackButtonDown();
                 }
 
-                if ((tempPressAttackRight || tempPressAttackLeft) &&
-                    turningState == TurningState.None)
+                if ((tempPressAttackRight || tempPressAttackLeft) && !PlayerCharacterEntity.IsAttackingOrUsingSkill)
                 {
-                    // So priority is right > left
+                    // Priority is right > left
                     isLeftHandAttacking = !tempPressAttackRight && tempPressAttackLeft;
                 }
 
@@ -577,7 +585,7 @@ namespace MultiplayerARPG
                 {
                     tempEntity = tempDamageableEntity.Entity;
 
-                    // Entity is in front of character, so this is target
+                    // Entity isn't in front of character, so it's not the target
                     if (turnForwardWhileDoingAction && !IsInFront(tempHitInfo.point))
                         continue;
 
@@ -727,84 +735,39 @@ namespace MultiplayerARPG
                             targetVehicle = SelectedEntity as VehicleEntity;
                     }
                 }
-                // While attacking turn character to aim direction
-                tempCalculateAngle = Vector3.Angle(CacheTransform.forward, aimDirection);
-
+                // Update look direction
                 if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 {
-                    // Just look at camera forward while character playing action animation
-                    switch (ViewMode)
-                    {
-                        case ControllerViewMode.Fps:
-                            targetLookDirection = cameraForward;
-                            break;
-                        case ControllerViewMode.Tps:
-                            targetLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
-                            break;
-                    }
+                    SetTargetLookDirectionWhileDoingAction();
                 }
-                else if (tempCalculateAngle > 15f && ViewMode == ControllerViewMode.Tps)
+                else if (queueUsingSkill.skill != null)
                 {
-                    // Fps mode character always turn to camera forward.
-                    // So set turning state for Tps view mode only
-                    if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
-                    {
-                        turningState = TurningState.UseSkill;
-                    }
-                    else if (tempPressAttackRight || tempPressAttackLeft)
-                    {
-                        turningState = TurningState.Attack;
-                    }
-                    else if (activateInput.IsPress)
-                    {
-                        turningState = TurningState.None;
-                    }
-                    else if (activateInput.IsRelease)
-                    {
-                        turningState = TurningState.Activate;
-                    }
-                    // Calculate turn duration to smoothing character rotation in `UpdateLookAtTarget()`
-                    calculatedTurnDuration = (180f - tempCalculateAngle) / 180f * turnToTargetDuration;
-                    targetLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
-                    // Set movement state by inputs
-                    if (normalizedInput.x > 0.5f)
-                        movementState |= MovementState.Forward;
-                    else if (normalizedInput.x < -0.5f)
-                        movementState |= MovementState.Backward;
-                    if (normalizedInput.y > 0.5f)
-                        movementState |= MovementState.Right;
-                    else if (normalizedInput.y < -0.5f)
-                        movementState |= MovementState.Left;
-                }
-                else
-                {
-                    // Attack immediately if character already look at target
-                    if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
-                    {
-                        UseSkill(isLeftHandAttacking);
-                    }
-                    else if (tempPressAttackRight || tempPressAttackLeft)
-                    {
-                        Attack(isLeftHandAttacking);
-                    }
-                    else if (activateInput.IsHold)
-                    {
-                        HoldActivate();
-                    }
-                    else if (activateInput.IsRelease)
-                    {
-                        Activate();
-                    }
-                }
-
-                // If skill is not attack skill, use it immediately
-                if (queueUsingSkill.skill != null && !queueUsingSkill.skill.IsAttack())
-                {
+                    SetTargetLookDirectionWhileDoingAction();
+                    UpdateLookAtTarget();
                     UseSkill(isLeftHandAttacking);
+                }
+                else if (tempPressAttackRight || tempPressAttackLeft)
+                {
+                    SetTargetLookDirectionWhileDoingAction();
+                    UpdateLookAtTarget();
+                    Attack(isLeftHandAttacking);
+                }
+                else if (activateInput.IsHold)
+                {
+                    SetTargetLookDirectionWhileDoingAction();
+                    UpdateLookAtTarget();
+                    HoldActivate();
+                }
+                else if (activateInput.IsRelease)
+                {
+                    SetTargetLookDirectionWhileDoingAction();
+                    UpdateLookAtTarget();
+                    Activate();
                 }
             }
             else if (tempPressWeaponAbility)
             {
+                // Toggle weapon ability
                 switch (WeaponAbilityState)
                 {
                     case WeaponAbilityState.Activated:
@@ -840,9 +803,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Update move direction
-                if (moveDirection.sqrMagnitude > 0f && ViewMode == ControllerViewMode.Tps)
-                    targetLookDirection = moveLookDirection;
+                // Update look direction while moving without doing any action
+                SetTargetLookDirectionWhileMoving();
             }
 
             // Setup releasing state
@@ -857,7 +819,7 @@ namespace MultiplayerARPG
                 mustReleaseFireKey = true;
             }
 
-            // Auto reload
+            // Auto reload when ammo empty
             if (!tempPressAttackRight && !tempPressAttackLeft && !reloadInput.IsPress &&
                 (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
                 PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoEmpty()))
@@ -869,9 +831,7 @@ namespace MultiplayerARPG
 
         private void UpdateInputs_BuildMode()
         {
-            // Update move direction
-            if (moveDirection.sqrMagnitude > 0f && ViewMode == ControllerViewMode.Tps)
-                targetLookDirection = moveLookDirection;
+            SetTargetLookDirectionWhileMoving();
         }
 
         private void ReloadAmmo()
@@ -918,68 +878,41 @@ namespace MultiplayerARPG
             crosshairRect.sizeDelta = new Vector2(Mathf.Clamp(CurrentCrosshairSize.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(CurrentCrosshairSize.y, setting.minSpread, setting.maxSpread));
         }
 
+        protected virtual void SetTargetLookDirectionWhileDoingAction()
+        {
+            switch (ViewMode)
+            {
+                case ControllerViewMode.Fps:
+                    // Just look at camera forward while character playing action animation
+                    targetLookDirection = cameraForward;
+                    break;
+                case ControllerViewMode.Tps:
+                    // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
+                    targetLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
+                    break;
+            }
+        }
+
+        protected virtual void SetTargetLookDirectionWhileMoving()
+        {
+            switch (ViewMode)
+            {
+                case ControllerViewMode.Fps:
+                    // Just look at camera forward while character playing action animation
+                    targetLookDirection = cameraForward;
+                    break;
+                case ControllerViewMode.Tps:
+                    // Turn character look direction to move direction while moving without doing any action
+                    if (moveDirection.sqrMagnitude > 0f)
+                        targetLookDirection = moveLookDirection;
+                    break;
+            }
+        }
+
         protected void UpdateLookAtTarget()
         {
-            if (ViewMode == ControllerViewMode.Tps)
-            {
-                if (PlayerCharacterEntity.IsPlayingActionAnimation())
-                {
-                    // Turn character to look direction immediately
-                    // If character playing action animation
-                    tempLookAt = Quaternion.LookRotation(targetLookDirection);
-                    PlayerCharacterEntity.SetLookRotation(tempLookAt);
-                    return;
-                }
-                tempCalculateAngle = Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection);
-                if (turningState != TurningState.None)
-                {
-                    if (tempCalculateAngle > 0)
-                    {
-                        // Update rotation when angle difference more than 0
-                        tempLookAt = Quaternion.Slerp(tempLookAt, Quaternion.LookRotation(targetLookDirection), calculatedTurnDuration / turnToTargetDuration);
-                        PlayerCharacterEntity.SetLookRotation(tempLookAt);
-                    }
-                    else
-                    {
-                        // Update temp look at to character's rotation
-                        tempLookAt = PlayerCharacterEntity.GetLookRotation();
-                        // Do actions
-                        switch (turningState)
-                        {
-                            case TurningState.Attack:
-                                Attack(isLeftHandAttacking);
-                                break;
-                            case TurningState.Activate:
-                                Activate();
-                                break;
-                            case TurningState.UseSkill:
-                                UseSkill(isLeftHandAttacking);
-                                break;
-                        }
-                        turningState = TurningState.None;
-                    }
-                }
-                else
-                {
-                    if (tempCalculateAngle > 0)
-                    {
-                        // Update rotation when angle difference more than 0
-                        tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
-                        PlayerCharacterEntity.SetLookRotation(tempLookAt);
-                    }
-                    else
-                    {
-                        // Update temp look at to character's rotation
-                        tempLookAt = PlayerCharacterEntity.GetLookRotation();
-                    }
-                }
-            }
-            else if (ViewMode == ControllerViewMode.Fps)
-            {
-                // Turn character to look direction immediately
-                tempLookAt = Quaternion.LookRotation(targetLookDirection);
-                PlayerCharacterEntity.SetLookRotation(tempLookAt);
-            }
+            // Turn character to look direction immediately
+            PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(targetLookDirection));
         }
 
         public override void UseHotkey(HotkeyType type, string relateId, Vector3? aimPosition)
@@ -1221,11 +1154,6 @@ namespace MultiplayerARPG
             CacheGameplayCamera.fieldOfView = CameraFov;
             CacheGameplayCamera.nearClipPlane = CameraNearClipPlane;
             CacheGameplayCamera.farClipPlane = CameraFarClipPlane;
-            CacheGameplayCameraControls.targetOffset = CameraTargetOffset;
-            CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
-            CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
-            CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
-            CacheGameplayCameraControls.enableWallHitSpring = viewMode == ControllerViewMode.Tps ? true : false;
             PlayerCharacterEntity.ModelManager.SetIsFps(viewMode == ControllerViewMode.Fps);
         }
 
