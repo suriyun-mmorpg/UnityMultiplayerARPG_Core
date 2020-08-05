@@ -45,6 +45,11 @@ namespace MultiplayerARPG
             return clip;
         }
 
+        public float GetAnimSpeedRate()
+        {
+            return animSpeedRate > 0 ? animSpeedRate : 1f;
+        }
+
         public float GetClipLength()
         {
             switch (durationType)

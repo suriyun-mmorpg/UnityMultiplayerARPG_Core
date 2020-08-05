@@ -35,7 +35,7 @@ namespace MultiplayerARPG
         public WeaponAnimations2D[] weaponAnimations2D;
         [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
         public SkillAnimations2D[] skillAnimations2D;
-        
+
         [Header("Sample 2D Animations")]
         public SampleAnimation sampleAnimation = SampleAnimation.Idle;
         public DirectionType2D sampleDirection = DirectionType2D.Down;
@@ -314,24 +314,25 @@ namespace MultiplayerARPG
             playingAction = false;
         }
 
-        public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float[] triggerDurations, out float totalDuration)
+        public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             animationIndex = 0;
-            return GetRightHandAttackAnimation(dataId, animationIndex, out triggerDurations, out totalDuration);
+            return GetRightHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
-        public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float[] triggerDurations, out float totalDuration)
+        public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             animationIndex = 0;
-            return GetLeftHandAttackAnimation(dataId, animationIndex, out triggerDurations, out totalDuration);
+            return GetLeftHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
-        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float[] triggerDurations, out float totalDuration)
+        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation2D animation2D = defaultAttackAnimation2D;
             WeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.rightHandAttackAnimation;
+            animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -342,12 +343,13 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float[] triggerDurations, out float totalDuration)
+        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation2D animation2D = defaultAttackAnimation2D;
             WeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.leftHandAttackAnimation;
+            animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -358,12 +360,13 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetSkillActivateAnimation(int dataId, out float[] triggerDurations, out float totalDuration)
+        public override bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation2D animation2D = defaultSkillActivateAnimation2D;
             SkillAnimations2D skillAnims;
             if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out skillAnims))
                 animation2D = skillAnims.activateAnimation;
+            animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -374,12 +377,13 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetRightHandReloadAnimation(int dataId, out float[] triggerDurations, out float totalDuration)
+        public override bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation2D animation2D = defaultReloadAnimation2D;
             WeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.rightHandReloadAnimation;
+            animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -390,12 +394,13 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetLeftHandReloadAnimation(int dataId, out float[] triggerDurations, out float totalDuration)
+        public override bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation2D animation2D = defaultReloadAnimation2D;
             WeaponAnimations2D weaponAnims;
             if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
                 animation2D = weaponAnims.leftHandReloadAnimation;
+            animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             if (animation2D == null) return false;

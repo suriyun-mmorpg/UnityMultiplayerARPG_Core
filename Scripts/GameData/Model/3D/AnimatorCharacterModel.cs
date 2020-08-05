@@ -703,7 +703,7 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            playSpeedMultiplier *= (tempActionAnimation.animSpeedRate > 0f ? tempActionAnimation.animSpeedRate : 1f);
+            playSpeedMultiplier *= tempActionAnimation.GetAnimSpeedRate();
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
