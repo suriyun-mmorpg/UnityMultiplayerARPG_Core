@@ -138,7 +138,8 @@ namespace MultiplayerARPG
         public void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
-            FindGroundedPosition(spawnPosition, 512f, out spawnPosition);
+            FindGroundedPosition(spawnPosition, 128f, out spawnPosition);
+            Teleport(spawnPosition);
             SpawnPosition = spawnPosition;
         }
 

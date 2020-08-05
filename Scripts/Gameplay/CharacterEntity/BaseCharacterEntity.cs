@@ -1058,24 +1058,26 @@ namespace MultiplayerARPG
             AnimActionType animActionType,
             int skillOrWeaponTypeDataId,
             out int animationIndex,
+            out float animSpeedRate,
             out float[] triggerDurations,
             out float totalDuration)
         {
             animationIndex = 0;
+            animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDurations, out totalDuration);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
             }
         }
@@ -1084,23 +1086,25 @@ namespace MultiplayerARPG
             AnimActionType animActionType,
             int skillOrWeaponTypeDataId,
             int animationIndex,
+            out float animSpeedRate,
             out float[] triggerDurations,
             out float totalDuration)
         {
+            animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out triggerDurations, out totalDuration);
+                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out triggerDurations, out totalDuration);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
             }
         }

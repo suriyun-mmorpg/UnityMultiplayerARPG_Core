@@ -173,12 +173,13 @@ namespace MultiplayerARPG
             IWeaponItem reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
 
             // Prepare requires data and get animation data
+            float animSpeedRate;
             float[] triggerDurations;
             float totalDuration;
             if (!isLeftHand)
-                CharacterModel.GetRightHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDurations, out totalDuration);
+                CharacterModel.GetRightHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration);
             else
-                CharacterModel.GetLeftHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out triggerDurations, out totalDuration);
+                CharacterModel.GetLeftHandReloadAnimation(reloadingWeaponItem.WeaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration);
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
@@ -195,7 +196,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < triggerDurations.Length; ++i)
             {
                 // Wait until triggger before reload ammo
-                await Task.Delay((int)(triggerDurations[i] * 1000f));
+                await Task.Delay((int)(triggerDurations[i] / animSpeedRate * 1000f));
 
                 // Prepare data
                 EquipWeapons equipWeapons = EquipWeapons;
@@ -210,7 +211,7 @@ namespace MultiplayerARPG
                         equipWeapons.rightHand = reloadingWeapon;
                     EquipWeapons = equipWeapons;
                 }
-                await Task.Delay((int)((totalDuration - triggerDurations[i]) * 1000f));
+                await Task.Delay((int)((totalDuration - triggerDurations[i]) / animSpeedRate * 1000f));
             }
 
             // Clear action states at clients and server
@@ -234,12 +235,14 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get animation data
             int animationIndex;
+            float animSpeedRate;
             float[] triggerDurations;
             float totalDuration;
             GetRandomAnimationData(
                 animActionType,
                 animaActionDataId,
                 out animationIndex,
+                out animSpeedRate,
                 out triggerDurations,
                 out totalDuration);
 
@@ -267,12 +270,14 @@ namespace MultiplayerARPG
                 out weapon);
 
             // Prepare requires data and get animation data
+            float animSpeedRate;
             float[] triggerDurations;
             float totalDuration;
             GetAnimationData(
                 animActionType,
                 animActionDataId,
                 animationIndex,
+                out animSpeedRate,
                 out triggerDurations,
                 out totalDuration);
 
@@ -287,15 +292,15 @@ namespace MultiplayerARPG
             MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
-            float playSpeedMultiplier = GetAnimSpeedRate(AnimActionType);
+            animSpeedRate *= GetAnimSpeedRate(AnimActionType);
 
             // Animations will plays on clients only
             if (IsClient)
             {
                 // Play animation
-                CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, playSpeedMultiplier);
+                CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 if (FpsModel && FpsModel.gameObject.activeSelf)
-                    FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, playSpeedMultiplier);
+                    FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
             }
 
             float remainsDuration = totalDuration;
@@ -305,7 +310,7 @@ namespace MultiplayerARPG
                 // Play special effects after trigger duration
                 tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                 remainsDuration -= tempTriggerDuration;
-                await Task.Delay((int)(tempTriggerDuration / playSpeedMultiplier * 1000f));
+                await Task.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f));
 
                 // Special effects will plays on clients only
                 if (IsClient)
@@ -357,7 +362,7 @@ namespace MultiplayerARPG
             if (remainsDuration > 0f)
             {
                 // Wait until animation ends to stop actions
-                await Task.Delay((int)(remainsDuration / playSpeedMultiplier * 1000f));
+                await Task.Delay((int)(remainsDuration / animSpeedRate * 1000f));
             }
             // Clear action states at clients and server
             ClearActionStates();
