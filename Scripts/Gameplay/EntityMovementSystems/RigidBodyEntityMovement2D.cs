@@ -159,9 +159,10 @@ namespace MultiplayerARPG
             CacheNetTransform.Teleport(position, Quaternion.identity);
         }
 
-        public override void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
+            return true;
         }
 
         public override void EntityFixedUpdate()

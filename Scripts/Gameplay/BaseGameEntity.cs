@@ -779,11 +779,12 @@ namespace MultiplayerARPG
 
         }
 
-        public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = CacheTransform.position;
             if (ActiveMovement != null)
-                ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
+                return ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
+            return false;
         }
 
         public void TriggerJump()

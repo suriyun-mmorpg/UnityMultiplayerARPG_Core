@@ -12,8 +12,6 @@ namespace MultiplayerARPG
         [Tooltip("This is deprecated, might be removed in future version, set your asset to `Asset` instead.")]
         [ReadOnlyField]
         public HarvestableEntity harvestableEntity;
-        // Private data
-        private int pending;
 
         private void Awake()
         {
@@ -66,13 +64,23 @@ namespace MultiplayerARPG
             {
                 GameObject spawnObj = Instantiate(asset.gameObject, spawnPosition, spawnRotation);
                 HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
-                entity.SetSpawnArea(this, spawnPosition);
-                BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+                if (entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
+                {
+                    entity.SetSpawnArea(this, spawnPosition);
+                    BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+                }
+                else
+                {
+                    // Destroy the entity (because it can't find ground position)
+                    Destroy(entity.gameObject);
+                    ++pending;
+                    Logging.LogWarning(ToString(), "Cannot spawn harvestable, it cannot find grounded position, pending harvestable amount " + pending);
+                }
             }
             else
             {
                 ++pending;
-                Logging.LogWarning(ToString(), "Cannot spawn harvestable it is collided to another entities, pending harvestable amount " + pending);
+                Logging.LogWarning(ToString(), "Cannot spawn harvestable, it is collided to another entities, pending harvestable amount " + pending);
             }
         }
 

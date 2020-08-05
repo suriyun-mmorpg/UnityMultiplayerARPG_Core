@@ -139,12 +139,16 @@ namespace MultiplayerARPG
             CacheNetTransform.Teleport(position, Quaternion.Euler(0, CacheEntity.MovementTransform.eulerAngles.y, 0));
         }
 
-        public override void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
             NavMeshHit navHit;
             if (NavMesh.SamplePosition(fromPosition, out navHit, findDistance, -1))
+            {
                 result = navHit.position;
+                return true;
+            }
+            return false;
         }
 
         public override void EntityFixedUpdate()

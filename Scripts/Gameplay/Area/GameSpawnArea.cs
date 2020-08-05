@@ -9,6 +9,27 @@ namespace MultiplayerARPG
         [Header("Spawning Data")]
         public T asset;
         public short amount = 1;
+        public float respawnPendingEntitiesDelay = 5f;
+        protected float respawnPendingEntitiesTimer = 0f;
+        protected int pending = 0;
+
+        protected virtual void LateUpdate()
+        {
+            if (pending > 0)
+            {
+                respawnPendingEntitiesTimer += Time.deltaTime;
+                if (respawnPendingEntitiesTimer >= respawnPendingEntitiesDelay)
+                {
+                    respawnPendingEntitiesTimer = 0f;
+                    Logging.LogWarning(ToString(), "Spawning pending entities, " + pending);
+                    while (pending > 0)
+                    {
+                        Spawn(0);
+                        pending--;
+                    }
+                }
+            }
+        }
 
         public virtual void RegisterAssets()
         {
@@ -18,18 +39,16 @@ namespace MultiplayerARPG
 
         public virtual void SpawnAll()
         {
-            if (asset != null)
+            for (int i = 0; i < amount; ++i)
             {
-                for (int i = 0; i < amount; ++i)
-                {
-                    Spawn(0);
-                }
+                Spawn(0);
             }
         }
 
         public virtual void Spawn(float delay)
         {
-            Invoke("SpawnInternal", delay);
+            if (asset != null)
+                Invoke("SpawnInternal", delay);
         }
 
         protected abstract void SpawnInternal();
