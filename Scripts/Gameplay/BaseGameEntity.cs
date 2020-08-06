@@ -784,7 +784,7 @@ namespace MultiplayerARPG
             result = CacheTransform.position;
             if (ActiveMovement != null)
                 return ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
-            return false;
+            return true;
         }
 
         public void TriggerJump()

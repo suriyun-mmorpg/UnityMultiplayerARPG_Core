@@ -22,7 +22,12 @@ namespace MultiplayerARPG
                 {
                     respawnPendingEntitiesTimer = 0f;
                     Logging.LogWarning(ToString(), "Spawning pending entities, " + pending);
-                    SpawnByAmount(pending);
+                    int spawnAmount = pending;
+                    for (int i = 0; i < spawnAmount; ++i)
+                    {
+                        pending--;
+                        Spawn(0);
+                    }
                 }
             }
         }
