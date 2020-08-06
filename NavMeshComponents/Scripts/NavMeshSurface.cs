@@ -13,11 +13,7 @@ namespace UnityEngine.AI
         Children = 2,
     }
 
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [DefaultExecutionOrder(-102)]
     [AddComponentMenu("Navigation/NavMeshSurface", 30)]
     [HelpURL("https://github.com/Unity-Technologies/NavMeshComponents#documentation-draft")]
@@ -109,7 +105,7 @@ namespace UnityEngine.AI
 
         public void AddData()
         {
-#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+#if UNITY_EDITOR
             var isInPreviewScene = EditorSceneManager.IsPreviewSceneObject(this);
             var isPrefab = isInPreviewScene || EditorUtility.IsPersistent(this);
             if (isPrefab)
@@ -200,7 +196,7 @@ namespace UnityEngine.AI
 
         static void Register(NavMeshSurface surface)
         {
-#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+#if UNITY_EDITOR
             var isInPreviewScene = EditorSceneManager.IsPreviewSceneObject(surface);
             var isPrefab = isInPreviewScene || EditorUtility.IsPersistent(surface);
             if (isPrefab)
@@ -233,7 +229,7 @@ namespace UnityEngine.AI
 
         void AppendModifierVolumes(ref List<NavMeshBuildSource> sources)
         {
-#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+#if UNITY_EDITOR
             var myStage = StageUtility.GetStageHandle(gameObject);
             if (!myStage.IsValid())
                 return;
@@ -256,7 +252,7 @@ namespace UnityEngine.AI
                     continue;
                 if (!m.AffectsAgentType(m_AgentTypeID))
                     continue;
-#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+#if UNITY_EDITOR
                 if (!myStage.Contains(m.gameObject))
                     continue;
 #endif
@@ -303,7 +299,7 @@ namespace UnityEngine.AI
                 markups.Add(markup);
             }
 
-#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+#if UNITY_EDITOR
             if (!EditorApplication.isPlaying)
             {
                 if (m_CollectObjects == CollectObjects.All)
@@ -431,24 +427,13 @@ namespace UnityEngine.AI
                 return false;
 
             // Prefab parent owns the asset reference
-#if UNITY_2018_3_OR_NEWER
             var isInPreviewScene = EditorSceneManager.IsPreviewSceneObject(this);
             var isPersistentObject = EditorUtility.IsPersistent(this);
             if (isInPreviewScene || isPersistentObject)
                 return false;
-#else
-            // Prefab parent owns the asset reference
-            var prefabType = UnityEditor.PrefabUtility.GetPrefabType(this);
-            if (prefabType == UnityEditor.PrefabType.Prefab)
-                return false;
-#endif
 
             // An instance can share asset reference only with its prefab parent
-#if UNITY_2018_2_OR_NEWER
             var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(this) as NavMeshSurface;
-#else
-            var prefab = UnityEditor.PrefabUtility.GetPrefabParent(this) as NavMeshSurface;
-#endif
             if (prefab != null && prefab.navMeshData == navMeshData)
                 return false;
 
@@ -497,5 +482,5 @@ namespace UnityEngine.AI
             }
         }
 #endif
-        }
     }
+}
