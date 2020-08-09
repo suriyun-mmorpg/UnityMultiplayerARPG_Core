@@ -193,8 +193,16 @@ namespace MultiplayerARPG
         InputStateManager reloadInput;
         InputStateManager exitVehicleInput;
         InputStateManager switchEquipWeaponSetInput;
+        // Temp physic variables
+        RaycastHit[] raycasts = new RaycastHit[512];
+        Collider[] overlapColliders = new Collider[512];
+        RaycastHit tempHitInfo;
+        // Temp target
+        BasePlayerCharacterEntity targetPlayer;
+        NpcEntity targetNpc;
+        BuildingEntity targetBuilding;
+        VehicleEntity targetVehicle;
         // Temp data
-        ControllerViewMode dirtyViewMode;
         IDamageableEntity tempDamageableEntity;
         BaseGameEntity tempEntity;
         Ray centerRay;
@@ -212,28 +220,21 @@ namespace MultiplayerARPG
         bool tempPressAttackLeft;
         bool tempPressWeaponAbility;
         bool isLeftHandAttacking;
-        GameObject tempGameObject;
-        BasePlayerCharacterEntity targetPlayer;
-        NpcEntity targetNpc;
-        BuildingEntity targetBuilding;
-        VehicleEntity targetVehicle;
-        RaycastHit[] raycasts = new RaycastHit[512];
-        Collider[] overlapColliders = new Collider[512];
-        RaycastHit tempHitInfo;
         float pitch;
         Vector3 aimPosition;
         Vector3 aimDirection;
+        bool toggleSprintOn;
+        bool toggleCrouchOn;
+        bool toggleCrawlOn;
         // Controlling states
-        bool isDoingAction;
-        bool mustReleaseFireKey;
+        ControllerViewMode dirtyViewMode;
         IWeaponItem rightHandWeapon;
         IWeaponItem leftHandWeapon;
         MovementState movementState;
         ExtraMovementState extraMovementState;
-        bool toggleSprintOn;
-        bool toggleCrouchOn;
-        bool toggleCrawlOn;
         ControllerViewMode? viewModeBeforeDead;
+        bool isDoingAction;
+        bool mustReleaseFireKey;
         float buildYRotate;
 
         protected override void Awake()
@@ -1106,8 +1107,7 @@ namespace MultiplayerARPG
             int tempCount = OverlapObjects(CacheTransform.position, actDistance, layerMask);
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
-                tempGameObject = overlapColliders[tempCounter].gameObject;
-                if (tempGameObject == target)
+                if (overlapColliders[tempCounter].gameObject == target)
                     return true;
             }
             return false;
