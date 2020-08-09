@@ -87,9 +87,25 @@ namespace MultiplayerARPG
         [SerializeField]
         private float fpsFarClipPlane = 1000f;
 
-        public bool IsBlockController { get; protected set; }
-        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
-        public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
+        [Header("Aim Assist Settings")]
+        [SerializeField]
+        private bool enableAimAssist = false;
+        [SerializeField]
+        private bool enableAimAssistX = true;
+        [SerializeField]
+        private bool enableAimAssistY = false;
+        [SerializeField]
+        private bool aimAssistOnFireOnly = true;
+        [SerializeField]
+        private float aimAssistRadius = 0.5f;
+        [SerializeField]
+        private float aimAssistXSpeed = 20f;
+        [SerializeField]
+        private float aimAssistYSpeed = 20f;
+
+        public bool IsBlockController { get; private set; }
+        public FollowCameraControls CacheGameplayCameraControls { get; private set; }
+        public FollowCameraControls CacheMinimapCameraControls { get; private set; }
         public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
         public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
         public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
@@ -281,17 +297,17 @@ namespace MultiplayerARPG
             Cursor.visible = true;
         }
 
-        protected void SetupEquipWeapons(byte equipWeaponSet)
+        private void SetupEquipWeapons(byte equipWeaponSet)
         {
             SetupEquipWeapons(PlayerCharacterEntity.EquipWeapons);
         }
 
-        protected void SetupEquipWeapons(LiteNetLibManager.LiteNetLibSyncList.Operation operation, int index)
+        private void SetupEquipWeapons(LiteNetLibManager.LiteNetLibSyncList.Operation operation, int index)
         {
             SetupEquipWeapons(PlayerCharacterEntity.EquipWeapons);
         }
 
-        protected void SetupEquipWeapons(EquipWeapons equipWeapons)
+        private void SetupEquipWeapons(EquipWeapons equipWeapons)
         {
             CurrentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
             UpdateCrosshair(CurrentCrosshairSetting, -CurrentCrosshairSetting.shrinkPerFrame);
@@ -501,6 +517,7 @@ namespace MultiplayerARPG
             reloadInput.OnLateUpdate();
             exitVehicleInput.OnLateUpdate();
             switchEquipWeaponSetInput.OnLateUpdate();
+            // Update aim assists
         }
 
         private bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
@@ -878,7 +895,7 @@ namespace MultiplayerARPG
             crosshairRect.sizeDelta = new Vector2(Mathf.Clamp(CurrentCrosshairSize.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(CurrentCrosshairSize.y, setting.minSpread, setting.maxSpread));
         }
 
-        protected virtual void SetTargetLookDirectionWhileDoingAction()
+        private void SetTargetLookDirectionWhileDoingAction()
         {
             switch (ViewMode)
             {
@@ -893,7 +910,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void SetTargetLookDirectionWhileMoving()
+        private void SetTargetLookDirectionWhileMoving()
         {
             switch (ViewMode)
             {
@@ -909,7 +926,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateLookAtTarget()
+        private void UpdateLookAtTarget()
         {
             // Turn character to look direction immediately
             PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(targetLookDirection));
@@ -929,7 +946,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UseSkill(string id, Vector3? aimPosition)
+        private void UseSkill(string id, Vector3? aimPosition)
         {
             BaseSkill skill;
             short skillLevel;
@@ -939,7 +956,7 @@ namespace MultiplayerARPG
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
 
-        protected void UseItem(string id, Vector3? aimPosition)
+        private void UseItem(string id, Vector3? aimPosition)
         {
             InventoryType inventoryType;
             int itemIndex;
