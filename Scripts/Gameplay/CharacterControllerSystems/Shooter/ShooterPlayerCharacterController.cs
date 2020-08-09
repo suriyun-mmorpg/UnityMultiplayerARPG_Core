@@ -110,6 +110,10 @@ namespace MultiplayerARPG
         public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
         public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
         public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
+        public Vector2 CurrentCrosshairSize { get; private set; }
+        public CrosshairSetting CurrentCrosshairSetting { get; private set; }
+        public BaseWeaponAbility WeaponAbility { get; private set; }
+        public WeaponAbilityState WeaponAbilityState { get; private set; }
 
         public ControllerMode Mode
         {
@@ -219,9 +223,6 @@ namespace MultiplayerARPG
         float pitch;
         Vector3 aimPosition;
         Vector3 aimDirection;
-        // Crosshair
-        public Vector2 CurrentCrosshairSize { get; private set; }
-        public CrosshairSetting CurrentCrosshairSetting { get; private set; }
         // Controlling states
         bool isDoingAction;
         bool mustReleaseFireKey;
@@ -234,8 +235,6 @@ namespace MultiplayerARPG
         bool toggleCrawlOn;
         ControllerViewMode? viewModeBeforeDead;
         float buildYRotate;
-        public BaseWeaponAbility WeaponAbility { get; private set; }
-        public WeaponAbilityState WeaponAbilityState { get; private set; }
 
         protected override void Awake()
         {
