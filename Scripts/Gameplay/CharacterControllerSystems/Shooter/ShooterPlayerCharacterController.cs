@@ -91,9 +91,9 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool enableAimAssist = false;
         [SerializeField]
-        private bool enableAimAssistX = true;
+        private bool enableAimAssistX = false;
         [SerializeField]
-        private bool enableAimAssistY = false;
+        private bool enableAimAssistY = true;
         [SerializeField]
         private bool aimAssistOnFireOnly = true;
         [SerializeField]
@@ -194,6 +194,7 @@ namespace MultiplayerARPG
         InputStateManager exitVehicleInput;
         InputStateManager switchEquipWeaponSetInput;
         // Temp physic variables
+        List<Collider> playerEntityColliders = new List<Collider>();
         RaycastHit[] raycasts = new RaycastHit[512];
         Collider[] overlapColliders = new Collider[512];
         RaycastHit tempHitInfo;
@@ -517,7 +518,6 @@ namespace MultiplayerARPG
             reloadInput.OnLateUpdate();
             exitVehicleInput.OnLateUpdate();
             switchEquipWeaponSetInput.OnLateUpdate();
-            // Update aim assists
         }
 
         private bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
@@ -585,6 +585,12 @@ namespace MultiplayerARPG
                     attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
                 }
             }
+            // Temporary disable colliders
+            PlayerCharacterEntity.GetAllColliders(playerEntityColliders);
+            foreach (Collider collider in playerEntityColliders)
+            {
+                collider.enabled = false;
+            }
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + attackDistance);
             // Raycast from camera position to center of screen
@@ -604,10 +610,6 @@ namespace MultiplayerARPG
 
                     // Entity isn't in front of character, so it's not the target
                     if (turnForwardWhileDoingAction && !IsInFront(tempHitInfo.point))
-                        continue;
-
-                    // Target must be damageable, not player character entity, within aim distance and alive
-                    if (tempDamageableEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
                         continue;
 
                     // Target must not hidding
@@ -647,6 +649,21 @@ namespace MultiplayerARPG
             // Show target hp/mp
             CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
             PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
+            // Update aim assist
+            CacheGameplayCameraControls.enableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly);
+            CacheGameplayCameraControls.enableAimAssistX = enableAimAssistX;
+            CacheGameplayCameraControls.enableAimAssistY = enableAimAssistY;
+            CacheGameplayCameraControls.aimAssistRadius = aimAssistRadius;
+            CacheGameplayCameraControls.aimAssistDistance = centerOriginToCharacterDistance + attackDistance;
+            CacheGameplayCameraControls.aimAssistLayerMask = CurrentGameInstance.GetDamageableLayerMask();
+            CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
+            CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
+            CacheGameplayCameraControls.aimAssistExceptions = playerEntityColliders;
+            // Enable colliders back
+            foreach (Collider collider in playerEntityColliders)
+            {
+                collider.enabled = true;
+            }
         }
 
         private void UpdateMovementInputs()
