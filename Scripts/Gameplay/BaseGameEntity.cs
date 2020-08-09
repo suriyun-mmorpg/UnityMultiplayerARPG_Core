@@ -946,5 +946,51 @@ namespace MultiplayerARPG
             // Teleport to exit transform
             Teleport(exitPosition);
         }
+
+        /// <summary>
+        /// Get all colliders from this entity and its passenging entity
+        /// </summary>
+        /// <returns></returns>
+        public List<Collider> GetAllColliders()
+        {
+            return GetAllColliders(new List<Collider>());
+        }
+
+        /// <summary>
+        /// Get all colliders from this entity and its passenging entity
+        /// </summary>
+        /// <param name="colliders"></param>
+        /// <returns></returns>
+        public List<Collider> GetAllColliders(List<Collider> colliders)
+        {
+            colliders.Clear();
+            colliders.AddRange(GetComponentsInChildren<Collider>(true));
+            if (PassengingVehicleEntity != null)
+                colliders.AddRange(PassengingVehicleEntity.Entity.GetAllColliders());
+            return colliders;
+        }
+
+        /// <summary>
+        /// Get all colliders from this entity and its passenging entity
+        /// </summary>
+        /// <returns></returns>
+        public List<Collider2D> GetAllColliders2D()
+        {
+            return GetAllColliders2D(new List<Collider2D>());
+        }
+
+        /// <summary>
+        /// Get all colliders from this entity and its passenging entity
+        /// </summary>
+        /// <param name="colliders"></param>
+        /// <returns></returns>
+        public List<Collider2D> GetAllColliders2D(List<Collider2D> colliders)
+        {
+            colliders.Clear();
+            colliders.AddRange(GetComponentsInChildren<Collider2D>(true));
+            if (PassengingVehicleEntity != null)
+                colliders.AddRange(PassengingVehicleEntity.Entity.GetAllColliders2D());
+            return colliders;
+        }
     }
 }
