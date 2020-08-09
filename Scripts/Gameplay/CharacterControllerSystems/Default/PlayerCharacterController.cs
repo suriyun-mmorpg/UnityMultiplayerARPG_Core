@@ -26,50 +26,56 @@ namespace MultiplayerARPG
 
         [Header("Camera Controls Prefabs")]
         [SerializeField]
-        private FollowCameraControls gameplayCameraPrefab;
+        protected FollowCameraControls gameplayCameraPrefab;
         [SerializeField]
-        private FollowCameraControls minimapCameraPrefab;
+        protected FollowCameraControls minimapCameraPrefab;
 
         [Header("Controller Settings")]
-        public PlayerCharacterControllerMode controllerMode;
+        [SerializeField]
+        protected PlayerCharacterControllerMode controllerMode;
         [Tooltip("Set this to `TRUE` to find nearby enemy and follow it to attack while `Controller Mode` is `WASD`")]
-        public bool wasdLockAttackTarget;
+        [SerializeField]
+        protected bool wasdLockAttackTarget;
         [Tooltip("This will be used to find nearby enemy while `Controller Mode` is `Point Click` or when `Wasd Lock Attack Target` is `TRUE`")]
-        public float lockAttackTargetDistance = 10f;
+        [SerializeField]
+        protected float lockAttackTargetDistance = 10f;
         [Tooltip("This will be used to clear selected target when character move with WASD keys and far from target")]
-        public float wasdClearTargetDistance = 15f;
+        [SerializeField]
+        protected float wasdClearTargetDistance = 15f;
         [Tooltip("Set this to TRUE to move to target immediately when clicked on target, if this is FALSE it will not move to target immediately")]
-        public bool pointClickSetTargetImmediately;
+        [SerializeField]
+        protected bool pointClickSetTargetImmediately;
         [Tooltip("Set this to TRUE to interrupt casting skill when click on ground to move")]
-        public bool pointClickInterruptCastingSkill;
-        public GameObject targetObjectPrefab;
+        [SerializeField]
+        protected bool pointClickInterruptCastingSkill;
+        [Tooltip("The object which will represent where character is moving to")]
+        [SerializeField]
+        protected GameObject targetObjectPrefab;
 
         [Header("Building Settings")]
-        public bool buildGridSnap;
-        public Vector3 buildGridOffsets = Vector3.zero;
-        public float buildGridSize = 4f;
-        public bool buildRotationSnap;
-        public float buildRotateAngle = 45f;
-
-        protected bool isSprinting;
-        protected Vector3? destination;
-        protected Vector3 mouseDownPosition;
-        protected float mouseDownTime;
-        protected bool isMouseDragOrHoldOrOverUI;
+        [SerializeField]
+        protected bool buildGridSnap;
+        [SerializeField]
+        protected Vector3 buildGridOffsets = Vector3.zero;
+        [SerializeField]
+        protected float buildGridSize = 4f;
+        [SerializeField]
+        protected bool buildRotationSnap;
+        [SerializeField]
+        protected float buildRotateAngle = 45f;
 
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
+        public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
+        public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
+        public NearbyEntityDetector EnemyEntityDetector { get; protected set; }
         public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
         public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
         public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
         public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
         public GameObject CacheTargetObject { get; protected set; }
-        protected Vector3? targetPosition;
-        protected TargetActionType targetActionType;
 
-        protected IPhysicFunctions physicFunctions;
-
-        // Optimizing garbage collection
+        // Input & control states variables
         protected bool getMouseUp;
         protected bool getMouseDown;
         protected bool getMouse;
@@ -77,6 +83,14 @@ namespace MultiplayerARPG
         protected bool isMouseDragDetected;
         protected bool isMouseHoldDetected;
         protected bool isMouseHoldAndNotDrag;
+        protected bool isSprinting;
+        protected Vector3? destination;
+        protected Vector3 mouseDownPosition;
+        protected float mouseDownTime;
+        protected bool isMouseDragOrHoldOrOverUI;
+        protected Vector3? targetPosition;
+        protected TargetActionType targetActionType;
+        protected IPhysicFunctions physicFunctions;
         protected DamageableEntity targetDamageable;
         protected BasePlayerCharacterEntity targetPlayer;
         protected BaseMonsterCharacterEntity targetMonster;
@@ -86,9 +100,6 @@ namespace MultiplayerARPG
         protected VehicleEntity targetVehicle;
         protected HarvestableEntity targetHarvestable;
         protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
-        public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
-        public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
-        public NearbyEntityDetector EnemyEntityDetector { get; protected set; }
         protected int findingEnemyIndex;
         protected bool isLeftHandAttacking;
         protected bool isFollowingTarget;
