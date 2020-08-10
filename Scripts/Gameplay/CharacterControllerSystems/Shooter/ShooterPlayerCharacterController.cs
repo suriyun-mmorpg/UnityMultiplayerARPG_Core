@@ -646,6 +646,12 @@ namespace MultiplayerARPG
                     break;
                 }
             }
+            // Enable colliders back
+            foreach (Collider collider in aimAssistExceptions)
+            {
+                collider.enabled = true;
+            }
+            // Calculate aim direction
             aimDirection = aimPosition - CacheTransform.position;
             aimDirection.y = 0f;
             aimDirection.Normalize();
@@ -662,11 +668,6 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
             CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
             CacheGameplayCameraControls.aimAssistExceptions = aimAssistExceptions;
-            // Enable colliders back
-            foreach (Collider collider in aimAssistExceptions)
-            {
-                collider.enabled = true;
-            }
         }
 
         private void UpdateTarget_BuildMode()
@@ -1223,10 +1224,16 @@ namespace MultiplayerARPG
                 buildYRotate += buildRotateAngle;
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
+            // Disable constructing building entity's colliders
+            List<Collider> exceptionColliders = ConstructingBuildingEntity.GetAllColliders();
+            foreach (Collider collider in exceptionColliders)
+            {
+                collider.enabled = false;
+            }
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + ConstructingBuildingEntity.buildDistance);
             // Raycast from camera position to center of screen
-            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, 100f, CurrentGameInstance.GetBuildLayerMask());
+            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, centerOriginToCharacterDistance + ConstructingBuildingEntity.buildDistance, CurrentGameInstance.GetBuildLayerMask());
             BuildingArea buildingArea;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
@@ -1250,19 +1257,28 @@ namespace MultiplayerARPG
                 }
 
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
-                if (!buildingArea.snapBuildingObject)
-                {
-                    // There is no snap build position, set building rotation by camera look direction
-                    ConstructingBuildingEntity.CacheTransform.position = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.buildDistance);
-                    // Rotate to camera
-                    Vector3 direction = aimPosition - CacheGameplayCameraTransform.position;
-                    direction.y = 0f;
-                    direction.Normalize();
-                    ConstructingBuildingEntity.CacheTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);
-                }
                 break;
             }
-
+            // Enable colliders back
+            foreach (Collider collider in exceptionColliders)
+            {
+                collider.enabled = false;
+            }
+            // Place constructing building
+            if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
+                !ConstructingBuildingEntity.BuildingArea)
+            {
+                // Place the building on the ground when the building area is not snapping
+                // Or place it anywhere if there is no building area
+                // There is no snap build position, set building rotation by camera look direction
+                ConstructingBuildingEntity.CacheTransform.position = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.buildDistance);
+                // Rotate to camera
+                Vector3 direction = aimPosition - CacheGameplayCameraTransform.position;
+                direction.y = 0f;
+                direction.Normalize();
+                ConstructingBuildingEntity.CacheTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);
+            }
+            // Validate constructing building position
             if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > ConstructingBuildingEntity.buildDistance)
             {
                 // Mark as unable to build when the building is far from character
