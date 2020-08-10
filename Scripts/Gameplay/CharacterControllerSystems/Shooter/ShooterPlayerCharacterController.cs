@@ -910,8 +910,8 @@ namespace MultiplayerARPG
         {
             if (crosshairRect == null)
                 return;
-
-            crosshairRect.gameObject.SetActive(!setting.hidden);
+            // Show cross hair if weapon's crosshair setting isn't hidden or there is a constructing building
+            crosshairRect.gameObject.SetActive(!setting.hidden || ConstructingBuildingEntity != null);
             // Change crosshair size by power
             Vector3 sizeDelta = crosshairRect.sizeDelta;
             sizeDelta.x += power;
