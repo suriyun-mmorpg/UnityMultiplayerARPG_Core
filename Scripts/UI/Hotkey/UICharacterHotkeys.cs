@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -101,6 +102,62 @@ namespace MultiplayerARPG
             // but now it is a variable for a prefab.
             if (hotkeyAimJoyStickPrefab != null)
                 hotkeyAimJoyStickPrefab.gameObject.SetActive(false);
+        }
+
+        private void OnEnable()
+        {
+            UpdateData();
+            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onSkillsOperation += OnSkillsOperation;
+            BasePlayerCharacterController.OwningCharacter.onHotkeysOperation += OnHotkeysOperation;
+        }
+
+        private void OnDisable()
+        {
+            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onSkillsOperation -= OnSkillsOperation;
+            BasePlayerCharacterController.OwningCharacter.onHotkeysOperation -= OnHotkeysOperation;
+        }
+
+        private void OnEquipWeaponSetChange(byte equipWeaponSet)
+        {
+            UpdateData();
+        }
+
+        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void UpdateData()
+        {
+            UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
         private void Update()

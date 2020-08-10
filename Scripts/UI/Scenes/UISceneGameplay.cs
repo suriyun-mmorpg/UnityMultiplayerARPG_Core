@@ -24,10 +24,6 @@ namespace MultiplayerARPG
         public UIEquipItems[] uiCharacterEquipItems;
         public UINonEquipItems[] uiCharacterNonEquipItems;
         public UICharacterSkills[] uiCharacterSkills;
-        public UICharacterSummons[] uiCharacterSummons;
-        public UICharacterHotkeys[] uiCharacterHotkeys;
-        public UICharacterQuests[] uiCharacterQuests;
-        public UIAmmoAmount uiAmmoAmount;
 
         [Header("Selected Target UIs")]
         public UICharacter uiTargetCharacter;
@@ -108,10 +104,6 @@ namespace MultiplayerARPG
             RegisterEventToUIs<UIEquipItems, UIOwningEquipItems>(uiCharacterEquipItems);
             RegisterEventToUIs<UINonEquipItems, UIOwningNonEquipItems>(uiCharacterNonEquipItems);
             RegisterEventToUIs<UICharacterSkills, UIOwningSkills>(uiCharacterSkills);
-            RegisterEventToUIs<UICharacterSummons, UIOwningSummons>(uiCharacterSummons);
-            RegisterEventToUIs<UICharacterHotkeys, UIOwningHotkeys>(uiCharacterHotkeys);
-            RegisterEventToUIs<UICharacterQuests, UIOwningQuests>(uiCharacterQuests);
-            RegisterEventToUI<UIAmmoAmount, UIOwningAmmoAmount>(uiAmmoAmount);
 
             this.InvokeInstanceDevExtMethods("Awake");
         }

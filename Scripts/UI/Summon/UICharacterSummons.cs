@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -39,12 +40,23 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            
+            UpdateData();
+            BasePlayerCharacterController.OwningCharacter.onSummonsOperation += OnSummonsOperation;
         }
 
         private void OnDisable()
         {
-            
+            BasePlayerCharacterController.OwningCharacter.onSummonsOperation -= OnSummonsOperation;
+        }
+
+        private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void UpdateData()
+        {
+            UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
         public override void Show()

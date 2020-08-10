@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,6 +17,48 @@ namespace MultiplayerARPG
         public GameObject uiLeftHandAmmoRoot;
         public TextWrapper uiTextLeftHandCurrentAmmo;
         public TextWrapper uiTextLeftHandReserveAmmo;
+
+        private void OnEnable()
+        {
+            UpdateData();
+            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+        }
+
+        private void OnDisable()
+        {
+            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+        }
+
+        protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void OnEquipWeaponSetChange(byte equipWeaponSet)
+        {
+            UpdateData();
+        }
+
+        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void UpdateData()
+        {
+            UpdateData(BasePlayerCharacterController.OwningCharacter);
+        }
 
         public void UpdateData(ICharacterData character)
         {

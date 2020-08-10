@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -50,6 +51,27 @@ namespace MultiplayerARPG
                 cacheQuestSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheQuestSelectionManager;
             }
+        }
+
+        private void OnEnable()
+        {
+            UpdateData();
+            BasePlayerCharacterController.OwningCharacter.onQuestsOperation += OnQuestsOperation;
+        }
+
+        private void OnDisable()
+        {
+            BasePlayerCharacterController.OwningCharacter.onQuestsOperation -= OnQuestsOperation;
+        }
+
+        private void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void UpdateData()
+        {
+            UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
         public override void Show()
