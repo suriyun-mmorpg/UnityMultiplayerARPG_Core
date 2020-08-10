@@ -194,7 +194,7 @@ namespace MultiplayerARPG
         InputStateManager exitVehicleInput;
         InputStateManager switchEquipWeaponSetInput;
         // Temp physic variables
-        List<Collider> playerEntityColliders = new List<Collider>();
+        List<Collider> aimAssistExceptions = new List<Collider>();
         RaycastHit[] raycasts = new RaycastHit[512];
         Collider[] overlapColliders = new Collider[512];
         RaycastHit tempHitInfo;
@@ -444,6 +444,8 @@ namespace MultiplayerARPG
             // Update look target and aim position
             if (ConstructingBuildingEntity == null)
                 UpdateTarget_BattleMode();
+            else
+                UpdateTarget_BuildMode();
 
             // Update movement and camera pitch
             UpdateMovementInputs();
@@ -586,8 +588,9 @@ namespace MultiplayerARPG
                 }
             }
             // Temporary disable colliders
-            PlayerCharacterEntity.GetAllColliders(playerEntityColliders);
-            foreach (Collider collider in playerEntityColliders)
+            aimAssistExceptions.Clear();
+            PlayerCharacterEntity.AppendAllColliders(aimAssistExceptions);
+            foreach (Collider collider in aimAssistExceptions)
             {
                 collider.enabled = false;
             }
@@ -658,12 +661,18 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.aimAssistLayerMask = CurrentGameInstance.GetDamageableLayerMask();
             CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
             CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
-            CacheGameplayCameraControls.aimAssistExceptions = playerEntityColliders;
+            CacheGameplayCameraControls.aimAssistExceptions = aimAssistExceptions;
             // Enable colliders back
-            foreach (Collider collider in playerEntityColliders)
+            foreach (Collider collider in aimAssistExceptions)
             {
                 collider.enabled = true;
             }
+        }
+
+        private void UpdateTarget_BuildMode()
+        {
+            // Disable aim assist while constucting the building
+            CacheGameplayCameraControls.enableAimAssist = false;
         }
 
         private void UpdateMovementInputs()
