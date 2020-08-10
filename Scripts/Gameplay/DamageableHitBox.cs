@@ -18,22 +18,22 @@ namespace MultiplayerARPG
                 entity = GetComponentInParent<T>();
         }
 
-        public bool CanReceiveDamageFrom(IGameEntity attacker)
+        public virtual bool CanReceiveDamageFrom(IGameEntity attacker)
         {
             return entity.CanReceiveDamageFrom(attacker);
         }
 
-        public bool IsDead()
+        public virtual bool IsDead()
         {
             return entity.IsDead();
         }
 
-        public void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
+        public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
         {
             entity.PlayHitEffects(damageElements, skill);
         }
 
-        public void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
+        public virtual void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
         {
             entity.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
         }
