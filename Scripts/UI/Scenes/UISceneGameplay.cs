@@ -102,7 +102,6 @@ namespace MultiplayerARPG
 
             RegisterEventToUIs<UICharacter, UIOwningCharacter>(uiCharacters);
             RegisterEventToUIs<UIEquipItems, UIOwningEquipItems>(uiCharacterEquipItems);
-            RegisterEventToUIs<UINonEquipItems, UIOwningNonEquipItems>(uiCharacterNonEquipItems);
             RegisterEventToUIs<UICharacterSkills, UIOwningSkills>(uiCharacterSkills);
 
             this.InvokeInstanceDevExtMethods("Awake");

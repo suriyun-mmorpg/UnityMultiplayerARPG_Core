@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -37,6 +38,27 @@ namespace MultiplayerARPG
                 cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheItemSelectionManager;
             }
+        }
+
+        private void OnEnable()
+        {
+            UpdateData();
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+        }
+
+        private void OnDisable()
+        {
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+        }
+
+        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData();
+        }
+
+        private void UpdateData()
+        {
+            UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
         public override void Show()

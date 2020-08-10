@@ -17,7 +17,6 @@ namespace MultiplayerARPG
 		private void OnEnable()
 		{
 			UpdateData();
-			BasePlayerCharacterController.OwningCharacter.onDataIdChange += OnDataIdChange;
 			BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
 			BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
 			BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
@@ -25,15 +24,9 @@ namespace MultiplayerARPG
 
 		private void OnDisable()
 		{
-			BasePlayerCharacterController.OwningCharacter.onDataIdChange -= OnDataIdChange;
 			BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
 			BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
 			BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
-		}
-
-		private void OnDataIdChange(int dataId)
-		{
-			UpdateData();
 		}
 
 		private void OnEquipWeaponSetChange(byte equipWeaponSet)
