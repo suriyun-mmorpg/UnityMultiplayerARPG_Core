@@ -34,7 +34,7 @@ namespace MultiplayerARPG
 
             selectableWeaponSets.forOwnerOnly = false;
             attributes.forOwnerOnly = false;
-            skills.forOwnerOnly = true;
+            skills.forOwnerOnly = false;
             skillUsages.forOwnerOnly = true;
             buffs.forOwnerOnly = false;
             equipItems.forOwnerOnly = false;
