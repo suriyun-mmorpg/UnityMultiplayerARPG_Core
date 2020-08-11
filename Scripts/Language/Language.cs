@@ -690,8 +690,15 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.CannotCarryAnymore.ToString(), "Cannot carry anymore items");
             // Refine
             Texts.Add(GameMessage.Type.RefineItemReachedMaxLevel.ToString(), "Item reached max level");
-            Texts.Add(GameMessage.Type.RefineSuccess.ToString(), "Item level up success");
-            Texts.Add(GameMessage.Type.RefineFail.ToString(), "Item level up fail");
+            Texts.Add(GameMessage.Type.RefineSuccess.ToString(), "Refine success");
+            Texts.Add(GameMessage.Type.RefineFail.ToString(), "Refine fail");
+            // Enhance
+            Texts.Add(GameMessage.Type.CannotEnhanceSocket.ToString(), "Cannot enhance the item");
+            Texts.Add(GameMessage.Type.NotEnoughSocketEnchaner.ToString(), "Have not enough items");
+            Texts.Add(GameMessage.Type.NoEmptySocket.ToString(), "No empty slot");
+            // Repair
+            Texts.Add(GameMessage.Type.CannotRepair.ToString(), "Cannot repair the item");
+            Texts.Add(GameMessage.Type.RepairSuccess.ToString(), "Repair success");
             // Dealing
             Texts.Add(GameMessage.Type.CharacterIsInAnotherDeal.ToString(), "Character is in another deal");
             Texts.Add(GameMessage.Type.CharacterIsTooFar.ToString(), "Character is too far");
