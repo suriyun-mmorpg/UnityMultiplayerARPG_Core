@@ -169,6 +169,7 @@ namespace MultiplayerARPG
                 if (ui != null)
                 {
                     UICharacter uiCharacter = ui.GetComponent<UICharacter>();
+                    uiCharacter.NotForOwningCharacter = true;
                     uiCharacter.Data = playerCharacterData;
                     CacheCharacterSelectionManager.Add(uiCharacter);
                 }
