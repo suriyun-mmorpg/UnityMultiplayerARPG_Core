@@ -57,14 +57,17 @@ namespace MultiplayerARPG
                 // Cannot enhance socket because it's not equipment item
                 return;
             }
-            if (equipmentItem.MaxSocket <= 0)
+            byte maxSocket = GameInstance.Singleton.GameplayRule.GetItemMaxSocket(character, enhancingItem);
+            if (maxSocket <= 0)
             {
                 // Cannot enhance socket because equipment has no socket(s)
+                gameMessageType = GameMessage.Type.NoEmptySocket;
                 return;
             }
-            if (enhancingItem.Sockets.Count >= equipmentItem.MaxSocket)
+            if (enhancingItem.Sockets.Count >= maxSocket)
             {
                 // Cannot enhance socket because socket is full
+                gameMessageType = GameMessage.Type.NoEmptySocket;
                 return;
             }
             BaseItem enhancerItem;
