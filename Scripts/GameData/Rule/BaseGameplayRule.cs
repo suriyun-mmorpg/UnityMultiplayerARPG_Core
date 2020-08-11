@@ -53,5 +53,10 @@ namespace MultiplayerARPG
         public abstract Reward MakeQuestReward(Quest quest);
         public abstract float GetRecoveryUpdateDuration();
         public abstract void ApplyFallDamage(BaseCharacterEntity character, Vector3 lastGroundedPosition);
+        public virtual byte GetItemMaxSocket(IPlayerCharacterData character, CharacterItem characterItem)
+        {
+            IEquipmentItem item = characterItem.GetEquipmentItem();
+            return item == null ? (byte)0 : item.MaxSocket;
+        }
     }
 }
