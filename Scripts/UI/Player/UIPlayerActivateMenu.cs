@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     public partial class UIPlayerActivateMenu : UISelectionEntry<BasePlayerCharacterEntity>
     {
-        public UICharacter uiCharacter;
+        [FormerlySerializedAs("uiCharacter")]
+        public UICharacter uiAnotherCharacter;
         [Tooltip("These objects will be activated when owning character can invite to join party")]
         public GameObject[] partyInviteObjects;
         [Tooltip("These objects will be activated when owning character can invite to join guild")]
@@ -27,8 +29,11 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (uiCharacter != null)
-                uiCharacter.Data = Data;
+            if (uiAnotherCharacter != null)
+            {
+                uiAnotherCharacter.NotForOwningCharacter = true;
+                uiAnotherCharacter.Data = Data;
+            }
         }
 
         public void OnClickSendDealingRequest()

@@ -84,7 +84,10 @@ namespace MultiplayerARPG
 
             // Update character UI every `updateUIRepeatRate` seconds
             if (uiCharacter != null)
+            {
+                uiCharacter.NotForOwningCharacter = true;
                 uiCharacter.Data = Data;
+            }
         }
     }
 }

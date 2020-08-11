@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -27,19 +28,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
-        // EXP
         public UIGageValue uiGageExp;
-        // HP
         public UIGageValue uiGageHp;
-        // MP
         public UIGageValue uiGageMp;
-        // Stamina
         public UIGageValue uiGageStamina;
-        // Food
         public UIGageValue uiGageFood;
-        // Water
         public UIGageValue uiGageWater;
-
         public TextWrapper uiTextStatPoint;
         public TextWrapper uiTextSkillPoint;
         public TextWrapper uiTextGold;
@@ -56,10 +50,17 @@ namespace MultiplayerARPG
         public UICharacterClass uiCharacterClass;
 
         [Header("Options")]
+        [Tooltip("If this is `TRUE` it won't update data when controlling character's data changes")]
+        public bool notForOwningCharacter;
+        [Tooltip("If this is `TRUE` it will show stats which sum with buffs")]
         public bool showStatsWithBuffs;
+        [Tooltip("If this is `TRUE` it will show attributes which sum with buffs")]
         public bool showAttributeWithBuffs;
+        [Tooltip("If this is `TRUE` it will show resistances which sum with buffs")]
         public bool showResistanceWithBuffs;
+        [Tooltip("If this is `TRUE` it will show armors which sum with buffs")]
         public bool showArmorWithBuffs;
+        [Tooltip("If this is `TRUE` it will show damages which sum with buffs")]
         public bool showDamageWithBuffs;
 
         // Improve garbage collector
@@ -70,6 +71,16 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, float> cacheArmors;
         private Dictionary<DamageElement, MinMaxFloat> cacheDamages;
         private Dictionary<EquipmentSet, int> cacheEquipmentSets;
+
+        public bool NotForOwningCharacter
+        {
+            get { return notForOwningCharacter; }
+            set
+            {
+                notForOwningCharacter = value;
+                RegisterOwningCharacterEvents();
+            }
+        }
 
         private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes;
         public Dictionary<Attribute, UICharacterAttribute> CacheUICharacterAttributes
@@ -89,6 +100,99 @@ namespace MultiplayerARPG
                 }
                 return cacheUICharacterAttributes;
             }
+        }
+
+        protected override void OnEnable()
+        {
+            UpdateOwningCharacterData();
+            RegisterOwningCharacterEvents();
+            base.OnEnable();
+        }
+
+        protected override void OnDisable()
+        {
+            UnregisterOwningCharacterEvents();
+            base.OnDisable();
+        }
+
+        public void RegisterOwningCharacterEvents()
+        {
+            UnregisterOwningCharacterEvents();
+            if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
+            BasePlayerCharacterController.OwningCharacter.onDataIdChange += OnDataIdChange;
+            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            BasePlayerCharacterController.OwningCharacter.onAttributesOperation += OnAttributesOperation;
+            BasePlayerCharacterController.OwningCharacter.onSkillsOperation += OnSkillsOperation;
+            BasePlayerCharacterController.OwningCharacter.onSummonsOperation += OnSummonsOperation;
+            BasePlayerCharacterController.OwningCharacter.onBuffsOperation += OnBuffsOperation;
+            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+        }
+
+        public void UnregisterOwningCharacterEvents()
+        {
+            if (!BasePlayerCharacterController.OwningCharacter) return;
+            BasePlayerCharacterController.OwningCharacter.onDataIdChange -= OnDataIdChange;
+            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            BasePlayerCharacterController.OwningCharacter.onAttributesOperation -= OnAttributesOperation;
+            BasePlayerCharacterController.OwningCharacter.onSkillsOperation -= OnSkillsOperation;
+            BasePlayerCharacterController.OwningCharacter.onSummonsOperation -= OnSummonsOperation;
+            BasePlayerCharacterController.OwningCharacter.onBuffsOperation -= OnBuffsOperation;
+            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+        }
+
+        private void OnDataIdChange(int dataId)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnEquipWeaponSetChange(byte equipWeaponSet)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        public void UpdateOwningCharacterData()
+        {
+            if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
+            Data = BasePlayerCharacterController.OwningCharacter;
         }
 
         protected override void Update()
@@ -285,7 +389,6 @@ namespace MultiplayerARPG
                 if (rightHandWeapon == null && leftHandWeapon == null)
                 {
                     IWeaponItem defaultWeaponItem = GameInstance.Singleton.DefaultWeaponItem;
-                    WeaponItemEquipType defaultWeaponItemType = defaultWeaponItem.EquipType;
                     KeyValuePair<DamageElement, MinMaxFloat> damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
                     textDamages = string.Format(
                         LanguageManager.GetText(formatKeyWeaponDamage),
@@ -344,7 +447,7 @@ namespace MultiplayerARPG
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {
-                int tempIndexOfAttribute = -1;
+                int tempIndexOfAttribute;
                 CharacterAttribute tempCharacterAttribute;
                 float tempAmount;
                 foreach (Attribute attribute in CacheUICharacterAttributes.Keys)

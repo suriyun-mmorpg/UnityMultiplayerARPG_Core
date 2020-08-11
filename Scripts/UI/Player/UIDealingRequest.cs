@@ -9,7 +9,10 @@
             BasePlayerCharacterEntity anotherCharacter = Data;
 
             if (uiAnotherCharacter != null)
+            {
+                uiAnotherCharacter.NotForOwningCharacter = true;
                 uiAnotherCharacter.Data = anotherCharacter;
+            }
         }
 
         public void OnClickAccept()

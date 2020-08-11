@@ -13,10 +13,11 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            BasePlayerCharacterEntity anotherCharacter = Data;
-
             if (uiAnotherCharacter != null)
-                uiAnotherCharacter.Data = anotherCharacter;
+            {
+                uiAnotherCharacter.NotForOwningCharacter = true;
+                uiAnotherCharacter.Data = Data;
+            }
 
             if (uiTextGuildName != null)
                 uiTextGuildName.text = string.Format(LanguageManager.GetText(formatKeyGuildName), Data.TitleB);

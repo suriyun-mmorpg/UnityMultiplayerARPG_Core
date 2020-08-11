@@ -169,7 +169,10 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity anotherCharacter = Data;
 
             if (uiAnotherCharacter != null)
+            {
+                uiAnotherCharacter.NotForOwningCharacter = true;
                 uiAnotherCharacter.Data = anotherCharacter;
+            }
 
             dealingState = DealingState.None;
             anotherDealingState = DealingState.None;

@@ -105,10 +105,13 @@ namespace MultiplayerARPG
             if (uiCharacter != null)
             {
                 if (!tempSummonData || !Data.CacheEntity)
+                {
                     uiCharacter.Hide();
+                }
                 else
                 {
                     uiCharacter.Show();
+                    uiCharacter.NotForOwningCharacter = true;
                     uiCharacter.Data = Data.CacheEntity;
                 }
             }

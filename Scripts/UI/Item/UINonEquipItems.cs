@@ -42,7 +42,7 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            UpdateData();
+            UpdateOwningCharacterData();
             BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
@@ -53,10 +53,10 @@ namespace MultiplayerARPG
 
         private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateData();
+            UpdateOwningCharacterData();
         }
 
-        private void UpdateData()
+        private void UpdateOwningCharacterData()
         {
             UpdateData(BasePlayerCharacterController.OwningCharacter);
         }

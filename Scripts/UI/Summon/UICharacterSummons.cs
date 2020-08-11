@@ -40,7 +40,7 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            UpdateData();
+            UpdateOwningCharacterData();
             BasePlayerCharacterController.OwningCharacter.onSummonsOperation += OnSummonsOperation;
         }
 
@@ -51,10 +51,10 @@ namespace MultiplayerARPG
 
         private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateData();
+            UpdateOwningCharacterData();
         }
 
-        private void UpdateData()
+        private void UpdateOwningCharacterData()
         {
             UpdateData(BasePlayerCharacterController.OwningCharacter);
         }

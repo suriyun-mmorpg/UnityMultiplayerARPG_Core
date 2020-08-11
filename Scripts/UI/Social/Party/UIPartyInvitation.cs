@@ -6,10 +6,11 @@
 
         protected override void UpdateData()
         {
-            BasePlayerCharacterEntity anotherCharacter = Data;
-
             if (uiAnotherCharacter != null)
-                uiAnotherCharacter.Data = anotherCharacter;
+            {
+                uiAnotherCharacter.NotForOwningCharacter = true;
+                uiAnotherCharacter.Data = Data;
+            }
         }
 
         public void OnClickAccept()

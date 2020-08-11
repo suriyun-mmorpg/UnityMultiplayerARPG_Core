@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             }
 
             // Character class data
-            PlayerCharacter character = null;
+            PlayerCharacter character;
             GameInstance.PlayerCharacters.TryGetValue(Data.socialCharacter.dataId, out character);
             if (uiCharacterClass != null)
                 uiCharacterClass.Data = character;

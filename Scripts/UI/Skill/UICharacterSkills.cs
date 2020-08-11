@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -6,11 +7,27 @@ namespace MultiplayerARPG
     public partial class UICharacterSkills : UIBase
     {
         public ICharacterData character { get; protected set; }
+
+        [Header("UI Elements")]
         public UICharacterSkill uiSkillDialog;
         public UICharacterSkill uiCharacterSkillPrefab;
         public List<string> filterCategories;
         public List<SkillType> filterSkillTypes;
         public Transform uiCharacterSkillContainer;
+
+        [Header("Options")]
+        [Tooltip("If this is `TRUE` it won't update data when controlling character's data changes")]
+        public bool notForOwningCharacter;
+
+        public bool NotForOwningCharacter
+        {
+            get { return notForOwningCharacter; }
+            set
+            {
+                notForOwningCharacter = value;
+                RegisterOwningCharacterEvents();
+            }
+        }
 
         private UIList cacheSkillList;
         public UIList CacheSkillList
@@ -38,7 +55,70 @@ namespace MultiplayerARPG
                 return cacheSkillSelectionManager;
             }
         }
-        
+
+        private void OnEnable()
+        {
+            UpdateOwningCharacterData();
+            RegisterOwningCharacterEvents();
+        }
+
+        private void OnDisable()
+        {
+            UnregisterOwningCharacterEvents();
+        }
+
+        public void RegisterOwningCharacterEvents()
+        {
+            UnregisterOwningCharacterEvents();
+            if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
+            BasePlayerCharacterController.OwningCharacter.onDataIdChange += OnDataIdChange;
+            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onSkillsOperation += OnSkillsOperation;
+        }
+
+        public void UnregisterOwningCharacterEvents()
+        {
+            if (!BasePlayerCharacterController.OwningCharacter) return;
+            BasePlayerCharacterController.OwningCharacter.onDataIdChange -= OnDataIdChange;
+            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onSkillsOperation -= OnSkillsOperation;
+        }
+
+        private void OnDataIdChange(int dataId)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnEquipWeaponSetChange(byte equipWeaponSet)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void UpdateOwningCharacterData()
+        {
+            if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
+            UpdateData(BasePlayerCharacterController.OwningCharacter);
+        }
+
         public override void Show()
         {
             CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);

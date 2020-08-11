@@ -55,7 +55,7 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            UpdateData();
+            UpdateOwningCharacterData();
             BasePlayerCharacterController.OwningCharacter.onQuestsOperation += OnQuestsOperation;
         }
 
@@ -66,10 +66,10 @@ namespace MultiplayerARPG
 
         private void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateData();
+            UpdateOwningCharacterData();
         }
 
-        private void UpdateData()
+        private void UpdateOwningCharacterData()
         {
             UpdateData(BasePlayerCharacterController.OwningCharacter);
         }

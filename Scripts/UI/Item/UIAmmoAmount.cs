@@ -20,7 +20,7 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            UpdateData();
+            UpdateOwningCharacterData();
             BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
             BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
             BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
@@ -37,25 +37,25 @@ namespace MultiplayerARPG
 
         protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateData();
+            UpdateOwningCharacterData();
         }
 
         private void OnEquipWeaponSetChange(byte equipWeaponSet)
         {
-            UpdateData();
+            UpdateOwningCharacterData();
         }
 
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateData();
+            UpdateOwningCharacterData();
         }
 
         protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateData();
+            UpdateOwningCharacterData();
         }
 
-        private void UpdateData()
+        private void UpdateOwningCharacterData()
         {
             UpdateData(BasePlayerCharacterController.OwningCharacter);
         }

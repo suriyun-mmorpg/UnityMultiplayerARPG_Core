@@ -19,12 +19,6 @@ namespace MultiplayerARPG
             public KeyCode key;
         }
 
-        [Header("Character Releates UIs")]
-        public UICharacter[] uiCharacters;
-        public UIEquipItems[] uiCharacterEquipItems;
-        public UINonEquipItems[] uiCharacterNonEquipItems;
-        public UICharacterSkills[] uiCharacterSkills;
-
         [Header("Selected Target UIs")]
         public UICharacter uiTargetCharacter;
         public UIBaseGameEntity uiTargetNpc;
@@ -100,34 +94,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            RegisterEventToUIs<UICharacter, UIOwningCharacter>(uiCharacters);
-            RegisterEventToUIs<UIEquipItems, UIOwningEquipItems>(uiCharacterEquipItems);
-            RegisterEventToUIs<UICharacterSkills, UIOwningSkills>(uiCharacterSkills);
-
             this.InvokeInstanceDevExtMethods("Awake");
-        }
-
-        protected void RegisterEventToUIs<TUI, TEvent>(TUI[] uis)
-            where TUI : UIBase
-            where TEvent : Component
-        {
-            if (uis != null && uis.Length > 0)
-            {
-                for (int i = 0; i < uis.Length; ++i)
-                {
-                    uis[i].gameObject.GetOrAddComponent<TEvent>();
-                }
-            }
-        }
-
-        protected void RegisterEventToUI<TUI, TEvent>(TUI ui)
-            where TUI : UIBase
-            where TEvent : Component
-        {
-            if (ui != null)
-            {
-                ui.gameObject.GetOrAddComponent<TEvent>();
-            }
         }
 
         protected void OnDestroy()
@@ -195,6 +162,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            uiTargetCharacter.NotForOwningCharacter = true;
             uiTargetCharacter.Data = character;
             uiTargetCharacter.Show();
         }
