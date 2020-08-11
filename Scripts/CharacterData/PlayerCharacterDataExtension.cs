@@ -66,7 +66,6 @@ public static partial class PlayerCharacterDataExtension
 
     public static T ValidateCharacterData<T>(this T character) where T : IPlayerCharacterData
     {
-        GameInstance gameInstance = GameInstance.Singleton;
         PlayerCharacter database;
         if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out database))
             return character;
