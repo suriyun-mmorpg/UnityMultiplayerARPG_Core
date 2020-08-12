@@ -58,6 +58,7 @@ namespace MultiplayerARPG
             {
                 case GameStartType.Host:
                     SetMapInfo(selectedCharacter.CurrentMapName);
+                    Assets.onlineScene.SceneName = CurrentMapInfo.GetSceneName();
                     networkPort = gameServiceConnection.networkPort;
                     maxConnections = gameServiceConnection.maxConnections;
                     StartHost(false);
@@ -75,6 +76,7 @@ namespace MultiplayerARPG
                     break;
                 case GameStartType.SinglePlayer:
                     SetMapInfo(selectedCharacter.CurrentMapName);
+                    Assets.onlineScene.SceneName = CurrentMapInfo.GetSceneName();
                     StartHost(true);
                     // Stop discovery client because game started
                     CacheDiscovery.StopClient();

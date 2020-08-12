@@ -187,7 +187,6 @@ namespace MultiplayerARPG
                 characterData.CurrentMapName = database.StartMap.Id;
                 characterData.CurrentPosition = database.StartPosition;
             }
-            networkManager.Assets.onlineScene.SceneName = GameInstance.MapInfos[characterData.CurrentMapName].GetSceneName();
             networkManager.selectedCharacter = characterData;
             networkManager.StartGame();
         }
