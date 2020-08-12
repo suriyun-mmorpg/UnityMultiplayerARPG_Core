@@ -22,23 +22,26 @@ namespace MultiplayerARPG
             isReadyToSave = false;
             buildingEntities.Clear();
             storageItems.Clear();
-            // Load and Spawn buildings
-            worldSaveData.LoadPersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
-            await Task.Yield();
-            foreach (BuildingSaveData building in worldSaveData.buildings)
+            if (hostPlayerCharacterData != null && !string.IsNullOrEmpty(hostPlayerCharacterData.Id))
             {
-                BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
-            }
-            // Load storage data
-            storageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
-            await Task.Yield();
-            StorageId storageId;
-            foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
-            {
-                storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
-                if (!storageItems.ContainsKey(storageId))
-                    storageItems[storageId] = new List<CharacterItem>();
-                storageItems[storageId].Add(storageItem.characterItem);
+                // Load and Spawn buildings
+                worldSaveData.LoadPersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
+                await Task.Yield();
+                foreach (BuildingSaveData building in worldSaveData.buildings)
+                {
+                    BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
+                }
+                // Load storage data
+                storageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
+                await Task.Yield();
+                StorageId storageId;
+                foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
+                {
+                    storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
+                    if (!storageItems.ContainsKey(storageId))
+                        storageItems[storageId] = new List<CharacterItem>();
+                    storageItems[storageId].Add(storageItem.characterItem);
+                }
             }
             isReadyToSave = true;
         }
