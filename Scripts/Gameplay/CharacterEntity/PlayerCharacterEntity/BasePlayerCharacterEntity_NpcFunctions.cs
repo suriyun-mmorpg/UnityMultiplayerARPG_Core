@@ -11,7 +11,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            NpcEntity npcEntity = null;
+            NpcEntity npcEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out npcEntity))
                 return;
 

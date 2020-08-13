@@ -168,7 +168,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity = null;
+            BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
                 // Can't find the building
@@ -195,7 +195,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity = null;
+            BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
                 return;
 
@@ -742,7 +742,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            StorageEntity storageEntity = null;
+            StorageEntity storageEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out storageEntity))
             {
                 // Can't find the storage
@@ -777,7 +777,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            DoorEntity doorEntity = null;
+            DoorEntity doorEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out doorEntity))
             {
                 // Can't find the door
@@ -804,7 +804,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            DoorEntity doorEntity = null;
+            DoorEntity doorEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out doorEntity))
             {
                 // Can't find the door
@@ -825,7 +825,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            CampFireEntity campfireEntity = null;
+            CampFireEntity campfireEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out campfireEntity))
             {
                 // Can't find the door
@@ -846,7 +846,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            CampFireEntity campfireEntity = null;
+            CampFireEntity campfireEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out campfireEntity))
             {
                 // Can't find the door
@@ -867,7 +867,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            WorkbenchEntity workbenchEntity = null;
+            WorkbenchEntity workbenchEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out workbenchEntity))
             {
                 // Can't find the workbench
@@ -912,7 +912,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity = null;
+            BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
                 // Can't find the building
@@ -946,7 +946,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity = null;
+            BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
                 // Can't find the building
@@ -979,7 +979,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity = null;
+            BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
                 // Can't find the building
