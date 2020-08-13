@@ -1234,6 +1234,7 @@ namespace MultiplayerARPG
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + ConstructingBuildingEntity.buildDistance);
             // Raycast from camera position to center of screen
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, centerOriginToCharacterDistance + ConstructingBuildingEntity.buildDistance, CurrentGameInstance.GetBuildLayerMask());
+            bool hitGround = false;
             BuildingArea buildingArea;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
@@ -1246,6 +1247,7 @@ namespace MultiplayerARPG
                     continue;
                 }
 
+                hitGround = true;
                 aimPosition = tempHitInfo.point;
                 buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
                 if (buildingArea == null ||
@@ -1258,6 +1260,13 @@ namespace MultiplayerARPG
 
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
                 break;
+            }
+            // Not hit ground, find ground to snap
+            if (!hitGround)
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(aimPosition, Vector3.down, out hit, 100f, CurrentGameInstance.GetBuildLayerMask()))
+                    aimPosition = hit.point;
             }
             // Enable colliders back
             foreach (Collider collider in exceptionColliders)
