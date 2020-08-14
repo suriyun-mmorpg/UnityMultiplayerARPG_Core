@@ -10,6 +10,8 @@ namespace MultiplayerARPG
         const float ZOOM_SPEED = 1.25f;
 
         public float zoomingFov = 20f;
+        [Range(0.1f, 1f)]
+        public float rotationSpeedScaleWhileZooming = 0.5f;
         public bool disableRenderersOnZoom;
         public Sprite zoomCrosshair;
 
@@ -19,6 +21,8 @@ namespace MultiplayerARPG
         private ShooterPlayerCharacterController shooterController;
         [System.NonSerialized]
         private ShooterPlayerCharacterController.ControllerViewMode preActivateViewMode;
+
+        // TODO: Add rotate scale player's config
 
         public override void Setup(BasePlayerCharacterController controller, CharacterItem weapon)
         {
@@ -39,6 +43,7 @@ namespace MultiplayerARPG
             preActivateViewMode = shooterController.ViewMode;
             shooterController.ViewMode = ShooterPlayerCharacterController.ControllerViewMode.Fps;
             shooterController.SetZoomCrosshairSprite(zoomCrosshair);
+            shooterController.CacheGameplayCameraControls.rotationSpeedScale = rotationSpeedScaleWhileZooming;
         }
 
         public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime)
@@ -83,7 +88,7 @@ namespace MultiplayerARPG
 
         public override void OnPreDeactivate()
         {
-            // Do Nothing
+            shooterController.CacheGameplayCameraControls.rotationSpeedScale = 1f;
         }
     }
 }
