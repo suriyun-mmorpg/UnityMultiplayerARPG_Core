@@ -199,14 +199,7 @@ namespace MultiplayerARPG
                 UICharacterHotkeys.SetUsingHotkey(null);
             }
             
-            if (usingItem != null &&
-                usingItem.HasCustomAimControls())
-            {
-                UICharacterHotkeys.SetUsingHotkey(this);
-            }
-            else if (usingSkill != null && usingSkillLevel > 0 &&
-                usingSkill.IsActive() &&
-                usingSkill.HasCustomAimControls())
+            if (HasCustomAimControls())
             {
                 UICharacterHotkeys.SetUsingHotkey(this);
             }
@@ -214,6 +207,22 @@ namespace MultiplayerARPG
             {
                 Use(null);
             }
+        }
+
+        public bool HasCustomAimControls()
+        {
+            if (usingItem != null &&
+                usingItem.HasCustomAimControls())
+            {
+                return true;
+            }
+            else if (usingSkill != null && usingSkillLevel > 0 &&
+                usingSkill.IsActive() &&
+                usingSkill.HasCustomAimControls())
+            {
+                return true;
+            }
+            return false;
         }
 
         public void Use(Vector3? aimPosition)
