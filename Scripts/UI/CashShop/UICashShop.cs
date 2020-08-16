@@ -101,7 +101,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopInfo(AckResponseCode responseCode, BaseAckMessage message)
         {
-            ResponseCashShopInfoMessage castedMessage = (ResponseCashShopInfoMessage)message;
+            ResponseCashShopInfoMessage castedMessage = message as ResponseCashShopInfoMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -146,7 +146,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopBuy(AckResponseCode responseCode, BaseAckMessage message)
         {
-            ResponseCashShopBuyMessage castedMessage = (ResponseCashShopBuyMessage)message;
+            ResponseCashShopBuyMessage castedMessage = message as ResponseCashShopBuyMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:

@@ -165,7 +165,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashPackageBuyValidation(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseCashPackageBuyValidationMessage)message;
+            var castedMessage = message as ResponseCashPackageBuyValidationMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:

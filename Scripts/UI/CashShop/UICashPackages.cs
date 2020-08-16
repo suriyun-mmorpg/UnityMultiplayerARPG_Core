@@ -112,7 +112,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashPackageInfo(AckResponseCode responseCode, BaseAckMessage message)
         {
-            ResponseCashPackageInfoMessage castedMessage = (ResponseCashPackageInfoMessage)message;
+            ResponseCashPackageInfoMessage castedMessage = message as ResponseCashPackageInfoMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
