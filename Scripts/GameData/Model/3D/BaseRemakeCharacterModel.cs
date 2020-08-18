@@ -83,9 +83,9 @@ namespace MultiplayerARPG
 
         [Header("Animations")]
         public DefaultAnimations defaultAnimations;
-        [ArrayElementTitle("weaponType", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("weaponType")]
         public WeaponAnimations[] weaponAnimations;
-        [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("skill")]
         public SkillAnimations[] skillAnimations;
 
         protected override void Awake()

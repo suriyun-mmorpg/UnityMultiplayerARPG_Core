@@ -205,9 +205,9 @@ namespace MultiplayerARPG
         public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
-        [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
-        [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("clip")]
         public ActionAnimation[] leftHandAttackAnimations;
 
         [Header("Reload(Gun) movements")]
@@ -342,9 +342,9 @@ namespace MultiplayerARPG
         public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
-        [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
-        [ArrayElementTitle("clip", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("clip")]
         public ActionAnimation[] leftHandAttackAnimations;
 
         [Header("Reload(Gun) movements")]

@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public QuestTask[] tasks;
         public int rewardExp;
         public int rewardGold;
-        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("item")]
         public ItemAmount[] rewardItems;
         public bool canRepeat;
         private HashSet<int> cacheKillMonsterIds;

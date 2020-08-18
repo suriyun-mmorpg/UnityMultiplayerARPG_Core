@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         [Tooltip("Max kind of items that will be dropped in ground")]
         [SerializeField]
         protected byte maxDropItems = 5;
-        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("item")]
         [SerializeField]
         protected ItemDrop[] randomItems;
         [SerializeField]

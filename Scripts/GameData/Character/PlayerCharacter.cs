@@ -14,7 +14,7 @@ namespace MultiplayerARPG
     {
         [Header("Skills")]
         [SerializeField]
-        [ArrayElementTitle("skill", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("skill")]
         private SkillLevel[] skillLevels;
 
         [Header("Start Equipments")]
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
 
         [Header("Start Items")]
         [Tooltip("Items that will be added to character when create new character")]
-        [ArrayElementTitle("item", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("item")]
         public ItemAmount[] startItems;
 
         [Header("Start Map")]

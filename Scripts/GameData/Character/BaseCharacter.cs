@@ -10,13 +10,13 @@ namespace MultiplayerARPG
         [SerializeField]
         private CharacterStatsIncremental stats;
         [SerializeField]
-        [ArrayElementTitle("attribute", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("attribute")]
         private AttributeIncremental[] attributes;
         [SerializeField]
-        [ArrayElementTitle("damageElement", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("damageElement")]
         private ResistanceIncremental[] resistances;
         [SerializeField]
-        [ArrayElementTitle("damageElement", new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 })]
+        [ArrayElementTitle("damageElement")]
         private ArmorIncremental[] armors;
 
         public virtual CharacterStatsIncremental Stats
