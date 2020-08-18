@@ -6,7 +6,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine.Profiling;
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -860,7 +860,7 @@ namespace MultiplayerARPG
             SaveSystem.OnServerStart();
         }
         
-        protected override async Task PreSpawnEntities()
+        protected override async UniTask PreSpawnEntities()
         {
             await SaveSystem.PreSpawnEntities(selectedCharacter, buildingEntities, storageItems);
         }

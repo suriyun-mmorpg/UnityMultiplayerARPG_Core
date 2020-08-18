@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             isReadyToSave = false;
         }
 
-        public override async Task PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
+        public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
             buildingEntities.Clear();
@@ -26,14 +26,14 @@ namespace MultiplayerARPG
             {
                 // Load and Spawn buildings
                 worldSaveData.LoadPersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
-                await Task.Yield();
+                await UniTask.Yield();
                 foreach (BuildingSaveData building in worldSaveData.buildings)
                 {
                     BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
                 }
                 // Load storage data
                 storageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
-                await Task.Yield();
+                await UniTask.Yield();
                 StorageId storageId;
                 foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
                 {

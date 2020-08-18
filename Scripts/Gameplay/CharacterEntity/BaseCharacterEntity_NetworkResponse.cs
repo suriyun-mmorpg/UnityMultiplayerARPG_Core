@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         protected void NetFuncPlayAttack(bool isLeftHand, byte animationIndex)
         {
-            AttackRoutine(isLeftHand, animationIndex);
+            AttackRoutine(isLeftHand, animationIndex).Forget();
         }
 
         protected void NetFuncPlayUseSkill(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
@@ -36,7 +36,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncPlayReload(bool isLeftHand, short reloadingAmmoAmount)
         {
-            ReloadRoutine(isLeftHand, reloadingAmmoAmount);
+            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
         }
 
         /// <summary>

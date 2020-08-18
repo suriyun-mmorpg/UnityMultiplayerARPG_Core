@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -165,7 +165,7 @@ namespace MultiplayerARPG
             RequestPlayReloadAnimation(isLeftHand, reloadingAmmoAmount);
         }
 
-        protected async void ReloadRoutine(bool isLeftHand, short reloadingAmmoAmount)
+        protected async UniTaskVoid ReloadRoutine(bool isLeftHand, short reloadingAmmoAmount)
         {
             // Set doing action state at clients and server
             SetReloadActionStates(isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand, reloadingAmmoAmount);
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < triggerDurations.Length; ++i)
             {
                 // Wait until triggger before reload ammo
-                await Task.Delay((int)(triggerDurations[i] / animSpeedRate * 1000f));
+                await UniTask.Delay((int)(triggerDurations[i] / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
 
                 // Prepare data
                 EquipWeapons equipWeapons = EquipWeapons;
@@ -211,7 +211,7 @@ namespace MultiplayerARPG
                         equipWeapons.rightHand = reloadingWeapon;
                     EquipWeapons = equipWeapons;
                 }
-                await Task.Delay((int)((totalDuration - triggerDurations[i]) / animSpeedRate * 1000f));
+                await UniTask.Delay((int)((totalDuration - triggerDurations[i]) / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
             }
 
             // Clear action states at clients and server
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
             RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex);
         }
 
-        protected async void AttackRoutine(bool isLeftHand, byte animationIndex)
+        protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex)
         {
             // Prepare requires data and get weapon data
             AnimActionType animActionType;
@@ -310,7 +310,7 @@ namespace MultiplayerARPG
                 // Play special effects after trigger duration
                 tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                 remainsDuration -= tempTriggerDuration;
-                await Task.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f));
+                await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
 
                 // Special effects will plays on clients only
                 if (IsClient)
@@ -362,7 +362,7 @@ namespace MultiplayerARPG
             if (remainsDuration > 0f)
             {
                 // Wait until animation ends to stop actions
-                await Task.Delay((int)(remainsDuration / animSpeedRate * 1000f));
+                await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
             }
             // Clear action states at clients and server
             ClearActionStates();

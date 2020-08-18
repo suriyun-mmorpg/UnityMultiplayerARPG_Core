@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async void UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3? skillAimPosition)
+        protected async UniTaskVoid UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3? skillAimPosition)
         {
             // Prepare requires data and get skill data
             AnimActionType animActionType;
@@ -241,7 +241,7 @@ namespace MultiplayerARPG
                         }
                     }
                     // Wait until end of cast duration
-                    await Task.Delay((int)(CastingSkillDuration * 1000f), skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
                 }
 
                 // Animations will plays on clients only
@@ -259,7 +259,7 @@ namespace MultiplayerARPG
                     // Play special effects after trigger duration
                     tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
-                    await Task.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await Task.Delay((int)(remainsDuration / animSpeedRate * 1000f), skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
                 }
             }
             catch
