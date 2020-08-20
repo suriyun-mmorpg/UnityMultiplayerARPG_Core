@@ -74,6 +74,24 @@ namespace MultiplayerARPG
         private float tpsFarClipPlane = 1000f;
         [SerializeField]
         private bool turnForwardWhileDoingAction = true;
+        [SerializeField]
+        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
+        private float turnSpeed = 0f;
+        [SerializeField]
+        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
+        private float turnSpeedWhileSprinting = 0f;
+        [SerializeField]
+        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
+        private float turnSpeedWhileCrouching = 0f;
+        [SerializeField]
+        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
+        private float turnSpeedWileCrawling = 0f;
+        [SerializeField]
+        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
+        private float turnSpeedWileSwimming = 0f;
+        [SerializeField]
+        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
+        private float turnSpeedWileDoingAction = 0f;
 
         [Header("FPS Settings")]
         [SerializeField]
@@ -187,6 +205,25 @@ namespace MultiplayerARPG
             get { return ViewMode == ControllerViewMode.Tps ? tpsFarClipPlane : fpsFarClipPlane; }
         }
 
+        public float CurrentTurnSpeed
+        {
+            get
+            {
+                if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsUnderWater))
+                    return turnSpeedWileSwimming;
+                switch (PlayerCharacterEntity.ExtraMovementState)
+                {
+                    case ExtraMovementState.IsSprinting:
+                        return turnSpeedWhileSprinting;
+                    case ExtraMovementState.IsCrouching:
+                        return turnSpeedWhileCrouching;
+                    case ExtraMovementState.IsCrawling:
+                        return turnSpeedWileCrawling;
+                }
+                return turnSpeed;
+            }
+        }
+
         // Input data
         InputStateManager activateInput;
         InputStateManager pickupItemInput;
@@ -262,6 +299,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
+            targetLookDirection = MovementTransform.forward;
             SetupEquipWeapons(characterEntity.EquipWeapons);
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
@@ -932,7 +970,19 @@ namespace MultiplayerARPG
                     break;
                 case ControllerViewMode.Tps:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
-                    targetLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
+                    Vector3 doActionLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
+                    if (turnSpeedWileDoingAction > 0f)
+                    {
+                        Quaternion currentRot = Quaternion.LookRotation(targetLookDirection);
+                        Quaternion targetRot = Quaternion.LookRotation(doActionLookDirection);
+                        currentRot = Quaternion.Slerp(currentRot, targetRot, turnSpeedWileDoingAction * Time.deltaTime);
+                        targetLookDirection = currentRot * Vector3.forward;
+                    }
+                    else
+                    {
+                        // Turn immediately because turn speed <= 0
+                        targetLookDirection = doActionLookDirection;
+                    }
                     break;
             }
         }
@@ -948,7 +998,21 @@ namespace MultiplayerARPG
                 case ControllerViewMode.Tps:
                     // Turn character look direction to move direction while moving without doing any action
                     if (moveDirection.sqrMagnitude > 0f)
-                        targetLookDirection = moveLookDirection;
+                    {
+                        float currentTurnSpeed = CurrentTurnSpeed;
+                        if (currentTurnSpeed > 0f)
+                        {
+                            Quaternion currentRot = Quaternion.LookRotation(targetLookDirection);
+                            Quaternion targetRot = Quaternion.LookRotation(moveLookDirection);
+                            currentRot = Quaternion.Slerp(currentRot, targetRot, currentTurnSpeed * Time.deltaTime);
+                            targetLookDirection = currentRot * Vector3.forward;
+                        }
+                        else
+                        {
+                            // Turn immediately because turn speed <= 0
+                            targetLookDirection = moveLookDirection;
+                        }
+                    }
                     break;
             }
         }
