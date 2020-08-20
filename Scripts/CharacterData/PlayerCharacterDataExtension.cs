@@ -174,11 +174,14 @@ public static partial class PlayerCharacterDataExtension
     public static T SetNewPlayerCharacterData<T>(this T character, string characterName, int dataId, int entityId) where T : IPlayerCharacterData
     {
         GameInstance gameInstance = GameInstance.Singleton;
-        PlayerCharacter database;
-        if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out database))
+        PlayerCharacter playerCharacter;
+        if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter))
             return character;
-        // Player character database
-        PlayerCharacter playerCharacter = database as PlayerCharacter;
+        // General data
+        character.DataId = dataId;
+        character.EntityId = entityId;
+        character.CharacterName = characterName;
+        character.Level = 1;
         // Attributes
         foreach (Attribute attribute in GameInstance.Attributes.Values)
         {
@@ -187,7 +190,6 @@ public static partial class PlayerCharacterDataExtension
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
-        Dictionary<BaseSkill, short> skillLevels = playerCharacter.CacheSkillLevels;
         foreach (BaseSkill skill in playerCharacter.CacheSkillLevels.Keys)
         {
             CharacterSkill characterSkill = new CharacterSkill();
@@ -221,15 +223,10 @@ public static partial class PlayerCharacterDataExtension
             CharacterItem newItem = CharacterItem.Create(armorItem);
             character.EquipItems.Add(newItem);
         }
-        // General data
-        character.DataId = dataId;
-        character.EntityId = entityId;
-        character.CharacterName = characterName;
-        character.Level = 1;
         // Start items
         List<ItemAmount> startItems = new List<ItemAmount>();
         startItems.AddRange(gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startItems : gameInstance.startItems);
-        startItems.AddRange(database.startItems);
+        startItems.AddRange(playerCharacter.startItems);
         foreach (ItemAmount startItem in startItems)
         {
             if (startItem.item == null || startItem.amount <= 0)
