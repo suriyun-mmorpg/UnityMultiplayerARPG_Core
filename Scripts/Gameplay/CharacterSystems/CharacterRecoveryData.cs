@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)decreasingHp;
                     characterEntity.CurrentHp -= tempAmount;
-                    characterEntity.ReceivedDamage(causer, CombatAmountType.NormalDamage, tempAmount);
+                    characterEntity.ReceivedDamage(causer, CombatAmountType.NormalDamage, tempAmount, null, null, 0);
                     decreasingHp -= tempAmount;
                 }
             }

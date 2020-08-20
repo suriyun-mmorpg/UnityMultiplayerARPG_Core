@@ -486,7 +486,7 @@ namespace MultiplayerARPG
             character.CurrentWater = character.GetCaches().MaxWater;
         }
 
-        public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage)
+        public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             float decreaseWeaponDurability;
             float decreaseShieldDurability;
@@ -501,14 +501,15 @@ namespace MultiplayerARPG
             DecreaseEquipItemsDurability(damageReceiver, decreaseArmorDurability);
         }
 
-        public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage)
+        public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             float decreaseWeaponDurability;
             float decreaseShieldDurability;
             float decreaseArmorDurability;
             GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
             // Decrease Weapon Durability
-            DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
+            if (attacker != null)
+                DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
         }
 
         private void GetDecreaseDurabilityAmount(CombatAmountType combatAmountType, out float decreaseWeaponDurability, out float decreaseShieldDurability, out float decreaseArmorDurability)
@@ -703,7 +704,7 @@ namespace MultiplayerARPG
                 return;
             int damage = (int)(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
             character.CurrentHp -= damage;
-            character.ReceivedDamage(null, CombatAmountType.NormalDamage, damage);
+            character.ReceivedDamage(null, CombatAmountType.NormalDamage, damage, null, null, 0);
             if (character.IsDead())
             {
                 // Dead by itself, so causer is itself

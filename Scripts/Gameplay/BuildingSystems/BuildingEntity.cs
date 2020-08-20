@@ -263,12 +263,12 @@ namespace MultiplayerARPG
             return buildingTypes.Contains(BuildingArea.buildingType);
         }
 
-        public override void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
+        public override void ReceiveDamage(IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead())
                 return;
 
-            base.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
+            base.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
             float calculatingTotalDamage = 0f;
             if (damageAmounts.Count > 0)
             {
@@ -282,7 +282,7 @@ namespace MultiplayerARPG
             // Apply damages
             int totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
-            ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
+            ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage, weapon, skill, skillLevel);
 
             // If current hp <= 0, character dead
             if (IsDead())

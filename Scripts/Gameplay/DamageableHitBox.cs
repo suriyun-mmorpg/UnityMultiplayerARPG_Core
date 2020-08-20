@@ -33,9 +33,9 @@ namespace MultiplayerARPG
             entity.PlayHitEffects(damageElements, skill);
         }
 
-        public virtual void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
+        public virtual void ReceiveDamage(IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            entity.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
+            entity.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
         }
     }
 

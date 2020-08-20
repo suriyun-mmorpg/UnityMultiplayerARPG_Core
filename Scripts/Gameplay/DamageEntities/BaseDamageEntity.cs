@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             if (IsClient)
                 target.PlayHitEffects(damageAmounts.Keys, skill);
             if (IsServer)
-                target.ReceiveDamage(attacker, weapon, damageAmounts, skill, skillLevel);
+                target.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
         }
 
         public override void InitPrefab()

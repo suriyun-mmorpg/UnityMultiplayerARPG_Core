@@ -8,14 +8,17 @@ namespace MultiplayerARPG
         byte reasons);
     public delegate void ReceiveDamageDelegate(
         IGameEntity attacker,
-        CharacterItem weapon,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+        CharacterItem weapon,
         BaseSkill skill,
         short skillLevel);
     public delegate void ReceivedDamageDelegate(
         IGameEntity attacker,
         CombatAmountType combatAmountType,
-        int damage);
+        int damage,
+        CharacterItem weapon,
+        BaseSkill skill,
+        short skillLevel);
     public delegate void AttackRoutineDelegate(
         bool isLeftHand,
         CharacterItem weapon,

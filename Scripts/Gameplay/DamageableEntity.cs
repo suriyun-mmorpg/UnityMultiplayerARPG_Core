@@ -91,19 +91,19 @@ namespace MultiplayerARPG
             return CurrentHp <= 0;
         }
 
-        public virtual void ReceiveDamage(IGameEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel)
+        public virtual void ReceiveDamage(IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead())
                 return;
             if (onReceiveDamage != null)
-                onReceiveDamage.Invoke(attacker, weapon, damageAmounts, skill, skillLevel);
+                onReceiveDamage.Invoke(attacker, damageAmounts, weapon, skill, skillLevel);
         }
 
-        public virtual void ReceivedDamage(IGameEntity attacker, CombatAmountType combatAmountType, int damage)
+        public virtual void ReceivedDamage(IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             RequestCombatAmount(combatAmountType, damage);
             if (onReceivedDamage != null)
-                onReceivedDamage.Invoke(attacker, combatAmountType, damage);
+                onReceivedDamage.Invoke(attacker, combatAmountType, damage, weapon, skill, skillLevel);
         }
 
         public virtual bool CanReceiveDamageFrom(IGameEntity attacker)
