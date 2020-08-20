@@ -477,6 +477,15 @@ namespace MultiplayerARPG
                 return 0f;
         }
 
+        public override void OnCharacterRespawn(BaseCharacterEntity character)
+        {
+            character.CurrentHp = character.GetCaches().MaxHp;
+            character.CurrentMp = character.GetCaches().MaxMp;
+            character.CurrentStamina = character.GetCaches().MaxStamina;
+            character.CurrentFood = character.GetCaches().MaxFood;
+            character.CurrentWater = character.GetCaches().MaxWater;
+        }
+
         public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage)
         {
             float decreaseWeaponDurability;

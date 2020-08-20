@@ -400,11 +400,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer || !IsDead())
                 return;
-            CurrentHp = this.GetCaches().MaxHp;
-            CurrentMp = this.GetCaches().MaxMp;
-            CurrentStamina = this.GetCaches().MaxStamina;
-            CurrentFood = this.GetCaches().MaxFood;
-            CurrentWater = this.GetCaches().MaxWater;
+            CurrentGameInstance.GameplayRule.OnCharacterRespawn(this);
             lastGrounded = true;
             lastGroundedPosition = CacheTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
