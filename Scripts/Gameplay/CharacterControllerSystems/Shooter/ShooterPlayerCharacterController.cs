@@ -780,11 +780,7 @@ namespace MultiplayerARPG
                     }
                 }
                 // Update look direction
-                if (PlayerCharacterEntity.IsPlayingActionAnimation())
-                {
-                    SetTargetLookDirectionWhileDoingAction();
-                }
-                else if (queueUsingSkill.skill != null)
+                if (queueUsingSkill.skill != null)
                 {
                     SetTargetLookDirectionWhileDoingAction();
                     UpdateLookAtTarget();
