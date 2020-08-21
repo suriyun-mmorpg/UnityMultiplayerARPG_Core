@@ -15,83 +15,83 @@ namespace MultiplayerARPG
                 cacheItem = CreateInstance<Item>();
 
             // Armor
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.maxSocket));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.equipmentModels));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.requirement));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseStats));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseStatsRate));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseAttributes));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseAttributesRate));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseResistances));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseArmors));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.increaseSkillLevels));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.equipmentSet));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.armorType));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.armorAmount));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.maxDurability));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Armor.ToString(), cacheItem.GetMemberName(a => a.destroyIfBroken));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.maxSocket));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.equipmentModels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.requirement));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseStats));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseStatsRate));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseAttributes));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseAttributesRate));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseResistances));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseArmors));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseDamages));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseSkillLevels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.equipmentSet));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.armorType));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.armorAmount));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.maxDurability));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.destroyIfBroken));
             // Weapon
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.maxSocket));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.equipmentModels));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.subEquipmentModels));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.requirement));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseStats));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseStatsRate));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseAttributes));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseAttributesRate));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseResistances));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseArmors));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.increaseSkillLevels));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.equipmentSet));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.weaponType));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.damageAmount));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.harvestDamageAmount));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.moveSpeedRateWhileAttacking));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.ammoCapacity));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.weaponAbility));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.crosshairSetting));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.fireType));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.fireStagger));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.fireSpread));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.maxDurability));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Weapon.ToString(), cacheItem.GetMemberName(a => a.destroyIfBroken));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.maxSocket));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.equipmentModels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.subEquipmentModels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.requirement));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseStats));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseStatsRate));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseAttributes));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseAttributesRate));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseResistances));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseArmors));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseDamages));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseSkillLevels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.equipmentSet));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.weaponType));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.damageAmount));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.harvestDamageAmount));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.moveSpeedRateWhileAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.ammoCapacity));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.weaponAbility));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.crosshairSetting));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireType));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireStagger));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireSpread));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.maxDurability));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.destroyIfBroken));
             // Shield
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.maxSocket));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.equipmentModels));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.requirement));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseStats));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseStatsRate));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseAttributes));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseAttributesRate));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseResistances));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseArmors));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.increaseSkillLevels));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.equipmentSet));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.armorAmount));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.maxDurability));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Shield.ToString(), cacheItem.GetMemberName(a => a.destroyIfBroken));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.maxSocket));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.equipmentModels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.requirement));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseStats));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseStatsRate));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseAttributes));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseAttributesRate));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseResistances));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseArmors));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseDamages));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseSkillLevels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.equipmentSet));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.armorAmount));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.maxDurability));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.destroyIfBroken));
             // Potion
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Potion.ToString(), cacheItem.GetMemberName(a => a.buff));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Potion), nameof(cacheItem.buff));
             // Ammo
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Ammo.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Ammo.ToString(), cacheItem.GetMemberName(a => a.ammoType));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Ammo), nameof(cacheItem.increaseDamages));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Ammo), nameof(cacheItem.ammoType));
             // Building
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Building.ToString(), cacheItem.GetMemberName(a => a.buildingEntity));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Building), nameof(cacheItem.buildingEntity));
             // Pet
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Pet.ToString(), cacheItem.GetMemberName(a => a.petEntity));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Pet), nameof(cacheItem.petEntity));
             // Socket Enhancer
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.socketEnhanceEffect));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.socketEnhanceEffect));
             // Mount
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Mount.ToString(), cacheItem.GetMemberName(a => a.mountEntity));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Mount), nameof(cacheItem.mountEntity));
             // Attribute Increase
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.AttributeIncrease.ToString(), cacheItem.GetMemberName(a => a.attributeAmount));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(cacheItem.attributeAmount));
             // Skill Use
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.Skill.ToString(), cacheItem.GetMemberName(a => a.skillLevel));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Skill), nameof(cacheItem.skillLevel));
             // Skill Learn
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), Item.LegacyItemType.SkillLearn.ToString(), cacheItem.GetMemberName(a => a.skillLevel));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(cacheItem.skillLevel));
         }
     }
 }

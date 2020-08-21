@@ -14,15 +14,15 @@ namespace MultiplayerARPG
             if (cacheGuildSkill == null)
                 cacheGuildSkill = CreateInstance<GuildSkill>();
             // Passive skill
-            ShowOnEnum(cacheGuildSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheGuildSkill.GetMemberName(a => a.increaseMaxMember));
-            ShowOnEnum(cacheGuildSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheGuildSkill.GetMemberName(a => a.increaseExpGainPercentage));
-            ShowOnEnum(cacheGuildSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheGuildSkill.GetMemberName(a => a.increaseGoldGainPercentage));
-            ShowOnEnum(cacheGuildSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheGuildSkill.GetMemberName(a => a.increaseShareExpGainPercentage));
-            ShowOnEnum(cacheGuildSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheGuildSkill.GetMemberName(a => a.increaseShareGoldGainPercentage));
-            ShowOnEnum(cacheGuildSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheGuildSkill.GetMemberName(a => a.decreaseExpLostPercentage));
+            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseMaxMember));
+            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseExpGainPercentage));
+            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseGoldGainPercentage));
+            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseShareExpGainPercentage));
+            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseShareGoldGainPercentage));
+            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.decreaseExpLostPercentage));
             // Active skill
-            ShowOnEnum(cacheGuildSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheGuildSkill.GetMemberName(a => a.coolDownDuration));
-            ShowOnEnum(cacheGuildSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheGuildSkill.GetMemberName(a => a.buff));
+            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Active), nameof(cacheGuildSkill.coolDownDuration));
+            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Active), nameof(cacheGuildSkill.buff));
         }
     }
 }

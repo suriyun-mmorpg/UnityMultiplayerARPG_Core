@@ -15,56 +15,56 @@ namespace MultiplayerARPG
             serializedObject.Update();
 
             NpcDialog node = target as NpcDialog;
-            NodeEditorGUILayout.PortField(target.GetInputPort(node.GetMemberName(a => a.input)));
+            NodeEditorGUILayout.PortField(target.GetInputPort(nameof(node.input)));
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.title)));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.titles)), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.description)));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.descriptions)), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.icon)));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.type)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.title)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.titles)), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.description)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.descriptions)), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.icon)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.type)));
             switch (node.type)
             {
                 case NpcDialogType.Normal:
-                    NodeEditorGUILayout.DynamicPortList(node.GetMemberName(a => a.menus), typeof(NpcDialog), serializedObject, NodePort.IO.Output, Node.ConnectionType.Override);
+                    NodeEditorGUILayout.DynamicPortList(nameof(node.menus), typeof(NpcDialog), serializedObject, NodePort.IO.Output, Node.ConnectionType.Override);
                     break;
                 case NpcDialogType.Quest:
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.quest)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.questAcceptedDialog)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.questDeclinedDialog)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.questAbandonedDialog)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.questCompletedDialog)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.quest)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.questAcceptedDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.questDeclinedDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.questAbandonedDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.questCompletedDialog)));
                     break;
                 case NpcDialogType.Shop:
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.sellItems)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.sellItems)));
                     break;
                 case NpcDialogType.CraftItem:
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.itemCraft)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.craftDoneDialog)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.craftItemWillOverwhelmingDialog)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.craftNotMeetRequirementsDialog)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.craftCancelDialog)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.itemCraft)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.craftDoneDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.craftItemWillOverwhelmingDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.craftNotMeetRequirementsDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.craftCancelDialog)));
                     break;
                 case NpcDialogType.SaveRespawnPoint:
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.saveRespawnMap)));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.saveRespawnPosition)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.saveRespawnConfirmDialog)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.saveRespawnCancelDialog)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.saveRespawnMap)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.saveRespawnPosition)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.saveRespawnConfirmDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.saveRespawnCancelDialog)));
                     break;
                 case NpcDialogType.Warp:
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.warpPortalType)));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.warpMap)));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(node.GetMemberName(a => a.warpPosition)));
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.warpCancelDialog)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpPortalType)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpMap)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpPosition)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.warpCancelDialog)));
                     break;
                 case NpcDialogType.RefineItem:
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.refineItemCancelDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.refineItemCancelDialog)));
                     break;
                 case NpcDialogType.PlayerStorage:
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.storageCancelDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.storageCancelDialog)));
                     break;
                 case NpcDialogType.GuildStorage:
-                    NodeEditorGUILayout.PortField(target.GetOutputPort(node.GetMemberName(a => a.storageCancelDialog)));
+                    NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.storageCancelDialog)));
                     break;
             }
 

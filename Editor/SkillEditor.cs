@@ -14,54 +14,54 @@ namespace MultiplayerARPG
             if (cacheSkill == null)
                 cacheSkill = CreateInstance<Skill>();
             // Skill type
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.availableWeapons));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.consumeMp));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.coolDownDuration));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.skillAttackType));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.skillBuffType));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.moveSpeedRateWhileUsingSkill));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.skillCastEffects));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.castDuration));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.canBeInterruptedWhileCasting));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.consumeMp));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.coolDownDuration));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.moveSpeedRateWhileUsingSkill));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.skillCastEffects));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.castDuration));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.canBeInterruptedWhileCasting));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.availableWeapons));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.consumeMp));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.coolDownDuration));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.skillAttackType));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.skillBuffType));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.moveSpeedRateWhileUsingSkill));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.skillCastEffects));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.castDuration));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.canBeInterruptedWhileCasting));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.consumeMp));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.coolDownDuration));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.moveSpeedRateWhileUsingSkill));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.skillCastEffects));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.castDuration));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.canBeInterruptedWhileCasting));
             // Normal Attack skill
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.damageHitEffects));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.damageInfo));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.damageAmount));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.effectivenessAttributes));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.weaponDamageInflictions));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.additionalDamageAmounts));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.increaseDamageAmountsWithBuffs));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.isDebuff));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.damageHitEffects));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.damageInfo));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.damageAmount));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.effectivenessAttributes));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.weaponDamageInflictions));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.additionalDamageAmounts));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.isDebuff));
             // Based On Weapon Attack skill
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.damageHitEffects));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.weaponDamageInflictions));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.additionalDamageAmounts));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.increaseDamageAmountsWithBuffs));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.isDebuff));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.damageHitEffects));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.weaponDamageInflictions));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.additionalDamageAmounts));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.isDebuff));
             // Debuff
-            ShowOnBool(cacheSkill.GetMemberName(a => a.isDebuff), true, cacheSkill.GetMemberName(a => a.debuff));
+            ShowOnBool(nameof(cacheSkill.isDebuff), true, nameof(cacheSkill.debuff));
             // Buff
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToNearbyAllies.ToString(), cacheSkill.GetMemberName(a => a.buffDistance));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToNearbyCharacters.ToString(), cacheSkill.GetMemberName(a => a.buffDistance));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToTarget.ToString(), cacheSkill.GetMemberName(a => a.buffDistance));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToUser.ToString(), cacheSkill.GetMemberName(a => a.buff));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToNearbyAllies.ToString(), cacheSkill.GetMemberName(a => a.buff));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToNearbyCharacters.ToString(), cacheSkill.GetMemberName(a => a.buff));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.BuffToTarget.ToString(), cacheSkill.GetMemberName(a => a.buff));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), Skill.SkillBuffType.Toggle.ToString(), cacheSkill.GetMemberName(a => a.buff));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheSkill.GetMemberName(a => a.buff));
+            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(cacheSkill.buffDistance));
+            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(cacheSkill.buffDistance));
+            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(cacheSkill.buffDistance));
+            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToUser), nameof(cacheSkill.buff));
+            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(cacheSkill.buff));
+            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(cacheSkill.buff));
+            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(cacheSkill.buff));
+            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.Toggle), nameof(cacheSkill.buff));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Passive), nameof(cacheSkill.buff));
             // Summon
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.summon));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.summon));
             // Mount
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.mount));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.mount));
             // Craft
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.itemCraft));
+            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.itemCraft));
         }
     }
 }

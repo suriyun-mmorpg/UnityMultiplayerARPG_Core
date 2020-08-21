@@ -14,21 +14,21 @@ namespace MultiplayerARPG
             if (cacheSkill == null)
                 cacheSkill = CreateInstance<SimpleAreaAttackSkill>();
             // Normal Attack skill
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.damageHitEffects));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.damageAmount));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.effectivenessAttributes));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.weaponDamageInflictions));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.additionalDamageAmounts));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.increaseDamageAmountsWithBuffs));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.isDebuff));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.damageHitEffects));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.damageAmount));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.effectivenessAttributes));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.weaponDamageInflictions));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.additionalDamageAmounts));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.isDebuff));
             // Based On Weapon Attack skill
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.damageHitEffects));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.weaponDamageInflictions));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.additionalDamageAmounts));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.increaseDamageAmountsWithBuffs));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), Skill.SkillAttackType.BasedOnWeapon.ToString(), cacheSkill.GetMemberName(a => a.isDebuff));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.damageHitEffects));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.weaponDamageInflictions));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.additionalDamageAmounts));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
+            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.isDebuff));
             // Debuff
-            ShowOnBool(cacheSkill.GetMemberName(a => a.isDebuff), true, cacheSkill.GetMemberName(a => a.debuff));
+            ShowOnBool(nameof(cacheSkill.isDebuff), true, nameof(cacheSkill.debuff));
         }
     }
 }
