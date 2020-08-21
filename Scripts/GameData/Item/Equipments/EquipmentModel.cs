@@ -7,9 +7,9 @@ namespace MultiplayerARPG
     {
         public string equipSocket;
         public bool useInstantiatedObject;
-        [BoolShowConditional(conditionFieldName: "useInstantiatedObject", conditionValue: false)]
+        [BoolShowConditional(nameof(useInstantiatedObject), false)]
         public GameObject model;
-        [BoolShowConditional(conditionFieldName: "useInstantiatedObject", conditionValue: true)]
+        [BoolShowConditional(nameof(useInstantiatedObject), true)]
         public int instantiatedObjectIndex;
     }
 }

@@ -518,46 +518,46 @@ namespace MultiplayerARPG
             if (from.fieldName.Contains("menus ") && int.TryParse(from.fieldName.Split(' ')[1], out arrayIndex) && arrayIndex < menus.Length)
                 menus[arrayIndex].dialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.questAcceptedDialog)))
+            if (from.fieldName.Equals(nameof(questAcceptedDialog)))
                 questAcceptedDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.questDeclinedDialog)))
+            if (from.fieldName.Equals(nameof(questDeclinedDialog)))
                 questDeclinedDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.questAbandonedDialog)))
+            if (from.fieldName.Equals(nameof(questAbandonedDialog)))
                 questAbandonedDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.questCompletedDialog)))
+            if (from.fieldName.Equals(nameof(questCompletedDialog)))
                 questCompletedDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.craftDoneDialog)))
+            if (from.fieldName.Equals(nameof(craftDoneDialog)))
                 craftDoneDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.craftItemWillOverwhelmingDialog)))
+            if (from.fieldName.Equals(nameof(craftItemWillOverwhelmingDialog)))
                 craftItemWillOverwhelmingDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.craftNotMeetRequirementsDialog)))
+            if (from.fieldName.Equals(nameof(craftNotMeetRequirementsDialog)))
                 craftNotMeetRequirementsDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.craftCancelDialog)))
+            if (from.fieldName.Equals(nameof(craftCancelDialog)))
                 craftCancelDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.saveRespawnConfirmDialog)))
+            if (from.fieldName.Equals(nameof(saveRespawnConfirmDialog)))
                 saveRespawnConfirmDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.saveRespawnCancelDialog)))
+            if (from.fieldName.Equals(nameof(saveRespawnCancelDialog)))
                 saveRespawnCancelDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.warpCancelDialog)))
+            if (from.fieldName.Equals(nameof(warpCancelDialog)))
                 warpCancelDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.refineItemCancelDialog)))
+            if (from.fieldName.Equals(nameof(refineItemCancelDialog)))
                 refineItemCancelDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.storageCancelDialog)))
+            if (from.fieldName.Equals(nameof(storageCancelDialog)))
                 storageCancelDialog = dialog;
 
-            if (from.fieldName.Equals(this.GetMemberName(a => a.repairItemCancelDialog)))
+            if (from.fieldName.Equals(nameof(repairItemCancelDialog)))
                 repairItemCancelDialog = dialog;
         }
 

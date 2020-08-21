@@ -4,7 +4,7 @@
     public struct UILocaleKeySetting
     {
         public UIFormatKeys localeKey;
-        [StringShowConditional("localeKey", "UI_CUSTOM")]
+        [StringShowConditional(nameof(localeKey), nameof(UIFormatKeys.UI_CUSTOM))]
         public string customKey;
         public UILocaleKeySetting(UIFormatKeys localeKey)
         {

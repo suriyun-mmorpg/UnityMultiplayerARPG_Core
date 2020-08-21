@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         public LanguageData[] titles;
         public NpcDialogCondition[] showConditions;
         public bool isCloseMenu;
-        [BoolShowConditional(conditionFieldName: "isCloseMenu", conditionValue: false)]
+        [BoolShowConditional(nameof(isCloseMenu), false)]
         public NpcDialog dialog;
 
         public string Title

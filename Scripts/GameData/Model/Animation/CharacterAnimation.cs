@@ -29,7 +29,7 @@ namespace MultiplayerARPG
         public float[] multiHitTriggerDurationRates;
         [Tooltip("How animation duration defined")]
         public AnimationDurationType durationType;
-        [StringShowConditional("durationType", "ByFixValue")]
+        [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixValue))]
         [Tooltip("This will be used when `durationType` equals to `ByFixValue` to define animation duration")]
         public float fixDurationValue;
         [Tooltip("This will be in use with attack/skill animations, This is duration after played animation clip to add delay before next animation")]
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
         public AnimationClip castClip;
         public bool playCastClipAllLayers;
         public SkillActivateAnimationType activateAnimationType;
-        [StringShowConditional("activateAnimationType", "UseActivateAnimation")]
+        [StringShowConditional(nameof(activateAnimationType), nameof(SkillActivateAnimationType.UseActivateAnimation))]
         public ActionAnimation activateAnimation;
         public BaseSkill Data { get { return skill; } }
     }

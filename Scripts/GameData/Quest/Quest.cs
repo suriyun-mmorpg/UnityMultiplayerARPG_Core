@@ -72,9 +72,9 @@ namespace MultiplayerARPG
     public struct QuestTask
     {
         public QuestTaskType taskType;
-        [StringShowConditional(conditionFieldName: "taskType", conditionValue: "KillMonster")]
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.KillMonster))]
         public MonsterCharacterAmount monsterCharacterAmount;
-        [StringShowConditional(conditionFieldName: "taskType", conditionValue: "CollectItem")]
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
         public ItemAmount itemAmount;
     }
 }

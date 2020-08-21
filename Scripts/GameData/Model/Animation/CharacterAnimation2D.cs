@@ -119,7 +119,7 @@ namespace MultiplayerARPG
         public BaseSkill skill;
         public CharacterAnimation2D castAnimation;
         public SkillActivateAnimationType activateAnimationType;
-        [StringShowConditional("activateAnimationType", "UseActivateAnimation")]
+        [StringShowConditional(nameof(activateAnimationType), nameof(SkillActivateAnimationType.UseActivateAnimation))]
         public ActionAnimation2D activateAnimation;
         public BaseSkill Data { get { return skill; } }
     }
