@@ -49,9 +49,9 @@ namespace MultiplayerARPG
         protected readonly Dictionary<string, BaseCharacterModel> CharacterModelById = new Dictionary<string, BaseCharacterModel>();
         protected BaseCharacterModel selectedModel;
         public BaseCharacterModel SelectedModel { get { return selectedModel; } }
-        protected readonly Dictionary<string, IPlayerCharacterData> PlayerCharacterDataById = new Dictionary<string, IPlayerCharacterData>();
-        protected IPlayerCharacterData selectedPlayerCharacterData;
-        public IPlayerCharacterData SelectedPlayerCharacterData { get { return selectedPlayerCharacterData; } }
+        protected readonly Dictionary<string, PlayerCharacterData> PlayerCharacterDataById = new Dictionary<string, PlayerCharacterData>();
+        protected PlayerCharacterData selectedPlayerCharacterData;
+        public PlayerCharacterData SelectedPlayerCharacterData { get { return selectedPlayerCharacterData; } }
 
         protected virtual void LoadCharacters()
         {
@@ -87,6 +87,10 @@ namespace MultiplayerARPG
             else
                 eventOnAbleToCreateCharacter.Invoke();
 
+            // Clear selected character data, will select first in list if available
+            (BaseGameNetworkManager.Singleton as LanRpgNetworkManager).selectedCharacter = selectedPlayerCharacterData = null;
+
+            // Generate list entry by saved characters
             if (selectableCharacters.Count > 0)
             {
                 selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
@@ -158,51 +162,43 @@ namespace MultiplayerARPG
             if (buttonDelete)
                 buttonDelete.gameObject.SetActive(true);
             characterModelContainer.SetChildrenActive(false);
+            // Load selected character and also validate its data
             PlayerCharacterDataById.TryGetValue(playerCharacterData.Id, out selectedPlayerCharacterData);
+            // Validate map data
+            if (!GameInstance.Singleton.GetGameMapIds().Contains(SelectedPlayerCharacterData.CurrentMapName))
+            {
+                PlayerCharacter database = SelectedPlayerCharacterData.GetDatabase() as PlayerCharacter;
+                SelectedPlayerCharacterData.CurrentMapName = database.StartMap.Id;
+                SelectedPlayerCharacterData.CurrentPosition = database.StartPosition;
+            }
+            // Set selected character to network manager
+            (BaseGameNetworkManager.Singleton as LanRpgNetworkManager).selectedCharacter = SelectedPlayerCharacterData;
+            // Show selected character model
             CharacterModelById.TryGetValue(playerCharacterData.Id, out selectedModel);
-            // Show selected model
             if (SelectedModel != null)
                 SelectedModel.gameObject.SetActive(true);
         }
 
         public virtual void OnClickStart()
         {
-            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
-            if (selectedUI == null)
+            if (SelectedPlayerCharacterData == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_START.ToString()));
                 Debug.LogWarning("Cannot start game, No chosen character");
                 return;
             }
-            // Load gameplay scene, we're going to manage maps in gameplay scene later
-            // So we can add gameplay UI just once in gameplay scene
-            PlayerCharacterData characterData = new PlayerCharacterData();
-            IPlayerCharacterData playerCharacter = selectedUI.Data as IPlayerCharacterData;
-            playerCharacter.CloneTo(characterData);
-            GameInstance gameInstance = GameInstance.Singleton;
-            LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
-            if (!gameInstance.GetGameMapIds().Contains(characterData.CurrentMapName))
-            {
-                PlayerCharacter database = characterData.GetDatabase() as PlayerCharacter;
-                characterData.CurrentMapName = database.StartMap.Id;
-                characterData.CurrentPosition = database.StartPosition;
-            }
-            networkManager.selectedCharacter = characterData;
-            networkManager.StartGame();
+            (BaseGameNetworkManager.Singleton as LanRpgNetworkManager).StartGame();
         }
 
         public virtual void OnClickDelete()
         {
-            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
-            if (selectedUI == null)
+            if (SelectedPlayerCharacterData == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE.ToString()));
                 Debug.LogWarning("Cannot delete character, No chosen character");
                 return;
             }
-
-            IPlayerCharacterData playerCharacter = selectedUI.Data as IPlayerCharacterData;
-            playerCharacter.DeletePersistentCharacterData();
+            SelectedPlayerCharacterData.DeletePersistentCharacterData();
             // Reload characters
             LoadCharacters();
         }
