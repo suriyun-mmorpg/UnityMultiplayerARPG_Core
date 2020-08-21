@@ -45,6 +45,8 @@ namespace MultiplayerARPG
             zoomWeaponAbilityController.RotationSpeedScale = 1f;
             zoomWeaponAbilityController.ShowZoomCrosshair = false;
             zoomWeaponAbilityController.HideCrosshair = false;
+            if (disableRenderersOnZoom)
+                BasePlayerCharacterController.OwningCharacter.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, false);
         }
 
         public override void OnPreActivate()
@@ -86,7 +88,8 @@ namespace MultiplayerARPG
 
             if (!isActive)
             {
-                BasePlayerCharacterController.OwningCharacter.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, false);
+                if (disableRenderersOnZoom)
+                    BasePlayerCharacterController.OwningCharacter.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, false);
             }
             else
             {
