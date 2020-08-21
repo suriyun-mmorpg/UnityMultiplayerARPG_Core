@@ -219,8 +219,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Activate Instantiate Object")]
-        public void ActivateInstantiateObject()
+        [ContextMenu("Activate Instantiated Object")]
+        public void ActivateInstantiatedObject()
         {
             if (equipmentContainers != null && equipmentContainers.Length > 0)
             {
