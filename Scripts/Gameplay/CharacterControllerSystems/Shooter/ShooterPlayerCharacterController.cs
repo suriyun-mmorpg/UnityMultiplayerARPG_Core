@@ -4,18 +4,12 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController
+    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController
     {
         public enum ControllerMode
         {
             Adventure,
             Combat,
-        }
-
-        public enum ControllerViewMode
-        {
-            Tps,
-            Fps,
         }
 
         public enum ExtraMoveActiveMode
@@ -37,7 +31,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool canSwitchViewMode;
         [SerializeField]
-        private ControllerViewMode viewMode;
+        private ShooterControllerViewMode viewMode;
         [SerializeField]
         private ExtraMoveActiveMode sprintActiveMode;
         [SerializeField]
@@ -137,7 +131,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (viewMode == ControllerViewMode.Fps)
+                if (viewMode == ShooterControllerViewMode.Fps)
                 {
                     // If view mode is fps, controls type must be combat
                     return ControllerMode.Combat;
@@ -146,7 +140,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public ControllerViewMode ViewMode
+        public ShooterControllerViewMode ViewMode
         {
             get { return viewMode; }
             set { viewMode = value; }
@@ -154,24 +148,24 @@ namespace MultiplayerARPG
 
         public float CameraZoomDistance
         {
-            get { return ViewMode == ControllerViewMode.Tps ? tpsZoomDistance : fpsZoomDistance; }
+            get { return ViewMode == ShooterControllerViewMode.Tps ? tpsZoomDistance : fpsZoomDistance; }
         }
 
         public float CameraMinZoomDistance
         {
-            get { return ViewMode == ControllerViewMode.Tps ? tpsMinZoomDistance : fpsZoomDistance; }
+            get { return ViewMode == ShooterControllerViewMode.Tps ? tpsMinZoomDistance : fpsZoomDistance; }
         }
 
         public float CameraMaxZoomDistance
         {
-            get { return ViewMode == ControllerViewMode.Tps ? tpsMaxZoomDistance : fpsZoomDistance; }
+            get { return ViewMode == ShooterControllerViewMode.Tps ? tpsMaxZoomDistance : fpsZoomDistance; }
         }
 
         public Vector3 CameraTargetOffset
         {
             get
             {
-                if (ViewMode == ControllerViewMode.Tps)
+                if (ViewMode == ShooterControllerViewMode.Tps)
                 {
                     if (PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrouching))
                     {
@@ -192,18 +186,32 @@ namespace MultiplayerARPG
 
         public float CameraFov
         {
-            get { return ViewMode == ControllerViewMode.Tps ? tpsFov : fpsFov; }
+            get { return ViewMode == ShooterControllerViewMode.Tps ? tpsFov : fpsFov; }
         }
 
         public float CameraNearClipPlane
         {
-            get { return ViewMode == ControllerViewMode.Tps ? tpsNearClipPlane : fpsNearClipPlane; }
+            get { return ViewMode == ShooterControllerViewMode.Tps ? tpsNearClipPlane : fpsNearClipPlane; }
         }
 
         public float CameraFarClipPlane
         {
-            get { return ViewMode == ControllerViewMode.Tps ? tpsFarClipPlane : fpsFarClipPlane; }
+            get { return ViewMode == ShooterControllerViewMode.Tps ? tpsFarClipPlane : fpsFarClipPlane; }
         }
+
+        public float CurrentCameraFov
+        {
+            get { return CacheGameplayCamera.fieldOfView; }
+            set { CacheGameplayCamera.fieldOfView = value; }
+        }
+
+        public float RotationSpeedScale
+        {
+            get { return CacheGameplayCameraControls.rotationSpeedScale; }
+            set { CacheGameplayCameraControls.rotationSpeedScale = value; }
+        }
+
+        public bool HideCrosshair { get; set; }
 
         public float CurrentTurnSpeed
         {
@@ -265,12 +273,12 @@ namespace MultiplayerARPG
         bool toggleCrouchOn;
         bool toggleCrawlOn;
         // Controlling states
-        ControllerViewMode dirtyViewMode;
+        ShooterControllerViewMode dirtyViewMode;
         IWeaponItem rightHandWeapon;
         IWeaponItem leftHandWeapon;
         MovementState movementState;
         ExtraMovementState extraMovementState;
-        ControllerViewMode? viewModeBeforeDead;
+        ShooterControllerViewMode? viewModeBeforeDead;
         bool isDoingAction;
         bool mustReleaseFireKey;
         float buildYRotate;
@@ -304,7 +312,7 @@ namespace MultiplayerARPG
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
             characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraTransform);
-            characterEntity.ModelManager.SetIsFps(ViewMode == ControllerViewMode.Fps);
+            characterEntity.ModelManager.SetIsFps(ViewMode == ShooterControllerViewMode.Fps);
             UpdateCameraSettings();
         }
 
@@ -388,10 +396,16 @@ namespace MultiplayerARPG
 
             if (PlayerCharacterEntity.IsDead())
             {
+                // Deactivate weapon ability immediately when dead
+                if (WeaponAbility != null && WeaponAbilityState != WeaponAbilityState.Deactivated)
+                {
+                    WeaponAbility.ForceDeactivated();
+                    WeaponAbilityState = WeaponAbilityState.Deactivated;
+                }
                 // Set view mode to TPS when character dead
                 if (!viewModeBeforeDead.HasValue)
                     viewModeBeforeDead = ViewMode;
-                ViewMode = ControllerViewMode.Tps;
+                ViewMode = ShooterControllerViewMode.Tps;
             }
             else
             {
@@ -413,8 +427,8 @@ namespace MultiplayerARPG
                 CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
             }
             CacheGameplayCameraControls.targetOffset = CameraTargetOffset;
-            CacheGameplayCameraControls.enableWallHitSpring = viewMode == ControllerViewMode.Tps ? true : false;
-            CacheGameplayCameraControls.target = ViewMode == ControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
+            CacheGameplayCameraControls.enableWallHitSpring = viewMode == ShooterControllerViewMode.Tps ? true : false;
+            CacheGameplayCameraControls.target = ViewMode == ShooterControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
 
             // Set temp data
             tempDeltaTime = Time.deltaTime;
@@ -533,11 +547,11 @@ namespace MultiplayerARPG
             {
                 switch (ViewMode)
                 {
-                    case ControllerViewMode.Tps:
-                        ViewMode = ControllerViewMode.Fps;
+                    case ShooterControllerViewMode.Tps:
+                        ViewMode = ShooterControllerViewMode.Fps;
                         break;
-                    case ControllerViewMode.Fps:
-                        ViewMode = ControllerViewMode.Tps;
+                    case ShooterControllerViewMode.Fps:
+                        ViewMode = ShooterControllerViewMode.Tps;
                         break;
                 }
             }
@@ -757,7 +771,7 @@ namespace MultiplayerARPG
                     break;
             }
 
-            if (ViewMode == ControllerViewMode.Fps)
+            if (ViewMode == ShooterControllerViewMode.Fps)
             {
                 // Force turn to look direction
                 moveLookDirection = cameraForward;
@@ -950,7 +964,10 @@ namespace MultiplayerARPG
             if (crosshairRect == null)
                 return;
             // Show cross hair if weapon's crosshair setting isn't hidden or there is a constructing building
-            crosshairRect.gameObject.SetActive(!setting.hidden || ConstructingBuildingEntity != null);
+            crosshairRect.gameObject.SetActive((!setting.hidden && !HideCrosshair) || ConstructingBuildingEntity != null);
+            // Not active?, don't update
+            if (!crosshairRect.gameObject)
+                return;
             // Change crosshair size by power
             Vector3 sizeDelta = crosshairRect.sizeDelta;
             sizeDelta.x += power;
@@ -964,11 +981,11 @@ namespace MultiplayerARPG
         {
             switch (ViewMode)
             {
-                case ControllerViewMode.Fps:
+                case ShooterControllerViewMode.Fps:
                     // Just look at camera forward while character playing action animation
                     targetLookDirection = cameraForward;
                     break;
-                case ControllerViewMode.Tps:
+                case ShooterControllerViewMode.Tps:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
                     Vector3 doActionLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
                     if (turnSpeedWileDoingAction > 0f)
@@ -991,11 +1008,11 @@ namespace MultiplayerARPG
         {
             switch (ViewMode)
             {
-                case ControllerViewMode.Fps:
+                case ShooterControllerViewMode.Fps:
                     // Just look at camera forward while character playing action animation
                     targetLookDirection = cameraForward;
                     break;
-                case ControllerViewMode.Tps:
+                case ShooterControllerViewMode.Tps:
                     // Turn character look direction to move direction while moving without doing any action
                     if (moveDirection.sqrMagnitude > 0f)
                     {
@@ -1246,22 +1263,12 @@ namespace MultiplayerARPG
             return InputManager.GetButtonDown("Fire2");
         }
 
-        public void SetActiveCrosshair(bool isActive)
-        {
-            if (crosshairRect != null &&
-                crosshairRect.gameObject.activeSelf != isActive)
-            {
-                // Hide crosshair when not active
-                crosshairRect.gameObject.SetActive(isActive);
-            }
-        }
-
         public void UpdateCameraSettings()
         {
             CacheGameplayCamera.fieldOfView = CameraFov;
             CacheGameplayCamera.nearClipPlane = CameraNearClipPlane;
             CacheGameplayCamera.farClipPlane = CameraFarClipPlane;
-            PlayerCharacterEntity.ModelManager.SetIsFps(viewMode == ControllerViewMode.Fps);
+            PlayerCharacterEntity.ModelManager.SetIsFps(viewMode == ShooterControllerViewMode.Fps);
         }
 
         public bool IsInFront(Vector3 position)

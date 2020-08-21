@@ -16,79 +16,92 @@ namespace MultiplayerARPG
         public Sprite zoomCrosshair;
 
         [System.NonSerialized]
-        private float zoomInterpTime;
+        private float currentZoomInterpTime;
         [System.NonSerialized]
-        private ShooterPlayerCharacterController shooterController;
+        private float currentZoomFov;
         [System.NonSerialized]
-        private ShooterPlayerCharacterController.ControllerViewMode preActivateViewMode;
+        private IZoomWeaponAbilityController zoomWeaponAbilityController;
+        [System.NonSerialized]
+        private ShooterControllerViewMode? preActivateViewMode;
 
         // TODO: Add rotate scale player's config
 
         public override void Setup(BasePlayerCharacterController controller, CharacterItem weapon)
         {
             base.Setup(controller, weapon);
-            shooterController = controller as ShooterPlayerCharacterController;
-            shooterController.zoomCrosshairImage.preserveAspect = true;
-            shooterController.zoomCrosshairImage.raycastTarget = false;
+            zoomWeaponAbilityController = controller as IZoomWeaponAbilityController;
+            zoomWeaponAbilityController.InitialZoomCrosshair();
         }
 
         public override void Desetup()
         {
-            if (shooterController.zoomCrosshairImage != null)
-                shooterController.zoomCrosshairImage.gameObject.SetActive(false);
+            ForceDeactivated();
+        }
+
+        public override void ForceDeactivated()
+        {
+            if (preActivateViewMode.HasValue)
+                zoomWeaponAbilityController.ViewMode = preActivateViewMode.Value;
+            zoomWeaponAbilityController.RotationSpeedScale = 1f;
+            zoomWeaponAbilityController.ShowZoomCrosshair = false;
+            zoomWeaponAbilityController.HideCrosshair = false;
         }
 
         public override void OnPreActivate()
         {
-            preActivateViewMode = shooterController.ViewMode;
-            shooterController.ViewMode = ShooterPlayerCharacterController.ControllerViewMode.Fps;
-            shooterController.SetZoomCrosshairSprite(zoomCrosshair);
-            shooterController.CacheGameplayCameraControls.rotationSpeedScale = rotationSpeedScaleWhileZooming;
+            preActivateViewMode = zoomWeaponAbilityController.ViewMode;
+            zoomWeaponAbilityController.ViewMode = ShooterControllerViewMode.Fps;
+            zoomWeaponAbilityController.SetZoomCrosshairSprite(zoomCrosshair);
+            zoomWeaponAbilityController.RotationSpeedScale = rotationSpeedScaleWhileZooming;
+            currentZoomInterpTime = 0f;
+            currentZoomFov = zoomWeaponAbilityController.CurrentCameraFov;
         }
 
         public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime)
         {
             if (state == WeaponAbilityState.Deactivating)
             {
-                zoomInterpTime += deltaTime * ZOOM_SPEED;
-                shooterController.CacheGameplayCamera.fieldOfView = Mathf.Lerp(shooterController.CacheGameplayCamera.fieldOfView, shooterController.CameraFov, zoomInterpTime);
-                if (zoomInterpTime >= 1f)
+                currentZoomInterpTime += deltaTime * ZOOM_SPEED;
+                zoomWeaponAbilityController.CurrentCameraFov = currentZoomFov = Mathf.Lerp(currentZoomFov, zoomWeaponAbilityController.CameraFov, currentZoomInterpTime);
+                if (currentZoomInterpTime >= 1f)
                 {
-                    zoomInterpTime = 0;
+                    currentZoomInterpTime = 0;
                     state = WeaponAbilityState.Deactivated;
                 }
             }
             else if (state == WeaponAbilityState.Activating)
             {
-                zoomInterpTime += deltaTime * ZOOM_SPEED;
-                shooterController.CacheGameplayCamera.fieldOfView = Mathf.Lerp(shooterController.CacheGameplayCamera.fieldOfView, zoomingFov, zoomInterpTime);
-                if (zoomInterpTime >= 1f)
+                currentZoomInterpTime += deltaTime * ZOOM_SPEED;
+                zoomWeaponAbilityController.CurrentCameraFov = currentZoomFov = Mathf.Lerp(currentZoomFov, zoomingFov, currentZoomInterpTime);
+                if (currentZoomInterpTime >= 1f)
                 {
-                    zoomInterpTime = 0;
+                    currentZoomInterpTime = 0;
                     state = WeaponAbilityState.Activated;
                 }
             }
 
             bool isActive = state == WeaponAbilityState.Activated || state == WeaponAbilityState.Activating;
-            shooterController.SetActiveZoomCrosshair(isActive);
-            shooterController.SetActiveCrosshair(!isActive && !shooterController.CurrentCrosshairSetting.hidden);
+            zoomWeaponAbilityController.ShowZoomCrosshair = isActive;
+            zoomWeaponAbilityController.HideCrosshair = isActive;
 
             if (!isActive)
             {
-                shooterController.PlayerCharacterEntity.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, false);
-                shooterController.ViewMode = preActivateViewMode;
+                BasePlayerCharacterController.OwningCharacter.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, false);
             }
             else
             {
                 if (disableRenderersOnZoom)
-                    shooterController.PlayerCharacterEntity.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, true);
+                    BasePlayerCharacterController.OwningCharacter.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, true);
             }
             return state;
         }
 
         public override void OnPreDeactivate()
         {
-            shooterController.CacheGameplayCameraControls.rotationSpeedScale = 1f;
+            zoomWeaponAbilityController.ViewMode = preActivateViewMode.Value;
+            zoomWeaponAbilityController.RotationSpeedScale = 1f;
+            currentZoomInterpTime = 0f;
+            currentZoomFov = zoomWeaponAbilityController.CurrentCameraFov;
         }
     }
 }

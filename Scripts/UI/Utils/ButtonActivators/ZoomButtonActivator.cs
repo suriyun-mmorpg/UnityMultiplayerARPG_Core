@@ -8,13 +8,13 @@ namespace MultiplayerARPG
     {
         public GameObject[] activateObjects;
 
-        private ShooterPlayerCharacterController controller;
+        private IWeaponAbilityController controller;
         private bool canZoom;
 
         private void LateUpdate()
         {
             if (BasePlayerCharacterController.Singleton != null && controller == null)
-                controller = BasePlayerCharacterController.Singleton as ShooterPlayerCharacterController;
+                controller = BasePlayerCharacterController.Singleton as IWeaponAbilityController;
             canZoom = controller != null && controller.WeaponAbility != null &&
                 controller.WeaponAbility is ZoomWeaponAbility;
 

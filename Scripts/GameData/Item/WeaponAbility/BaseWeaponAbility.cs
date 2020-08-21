@@ -16,7 +16,8 @@ namespace MultiplayerARPG
         }
 
         // TODO: May add more abstract functions later
-        public abstract void Desetup();
+        public virtual void Desetup() { }
+        public virtual void ForceDeactivated() { }
         public abstract void OnPreActivate();
         public abstract WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime);
         public abstract void OnPreDeactivate();
