@@ -860,6 +860,10 @@ namespace MultiplayerARPG
                     UpdateLookAtTarget();
                     Activate();
                 }
+                else
+                {
+                    SetTargetLookDirectionWhileMoving();
+                }
             }
             else if (tempPressWeaponAbility)
             {
