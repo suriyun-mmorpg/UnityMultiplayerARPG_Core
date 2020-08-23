@@ -22,3 +22,6 @@
 [submodule "SerializableCallback"]
 	path = SerializableCallback
 	url = https://github.com/insthync/SerializableCallback.git
+[submodule "SuperGrid2DVisibleChecker"]
+	path = SuperGrid2DVisibleChecker
+	url = https://github.com/insthync/LiteNetLib-SuperGrid2D-Integration.git
