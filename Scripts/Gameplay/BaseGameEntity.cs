@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             get
             {
                 if (PassengingVehicleEntity != null)
-                    return (PassengingVehicleEntity as IGameEntity).Entity.Direction2D;
+                    return PassengingVehicleEntity.Entity.Direction2D;
                 if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
                     return LocalDirection2D;
                 return direction2D.Value;
@@ -538,7 +538,7 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncTriggerPickup);
             RegisterNetFunction<MovementState>(NetFuncSetMovement);
             RegisterNetFunction<ExtraMovementState>(NetFuncSetExtraMovement);
-            RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection);
+            RegisterNetFunction<DirectionVector2>(NetFuncUpdateDirection2D);
 
             if (teleportingPosition.HasValue)
             {
@@ -670,7 +670,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncUpdateDirection(DirectionVector2 direction)
+        protected void NetFuncUpdateDirection2D(DirectionVector2 direction)
         {
             // Set data at server and sync to clients later
             Direction2D = direction;
@@ -876,7 +876,7 @@ namespace MultiplayerARPG
                 Direction2D = direction;
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, new DirectionVector2(LocalDirection2D));
+                CallNetFunction(NetFuncUpdateDirection2D, FunctionReceivers.Server, new DirectionVector2(LocalDirection2D));
         }
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
