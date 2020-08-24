@@ -802,6 +802,22 @@ namespace StandardAssets.Characters.Physics
 		/// <summary>
 		/// Set the capsule's height and center.
 		/// </summary>
+		/// <param name="newRadius">The new radius.</param>
+		/// <param name="newHeight">The new height.</param>
+		/// <param name="newCenter">The new center.</param>
+		/// <param name="checkForPenetration">Check for collision, and then de-penetrate if there's collision?</param>
+		/// <param name="updateGrounded">Update the grounded state? This uses a cast, so only set it to true if you need it.</param>
+		/// <returns>Returns the height that was set, which may be different to newHeight because of validation.</returns>
+		public float SetRadiusHeightAndCenter(float newRadius, float newHeight, Vector3 newCenter, bool checkForPenetration,
+										bool updateGrounded)
+        {
+			m_Radius = newRadius;
+			return SetHeightAndCenter(newHeight, newCenter, checkForPenetration, updateGrounded);
+		}
+
+		/// <summary>
+		/// Set the capsule's height and center.
+		/// </summary>
 		/// <param name="newHeight">The new height.</param>
 		/// <param name="newCenter">The new center.</param>
 		/// <param name="checkForPenetration">Check for collision, and then de-penetrate if there's collision?</param>
@@ -1108,21 +1124,6 @@ namespace StandardAssets.Characters.Physics
 
 			defaultHeight = m_Height;
 			m_DefaultCenter = m_Center;
-		}
-
-		/// <summary>
-		/// Init the capsule's radius, height and center. Call this before start
-		/// </summary>
-		/// <param name="newRadius"></param>
-		/// <param name="newHeight"></param>
-		/// <param name="newCenter"></param>
-		public void InitRadiusHeightAndCenter(float newRadius, float newHeight, Vector3 newCenter)
-		{
-			m_Radius = newRadius;
-			m_Height = newHeight;
-			m_Center = newCenter;
-			if (Application.isPlaying)
-				Awake();
 		}
 
 		// Call this when the capsule's values change.
