@@ -899,7 +899,7 @@ public static partial class CharacterDataExtension
             // If there are no changes and there are an empty entries, fill them
             foreach (int emptySlotIndex in emptySlots.Keys)
             {
-                tempNewItem = addingItem.Clone();
+                tempNewItem = addingItem.Clone(true);
                 short addAmount = 0;
                 if (amount - maxStack >= 0)
                 {
@@ -927,7 +927,7 @@ public static partial class CharacterDataExtension
         // Add new items to new slots
         while (amount > 0)
         {
-            tempNewItem = addingItem.Clone();
+            tempNewItem = addingItem.Clone(true);
             short addAmount;
             if (amount - maxStack >= 0)
             {
