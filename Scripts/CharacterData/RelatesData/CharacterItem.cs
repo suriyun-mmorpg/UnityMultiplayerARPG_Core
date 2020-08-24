@@ -457,10 +457,10 @@ public class CharacterItem : INetSerializableWithElement
         return result;
     }
 
-    public CharacterItem Clone()
+    public CharacterItem Clone(bool generateNewId = false)
     {
         CharacterItem cloneItem = new CharacterItem();
-        cloneItem.id = id;
+        cloneItem.id = generateNewId ? GenericUtils.GetUniqueId() : id;
         cloneItem.dataId = dataId;
         cloneItem.level = level;
         cloneItem.amount = amount;
