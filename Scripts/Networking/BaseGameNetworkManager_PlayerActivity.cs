@@ -766,6 +766,11 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        /// <summary>
+        /// Get current map Id for saving purpose
+        /// </summary>
+        /// <param name="playerCharacterEntity"></param>
+        /// <returns></returns>
         public virtual string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
@@ -773,6 +778,11 @@ namespace MultiplayerARPG
             return CurrentMapInfo.Id;
         }
 
+        /// <summary>
+        /// Get current position for saving purpose
+        /// </summary>
+        /// <param name="playerCharacterEntity"></param>
+        /// <returns></returns>
         public virtual Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
