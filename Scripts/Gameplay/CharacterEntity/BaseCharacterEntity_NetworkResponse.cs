@@ -26,7 +26,7 @@ namespace MultiplayerARPG
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
             {
-                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, aimPosition);
+                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, aimPosition).Forget();
             }
             else
             {
