@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using StandardAssets.Characters.Physics;
 
 namespace MultiplayerARPG
 {
@@ -56,16 +57,21 @@ namespace MultiplayerARPG
 #endif
         };
 
+        private OpenCharacterController openCharacterController;
         private CapsuleCollider capsuleCollider;
+        private bool previousIsUnderWater;
+        private ExtraMovementState previousExtraMovementState;
 
         public override void EntityAwake()
         {
+            openCharacterController = GetComponent<OpenCharacterController>();
             capsuleCollider = GetComponent<CapsuleCollider>();
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
+            openCharacterController = GetComponent<OpenCharacterController>();
             capsuleCollider = GetComponent<CapsuleCollider>();
             ApplyingSettings(ref standSettings);
             ApplyingSettings(ref crouchSettings);
@@ -145,14 +151,15 @@ namespace MultiplayerARPG
 
         public override void EntityLateUpdate()
         {
-            if (capsuleCollider == null)
+            if (openCharacterController == null && capsuleCollider == null)
                 return;
 
-            if (CacheEntity.MovementState.HasFlag(MovementState.IsUnderWater))
+            bool isUnderWater = CacheEntity.MovementState.HasFlag(MovementState.IsUnderWater);
+            if (isUnderWater && isUnderWater != previousIsUnderWater)
             {
                 Apply(swimSettings);
             }
-            else
+            else if (CacheEntity.ExtraMovementState != previousExtraMovementState)
             {
                 switch (CacheEntity.ExtraMovementState)
                 {
@@ -167,14 +174,23 @@ namespace MultiplayerARPG
                         break;
                 }
             }
+            previousIsUnderWater = isUnderWater;
+            previousExtraMovementState = CacheEntity.ExtraMovementState;
         }
 
         private void Apply(Settings settings)
         {
-            capsuleCollider.center = settings.center;
-            capsuleCollider.radius = settings.radius;
-            capsuleCollider.height = settings.height;
-            capsuleCollider.direction = (int)settings.direction;
+            if (openCharacterController != null)
+            {
+                openCharacterController.SetRadiusHeightAndCenter(settings.radius, settings.height, settings.center, true, true);
+            }
+            if (capsuleCollider != null)
+            {
+                capsuleCollider.center = settings.center;
+                capsuleCollider.radius = settings.radius;
+                capsuleCollider.height = settings.height;
+                capsuleCollider.direction = (int)settings.direction;
+            }
         }
     }
 }
