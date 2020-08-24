@@ -596,6 +596,8 @@ namespace MultiplayerARPG
 
         public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, Vector2 direction2D)
         {
+            if (!Application.isPlaying)
+                return;
             this.movementState = movementState;
             this.extraMovementState = extraMovementState;
             this.direction2D = direction2D;
