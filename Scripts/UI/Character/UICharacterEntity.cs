@@ -3,7 +3,6 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(Canvas))]
     public class UICharacterEntity : UIDamageableEntity<BaseCharacterEntity>
     {
         [Header("Character Entity - String Formats")]
