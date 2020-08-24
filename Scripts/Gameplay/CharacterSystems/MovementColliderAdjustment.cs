@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             public bool drawGizmos;
             public Color gizmosColor;
             [Header("Editor Tools")]
-            public bool applyToCapsule;
+            public bool applyToComponent;
 #endif
         }
 
@@ -73,6 +73,41 @@ namespace MultiplayerARPG
         {
             openCharacterController = GetComponent<OpenCharacterController>();
             capsuleCollider = GetComponent<CapsuleCollider>();
+            if (openCharacterController != null)
+            {
+                Settings tempSettings;
+                bool anyDirectionNotY = false;
+                if (standSettings.direction != Direction.Y)
+                {
+                    anyDirectionNotY = true;
+                    tempSettings = standSettings;
+                    tempSettings.direction = Direction.Y;
+                    standSettings = tempSettings;
+                }
+                if (crouchSettings.direction != Direction.Y)
+                {
+                    anyDirectionNotY = true;
+                    tempSettings = crouchSettings;
+                    tempSettings.direction = Direction.Y;
+                    crouchSettings = tempSettings;
+                }
+                if (crawlSettings.direction != Direction.Y)
+                {
+                    anyDirectionNotY = true;
+                    tempSettings = crawlSettings;
+                    tempSettings.direction = Direction.Y;
+                    crawlSettings = tempSettings;
+                }
+                if (swimSettings.direction != Direction.Y)
+                {
+                    anyDirectionNotY = true;
+                    tempSettings = swimSettings;
+                    tempSettings.direction = Direction.Y;
+                    swimSettings = tempSettings;
+                }
+                if (anyDirectionNotY)
+                    Debug.LogWarning("Direction for `OpenCharacterController` can set to `Y` only");
+            }
             ApplyingSettings(ref standSettings);
             ApplyingSettings(ref crouchSettings);
             ApplyingSettings(ref crawlSettings);
@@ -81,10 +116,10 @@ namespace MultiplayerARPG
 
         private void ApplyingSettings(ref Settings settings)
         {
-            if (settings.applyToCapsule)
+            if (settings.applyToComponent)
             {
                 Apply(settings);
-                settings.applyToCapsule = false;
+                settings.applyToComponent = false;
             }
         }
 
@@ -184,7 +219,7 @@ namespace MultiplayerARPG
             {
                 openCharacterController.SetRadiusHeightAndCenter(settings.radius, settings.height, settings.center, true, true);
             }
-            if (capsuleCollider != null)
+            else if (capsuleCollider != null)
             {
                 capsuleCollider.center = settings.center;
                 capsuleCollider.radius = settings.radius;
