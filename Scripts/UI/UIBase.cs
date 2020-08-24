@@ -24,10 +24,6 @@ public class UIBase : MonoBehaviour
         }
     }
 
-    public Canvas CacheRootCanvas { get; private set; }
-
-    public GraphicRaycaster CacheGraphicRaycaster { get; private set; }
-
     public bool AlreadyCachedComponents { get; private set; }
 
     protected virtual void Awake()
@@ -49,23 +45,19 @@ public class UIBase : MonoBehaviour
 
         if (root == null)
             root = gameObject;
-        CacheRootCanvas = CacheRoot.GetOrAddComponent<Canvas>();
-        CacheGraphicRaycaster = CacheRoot.GetOrAddComponent<GraphicRaycaster>();
         AlreadyCachedComponents = true;
     }
 
     public virtual bool IsVisible()
     {
         CacheComponents();
-        return CacheRoot.activeSelf && CacheRootCanvas.enabled;
+        return CacheRoot.activeSelf;
     }
 
     public virtual void Show()
     {
         isAwaken = true;
         CacheComponents();
-        CacheRootCanvas.enabled = true;
-        CacheGraphicRaycaster.enabled = true;
         if (!CacheRoot.activeSelf)
             CacheRoot.SetActive(true);
         if (onShow != null)
@@ -79,8 +71,6 @@ public class UIBase : MonoBehaviour
     {
         isAwaken = true;
         CacheComponents();
-        CacheRootCanvas.enabled = false;
-        CacheGraphicRaycaster.enabled = false;
         CacheRoot.SetActive(false);
         if (onHide != null)
             onHide.Invoke();
