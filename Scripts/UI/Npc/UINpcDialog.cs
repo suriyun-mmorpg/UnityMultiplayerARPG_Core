@@ -17,9 +17,12 @@ namespace MultiplayerARPG
         public TextWrapper uiTextDescription;
         public Image imageIcon;
 
+        protected BaseNpcDialog lastData;
+
         protected override void UpdateData()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (lastData != null)
+                lastData.UnrenderUI(this);
 
             if (uiTextTitle != null)
             {
@@ -43,6 +46,7 @@ namespace MultiplayerARPG
             }
 
             Data.RenderUI(this);
+            lastData = Data;
         }
     }
 }

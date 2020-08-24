@@ -6,15 +6,23 @@ namespace MultiplayerARPG
 {
     public partial class UINpcDialog
     {
-        [Header("Built-in NPC Dialog UI Content")]
-        public UICharacterQuest uiCharacterQuest;
-        public UICraftItem uiCraftItem;
-        public Transform uiMenuContainer;
+        [Header("Built-in UIs")]
+        [Header("Menu")]
         public UINpcDialogMenu uiMenuPrefab;
+        public Transform uiMenuContainer;
         public GameObject uiMenuRoot;
+
+        [Header("Shop Dialog")]
+        public UINpcSellItem uiSellItemDialog;
         public UINpcSellItem uiSellItemPrefab;
-        public GameObject uiSellItemRoot;
         public Transform uiSellItemContainer;
+        public GameObject uiSellItemRoot;
+
+        [Header("Quest Dialog")]
+        public UICharacterQuest uiCharacterQuest;
+
+        [Header("Craft Item Dialog")]
+        public UICraftItem uiCraftItem;
 
         [Header("Quest Accept Menu Title")]
         public string messageQuestAccept = "Accept";
@@ -216,6 +224,62 @@ namespace MultiplayerARPG
                     cacheSellItemList.uiContainer = uiSellItemContainer;
                 }
                 return cacheSellItemList;
+            }
+        }
+
+        private UINpcSellItemSelectionManager cacheSellItemSelectionManager;
+        public UINpcSellItemSelectionManager CacheSellItemSelectionManager
+        {
+            get
+            {
+                if (cacheSellItemSelectionManager == null)
+                    cacheSellItemSelectionManager = gameObject.GetOrAddComponent<UINpcSellItemSelectionManager>();
+                cacheSellItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSellItemSelectionManager;
+            }
+        }
+
+        [DevExtMethods("Show")]
+        protected void Show_Builtin()
+        {
+            CacheSellItemSelectionManager.eventOnSelected.RemoveListener(OnSelectSellItem);
+            CacheSellItemSelectionManager.eventOnSelected.AddListener(OnSelectSellItem);
+            CacheSellItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectSellItem);
+            CacheSellItemSelectionManager.eventOnDeselected.AddListener(OnDeselectSellItem);
+            if (uiSellItemDialog != null)
+                uiSellItemDialog.onHide.AddListener(OnSellItemDialogHide);
+        }
+
+        [DevExtMethods("Hide")]
+        protected void Hide_Builtin()
+        {
+            if (uiSellItemDialog != null)
+                uiSellItemDialog.onHide.RemoveListener(OnSellItemDialogHide);
+            CacheSellItemSelectionManager.DeselectSelectedUI();
+        }
+
+        protected void OnSellItemDialogHide()
+        {
+            CacheSellItemSelectionManager.DeselectSelectedUI();
+        }
+
+        protected void OnSelectSellItem(UINpcSellItem ui)
+        {
+            if (uiSellItemDialog != null)
+            {
+                uiSellItemDialog.selectionManager = CacheSellItemSelectionManager;
+                uiSellItemDialog.Data = ui.Data;
+                uiSellItemDialog.Show();
+            }
+        }
+
+        protected void OnDeselectSellItem(UINpcSellItem ui)
+        {
+            if (uiSellItemDialog != null)
+            {
+                uiSellItemDialog.onHide.RemoveListener(OnSellItemDialogHide);
+                uiSellItemDialog.Hide();
+                uiSellItemDialog.onHide.AddListener(OnSellItemDialogHide);
             }
         }
     }

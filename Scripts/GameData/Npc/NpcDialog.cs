@@ -105,11 +105,14 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             BaseItem craftingItem = null;
 
-            if (uiNpcDialog.uiCharacterQuest != null)
-                uiNpcDialog.uiCharacterQuest.Hide();
-
             if (uiNpcDialog.uiSellItemRoot != null)
                 uiNpcDialog.uiSellItemRoot.SetActive(false);
+
+            if (uiNpcDialog.uiSellItemDialog != null)
+                uiNpcDialog.uiSellItemDialog.Hide();
+
+            if (uiNpcDialog.uiCharacterQuest != null)
+                uiNpcDialog.uiCharacterQuest.Hide();
 
             if (uiNpcDialog.uiCraftItem != null)
                 uiNpcDialog.uiCraftItem.Hide();
@@ -186,6 +189,7 @@ namespace MultiplayerARPG
                         tempUiNpcSellItem = ui.GetComponent<UINpcSellItem>();
                         tempUiNpcSellItem.Setup(sellItem, index);
                         tempUiNpcSellItem.Show();
+                        uiNpcDialog.CacheSellItemSelectionManager.Add(tempUiNpcSellItem);
                     });
                     break;
                 case NpcDialogType.CraftItem:
@@ -306,6 +310,24 @@ namespace MultiplayerARPG
                 tempUiNpcDialogMenu.uiNpcDialog = uiNpcDialog;
                 tempUiNpcDialogMenu.Show();
             });
+        }
+
+        public override void UnrenderUI(UINpcDialog uiNpcDialog)
+        {
+            if (uiNpcDialog.uiMenuRoot != null)
+                uiNpcDialog.uiMenuRoot.SetActive(false);
+
+            if (uiNpcDialog.uiSellItemRoot != null)
+                uiNpcDialog.uiSellItemRoot.SetActive(false);
+
+            if (uiNpcDialog.uiSellItemDialog != null)
+                uiNpcDialog.uiSellItemDialog.Hide();
+
+            if (uiNpcDialog.uiCharacterQuest != null)
+                uiNpcDialog.uiCharacterQuest.Hide();
+
+            if (uiNpcDialog.uiCraftItem != null)
+                uiNpcDialog.uiCraftItem.Hide();
         }
 
         public override bool ValidateDialog(BasePlayerCharacterEntity characterEntity)

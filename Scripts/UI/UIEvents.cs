@@ -44,6 +44,14 @@ namespace MultiplayerARPG
     public class UICharacterItemEvent : UnityEvent<UICharacterItem> { }
     #endregion
 
+    #region Events for UI Npc Sell Item
+    [System.Serializable]
+    public class NpcSellItemEvent : UnityEvent<NpcSellItem> { }
+
+    [System.Serializable]
+    public class UINpcSellItemEvent : UnityEvent<UINpcSellItem> { }
+    #endregion
+
     #region Events for UI Craft Item
     [System.Serializable]
     public class CraftItemEvent : UnityEvent<ItemCraft> { }

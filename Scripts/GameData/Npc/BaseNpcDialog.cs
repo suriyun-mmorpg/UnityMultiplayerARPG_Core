@@ -58,11 +58,6 @@ namespace MultiplayerARPG
 
         }
 
-        public virtual void RenderUI(UINpcDialog uiNpcDialog)
-        {
-
-        }
-
         public override object GetValue(NodePort port)
         {
             return port.node;
@@ -77,8 +72,29 @@ namespace MultiplayerARPG
         {
             SetDialogByPort(port, null);
         }
-        
+
+        /// <summary>
+        /// This will be called to render current dialog
+        /// </summary>
+        /// <param name="uiNpcDialog"></param>
+        public abstract void RenderUI(UINpcDialog uiNpcDialog);
+        /// <summary>
+        /// This will be called to un-render previous dialog
+        /// </summary>
+        /// <param name="uiNpcDialog"></param>
+        public abstract void UnrenderUI(UINpcDialog uiNpcDialog);
+        /// <summary>
+        /// This will be called to validate dialog to determine that it will show to player or not
+        /// </summary>
+        /// <param name="characterEntity"></param>
+        /// <returns></returns>
         public abstract bool ValidateDialog(BasePlayerCharacterEntity characterEntity);
+        /// <summary>
+        /// Get next dialog by selected menu index
+        /// </summary>
+        /// <param name="characterEntity"></param>
+        /// <param name="menuIndex"></param>
+        /// <returns></returns>
         public abstract NpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
         protected abstract void SetDialogByPort(NodePort from, NodePort to);
         public abstract bool IsShop { get; }
