@@ -95,9 +95,12 @@ namespace MultiplayerARPG
             // Prepare collider component
             CacheCapsuleCollider = gameObject.GetOrAddComponent<CapsuleCollider>();
             // Prepare open character controller
+            float radius = CacheCapsuleCollider.radius;
+            float height = CacheCapsuleCollider.height;
+            Vector3 center = CacheCapsuleCollider.center;
             CacheOpenCharacterController = gameObject.GetOrAddComponent<OpenCharacterController>((comp) =>
             {
-                comp.InitRadiusHeightAndCenter(CacheCapsuleCollider.radius, CacheCapsuleCollider.height, CacheCapsuleCollider.center);
+                comp.SetRadiusHeightAndCenter(radius, height, center, true, true);
             });
             // Setup
             StopMove();
@@ -567,14 +570,13 @@ namespace MultiplayerARPG
         [ContextMenu("Applies Collider Settings To Controller")]
         public void AppliesColliderSettingsToController()
         {
-            CapsuleCollider collider = GetComponent<CapsuleCollider>();
-            if (collider == null)
-                collider = gameObject.AddComponent<CapsuleCollider>();
+            CapsuleCollider collider = gameObject.GetOrAddComponent<CapsuleCollider>();
+            float radius = collider.radius;
+            float height = collider.height;
+            Vector3 center = collider.center;
             // Prepare open character controller
-            OpenCharacterController controller = GetComponent<OpenCharacterController>();
-            if (controller == null)
-                controller = gameObject.AddComponent<OpenCharacterController>();
-            controller.InitRadiusHeightAndCenter(collider.radius, collider.height, collider.center);
+            OpenCharacterController controller = gameObject.GetOrAddComponent<OpenCharacterController>();
+            controller.SetRadiusHeightAndCenter(radius, height, center, true, true);
         }
 #endif
     }
