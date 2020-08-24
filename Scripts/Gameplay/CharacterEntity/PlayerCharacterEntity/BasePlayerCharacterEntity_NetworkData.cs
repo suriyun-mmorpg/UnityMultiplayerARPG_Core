@@ -139,6 +139,24 @@ namespace MultiplayerARPG
             get { return CurrentGameManager.GetCurrentPosition(this); }
             set { CurrentGameManager.SetCurrentPosition(this, value); }
         }
+        public Vector3 CurrentRotation
+        {
+            get
+            {
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                    return CacheTransform.eulerAngles;
+                return Quaternion.LookRotation(Direction2D).eulerAngles;
+            }
+            set
+            {
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                {
+                    CacheTransform.eulerAngles = value;
+                    return;
+                }
+                Direction2D = Quaternion.Euler(value) * Vector3.forward;
+            }
+        }
         public string RespawnMapName { get { return respawnMapName.Value; } set { respawnMapName.Value = value; } }
         public Vector3 RespawnPosition { get { return respawnPosition.Value; } set { respawnPosition.Value = value; } }
         public bool IsWarping { get { return isWarping.Value; } set { isWarping.Value = value; } }
