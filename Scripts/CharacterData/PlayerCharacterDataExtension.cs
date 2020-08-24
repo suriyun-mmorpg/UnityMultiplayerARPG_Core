@@ -46,6 +46,7 @@ public static partial class PlayerCharacterDataExtension
         to.EquipWeaponSet = from.EquipWeaponSet;
         to.CurrentMapName = from.CurrentMapName;
         to.CurrentPosition = from.CurrentPosition;
+        to.CurrentRotation = from.CurrentRotation;
         to.RespawnMapName = from.RespawnMapName;
         to.RespawnPosition = from.RespawnPosition;
         to.MountDataId = from.MountDataId;
@@ -386,6 +387,9 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(characterData.CurrentPosition.x);
         writer.Put(characterData.CurrentPosition.y);
         writer.Put(characterData.CurrentPosition.z);
+        writer.Put(characterData.CurrentRotation.x);
+        writer.Put(characterData.CurrentRotation.y);
+        writer.Put(characterData.CurrentRotation.z);
         writer.Put(characterData.RespawnMapName);
         writer.Put(characterData.RespawnPosition.x);
         writer.Put(characterData.RespawnPosition.y);
@@ -470,6 +474,7 @@ public static partial class PlayerCharacterDataExtension
         result.UserCash = reader.GetPackedInt();
         result.CurrentMapName = reader.GetString();
         result.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+        result.CurrentRotation = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
         result.RespawnMapName = reader.GetString();
         result.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
         result.MountDataId = reader.GetPackedInt();

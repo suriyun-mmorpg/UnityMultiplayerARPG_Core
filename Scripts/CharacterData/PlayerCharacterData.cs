@@ -18,6 +18,7 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData, 
     private int sharedGuildExp;
     private string currentMapName;
     private Vector3 currentPosition;
+    private Vector3 currentRotation;
     private string respawnMapName;
     private Vector3 respawnPosition;
     private int mountDataId;
@@ -37,6 +38,7 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData, 
     public int SharedGuildExp { get { return sharedGuildExp; } set { sharedGuildExp = value; } }
     public string CurrentMapName { get { return currentMapName; } set { currentMapName = value; } }
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
+    public Vector3 CurrentRotation { get { return currentRotation; } set { currentRotation = value; } }
     public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
     public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
     public int MountDataId { get { return mountDataId; } set { mountDataId = value; } }

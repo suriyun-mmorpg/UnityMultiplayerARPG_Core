@@ -39,6 +39,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         info.AddValue("userCash", data.UserCash);
         info.AddValue("currentMapName", data.CurrentMapName);
         info.AddValue("currentPosition", data.CurrentPosition);
+        info.AddValue("currentRotation", data.CurrentRotation);
         info.AddValue("respawnMapName", data.RespawnMapName);
         info.AddValue("respawnPosition", data.RespawnPosition);
         info.AddValue("mountDataId", data.MountDataId);
@@ -98,6 +99,12 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         catch { }
         data.CurrentMapName = info.GetString("currentMapName");
         data.CurrentPosition = (Vector3)info.GetValue("currentPosition", typeof(Vector3));
+        // TODO: Backward compatible, this will be removed in future version
+        try
+        {
+            data.CurrentRotation = (Vector3)info.GetValue("currentRotation", typeof(Vector3));
+        }
+        catch { }
         data.RespawnMapName = info.GetString("respawnMapName");
         data.RespawnPosition = (Vector3)info.GetValue("respawnPosition", typeof(Vector3));
         // TODO: Backward compatible, this will be removed in future version

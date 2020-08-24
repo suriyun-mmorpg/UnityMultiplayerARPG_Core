@@ -49,6 +49,7 @@ public partial interface IPlayerCharacterData : ICharacterData
     /// </summary>
     string CurrentMapName { get; set; }
     Vector3 CurrentPosition { get; set; }
+    Vector3 CurrentRotation { get; set; }
     /// <summary>
     /// Respawn Map Name will be work with MMORPG system only
     /// For Lan game it will be scene name which set in game instance
