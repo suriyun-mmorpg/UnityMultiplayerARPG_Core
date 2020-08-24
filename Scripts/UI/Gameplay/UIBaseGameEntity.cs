@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheCanvas == null)
-                    cacheCanvas = GetComponent<Canvas>();
+                    cacheCanvas = gameObject.GetOrAddComponent<Canvas>();
                 return cacheCanvas;
             }
         }
