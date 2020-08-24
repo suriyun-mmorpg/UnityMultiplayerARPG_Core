@@ -540,7 +540,7 @@ namespace MultiplayerARPG
             short weightLimit = storage.weightLimit;
             short slotLimit = storage.slotLimit;
             // Prepare item data
-            CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone();
+            CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone(true);
             movingItem.amount = amount;
             if (storageItemIndex < 0 ||
                 storageItemIndex >= storageItemList.Count ||
@@ -590,7 +590,7 @@ namespace MultiplayerARPG
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Prepare item data
-            CharacterItem movingItem = storageItemList[storageItemIndex].Clone();
+            CharacterItem movingItem = storageItemList[storageItemIndex].Clone(true);
             movingItem.amount = amount;
             if (nonEquipIndex < 0 ||
                 nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
