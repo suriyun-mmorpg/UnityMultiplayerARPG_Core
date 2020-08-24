@@ -162,7 +162,7 @@ namespace MultiplayerARPG
             if (buttonDelete)
                 buttonDelete.gameObject.SetActive(true);
             characterModelContainer.SetChildrenActive(false);
-            // Load selected character and also validate its data
+            // Load selected character, set selected player character data and also validate its data
             PlayerCharacterDataById.TryGetValue(playerCharacterData.Id, out selectedPlayerCharacterData);
             // Validate map data
             if (!GameInstance.Singleton.GetGameMapIds().Contains(SelectedPlayerCharacterData.CurrentMapName))
