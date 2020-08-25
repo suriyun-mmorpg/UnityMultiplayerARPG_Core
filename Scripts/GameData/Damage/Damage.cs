@@ -16,31 +16,31 @@ namespace MultiplayerARPG
     {
         public DamageType damageType;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee", "Missile" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee), nameof(DamageType.Missile) })]
         [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 random target")]
         public bool hitOnlySelectedTarget;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee) })]
         public float hitDistance;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee) })]
         [Range(10f, 360f)]
         public float hitFov;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "Raycast" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile), nameof(DamageType.Raycast) })]
         public float missileDistance;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "Raycast" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile), nameof(DamageType.Raycast) })]
         public float missileSpeed;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile) })]
         public MissileDamageEntity missileDamageEntity;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public ProjectileEffect projectileEffect;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public byte pierceThroughEntities;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Raycast" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public ImpactEffects impactEffects;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Custom" })]
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Custom) })]
         public BaseCustomDamageInfo customDamageInfo;
 
         public float GetDistance()

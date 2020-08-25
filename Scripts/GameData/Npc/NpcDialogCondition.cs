@@ -4,11 +4,11 @@
     public struct NpcDialogCondition
     {
         public NpcDialogConditionType conditionType;
-        [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "FactionIs" })]
+        [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.FactionIs) })]
         public Faction faction;
-        [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "QuestNotStarted", "QuestOngoing", "QuestTasksCompleted", "QuestCompleted" })]
+        [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.QuestNotStarted), nameof(NpcDialogConditionType.QuestOngoing), nameof(NpcDialogConditionType.QuestTasksCompleted), nameof(NpcDialogConditionType.QuestCompleted) })]
         public Quest quest;
-        [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "LevelMoreThanOrEqual", "LevelLessThanOrEqual" })]
+        [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.LevelMoreThanOrEqual), nameof(NpcDialogConditionType.LevelLessThanOrEqual) })]
         public int conditionalLevel;
         [NpcDialogConditionData]
         public NpcDialogConditionData conditionData;
