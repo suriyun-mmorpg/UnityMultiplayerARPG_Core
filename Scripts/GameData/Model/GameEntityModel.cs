@@ -215,7 +215,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public List<GameEffect> InstantiateEffect(GameEffect[] effects)
+        public List<GameEffect> InstantiateEffect(params GameEffect[] effects)
         {
             if (effects == null || effects.Length == 0)
                 return null;
