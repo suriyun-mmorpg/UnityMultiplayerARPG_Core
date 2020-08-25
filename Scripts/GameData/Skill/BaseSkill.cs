@@ -103,16 +103,11 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            if (availableWeapons != null && availableWeapons.Length > 0)
-                GameInstance.AddWeaponTypes(availableWeapons);
-            if (skillCastEffects != null && skillCastEffects.Length > 0)
-                GameInstance.AddPoolingObjects(skillCastEffects);
-            if (damageHitEffects != null && damageHitEffects.Length > 0)
-                GameInstance.AddPoolingObjects(damageHitEffects);
-            if (GetBuff().effects != null && GetBuff().effects.Length > 0)
-                GameInstance.AddPoolingObjects(GetBuff().effects);
-            if (GetDebuff().effects != null && GetDebuff().effects.Length > 0)
-                GameInstance.AddPoolingObjects(GetDebuff().effects);
+            GameInstance.AddWeaponTypes(availableWeapons);
+            GameInstance.AddPoolingObjects(skillCastEffects);
+            GameInstance.AddPoolingObjects(damageHitEffects);
+            GameInstance.AddPoolingObjects(GetBuff().effects);
+            GameInstance.AddPoolingObjects(GetDebuff().effects);
         }
 
         public GameEffect[] GetSkillCastEffect()
