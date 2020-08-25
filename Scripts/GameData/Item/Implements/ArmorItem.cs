@@ -35,8 +35,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add armor type
-            GameInstance.AddArmorTypes(new ArmorType[] { armorType });
+            GameInstance.AddArmorTypes(ArmorType);
         }
     }
 }
