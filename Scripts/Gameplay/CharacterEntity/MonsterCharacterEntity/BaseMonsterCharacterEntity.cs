@@ -86,7 +86,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddCharacters(new MonsterCharacter[] { CharacterDatabase });
+            GameInstance.AddCharacters(CharacterDatabase);
         }
 
         protected override void EntityAwake()
