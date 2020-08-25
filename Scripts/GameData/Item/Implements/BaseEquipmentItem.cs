@@ -120,12 +120,10 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add damage elements
-            GameInstance.AddDamageElements(increaseDamages);
-            // Add skills
-            GameInstance.AddSkills(increaseSkillLevels);
-            // Add equipment sets
-            GameInstance.AddEquipmentSets(new EquipmentSet[] { equipmentSet });
+            GameInstance.AddDamageElements(IncreaseDamages);
+            GameInstance.AddSkills(IncreaseSkillLevels);
+            GameInstance.AddEquipmentSets(EquipmentSet);
+            GameInstance.AddGameEffectPoolContainers(EquipmentModels);
         }
     }
 }
