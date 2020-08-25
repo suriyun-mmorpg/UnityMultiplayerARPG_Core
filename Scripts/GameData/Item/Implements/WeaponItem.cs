@@ -103,10 +103,9 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add weapon type
-            GameInstance.AddWeaponTypes(new WeaponType[] { weaponType });
-            // Add damage elements
-            GameInstance.AddDamageElements(new DamageIncremental[] { damageAmount });
+            GameInstance.AddWeaponTypes(WeaponType);
+            GameInstance.AddDamageElements(DamageAmount);
+            GameInstance.AddGameEffectPoolContainers(OffHandEquipmentModels);
         }
     }
 }
