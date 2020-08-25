@@ -51,8 +51,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add mount entity
-            GameInstance.AddVehicleEntities(new VehicleEntity[] { mountEntity });
+            GameInstance.AddVehicleEntities(MountEntity);
         }
     }
 }
