@@ -16,6 +16,8 @@ namespace MultiplayerARPG
             get { return followingTarget; }
             set
             {
+                if (followingTarget == null)
+                    return;
                 followingTarget = value;
                 intendToFollowingTarget = true;
             }
@@ -63,6 +65,7 @@ namespace MultiplayerARPG
             }
             else if (intendToFollowingTarget)
             {
+                // Push back because following target was destroyed
                 PushBack();
             }
         }
