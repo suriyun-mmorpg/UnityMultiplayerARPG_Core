@@ -69,11 +69,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add skills
-            List<BaseSkill> skills = new List<BaseSkill>();
-            if (CacheSkillLevels.Count > 0)
-                skills.AddRange(CacheSkillLevels.Keys);
-            GameInstance.AddSkills(skills);
+            GameInstance.AddSkills(CacheSkillLevels.Keys);
         }
     }
 }
