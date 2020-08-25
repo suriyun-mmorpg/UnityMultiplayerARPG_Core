@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameData : ScriptableObject
+    public abstract partial class BaseGameData : ScriptableObject, IGameData
     {
         [Header("Game Data Configs")]
         [Tooltip("Default title")]
