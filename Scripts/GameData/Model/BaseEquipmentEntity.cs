@@ -20,11 +20,15 @@ namespace MultiplayerARPG
             }
         }
 
+        [Tooltip("These game effects must placed as this children, it will active when launch (can place muzzle effects here)")]
         public GameEffect[] weaponLaunchEffects;
+        [Tooltip("These game effects must placed as this children, it will active when launch (can place muzzle sound effects here)")]
         public AudioClip[] weaponLaunchSoundEffects;
+        [Tooltip("These game effect prefabs will, it will instantiate to container when launch (can place muzzle effects here)")]
+        public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
-        
+
         protected virtual void OnEnable()
         {
             if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
@@ -44,7 +48,12 @@ namespace MultiplayerARPG
             if (weaponLaunchSoundEffects != null && weaponLaunchSoundEffects.Length > 0)
                 AudioSource.PlayClipAtPoint(weaponLaunchSoundEffects[Random.Range(0, weaponLaunchEffects.Length)], transform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
 
+            if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
+            {
+                poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
+            }
         }
+
         public abstract void OnLevelChanged(int level);
     }
 }
