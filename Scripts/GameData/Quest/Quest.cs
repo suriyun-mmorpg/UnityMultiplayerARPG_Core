@@ -43,28 +43,21 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            List<MonsterCharacter> monsters = new List<MonsterCharacter>();
-            List<BaseItem> items = new List<BaseItem>();
             if (tasks != null && tasks.Length > 0)
             {
                 foreach (QuestTask task in tasks)
                 {
-                    if (task.monsterCharacterAmount.monster != null)
-                        monsters.Add(task.monsterCharacterAmount.monster);
-                    if (task.itemAmount.item != null)
-                        items.Add(task.itemAmount.item);
+                    GameInstance.AddCharacters(task.monsterCharacterAmount.monster);
+                    GameInstance.AddItems(task.itemAmount.item);
                 }
             }
             if (rewardItems != null && rewardItems.Length > 0)
             {
                 foreach (ItemAmount rewardItem in rewardItems)
                 {
-                    if (rewardItem.item != null)
-                        items.Add(rewardItem.item);
+                    GameInstance.AddItems(rewardItem.item);
                 }
             }
-            GameInstance.AddCharacters(monsters);
-            GameInstance.AddItems(items);
         }
     }
 
