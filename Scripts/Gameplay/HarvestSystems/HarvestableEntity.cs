@@ -39,7 +39,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddHarvestables(new Harvestable[] { harvestable });
+            GameInstance.AddHarvestables(harvestable);
         }
 
         protected override void EntityAwake()
