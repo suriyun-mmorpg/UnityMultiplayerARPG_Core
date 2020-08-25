@@ -431,24 +431,18 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add armor type
-            GameInstance.AddArmorTypes(new ArmorType[] { armorType });
-            // Add weapon type
-            GameInstance.AddWeaponTypes(new WeaponType[] { weaponType });
-            // Add building entity
-            GameInstance.AddBuildingEntities(new BuildingEntity[] { buildingEntity });
-            // Add pet entity
-            GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { petEntity });
-            // Add mount entity
-            GameInstance.AddVehicleEntities(new VehicleEntity[] { mountEntity });
-            // Add damage elements
+            GameInstance.AddArmorTypes(armorType);
+            GameInstance.AddWeaponTypes(weaponType);
+            GameInstance.AddBuildingEntities(buildingEntity);
+            GameInstance.AddCharacterEntities(petEntity);
+            GameInstance.AddVehicleEntities(mountEntity);
             GameInstance.AddDamageElements(increaseDamages);
-            GameInstance.AddDamageElements(new DamageIncremental[] { damageAmount });
-            // Add skills
+            GameInstance.AddDamageElements(damageAmount);
             GameInstance.AddSkills(increaseSkillLevels);
-            GameInstance.AddSkills(new SkillLevel[] { skillLevel });
-            // Add equipment sets
-            GameInstance.AddEquipmentSets(new EquipmentSet[] { equipmentSet });
+            GameInstance.AddSkills(skillLevel);
+            GameInstance.AddEquipmentSets(equipmentSet);
+            GameInstance.AddGameEffectPoolContainers(equipmentModels);
+            GameInstance.AddGameEffectPoolContainers(subEquipmentModels);
         }
 
         public Item GenerateDefaultItem(WeaponType type)
