@@ -332,15 +332,10 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { summon.MonsterEntity });
-            GameInstance.AddVehicleEntities(new VehicleEntity[] { mount.MountEntity });
-            List<BaseItem> items = new List<BaseItem>();
-            items.Add(itemCraft.CraftingItem);
-            foreach (BaseItem item in itemCraft.CacheCraftRequirements.Keys)
-            {
-                items.Add(item);
-            }
-            GameInstance.AddItems(items);
+            GameInstance.AddCharacterEntities(summon.MonsterEntity);
+            GameInstance.AddVehicleEntities(mount.MountEntity);
+            GameInstance.AddItems(itemCraft.CraftingItem);
+            GameInstance.AddItems(itemCraft.CacheCraftRequirements.Keys);
             damageInfo.PrepareRelatesData();
         }
 
