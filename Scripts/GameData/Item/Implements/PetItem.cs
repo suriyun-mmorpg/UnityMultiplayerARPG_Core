@@ -64,8 +64,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add pet entity
-            GameInstance.AddCharacterEntities(new BaseCharacterEntity[] { petEntity });
+            GameInstance.AddCharacterEntities(PetEntity);
         }
     }
 }
