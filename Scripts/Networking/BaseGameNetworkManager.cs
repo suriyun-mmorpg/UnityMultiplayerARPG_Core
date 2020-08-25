@@ -859,6 +859,7 @@ namespace MultiplayerARPG
                     continue;
                 PoolSystem.InitPool(poolingObject);
             }
+            System.GC.Collect();
         }
 
         protected bool UpdateSocialGroupMember(SocialGroupData socialGroupData, UpdateSocialMemberMessage message)
