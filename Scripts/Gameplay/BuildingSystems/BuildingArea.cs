@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -12,11 +13,21 @@ namespace MultiplayerARPG
         {
             get { return entity; }
         }
-        
+
+        public LiteNetLibIdentity Identity
+        {
+            get { return entity.Identity; }
+        }
+
         private void Start()
         {
             if (entity == null)
                 entity = GetComponentInParent<BuildingEntity>();
+        }
+
+        public virtual void PrepareRelatesData()
+        {
+            // Do nothing
         }
     }
 }
