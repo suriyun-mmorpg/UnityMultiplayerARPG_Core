@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseNpcDialog : Node
+    public abstract partial class BaseNpcDialog : Node, IGameData
     {
         [Input]
         public BaseNpcDialog input;
