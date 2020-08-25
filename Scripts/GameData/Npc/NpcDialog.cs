@@ -72,32 +72,23 @@ namespace MultiplayerARPG
 
         public override void PrepareRelatesData()
         {
-            // Add dialogs from menus
-            List<NpcDialog> menuDialogs = new List<NpcDialog>();
             if (menus != null && menus.Length > 0)
             {
                 foreach (NpcDialogMenu menu in menus)
                 {
-                    if (menu.dialog != null)
-                        menuDialogs.Add(menu.dialog);
+                    GameInstance.AddNpcDialogs(menu.dialog);
                 }
             }
-            GameInstance.AddNpcDialogs(menuDialogs);
-            // Add items
-            List<BaseItem> items = new List<BaseItem>();
             if (sellItems != null && sellItems.Length > 0)
             {
                 foreach (NpcSellItem sellItem in sellItems)
                 {
-                    if (sellItem.item != null)
-                        items.Add(sellItem.item);
+                    GameInstance.AddItems(sellItem.item);
                 }
             }
-            if (itemCraft.CraftingItem != null)
-                items.Add(itemCraft.CraftingItem);
-            GameInstance.AddItems(items);
-            // Add quest
-            GameInstance.AddQuests(new Quest[] { quest });
+            GameInstance.AddItems(itemCraft.CraftingItem);
+            GameInstance.AddItems(itemCraft.CacheCraftRequirements.Keys);
+            GameInstance.AddQuests(quest);
         }
 
         public override void RenderUI(UINpcDialog uiNpcDialog)
