@@ -337,15 +337,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             DamageInfo.PrepareRelatesData();
-            // Add items from drop table
-            List<BaseItem> items = new List<BaseItem>();
-            foreach (var randomItem in CacheRandomItems)
-            {
-                if (randomItem.item == null)
-                    continue;
-                items.Add(randomItem.item);
-            }
-            GameInstance.AddItems(items);
+            GameInstance.AddItems(CacheRandomItems);
         }
     }
 }
