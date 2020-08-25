@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         public override void RegisterAssets()
         {
             base.RegisterAssets();
-            GameInstance.AddItemDropEntities(new ItemDropEntity[] { asset });
+            GameInstance.AddItemDropEntities(asset);
         }
 
         protected override void SpawnInternal()
