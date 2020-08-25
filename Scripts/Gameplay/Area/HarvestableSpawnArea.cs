@@ -39,7 +39,7 @@ namespace MultiplayerARPG
         public override void RegisterAssets()
         {
             base.RegisterAssets();
-            GameInstance.AddHarvestableEntities(new HarvestableEntity[] { asset });
+            GameInstance.AddHarvestableEntities(asset);
         }
 
         protected override void SpawnInternal()
