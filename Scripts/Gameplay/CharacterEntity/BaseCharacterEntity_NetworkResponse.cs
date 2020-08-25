@@ -382,7 +382,7 @@ namespace MultiplayerARPG
         protected virtual void NetFuncOnLevelUp()
         {
             if (CurrentGameInstance.levelUpEffect != null)
-                CharacterModel.InstantiateEffect(new GameEffect[] { CurrentGameInstance.levelUpEffect });
+                CharacterModel.InstantiateEffect(CurrentGameInstance.levelUpEffect);
             if (onLevelUp != null)
                 onLevelUp.Invoke();
         }
