@@ -153,11 +153,9 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            List<BaseItem> items = new List<BaseItem>();
-            if (armorItems != null && armorItems.Length > 0)
-                items.AddRange(armorItems);
-            items.Add(rightHandEquipItem);
-            items.Add(leftHandEquipItem);
+            GameInstance.AddItems(armorItems);
+            GameInstance.AddItems(rightHandEquipItem);
+            GameInstance.AddItems(leftHandEquipItem);
         }
     }
 }
