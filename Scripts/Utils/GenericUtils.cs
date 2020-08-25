@@ -82,6 +82,21 @@ public static class GenericUtils
         }
     }
 
+    public static List<T> GetComponents<T>(this IEnumerable<GameObject> gameObjects) where T : Component
+    {
+        List<T> result = new List<T>();
+        T comp;
+        foreach (GameObject gameObject in gameObjects)
+        {
+            if (gameObject == null)
+                continue;
+            comp = gameObject.GetComponent<T>();
+            if (comp != null)
+                result.Add(comp);
+        }
+        return result;
+    }
+
     public static T GetOrAddComponent<T>(this GameObject gameObject) where T : Component
     {
         if (gameObject == null)
