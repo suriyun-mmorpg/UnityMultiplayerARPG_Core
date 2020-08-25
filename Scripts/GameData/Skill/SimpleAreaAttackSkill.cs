@@ -116,7 +116,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddPoolingObjects(new IPoolDescriptor[] { areaDamageEntity });
+            GameInstance.AddPoolingObjects(areaDamageEntity);
         }
     }
 }
