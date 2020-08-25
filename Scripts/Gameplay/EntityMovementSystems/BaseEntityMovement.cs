@@ -16,5 +16,10 @@ namespace MultiplayerARPG
         public abstract Quaternion GetLookRotation();
         public abstract void Teleport(Vector3 position);
         public abstract bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
+
+        public virtual void PrepareRelatesData()
+        {
+            // Do nothing
+        }
     }
 }
