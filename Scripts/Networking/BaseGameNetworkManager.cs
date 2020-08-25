@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
+using LiteNetLibManager.SuperGrid2D;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
@@ -772,6 +773,7 @@ namespace MultiplayerARPG
         {
             doNotEnterGameOnConnect = false;
             Assets.offlineScene.SceneName = CurrentGameInstance.HomeSceneName;
+            // Prepare networking prefabs
             Assets.playerPrefab = null;
             HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             if (CurrentGameInstance.itemDropEntityPrefab != null)
@@ -800,6 +802,15 @@ namespace MultiplayerARPG
             }
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
+            // Make sure that grid manager -> axis mode set correctly for current dimension type
+            GridManager gridManager = GetComponent<GridManager>();
+            if (gridManager != null)
+            {
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                    gridManager.axisMode = GridManager.EAxisMode.XZ;
+                else
+                    gridManager.axisMode = GridManager.EAxisMode.XY;
+            }
             this.InvokeInstanceDevExtMethods("Init");
         }
 
