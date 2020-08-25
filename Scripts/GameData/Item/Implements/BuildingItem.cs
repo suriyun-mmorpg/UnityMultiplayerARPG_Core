@@ -48,8 +48,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add building entity
-            GameInstance.AddBuildingEntities(new BuildingEntity[] { buildingEntity });
+            GameInstance.AddBuildingEntities(BuildingEntity);
         }
     }
 }
