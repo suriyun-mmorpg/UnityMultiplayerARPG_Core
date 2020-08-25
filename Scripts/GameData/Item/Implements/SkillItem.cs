@@ -55,8 +55,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add skills
-            GameInstance.AddSkills(new BaseSkill[] { usingSkill });
+            GameInstance.AddSkills(UsingSkill);
         }
     }
 }
