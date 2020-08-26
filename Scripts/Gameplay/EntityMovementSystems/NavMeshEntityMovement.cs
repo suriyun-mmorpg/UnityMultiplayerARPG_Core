@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         {
             if (!CacheEntity.CanMove())
                 return;
-            CacheTransform.eulerAngles = new Vector3(0, (float)yRotation, 0);
+            CacheTransform.eulerAngles = new Vector3(0, yRotation, 0);
         }
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
