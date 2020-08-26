@@ -57,8 +57,6 @@ namespace MultiplayerARPG
 
             if (!warpImmediatelyWhenEnter)
             {
-                playerCharacterEntity.WarpingPortal = this;
-
                 if (playerCharacterEntity == BasePlayerCharacterController.OwningCharacter)
                 {
                     foreach (GameObject warpSignal in warpSignals)
@@ -82,8 +80,6 @@ namespace MultiplayerARPG
 
             if (playerCharacterEntity == BasePlayerCharacterController.OwningCharacter)
             {
-                playerCharacterEntity.WarpingPortal = null;
-
                 foreach (GameObject warpSignal in warpSignals)
                 {
                     if (warpSignal != null)

@@ -200,11 +200,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestEnterWarp()
+        public bool RequestEnterWarp(uint objectId)
         {
-            if (!CanDoActions() || WarpingPortal == null)
+            if (!CanDoActions())
                 return false;
-            CallNetFunction(NetFuncEnterWarp, FunctionReceivers.Server);
+            CallNetFunction(NetFuncEnterWarp, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 

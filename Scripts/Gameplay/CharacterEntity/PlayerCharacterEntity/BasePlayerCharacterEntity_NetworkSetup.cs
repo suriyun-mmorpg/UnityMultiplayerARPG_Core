@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncShowNpcRepairItem);
             RegisterNetFunction<byte>(NetFuncSelectNpcDialogMenu);
             RegisterNetFunction<short, short>(NetFuncBuyNpcItem);
-            RegisterNetFunction(NetFuncEnterWarp);
+            RegisterNetFunction<PackedUInt>(NetFuncEnterWarp);
             RegisterNetFunction<short, Vector3, Quaternion, PackedUInt>(NetFuncBuild);
             RegisterNetFunction<PackedUInt>(NetFuncDestroyBuilding);
             RegisterNetFunction<short, short>(NetFuncSellItem);

@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         public bool findOnlyAliveBuildings;
         public bool findOnlyActivatableBuildings;
         public bool findVehicle;
+        public bool findWarpPortal;
         public readonly List<BaseCharacterEntity> characters = new List<BaseCharacterEntity>();
         public readonly List<BasePlayerCharacterEntity> players = new List<BasePlayerCharacterEntity>();
         public readonly List<BaseMonsterCharacterEntity> monsters = new List<BaseMonsterCharacterEntity>();
@@ -28,6 +29,7 @@ namespace MultiplayerARPG
         public readonly List<ItemDropEntity> itemDrops = new List<ItemDropEntity>();
         public readonly List<BuildingEntity> buildings = new List<BuildingEntity>();
         public readonly List<VehicleEntity> vehicles = new List<VehicleEntity>();
+        public readonly List<WarpPortalEntity> warpPortals = new List<WarpPortalEntity>();
         private readonly HashSet<Collider> excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> excludeCollider2Ds = new HashSet<Collider2D>();
         private SphereCollider cacheCollider;
@@ -83,6 +85,7 @@ namespace MultiplayerARPG
             SortNearestEntity(itemDrops);
             SortNearestEntity(buildings);
             SortNearestEntity(vehicles);
+            SortNearestEntity(warpPortals);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -133,13 +136,14 @@ namespace MultiplayerARPG
 
         private bool AddEntity(GameObject other)
         {
-            BasePlayerCharacterEntity player = null;
-            BaseMonsterCharacterEntity monster = null;
-            NpcEntity npc = null;
-            ItemDropEntity itemDrop = null;
-            BuildingEntity building = null;
-            VehicleEntity vehicle = null;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle);
+            BasePlayerCharacterEntity player;
+            BaseMonsterCharacterEntity monster;
+            NpcEntity npc;
+            ItemDropEntity itemDrop;
+            BuildingEntity building;
+            VehicleEntity vehicle;
+            WarpPortalEntity warpPortal;
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal);
 
             if (player != null)
             {
@@ -163,6 +167,12 @@ namespace MultiplayerARPG
                     npcs.Add(npc);
                 return true;
             }
+            if (itemDrop != null)
+            {
+                if (!itemDrops.Contains(itemDrop))
+                    itemDrops.Add(itemDrop);
+                return true;
+            }
             if (building != null)
             {
                 if (!buildings.Contains(building))
@@ -175,10 +185,10 @@ namespace MultiplayerARPG
                     vehicles.Add(vehicle);
                 return true;
             }
-            if (itemDrop != null)
+            if (warpPortals != null)
             {
-                if (!itemDrops.Contains(itemDrop))
-                    itemDrops.Add(itemDrop);
+                if (!warpPortals.Contains(warpPortal))
+                    warpPortals.Add(warpPortal);
                 return true;
             }
             return false;
@@ -186,13 +196,14 @@ namespace MultiplayerARPG
 
         private bool RemoveEntity(GameObject other)
         {
-            BasePlayerCharacterEntity player = null;
-            BaseMonsterCharacterEntity monster = null;
-            NpcEntity npc = null;
-            ItemDropEntity itemDrop = null;
-            BuildingEntity building = null;
-            VehicleEntity vehicle = null;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, false);
+            BasePlayerCharacterEntity player;
+            BaseMonsterCharacterEntity monster;
+            NpcEntity npc;
+            ItemDropEntity itemDrop;
+            BuildingEntity building;
+            VehicleEntity vehicle;
+            WarpPortalEntity warpPortal;
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, false);
 
             if (player != null)
                 return characters.Remove(player) && players.Remove(player);
@@ -206,6 +217,8 @@ namespace MultiplayerARPG
                 return buildings.Remove(building);
             if (vehicle != null)
                 return vehicles.Remove(vehicle);
+            if (warpPortal != null)
+                return warpPortals.Remove(warpPortal);
             return false;
         }
 
@@ -216,6 +229,7 @@ namespace MultiplayerARPG
             out ItemDropEntity itemDrop,
             out BuildingEntity building,
             out VehicleEntity vehicle,
+            out WarpPortalEntity warpPortal,
             bool findWithAdvanceOptions = true)
         {
             player = null;
@@ -272,6 +286,10 @@ namespace MultiplayerARPG
             vehicle = null;
             if (findVehicle)
                 vehicle = other.GetComponent<VehicleEntity>();
+
+            warpPortal = null;
+            if (findWarpPortal)
+                warpPortal = other.GetComponent<WarpPortalEntity>();
         }
 
         private void SortNearestEntity<T>(List<T> entities) where T : BaseGameEntity

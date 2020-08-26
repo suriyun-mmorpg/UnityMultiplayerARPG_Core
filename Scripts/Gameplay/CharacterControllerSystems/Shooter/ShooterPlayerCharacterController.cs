@@ -248,6 +248,7 @@ namespace MultiplayerARPG
         NpcEntity targetNpc;
         BuildingEntity targetBuilding;
         VehicleEntity targetVehicle;
+        WarpPortalEntity targetWarpPortal;
         // Temp data
         IDamageableEntity tempDamageableEntity;
         BaseGameEntity tempEntity;
@@ -812,6 +813,7 @@ namespace MultiplayerARPG
                 targetNpc = null;
                 targetBuilding = null;
                 targetVehicle = null;
+                targetWarpPortal = null;
                 if (!tempPressAttackRight && !tempPressAttackLeft)
                 {
                     if (activateInput.IsHold)
@@ -829,6 +831,8 @@ namespace MultiplayerARPG
                             targetBuilding = SelectedEntity as BuildingEntity;
                         if (SelectedEntity is VehicleEntity)
                             targetVehicle = SelectedEntity as VehicleEntity;
+                        if (SelectedEntity is WarpPortalEntity)
+                            targetWarpPortal = SelectedEntity as WarpPortalEntity;
                     }
                 }
                 // Update look direction
@@ -1185,6 +1189,8 @@ namespace MultiplayerARPG
                 ActivateBuilding(targetBuilding);
             else if (targetVehicle != null)
                 PlayerCharacterEntity.RequestEnterVehicle(targetVehicle.ObjectId);
+            else if (targetWarpPortal != null)
+                PlayerCharacterEntity.RequestEnterWarp(targetWarpPortal.ObjectId);
         }
 
         public void UseSkill(bool isLeftHand)

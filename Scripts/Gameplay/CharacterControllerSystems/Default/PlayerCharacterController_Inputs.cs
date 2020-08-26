@@ -44,6 +44,9 @@ namespace MultiplayerARPG
                     targetVehicle = null;
                     if (ActivatableEntityDetector.vehicles.Count > 0)
                         targetVehicle = ActivatableEntityDetector.vehicles[0];
+                    targetWarpPortal = null;
+                    if (ActivatableEntityDetector.warpPortals.Count > 0)
+                        targetWarpPortal = ActivatableEntityDetector.warpPortals[0];
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null && CacheUISceneGameplay != null)
                     {
@@ -68,10 +71,10 @@ namespace MultiplayerARPG
                         // Enter vehicle
                         PlayerCharacterEntity.RequestEnterVehicle(targetVehicle.ObjectId);
                     }
-                    else
+                    else if (targetWarpPortal != null)
                     {
                         // Enter warp, For some warp portals that `warpImmediatelyWhenEnter` is FALSE
-                        PlayerCharacterEntity.RequestEnterWarp();
+                        PlayerCharacterEntity.RequestEnterWarp(targetWarpPortal.ObjectId);
                     }
                 }
                 // Pick up nearby items

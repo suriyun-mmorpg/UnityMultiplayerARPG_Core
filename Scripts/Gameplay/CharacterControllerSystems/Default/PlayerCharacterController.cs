@@ -98,6 +98,7 @@ namespace MultiplayerARPG
         protected ItemDropEntity targetItemDrop;
         protected BuildingEntity targetBuilding;
         protected VehicleEntity targetVehicle;
+        protected WarpPortalEntity targetWarpPortal;
         protected HarvestableEntity targetHarvestable;
         protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
         protected int findingEnemyIndex;
@@ -134,6 +135,7 @@ namespace MultiplayerARPG
             ActivatableEntityDetector.findOnlyAliveBuildings = true;
             ActivatableEntityDetector.findOnlyActivatableBuildings = true;
             ActivatableEntityDetector.findVehicle = true;
+            ActivatableEntityDetector.findWarpPortal = true;
             // This entity detector will be find item drop entities to use when pressed pickup key
             tempGameObject = new GameObject("_ItemDropEntityDetector");
             ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();

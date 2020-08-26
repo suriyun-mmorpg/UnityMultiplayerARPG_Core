@@ -124,11 +124,25 @@ namespace MultiplayerARPG
                 hotkeys.Add(characterHotkey);
         }
 
-        protected void NetFuncEnterWarp()
+        protected void NetFuncEnterWarp(PackedUInt objectId)
         {
-            if (!CanDoActions() || WarpingPortal == null)
+            if (!CanDoActions())
                 return;
-            WarpingPortal.EnterWarp(this);
+
+            WarpPortalEntity warpPortalEntity;
+            if (!Manager.TryGetEntityByObjectId(objectId, out warpPortalEntity))
+            {
+                // Can't find the building
+                return;
+            }
+
+            if (GameplayUtils.BoundsDistance(WorldBounds, warpPortalEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            {
+                // Too far from the warp portal
+                return;
+            }
+
+            warpPortalEntity.EnterWarp(this);
         }
 
         protected void NetFuncBuild(short itemIndex, Vector3 position, Quaternion rotation, PackedUInt parentObjectId)

@@ -7,7 +7,6 @@ namespace MultiplayerARPG
 {
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
-        public WarpPortalEntity WarpingPortal { get; set; }
         public NpcDialog CurrentNpcDialog { get; set; }
 
         [Header("Player Character Settings")]
