@@ -92,6 +92,11 @@ namespace MultiplayerARPG
             StopMove();
         }
 
+        public override void EntityStart()
+        {
+            yRotation = CacheTransform.eulerAngles.y;
+        }
+
         public override void EntityLateUpdate()
         {
             base.EntityLateUpdate();
