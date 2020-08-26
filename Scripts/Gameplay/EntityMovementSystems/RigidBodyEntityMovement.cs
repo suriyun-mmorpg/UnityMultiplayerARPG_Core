@@ -108,6 +108,7 @@ namespace MultiplayerARPG
 
         public override void EntityStart()
         {
+            yRotation = CacheTransform.eulerAngles.y;
             tempCurrentPosition = CacheTransform.position;
             tempCurrentPosition.y += GROUND_BUFFER;
             CacheOpenCharacterController.SetPosition(tempCurrentPosition, true);
@@ -212,7 +213,7 @@ namespace MultiplayerARPG
                 return;
             if (!HasNavPaths)
             {
-                this.yRotation = (float)yRotation;
+                this.yRotation = yRotation;
                 UpdateRotation();
             }
         }
