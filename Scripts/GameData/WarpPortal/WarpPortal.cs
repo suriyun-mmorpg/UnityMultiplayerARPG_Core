@@ -15,8 +15,8 @@ namespace MultiplayerARPG
         [Tooltip("Position which character will warp to when use the warp portal")]
         public Vector3 warpToPosition;
         [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
-        public bool overrideRotation;
-        [Tooltip("This will be used if `overrideRotation` is `TRUE` to change character's rotation when warp")]
+        public bool warpOverrideRotation;
+        [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         public Vector3 warpToRotation;
     }
 }

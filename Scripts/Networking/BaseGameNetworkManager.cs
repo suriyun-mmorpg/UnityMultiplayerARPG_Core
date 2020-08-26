@@ -949,7 +949,7 @@ namespace MultiplayerARPG
                             warpPortalEntity.warpPortalType = warpPortal.warpPortalType;
                             warpPortalEntity.warpToMapInfo = warpPortal.warpToMapInfo;
                             warpPortalEntity.warpToPosition = warpPortal.warpToPosition;
-                            warpPortalEntity.overrideRotation = warpPortal.overrideRotation;
+                            warpPortalEntity.warpOverrideRotation = warpPortal.warpOverrideRotation;
                             warpPortalEntity.warpToRotation = warpPortal.warpToRotation;
                             Assets.NetworkSpawn(warpPortalEntity.gameObject);
                         }

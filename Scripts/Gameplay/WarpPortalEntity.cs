@@ -18,8 +18,8 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("position")]
         public Vector3 warpToPosition;
         [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
-        public bool overrideRotation;
-        [Tooltip("This will be used if `overrideRotation` is `TRUE` to change character's rotation when warp")]
+        public bool warpOverrideRotation;
+        [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         public Vector3 warpToRotation;
 
         protected override void EntityAwake()
@@ -101,9 +101,9 @@ namespace MultiplayerARPG
         public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (warpToMapInfo == null)
-                CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, string.Empty, warpToPosition, overrideRotation, warpToRotation);
+                CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, string.Empty, warpToPosition, warpOverrideRotation, warpToRotation);
             else
-                CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, warpToMapInfo.Id, warpToPosition, overrideRotation, warpToRotation);
+                CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, warpToMapInfo.Id, warpToPosition, warpOverrideRotation, warpToRotation);
         }
     }
 }
