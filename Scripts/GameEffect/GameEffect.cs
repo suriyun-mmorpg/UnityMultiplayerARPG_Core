@@ -16,7 +16,7 @@ namespace MultiplayerARPG
             get { return followingTarget; }
             set
             {
-                if (followingTarget == null)
+                if (value == null)
                     return;
                 followingTarget = value;
                 intendToFollowingTarget = true;
