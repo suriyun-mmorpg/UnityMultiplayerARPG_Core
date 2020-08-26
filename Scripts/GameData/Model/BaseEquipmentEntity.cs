@@ -42,6 +42,9 @@ namespace MultiplayerARPG
 
         public void PlayWeaponLaunchEffect()
         {
+            if (!gameObject.activeInHierarchy)
+                return;
+
             if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
                 weaponLaunchEffects[Random.Range(0, weaponLaunchEffects.Length)].Play();
 
