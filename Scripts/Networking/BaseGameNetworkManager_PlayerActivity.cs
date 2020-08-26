@@ -491,7 +491,7 @@ namespace MultiplayerARPG
             {
                 CurrentMapInfo.GetRespawnPoint(playerCharacterEntity, out respawnMapName, out respawnPosition);
             }
-            WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition);
+            WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition, false, Vector3.zero);
         }
 
         public virtual void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem, int partyId)
@@ -796,15 +796,15 @@ namespace MultiplayerARPG
             playerCharacterEntity.CacheTransform.position = position;
         }
 
-        public void WarpCharacter(WarpPortalType warpPortalType, BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        public void WarpCharacter(WarpPortalType warpPortalType, BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             switch (warpPortalType)
             {
                 case WarpPortalType.Default:
-                    WarpCharacter(playerCharacterEntity, mapName, position);
+                    WarpCharacter(playerCharacterEntity, mapName, position, overrideRotation, rotation);
                     break;
                 case WarpPortalType.EnterInstance:
-                    WarpCharacterToInstance(playerCharacterEntity, mapName, position);
+                    WarpCharacterToInstance(playerCharacterEntity, mapName, position, overrideRotation, rotation);
                     break;
             }
         }
@@ -1000,7 +1000,9 @@ namespace MultiplayerARPG
         /// <param name="playerCharacterEntity"></param>
         /// <param name="mapName"></param>
         /// <param name="position"></param>
-        protected abstract void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position);
+        /// <param name="overrideRotation"></param>
+        /// <param name="rotation"></param>
+        protected abstract void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
 
         /// <summary>
         /// Warp character to instance map
@@ -1008,7 +1010,9 @@ namespace MultiplayerARPG
         /// <param name="playerCharacterEntity"></param>
         /// <param name="mapName"></param>
         /// <param name="position"></param>
-        protected abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position);
+        /// <param name="overrideRotation"></param>
+        /// <param name="rotation"></param>
+        protected abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
 
         /// <summary>
         /// Check if this game network manager is for instance map or not

@@ -263,7 +263,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
@@ -271,6 +271,8 @@ namespace MultiplayerARPG
             // If map name is empty, just teleport character to target position
             if (string.IsNullOrEmpty(mapName) || (mapName.Equals(CurrentMapInfo.Id) && !IsInstanceMap()))
             {
+                if (overrideRotation)
+                    playerCharacterEntity.CurrentRotation = rotation;
                 playerCharacterEntity.Teleport(position);
                 return;
             }
@@ -297,6 +299,8 @@ namespace MultiplayerARPG
                     selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
                     selectedCharacter.CurrentMapName = mapInfo.Id;
                     selectedCharacter.CurrentPosition = position;
+                    if (overrideRotation)
+                        selectedCharacter.CurrentRotation = rotation;
                     SaveSystem.SaveCharacter(selectedCharacter);
                 }
                 // Unregister all players characters to register later after map changed
@@ -842,11 +846,11 @@ namespace MultiplayerARPG
             SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
         }
 
-        protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             // For now just warp follow host
             // TODO: May add instance by load scene additive and offsets for LAN mode
-            WarpCharacter(playerCharacterEntity, mapName, position);
+            WarpCharacter(playerCharacterEntity, mapName, position, overrideRotation, rotation);
         }
 
         protected override bool IsInstanceMap()

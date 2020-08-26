@@ -5,10 +5,18 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct WarpPortal
     {
+        [Tooltip("The `WarpPortalEntity` prefab which will instantiates on the map scene. If this is not set, it will use the one which set to `GameInstance` → `warpPortalEntityPrefab`")]
         public WarpPortalEntity entityPrefab;
+        [Tooltip("Position where the warp portal will be placed on the map scene")]
         public Vector3 position;
         public WarpPortalType warpPortalType;
+        [Tooltip("Map which character will warp to when use the warp portal, leave this empty to warp character to other position in the same map")]
         public BaseMapInfo warpToMapInfo;
+        [Tooltip("Position which character will warp to when use the warp portal")]
         public Vector3 warpToPosition;
+        [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
+        public bool overrideRotation;
+        [Tooltip("This will be used if `overrideRotation` is `TRUE` to change character's rotation when warp")]
+        public Vector3 warpToRotation;
     }
 }

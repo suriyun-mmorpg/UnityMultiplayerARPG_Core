@@ -946,9 +946,11 @@ namespace MultiplayerARPG
                         if (warpPortalPrefab != null)
                         {
                             warpPortalEntity = Instantiate(warpPortalPrefab, warpPortal.position, Quaternion.identity);
-                            warpPortalEntity.type = warpPortal.warpPortalType;
-                            warpPortalEntity.mapInfo = warpPortal.warpToMapInfo;
-                            warpPortalEntity.position = warpPortal.warpToPosition;
+                            warpPortalEntity.warpPortalType = warpPortal.warpPortalType;
+                            warpPortalEntity.warpToMapInfo = warpPortal.warpToMapInfo;
+                            warpPortalEntity.warpToPosition = warpPortal.warpToPosition;
+                            warpPortalEntity.overrideRotation = warpPortal.overrideRotation;
+                            warpPortalEntity.warpToRotation = warpPortal.warpToRotation;
                             Assets.NetworkSpawn(warpPortalEntity.gameObject);
                         }
                         await UniTask.Yield();

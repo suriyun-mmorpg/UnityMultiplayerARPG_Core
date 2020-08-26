@@ -448,7 +448,7 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition);
+                            BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition, false, Vector3.zero);
                             return null;
                         case CANCEL_MENU_INDEX:
                             nextDialog = warpCancelDialog;

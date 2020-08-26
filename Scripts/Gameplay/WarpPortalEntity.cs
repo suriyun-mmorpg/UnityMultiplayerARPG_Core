@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -6,11 +7,20 @@ namespace MultiplayerARPG
     {
         [Tooltip("Signal to tell players that their character can enter the portal")]
         public GameObject[] warpSignals;
+        [Tooltip("If this is `TRUE`, character will warp immediately when enter this warp portal")]
         public bool warpImmediatelyWhenEnter;
-        public WarpPortalType type;
-        [Tooltip("Leave this empty to warp character to other position in the same map")]
-        public BaseMapInfo mapInfo;
-        public Vector3 position;
+        [FormerlySerializedAs("type")]
+        public WarpPortalType warpPortalType;
+        [Tooltip("Map which character will warp to when use the warp portal, leave this empty to warp character to other position in the same map")]
+        [FormerlySerializedAs("mapInfo")]
+        public BaseMapInfo warpToMapInfo;
+        [Tooltip("Position which character will warp to when use the warp portal")]
+        [FormerlySerializedAs("position")]
+        public Vector3 warpToPosition;
+        [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
+        public bool overrideRotation;
+        [Tooltip("This will be used if `overrideRotation` is `TRUE` to change character's rotation when warp")]
+        public Vector3 warpToRotation;
 
         protected override void EntityAwake()
         {
@@ -90,10 +100,10 @@ namespace MultiplayerARPG
 
         public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (mapInfo == null)
-                CurrentGameManager.WarpCharacter(type, playerCharacterEntity, string.Empty, position);
+            if (warpToMapInfo == null)
+                CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, string.Empty, warpToPosition, overrideRotation, warpToRotation);
             else
-                CurrentGameManager.WarpCharacter(type, playerCharacterEntity, mapInfo.Id, position);
+                CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, warpToMapInfo.Id, warpToPosition, overrideRotation, warpToRotation);
         }
     }
 }
