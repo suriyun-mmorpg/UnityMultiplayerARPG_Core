@@ -8,14 +8,14 @@ namespace MultiplayerARPG
     {
         public float damageRate = 1f;
 
-        public override void ReceiveDamage(IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
             foreach (DamageElement key in keys)
             {
                 damageAmounts[key] = damageAmounts[key] * damageRate;
             }
-            entity.ReceiveDamageFunction(attacker, damageAmounts, weapon, skill, skillLevel);
+            entity.ReceiveDamageFunction(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
     }
 }

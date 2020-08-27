@@ -7,12 +7,14 @@ namespace MultiplayerARPG
     public delegate void NetworkDestroyDelegate(
         byte reasons);
     public delegate void ReceiveDamageDelegate(
+        Vector3 fromPosition,
         IGameEntity attacker,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         CharacterItem weapon,
         BaseSkill skill,
         short skillLevel);
     public delegate void ReceivedDamageDelegate(
+        Vector3 fromPosition,
         IGameEntity attacker,
         CombatAmountType combatAmountType,
         int damage,

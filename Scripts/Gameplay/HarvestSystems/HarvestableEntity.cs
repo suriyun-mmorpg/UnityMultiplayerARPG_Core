@@ -85,12 +85,12 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncOnHarvestableDestroy, FunctionReceivers.All);
         }
 
-        public override void ReceiveDamage(IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || weapon == null)
                 return;
 
-            base.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
+            base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
 
             BaseCharacterEntity attackerCharacter = null;
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
             }
 
             CurrentHp -= totalDamage;
-            ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage, weapon, skill, skillLevel);
+            ReceivedDamage(fromPosition, attacker, CombatAmountType.NormalDamage, totalDamage, weapon, skill, skillLevel);
 
             if (IsDead())
                 DestroyAndRespawn();
@@ -174,9 +174,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void ReceivedDamage(IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            base.ReceivedDamage(attacker, combatAmountType, damage, weapon, skill, skillLevel);
+            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
                 CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
         }

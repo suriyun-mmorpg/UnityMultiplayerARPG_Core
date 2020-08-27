@@ -196,12 +196,12 @@ namespace MultiplayerARPG
             return base.GetMoveSpeed();
         }
 
-        public override void ReceiveDamage(IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
-            base.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
+            base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
 
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
             {
@@ -288,7 +288,7 @@ namespace MultiplayerARPG
             return CharacterDatabase.DamageInfo.GetFov();
         }
 
-        public override void ReceivedDamage(IGameEntity attacker, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             // Attacker can be null when character buff's buff applier is null, So avoid it
             if (attacker != null)
@@ -315,7 +315,7 @@ namespace MultiplayerARPG
                     receivedDamageRecords[attackerCharacter] = receivedDamageRecord;
                 }
             }
-            base.ReceivedDamage(attacker, damageAmountType, damage, weapon, skill, skillLevel);
+            base.ReceivedDamage(fromPosition, attacker, damageAmountType, damage, weapon, skill, skillLevel);
         }
 
         public override void Killed(IGameEntity lastAttacker)

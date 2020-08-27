@@ -704,7 +704,7 @@ namespace MultiplayerARPG
                 return;
             int damage = (int)(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
             character.CurrentHp -= damage;
-            character.ReceivedDamage(null, CombatAmountType.NormalDamage, damage, null, null, 0);
+            character.ReceivedDamage(character.CacheTransform.position, null, CombatAmountType.NormalDamage, damage, null, null, 0);
             if (character.IsDead())
             {
                 // Dead by itself, so causer is itself

@@ -563,7 +563,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void ReceiveDamage(IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
@@ -574,12 +574,12 @@ namespace MultiplayerARPG
                 return;
             }
 
-            ReceiveDamageFunction(attacker, damageAmounts, weapon, skill, skillLevel);
+            ReceiveDamageFunction(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
 
-        internal void ReceiveDamageFunction(IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        internal void ReceiveDamageFunction(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            base.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
+            base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
 
             BaseCharacterEntity attackerCharacter = null;
             if (attacker != null)
@@ -597,7 +597,7 @@ namespace MultiplayerARPG
             {
                 if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(attackerCharacter, this, out isCritical, out isBlocked))
                 {
-                    ReceivedDamage(attackerCharacter, CombatAmountType.Miss, 0, weapon, skill, skillLevel);
+                    ReceivedDamage(fromPosition, attackerCharacter, CombatAmountType.Miss, 0, weapon, skill, skillLevel);
                     return;
                 }
             }
@@ -637,7 +637,7 @@ namespace MultiplayerARPG
                 combatAmountType = CombatAmountType.BlockedDamage;
             else if (isCritical)
                 combatAmountType = CombatAmountType.CriticalDamage;
-            ReceivedDamage(attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            ReceivedDamage(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
 
             // Interrupt casting skill when receive damage
             InterruptCastingSkill();
@@ -659,9 +659,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ReceivedDamage(IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            base.ReceivedDamage(attacker, combatAmountType, damage, weapon, skill, skillLevel);
+            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
                 CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
         }

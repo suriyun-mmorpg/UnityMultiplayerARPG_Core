@@ -284,7 +284,7 @@ namespace MultiplayerARPG
                             if (isClient)
                                 damageTakenTarget.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
-                                damageTakenTarget.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
+                                damageTakenTarget.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
                         }
                     }
                     else
@@ -324,7 +324,7 @@ namespace MultiplayerARPG
                             if (isClient)
                                 tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
-                                tempDamageableEntity.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableEntity.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
                         }
                     }
                     break;
@@ -397,7 +397,7 @@ namespace MultiplayerARPG
                             if (isClient)
                                 tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
-                                tempDamageableEntity.ReceiveDamage(attacker, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableEntity.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)
