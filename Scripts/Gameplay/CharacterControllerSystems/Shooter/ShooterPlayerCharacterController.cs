@@ -114,6 +114,12 @@ namespace MultiplayerARPG
         private float aimAssistXSpeed = 20f;
         [SerializeField]
         private float aimAssistYSpeed = 20f;
+        [SerializeField]
+        private bool aimAssistCharacter = true;
+        [SerializeField]
+        private bool aimAssistBuilding = false;
+        [SerializeField]
+        private bool aimAssistHarvestable = false;
 
         public bool IsBlockController { get; private set; }
         public FollowCameraControls CacheGameplayCameraControls { get; private set; }
@@ -717,11 +723,23 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.enableAimAssistY = enableAimAssistY;
             CacheGameplayCameraControls.aimAssistRadius = aimAssistRadius;
             CacheGameplayCameraControls.aimAssistDistance = centerOriginToCharacterDistance + attackDistance;
-            CacheGameplayCameraControls.aimAssistLayerMask = CurrentGameInstance.GetDamageableLayerMask();
+            CacheGameplayCameraControls.aimAssistLayerMask = GetAimAssistLayerMask();
             CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
             CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
             CacheGameplayCameraControls.aimAssistAngleLessThan = 115f;
             CacheGameplayCameraControls.aimAssistExceptions = aimAssistExceptions;
+        }
+
+        private int GetAimAssistLayerMask()
+        {
+            int layerMask = 0;
+            if (aimAssistCharacter)
+                layerMask = layerMask | CurrentGameInstance.characterLayer.Mask;
+            if (aimAssistBuilding)
+                layerMask = layerMask | CurrentGameInstance.buildingLayer.Mask;
+            if (aimAssistHarvestable)
+                layerMask = layerMask | CurrentGameInstance.harvestableLayer.Mask;
+            return layerMask;
         }
 
         private void UpdateTarget_BuildMode()
