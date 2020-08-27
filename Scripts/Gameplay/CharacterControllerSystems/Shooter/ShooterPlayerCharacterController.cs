@@ -720,6 +720,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.aimAssistLayerMask = CurrentGameInstance.GetDamageableLayerMask();
             CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
             CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
+            CacheGameplayCameraControls.aimAssistAngleLessThan = 115f;
             CacheGameplayCameraControls.aimAssistExceptions = aimAssistExceptions;
         }
 
@@ -1283,11 +1284,7 @@ namespace MultiplayerARPG
 
         public bool IsInFront(Vector3 position)
         {
-            Vector3 from = cameraForward;
-            from.y = 0f;
-            Vector3 to = CacheTransform.position - position;
-            to.y = 0;
-            return Vector3.Angle(from, to) > 135f;
+            return Vector3.Angle(cameraForward, position - CacheTransform.position) < 115f;
         }
 
         public override Vector3? UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab)
