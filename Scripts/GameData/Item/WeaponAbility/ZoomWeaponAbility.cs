@@ -52,8 +52,11 @@ namespace MultiplayerARPG
         public override void OnPreActivate()
         {
             preActivateViewMode = zoomWeaponAbilityController.ViewMode;
-            zoomWeaponAbilityController.ViewMode = ShooterControllerViewMode.Fps;
-            zoomWeaponAbilityController.SetZoomCrosshairSprite(zoomCrosshair);
+            if (zoomCrosshair)
+            {
+                zoomWeaponAbilityController.ViewMode = ShooterControllerViewMode.Fps;
+                zoomWeaponAbilityController.SetZoomCrosshairSprite(zoomCrosshair);
+            }
             zoomWeaponAbilityController.RotationSpeedScale = rotationSpeedScaleWhileZooming;
             currentZoomInterpTime = 0f;
             currentZoomFov = zoomWeaponAbilityController.CurrentCameraFov;
@@ -83,8 +86,8 @@ namespace MultiplayerARPG
             }
 
             bool isActive = state == WeaponAbilityState.Activated || state == WeaponAbilityState.Activating;
-            zoomWeaponAbilityController.ShowZoomCrosshair = isActive;
-            zoomWeaponAbilityController.HideCrosshair = isActive;
+            zoomWeaponAbilityController.ShowZoomCrosshair = zoomCrosshair && isActive;
+            zoomWeaponAbilityController.HideCrosshair = zoomCrosshair && isActive;
 
             if (!isActive)
             {
