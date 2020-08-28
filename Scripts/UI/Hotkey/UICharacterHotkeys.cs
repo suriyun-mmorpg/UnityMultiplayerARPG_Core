@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     public partial class UICharacterHotkeys : UIBase
     {
         public IPlayerCharacterData character { get; protected set; }
+        public List<string> filterCategories = new List<string>();
         public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Building, ItemType.Pet, ItemType.Mount, ItemType.Skill };
         public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active, SkillType.CraftItem };
         public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;

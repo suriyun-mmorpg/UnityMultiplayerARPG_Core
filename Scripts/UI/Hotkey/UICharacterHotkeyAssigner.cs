@@ -19,7 +19,8 @@ namespace MultiplayerARPG
                 if (cacheSkillList == null)
                 {
                     cacheSkillList = gameObject.AddComponent<UIList>();
-                    cacheSkillList.uiPrefab = uiCharacterSkillPrefab.gameObject;
+                    if (uiCharacterSkillPrefab != null)
+                        cacheSkillList.uiPrefab = uiCharacterSkillPrefab.gameObject;
                     cacheSkillList.uiContainer = uiCharacterSkillContainer;
                 }
                 return cacheSkillList;
@@ -34,7 +35,8 @@ namespace MultiplayerARPG
                 if (cacheItemList == null)
                 {
                     cacheItemList = gameObject.AddComponent<UIList>();
-                    cacheItemList.uiPrefab = uiCharacterItemPrefab.gameObject;
+                    if (uiCharacterItemPrefab != null)
+                        cacheItemList.uiPrefab = uiCharacterItemPrefab.gameObject;
                     cacheItemList.uiContainer = uiCharacterItemContainer;
                 }
                 return cacheItemList;

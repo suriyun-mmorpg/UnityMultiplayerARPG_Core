@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -18,9 +19,44 @@ namespace MultiplayerARPG
         public UICharacterItem uiCharacterItem;
         public KeyCode key;
 
+        [Header("Options")]
+        public bool autoAssignItem;
+
         private IUsableItem usingItem;
         private BaseSkill usingSkill;
         private short usingSkillLevel;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+        }
+
+        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (!autoAssignItem)
+                return;
+            BaseSkill skill;
+            short skillLevel;
+            int itemIndex;
+            CharacterItem characterItem;
+            if (!GetAssignedSkill(out skill, out skillLevel) && !GetAssignedItem(out itemIndex, out characterItem))
+            {
+                foreach (CharacterItem nonEquipItem in OwningCharacter.NonEquipItems)
+                {
+                    if (!CanAssignCharacterItem(nonEquipItem))
+                        continue;
+                    OwningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Item, nonEquipItem.id);
+                    break;
+                }
+            }
+        }
 
         public void Setup(UICharacterHotkeys uiCharacterHotkeys, UICharacterHotkeyAssigner uiCharacterHotkeyAssigner, CharacterHotkey data, int indexOfData)
         {
@@ -52,25 +88,25 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void UpdateData()
+        public bool GetAssignedSkill(out BaseSkill skill, out short skillLevel)
         {
-            usingItem = null;
-            usingSkill = null;
-            usingSkillLevel = 0;
-
-            // Find skill by relate Id
-            bool foundUsingSkill = false;
+            skill = null;
+            skillLevel = 0;
             if (Data.type == HotkeyType.Skill)
             {
                 // Get all skills included equipment skills
                 Dictionary<BaseSkill, short> skills = OwningCharacter.GetCaches().Skills;
-                foundUsingSkill = GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.relateId), out usingSkill) && usingSkill != null && skills.TryGetValue(usingSkill, out usingSkillLevel);
+                int dataId = BaseGameData.MakeDataId(Data.relateId);
+                return GameInstance.Skills.TryGetValue(dataId, out skill) &&
+                    skill != null && skills.TryGetValue(skill, out skillLevel);
             }
+            return false;
+        }
 
-            // Find item by relate Id
-            bool foundUsingItem = false;
-            int itemIndex = -1;
-            CharacterItem characterItem = null;
+        public bool GetAssignedItem(out int itemIndex, out CharacterItem characterItem)
+        {
+            itemIndex = -1;
+            characterItem = null;
             if (Data.type == HotkeyType.Item)
             {
                 InventoryType inventoryType;
@@ -86,17 +122,30 @@ namespace MultiplayerARPG
                 {
                     case InventoryType.EquipItems:
                     case InventoryType.NonEquipItems:
-                        foundUsingItem = itemIndex >= 0;
-                        break;
+                        return itemIndex >= 0;
                     case InventoryType.EquipWeaponRight:
                     case InventoryType.EquipWeaponLeft:
-                        foundUsingItem = true;
-                        break;
+                        return true;
                 }
-
-                if (foundUsingItem)
-                    usingItem = characterItem.GetUsableItem();
             }
+            return false;
+        }
+
+        protected override void UpdateData()
+        {
+            usingItem = null;
+            usingSkill = null;
+            usingSkillLevel = 0;
+
+            // Find skill by relate Id
+            bool foundUsingSkill = GetAssignedSkill(out usingSkill, out usingSkillLevel);
+
+            // Find item by relate Id
+            int itemIndex;
+            CharacterItem characterItem;
+            bool foundUsingItem = GetAssignedItem(out itemIndex, out characterItem);
+            if (foundUsingItem)
+                usingItem = characterItem.GetUsableItem();
 
             if (uiCharacterSkill == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterSkillPrefab != null)
             {
@@ -133,8 +182,6 @@ namespace MultiplayerARPG
 
             if (uiCharacterItem != null)
             {
-                // Prepare item data
-
                 if (!foundUsingItem)
                 {
                     uiCharacterItem.Hide();
@@ -235,19 +282,28 @@ namespace MultiplayerARPG
         {
             if (characterItem.IsEmpty() || characterItem.IsEmptySlot())
                 return false;
-            if (UICharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().ItemType))
-                return true;
-            return false;
+            if (UICharacterHotkeys.filterCategories.Count > 0 &&
+                !UICharacterHotkeys.filterCategories.Contains(characterItem.GetItem().category))
+                return false;
+            if (UICharacterHotkeys.filterItemTypes.Count > 0 &&
+                !UICharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().ItemType))
+                return false;
+            return true;
         }
 
         public bool CanAssignCharacterSkill(CharacterSkill characterSkill)
         {
             if (characterSkill.IsEmpty())
                 return false;
-            if (characterSkill.GetSkill().IsAvailable(OwningCharacter) &&
-                UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().SkillType))
+            if (!characterSkill.GetSkill().IsAvailable(OwningCharacter))
+                return false;
+            if (UICharacterHotkeys.filterCategories.Count > 0 &&
+                !UICharacterHotkeys.filterCategories.Contains(characterSkill.GetSkill().category))
+                return false;
+            if (UICharacterHotkeys.filterSkillTypes.Count > 0 &&
+                !UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().SkillType))
                 return true;
-            return false;
+            return true;
         }
 
         public bool IsAssigned()
