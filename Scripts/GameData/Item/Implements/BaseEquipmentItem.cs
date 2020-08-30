@@ -123,7 +123,7 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(IncreaseDamages);
             GameInstance.AddSkills(IncreaseSkillLevels);
             GameInstance.AddEquipmentSets(EquipmentSet);
-            GameInstance.AddGameEffectPoolContainers(EquipmentModels);
+            GameInstance.AddPoolingWeaponLaunchEffects(EquipmentModels);
         }
     }
 }

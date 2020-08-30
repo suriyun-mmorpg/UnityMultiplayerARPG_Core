@@ -441,8 +441,8 @@ namespace MultiplayerARPG
             GameInstance.AddSkills(increaseSkillLevels);
             GameInstance.AddSkills(skillLevel);
             GameInstance.AddEquipmentSets(equipmentSet);
-            GameInstance.AddGameEffectPoolContainers(equipmentModels);
-            GameInstance.AddGameEffectPoolContainers(subEquipmentModels);
+            GameInstance.AddPoolingWeaponLaunchEffects(equipmentModels);
+            GameInstance.AddPoolingWeaponLaunchEffects(subEquipmentModels);
         }
 
         public Item GenerateDefaultItem(WeaponType type)

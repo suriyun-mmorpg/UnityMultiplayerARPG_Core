@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseEquipmentEntity : MonoBehaviour
+    public abstract class BaseEquipmentEntity : MonoBehaviour, IPoolDescriptorCollection
     {
         private int level;
         public int Level
@@ -29,6 +29,19 @@ namespace MultiplayerARPG
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
 
+        public IEnumerable<IPoolDescriptor> PoolDescriptors
+        {
+            get
+            {
+                List<IPoolDescriptor> effects = new List<IPoolDescriptor>();
+                foreach (GameEffectPoolContainer container in poolingWeaponLaunchEffects)
+                {
+                    effects.Add(container.prefab);
+                }
+                return effects;
+            }
+        }
+
         protected virtual void OnEnable()
         {
             if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
@@ -52,9 +65,7 @@ namespace MultiplayerARPG
                 AudioSource.PlayClipAtPoint(weaponLaunchSoundEffects[Random.Range(0, weaponLaunchEffects.Length)], transform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
 
             if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
-            {
                 poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
-            }
         }
 
         public abstract void OnLevelChanged(int level);

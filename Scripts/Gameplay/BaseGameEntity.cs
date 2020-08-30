@@ -328,7 +328,8 @@ namespace MultiplayerARPG
         /// </summary>
         public virtual void PrepareRelatesData()
         {
-
+            // Add pooling game effects
+            GameInstance.AddPoolingObjects(GetComponentsInChildren<IPoolDescriptorCollection>(true));
         }
 
         public virtual Bounds MakeLocalBounds()

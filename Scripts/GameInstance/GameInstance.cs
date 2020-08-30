@@ -994,19 +994,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddGameEffectPoolContainers(IEnumerable<GameEffectPoolContainer> containers)
-        {
-            if (containers == null)
-                return;
-            foreach (GameEffectPoolContainer container in containers)
-            {
-                if (container.prefab == null || PoolingObjectPrefabs.Contains(container.prefab))
-                    continue;
-                PoolingObjectPrefabs.Add(container.prefab);
-            }
-        }
-
-        public static void AddGameEffectPoolContainers(IEnumerable<EquipmentModel> equipmentModels)
+        public static void AddPoolingWeaponLaunchEffects(IEnumerable<EquipmentModel> equipmentModels)
         {
             if (equipmentModels == null)
                 return;
@@ -1017,16 +1005,16 @@ namespace MultiplayerARPG
                     continue;
                 modelObjects.Add(equipmentModel.model);
             }
-            AddGameEffectPoolContainers(modelObjects.GetComponents<BaseEquipmentEntity>());
+            AddPoolingObjects(modelObjects.GetComponents<BaseEquipmentEntity>());
         }
 
-        public static void AddGameEffectPoolContainers(IEnumerable<BaseEquipmentEntity> equipmentEntities)
+        public static void AddPoolingObjects(IEnumerable<IPoolDescriptorCollection> collections)
         {
-            if (equipmentEntities == null)
+            if (collections == null)
                 return;
-            foreach (BaseEquipmentEntity equipmentEntity in equipmentEntities)
+            foreach (IPoolDescriptorCollection collection in collections)
             {
-                AddGameEffectPoolContainers(equipmentEntity.poolingWeaponLaunchEffects);
+                AddPoolingObjects(collection.PoolDescriptors);
             }
         }
 

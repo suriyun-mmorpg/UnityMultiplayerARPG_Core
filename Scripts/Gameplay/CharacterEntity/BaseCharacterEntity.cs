@@ -124,13 +124,6 @@ namespace MultiplayerARPG
             HitBoxes = GetComponentsInChildren<CharacterHitBox>();
         }
 
-        public override void PrepareRelatesData()
-        {
-            base.PrepareRelatesData();
-            // Add pooling game effects from equipment entity
-            GameInstance.AddGameEffectPoolContainers(GetComponentsInChildren<BaseEquipmentEntity>(true));
-        }
-
         protected override void EntityAwake()
         {
             base.EntityAwake();
