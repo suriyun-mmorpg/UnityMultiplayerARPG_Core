@@ -204,7 +204,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < triggerDurations.Length; ++i)
                 {
                     // Wait until triggger before reload ammo
-                    await UniTask.Delay((int)(triggerDurations[i] / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
+                    await UniTask.Delay((int)(triggerDurations[i] / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
 
                     // Prepare data
                     EquipWeapons equipWeapons = EquipWeapons;
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
                             equipWeapons.rightHand = reloadingWeapon;
                         EquipWeapons = equipWeapons;
                     }
-                    await UniTask.Delay((int)((totalDuration - triggerDurations[i]) / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
+                    await UniTask.Delay((int)((totalDuration - triggerDurations[i]) / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
                 }
             }
             catch
@@ -332,7 +332,7 @@ namespace MultiplayerARPG
                     // Play special effects after trigger duration
                     tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -384,7 +384,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
                 }
             }
             catch
