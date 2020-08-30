@@ -65,8 +65,8 @@ namespace MultiplayerARPG
             }
             else if (intendToFollowingTarget)
             {
-                // Push back because following target was destroyed
-                PushBack();
+                // Don't push back immediately
+                DestroyEffect();
             }
         }
 
