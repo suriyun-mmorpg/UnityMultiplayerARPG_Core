@@ -4,7 +4,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public abstract class DamageableEntity : BaseGameEntity, IDamageableEntity
+    public abstract partial class DamageableEntity : BaseGameEntity, IDamageableEntity
     {
         // Events
         public event ReceiveDamageDelegate onReceiveDamage;
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public abstract int MaxHp { get; }
         public float HpRate { get { return (float)CurrentHp / (float)MaxHp; } }
-        
+
         // Temp data
         private GameEffect[] pendingHitEffects;
 
