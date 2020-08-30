@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController
+    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController, IAimAssistAvoidanceListener
     {
         public enum ControllerMode
         {
@@ -245,7 +245,7 @@ namespace MultiplayerARPG
         InputStateManager exitVehicleInput;
         InputStateManager switchEquipWeaponSetInput;
         // Temp physic variables
-        List<Collider> aimAssistExceptions = new List<Collider>();
+        List<Collider> aimAvoidances = new List<Collider>();
         RaycastHit[] raycasts = new RaycastHit[512];
         Collider[] overlapColliders = new Collider[512];
         RaycastHit tempHitInfo;
@@ -647,9 +647,9 @@ namespace MultiplayerARPG
                 }
             }
             // Temporary disable colliders
-            aimAssistExceptions.Clear();
-            PlayerCharacterEntity.AppendAllColliders(aimAssistExceptions);
-            foreach (Collider collider in aimAssistExceptions)
+            aimAvoidances.Clear();
+            PlayerCharacterEntity.AppendAllColliders(aimAvoidances);
+            foreach (Collider collider in aimAvoidances)
             {
                 collider.enabled = false;
             }
@@ -706,7 +706,7 @@ namespace MultiplayerARPG
                 }
             }
             // Enable colliders back
-            foreach (Collider collider in aimAssistExceptions)
+            foreach (Collider collider in aimAvoidances)
             {
                 collider.enabled = true;
             }
@@ -727,7 +727,18 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
             CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
             CacheGameplayCameraControls.aimAssistAngleLessThan = 115f;
-            CacheGameplayCameraControls.aimAssistExceptions = aimAssistExceptions;
+            CacheGameplayCameraControls.AimAssistAvoidanceListener = this;
+        }
+
+        public bool AvoidAimAssist(RaycastHit hitInfo)
+        {
+            IGameEntity entity = hitInfo.collider.GetComponent<IGameEntity>();
+            if (entity != null && entity.Entity != null && entity.Entity != PlayerCharacterEntity)
+            {
+                DamageableEntity damageableEntity = entity.Entity as DamageableEntity;
+                return damageableEntity != null && !damageableEntity.IsDead();
+            }
+            return false;
         }
 
         private int GetAimAssistLayerMask()
@@ -1321,8 +1332,9 @@ namespace MultiplayerARPG
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
             // Disable constructing building entity's colliders
-            List<Collider> exceptionColliders = ConstructingBuildingEntity.GetAllColliders();
-            foreach (Collider collider in exceptionColliders)
+            aimAvoidances.Clear();
+            ConstructingBuildingEntity.AppendAllColliders(aimAvoidances);
+            foreach (Collider collider in aimAvoidances)
             {
                 collider.enabled = false;
             }
@@ -1365,7 +1377,7 @@ namespace MultiplayerARPG
                     aimPosition = hit.point;
             }
             // Enable colliders back
-            foreach (Collider collider in exceptionColliders)
+            foreach (Collider collider in aimAvoidances)
             {
                 collider.enabled = false;
             }
