@@ -736,9 +736,9 @@ namespace MultiplayerARPG
             if (entity != null && entity.Entity != null && entity.Entity != PlayerCharacterEntity)
             {
                 DamageableEntity damageableEntity = entity.Entity as DamageableEntity;
-                return damageableEntity != null && !damageableEntity.IsDead();
+                return damageableEntity == null || damageableEntity.IsDead();
             }
-            return false;
+            return true;
         }
 
         private int GetAimAssistLayerMask()
