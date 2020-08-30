@@ -641,6 +641,11 @@ namespace MultiplayerARPG
             // If current hp <= 0, character dead
             if (IsDead())
             {
+                // Cancel actions
+                CancelReload();
+                CancelAttack();
+                CancelSkill();
+
                 // Call killed function, this should be called only once when dead
                 ValidateRecovery(attacker);
             }

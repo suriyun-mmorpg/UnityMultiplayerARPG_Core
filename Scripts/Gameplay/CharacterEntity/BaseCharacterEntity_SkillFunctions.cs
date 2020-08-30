@@ -150,15 +150,7 @@ namespace MultiplayerARPG
             IsCastingSkillInterrupted = true;
             IsAttackingOrUsingSkill = false;
             CastingSkillDuration = CastingSkillCountDown = 0;
-            if (skillCancellationTokenSources.Count > 0)
-            {
-                List<CancellationTokenSource> cancellationSources = new List<CancellationTokenSource>(skillCancellationTokenSources);
-                foreach (CancellationTokenSource cancellationSource in cancellationSources)
-                {
-                    if (!cancellationSource.IsCancellationRequested)
-                        cancellationSource.Cancel();
-                }
-            }
+            CancelSkill();
             CharacterModel.StopActionAnimation();
             CharacterModel.StopSkillCastAnimation();
             if (FpsModel && FpsModel.gameObject.activeSelf)
@@ -217,10 +209,13 @@ namespace MultiplayerARPG
             // Set doing action data
             IsCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
             IsCastingSkillInterrupted = false;
-            CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
-            skillCancellationTokenSources.Add(skillCancellationTokenSource);
+
             // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
+
+            // Prepare cancellation
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            skillCancellationTokenSources.Add(cancellationTokenSource);
             try
             {
                 if (CastingSkillDuration > 0f)
@@ -241,7 +236,7 @@ namespace MultiplayerARPG
                         }
                     }
                     // Wait until end of cast duration
-                    await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
                 }
 
                 // Animations will plays on clients only
@@ -259,7 +254,7 @@ namespace MultiplayerARPG
                     // Play special effects after trigger duration
                     tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -293,7 +288,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
                 }
             }
             catch
@@ -302,11 +297,24 @@ namespace MultiplayerARPG
             }
             finally
             {
-                skillCancellationTokenSources.Remove(skillCancellationTokenSource);
-                skillCancellationTokenSource.Dispose();
+                skillCancellationTokenSources.Remove(cancellationTokenSource);
+                cancellationTokenSource.Dispose();
             }
             // Clear action states at clients and server
             ClearActionStates();
+        }
+
+        protected void CancelSkill()
+        {
+            if (skillCancellationTokenSources.Count > 0)
+            {
+                List<CancellationTokenSource> cancellationSources = new List<CancellationTokenSource>(skillCancellationTokenSources);
+                foreach (CancellationTokenSource cancellationSource in cancellationSources)
+                {
+                    if (!cancellationSource.IsCancellationRequested)
+                        cancellationSource.Cancel();
+                }
+            }
         }
     }
 }

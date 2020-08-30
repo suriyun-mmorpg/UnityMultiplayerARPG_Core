@@ -367,6 +367,9 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncOnDead()
         {
+            CancelReload();
+            CancelAttack();
+            CancelSkill();
             ClearActionStates();
             if (onDead != null)
                 onDead.Invoke();
@@ -374,6 +377,9 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncOnRespawn()
         {
+            CancelReload();
+            CancelAttack();
+            CancelSkill();
             ClearActionStates();
             if (onRespawn != null)
                 onRespawn.Invoke();

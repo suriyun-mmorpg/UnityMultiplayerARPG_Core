@@ -2,12 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        protected readonly List<CancellationTokenSource> attackCancellationTokenSources = new List<CancellationTokenSource>();
+        protected readonly List<CancellationTokenSource> reloadCancellationTokenSources = new List<CancellationTokenSource>();
         /// <summary>
         /// This will be `TRUE` if it's allowing to change aim position instead of using default aim position (character's forward)
         /// So it should be `TRUE` while player's controller is shooter controller
@@ -184,36 +187,50 @@ namespace MultiplayerARPG
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
 
-            // Animations will plays on clients only
-            if (IsClient)
+            // Prepare cancellation
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            reloadCancellationTokenSources.Add(cancellationTokenSource);
+            try
             {
-                // Play animation
-                CharacterModel.PlayActionAnimation(AnimActionType, reloadingWeaponItem.WeaponType.DataId, 0);
-                if (FpsModel && FpsModel.gameObject.activeSelf)
-                    FpsModel.PlayActionAnimation(AnimActionType, reloadingWeaponItem.WeaponType.DataId, 0);
-            }
-
-            for (int i = 0; i < triggerDurations.Length; ++i)
-            {
-                // Wait until triggger before reload ammo
-                await UniTask.Delay((int)(triggerDurations[i] / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
-
-                // Prepare data
-                EquipWeapons equipWeapons = EquipWeapons;
-                Dictionary<CharacterItem, short> decreaseItems;
-                if (IsServer && this.DecreaseAmmos(reloadingWeaponItem.WeaponType.RequireAmmoType, ReloadingAmmoAmount, out decreaseItems))
+                // Animations will plays on clients only
+                if (IsClient)
                 {
-                    this.FillEmptySlots();
-                    reloadingWeapon.ammo += ReloadingAmmoAmount;
-                    if (isLeftHand)
-                        equipWeapons.leftHand = reloadingWeapon;
-                    else
-                        equipWeapons.rightHand = reloadingWeapon;
-                    EquipWeapons = equipWeapons;
+                    // Play animation
+                    CharacterModel.PlayActionAnimation(AnimActionType, reloadingWeaponItem.WeaponType.DataId, 0);
+                    if (FpsModel && FpsModel.gameObject.activeSelf)
+                        FpsModel.PlayActionAnimation(AnimActionType, reloadingWeaponItem.WeaponType.DataId, 0);
                 }
-                await UniTask.Delay((int)((totalDuration - triggerDurations[i]) / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
-            }
 
+                for (int i = 0; i < triggerDurations.Length; ++i)
+                {
+                    // Wait until triggger before reload ammo
+                    await UniTask.Delay((int)(triggerDurations[i] / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
+
+                    // Prepare data
+                    EquipWeapons equipWeapons = EquipWeapons;
+                    Dictionary<CharacterItem, short> decreaseItems;
+                    if (IsServer && this.DecreaseAmmos(reloadingWeaponItem.WeaponType.RequireAmmoType, ReloadingAmmoAmount, out decreaseItems))
+                    {
+                        this.FillEmptySlots();
+                        reloadingWeapon.ammo += ReloadingAmmoAmount;
+                        if (isLeftHand)
+                            equipWeapons.leftHand = reloadingWeapon;
+                        else
+                            equipWeapons.rightHand = reloadingWeapon;
+                        EquipWeapons = equipWeapons;
+                    }
+                    await UniTask.Delay((int)((totalDuration - triggerDurations[i]) / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
+                }
+            }
+            catch
+            {
+                // Catch the cancellation
+            }
+            finally
+            {
+                reloadCancellationTokenSources.Remove(cancellationTokenSource);
+                cancellationTokenSource.Dispose();
+            }
             // Clear action states at clients and server
             ClearActionStates();
         }
@@ -294,75 +311,90 @@ namespace MultiplayerARPG
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= GetAnimSpeedRate(AnimActionType);
 
-            // Animations will plays on clients only
-            if (IsClient)
+            // Prepare cancellation
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            attackCancellationTokenSources.Add(cancellationTokenSource);
+            try
             {
-                // Play animation
-                CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
-                if (FpsModel && FpsModel.gameObject.activeSelf)
-                    FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
-            }
-
-            float remainsDuration = totalDuration;
-            float tempTriggerDuration;
-            for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
-            {
-                // Play special effects after trigger duration
-                tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
-                remainsDuration -= tempTriggerDuration;
-                await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
-
-                // Special effects will plays on clients only
+                // Animations will plays on clients only
                 if (IsClient)
                 {
-                    // Play weapon launch special effects
-                    CharacterModel.PlayWeaponLaunchEffect(AnimActionType);
+                    // Play animation
+                    CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                     if (FpsModel && FpsModel.gameObject.activeSelf)
-                        FpsModel.PlayWeaponLaunchEffect(AnimActionType);
+                        FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
 
-                // Get aim position by character's forward
-                Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
-                if (HasAimPosition)
-                    aimPosition = AimPosition;
-
-                // Call on attack to extend attack functionality while attacking
-                bool overrideDefaultAttack = false;
-                foreach (CharacterSkill characterSkill in Skills)
+                float remainsDuration = totalDuration;
+                float tempTriggerDuration;
+                for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
-                    if (characterSkill.level <= 0)
-                        continue;
-                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition))
-                        overrideDefaultAttack = true;
+                    // Play special effects after trigger duration
+                    tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
+                    remainsDuration -= tempTriggerDuration;
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
+
+                    // Special effects will plays on clients only
+                    if (IsClient)
+                    {
+                        // Play weapon launch special effects
+                        CharacterModel.PlayWeaponLaunchEffect(AnimActionType);
+                        if (FpsModel && FpsModel.gameObject.activeSelf)
+                            FpsModel.PlayWeaponLaunchEffect(AnimActionType);
+                    }
+
+                    // Get aim position by character's forward
+                    Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
+                    if (HasAimPosition)
+                        aimPosition = AimPosition;
+
+                    // Call on attack to extend attack functionality while attacking
+                    bool overrideDefaultAttack = false;
+                    foreach (CharacterSkill characterSkill in Skills)
+                    {
+                        if (characterSkill.level <= 0)
+                            continue;
+                        if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition))
+                            overrideDefaultAttack = true;
+                    }
+
+                    // Skip attack function when applied skills (buffs) will override default attack functionality
+                    if (!overrideDefaultAttack)
+                    {
+                        // Trigger attack event
+                        if (onAttackRoutine != null)
+                            onAttackRoutine.Invoke(isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+
+                        // Apply attack damages
+                        ApplyAttack(
+                            isLeftHand,
+                            weapon,
+                            damageInfo,
+                            damageAmounts,
+                            aimPosition);
+                    }
+
+                    if (remainsDuration <= 0f)
+                    {
+                        // Stop trigger animations loop
+                        break;
+                    }
                 }
 
-                // Skip attack function when applied skills (buffs) will override default attack functionality
-                if (!overrideDefaultAttack)
+                if (remainsDuration > 0f)
                 {
-                    // Trigger attack event
-                    if (onAttackRoutine != null)
-                        onAttackRoutine.Invoke(isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
-
-                    // Apply attack damages
-                    ApplyAttack(
-                        isLeftHand,
-                        weapon,
-                        damageInfo,
-                        damageAmounts,
-                        aimPosition);
-                }
-
-                if (remainsDuration <= 0f)
-                {
-                    // Stop trigger animations loop
-                    break;
+                    // Wait until animation ends to stop actions
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
                 }
             }
-
-            if (remainsDuration > 0f)
+            catch
             {
-                // Wait until animation ends to stop actions
-                await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update);
+                // Catch the cancellation
+            }
+            finally
+            {
+                attackCancellationTokenSources.Remove(cancellationTokenSource);
+                cancellationTokenSource.Dispose();
             }
             // Clear action states at clients and server
             ClearActionStates();
@@ -401,6 +433,32 @@ namespace MultiplayerARPG
                     0,
                     aimPosition,
                     stagger);
+            }
+        }
+
+        protected void CancelReload()
+        {
+            if (reloadCancellationTokenSources.Count > 0)
+            {
+                List<CancellationTokenSource> cancellationSources = new List<CancellationTokenSource>(reloadCancellationTokenSources);
+                foreach (CancellationTokenSource cancellationSource in cancellationSources)
+                {
+                    if (!cancellationSource.IsCancellationRequested)
+                        cancellationSource.Cancel();
+                }
+            }
+        }
+
+        protected void CancelAttack()
+        {
+            if (attackCancellationTokenSources.Count > 0)
+            {
+                List<CancellationTokenSource> cancellationSources = new List<CancellationTokenSource>(attackCancellationTokenSources);
+                foreach (CancellationTokenSource cancellationSource in cancellationSources)
+                {
+                    if (!cancellationSource.IsCancellationRequested)
+                        cancellationSource.Cancel();
+                }
             }
         }
     }
