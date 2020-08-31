@@ -53,28 +53,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnEnable()
-        {
-            UpdateOwningCharacterData();
-            BasePlayerCharacterController.OwningCharacter.onQuestsOperation += OnQuestsOperation;
-        }
-
-        private void OnDisable()
-        {
-            BasePlayerCharacterController.OwningCharacter.onQuestsOperation -= OnQuestsOperation;
-        }
-
-        private void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void UpdateOwningCharacterData()
-        {
-            UpdateData(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        public override void Show()
+        protected virtual void OnEnable()
         {
             CacheQuestSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterQuest);
             CacheQuestSelectionManager.eventOnSelect.AddListener(OnSelectCharacterQuest);
@@ -86,15 +65,29 @@ namespace MultiplayerARPG
                 CacheQuestSelectionManager.Get(0).OnClickSelect();
             else if (uiQuestDialog != null)
                 uiQuestDialog.Hide();
-            base.Show();
+            UpdateOwningCharacterData();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
+            BasePlayerCharacterController.OwningCharacter.onQuestsOperation += OnQuestsOperation;
         }
 
-        public override void Hide()
+        protected virtual void OnDisable()
         {
             if (uiQuestDialog != null)
                 uiQuestDialog.onHide.RemoveListener(OnQuestDialogHide);
             CacheQuestSelectionManager.DeselectSelectedUI();
-            base.Hide();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
+            BasePlayerCharacterController.OwningCharacter.onQuestsOperation -= OnQuestsOperation;
+        }
+
+        private void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void UpdateOwningCharacterData()
+        {
+            if (!BasePlayerCharacterController.OwningCharacter) return;
+            UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
         protected void OnQuestDialogHide()

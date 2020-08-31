@@ -84,6 +84,8 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
+            if (inputNetworkAddress != null)
+                inputNetworkAddress.text = DefaultNetworkAddress;
             if (CacheDiscovery != null)
             {
                 CacheDiscovery.onReceivedBroadcast += OnReceivedBroadcast;
@@ -123,13 +125,6 @@ namespace MultiplayerARPG
         {
             UIDiscoveryEntry selectedUI = CacheSelectionManager.SelectedUI;
             return remoteEndPoints[selectedUI.Data.id];
-        }
-
-        public override void Show()
-        {
-            base.Show();
-            if (inputNetworkAddress != null)
-                inputNetworkAddress.text = DefaultNetworkAddress;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void Show()
+        protected virtual void OnEnable()
         {
             CacheBuffSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterBuff);
             CacheBuffSelectionManager.eventOnSelect.AddListener(OnSelectCharacterBuff);
@@ -45,15 +45,13 @@ namespace MultiplayerARPG
             CacheBuffSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterBuff);
             if (uiBuffDialog != null)
                 uiBuffDialog.onHide.AddListener(OnBuffDialogHide);
-            base.Show();
         }
 
-        public override void Hide()
+        protected virtual void OnDisable()
         {
             if (uiBuffDialog != null)
                 uiBuffDialog.onHide.RemoveListener(OnBuffDialogHide);
             CacheBuffSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnBuffDialogHide()

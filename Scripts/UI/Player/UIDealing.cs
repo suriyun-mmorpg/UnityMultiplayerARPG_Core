@@ -85,7 +85,14 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
+            CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
             UpdateData();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onUpdateDealingState += UpdateDealingState;
             BasePlayerCharacterController.OwningCharacter.onUpdateDealingGold += UpdateDealingGold;
             BasePlayerCharacterController.OwningCharacter.onUpdateDealingItems += UpdateDealingItems;
@@ -97,31 +104,16 @@ namespace MultiplayerARPG
         protected override void OnDisable()
         {
             base.OnDisable();
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+            CacheItemSelectionManager.DeselectSelectedUI();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onUpdateDealingState -= UpdateDealingState;
             BasePlayerCharacterController.OwningCharacter.onUpdateDealingGold -= UpdateDealingGold;
             BasePlayerCharacterController.OwningCharacter.onUpdateDealingItems -= UpdateDealingItems;
             BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingState -= UpdateAnotherDealingState;
             BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingGold -= UpdateAnotherDealingGold;
             BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingItems -= UpdateAnotherDealingItems;
-        }
-
-        public override void Show()
-        {
-            CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
-            if (uiItemDialog != null)
-                uiItemDialog.onHide.AddListener(OnItemDialogHide);
-            base.Show();
-        }
-
-        public override void Hide()
-        {
-            if (uiItemDialog != null)
-                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
-            CacheItemSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnItemDialogHide()

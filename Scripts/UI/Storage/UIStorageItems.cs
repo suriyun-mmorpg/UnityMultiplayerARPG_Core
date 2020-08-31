@@ -53,23 +53,7 @@ namespace MultiplayerARPG
         public float TotalWeight { get; private set; }
         public short UsedSlots { get; private set; }
 
-        private void OnEnable()
-        {
-            UpdateData();
-            BasePlayerCharacterController.OwningCharacter.onStorageItemsChange += OnStorageItemsChange;
-        }
-
-        private void OnDisable()
-        {
-            BasePlayerCharacterController.OwningCharacter.onStorageItemsChange -= OnStorageItemsChange;
-        }
-
-        private void OnStorageItemsChange(CharacterItem[] storageItems)
-        {
-            UpdateData();
-        }
-
-        public override void Show()
+        protected virtual void OnEnable()
         {
             CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
             CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
@@ -77,19 +61,12 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
             if (uiItemDialog != null)
                 uiItemDialog.onHide.AddListener(OnItemDialogHide);
-            base.Show();
+            UpdateData();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
+            BasePlayerCharacterController.OwningCharacter.onStorageItemsChange += OnStorageItemsChange;
         }
 
-        public void Show(StorageType storageType, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
-        {
-            StorageType = storageType;
-            TargetEntity = targetEntity;
-            WeightLimit = weightLimit;
-            SlotLimit = slotLimit;
-            Show();
-        }
-
-        public override void Hide()
+        protected virtual void OnDisable()
         {
             // Close storage
             if (StorageType != StorageType.None)
@@ -103,7 +80,22 @@ namespace MultiplayerARPG
             if (uiItemDialog != null)
                 uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
-            base.Hide();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
+            BasePlayerCharacterController.OwningCharacter.onStorageItemsChange -= OnStorageItemsChange;
+        }
+
+        private void OnStorageItemsChange(CharacterItem[] storageItems)
+        {
+            UpdateData();
+        }
+
+        public void Show(StorageType storageType, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
+        {
+            StorageType = storageType;
+            TargetEntity = targetEntity;
+            WeightLimit = weightLimit;
+            SlotLimit = slotLimit;
+            Show();
         }
 
         protected void OnItemDialogHide()

@@ -49,9 +49,8 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.RequestCashPackageInfo(ResponseCashPackageInfo);
         }
 
-        public override void Show()
+        protected virtual void OnEnable()
         {
-            base.Show();
             CacheCashPackageSelectionManager.eventOnSelect.RemoveListener(OnSelectCashPackage);
             CacheCashPackageSelectionManager.eventOnSelect.AddListener(OnSelectCashPackage);
             CacheCashPackageSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashPackage);
@@ -61,12 +60,11 @@ namespace MultiplayerARPG
             RefreshCashPackageInfo();
         }
 
-        public override void Hide()
+        protected virtual void OnDisable()
         {
             if (uiCashPackageDialog != null)
                 uiCashPackageDialog.onHide.RemoveListener(OnCashPackageDialogHide);
             CacheCashPackageSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnCashPackageDialogHide()
@@ -112,14 +110,16 @@ namespace MultiplayerARPG
 
         private void ResponseCashPackageInfo(AckResponseCode responseCode, BaseAckMessage message)
         {
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                return;
+            }
             ResponseCashPackageInfoMessage castedMessage = message as ResponseCashPackageInfoMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
-                    break;
-                case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     if (uiTextCash != null)

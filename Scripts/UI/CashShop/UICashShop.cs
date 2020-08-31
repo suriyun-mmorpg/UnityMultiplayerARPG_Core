@@ -49,9 +49,8 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.RequestCashShopInfo(ResponseCashShopInfo);
         }
 
-        public override void Show()
+        protected virtual void OnEnable()
         {
-            base.Show();
             CacheCashShopSelectionManager.eventOnSelect.RemoveListener(OnSelectCashShopItem);
             CacheCashShopSelectionManager.eventOnSelect.AddListener(OnSelectCashShopItem);
             CacheCashShopSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashShopItem);
@@ -61,12 +60,11 @@ namespace MultiplayerARPG
             RefreshCashShopInfo();
         }
 
-        public override void Hide()
+        protected virtual void OnDisable()
         {
             if (uiCashShopItemDialog != null)
                 uiCashShopItemDialog.onHide.RemoveListener(OnCashShopItemDialogHide);
             CacheCashShopSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnCashShopItemDialogHide()
@@ -101,14 +99,16 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopInfo(AckResponseCode responseCode, BaseAckMessage message)
         {
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                return;
+            }
             ResponseCashShopInfoMessage castedMessage = message as ResponseCashShopInfoMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString()));
-                    break;
-                case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     if (uiTextCash != null)
@@ -146,6 +146,11 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopBuy(AckResponseCode responseCode, BaseAckMessage message)
         {
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                return;
+            }
             ResponseCashShopBuyMessage castedMessage = message as ResponseCashShopBuyMessage;
             switch (responseCode)
             {
@@ -167,9 +172,6 @@ namespace MultiplayerARPG
                             break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-                    break;
-                case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_SUCCESS_CASH_SHOP_BUY.ToString()));

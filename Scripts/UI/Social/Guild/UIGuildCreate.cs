@@ -13,15 +13,14 @@ namespace MultiplayerARPG
         public TextWrapper textRequireGold;
         public UIItemAmounts uiRequireItems;
 
-        public override void Show()
+        protected virtual void OnEnable()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             SocialSystemSetting systemSetting = GameInstance.Singleton.SocialSystemSetting;
             if (textRequireGold != null)
             {
                 int currentAmount = 0;
-                if (owningCharacter != null)
-                    currentAmount = owningCharacter.Gold;
+                if (BasePlayerCharacterController.OwningCharacter)
+                    currentAmount = BasePlayerCharacterController.OwningCharacter.Gold;
                 textRequireGold.text = string.Format(
                     LanguageManager.GetText(formatKeyRequireGold),
                     currentAmount,
@@ -33,8 +32,6 @@ namespace MultiplayerARPG
                 uiRequireItems.showAsRequirement = true;
                 uiRequireItems.Data = systemSetting.CacheCreateGuildRequireItems;
             }
-
-            base.Show();
         }
 
         public void OnClickCreate()

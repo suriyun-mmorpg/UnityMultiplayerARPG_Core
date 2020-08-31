@@ -27,6 +27,10 @@ namespace MultiplayerARPG
                 return;
             }
             base.Show();
+        }
+
+        protected virtual void OnEnable()
+        {
             if (textTitle != null)
                 textTitle.text = Controller.TargetBuildingEntity.Title;
             if (lockableObjects != null && lockableObjects.Length > 0)

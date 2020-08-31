@@ -29,12 +29,14 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         }
 

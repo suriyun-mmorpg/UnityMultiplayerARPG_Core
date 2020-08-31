@@ -40,17 +40,6 @@ namespace MultiplayerARPG
         public CrafterType CrafterType { get; private set; }
         public BaseGameEntity TargetEntity { get; private set; }
 
-        public override void Show()
-        {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCraftItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCraftItem);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCraftItem);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCraftItem);
-            if (uiCraftItemDialog != null)
-                uiCraftItemDialog.onHide.AddListener(OnItemDialogHide);
-            base.Show();
-        }
-
         public void Show(CrafterType crafterType, BaseGameEntity targetEntity)
         {
             CrafterType = crafterType;
@@ -78,7 +67,17 @@ namespace MultiplayerARPG
             Show();
         }
 
-        public override void Hide()
+        protected virtual void OnEnable()
+        {
+            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCraftItem);
+            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCraftItem);
+            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCraftItem);
+            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCraftItem);
+            if (uiCraftItemDialog != null)
+                uiCraftItemDialog.onHide.AddListener(OnItemDialogHide);
+        }
+
+        protected virtual void OnDisable()
         {
             if (uiCraftItemDialog != null)
                 uiCraftItemDialog.onHide.RemoveListener(OnItemDialogHide);

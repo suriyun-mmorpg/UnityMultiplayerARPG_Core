@@ -30,29 +30,21 @@ namespace MultiplayerARPG
             base.UpdateUIs();
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+            UpdatePartyUIs(Party);
             BaseGameNetworkManager.Singleton.onClientUpdateParty += UpdatePartyUIs;
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
-            BaseGameNetworkManager.Singleton.onClientUpdateParty -= UpdatePartyUIs;
-        }
-
-        public override void Show()
-        {
-            base.Show();
-            UpdatePartyUIs(Party);
-        }
-
-        public override void Hide()
-        {
+            base.OnDisable();
             if (uiPartyCreate != null)
                 uiPartyCreate.Hide();
             if (uiPartySetting != null)
                 uiPartySetting.Hide();
-            base.Hide();
+            BaseGameNetworkManager.Singleton.onClientUpdateParty -= UpdatePartyUIs;
         }
 
         private void UpdatePartyUIs(PartyData party)

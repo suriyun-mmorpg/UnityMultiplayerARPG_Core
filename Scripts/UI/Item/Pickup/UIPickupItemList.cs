@@ -37,11 +37,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void Show()
+        protected virtual void OnEnable()
         {
             CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
             CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            base.Show();
         }
 
         protected void OnSelectCharacterItem(UICharacterItem ui)

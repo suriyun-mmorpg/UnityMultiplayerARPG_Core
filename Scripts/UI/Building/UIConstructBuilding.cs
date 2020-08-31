@@ -13,6 +13,10 @@
                 return;
             }
             base.Show();
+        }
+
+        protected virtual void OnEnable()
+        {
             if (textTitle != null)
                 textTitle.text = Controller.ConstructingBuildingEntity.Title;
         }

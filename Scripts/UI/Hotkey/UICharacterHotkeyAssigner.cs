@@ -74,18 +74,22 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
-            CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
-            CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null)
+            if (BasePlayerCharacterController.OwningCharacter == null)
             {
                 CacheSkillList.HideAll();
                 CacheItemList.HideAll();
                 return;
             }
-            
+            base.Show();
+        }
+
+        protected virtual void OnEnable()
+        {
+            CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
+            CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
+            CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
+
             CacheSkillList.doNotRemoveContainerChildren = true;
             CacheItemList.doNotRemoveContainerChildren = true;
 
@@ -94,16 +98,16 @@ namespace MultiplayerARPG
             CharacterSkill tempCharacterSkill;
             BaseSkill tempSkill;
             int tempIndexOfSkill;
-            CacheSkillList.Generate(owningCharacter.GetCaches().Skills, (index, skillLevel, ui) =>
+            CacheSkillList.Generate(BasePlayerCharacterController.OwningCharacter.GetCaches().Skills, (index, skillLevel, ui) =>
             {
                 tempUiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                 tempSkill = skillLevel.Key;
-                tempIndexOfSkill = owningCharacter.IndexOfSkill(tempSkill.DataId);
+                tempIndexOfSkill = BasePlayerCharacterController.OwningCharacter.IndexOfSkill(tempSkill.DataId);
                 // Set character skill data
                 tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
                 if (uiCharacterHotkey.CanAssignCharacterSkill(tempCharacterSkill))
                 {
-                    tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), owningCharacter, tempIndexOfSkill);
+                    tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), BasePlayerCharacterController.OwningCharacter, tempIndexOfSkill);
                     tempUiCharacterSkill.Show();
                     CacheSkillSelectionManager.Add(tempUiCharacterSkill);
                 }
@@ -115,12 +119,12 @@ namespace MultiplayerARPG
 
             // Setup item list
             UICharacterItem tempUiCharacterItem;
-            CacheItemList.Generate(owningCharacter.NonEquipItems, (index, characterItem, ui) =>
+            CacheItemList.Generate(BasePlayerCharacterController.OwningCharacter.NonEquipItems, (index, characterItem, ui) =>
             {
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
                 if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
                 {
-                    tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), owningCharacter, index);
+                    tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, index);
                     tempUiCharacterItem.Show();
                     CacheItemSelectionManager.Add(tempUiCharacterItem);
                 }
@@ -129,14 +133,12 @@ namespace MultiplayerARPG
                     tempUiCharacterItem.Hide();
                 }
             });
-            base.Show();
         }
 
-        public override void Hide()
+        protected virtual void OnDisable()
         {
             CacheSkillSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnSelectCharacterSkill(UICharacterSkill ui)

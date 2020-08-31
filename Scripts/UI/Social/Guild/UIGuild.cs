@@ -167,19 +167,9 @@ namespace MultiplayerARPG
             base.UpdateUIs();
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
-            BaseGameNetworkManager.Singleton.onClientUpdateGuild += UpdateGuildUIs;
-        }
-
-        private void OnDisable()
-        {
-            BaseGameNetworkManager.Singleton.onClientUpdateGuild -= UpdateGuildUIs;
-        }
-
-        public override void Show()
-        {
-            base.Show();
+            base.OnEnable();
             RoleSelectionManager.eventOnSelect.RemoveListener(OnSelectRole);
             RoleSelectionManager.eventOnSelect.AddListener(OnSelectRole);
             RoleSelectionManager.eventOnDeselect.RemoveListener(OnDeselectRole);
@@ -193,10 +183,12 @@ namespace MultiplayerARPG
             if (uiSkillDialog != null)
                 uiSkillDialog.onHide.AddListener(OnSkillDialogHide);
             UpdateGuildUIs(Guild);
+            BaseGameNetworkManager.Singleton.onClientUpdateGuild += UpdateGuildUIs;
         }
 
-        public override void Hide()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             if (uiGuildCreate != null)
                 uiGuildCreate.Hide();
             if (uiRoleDialog != null)
@@ -205,7 +197,7 @@ namespace MultiplayerARPG
                 uiSkillDialog.onHide.RemoveListener(OnSkillDialogHide);
             RoleSelectionManager.DeselectSelectedUI();
             SkillSelectionManager.DeselectSelectedUI();
-            base.Hide();
+            BaseGameNetworkManager.Singleton.onClientUpdateGuild -= UpdateGuildUIs;
         }
 
         protected void OnRoleDialogHide()

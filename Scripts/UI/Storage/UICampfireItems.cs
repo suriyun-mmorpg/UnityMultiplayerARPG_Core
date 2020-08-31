@@ -13,9 +13,9 @@ namespace MultiplayerARPG
 
         private CampFireEntity campFireEntity;
 
-        public override void Show()
+        protected override void OnEnable()
         {
-            base.Show();
+            base.OnEnable();
             if (TargetEntity)
                 campFireEntity = TargetEntity as CampFireEntity;
         }

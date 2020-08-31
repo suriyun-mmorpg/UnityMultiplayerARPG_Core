@@ -40,14 +40,25 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
+            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
             UpdateOwningCharacterData();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+            CacheItemSelectionManager.DeselectSelectedUI();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         }
 
@@ -58,26 +69,8 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             UpdateData(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        public override void Show()
-        {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
-            if (uiItemDialog != null)
-                uiItemDialog.onHide.AddListener(OnItemDialogHide);
-            base.Show();
-        }
-
-        public override void Hide()
-        {
-            if (uiItemDialog != null)
-                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
-            CacheItemSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnItemDialogHide()

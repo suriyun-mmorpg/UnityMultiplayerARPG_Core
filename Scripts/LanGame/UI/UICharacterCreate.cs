@@ -209,7 +209,7 @@ namespace MultiplayerARPG
                 OnSelectFaction(firstData);
         }
 
-        public virtual void OnEnable()
+        protected virtual void OnEnable()
         {
             // Setup Events
             buttonCreate.onClick.RemoveListener(OnClickCreate);
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
             LoadFactions();
         }
 
-        public virtual void OnDisable()
+        protected virtual void OnDisable()
         {
             characterModelContainer.RemoveChildren();
             inputCharacterName.text = "";

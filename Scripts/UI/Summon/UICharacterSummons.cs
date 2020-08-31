@@ -38,14 +38,25 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
+            CacheSummonSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSummon);
+            CacheSummonSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSummon);
+            CacheSummonSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSummon);
+            CacheSummonSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSummon);
+            if (uiSummonDialog != null)
+                uiSummonDialog.onHide.AddListener(OnSummonDialogHide);
             UpdateOwningCharacterData();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onSummonsOperation += OnSummonsOperation;
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
+            if (uiSummonDialog != null)
+                uiSummonDialog.onHide.RemoveListener(OnSummonDialogHide);
+            CacheSummonSelectionManager.DeselectSelectedUI();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onSummonsOperation -= OnSummonsOperation;
         }
 
@@ -56,26 +67,8 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             UpdateData(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        public override void Show()
-        {
-            CacheSummonSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSummon);
-            CacheSummonSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSummon);
-            CacheSummonSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSummon);
-            CacheSummonSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSummon);
-            if (uiSummonDialog != null)
-                uiSummonDialog.onHide.AddListener(OnSummonDialogHide);
-            base.Show();
-        }
-
-        public override void Hide()
-        {
-            if (uiSummonDialog != null)
-                uiSummonDialog.onHide.RemoveListener(OnSummonDialogHide);
-            CacheSummonSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnSummonDialogHide()

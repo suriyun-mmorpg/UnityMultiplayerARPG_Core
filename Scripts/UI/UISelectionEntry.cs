@@ -59,12 +59,6 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
         }
     }
 
-    public override void Show()
-    {
-        UpdateUI();
-        base.Show();
-    }
-
     public void ForceUpdate()
     {
         UpdateData();

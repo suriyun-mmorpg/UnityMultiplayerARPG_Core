@@ -57,7 +57,7 @@ public class UIInputDialog : UIBase
         }
     }
 
-    public override void Show()
+    protected virtual void OnEnable()
     {
         if (uiInputField != null)
         {
@@ -69,7 +69,6 @@ public class UIInputDialog : UIBase
             buttonConfirm.onClick.RemoveListener(OnClickConfirm);
             buttonConfirm.onClick.AddListener(OnClickConfirm);
         }
-        base.Show();
     }
 
     public void Show(string title,

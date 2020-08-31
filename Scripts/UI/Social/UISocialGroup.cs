@@ -138,9 +138,8 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void Show()
+        protected virtual void OnEnable()
         {
-            base.Show();
             MemberSelectionManager.eventOnSelect.RemoveListener(OnSelectMember);
             MemberSelectionManager.eventOnSelect.AddListener(OnSelectMember);
             MemberSelectionManager.eventOnDeselect.RemoveListener(OnDeselectMember);
@@ -150,12 +149,11 @@ namespace MultiplayerARPG
             UpdateUIs();
         }
 
-        public override void Hide()
+        protected virtual void OnDisable()
         {
             if (uiMemberDialog != null)
                 uiMemberDialog.onHide.RemoveListener(OnMemberDialogHide);
             MemberSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnMemberDialogHide()

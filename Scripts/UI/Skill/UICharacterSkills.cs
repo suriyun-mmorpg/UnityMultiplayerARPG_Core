@@ -56,14 +56,23 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
+            CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
+            CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
+            CacheSkillSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSkill);
+            CacheSkillSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSkill);
+            if (uiSkillDialog != null)
+                uiSkillDialog.onHide.AddListener(OnSkillDialogHide);
             UpdateOwningCharacterData();
             RegisterOwningCharacterEvents();
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
+            if (uiSkillDialog != null)
+                uiSkillDialog.onHide.RemoveListener(OnSkillDialogHide);
+            CacheSkillSelectionManager.DeselectSelectedUI();
             UnregisterOwningCharacterEvents();
         }
 
@@ -117,25 +126,6 @@ namespace MultiplayerARPG
         {
             if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
             UpdateData(BasePlayerCharacterController.OwningCharacter);
-        }
-
-        public override void Show()
-        {
-            CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
-            CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
-            CacheSkillSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSkill);
-            CacheSkillSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSkill);
-            if (uiSkillDialog != null)
-                uiSkillDialog.onHide.AddListener(OnSkillDialogHide);
-            base.Show();
-        }
-
-        public override void Hide()
-        {
-            if (uiSkillDialog != null)
-                uiSkillDialog.onHide.RemoveListener(OnSkillDialogHide);
-            CacheSkillSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnSkillDialogHide()

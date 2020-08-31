@@ -63,9 +63,8 @@ public class UIMessageDialog : UIBase
     private System.Action onClickNo;
     private System.Action onClickCancel;
 
-    public override void Show()
+    protected virtual void OnEnable()
     {
-        base.Show();
         // Set click events to all buttons
         if (buttonOkay != null)
         {
