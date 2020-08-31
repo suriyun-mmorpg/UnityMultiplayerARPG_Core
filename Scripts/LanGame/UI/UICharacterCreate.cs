@@ -209,7 +209,7 @@ namespace MultiplayerARPG
                 OnSelectFaction(firstData);
         }
 
-        public override void Show()
+        public virtual void OnEnable()
         {
             // Setup Events
             buttonCreate.onClick.RemoveListener(OnClickCreate);
@@ -223,14 +223,12 @@ namespace MultiplayerARPG
             // Load characters and factions
             LoadCharacters();
             LoadFactions();
-            base.Show();
         }
 
-        public override void Hide()
+        public virtual void OnDisable()
         {
             characterModelContainer.RemoveChildren();
             inputCharacterName.text = "";
-            base.Hide();
         }
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
