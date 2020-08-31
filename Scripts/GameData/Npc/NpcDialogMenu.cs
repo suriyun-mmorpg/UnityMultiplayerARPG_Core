@@ -21,13 +21,13 @@ namespace MultiplayerARPG
 
         public bool IsPassConditions(IPlayerCharacterData character)
         {
+            if (dialog != null && !dialog.IsPassMenuCondition(character))
+                return false;
             foreach (NpcDialogCondition showCondition in showConditions)
             {
                 if (!showCondition.IsPass(character))
                     return false;
             }
-            if (dialog != null)
-                return dialog.IsPassMenuCondition(character);
             return true;
         }
     }

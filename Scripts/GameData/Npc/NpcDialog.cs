@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             {
                 if (quest == null)
                     return false;
-                // Quest is completed, so don't show the menu to this dialog
+                // Quest is completed, so don't show the menu which navigate to this dialog
                 int indexOfQuest = character.IndexOfQuest(quest.DataId);
                 if (indexOfQuest >= 0 && character.Quests[indexOfQuest].isComplete)
                     return false;
