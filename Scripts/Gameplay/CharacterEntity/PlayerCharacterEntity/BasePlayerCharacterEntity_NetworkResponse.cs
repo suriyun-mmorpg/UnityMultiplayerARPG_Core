@@ -223,26 +223,6 @@ namespace MultiplayerARPG
                 onShowStorage.Invoke(type, objectId, weightLimit, slotLimit);
         }
 
-        protected void NetFuncSellItem(short index, short amount)
-        {
-            if (IsDead() ||
-                index >= nonEquipItems.Count)
-                return;
-
-            if (CurrentNpcDialog == null || CurrentNpcDialog.type != NpcDialogType.Shop)
-                return;
-
-            CharacterItem nonEquipItem = nonEquipItems[index];
-            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
-                return;
-
-            BaseItem item = nonEquipItem.GetItem();
-            if (!this.DecreaseItemsByIndex(index, amount))
-                return;
-            this.FillEmptySlots();
-            CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
-        }
-
         protected void NetFuncDismantleItem(short index)
         {
             if (IsDead() ||

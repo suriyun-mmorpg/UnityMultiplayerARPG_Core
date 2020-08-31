@@ -7,7 +7,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
-        public NpcDialog CurrentNpcDialog { get; set; }
+        public BaseNpcDialog CurrentNpcDialog { get; set; }
 
         [Header("Player Character Settings")]
         [Tooltip("The title which will be shown in create scene")]

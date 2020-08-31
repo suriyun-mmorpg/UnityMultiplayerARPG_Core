@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         [SerializeField]
         [Tooltip("It will use `startDialog` if `graph` is empty")]
-        private NpcDialog startDialog;
+        private BaseNpcDialog startDialog;
         [SerializeField]
         [Tooltip("It will use `graph` start dialog if this is not empty")]
         private NpcDialogGraph graph;
@@ -24,12 +24,12 @@ namespace MultiplayerARPG
         private UINpcEntity uiNpcEntity;
         private NpcQuestIndicator questIndicator;
 
-        public NpcDialog StartDialog
+        public BaseNpcDialog StartDialog
         {
             get
             {
                 if (graph != null && graph.nodes != null && graph.nodes.Count > 0)
-                    return graph.nodes[0] as NpcDialog;
+                    return graph.nodes[0] as BaseNpcDialog;
                 return startDialog;
             }
             set
@@ -99,6 +99,10 @@ namespace MultiplayerARPG
         protected override void EntityStart()
         {
             base.EntityStart();
+            if (startDialog != null)
+                GameInstance.AddNpcDialogs(startDialog);
+            if (graph != null)
+                GameInstance.AddNpcDialogs(graph.GetDialogs());
             SetupQuestIds();
         }
 
@@ -160,11 +164,15 @@ namespace MultiplayerARPG
             FindQuestFromDialog(StartDialog);
         }
 
-        private void FindQuestFromDialog(NpcDialog dialog, List<NpcDialog> foundDialogs = null)
+        private void FindQuestFromDialog(BaseNpcDialog baseDialog, List<BaseNpcDialog> foundDialogs = null)
         {
             if (foundDialogs == null)
-                foundDialogs = new List<NpcDialog>();
+                foundDialogs = new List<BaseNpcDialog>();
 
+            if (baseDialog == null)
+                return;
+
+            NpcDialog dialog = baseDialog as NpcDialog;
             if (dialog == null || foundDialogs.Contains(dialog))
                 return;
 

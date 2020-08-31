@@ -81,26 +81,70 @@ namespace MultiplayerARPG
             }
         }
 
+        protected void NetFuncSellItem(short index, short amount)
+        {
+            if (IsDead() ||
+                index >= nonEquipItems.Count)
+                return;
+
+            if (CurrentNpcDialog == null)
+                return;
+
+            // Dialog must be built-in shop dialog
+            NpcDialog builtInDialog = CurrentNpcDialog as NpcDialog;
+            if (builtInDialog == null || builtInDialog.type != NpcDialogType.Shop)
+                return;
+
+            // Found selling item or not?
+            CharacterItem nonEquipItem = nonEquipItems[index];
+            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+                return;
+
+            // Remove item from inventory
+            BaseItem item = nonEquipItem.GetItem();
+            if (!this.DecreaseItemsByIndex(index, amount))
+                return;
+            this.FillEmptySlots();
+
+            // Increase currencies
+            CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
+        }
+
         protected void NetFuncBuyNpcItem(short itemIndex, short amount)
         {
             if (CurrentNpcDialog == null)
                 return;
-            NpcSellItem[] sellItems = CurrentNpcDialog.sellItems;
+
+            // Dialog must be built-in shop dialog
+            NpcDialog builtInDialog = CurrentNpcDialog as NpcDialog;
+            if (builtInDialog == null || builtInDialog.type != NpcDialogType.Shop)
+                return;
+
+            // Found buying item or not?
+            NpcSellItem[] sellItems = builtInDialog.sellItems;
             if (sellItems == null || itemIndex >= sellItems.Length)
                 return;
+
+            // Currencies enough or not?
             NpcSellItem sellItem = sellItems[itemIndex];
             if (!CurrentGameplayRule.CurrenciesEnoughToBuyItem(this, sellItem, amount))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
                 return;
             }
+
+            // Can carry or not?
             int dataId = sellItem.item.DataId;
             if (this.IncreasingItemsWillOverwhelming(dataId, amount))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
+
+            // Decrease currencies
             CurrentGameplayRule.DecreaseCurrenciesWhenBuyItem(this, sellItem, amount);
+
+            // Add item to inventory
             this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
             this.FillEmptySlots();
             CurrentGameManager.SendNotifyRewardItem(ConnectionId, dataId, amount);
