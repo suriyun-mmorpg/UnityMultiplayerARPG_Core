@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void Show()
+        public virtual void OnEnable()
         {
             if (buttonStart)
             {
@@ -141,13 +141,11 @@ namespace MultiplayerARPG
             CacheCharacterList.HideAll();
             // Load characters
             LoadCharacters();
-            base.Show();
         }
 
-        public override void Hide()
+        public virtual void OnDisable()
         {
             characterModelContainer.RemoveChildren();
-            base.Hide();
         }
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
