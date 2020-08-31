@@ -154,7 +154,7 @@ namespace MultiplayerARPG
                     CacheTransform.eulerAngles = value;
                     return;
                 }
-                Direction2D = Quaternion.Euler(value) * Vector3.forward;
+                Direction2D = LocalDirection2D = Quaternion.Euler(value) * Vector3.forward;
             }
         }
         public string RespawnMapName { get { return respawnMapName.Value; } set { respawnMapName.Value = value; } }
