@@ -275,7 +275,7 @@ namespace MultiplayerARPG
         {
             if (uiNpcDialog == null)
                 return;
-            NpcDialog npcDialog;
+            BaseNpcDialog npcDialog;
             if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out npcDialog))
             {
                 uiNpcDialog.Hide();
