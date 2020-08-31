@@ -211,7 +211,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
         public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
         public static readonly Dictionary<int, BaseSkill> Skills = new Dictionary<int, BaseSkill>();
-        public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
+        public static readonly Dictionary<int, BaseNpcDialog> NpcDialogs = new Dictionary<int, BaseNpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
         public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
@@ -690,12 +690,12 @@ namespace MultiplayerARPG
             AddManyGameData(Skills, skills);
         }
 
-        public static void AddNpcDialogs(params NpcDialog[] npcDialogs)
+        public static void AddNpcDialogs(params BaseNpcDialog[] npcDialogs)
         {
-            AddNpcDialogs((IEnumerable<NpcDialog>)npcDialogs);
+            AddNpcDialogs((IEnumerable<BaseNpcDialog>)npcDialogs);
         }
 
-        public static void AddNpcDialogs(IEnumerable<NpcDialog> npcDialogs)
+        public static void AddNpcDialogs(IEnumerable<BaseNpcDialog> npcDialogs)
         {
             AddManyGameData(NpcDialogs, npcDialogs);
         }
