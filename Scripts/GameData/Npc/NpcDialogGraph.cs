@@ -11,15 +11,15 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Npc Dialog Graph", menuName = "Create GameData/Npc Dialog Graph", order = -4797)]
     public class NpcDialogGraph : NodeGraph
     {
-        public List<NpcDialog> GetDialogs()
+        public List<BaseNpcDialog> GetDialogs()
         {
-            List<NpcDialog> dialogs = new List<NpcDialog>();
+            List<BaseNpcDialog> dialogs = new List<BaseNpcDialog>();
             if (nodes != null && nodes.Count > 0)
             {
                 for (int i = 0; i < nodes.Count; ++i)
                 {
                     nodes[i].name = name + " " + i;
-                    dialogs.Add(nodes[i] as NpcDialog);
+                    dialogs.Add(nodes[i] as BaseNpcDialog);
                 }
             }
             return dialogs;

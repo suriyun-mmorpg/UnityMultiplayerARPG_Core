@@ -73,6 +73,11 @@ namespace MultiplayerARPG
             SetDialogByPort(port, null);
         }
 
+        public virtual bool IsPassMenuCondition(IPlayerCharacterData character)
+        {
+            return true;
+        }
+
         /// <summary>
         /// This will be called to render current dialog
         /// </summary>
@@ -95,7 +100,7 @@ namespace MultiplayerARPG
         /// <param name="characterEntity"></param>
         /// <param name="menuIndex"></param>
         /// <returns></returns>
-        public abstract NpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
+        public abstract BaseNpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
         protected abstract void SetDialogByPort(NodePort from, NodePort to);
         public abstract bool IsShop { get; }
     }

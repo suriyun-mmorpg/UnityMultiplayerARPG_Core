@@ -25,50 +25,50 @@ namespace MultiplayerARPG
         // Quest
         public Quest quest;
         [Output(backingValue = ShowBackingValue.Always, connectionType = ConnectionType.Override)]
-        public NpcDialog questAcceptedDialog;
+        public BaseNpcDialog questAcceptedDialog;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog questDeclinedDialog;
+        public BaseNpcDialog questDeclinedDialog;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog questAbandonedDialog;
+        public BaseNpcDialog questAbandonedDialog;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog questCompletedDialog;
+        public BaseNpcDialog questCompletedDialog;
         // Shop
         public NpcSellItem[] sellItems;
         // Craft Item
         public ItemCraft itemCraft;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog craftDoneDialog;
+        public BaseNpcDialog craftDoneDialog;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog craftItemWillOverwhelmingDialog;
+        public BaseNpcDialog craftItemWillOverwhelmingDialog;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog craftNotMeetRequirementsDialog;
+        public BaseNpcDialog craftNotMeetRequirementsDialog;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog craftCancelDialog;
+        public BaseNpcDialog craftCancelDialog;
         // Save Spawn Point
         public BaseMapInfo saveRespawnMap;
         public Vector3 saveRespawnPosition;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog saveRespawnConfirmDialog;
+        public BaseNpcDialog saveRespawnConfirmDialog;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog saveRespawnCancelDialog;
+        public BaseNpcDialog saveRespawnCancelDialog;
         // Warp
         public WarpPortalType warpPortalType;
         public BaseMapInfo warpMap;
         public Vector3 warpPosition;
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog warpCancelDialog;
+        public BaseNpcDialog warpCancelDialog;
         // Refine Item
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog refineItemCancelDialog;
+        public BaseNpcDialog refineItemCancelDialog;
         // Dismantle Item
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog dismantleItemCancelDialog;
+        public BaseNpcDialog dismantleItemCancelDialog;
         // Storage
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog storageCancelDialog;
+        public BaseNpcDialog storageCancelDialog;
         // Repair Item
         [Output(connectionType = ConnectionType.Override)]
-        public NpcDialog repairItemCancelDialog;
+        public BaseNpcDialog repairItemCancelDialog;
 
         public override void PrepareRelatesData()
         {
@@ -89,6 +89,20 @@ namespace MultiplayerARPG
             GameInstance.AddItems(itemCraft.CraftingItem);
             GameInstance.AddItems(itemCraft.CacheCraftRequirements.Keys);
             GameInstance.AddQuests(quest);
+        }
+
+        public override bool IsPassMenuCondition(IPlayerCharacterData character)
+        {
+            if (type == NpcDialogType.Quest)
+            {
+                if (quest == null)
+                    return false;
+                // Quest is completed, so don't show the menu to this dialog
+                int indexOfQuest = character.IndexOfQuest(quest.DataId);
+                if (indexOfQuest >= 0 && character.Quests[indexOfQuest].isComplete)
+                    return false;
+            }
+            return true;
         }
 
         public override void RenderUI(UINpcDialog uiNpcDialog)
@@ -361,10 +375,10 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override NpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
+        public override BaseNpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
         {
             // This dialog is current NPC dialog
-            NpcDialog nextDialog = null;
+            BaseNpcDialog nextDialog = null;
             switch (type)
             {
                 case NpcDialogType.Normal:
@@ -523,9 +537,9 @@ namespace MultiplayerARPG
             if (from.node != this)
                 return;
 
-            NpcDialog dialog = null;
+            BaseNpcDialog dialog = null;
             if (to != null && to.node != null)
-                dialog = to.node as NpcDialog;
+                dialog = to.node as BaseNpcDialog;
 
             int arrayIndex;
             if (from.fieldName.Contains("menus ") && int.TryParse(from.fieldName.Split(' ')[1], out arrayIndex) && arrayIndex < menus.Length)

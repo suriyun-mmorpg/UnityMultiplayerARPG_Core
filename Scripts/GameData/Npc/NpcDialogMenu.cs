@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public NpcDialogCondition[] showConditions;
         public bool isCloseMenu;
         [BoolShowConditional(nameof(isCloseMenu), false)]
-        public NpcDialog dialog;
+        public BaseNpcDialog dialog;
 
         public string Title
         {
@@ -21,19 +21,13 @@ namespace MultiplayerARPG
 
         public bool IsPassConditions(IPlayerCharacterData character)
         {
-            if (dialog != null && dialog.type == NpcDialogType.Quest)
-            {
-                if (dialog.quest == null)
-                    return false;
-                int indexOfQuest = character.IndexOfQuest(dialog.quest.DataId);
-                if (indexOfQuest >= 0 && character.Quests[indexOfQuest].isComplete)
-                    return false;
-            }
             foreach (NpcDialogCondition showCondition in showConditions)
             {
                 if (!showCondition.IsPass(character))
                     return false;
             }
+            if (dialog != null)
+                return dialog.IsPassMenuCondition(character);
             return true;
         }
     }

@@ -16,7 +16,7 @@ namespace MultiplayerARPG
             Attribute[] attributes = Resources.LoadAll<Attribute>("");
             BaseItem[] items = Resources.LoadAll<BaseItem>("");
             BaseSkill[] skills = Resources.LoadAll<BaseSkill>("");
-            NpcDialog[] npcDialogs = Resources.LoadAll<NpcDialog>("");
+            BaseNpcDialog[] npcDialogs = Resources.LoadAll<BaseNpcDialog>("");
             Quest[] quests = Resources.LoadAll<Quest>("");
             GuildSkill[] guildSkills = Resources.LoadAll<GuildSkill>("");
             PlayerCharacter[] playerCharacters = Resources.LoadAll<PlayerCharacter>("");
