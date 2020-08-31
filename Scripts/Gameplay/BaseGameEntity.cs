@@ -184,7 +184,7 @@ namespace MultiplayerARPG
             get
             {
                 if (PassengingVehicleEntity != null)
-                    return (PassengingVehicleEntity as IGameEntity).Entity.MovementState;
+                    return PassengingVehicleEntity.Entity.MovementState;
                 if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
                     return LocalMovementState;
                 return (MovementState)movementState.Value;
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
             get
             {
                 if (PassengingVehicleEntity != null)
-                    return (PassengingVehicleEntity as IGameEntity).Entity.ExtraMovementState;
+                    return PassengingVehicleEntity.Entity.ExtraMovementState;
                 if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
                     return LocalExtraMovementState;
                 return (ExtraMovementState)extraMovementState.Value;
