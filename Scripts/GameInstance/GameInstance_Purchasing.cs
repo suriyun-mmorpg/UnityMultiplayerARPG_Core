@@ -165,6 +165,11 @@ namespace MultiplayerARPG
 
         private void ResponseCashPackageBuyValidation(AckResponseCode responseCode, BaseAckMessage message)
         {
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                return;
+            }
             var castedMessage = message as ResponseCashPackageBuyValidationMessage;
             switch (responseCode)
             {
@@ -180,9 +185,6 @@ namespace MultiplayerARPG
                             break;
                     }
                     PurchaseResult(false, errorMessage);
-                    break;
-                case AckResponseCode.Timeout:
-                    PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     CashPackage package;
