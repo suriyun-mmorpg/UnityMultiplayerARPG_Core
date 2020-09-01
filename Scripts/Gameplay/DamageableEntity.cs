@@ -165,6 +165,7 @@ namespace MultiplayerARPG
                 // Play hit effects immediately because damage amount shown before client simulate hit
                 if (Model != null)
                     Model.InstantiateEffect(effects);
+                playHitEffectsImmediately = false;
             }
             else
             {
