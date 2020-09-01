@@ -37,6 +37,7 @@ namespace MultiplayerARPG
 
         // Temp data
         private GameEffect[] pendingHitEffects;
+        private bool playHitEffectsImmediately;
 
         public override void InitialRequiredComponents()
         {
@@ -71,14 +72,22 @@ namespace MultiplayerARPG
                 case CombatAmountType.NormalDamage:
                 case CombatAmountType.CriticalDamage:
                 case CombatAmountType.BlockedDamage:
-                    if (Model != null)
-                        Model.InstantiateEffect(pendingHitEffects);
-                    pendingHitEffects = null;
+                    if (pendingHitEffects == null || pendingHitEffects.Length == 0)
+                    {
+                        // Damage amount shown before hit effects prepared
+                        // So it will play hit effects immediately when PlayHitEffects() call later
+                        playHitEffectsImmediately = true;
+                    }
+                    else
+                    {
+                        if (Model != null)
+                            Model.InstantiateEffect(pendingHitEffects);
+                    }
                     break;
                 case CombatAmountType.Miss:
-                    pendingHitEffects = null;
                     break;
             }
+            pendingHitEffects = null;
         }
 
         public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
@@ -151,7 +160,17 @@ namespace MultiplayerARPG
                     break;
                 }
             }
-            pendingHitEffects = effects;
+            if (playHitEffectsImmediately)
+            {
+                // Play hit effects immediately because damage amount shown before client simulate hit
+                if (Model != null)
+                    Model.InstantiateEffect(effects);
+            }
+            else
+            {
+                // Prepare hit effects to play when damage amount show
+                pendingHitEffects = effects;
+            }
         }
     }
 }
