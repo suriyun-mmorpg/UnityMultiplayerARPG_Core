@@ -2,14 +2,16 @@
 {
     public class UIFriend : UISocialGroup<UISocialCharacter>
     {
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             BaseGameNetworkManager.Singleton.onClientUpdateFriends += UpdateFriendsUIs;
             BasePlayerCharacterController.OwningCharacter.RequestGetFriends();
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             BaseGameNetworkManager.Singleton.onClientUpdateFriends -= UpdateFriendsUIs;
         }
 

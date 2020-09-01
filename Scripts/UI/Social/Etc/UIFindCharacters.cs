@@ -4,13 +4,15 @@
     {
         public InputFieldWrapper inputCharacterName;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             BaseGameNetworkManager.Singleton.onClientUpdateFoundCharacters += UpdateFoundCharactersUIs;
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             BaseGameNetworkManager.Singleton.onClientUpdateFoundCharacters -= UpdateFoundCharactersUIs;
         }
 
