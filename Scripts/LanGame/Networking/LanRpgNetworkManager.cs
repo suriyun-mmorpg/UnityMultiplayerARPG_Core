@@ -10,7 +10,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
-    public sealed partial class LanRpgNetworkManager : BaseGameNetworkManager
+    public partial class LanRpgNetworkManager : BaseGameNetworkManager
     {
         public enum GameStartType
         {
