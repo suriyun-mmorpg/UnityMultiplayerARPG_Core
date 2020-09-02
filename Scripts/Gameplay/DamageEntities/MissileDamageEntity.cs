@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         protected float missileSpeed;
         protected bool isExploded;
         protected IDamageableEntity lockingTarget;
-        
+
         public Rigidbody CacheRigidbody { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
 
@@ -33,6 +33,17 @@ namespace MultiplayerARPG
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
         }
 
+        /// <summary>
+        /// Setup this component data
+        /// </summary>
+        /// <param name="attacker">Attacker entity who use weapon or skill to spawn this to attack enemy</param>
+        /// <param name="weapon">Weapon which was used to attack enemy</param>
+        /// <param name="damageAmounts">Calculated damage amounts</param>
+        /// <param name="skill">Skill which was used to attack enemy</param>
+        /// <param name="skillLevel">Level of the skill</param>
+        /// <param name="missileDistance">Calculated missile distance</param>
+        /// <param name="missileSpeed">Calculated missile speed</param>
+        /// <param name="lockingTarget">Locking target, if this is empty it can hit any entities</param>
         public virtual void Setup(
             IGameEntity attacker,
             CharacterItem weapon,
@@ -55,8 +66,6 @@ namespace MultiplayerARPG
                 destroying = true;
                 return;
             }
-
-            this.skill = skill;
             this.lockingTarget = lockingTarget;
             isExploded = false;
             destroying = false;
@@ -106,11 +115,12 @@ namespace MultiplayerARPG
                     CacheRigidbody.velocity = CacheTransform.forward * missileSpeed;
             }
         }
-        
+
         protected override void OnPushBack()
         {
             if (onDestroy != null)
                 onDestroy.Invoke();
+            base.OnPushBack();
         }
 
         protected virtual void OnTriggerEnter(Collider other)
@@ -135,11 +145,11 @@ namespace MultiplayerARPG
 
             if (other.GetComponent<IUnHittable>() != null)
                 return;
-            
+
             if (attacker != null && attacker.GetGameObject() == other)
                 return;
-            
-            IDamageableEntity target = null;
+
+            IDamageableEntity target;
             if (FindTargetEntity(other, out target))
             {
                 if (explodeDistance > 0f)
@@ -204,7 +214,7 @@ namespace MultiplayerARPG
 
         protected virtual void Explode()
         {
-            if (isExploded || !IsServer)
+            if (isExploded)
                 return;
 
             isExploded = true;
@@ -215,6 +225,9 @@ namespace MultiplayerARPG
 
             if (onExploded != null)
                 onExploded.Invoke();
+
+            if (!IsServer)
+                return;
 
             ExplodeApplyDamage();
         }

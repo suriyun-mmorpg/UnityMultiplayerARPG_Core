@@ -24,21 +24,25 @@ namespace MultiplayerARPG
         }
 
         public Transform CacheTransform { get; private set; }
+        private FxCollection fxCollection;
+        public FxCollection FxCollection
+        {
+            get
+            {
+                if (fxCollection == null)
+                    fxCollection = new FxCollection(gameObject);
+                return fxCollection;
+            }
+        }
 
         public AudioClip[] randomSoundEffects;
-        private ParticleSystem[] particles;
-        private AudioSource[] audioSources;
-        private AudioSourceSetter[] audioSourceSetters;
         private float destroyTime;
 
         private void Awake()
         {
             CacheTransform = transform;
-            particles = GetComponentsInChildren<ParticleSystem>(true);
-            audioSources = GetComponentsInChildren<AudioSource>(true);
-            audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
         }
-        
+
         protected override void PushBack()
         {
             OnPushBack();
@@ -72,25 +76,7 @@ namespace MultiplayerARPG
 
         public void DestroyEffect()
         {
-            if (particles != null && particles.Length > 0)
-            {
-                foreach (ParticleSystem particle in particles)
-                {
-                    if (!particle)
-                        continue;
-                    ParticleSystem.MainModule mainEmitter = particle.main;
-                    mainEmitter.loop = false;
-                }
-            }
-            if (audioSources != null && audioSources.Length > 0)
-            {
-                foreach (AudioSource audioSource in audioSources)
-                {
-                    if (!audioSource)
-                        continue;
-                    audioSource.loop = false;
-                }
-            }
+            FxCollection.SetLoop(false);
             destroyTime = Time.time + lifeTime;
         }
 
@@ -101,28 +87,7 @@ namespace MultiplayerARPG
                 Debug.LogWarning("The Game Effect is null, this should not happens " + this);
                 return;
             }
-            // Prepare audio sources
-            audioSources = GetComponentsInChildren<AudioSource>(true);
-            if (audioSources != null && audioSources.Length > 0)
-            {
-                foreach (AudioSource audioSource in audioSources)
-                {
-                    if (!audioSource)
-                        continue;
-                    audioSource.playOnAwake = false;
-                }
-            }
-            audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
-            if (audioSourceSetters != null && audioSourceSetters.Length > 0)
-            {
-                foreach (AudioSourceSetter audioSourceSetter in audioSourceSetters)
-                {
-                    if (!audioSourceSetter)
-                        continue;
-                    audioSourceSetter.playOnAwake = false;
-                    audioSourceSetter.playOnEnable = false;
-                }
-            }
+            FxCollection.InitPrefab();
             base.InitPrefab();
         }
 
@@ -149,36 +114,7 @@ namespace MultiplayerARPG
                 if (soundEffect != null)
                     AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, volume);
             }
-            // Play particles
-            if (particles != null && particles.Length > 0)
-            {
-                foreach (ParticleSystem particle in particles)
-                {
-                    if (!particle)
-                        continue;
-                    particle.Play();
-                }
-            }
-            // Play audio sources
-            if (audioSourceSetters != null && audioSourceSetters.Length > 0)
-            {
-                foreach (AudioSourceSetter audioSourceSetter in audioSourceSetters)
-                {
-                    if (!audioSourceSetter)
-                        continue;
-                    audioSourceSetter.Play();
-                }
-            }
-            if (audioSources != null && audioSources.Length > 0)
-            {
-                foreach (AudioSource audioSource in audioSources)
-                {
-                    if (!audioSource)
-                        continue;
-                    audioSource.volume = volume;
-                    audioSource.Play();
-                }
-            }
+            FxCollection.Play();
         }
     }
 }
