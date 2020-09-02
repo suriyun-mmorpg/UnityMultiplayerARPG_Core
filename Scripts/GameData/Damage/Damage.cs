@@ -338,9 +338,8 @@ namespace MultiplayerARPG
                             if (!attacker.TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
-                        float adjustingDistance = Vector3.Distance(aimPosition, damageEffectPosition) - Vector3.Distance(aimPosition, damagePosition);
                         PoolSystem.GetInstance(missileDamageEntity, damageEffectPosition, damageEffectRotation)
-                            .Setup(attacker, weapon, damageAmounts, skill, skillLevel, missileDistance + adjustingDistance, missileSpeed, tempDamageableEntity);
+                            .Setup(attacker, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableEntity);
                     }
                     break;
                 case DamageType.Raycast:
