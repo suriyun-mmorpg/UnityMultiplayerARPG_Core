@@ -194,8 +194,7 @@ namespace MultiplayerARPG
                 {
                     if (tempMoveDirectionMagnitude > 1)
                         tempMoveDirection = tempMoveDirection.normalized;
-                    if (currentDestination.HasValue)
-                        CacheEntity.SetDirection2D(tempMoveDirection);
+                    CacheEntity.SetDirection2D(tempMoveDirection);
                     CacheRigidbody2D.velocity = tempMoveDirection * CacheEntity.GetMoveSpeed();
                 }
                 else
