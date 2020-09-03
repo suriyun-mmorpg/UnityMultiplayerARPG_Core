@@ -105,9 +105,10 @@ namespace MultiplayerARPG
                 hotkeyAimJoyStickPrefab.gameObject.SetActive(false);
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             UpdateOwningCharacterData();
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
             BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
             BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
@@ -116,8 +117,9 @@ namespace MultiplayerARPG
             BasePlayerCharacterController.OwningCharacter.onHotkeysOperation += OnHotkeysOperation;
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
             BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
             BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
@@ -158,6 +160,7 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
+            if (!BasePlayerCharacterController.OwningCharacter) return;
             UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
