@@ -27,7 +27,6 @@ namespace MultiplayerARPG
         public Visibility visibility;
         public float visibleDistance = 30f;
 
-        private float lastShowTime;
         private BasePlayerCharacterEntity tempOwningCharacter;
         private BaseGameEntity tempTargetEntity;
 

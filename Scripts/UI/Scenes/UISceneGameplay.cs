@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         }
 
         [Header("Selected Target UIs")]
-        public UICharacter uiTargetCharacter;
+        public UICharacterEntity uiTargetCharacter;
         public UIBaseGameEntity uiTargetNpc;
         public UIBaseGameEntity uiTargetItemDrop;
         public UIDamageableEntity uiTargetBuilding;
@@ -162,7 +162,6 @@ namespace MultiplayerARPG
                 return;
             }
 
-            uiTargetCharacter.NotForOwningCharacter = true;
             uiTargetCharacter.Data = character;
             uiTargetCharacter.Show();
         }

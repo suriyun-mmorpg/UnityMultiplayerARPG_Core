@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public GameObject uiSkillCastContainer;
         public TextWrapper uiTextSkillCast;
         public Image imageSkillCastGage;
-        public UICharacter uiCharacter;
+        public UICharacterBuffs uiCharacterBuffs;
 
         protected int currentMp;
         protected int maxMp;
@@ -81,12 +81,9 @@ namespace MultiplayerARPG
             }
             base.UpdateUI();
 
-            // Update character UI every `updateUIRepeatRate` seconds
-            if (uiCharacter != null)
-            {
-                uiCharacter.NotForOwningCharacter = true;
-                uiCharacter.Data = Data;
-            }
+            // Update character buffs every `updateUIRepeatRate` seconds
+            if (uiCharacterBuffs != null)
+                uiCharacterBuffs.UpdateData(Data);
         }
     }
 }

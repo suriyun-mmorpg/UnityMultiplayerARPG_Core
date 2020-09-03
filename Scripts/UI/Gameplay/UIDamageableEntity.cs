@@ -9,16 +9,17 @@ namespace MultiplayerARPG
     public abstract class UIDamageableEntity<T> : UIBaseGameEntity<T>
         where T : DamageableEntity
     {
+
+        [Header("Options")]
+        [Tooltip("Visible when hit duration for non owning character")]
+        public float visibleWhenHitDuration = 2f;
+
         [Header("Damageable Entity - UI Elements")]
         // HP
         public UIGageValue uiGageHp;
 
         protected int currentHp;
         protected int maxHp;
-
-        [Header("Options")]
-        [Tooltip("Visible when hit duration for non owning character")]
-        public float visibleWhenHitDuration = 2f;
 
         protected override void Update()
         {
