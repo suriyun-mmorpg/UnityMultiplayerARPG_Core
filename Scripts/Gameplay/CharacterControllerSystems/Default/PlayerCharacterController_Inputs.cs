@@ -198,7 +198,6 @@ namespace MultiplayerARPG
                 Vector3 tempVector3;
                 bool tempHasMapPosition = false;
                 Vector3 tempMapPosition = Vector3.zero;
-                float tempHighestY = float.MinValue;
                 BuildingMaterial tempBuildingMaterial;
                 // If mouse up while cursor point to target (character, item, npc and so on)
                 bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI;
@@ -294,8 +293,7 @@ namespace MultiplayerARPG
                             // Set clicked map position, it will be used if no activating entity found
                             tempHasMapPosition = true;
                             tempMapPosition = physicFunctions.GetRaycastPoint(tempCounter);
-                            if (tempMapPosition.y > tempHighestY)
-                                tempHighestY = tempMapPosition.y;
+                            break;
                         }
                     } // End mouseUpOnTarget
                 }
