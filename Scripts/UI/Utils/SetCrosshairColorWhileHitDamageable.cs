@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class SetCrosshairColorByHitDamageable : MonoBehaviour
+    public class SetCrosshairColorWhileHitDamageable : MonoBehaviour
     {
         public Color notHitColor = Color.green;
         public Color hitColor = Color.red;
