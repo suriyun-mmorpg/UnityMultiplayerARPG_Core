@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 {
                     if (!CanAssignCharacterItem(nonEquipItem))
                         continue;
-                    OwningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Item, nonEquipItem.id);
+                    OwningCharacter.RequestAssignItemHotkey(hotkeyId, nonEquipItem);
                     break;
                 }
             }
@@ -111,23 +111,38 @@ namespace MultiplayerARPG
             characterItem = null;
             if (Data.type == HotkeyType.Item)
             {
-                InventoryType inventoryType;
-                byte equipWeaponSet;
-                OwningCharacter.IsEquipped(
-                    Data.relateId,
-                    out inventoryType,
-                    out itemIndex,
-                    out equipWeaponSet,
-                    out characterItem);
-
-                switch (inventoryType)
+                int dataId = BaseGameData.MakeDataId(Data.relateId);
+                if (GameInstance.Items.ContainsKey(dataId))
                 {
-                    case InventoryType.EquipItems:
-                    case InventoryType.NonEquipItems:
-                        return itemIndex >= 0;
-                    case InventoryType.EquipWeaponRight:
-                    case InventoryType.EquipWeaponLeft:
+                    // Find usable items
+                    itemIndex = OwningCharacter.IndexOfNonEquipItem(dataId);
+                    if (itemIndex >= 0)
+                    {
+                        characterItem = OwningCharacter.NonEquipItems[itemIndex];
                         return true;
+                    }
+                }
+                else
+                {
+                    InventoryType inventoryType;
+                    byte equipWeaponSet;
+                    if (OwningCharacter.IsEquipped(
+                        Data.relateId,
+                        out inventoryType,
+                        out itemIndex,
+                        out equipWeaponSet,
+                        out characterItem))
+                    {
+                        switch (inventoryType)
+                        {
+                            case InventoryType.EquipItems:
+                            case InventoryType.NonEquipItems:
+                                return itemIndex >= 0;
+                            case InventoryType.EquipWeaponRight:
+                            case InventoryType.EquipWeaponLeft:
+                                return true;
+                        }
+                    }
                 }
             }
             return false;

@@ -144,6 +144,28 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool RequestAssignItemHotkey(string hotkeyId, CharacterItem characterItem)
+        {
+            // Usable items will use item data id
+            string relateId = characterItem.GetItem().Id;
+            // For an equipments, it will use item unique id
+            if (characterItem.GetEquipmentItem() != null)
+            {
+                relateId = characterItem.id;
+            }
+            return RequestAssignHotkey(hotkeyId, HotkeyType.Item, relateId);
+        }
+
+        public bool RequestAssignSkillHotkey(string hotkeyId, BaseSkill skill)
+        {
+            return RequestAssignHotkey(hotkeyId, HotkeyType.Skill, skill.Id);
+        }
+
+        public bool RequestUnAssignHotkey(string hotkeyId)
+        {
+            return RequestAssignHotkey(hotkeyId, HotkeyType.None, string.Empty);
+        }
+
         public bool RequestNpcActivate(uint objectId)
         {
             if (IsDead())
