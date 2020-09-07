@@ -245,7 +245,6 @@ namespace MultiplayerARPG
         InputStateManager exitVehicleInput;
         InputStateManager switchEquipWeaponSetInput;
         // Temp physic variables
-        List<Collider> aimAvoidances = new List<Collider>();
         RaycastHit[] raycasts = new RaycastHit[512];
         Collider[] overlapColliders = new Collider[512];
         RaycastHit tempHitInfo;
@@ -256,8 +255,7 @@ namespace MultiplayerARPG
         VehicleEntity targetVehicle;
         WarpPortalEntity targetWarpPortal;
         // Temp data
-        IDamageableEntity tempDamageableEntity;
-        BaseGameEntity tempEntity;
+        IGameEntity tempGameEntity;
         Ray centerRay;
         float centerOriginToCharacterDistance;
         Vector3 moveDirection;
@@ -647,12 +645,6 @@ namespace MultiplayerARPG
                 }
             }
             // Temporary disable colliders
-            aimAvoidances.Clear();
-            PlayerCharacterEntity.AppendAllColliders(aimAvoidances);
-            foreach (Collider collider in aimAvoidances)
-            {
-                collider.enabled = false;
-            }
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + attackDistance);
             // Raycast from camera position to center of screen
@@ -665,50 +657,47 @@ namespace MultiplayerARPG
                 // Get distance between character and raycast hit point
                 tempDistance = Vector3.Distance(CacheTransform.position, tempHitInfo.point);
                 // If this is damageable entity
-                tempDamageableEntity = tempHitInfo.collider.GetComponent<IDamageableEntity>();
-                if (tempDamageableEntity != null)
+                tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
+                if (tempGameEntity == null || tempGameEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
                 {
-                    tempEntity = tempDamageableEntity.Entity;
-
+                    // Skip empty game entity and controlling player's entity
+                    continue;
+                }
+                if (tempGameEntity is IDamageableEntity)
+                {
                     // Entity isn't in front of character, so it's not the target
                     if (turnForwardWhileDoingAction && !IsInFront(tempHitInfo.point))
                         continue;
 
                     // Target must not hidding
-                    if (tempDamageableEntity.Entity is BaseCharacterEntity &&
-                        (tempDamageableEntity.Entity as BaseCharacterEntity).GetCaches().IsHide)
+                    if (tempGameEntity.Entity is BaseCharacterEntity &&
+                        (tempGameEntity.Entity as BaseCharacterEntity).GetCaches().IsHide)
                         continue;
 
                     // Entity is in front of character, so this is target
                     aimPosition = tempHitInfo.point;
-                    SelectedEntity = tempEntity;
+                    SelectedEntity = tempGameEntity.Entity;
                     break;
                 }
                 // Find item drop entity
-                tempEntity = tempHitInfo.collider.GetComponent<ItemDropEntity>();
-                if (tempEntity != null && tempDistance <= CurrentGameInstance.pickUpItemDistance)
+                if (tempGameEntity.Entity is ItemDropEntity &&
+                    tempDistance <= CurrentGameInstance.pickUpItemDistance)
                 {
                     // Entity is in front of character, so this is target
                     if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
                         aimPosition = tempHitInfo.point;
-                    SelectedEntity = tempEntity;
+                    SelectedEntity = tempGameEntity.Entity;
                     break;
                 }
                 // Find activatable entity (NPC/Building/Mount/Etc)
-                tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
-                if (tempEntity != null && tempDistance <= CurrentGameInstance.conversationDistance)
+                if (tempDistance <= CurrentGameInstance.conversationDistance)
                 {
                     // Entity is in front of character, so this is target
                     if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
                         aimPosition = tempHitInfo.point;
-                    SelectedEntity = tempEntity;
+                    SelectedEntity = tempGameEntity.Entity;
                     break;
                 }
-            }
-            // Enable colliders back
-            foreach (Collider collider in aimAvoidances)
-            {
-                collider.enabled = true;
             }
             // Calculate aim direction
             aimDirection = aimPosition - CacheTransform.position;
@@ -1342,12 +1331,6 @@ namespace MultiplayerARPG
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
             // Disable constructing building entity's colliders
-            aimAvoidances.Clear();
-            ConstructingBuildingEntity.AppendAllColliders(aimAvoidances);
-            foreach (Collider collider in aimAvoidances)
-            {
-                collider.enabled = false;
-            }
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + ConstructingBuildingEntity.buildDistance);
             // Raycast from camera position to center of screen
@@ -1369,7 +1352,7 @@ namespace MultiplayerARPG
                 aimPosition = tempHitInfo.point;
                 buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
                 if (buildingArea == null ||
-                    (buildingArea.Entity && buildingArea.GetObjectId() == ConstructingBuildingEntity.ObjectId) ||
+                    buildingArea.GetObjectId() == ConstructingBuildingEntity.ObjectId ||
                     !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                 {
                     // Skip because this area is not allowed to build the building
@@ -1385,11 +1368,6 @@ namespace MultiplayerARPG
                 RaycastHit hit;
                 if (Physics.Raycast(aimPosition, Vector3.down, out hit, 100f, CurrentGameInstance.GetBuildLayerMask()))
                     aimPosition = hit.point;
-            }
-            // Enable colliders back
-            foreach (Collider collider in aimAvoidances)
-            {
-                collider.enabled = false;
             }
             // Place constructing building
             if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
