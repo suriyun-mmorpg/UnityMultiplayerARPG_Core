@@ -318,6 +318,7 @@ namespace MultiplayerARPG
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
             characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraTransform);
             characterEntity.ModelManager.SetIsFps(ViewMode == ShooterControllerViewMode.Fps);
+            CacheGameplayCameraControls.startYRotation = characterEntity.CurrentRotation.y;
             UpdateCameraSettings();
         }
 
