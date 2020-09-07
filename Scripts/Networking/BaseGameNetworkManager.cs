@@ -803,14 +803,11 @@ namespace MultiplayerARPG
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
             // Make sure that grid manager -> axis mode set correctly for current dimension type
-            GridManager gridManager = GetComponent<GridManager>();
-            if (gridManager != null)
-            {
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                    gridManager.axisMode = GridManager.EAxisMode.XZ;
-                else
-                    gridManager.axisMode = GridManager.EAxisMode.XY;
-            }
+            GridManager gridManager = gameObject.GetOrAddComponent<GridManager>();
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                gridManager.axisMode = GridManager.EAxisMode.XZ;
+            else
+                gridManager.axisMode = GridManager.EAxisMode.XY;
             this.InvokeInstanceDevExtMethods("Init");
         }
 
