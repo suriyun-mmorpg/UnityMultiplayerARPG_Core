@@ -160,10 +160,9 @@ namespace MultiplayerARPG
         {
             Transform aimTransform = forEffect ? GetDamageEffectTransform(attacker, isLeftHand) : GetDamageTransform(attacker, isLeftHand);
             position = aimTransform.position;
-            Quaternion forwardRotation = Quaternion.LookRotation(aimPosition - position);
-            Vector3 forwardStagger = forwardRotation * stagger;
-            direction = aimPosition + forwardStagger - position;
-            rotation = Quaternion.LookRotation(direction);
+            Vector3 eulerAngles = Quaternion.LookRotation(aimPosition - position).eulerAngles + stagger;
+            rotation = Quaternion.Euler(eulerAngles);
+            direction = rotation * Vector3.forward;
         }
 
         /// <summary>
