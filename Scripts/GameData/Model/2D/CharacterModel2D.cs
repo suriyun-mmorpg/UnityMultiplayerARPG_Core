@@ -250,12 +250,12 @@ namespace MultiplayerARPG
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
         {
-            playingAction = true;
             return StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier));
         }
 
         IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
+            playingAction = true;
             // If animator is not null, play the action animation
             ActionAnimation2D animation2D = GetActionAnimation(animActionType, dataId);
             if (animation2D != null)
@@ -279,12 +279,12 @@ namespace MultiplayerARPG
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)
         {
-            playingAction = true;
             return StartCoroutine(PlaySkillCastClipRoutine(dataId, duration));
         }
 
         IEnumerator PlaySkillCastClipRoutine(int dataId, float duration)
         {
+            playingAction = true;
             CharacterAnimation2D animation2D = defaultSkillActivateAnimation2D;
             SkillAnimations2D skillAnims;
             if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out skillAnims))
