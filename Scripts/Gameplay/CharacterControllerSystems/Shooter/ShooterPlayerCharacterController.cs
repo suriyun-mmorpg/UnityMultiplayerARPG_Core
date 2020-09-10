@@ -1336,6 +1336,7 @@ namespace MultiplayerARPG
             // Raycast from camera position to center of screen
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, centerOriginToCharacterDistance + ConstructingBuildingEntity.buildDistance, CurrentGameInstance.GetBuildLayerMask());
             bool hitGround = false;
+            IGameEntity gameEntity;
             BuildingArea buildingArea;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
@@ -1348,25 +1349,20 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                if (tempHitInfo.transform.GetComponent<IDamageableEntity>() != null)
+                gameEntity = tempHitInfo.transform.GetComponent<IGameEntity>();
+                if (gameEntity != null && gameEntity.Entity == ConstructingBuildingEntity)
                 {
-                    // Hit damageable entity, skip it
+                    // Hit the constructing building entity, skip it
                     continue;
                 }
 
-                buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
+                buildingArea = gameEntity == null ? null : (gameEntity as BuildingArea);
                 if (buildingArea == null)
                 {
                     // Hit something but it's not building area
                     // set aim position and determine that it hit ground
                     aimPosition = tempHitInfo.point;
                     hitGround = true;
-                    continue;
-                }
-
-                if (buildingArea.Entity == ConstructingBuildingEntity)
-                {
-                    // Hit the constructing building entity, skip it
                     continue;
                 }
 
