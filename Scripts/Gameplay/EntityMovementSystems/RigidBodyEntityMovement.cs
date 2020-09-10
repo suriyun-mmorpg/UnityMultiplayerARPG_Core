@@ -305,7 +305,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void EntityFixedUpdate()
+        public override void EntityUpdate()
         {
             if ((CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
                 (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
@@ -400,11 +400,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Grounded, fall to zero
-                if (!useRootMotionForFall)
-                    tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, 0f, gravity * deltaTime);
-                else
-                    tempVerticalVelocity = 0f;
+                // Not falling set verical velocity to 0
+                tempVerticalVelocity = 0f;
             }
 
             // Jumping 
@@ -505,9 +502,10 @@ namespace MultiplayerARPG
             }
 
             collisionFlags = CacheOpenCharacterController.Move(tempMoveVelocity * deltaTime);
-            if ((collisionFlags & CollisionFlags.CollidedAbove) == CollisionFlags.CollidedAbove)
+            if ((collisionFlags & CollisionFlags.CollidedBelow) == CollisionFlags.CollidedBelow ||
+                (collisionFlags & CollisionFlags.CollidedAbove) == CollisionFlags.CollidedAbove)
             {
-                // Hit something above, falling in next frame
+                // Hit something below or above, falling in next frame
                 tempVerticalVelocity = 0f;
             }
 
