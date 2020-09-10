@@ -696,7 +696,7 @@ namespace MultiplayerARPG
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
-            return StartCoroutine(PlayActionAnimation_LegacyAnimation(animActionType, dataId, index, playSpeedMultiplier));
+            return StartedActionCoroutine(StartCoroutine(PlayActionAnimation_LegacyAnimation(animActionType, dataId, index, playSpeedMultiplier)));
         }
 
         private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
@@ -728,7 +728,7 @@ namespace MultiplayerARPG
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)
         {
-            return StartCoroutine(PlaySkillCastClip_LegacyAnimation(dataId, duration));
+            return StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_LegacyAnimation(dataId, duration)));
         }
 
         private IEnumerator PlaySkillCastClip_LegacyAnimation(int dataId, float duration)

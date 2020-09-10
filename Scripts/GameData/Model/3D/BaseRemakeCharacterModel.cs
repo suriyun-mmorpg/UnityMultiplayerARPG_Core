@@ -88,10 +88,28 @@ namespace MultiplayerARPG
         [ArrayElementTitle("skill")]
         public SkillAnimations[] skillAnimations;
 
+        /// <summary>
+        /// Coroutine for attack, use skill and other animations
+        /// </summary>
+        protected Coroutine actionCoroutine;
+
         protected override void Awake()
         {
             PrepareMissingMovementAnimations();
             base.Awake();
+        }
+
+        protected Coroutine StartedActionCoroutine(Coroutine coroutine)
+        {
+            StopActionCoroutine();
+            actionCoroutine = coroutine;
+            return actionCoroutine;
+        }
+
+        protected void StopActionCoroutine()
+        {
+            if (actionCoroutine != null)
+                StopCoroutine(actionCoroutine);
         }
 
         public void PrepareMissingMovementAnimations()
