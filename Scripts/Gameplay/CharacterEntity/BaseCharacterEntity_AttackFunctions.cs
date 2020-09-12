@@ -240,6 +240,9 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void NetFuncAttack(bool isLeftHand)
         {
+            if (!CanAttack())
+                return;
+
             // Prepare requires data and get weapon data
             AnimActionType animActionType;
             int animaActionDataId;
