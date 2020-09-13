@@ -98,6 +98,11 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             Profiler.BeginSample("BaseMonsterCharacterEntity - Update");
+            if (IsServer && Identity.CountSubscribers() == 0)
+            {
+                // Don't updates while there is no subscrubers
+                return;
+            }
             base.EntityUpdate();
             if (IsSummoned)
             {
