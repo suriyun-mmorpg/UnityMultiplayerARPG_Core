@@ -25,7 +25,6 @@ namespace MultiplayerARPG
 
         // Private state validater
         private bool isSetupComponent;
-        private bool isPlayingActionAnimation;
         private string lastFadedLegacyClipName;
 
         protected override void Awake()
@@ -714,7 +713,6 @@ namespace MultiplayerARPG
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-            isPlayingActionAnimation = true;
             if (tempActionAnimation.clip != null)
                 CrossFadeLegacyAnimation(CLIP_ACTION, actionClipFadeLength, WrapMode.Once);
             // Waits by current transition + clip duration before end animation
@@ -723,7 +721,6 @@ namespace MultiplayerARPG
                 CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
-            isPlayingActionAnimation = false;
         }
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)
@@ -739,14 +736,12 @@ namespace MultiplayerARPG
             legacyAnimation.AddClip(castClip, CLIP_CAST_SKILL);
             CrossFadeLegacyAnimation(CLIP_CAST_SKILL, actionClipFadeLength, WrapMode.Loop);
             yield return new WaitForSecondsRealtime(duration);
-            if (!isPlayingActionAnimation)
-                CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
+            CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }
 
         public override void StopActionAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
-            isPlayingActionAnimation = false;
         }
 
         public override void StopSkillCastAnimation()
