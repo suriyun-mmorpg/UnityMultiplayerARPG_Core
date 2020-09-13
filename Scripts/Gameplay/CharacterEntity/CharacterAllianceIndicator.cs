@@ -16,22 +16,21 @@ namespace MultiplayerARPG
         public GameObject neutralIndicator;
         public float updateWithinRange = 30f;
         public float updateRepeatRate = 0.5f;
-        [HideInInspector, System.NonSerialized]
-        public BaseCharacterEntity characterEntity;
+        private BaseCharacterEntity characterEntity;
         private float lastUpdateTime;
 
         private bool tempVisibleResult;
 
         private void Awake()
         {
-            if (characterEntity == null)
-                characterEntity = GetComponentInParent<BaseCharacterEntity>();
+            characterEntity = GetComponentInParent<BaseCharacterEntity>();
         }
 
         private void Update()
         {
-            if (characterEntity == null ||
+            if (characterEntity == null || !characterEntity.IsClient ||
                 BasePlayerCharacterController.OwningCharacter == null ||
+                (characterEntity.IsServer && characterEntity.Identity.CountSubscribers() == 0) ||
                 Vector3.Distance(characterEntity.CacheTransform.position, BasePlayerCharacterController.OwningCharacter.CacheTransform.position) > updateWithinRange)
             {
                 if (owningIndicator != null && owningIndicator.activeSelf)
