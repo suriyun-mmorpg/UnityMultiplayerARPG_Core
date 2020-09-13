@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
@@ -48,7 +47,6 @@ namespace MultiplayerARPG
                 return;
             }
 
-            float time = Time.unscaledTime;
             float deltaTime = Time.unscaledDeltaTime;
 
             Vector3 currentPosition = CacheEntity.MovementTransform.position;
