@@ -696,6 +696,8 @@ namespace MultiplayerARPG
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
+            StopActionAnimation();
+            StopSkillCastAnimation();
             return StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
         }
 
@@ -739,6 +741,8 @@ namespace MultiplayerARPG
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)
         {
+            StopActionAnimation();
+            StopSkillCastAnimation();
             return StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
         }
 
@@ -750,6 +754,7 @@ namespace MultiplayerARPG
             {
                 bool playAllLayers = IsSkillCastClipPlayingAllLayers(dataId);
                 CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
+                animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, 1f);
                 animator.SetBool(ANIM_IS_CASTING_SKILL, true);
                 animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, playAllLayers);
                 if (playAllLayers)
@@ -775,11 +780,13 @@ namespace MultiplayerARPG
         public override void StopActionAnimation()
         {
             animator.SetBool(ANIM_DO_ACTION, false);
+            animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
         }
 
         public override void StopSkillCastAnimation()
         {
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+            animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
         }
 
         public override void PlayHitAnimation()
