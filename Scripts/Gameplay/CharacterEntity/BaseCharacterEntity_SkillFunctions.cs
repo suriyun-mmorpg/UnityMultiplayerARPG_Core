@@ -46,7 +46,7 @@ namespace MultiplayerARPG
                 // Assign data id
                 animationDataId = skill.DataId;
                 // Assign animation action type
-                animActionType = !isLeftHand ? AnimActionType.SkillRightHand : AnimActionType.AttackLeftHand;
+                animActionType = !isLeftHand ? AnimActionType.SkillRightHand : AnimActionType.SkillLeftHand;
             }
         }
 
