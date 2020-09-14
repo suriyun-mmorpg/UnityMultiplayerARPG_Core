@@ -41,7 +41,7 @@ namespace MultiplayerARPG
 
         protected override bool ValidateToUpdateUI()
         {
-            return base.ValidateToUpdateUI() && !Data.IsDead() && (!Data.IsClient || (Data.IsServer && Data.Identity.CountSubscribers() == 0));
+            return base.ValidateToUpdateUI() && !Data.IsDead() && Data.IsClient;
         }
     }
 
