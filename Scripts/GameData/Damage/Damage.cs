@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         Melee,
         Missile,
         Raycast,
-        Custom = 255
+        Custom = 254
     }
 
     [System.Serializable]
