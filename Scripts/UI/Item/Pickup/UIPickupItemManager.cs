@@ -48,7 +48,19 @@ namespace MultiplayerARPG
             }
             // Update list
             if (uiList != null)
+            {
                 uiList.UpdateData(droppedItems);
+                if (droppedItems.Count == 0)
+                {
+                    if (uiList.IsVisible())
+                        uiList.Hide();
+                }
+                else
+                {
+                    if (!uiList.IsVisible())
+                        uiList.Show();
+                }
+            }
             // Update signal objects
             if (signalObjects != null && signalObjects.Length > 0)
             {
@@ -57,9 +69,6 @@ namespace MultiplayerARPG
                     signalObject.SetActive(droppedItems.Count > 0);
                 }
             }
-            // Hide list if no drop items nearby
-            if (droppedItems.Count == 0 && uiList != null && uiList.IsVisible())
-                uiList.Hide();
         }
     }
 }
