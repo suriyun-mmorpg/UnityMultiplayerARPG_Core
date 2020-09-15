@@ -43,6 +43,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool showConfirmConstructionUI = false;
         [SerializeField]
+        private bool clampBuildPositionByBuildDistance = false;
+        [SerializeField]
         private float buildRotateAngle = 45f;
         [SerializeField]
         private RectTransform crosshairRect;
@@ -1332,17 +1334,46 @@ namespace MultiplayerARPG
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
             // Default aim position (aim to sky/space)
-            aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + ConstructingBuildingEntity.buildDistance);
+            aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + findTargetRaycastDistance);
             // Raycast from camera position to center of screen
-            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, centerOriginToCharacterDistance + ConstructingBuildingEntity.buildDistance, CurrentGameInstance.GetBuildLayerMask());
-            bool hitGround = false;
+            bool hitGround;
+            FindConstructingBuildingArea(centerRay, centerOriginToCharacterDistance + findTargetRaycastDistance, out hitGround);
+            // Not hit ground, find ground to snap
+            if (!hitGround)
+            {
+                // Find nearest grounded position
+                FindConstructingBuildingArea(new Ray(aimPosition, Vector3.down), 100f, out hitGround);
+            }
+            // Place constructing building
+            if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
+                !ConstructingBuildingEntity.BuildingArea)
+            {
+                // Place the building on the ground when the building area is not snapping
+                // Or place it anywhere if there is no building area
+                // It's also no snapping build area, so set building rotation by camera look direction
+                if (!clampBuildPositionByBuildDistance)
+                    ConstructingBuildingEntity.Position = aimPosition;
+                else
+                    ConstructingBuildingEntity.Position = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.buildDistance);
+                // Rotate to camera
+                Vector3 direction = aimPosition - CacheGameplayCameraTransform.position;
+                direction.y = 0f;
+                direction.Normalize();
+                ConstructingBuildingEntity.CacheTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);
+            }
+            return ConstructingBuildingEntity.Position;
+        }
+
+        private int FindConstructingBuildingArea(Ray ray, float distance, out bool hitGround)
+        {
+            hitGround = false;
+            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(ray.origin, ray.direction, raycasts, distance, CurrentGameInstance.GetBuildLayerMask());
             IGameEntity gameEntity;
             BuildingArea buildingArea;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
 
-                // Set aim position
                 if (!IsInFront(tempHitInfo.point))
                 {
                     // Skip because this position is not allowed to build the building
@@ -1359,8 +1390,12 @@ namespace MultiplayerARPG
                 buildingArea = gameEntity == null ? null : (gameEntity as BuildingArea);
                 if (buildingArea == null)
                 {
+                    if (tempHitInfo.transform.GetComponentInParent<IGameEntity>() != null)
+                    {
+                        // If this is part of other game entity, skip it
+                        continue;
+                    }
                     // Hit something but it's not building area
-                    // set aim position and determine that it hit ground
                     aimPosition = tempHitInfo.point;
                     hitGround = true;
                     continue;
@@ -1369,58 +1404,16 @@ namespace MultiplayerARPG
                 if (!ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                 {
                     // Hit building area but skip it because this area is not allow to construct the building
-                    // set aim position and determine that it hit ground
-                    aimPosition = tempHitInfo.point;
-                    hitGround = true;
                     continue;
                 }
+
                 // Found building area which can construct the building
                 aimPosition = tempHitInfo.point;
                 hitGround = true;
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
                 break;
             }
-            // Not hit ground, find ground to snap
-            if (!hitGround)
-            {
-                // Disable constructing building entity's colliders
-                List<Collider> avoidColliders = ConstructingBuildingEntity.GetAllColliders();
-                foreach (Collider avoidCollider in avoidColliders)
-                {
-                    avoidCollider.enabled = false;
-                }
-                // Find nearest grounded position
-                tempCount = PhysicUtils.SortedRaycastNonAlloc3D(aimPosition, Vector3.down, raycasts, 100f, CurrentGameInstance.GetBuildLayerMask());
-                if (tempCount > 0)
-                    aimPosition = raycasts[0].point;
-                // Enable constructing building entity's colliders back for collider triggering
-                foreach (Collider avoidCollider in avoidColliders)
-                {
-                    avoidCollider.enabled = true;
-                }
-            }
-            // Place constructing building
-            if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
-                !ConstructingBuildingEntity.BuildingArea)
-            {
-                // Place the building on the ground when the building area is not snapping
-                // Or place it anywhere if there is no building area
-                // It's alno no snapping build area, so set building rotation by camera look direction
-                ConstructingBuildingEntity.CacheTransform.position = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.buildDistance);
-                // Rotate to camera
-                Vector3 direction = aimPosition - CacheGameplayCameraTransform.position;
-                direction.y = 0f;
-                direction.Normalize();
-                ConstructingBuildingEntity.CacheTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);
-            }
-            // Validate constructing building position
-            if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > ConstructingBuildingEntity.buildDistance)
-            {
-                // Mark as unable to build when the building is far from character
-                ConstructingBuildingEntity.BuildingArea = null;
-            }
-
-            return ConstructingBuildingEntity.Position;
+            return tempCount;
         }
 
         public override void FinishBuildAimControls(bool isCancel)

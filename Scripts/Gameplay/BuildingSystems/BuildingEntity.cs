@@ -13,6 +13,7 @@ namespace MultiplayerARPG
 {
     public class BuildingEntity : DamageableEntity, IBuildingSaveData
     {
+        public const float BUILD_DISTANCE_BUFFER = 0.1f;
         [Header("Building Data")]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
         public string buildingType;
@@ -259,6 +260,8 @@ namespace MultiplayerARPG
             if (BuildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
                 return false;
             if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
+                return false;
+            if (Vector3.Distance(CacheTransform.position, Builder.CacheTransform.position) - BUILD_DISTANCE_BUFFER > buildDistance)
                 return false;
             return buildingTypes.Contains(BuildingArea.buildingType);
         }
