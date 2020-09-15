@@ -36,13 +36,8 @@ namespace MultiplayerARPG
             CharacterItem tempCharacterItem;
             foreach (ItemDropEntity entity in ItemDropEntityDetector.itemDrops)
             {
-                if (entity.PlaceHolderItem == null)
-                {
-                    // Only place holder item drop entity will be shown in the list
-                    continue;
-                }
                 tempEntryId = entity.ObjectId.ToString();
-                tempCharacterItem = CharacterItem.Create(entity.PlaceHolderItem, entity.PlaceHolderLevel, entity.PlaceHolderAmount);
+                tempCharacterItem = CharacterItem.Create(entity.ItemDropData.dataId, entity.ItemDropData.level, entity.ItemDropData.amount);
                 tempCharacterItem.id = tempEntryId;
                 droppedItems.Add(tempCharacterItem);
             }
