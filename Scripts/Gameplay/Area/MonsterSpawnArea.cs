@@ -49,6 +49,7 @@ namespace MultiplayerARPG
             Quaternion spawnRotation = GetRandomRotation();
             GameObject spawnObj = Instantiate(asset.gameObject, spawnPosition, spawnRotation);
             BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
+            entity.gameObject.SetActive(false);
             if (entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
             {
                 entity.Level = level;

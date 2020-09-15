@@ -64,6 +64,7 @@ namespace MultiplayerARPG
             {
                 GameObject spawnObj = Instantiate(asset.gameObject, spawnPosition, spawnRotation);
                 HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
+                entity.gameObject.SetActive(false);
                 if (entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
                 {
                     entity.SetSpawnArea(this, spawnPosition);

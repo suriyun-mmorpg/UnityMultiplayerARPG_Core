@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             Quaternion spawnRotation = GetRandomRotation();
             GameObject spawnObj = Instantiate(asset.gameObject, spawnPosition, spawnRotation);
             ItemDropEntity entity = spawnObj.GetComponent<ItemDropEntity>();
+            entity.gameObject.SetActive(false);
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             entity.SetSpawnArea(this, spawnPosition);
         }
