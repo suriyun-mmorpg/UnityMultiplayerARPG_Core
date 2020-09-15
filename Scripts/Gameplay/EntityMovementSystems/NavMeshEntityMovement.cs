@@ -47,13 +47,20 @@ namespace MultiplayerARPG
         public override void ComponentOnEnable()
         {
             CacheNetTransform.enabled = true;
-            CacheNavMeshAgent.enabled = true;
+            CacheNavMeshAgent.enabled = false;
+            Invoke("EnableNavMeshAgent", 0.125f);
         }
 
         public override void ComponentOnDisable()
         {
             CacheNetTransform.enabled = false;
             CacheNavMeshAgent.enabled = false;
+        }
+
+        private void EnableNavMeshAgent()
+        {
+            CacheNavMeshAgent.enabled = true;
+            CacheNavMeshAgent.Warp(CacheTransform.position);
         }
 
         public override void OnSetup()
@@ -105,8 +112,9 @@ namespace MultiplayerARPG
         {
             CacheNavMeshAgent.updatePosition = false;
             CacheNavMeshAgent.updateRotation = false;
-            CacheNavMeshAgent.isStopped = true;
             CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+            if (CacheNavMeshAgent.isOnNavMesh)
+                CacheNavMeshAgent.isStopped = true;
         }
 
         public override void SetLookRotation(Quaternion rotation)
@@ -143,7 +151,7 @@ namespace MultiplayerARPG
         {
             result = fromPosition;
             NavMeshHit navHit;
-            if (NavMesh.SamplePosition(fromPosition, out navHit, findDistance, -1))
+            if (NavMesh.SamplePosition(fromPosition, out navHit, findDistance, NavMesh.AllAreas))
             {
                 result = navHit.position;
                 return true;
@@ -173,10 +181,13 @@ namespace MultiplayerARPG
                 return;
             CacheNavMeshAgent.updatePosition = true;
             CacheNavMeshAgent.updateRotation = true;
-            CacheNavMeshAgent.isStopped = false;
             CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
             CacheNavMeshAgent.speed = moveSpeed;
-            CacheNavMeshAgent.SetDestination(position);
+            if (CacheNavMeshAgent.isOnNavMesh)
+            {
+                CacheNavMeshAgent.isStopped = false;
+                CacheNavMeshAgent.SetDestination(position);
+            }
         }
     }
 }
