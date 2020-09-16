@@ -47,11 +47,8 @@ namespace MultiplayerARPG
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
             }
             // Spawn area entity
-            aimPosition = GameplayUtils.FindGround(GameplayUtils.ClampPosition(skillUser.CacheTransform.position, aimPosition, castDistance.GetAmount(skillLevel)),
-                AreaSkillControls.GROUND_DETECTION_DISTANCE,
-                GameInstance.Singleton.GetMonsterSpawnGroundDetectionLayerMask());
             PoolSystem.GetInstance(areaDamageEntity, aimPosition, skillUser.GetSummonRotation())
-                .Setup(skillUser, weapon, GetAttackDamages(skillUser, skillLevel, isLeftHand), this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+                .Setup(skillUser, weapon, damageAmounts, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)

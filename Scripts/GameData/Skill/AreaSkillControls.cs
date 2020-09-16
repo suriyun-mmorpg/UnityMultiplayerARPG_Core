@@ -7,7 +7,8 @@ namespace MultiplayerARPG
     public class AreaSkillControls
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
-        
+        public const int GROUND_DETECTION_RAYCAST_LENGTH = 64;
+
         public static bool IsMobile { get { return InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform; } }
 
         public static Vector3? UpdateAimControls(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
@@ -29,7 +30,7 @@ namespace MultiplayerARPG
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = GameplayUtils.CursorWorldPosition(Camera.main, cursorPosition);
             position = GameplayUtils.ClampPosition(BasePlayerCharacterController.Singleton.MovementTransform.position, position, castDistance);
-            position = GameplayUtils.FindGround(position, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetMonsterSpawnGroundDetectionLayerMask());
+            position = PhysicUtils.FindGroundedPosition(position, GROUND_DETECTION_RAYCAST_LENGTH, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
             if (targetObject != null)
             {
                 targetObject.SetActive(true);
@@ -42,7 +43,7 @@ namespace MultiplayerARPG
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = BasePlayerCharacterController.Singleton.MovementTransform.position + (GameplayUtils.GetDirectionByAxes(Camera.main.transform, aimAxes.x, aimAxes.y) * castDistance);
-            position = GameplayUtils.FindGround(position, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetMonsterSpawnGroundDetectionLayerMask());
+            position = PhysicUtils.FindGroundedPosition(position, GROUND_DETECTION_RAYCAST_LENGTH, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
             if (targetObject != null)
             {
                 targetObject.SetActive(true);

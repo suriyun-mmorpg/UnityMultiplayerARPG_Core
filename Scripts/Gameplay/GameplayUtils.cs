@@ -6,44 +6,17 @@ namespace MultiplayerARPG
 {
     public static class GameplayUtils
     {
-        public static Vector3 CursorWorldPosition(Camera camera, Vector3 cursorPosition)
+        public static Vector3 CursorWorldPosition(Camera camera, Vector3 cursorPosition, float distance = 100f)
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
             {
                 RaycastHit tempHit;
-                if (Physics.Raycast(camera.ScreenPointToRay(cursorPosition), out tempHit))
+                if (Physics.Raycast(camera.ScreenPointToRay(cursorPosition), out tempHit, distance, GameInstance.Singleton.GetTargetLayerMask()))
                 {
                     return tempHit.point;
                 }
             }
             return camera.ScreenToWorldPoint(cursorPosition);
-        }
-
-        public static Vector3 FindGround(Vector3 cursorPosition, float detectionDistance, int layerMask)
-        {
-            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
-                return cursorPosition;
-            // Raycast to find hit floor
-            Vector3? aboveHitPoint = null;
-            Vector3? underHitPoint = null;
-            RaycastHit tempHit;
-            if (Physics.Raycast(cursorPosition, Vector3.up, out tempHit, detectionDistance, layerMask))
-                aboveHitPoint = tempHit.point;
-            if (Physics.Raycast(cursorPosition, Vector3.down, out tempHit, detectionDistance, layerMask))
-                underHitPoint = tempHit.point;
-            // Set drop position to nearest hit point
-            if (aboveHitPoint.HasValue && underHitPoint.HasValue)
-            {
-                if (Vector3.Distance(cursorPosition, aboveHitPoint.Value) < Vector3.Distance(cursorPosition, underHitPoint.Value))
-                    cursorPosition = aboveHitPoint.Value;
-                else
-                    cursorPosition = underHitPoint.Value;
-            }
-            else if (aboveHitPoint.HasValue)
-                cursorPosition = aboveHitPoint.Value;
-            else if (underHitPoint.HasValue)
-                cursorPosition = underHitPoint.Value;
-            return cursorPosition;
         }
 
         public static Vector3 ClampPosition(Vector3 centerPosition, Vector3 validatingPosition, float distance)
