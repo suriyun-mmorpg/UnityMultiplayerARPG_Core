@@ -602,6 +602,7 @@ namespace MultiplayerARPG
             // Prepare raycast distance / fov
             float attackDistance = 0f;
             float attackFov = 90f;
+            bool attacking = false;
             if (IsUsingHotkey())
             {
                 mustReleaseFireKey = true;
@@ -633,18 +634,21 @@ namespace MultiplayerARPG
                     // Increase aim distance by skill attack distance
                     attackDistance = PlayerCharacterEntity.UsingSkill.GetCastDistance(PlayerCharacterEntity, PlayerCharacterEntity.UsingSkillLevel, isLeftHandAttacking);
                     attackFov = PlayerCharacterEntity.UsingSkill.GetCastFov(PlayerCharacterEntity, PlayerCharacterEntity.UsingSkillLevel, isLeftHandAttacking);
+                    attacking = true;
                 }
                 else if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                 {
                     // Increase aim distance by skill attack distance
                     attackDistance = queueUsingSkill.skill.GetCastDistance(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
                     attackFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
+                    attacking = true;
                 }
                 else
                 {
                     // Increase aim distance by attack distance
                     attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
                     attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
+                    attacking = true;
                 }
             }
             // Temporary disable colliders
@@ -670,6 +674,10 @@ namespace MultiplayerARPG
                 {
                     // Entity isn't in front of character, so it's not the target
                     if (turnForwardWhileDoingAction && !IsInFront(tempHitInfo.point))
+                        continue;
+
+                    // Skip dead entity while attacking (to allow to use resurrect skills)
+                    if (attacking && (tempGameEntity as IDamageableEntity).IsDead())
                         continue;
 
                     // Target must not hidding
