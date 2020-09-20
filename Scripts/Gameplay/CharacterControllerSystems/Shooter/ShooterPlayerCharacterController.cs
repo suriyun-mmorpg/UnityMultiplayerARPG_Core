@@ -622,7 +622,8 @@ namespace MultiplayerARPG
                     tempPressWeaponAbility = GetSecondaryAttackButtonDown();
                 }
 
-                if ((tempPressAttackRight || tempPressAttackLeft) && !PlayerCharacterEntity.IsAttackingOrUsingSkill)
+                attacking = tempPressAttackRight || tempPressAttackLeft;
+                if (attacking && !PlayerCharacterEntity.IsAttackingOrUsingSkill)
                 {
                     // Priority is right > left
                     isLeftHandAttacking = !tempPressAttackRight && tempPressAttackLeft;
@@ -648,14 +649,12 @@ namespace MultiplayerARPG
                     // Increase aim distance by attack distance
                     attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
                     attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
-                    attacking = true;
                 }
             }
             // Temporary disable colliders
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + attackDistance);
             // Raycast from camera position to center of screen
-            Debug.LogError("Start finding");
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.DefaultRaycastLayers);
             float tempDistance;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
@@ -666,14 +665,12 @@ namespace MultiplayerARPG
                 tempDistance = Vector3.Distance(CacheTransform.position, tempHitInfo.point);
                 tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
 
-                if (tempGameEntity == null || tempGameEntity.Entity.IsHide() ||
+                if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.Entity.IsHide() ||
                     tempGameEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
                 {
                     // Skip empty game entity / hiddeing entity / controlling player's entity
                     continue;
                 }
-
-                Debug.LogError("Hit " + tempGameEntity);
 
                 if (tempGameEntity is IDamageableEntity)
                 {
