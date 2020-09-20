@@ -232,10 +232,13 @@ namespace MultiplayerARPG
                         if (tempBuildingMaterial != null && tempBuildingMaterial.TargetEntity != null)
                             targetBuilding = tempBuildingMaterial.TargetEntity;
                         targetVehicle = tempTransform.GetComponent<VehicleEntity>();
-                        if (targetPlayer && !targetPlayer.IsHideOrDead())
+                        if (targetPlayer)
                         {
                             // Found activating entity as player character entity
-                            SetTarget(targetPlayer, TargetActionType.Attack);
+                            if (!targetPlayer.IsHideOrDead() && !targetPlayer.IsAlly(PlayerCharacterEntity))
+                                SetTarget(targetPlayer, TargetActionType.Attack);
+                            else
+                                SetTarget(targetPlayer, TargetActionType.Activate);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -483,7 +486,7 @@ namespace MultiplayerARPG
 
         protected void UpdateQueuedSkill()
         {
-            if (PlayerCharacterEntity.IsHideOrDead())
+            if (PlayerCharacterEntity.IsDead())
             {
                 ClearQueueUsingSkill();
                 return;
