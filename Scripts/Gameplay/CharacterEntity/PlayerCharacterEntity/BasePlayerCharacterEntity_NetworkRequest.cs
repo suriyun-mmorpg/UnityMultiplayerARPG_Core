@@ -92,7 +92,7 @@ namespace MultiplayerARPG
 
         public bool RequestSwapOrMergeItem(short fromIndex, short toIndex)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncSwapOrMergeItem, FunctionReceivers.Server, fromIndex, toIndex);
             return true;
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
 
         public bool RequestAddAttribute(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncAddAttribute, FunctionReceivers.Server, dataId);
             return true;
@@ -108,7 +108,7 @@ namespace MultiplayerARPG
 
         public bool RequestAddSkill(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncAddSkill, FunctionReceivers.Server, dataId);
             return true;
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
 
         public bool RequestAddGuildSkill(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncAddGuildSkill, FunctionReceivers.Server, dataId);
             return true;
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
 
         public bool RequestUseGuildSkill(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncUseGuildSkill, FunctionReceivers.Server, dataId);
             return true;
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
 
         public bool RequestRespawn()
         {
-            if (!IsDead())
+            if (!this.IsDead())
                 return false;
             CallNetFunction(NetFuncRespawn, FunctionReceivers.Server);
             return true;
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
 
         public bool RequestNpcActivate(uint objectId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncNpcActivate, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
@@ -176,7 +176,7 @@ namespace MultiplayerARPG
 
         public bool RequestShowNpcDialog(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncShowNpcDialog, ConnectionId, dataId);
             return true;
@@ -184,7 +184,7 @@ namespace MultiplayerARPG
 
         public bool RequestShowNpcRefineItem()
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncShowNpcRefineItem, ConnectionId);
             return true;
@@ -192,7 +192,7 @@ namespace MultiplayerARPG
 
         public bool RequestShowNpcDismantleItem()
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncShowNpcDismantleItem, ConnectionId);
             return true;
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
 
         public bool RequestShowNpcRepairItem()
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncShowNpcRepairItem, ConnectionId);
             return true;
@@ -208,7 +208,7 @@ namespace MultiplayerARPG
 
         public bool RequestSelectNpcDialogMenu(byte menuIndex)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncSelectNpcDialogMenu, FunctionReceivers.Server, menuIndex);
             return true;
@@ -216,7 +216,7 @@ namespace MultiplayerARPG
 
         public bool RequestBuyNpcItem(short itemIndex, short amount)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncBuyNpcItem, FunctionReceivers.Server, itemIndex, amount);
             return true;
@@ -248,8 +248,7 @@ namespace MultiplayerARPG
 
         public bool RequestSellItem(short nonEquipIndex, short amount)
         {
-            if (IsDead() ||
-                nonEquipIndex >= NonEquipItems.Count)
+            if (this.IsDead() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
             CallNetFunction(NetFuncSellItem, FunctionReceivers.Server, nonEquipIndex, amount);
             return true;
@@ -257,8 +256,7 @@ namespace MultiplayerARPG
 
         public bool RequestDismantleItem(short nonEquipIndex)
         {
-            if (IsDead() ||
-                nonEquipIndex >= NonEquipItems.Count)
+            if (this.IsDead() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
             CallNetFunction(NetFuncDismantleItem, FunctionReceivers.Server, nonEquipIndex);
             return true;
@@ -266,7 +264,7 @@ namespace MultiplayerARPG
 
         public bool RequestRefineItem(InventoryType inventoryType, short index)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncRefineItem, FunctionReceivers.Server, inventoryType, index);
             return true;
@@ -274,7 +272,7 @@ namespace MultiplayerARPG
 
         public bool RequestEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncEnhanceSocketItem, FunctionReceivers.Server, inventoryType, index, enhancerId);
             return true;
@@ -282,7 +280,7 @@ namespace MultiplayerARPG
 
         public bool RequestRepairItem(InventoryType inventoryType, short index)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncRepairItem, FunctionReceivers.Server, inventoryType, index);
             return true;

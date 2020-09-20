@@ -203,7 +203,7 @@ namespace MultiplayerARPG
 
         public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
+            if (!IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
             base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
@@ -213,7 +213,7 @@ namespace MultiplayerARPG
                 BaseCharacterEntity attackerCharacter = attacker.Entity as BaseCharacterEntity;
 
                 // If character is not dead, try to attack
-                if (!IsDead())
+                if (!this.IsDead())
                 {
                     BaseCharacterEntity targetEntity;
                     if (!TryGetTargetEntity(out targetEntity))
@@ -511,7 +511,7 @@ namespace MultiplayerARPG
 
         public override void Respawn()
         {
-            if (!IsServer || !IsDead())
+            if (!IsServer || !this.IsDead())
                 return;
 
             base.Respawn();

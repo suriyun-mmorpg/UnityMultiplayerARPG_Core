@@ -655,6 +655,7 @@ namespace MultiplayerARPG
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + attackDistance);
             // Raycast from camera position to center of screen
+            Debug.LogError("Start finding");
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.DefaultRaycastLayers);
             float tempDistance;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
@@ -663,13 +664,17 @@ namespace MultiplayerARPG
 
                 // Get distance between character and raycast hit point
                 tempDistance = Vector3.Distance(CacheTransform.position, tempHitInfo.point);
-                // If this is damageable entity
                 tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
-                if (tempGameEntity == null || tempGameEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
+
+                if (tempGameEntity == null || tempGameEntity.Entity.IsHide() ||
+                    tempGameEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
                 {
-                    // Skip empty game entity and controlling player's entity
+                    // Skip empty game entity / hiddeing entity / controlling player's entity
                     continue;
                 }
+
+                Debug.LogError("Hit " + tempGameEntity);
+
                 if (tempGameEntity is IDamageableEntity)
                 {
                     // Entity isn't in front of character, so it's not the target
@@ -678,11 +683,6 @@ namespace MultiplayerARPG
 
                     // Skip dead entity while attacking (to allow to use resurrect skills)
                     if (attacking && (tempGameEntity as IDamageableEntity).IsDead())
-                        continue;
-
-                    // Target must not hidding
-                    if (tempGameEntity.Entity is BaseCharacterEntity &&
-                        (tempGameEntity.Entity as BaseCharacterEntity).GetCaches().IsHide)
                         continue;
 
                     // Entity is in front of character, so this is target

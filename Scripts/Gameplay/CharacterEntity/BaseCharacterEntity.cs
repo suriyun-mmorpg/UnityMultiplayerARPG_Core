@@ -73,7 +73,6 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
         public short ReloadingAmmoAmount { get; protected set; }
-        public bool IsHideOrDead { get { return this.GetCaches().IsHide || IsDead(); } }
         public bool IsAttackingOrUsingSkill { get; protected set; }
         public float MoveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         public float RespawnGroundedCheckCountDown { get; protected set; }
@@ -255,7 +254,7 @@ namespace MultiplayerARPG
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D &&
                     CurrentMapInfo != null && CacheTransform.position.y <= CurrentMapInfo.DeadY)
                 {
-                    if (IsServer && !IsDead())
+                    if (IsServer && !this.IsDead())
                     {
                         // Character will dead only when dimension type is 3D
                         CurrentHp = 0;
@@ -271,7 +270,7 @@ namespace MultiplayerARPG
             }
 
             // Clear data when character dead
-            if (IsDead())
+            if (this.IsDead())
             {
                 // Clear action states when character dead
                 ClearActionStates();
@@ -301,7 +300,7 @@ namespace MultiplayerARPG
             if (IsClient)
             {
                 // Update is dead state
-                CharacterModel.SetIsDead(IsDead());
+                CharacterModel.SetIsDead(this.IsDead());
                 // Update move speed multiplier
                 CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                 // Update movement animation
@@ -310,7 +309,7 @@ namespace MultiplayerARPG
                 if (FpsModel && FpsModel.gameObject.activeSelf)
                 {
                     // Update is dead state
-                    FpsModel.SetIsDead(IsDead());
+                    FpsModel.SetIsDead(this.IsDead());
                     // Update move speed multiplier
                     FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                     // Update movement animation
@@ -383,7 +382,7 @@ namespace MultiplayerARPG
             if (CurrentWater > this.GetCaches().MaxWater)
                 CurrentWater = this.GetCaches().MaxWater;
 
-            if (IsDead())
+            if (this.IsDead())
                 Killed(causer);
         }
 
@@ -398,7 +397,7 @@ namespace MultiplayerARPG
 
         public virtual void Respawn()
         {
-            if (!IsServer || !IsDead())
+            if (!IsServer || !this.IsDead())
                 return;
             CurrentGameInstance.GameplayRule.OnCharacterRespawn(this);
             lastGrounded = true;
@@ -558,7 +557,7 @@ namespace MultiplayerARPG
 
         public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
+            if (!IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
             if (HitBoxes != null && HitBoxes.Length > 0)
@@ -639,7 +638,7 @@ namespace MultiplayerARPG
             CharacterModel.PlayHitAnimation();
 
             // If current hp <= 0, character dead
-            if (IsDead())
+            if (this.IsDead())
             {
                 // Cancel actions
                 CancelReload();
@@ -789,7 +788,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanDoActions()
         {
-            return !IsDead() && !IsPlayingActionAnimation() && !IsAttackingOrUsingSkill;
+            return !this.IsDead() && !IsPlayingActionAnimation() && !IsAttackingOrUsingSkill;
         }
 
         public float GetAttackSpeed()
@@ -841,7 +840,7 @@ namespace MultiplayerARPG
 
         public override sealed bool CanMove()
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             if (this.GetCaches().DisallowMove)
                 return false;
@@ -867,6 +866,11 @@ namespace MultiplayerARPG
             if (!MovementState.HasFlag(MovementState.IsGrounded) || MovementState.HasFlag(MovementState.IsUnderWater))
                 return false;
             return true;
+        }
+
+        public override sealed bool IsHide()
+        {
+            return this.GetCaches().IsHide;
         }
 
         public bool CanAttack()
@@ -895,7 +899,7 @@ namespace MultiplayerARPG
 
         public bool CanUseItem()
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             if (this.GetCaches().DisallowUseItem)
                 return false;

@@ -55,7 +55,7 @@ namespace MultiplayerARPG
         {
             Profiler.BeginSample("BasePlayerCharacterEntity - Update");
             base.EntityUpdate();
-            if (IsDead())
+            if (this.IsDead())
             {
                 StopMove();
                 SetTargetEntity(null);
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
 
         public override void Respawn()
         {
-            if (!IsServer || !IsDead())
+            if (!IsServer || !this.IsDead())
                 return;
             base.Respawn();
             CurrentGameManager.RespawnCharacter(this);

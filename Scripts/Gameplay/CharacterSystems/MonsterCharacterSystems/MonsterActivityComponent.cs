@@ -138,9 +138,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (tempTargetEnemy.Entity == CacheEntity.Entity ||
-                tempTargetEnemy.IsDead() || !tempTargetEnemy.CanReceiveDamageFrom(CacheEntity) ||
-                (tempTargetEnemy is BaseCharacterEntity && (tempTargetEnemy as BaseCharacterEntity).IsHideOrDead))
+            if (tempTargetEnemy.Entity == CacheEntity.Entity || tempTargetEnemy.IsHideOrDead() || !tempTargetEnemy.CanReceiveDamageFrom(CacheEntity))
             {
                 // If target is dead or in safe area stop attacking
                 CacheEntity.SetTargetEntity(null);

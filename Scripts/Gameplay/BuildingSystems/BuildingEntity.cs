@@ -268,7 +268,7 @@ namespace MultiplayerARPG
 
         public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (!IsServer || IsDead())
+            if (!IsServer || this.IsDead())
                 return;
 
             base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
@@ -282,13 +282,12 @@ namespace MultiplayerARPG
                     calculatingTotalDamage += damageAmount.Random();
                 }
             }
-            // Apply damages
+
             int totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
             ReceivedDamage(fromPosition, attacker, CombatAmountType.NormalDamage, totalDamage, weapon, skill, skillLevel);
 
-            // If current hp <= 0, character dead
-            if (IsDead())
+            if (this.IsDead())
                 Destroy();
         }
 

@@ -83,8 +83,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncSellItem(short index, short amount)
         {
-            if (IsDead() ||
-                index >= nonEquipItems.Count)
+            if (this.IsDead() || index >= nonEquipItems.Count)
                 return;
 
             if (CurrentNpcDialog == null)

@@ -78,7 +78,7 @@ namespace MultiplayerARPG
 
         public bool RequestPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncPlayAttack, FunctionReceivers.All, isLeftHand, animationIndex);
             return true;
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
 
         public bool RequestPlaySkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncPlayUseSkill, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel);
             return true;
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
         public bool RequestPlaySkillAnimationWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncPlayUseSkillWithAimPosition, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
             return true;
@@ -102,7 +102,7 @@ namespace MultiplayerARPG
 
         public bool RequestPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncPlayReload, FunctionReceivers.All, isLeftHand, reloadingAmmoAmount);
             return true;
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
 
         public bool RequestSkillCastingInterrupt()
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncSkillCastingInterrupt, FunctionReceivers.Server);
             return true;
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
 
         public bool RequestSkillCastingInterrupted()
         {
-            if (IsDead())
+            if (this.IsDead())
                 return false;
             CallNetFunction(NetFuncSkillCastingInterrupted, FunctionReceivers.All);
             return true;

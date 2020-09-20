@@ -48,7 +48,7 @@ namespace MultiplayerARPG
                     if (ActivatableEntityDetector.warpPortals.Count > 0)
                         targetWarpPortal = ActivatableEntityDetector.warpPortals[0];
                     // Priority Player -> Npc -> Buildings
-                    if (targetPlayer != null && CacheUISceneGameplay != null)
+                    if (targetPlayer != null)
                     {
                         // Show dealing, invitation menu
                         SelectedEntity = targetPlayer;
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                     if (EnemyEntityDetector.characters.Count > 0)
                     {
                         SetTarget(null, TargetActionType.Attack);
-                        if (!EnemyEntityDetector.characters[findingEnemyIndex].IsHideOrDead)
+                        if (!EnemyEntityDetector.characters[findingEnemyIndex].IsHideOrDead())
                         {
                             SetTarget(EnemyEntityDetector.characters[findingEnemyIndex], TargetActionType.Attack);
                             if (SelectedEntity != null)
@@ -178,7 +178,7 @@ namespace MultiplayerARPG
                 mouseDownPosition = Input.mousePosition;
             }
             // Read inputs
-            isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
+            isPointerOverUI = CacheUISceneGameplay.IsPointerOverUIObject();
             isMouseDragDetected = (Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE_SQUARED;
             isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
             isMouseHoldAndNotDrag = !isMouseDragDetected && isMouseHoldDetected;
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
                         if (tempBuildingMaterial != null && tempBuildingMaterial.TargetEntity != null)
                             targetBuilding = tempBuildingMaterial.TargetEntity;
                         targetVehicle = tempTransform.GetComponent<VehicleEntity>();
-                        if (targetPlayer && !targetPlayer.IsHideOrDead)
+                        if (targetPlayer && !targetPlayer.IsHideOrDead())
                         {
                             // Found activating entity as player character entity
                             SetTarget(targetPlayer, TargetActionType.Attack);
@@ -240,7 +240,7 @@ namespace MultiplayerARPG
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (targetMonster && !targetMonster.IsHideOrDead)
+                        else if (targetMonster && !targetMonster.IsHideOrDead())
                         {
                             // Found activating entity as monster character entity
                             SetTarget(targetMonster, TargetActionType.Attack);
@@ -435,7 +435,7 @@ namespace MultiplayerARPG
 
             if (wasdLockAttackTarget)
             {
-                if (!TryGetAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead)
+                if (!TryGetAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead())
                 {
                     // Find nearest target and move to the target
                     targetEntity = PlayerCharacterEntity
@@ -445,7 +445,7 @@ namespace MultiplayerARPG
                         true,
                         false);
                 }
-                if (targetEntity != null && !targetEntity.IsHideOrDead)
+                if (targetEntity != null && !targetEntity.IsHideOrDead())
                 {
                     // Set target, then attack later when moved nearby target
                     SelectedEntity = targetEntity;
@@ -483,7 +483,7 @@ namespace MultiplayerARPG
 
         protected void UpdateQueuedSkill()
         {
-            if (PlayerCharacterEntity.IsHideOrDead)
+            if (PlayerCharacterEntity.IsHideOrDead())
             {
                 ClearQueueUsingSkill();
                 return;
@@ -513,7 +513,7 @@ namespace MultiplayerARPG
             {
                 if (wasdLockAttackTarget)
                 {
-                    if (!TryGetSelectedTargetAsAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead)
+                    if (!TryGetSelectedTargetAsAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead())
                     {
                         // Try find nearby enemy if no selected target or selected taget is not enemy or target is hide or dead
                         targetEntity = PlayerCharacterEntity
@@ -523,7 +523,7 @@ namespace MultiplayerARPG
                             true,
                             false);
                     }
-                    if (targetEntity != null && !targetEntity.IsHideOrDead)
+                    if (targetEntity != null && !targetEntity.IsHideOrDead())
                     {
                         // Set target, then use skill later when moved nearby target
                         SelectedEntity = targetEntity;
@@ -611,7 +611,7 @@ namespace MultiplayerARPG
 
             if (TryGetAttackingEntity(out targetDamageable))
             {
-                if (EntityIsHideOrDead(targetDamageable))
+                if (targetDamageable.IsHideOrDead())
                 {
                     ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
@@ -625,7 +625,7 @@ namespace MultiplayerARPG
             }
             else if (TryGetUsingSkillEntity(out targetDamageable))
             {
-                if (queueUsingSkill.skill.IsAttack() && EntityIsHideOrDead(targetDamageable))
+                if (queueUsingSkill.skill.IsAttack() && targetDamageable.IsHideOrDead())
                 {
                     ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();

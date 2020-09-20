@@ -208,14 +208,12 @@ namespace MultiplayerARPG
                 ClearQueueUsingSkill();
                 destination = null;
                 isFollowingTarget = false;
-                if (CacheUISceneGameplay != null)
-                    CacheUISceneGameplay.SetTargetEntity(null);
                 CancelBuild();
+                CacheUISceneGameplay.SetTargetEntity(null);
             }
             else
             {
-                if (CacheUISceneGameplay != null)
-                    CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
+                CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
             }
 
             if (destination.HasValue)
@@ -305,11 +303,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool EntityIsHideOrDead(DamageableEntity entity)
-        {
-            return entity.IsDead() || (entity is BaseCharacterEntity && (entity as BaseCharacterEntity).IsHideOrDead);
-        }
-
         public bool TryGetTargetCharacter(out BaseCharacterEntity character)
         {
             character = null;
@@ -371,7 +364,7 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseSkill())
             {
-                bool canUseSkill = false;
+                bool canUseSkill;
                 if (queueUsingSkill.itemIndex >= 0)
                 {
                     if (queueUsingSkill.aimPosition.HasValue)

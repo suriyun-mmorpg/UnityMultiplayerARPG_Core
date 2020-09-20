@@ -95,14 +95,9 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncCombatAmount, FunctionReceivers.All, (byte)combatAmountType, amount);
         }
 
-        public bool IsDead()
-        {
-            return CurrentHp <= 0;
-        }
-
         public virtual void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (!IsServer || IsDead())
+            if (!IsServer || this.IsDead())
                 return;
             if (onReceiveDamage != null)
                 onReceiveDamage.Invoke(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);

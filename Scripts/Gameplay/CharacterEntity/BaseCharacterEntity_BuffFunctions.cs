@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         public void ApplyBuff(int dataId, BuffType type, short level, IGameEntity buffApplier)
         {
-            if (IsDead() || !IsServer)
+            if (!IsServer || this.IsDead())
                 return;
 
             int buffIndex = this.IndexOfBuff(dataId, type);

@@ -719,6 +719,11 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public virtual bool IsHide()
+        {
+            return false;
+        }
+
         public void StopMove()
         {
             if (ActiveMovement != null)

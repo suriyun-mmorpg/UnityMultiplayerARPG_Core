@@ -25,11 +25,6 @@ namespace MultiplayerARPG
             return entity.CanReceiveDamageFrom(attacker);
         }
 
-        public virtual bool IsDead()
-        {
-            return entity.IsDead();
-        }
-
         public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
         {
             entity.PlayHitEffects(damageElements, skill);

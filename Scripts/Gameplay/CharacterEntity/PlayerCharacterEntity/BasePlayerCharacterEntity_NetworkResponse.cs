@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncAddAttribute(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
@@ -61,7 +61,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncAddSkill(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncAddGuildSkill(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return;
 
             CurrentGameManager.AddGuildSkill(this, dataId);
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncUseGuildSkill(int dataId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return;
 
             GuildSkill guildSkill;
@@ -225,8 +225,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncDismantleItem(short index)
         {
-            if (IsDead() ||
-                index >= nonEquipItems.Count)
+            if (this.IsDead() || index >= nonEquipItems.Count)
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
@@ -266,7 +265,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncRefineItem(InventoryType inventoryType, short index)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
@@ -293,7 +292,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
@@ -320,7 +319,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncRepairItem(InventoryType inventoryType, short index)
         {
-            if (IsDead())
+            if (this.IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
@@ -683,8 +682,7 @@ namespace MultiplayerARPG
         #region Storage
         protected void NetFuncMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
         {
-            if (IsDead() ||
-                nonEquipIndex >= nonEquipItems.Count)
+            if (this.IsDead() || nonEquipIndex >= nonEquipItems.Count)
                 return;
 
             CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, nonEquipIndex, amount, storageItemIndex);
@@ -692,8 +690,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
         {
-            if (IsDead() ||
-                storageItemIndex >= storageItems.Length)
+            if (this.IsDead() || storageItemIndex >= storageItems.Length)
                 return;
 
             CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, nonEquipIndex);
@@ -701,8 +698,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncSwapOrMergeStorageItem(short fromIndex, short toIndex)
         {
-            if (IsDead() ||
-                fromIndex >= storageItems.Length ||
+            if (this.IsDead() || fromIndex >= storageItems.Length ||
                 toIndex >= storageItems.Length)
                 return;
 
