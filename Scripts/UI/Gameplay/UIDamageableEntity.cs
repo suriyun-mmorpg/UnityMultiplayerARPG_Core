@@ -15,8 +15,10 @@ namespace MultiplayerARPG
         public float visibleWhenHitDuration = 2f;
 
         [Header("Damageable Entity - UI Elements")]
-        // HP
         public UIGageValue uiGageHp;
+
+        [Header("Damageable Entity - Options")]
+        public bool hideWhileDead;
 
         protected int currentHp;
         protected int maxHp;
@@ -41,7 +43,7 @@ namespace MultiplayerARPG
 
         protected override bool ValidateToUpdateUI()
         {
-            return base.ValidateToUpdateUI() && !Data.IsDead() && Data.IsClient;
+            return base.ValidateToUpdateUI() && (!hideWhileDead || !Data.IsDead()) && Data.IsClient;
         }
     }
 

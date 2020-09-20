@@ -162,6 +162,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            uiTargetCharacter.hideWhileDead = false;
             uiTargetCharacter.Data = character;
             uiTargetCharacter.Show();
         }
