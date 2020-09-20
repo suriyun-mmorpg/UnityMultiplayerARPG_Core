@@ -413,7 +413,7 @@ namespace MultiplayerARPG
                 BaseCharacterEntity targetEntity;
                 if (character.TryGetTargetEntity(out targetEntity))
                 {
-                    if (Vector3.Distance(character.MovementTransform.position, targetEntity.CacheTransform.position) > GetCastDistance(character, level, isLeftHand))
+                    if (GameplayUtils.BoundsDistance(character.WorldBounds, targetEntity.WorldBounds) > GetCastDistance(character, level, isLeftHand))
                     {
                         gameMessageType = GameMessage.Type.CharacterIsTooFar;
                         return false;
