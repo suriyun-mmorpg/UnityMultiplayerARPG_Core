@@ -19,12 +19,12 @@ namespace MultiplayerARPG
         [Header("Equipment Containers")]
         public EquipmentContainer[] equipmentContainers;
 #if UNITY_EDITOR
-        [InspectorButton("SetEquipmentContainersBySetters")]
+        [InspectorButton(nameof(SetEquipmentContainersBySetters))]
         public bool setEquipmentContainersBySetters;
-        [InspectorButton("DeactivateInstantiatedObjects")]
+        [InspectorButton(nameof(DeactivateInstantiatedObjects))]
         public bool deactivateInstantiatedObjects;
-        [InspectorButton("ActivateInstantiateObject")]
-        public bool activateInstantiateObject;
+        [InspectorButton(nameof(ActivateInstantiatedObject))]
+        public bool activateInstantiatedObject;
 #endif
 
         private Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers = null;

@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         [Header("Add New Language")]
         [Tooltip("You can add new language by `Add New Language` context menu")]
         public string newLanguageKey;
-        [InspectorButton("AddNewLanguage")]
+        [InspectorButton(nameof(AddNewLanguage))]
         public bool addNewLanguage;
 
         private void Awake()

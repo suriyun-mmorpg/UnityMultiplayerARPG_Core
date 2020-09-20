@@ -111,7 +111,7 @@ namespace MultiplayerARPG
         public AnimActionType testAnimActionType;
         public WeaponType testWeaponType;
         public BaseSkill testSkill;
-        [InspectorButton("SetAnimatorClipsForTest")]
+        [InspectorButton(nameof(SetAnimatorClipsForTest))]
         public bool setAnimatorClipsForTest;
 #endif
 

@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         [Header("Effect Containers")]
         public EffectContainer[] effectContainers;
 #if UNITY_EDITOR
-        [InspectorButton("SetEffectContainersBySetters")]
+        [InspectorButton(nameof(SetEffectContainersBySetters))]
         public bool setEffectContainersBySetters;
 #endif
 

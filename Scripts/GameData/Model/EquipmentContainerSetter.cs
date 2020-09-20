@@ -15,9 +15,9 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         [Header("Set Default Model Tool")]
         public int childIndex;
-        [InspectorButton("SetDefaultModelByChildIndex")]
+        [InspectorButton(nameof(SetDefaultModelByChildIndex))]
         public bool setDefaultModelByChildIndex;
-        [InspectorButton("SetInstantiatedObjectsByContainersChildren")]
+        [InspectorButton(nameof(SetInstantiatedObjectsByContainersChildren))]
         public bool setInstantiatedObjectsByContainersChildren;
 #endif
 
