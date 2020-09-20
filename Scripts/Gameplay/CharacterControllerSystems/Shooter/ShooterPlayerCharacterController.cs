@@ -1218,7 +1218,7 @@ namespace MultiplayerARPG
         public void Activate()
         {
             // Priority Player -> Npc -> Buildings
-            if (targetPlayer != null && CacheUISceneGameplay != null)
+            if (targetPlayer != null)
                 CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
             else if (targetNpc != null)
                 PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
