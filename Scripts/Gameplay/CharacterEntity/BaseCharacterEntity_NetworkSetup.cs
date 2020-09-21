@@ -66,27 +66,27 @@ namespace MultiplayerARPG
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summons.onOperation += OnSummonsOperation;
             // Register Network functions
-            RegisterNetFunction<bool>(NetFuncAttack);
-            RegisterNetFunction<int, bool>(NetFuncUseSkill);
-            RegisterNetFunction<int, bool, Vector3>(NetFuncUseSkillWithAimPosition);
+            RegisterNetFunction<bool>(ServerAttack);
+            RegisterNetFunction<int, bool>(ServerUseSkill);
+            RegisterNetFunction<int, bool, Vector3>(ServerUseSkillWithAimPosition);
             RegisterNetFunction<bool, byte>(NetFuncPlayAttack);
             RegisterNetFunction<bool, byte, int, short>(NetFuncPlayUseSkill);
             RegisterNetFunction<bool, byte, int, short, Vector3>(NetFuncPlayUseSkillWithAimPosition);
             RegisterNetFunction<bool, short>(NetFuncPlayReload);
-            RegisterNetFunction(NetFuncSkillCastingInterrupt);
+            RegisterNetFunction(ServerSkillCastingInterrupt);
             RegisterNetFunction(NetFuncSkillCastingInterrupted);
-            RegisterNetFunction<PackedUInt>(NetFuncPickupItem);
-            RegisterNetFunction<short, short>(NetFuncDropItem);
-            RegisterNetFunction<short, byte>(NetFuncEquipArmor);
-            RegisterNetFunction<short, byte, bool>(NetFuncEquipWeapon);
-            RegisterNetFunction<short>(NetFuncUnEquipArmor);
-            RegisterNetFunction<byte, bool>(NetFuncUnEquipWeapon);
+            RegisterNetFunction<PackedUInt>(ServerPickupItem);
+            RegisterNetFunction<short, short>(ServerDropItem);
+            RegisterNetFunction<short, byte>(ServerEquipArmor);
+            RegisterNetFunction<short, byte, bool>(ServerEquipWeapon);
+            RegisterNetFunction<short>(ServerUnEquipArmor);
+            RegisterNetFunction<byte, bool>(ServerUnEquipWeapon);
             RegisterNetFunction(NetFuncOnDead);
             RegisterNetFunction(NetFuncOnRespawn);
             RegisterNetFunction(NetFuncOnLevelUp);
-            RegisterNetFunction<PackedUInt>(NetFuncUnSummon);
-            RegisterNetFunction<bool>(NetFuncReload);
-            RegisterNetFunction<byte>(NetFuncSwitchEquipWeaponSet);
+            RegisterNetFunction<PackedUInt>(ServerUnSummon);
+            RegisterNetFunction<bool>(ServerReload);
+            RegisterNetFunction<byte>(ServerSwitchEquipWeaponSet);
         }
 
         protected override void EntityOnDestroy()

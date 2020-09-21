@@ -134,7 +134,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void NetFuncReload(bool isLeftHand)
+        protected virtual void ServerReload(bool isLeftHand)
         {
             if (!CanAttack())
                 return;
@@ -238,7 +238,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected virtual void NetFuncAttack(bool isLeftHand)
+        protected virtual void ServerAttack(bool isLeftHand)
         {
             if (!CanAttack())
                 return;

@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        protected void NetFuncNpcActivate(PackedUInt objectId)
+        protected void ServerNpcActivate(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                 onShowNpcRepairItem.Invoke();
         }
 
-        protected void NetFuncSelectNpcDialogMenu(byte menuIndex)
+        protected void ServerSelectNpcDialogMenu(byte menuIndex)
         {
             if (CurrentNpcDialog == null)
                 return;
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncSellItem(short index, short amount)
+        protected void ServerSellItem(short index, short amount)
         {
             if (this.IsDead() || index >= nonEquipItems.Count)
                 return;
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
             CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
         }
 
-        protected void NetFuncBuyNpcItem(short itemIndex, short amount)
+        protected void ServerBuyNpcItem(short itemIndex, short amount)
         {
             if (CurrentNpcDialog == null)
                 return;

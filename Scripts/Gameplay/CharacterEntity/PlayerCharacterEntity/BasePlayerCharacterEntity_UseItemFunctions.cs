@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="itemIndex"></param>
         /// <param name="aimPosition"></param>
-        protected void NetFuncUseItem(short itemIndex)
+        protected void ServerUseItem(short itemIndex)
         {
             if (!CanUseItem())
                 return;
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         /// This function will be called at server to order character to use item
         /// </summary>
         /// <param name="itemIndex"></param>
-        protected void NetFuncUseSkillItem(short itemIndex, bool isLeftHand)
+        protected void ServerUseSkillItem(short itemIndex, bool isLeftHand)
         {
             UseItemSkill(itemIndex, isLeftHand, null);
         }
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="itemIndex"></param>
         /// <param name="aimPosition"></param>
-        protected void NetFuncUseSkillItemWithAimPosition(short itemIndex, bool isLeftHand, Vector3 aimPosition)
+        protected void ServerUseSkillItemWithAimPosition(short itemIndex, bool isLeftHand, Vector3 aimPosition)
         {
             UseItemSkill(itemIndex, isLeftHand, aimPosition);
         }

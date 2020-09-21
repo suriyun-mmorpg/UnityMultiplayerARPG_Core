@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        protected void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
+        protected void ServerSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (!CanDoActions() ||
                 fromIndex >= NonEquipItems.Count ||
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
                 CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
         }
 
-        protected void NetFuncAddSkill(int dataId)
+        protected void ServerAddSkill(int dataId)
         {
             if (this.IsDead())
                 return;
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
                 CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
         }
 
-        protected void NetFuncAddGuildSkill(int dataId)
+        protected void ServerAddGuildSkill(int dataId)
         {
             if (this.IsDead())
                 return;
@@ -79,7 +79,7 @@ namespace MultiplayerARPG
             CurrentGameManager.AddGuildSkill(this, dataId);
         }
 
-        protected void NetFuncUseGuildSkill(int dataId)
+        protected void ServerUseGuildSkill(int dataId)
         {
             if (this.IsDead())
                 return;
@@ -106,12 +106,12 @@ namespace MultiplayerARPG
             ApplyBuff(dataId, BuffType.GuildSkillBuff, level, this);
         }
 
-        protected void NetFuncRespawn()
+        protected void ServerRespawn()
         {
             Respawn();
         }
 
-        protected void NetFuncAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
+        protected void ServerAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
         {
             CharacterHotkey characterHotkey = new CharacterHotkey();
             characterHotkey.hotkeyId = hotkeyId;
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
                 hotkeys.Add(characterHotkey);
         }
 
-        protected void NetFuncEnterWarp(PackedUInt objectId)
+        protected void ServerEnterWarp(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -145,7 +145,7 @@ namespace MultiplayerARPG
             warpPortalEntity.EnterWarp(this);
         }
 
-        protected void NetFuncBuild(short itemIndex, Vector3 position, Quaternion rotation, PackedUInt parentObjectId)
+        protected void ServerBuild(short itemIndex, Vector3 position, Quaternion rotation, PackedUInt parentObjectId)
         {
             if (!CanDoActions() ||
                 itemIndex >= NonEquipItems.Count)
@@ -177,7 +177,7 @@ namespace MultiplayerARPG
             CurrentGameManager.CreateBuildingEntity(buildingSaveData, false);
         }
 
-        protected void NetFuncDestroyBuilding(PackedUInt objectId)
+        protected void ServerDestroyBuilding(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -223,7 +223,7 @@ namespace MultiplayerARPG
                 onShowStorage.Invoke(type, objectId, weightLimit, slotLimit);
         }
 
-        protected void NetFuncDismantleItem(short index)
+        protected void ServerDismantleItem(short index)
         {
             if (this.IsDead() || index >= nonEquipItems.Count)
                 return;
@@ -263,7 +263,7 @@ namespace MultiplayerARPG
             Gold += item.DismantleReturnGold * nonEquipItem.amount;
         }
 
-        protected void NetFuncRefineItem(InventoryType inventoryType, short index)
+        protected void ServerRefineItem(InventoryType inventoryType, short index)
         {
             if (this.IsDead())
                 return;
@@ -290,7 +290,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
+        protected void ServerEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
         {
             if (this.IsDead())
                 return;
@@ -317,7 +317,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncRepairItem(InventoryType inventoryType, short index)
+        protected void ServerRepairItem(InventoryType inventoryType, short index)
         {
             if (this.IsDead())
                 return;
@@ -345,7 +345,7 @@ namespace MultiplayerARPG
         }
 
         #region Dealing
-        protected void NetFuncSendDealingRequest(PackedUInt objectId)
+        protected void ServerSendDealingRequest(PackedUInt objectId)
         {
             BasePlayerCharacterEntity targetCharacterEntity = null;
             if (!Manager.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
@@ -378,7 +378,7 @@ namespace MultiplayerARPG
                 onShowDealingRequestDialog.Invoke(playerCharacterEntity);
         }
 
-        protected void NetFuncAcceptDealingRequest()
+        protected void ServerAcceptDealingRequest()
         {
             if (DealingCharacter == null)
             {
@@ -402,7 +402,7 @@ namespace MultiplayerARPG
             RequestAcceptedDealingRequest(DealingCharacter.ObjectId);
         }
 
-        protected void NetFuncDeclineDealingRequest()
+        protected void ServerDeclineDealingRequest()
         {
             if (DealingCharacter != null)
                 CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.DealingRequestDeclined);
@@ -419,7 +419,7 @@ namespace MultiplayerARPG
                 onShowDealingDialog.Invoke(playerCharacterEntity);
         }
 
-        protected void NetFuncSetDealingItem(short itemIndex, short amount)
+        protected void ServerSetDealingItem(short itemIndex, short amount)
         {
             if (DealingState != DealingState.Dealing)
             {
@@ -449,7 +449,7 @@ namespace MultiplayerARPG
             DealingItems = dealingItems;
         }
 
-        protected void NetFuncSetDealingGold(int gold)
+        protected void ServerSetDealingGold(int gold)
         {
             if (DealingState != DealingState.Dealing)
             {
@@ -463,7 +463,7 @@ namespace MultiplayerARPG
             DealingGold = gold;
         }
 
-        protected void NetFuncLockDealing()
+        protected void ServerLockDealing()
         {
             if (DealingState != DealingState.Dealing)
             {
@@ -473,7 +473,7 @@ namespace MultiplayerARPG
             DealingState = DealingState.LockDealing;
         }
 
-        protected void NetFuncConfirmDealing()
+        protected void ServerConfirmDealing()
         {
             if (DealingState != DealingState.LockDealing || !(DealingCharacter.DealingState == DealingState.LockDealing || DealingCharacter.DealingState == DealingState.ConfirmDealing))
             {
@@ -502,7 +502,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncCancelDealing()
+        protected void ServerCancelDealing()
         {
             if (DealingCharacter != null)
                 CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.DealingCanceled);
@@ -548,22 +548,22 @@ namespace MultiplayerARPG
         #endregion
 
         #region Party
-        protected void NetFuncCreateParty(bool shareExp, bool shareItem)
+        protected void ServerCreateParty(bool shareExp, bool shareItem)
         {
             CurrentGameManager.CreateParty(this, shareExp, shareItem);
         }
 
-        protected void NetFuncChangePartyLeader(string characterId)
+        protected void ServerChangePartyLeader(string characterId)
         {
             CurrentGameManager.ChangePartyLeader(this, characterId);
         }
 
-        protected void NetFuncPartySetting(bool shareExp, bool shareItem)
+        protected void ServerPartySetting(bool shareExp, bool shareItem)
         {
             CurrentGameManager.PartySetting(this, shareExp, shareItem);
         }
 
-        protected void NetFuncSendPartyInvitation(PackedUInt objectId)
+        protected void ServerSendPartyInvitation(PackedUInt objectId)
         {
             BasePlayerCharacterEntity targetCharacterEntity = null;
             if (!CurrentGameManager.CanSendPartyInvitation(this, objectId, out targetCharacterEntity))
@@ -583,13 +583,13 @@ namespace MultiplayerARPG
                 onShowPartyInvitationDialog.Invoke(playerCharacterEntity);
         }
 
-        protected void NetFuncAcceptPartyInvitation()
+        protected void ServerAcceptPartyInvitation()
         {
             CurrentGameManager.AddPartyMember(DealingCharacter, this);
             StopPartyInvitation();
         }
 
-        protected void NetFuncDeclinePartyInvitation()
+        protected void ServerDeclinePartyInvitation()
         {
             if (DealingCharacter != null)
                 CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
@@ -597,44 +597,44 @@ namespace MultiplayerARPG
             StopPartyInvitation();
         }
 
-        protected void NetFuncKickFromParty(string characterId)
+        protected void ServerKickFromParty(string characterId)
         {
             CurrentGameManager.KickFromParty(this, characterId);
         }
 
-        protected void NetFuncLeaveParty()
+        protected void ServerLeaveParty()
         {
             CurrentGameManager.LeaveParty(this);
         }
         #endregion
 
         #region Guild
-        protected void NetFuncCreateGuild(string guildName)
+        protected void ServerCreateGuild(string guildName)
         {
             CurrentGameManager.CreateGuild(this, guildName);
         }
 
-        protected void NetFuncChangeGuildLeader(string characterId)
+        protected void ServerChangeGuildLeader(string characterId)
         {
             CurrentGameManager.ChangeGuildLeader(this, characterId);
         }
 
-        protected void NetFuncSetGuildMessage(string guildMessage)
+        protected void ServerSetGuildMessage(string guildMessage)
         {
             CurrentGameManager.SetGuildMessage(this, guildMessage);
         }
 
-        protected void NetFuncSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        protected void ServerSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             CurrentGameManager.SetGuildRole(this, guildRole, name, canInvite, canKick, shareExpPercentage);
         }
 
-        protected void NetFuncSetGuildMemberRole(string characterId, byte guildRole)
+        protected void ServerSetGuildMemberRole(string characterId, byte guildRole)
         {
             CurrentGameManager.SetGuildMemberRole(this, characterId, guildRole);
         }
 
-        protected void NetFuncSendGuildInvitation(PackedUInt objectId)
+        protected void ServerSendGuildInvitation(PackedUInt objectId)
         {
             BasePlayerCharacterEntity targetCharacterEntity;
             if (!CurrentGameManager.CanSendGuildInvitation(this, objectId, out targetCharacterEntity))
@@ -654,13 +654,13 @@ namespace MultiplayerARPG
                 onShowGuildInvitationDialog.Invoke(playerCharacterEntity);
         }
 
-        protected void NetFuncAcceptGuildInvitation()
+        protected void ServerAcceptGuildInvitation()
         {
             CurrentGameManager.AddGuildMember(DealingCharacter, this);
             StopGuildInvitation();
         }
 
-        protected void NetFuncDeclineGuildInvitation()
+        protected void ServerDeclineGuildInvitation()
         {
             if (DealingCharacter != null)
                 CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
@@ -668,19 +668,19 @@ namespace MultiplayerARPG
             StopGuildInvitation();
         }
 
-        protected void NetFuncKickFromGuild(string characterId)
+        protected void ServerKickFromGuild(string characterId)
         {
             CurrentGameManager.KickFromGuild(this, characterId);
         }
 
-        protected void NetFuncLeaveGuild()
+        protected void ServerLeaveGuild()
         {
             CurrentGameManager.LeaveGuild(this);
         }
         #endregion
 
         #region Storage
-        protected void NetFuncMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
+        protected void ServerMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
         {
             if (this.IsDead() || nonEquipIndex >= nonEquipItems.Count)
                 return;
@@ -688,7 +688,7 @@ namespace MultiplayerARPG
             CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, nonEquipIndex, amount, storageItemIndex);
         }
 
-        protected void NetFuncMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
+        protected void ServerMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
         {
             if (this.IsDead() || storageItemIndex >= storageItems.Length)
                 return;
@@ -696,7 +696,7 @@ namespace MultiplayerARPG
             CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, nonEquipIndex);
         }
 
-        protected void NetFuncSwapOrMergeStorageItem(short fromIndex, short toIndex)
+        protected void ServerSwapOrMergeStorageItem(short fromIndex, short toIndex)
         {
             if (this.IsDead() || fromIndex >= storageItems.Length ||
                 toIndex >= storageItems.Length)
@@ -707,27 +707,27 @@ namespace MultiplayerARPG
         #endregion
 
         #region Banking
-        protected void NetFuncDepositGold(int amount)
+        protected void ServerDepositGold(int amount)
         {
             CurrentGameManager.DepositGold(this, amount);
         }
 
-        protected void NetFuncWithdrawGold(int amount)
+        protected void ServerWithdrawGold(int amount)
         {
             CurrentGameManager.WithdrawGold(this, amount);
         }
 
-        protected void NetFuncDepositGuildGold(int amount)
+        protected void ServerDepositGuildGold(int amount)
         {
             CurrentGameManager.DepositGuildGold(this, amount);
         }
 
-        protected void NetFuncWithdrawGuildGold(int amount)
+        protected void ServerWithdrawGuildGold(int amount)
         {
             CurrentGameManager.WithdrawGuildGold(this, amount);
         }
 
-        protected void NetFuncOpenStorage(PackedUInt objectId, string password)
+        protected void ServerOpenStorage(PackedUInt objectId, string password)
         {
             if (!CanDoActions())
                 return;
@@ -754,7 +754,7 @@ namespace MultiplayerARPG
             OpenStorage(StorageType.Building, storageEntity);
         }
 
-        protected void NetFuncCloseStorage()
+        protected void ServerCloseStorage()
         {
             CurrentGameManager.CloseStorage(this);
             CurrentStorageId = StorageId.Empty;
@@ -762,7 +762,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Building Entities
-        protected void NetFuncOpenDoor(PackedUInt objectId, string password)
+        protected void ServerOpenDoor(PackedUInt objectId, string password)
         {
             if (!CanDoActions())
                 return;
@@ -789,7 +789,7 @@ namespace MultiplayerARPG
             doorEntity.IsOpen = true;
         }
 
-        protected void NetFuncCloseDoor(PackedUInt objectId)
+        protected void ServerCloseDoor(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -810,7 +810,7 @@ namespace MultiplayerARPG
             doorEntity.IsOpen = false;
         }
 
-        protected void NetFuncTurnOnCampFire(PackedUInt objectId)
+        protected void ServerTurnOnCampFire(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -831,7 +831,7 @@ namespace MultiplayerARPG
             campfireEntity.TurnOn();
         }
 
-        protected void NetFuncTurnOffCampFire(PackedUInt objectId)
+        protected void ServerTurnOffCampFire(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -852,7 +852,7 @@ namespace MultiplayerARPG
             campfireEntity.TurnOff();
         }
 
-        protected void NetFuncCraftItemByWorkbench(PackedUInt objectId, int dataId)
+        protected void ServerCraftItemByWorkbench(PackedUInt objectId, int dataId)
         {
             if (!CanDoActions())
                 return;
@@ -875,29 +875,29 @@ namespace MultiplayerARPG
         #endregion
 
         #region Social
-        protected void NetFuncFindCharacters(string characterName)
+        protected void ServerFindCharacters(string characterName)
         {
             CurrentGameManager.FindCharacters(this, characterName);
         }
 
-        protected void NetFuncAddFriend(string friendCharacterId)
+        protected void ServerAddFriend(string friendCharacterId)
         {
             CurrentGameManager.AddFriend(this, friendCharacterId);
         }
 
-        protected void NetFuncRemoveFriend(string friendCharacterId)
+        protected void ServerRemoveFriend(string friendCharacterId)
         {
             CurrentGameManager.RemoveFriend(this, friendCharacterId);
         }
 
-        protected void NetFuncGetFriends()
+        protected void ServerGetFriends()
         {
             CurrentGameManager.GetFriends(this);
         }
         #endregion
 
         #region Building Locking
-        protected void NetFuncSetBuildingPassword(PackedUInt objectId, string password)
+        protected void ServerSetBuildingPassword(PackedUInt objectId, string password)
         {
             if (!CanDoActions())
                 return;
@@ -931,7 +931,7 @@ namespace MultiplayerARPG
             buildingEntity.IsLocked = true;
         }
 
-        protected void NetFuncLockBuilding(PackedUInt objectId)
+        protected void ServerLockBuilding(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -964,7 +964,7 @@ namespace MultiplayerARPG
             buildingEntity.IsLocked = true;
         }
 
-        protected void NetFuncUnlockBuilding(PackedUInt objectId)
+        protected void ServerUnlockBuilding(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;

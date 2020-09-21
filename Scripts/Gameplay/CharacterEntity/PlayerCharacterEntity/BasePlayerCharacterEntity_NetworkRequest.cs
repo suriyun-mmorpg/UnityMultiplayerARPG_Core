@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestUseItem(index))
                 return false;
-            CallNetFunction(NetFuncUseItem, FunctionReceivers.Server, index);
+            CallNetFunction(ServerUseItem, FunctionReceivers.Server, index);
             return true;
         }
 
@@ -78,7 +78,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestUseSkillItem(index, isLeftHand))
                 return false;
-            CallNetFunction(NetFuncUseSkillItem, FunctionReceivers.Server, index, isLeftHand);
+            CallNetFunction(ServerUseSkillItem, FunctionReceivers.Server, index, isLeftHand);
             return true;
         }
 
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestUseSkillItem(index, isLeftHand))
                 return false;
-            CallNetFunction(NetFuncUseSkillItemWithAimPosition, FunctionReceivers.Server, index, isLeftHand, aimPosition);
+            CallNetFunction(ServerUseSkillItemWithAimPosition, FunctionReceivers.Server, index, isLeftHand, aimPosition);
             return true;
         }
 
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncSwapOrMergeItem, FunctionReceivers.Server, fromIndex, toIndex);
+            CallNetFunction(ServerSwapOrMergeItem, FunctionReceivers.Server, fromIndex, toIndex);
             return true;
         }
 
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncAddSkill, FunctionReceivers.Server, dataId);
+            CallNetFunction(ServerAddSkill, FunctionReceivers.Server, dataId);
             return true;
         }
 
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncAddGuildSkill, FunctionReceivers.Server, dataId);
+            CallNetFunction(ServerAddGuildSkill, FunctionReceivers.Server, dataId);
             return true;
         }
 
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncUseGuildSkill, FunctionReceivers.Server, dataId);
+            CallNetFunction(ServerUseGuildSkill, FunctionReceivers.Server, dataId);
             return true;
         }
 
@@ -134,13 +134,13 @@ namespace MultiplayerARPG
         {
             if (!this.IsDead())
                 return false;
-            CallNetFunction(NetFuncRespawn, FunctionReceivers.Server);
+            CallNetFunction(ServerRespawn, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestAssignHotkey(string hotkeyId, HotkeyType type, string id)
         {
-            CallNetFunction(NetFuncAssignHotkey, FunctionReceivers.Server, hotkeyId, type, id);
+            CallNetFunction(ServerAssignHotkey, FunctionReceivers.Server, hotkeyId, type, id);
             return true;
         }
 
@@ -170,7 +170,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncNpcActivate, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerNpcActivate, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
@@ -210,7 +210,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncSelectNpcDialogMenu, FunctionReceivers.Server, menuIndex);
+            CallNetFunction(ServerSelectNpcDialogMenu, FunctionReceivers.Server, menuIndex);
             return true;
         }
 
@@ -218,7 +218,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncBuyNpcItem, FunctionReceivers.Server, itemIndex, amount);
+            CallNetFunction(ServerBuyNpcItem, FunctionReceivers.Server, itemIndex, amount);
             return true;
         }
 
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            CallNetFunction(NetFuncEnterWarp, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerEnterWarp, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
@@ -234,7 +234,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            CallNetFunction(NetFuncBuild, FunctionReceivers.Server, itemIndex, position, rotation, new PackedUInt(parentObjectId));
+            CallNetFunction(ServerBuild, FunctionReceivers.Server, itemIndex, position, rotation, new PackedUInt(parentObjectId));
             return true;
         }
 
@@ -242,7 +242,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            CallNetFunction(NetFuncDestroyBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerDestroyBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
@@ -250,7 +250,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            CallNetFunction(NetFuncSellItem, FunctionReceivers.Server, nonEquipIndex, amount);
+            CallNetFunction(ServerSellItem, FunctionReceivers.Server, nonEquipIndex, amount);
             return true;
         }
 
@@ -258,7 +258,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            CallNetFunction(NetFuncDismantleItem, FunctionReceivers.Server, nonEquipIndex);
+            CallNetFunction(ServerDismantleItem, FunctionReceivers.Server, nonEquipIndex);
             return true;
         }
 
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncRefineItem, FunctionReceivers.Server, inventoryType, index);
+            CallNetFunction(ServerRefineItem, FunctionReceivers.Server, inventoryType, index);
             return true;
         }
 
@@ -274,7 +274,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncEnhanceSocketItem, FunctionReceivers.Server, inventoryType, index, enhancerId);
+            CallNetFunction(ServerEnhanceSocketItem, FunctionReceivers.Server, inventoryType, index, enhancerId);
             return true;
         }
 
@@ -282,13 +282,13 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncRepairItem, FunctionReceivers.Server, inventoryType, index);
+            CallNetFunction(ServerRepairItem, FunctionReceivers.Server, inventoryType, index);
             return true;
         }
 
         public bool RequestSendDealingRequest(uint objectId)
         {
-            CallNetFunction(NetFuncSendDealingRequest, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerSendDealingRequest, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
@@ -300,13 +300,13 @@ namespace MultiplayerARPG
 
         public bool RequestAcceptDealingRequest()
         {
-            CallNetFunction(NetFuncAcceptDealingRequest, FunctionReceivers.Server);
+            CallNetFunction(ServerAcceptDealingRequest, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestDeclineDealingRequest()
         {
-            CallNetFunction(NetFuncDeclineDealingRequest, FunctionReceivers.Server);
+            CallNetFunction(ServerDeclineDealingRequest, FunctionReceivers.Server);
             return true;
         }
 
@@ -318,31 +318,31 @@ namespace MultiplayerARPG
 
         public bool RequestSetDealingItem(short itemIndex, short amount)
         {
-            CallNetFunction(NetFuncSetDealingItem, FunctionReceivers.Server, itemIndex, amount);
+            CallNetFunction(ServerSetDealingItem, FunctionReceivers.Server, itemIndex, amount);
             return true;
         }
 
         public bool RequestSetDealingGold(int dealingGold)
         {
-            CallNetFunction(NetFuncSetDealingGold, FunctionReceivers.Server, dealingGold);
+            CallNetFunction(ServerSetDealingGold, FunctionReceivers.Server, dealingGold);
             return true;
         }
 
         public bool RequestLockDealing()
         {
-            CallNetFunction(NetFuncLockDealing, FunctionReceivers.Server);
+            CallNetFunction(ServerLockDealing, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestConfirmDealing()
         {
-            CallNetFunction(NetFuncConfirmDealing, FunctionReceivers.Server);
+            CallNetFunction(ServerConfirmDealing, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestCancelDealing()
         {
-            CallNetFunction(NetFuncCancelDealing, FunctionReceivers.Server);
+            CallNetFunction(ServerCancelDealing, FunctionReceivers.Server);
             return true;
         }
 
@@ -384,25 +384,25 @@ namespace MultiplayerARPG
 
         public bool RequestCreateParty(bool shareExp, bool shareItem)
         {
-            CallNetFunction(NetFuncCreateParty, FunctionReceivers.Server, shareExp, shareItem);
+            CallNetFunction(ServerCreateParty, FunctionReceivers.Server, shareExp, shareItem);
             return true;
         }
 
         public bool RequestChangePartyLeader(string characterId)
         {
-            CallNetFunction(NetFuncChangePartyLeader, FunctionReceivers.Server, characterId);
+            CallNetFunction(ServerChangePartyLeader, FunctionReceivers.Server, characterId);
             return true;
         }
 
         public bool RequestPartySetting(bool shareExp, bool shareItem)
         {
-            CallNetFunction(NetFuncPartySetting, FunctionReceivers.Server, shareExp, shareItem);
+            CallNetFunction(ServerPartySetting, FunctionReceivers.Server, shareExp, shareItem);
             return true;
         }
 
         public bool RequestSendPartyInvitation(uint objectId)
         {
-            CallNetFunction(NetFuncSendPartyInvitation, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerSendPartyInvitation, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
@@ -414,61 +414,61 @@ namespace MultiplayerARPG
 
         public bool RequestAcceptPartyInvitation()
         {
-            CallNetFunction(NetFuncAcceptPartyInvitation, FunctionReceivers.Server);
+            CallNetFunction(ServerAcceptPartyInvitation, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestDeclinePartyInvitation()
         {
-            CallNetFunction(NetFuncDeclinePartyInvitation, FunctionReceivers.Server);
+            CallNetFunction(ServerDeclinePartyInvitation, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestKickFromParty(string characterId)
         {
-            CallNetFunction(NetFuncKickFromParty, FunctionReceivers.Server, characterId);
+            CallNetFunction(ServerKickFromParty, FunctionReceivers.Server, characterId);
             return true;
         }
 
         public bool RequestLeaveParty()
         {
-            CallNetFunction(NetFuncLeaveParty, FunctionReceivers.Server);
+            CallNetFunction(ServerLeaveParty, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestCreateGuild(string guildName)
         {
-            CallNetFunction(NetFuncCreateGuild, FunctionReceivers.Server, guildName);
+            CallNetFunction(ServerCreateGuild, FunctionReceivers.Server, guildName);
             return true;
         }
 
         public bool RequestChangeGuildLeader(string characterId)
         {
-            CallNetFunction(NetFuncChangeGuildLeader, FunctionReceivers.Server, characterId);
+            CallNetFunction(ServerChangeGuildLeader, FunctionReceivers.Server, characterId);
             return true;
         }
 
         public bool RequestSetGuildMessage(string guildMessage)
         {
-            CallNetFunction(NetFuncSetGuildMessage, FunctionReceivers.Server, guildMessage);
+            CallNetFunction(ServerSetGuildMessage, FunctionReceivers.Server, guildMessage);
             return true;
         }
 
         public bool RequestSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            CallNetFunction(NetFuncSetGuildRole, FunctionReceivers.Server, guildRole, name, canInvite, canKick, shareExpPercentage);
+            CallNetFunction(ServerSetGuildRole, FunctionReceivers.Server, guildRole, name, canInvite, canKick, shareExpPercentage);
             return true;
         }
 
         public bool RequestSetGuildMemberRole(string characterId, byte guildRole)
         {
-            CallNetFunction(NetFuncSetGuildMemberRole, FunctionReceivers.Server, characterId, guildRole);
+            CallNetFunction(ServerSetGuildMemberRole, FunctionReceivers.Server, characterId, guildRole);
             return true;
         }
 
         public bool RequestSendGuildInvitation(uint objectId)
         {
-            CallNetFunction(NetFuncSendGuildInvitation, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerSendGuildInvitation, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
@@ -480,151 +480,151 @@ namespace MultiplayerARPG
 
         public bool RequestAcceptGuildInvitation()
         {
-            CallNetFunction(NetFuncAcceptGuildInvitation, FunctionReceivers.Server);
+            CallNetFunction(ServerAcceptGuildInvitation, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestDeclineGuildInvitation()
         {
-            CallNetFunction(NetFuncDeclineGuildInvitation, FunctionReceivers.Server);
+            CallNetFunction(ServerDeclineGuildInvitation, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestKickFromGuild(string characterId)
         {
-            CallNetFunction(NetFuncKickFromGuild, FunctionReceivers.Server, characterId);
+            CallNetFunction(ServerKickFromGuild, FunctionReceivers.Server, characterId);
             return true;
         }
 
         public bool RequestLeaveGuild()
         {
-            CallNetFunction(NetFuncLeaveGuild, FunctionReceivers.Server);
+            CallNetFunction(ServerLeaveGuild, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
         {
-            CallNetFunction(NetFuncMoveItemToStorage, FunctionReceivers.Server, nonEquipIndex, amount, storageItemIndex);
+            CallNetFunction(ServerMoveItemToStorage, FunctionReceivers.Server, nonEquipIndex, amount, storageItemIndex);
             return true;
         }
 
         public bool RequestMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
         {
-            CallNetFunction(NetFuncMoveItemFromStorage, FunctionReceivers.Server, storageItemIndex, amount, nonEquipIndex);
+            CallNetFunction(ServerMoveItemFromStorage, FunctionReceivers.Server, storageItemIndex, amount, nonEquipIndex);
             return true;
         }
 
         public bool RequestSwapOrMergeStorageItem(short fromIndex, short toIndex)
         {
-            CallNetFunction(NetFuncSwapOrMergeStorageItem, FunctionReceivers.Server, fromIndex, toIndex);
+            CallNetFunction(ServerSwapOrMergeStorageItem, FunctionReceivers.Server, fromIndex, toIndex);
             return true;
         }
 
         public bool RequestDepositGold(int amount)
         {
-            CallNetFunction(NetFuncDepositGold, FunctionReceivers.Server, amount);
+            CallNetFunction(ServerDepositGold, FunctionReceivers.Server, amount);
             return true;
         }
 
         public bool RequestWithdrawGold(int amount)
         {
-            CallNetFunction(NetFuncWithdrawGold, FunctionReceivers.Server, amount);
+            CallNetFunction(ServerWithdrawGold, FunctionReceivers.Server, amount);
             return true;
         }
 
         public bool RequestDepositGuildGold(int amount)
         {
-            CallNetFunction(NetFuncDepositGuildGold, FunctionReceivers.Server, amount);
+            CallNetFunction(ServerDepositGuildGold, FunctionReceivers.Server, amount);
             return true;
         }
 
         public bool RequestWithdrawGuildGold(int amount)
         {
-            CallNetFunction(NetFuncWithdrawGuildGold, FunctionReceivers.Server, amount);
+            CallNetFunction(ServerWithdrawGuildGold, FunctionReceivers.Server, amount);
             return true;
         }
 
         public bool RequestOpenStorage(uint objectId, string password)
         {
-            CallNetFunction(NetFuncOpenStorage, FunctionReceivers.Server, new PackedUInt(objectId), password);
+            CallNetFunction(ServerOpenStorage, FunctionReceivers.Server, new PackedUInt(objectId), password);
             return true;
         }
 
         public bool RequestCloseStorage()
         {
-            CallNetFunction(NetFuncCloseStorage, FunctionReceivers.Server);
+            CallNetFunction(ServerCloseStorage, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestOpenDoor(uint objectId, string password)
         {
-            CallNetFunction(NetFuncOpenDoor, FunctionReceivers.Server, new PackedUInt(objectId), password);
+            CallNetFunction(ServerOpenDoor, FunctionReceivers.Server, new PackedUInt(objectId), password);
             return true;
         }
 
         public bool RequestCloseDoor(uint objectId)
         {
-            CallNetFunction(NetFuncCloseDoor, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerCloseDoor, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
         public bool RequestTurnOnCampFire(uint objectId)
         {
-            CallNetFunction(NetFuncTurnOnCampFire, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerTurnOnCampFire, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
         public bool RequestTurnOffCampFire(uint objectId)
         {
-            CallNetFunction(NetFuncTurnOffCampFire, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerTurnOffCampFire, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
         public bool RequestCraftItemByWorkbench(uint objectId, int dataId)
         {
-            CallNetFunction(NetFuncCraftItemByWorkbench, FunctionReceivers.Server, new PackedUInt(objectId), dataId);
+            CallNetFunction(ServerCraftItemByWorkbench, FunctionReceivers.Server, new PackedUInt(objectId), dataId);
             return true;
         }
 
         public bool RequestFindCharacters(string characterName)
         {
-            CallNetFunction(NetFuncFindCharacters, FunctionReceivers.Server, characterName);
+            CallNetFunction(ServerFindCharacters, FunctionReceivers.Server, characterName);
             return true;
         }
 
         public bool RequestAddFriend(string friendCharacterId)
         {
-            CallNetFunction(NetFuncAddFriend, FunctionReceivers.Server, friendCharacterId);
+            CallNetFunction(ServerAddFriend, FunctionReceivers.Server, friendCharacterId);
             return true;
         }
 
         public bool RequestRemoveFriend(string friendCharacterId)
         {
-            CallNetFunction(NetFuncRemoveFriend, FunctionReceivers.Server, friendCharacterId);
+            CallNetFunction(ServerRemoveFriend, FunctionReceivers.Server, friendCharacterId);
             return true;
         }
 
         public bool RequestGetFriends()
         {
-            CallNetFunction(NetFuncGetFriends, FunctionReceivers.Server);
+            CallNetFunction(ServerGetFriends, FunctionReceivers.Server);
             return true;
         }
 
         public bool RequestSetBuildingPassword(uint objectId, string password)
         {
-            CallNetFunction(NetFuncSetBuildingPassword, FunctionReceivers.Server, new PackedUInt(objectId), password);
+            CallNetFunction(ServerSetBuildingPassword, FunctionReceivers.Server, new PackedUInt(objectId), password);
             return true;
         }
 
         public bool RequestLockBuilding(uint objectId)
         {
-            CallNetFunction(NetFuncLockBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerLockBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
 
         public bool RequestUnlockBuilding(uint objectId)
         {
-            CallNetFunction(NetFuncUnlockBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerUnlockBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
             return true;
         }
     }

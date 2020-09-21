@@ -43,7 +43,7 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to pickup items
         /// </summary>
         /// <param name="objectId"></param>
-        protected virtual void NetFuncPickupItem(PackedUInt objectId)
+        protected virtual void ServerPickupItem(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="index"></param>
         /// <param name="amount"></param>
-        protected virtual void NetFuncDropItem(short index, short amount)
+        protected virtual void ServerDropItem(short index, short amount)
         {
             if (!CanDoActions() ||
                 index >= nonEquipItems.Count)
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
         /// <param name="nonEquipIndex"></param>
         /// <param name="equipWeaponSet"></param>
         /// <param name="isLeftHand"></param>
-        protected virtual void NetFuncEquipWeapon(short nonEquipIndex, byte equipWeaponSet, bool isLeftHand)
+        protected virtual void ServerEquipWeapon(short nonEquipIndex, byte equipWeaponSet, bool isLeftHand)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= nonEquipItems.Count)
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="nonEquipIndex"></param>
         /// <param name="equipSlotIndex"></param>
-        protected virtual void NetFuncEquipArmor(short nonEquipIndex, byte equipSlotIndex)
+        protected virtual void ServerEquipArmor(short nonEquipIndex, byte equipSlotIndex)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= nonEquipItems.Count)
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
             this.FillEmptySlots(true);
         }
 
-        protected virtual void NetFuncUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
+        protected virtual void ServerUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
         {
             GameMessage.Type gameMessageType;
             int unEquippedIndex;
@@ -328,7 +328,7 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to unequip equipments
         /// </summary>
         /// <param name="index"></param>
-        protected virtual void NetFuncUnEquipArmor(short index)
+        protected virtual void ServerUnEquipArmor(short index)
         {
             GameMessage.Type gameMessageType;
             int unEquippedIndex;
@@ -390,7 +390,7 @@ namespace MultiplayerARPG
                 onLevelUp.Invoke();
         }
 
-        protected virtual void NetFuncUnSummon(PackedUInt objectId)
+        protected virtual void ServerUnSummon(PackedUInt objectId)
         {
             int index = this.IndexOfSummon(objectId);
             if (index < 0)
@@ -404,7 +404,7 @@ namespace MultiplayerARPG
             summon.UnSummon(this);
         }
 
-        protected void NetFuncSwitchEquipWeaponSet(byte equipWeaponSet)
+        protected void ServerSwitchEquipWeaponSet(byte equipWeaponSet)
         {
             if (!CanDoActions())
                 return;

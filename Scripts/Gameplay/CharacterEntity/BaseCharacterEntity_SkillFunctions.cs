@@ -64,7 +64,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="dataId"></param>
         /// <param name="isLeftHand"></param>
-        protected void NetFuncUseSkill(int dataId, bool isLeftHand)
+        protected void ServerUseSkill(int dataId, bool isLeftHand)
         {
             UseSkillFunction(dataId, isLeftHand, null);
         }
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         /// <param name="dataId"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="aimPosition"></param>
-        protected void NetFuncUseSkillWithAimPosition(int dataId, bool isLeftHand, Vector3 aimPosition)
+        protected void ServerUseSkillWithAimPosition(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
             UseSkillFunction(dataId, isLeftHand, aimPosition);
         }
@@ -137,7 +137,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// This will be called at server by owner client to stop playing skill casting
         /// </summary>
-        protected virtual void NetFuncSkillCastingInterrupt()
+        protected virtual void ServerSkillCastingInterrupt()
         {
             InterruptCastingSkill();
         }

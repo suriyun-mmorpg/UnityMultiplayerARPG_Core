@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestAttack(isLeftHand))
                 return false;
-            CallNetFunction(NetFuncAttack, FunctionReceivers.Server, isLeftHand);
+            CallNetFunction(ServerAttack, FunctionReceivers.Server, isLeftHand);
             return true;
         }
 
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
-            CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId, isLeftHand);
+            CallNetFunction(ServerUseSkill, FunctionReceivers.Server, dataId, isLeftHand);
             return true;
         }
 
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
-            CallNetFunction(NetFuncUseSkillWithAimPosition, FunctionReceivers.Server, dataId, isLeftHand, aimPosition);
+            CallNetFunction(ServerUseSkillWithAimPosition, FunctionReceivers.Server, dataId, isLeftHand, aimPosition);
             return true;
         }
 
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncSkillCastingInterrupt, FunctionReceivers.Server);
+            CallNetFunction(ServerSkillCastingInterrupt, FunctionReceivers.Server);
             return true;
         }
 
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            CallNetFunction(NetFuncPickupItem, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(ServerPickupItem, FunctionReceivers.Server, new PackedUInt(objectId));
             TriggerPickup();
             return true;
         }
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            CallNetFunction(NetFuncDropItem, FunctionReceivers.Server, nonEquipIndex, amount);
+            CallNetFunction(ServerDropItem, FunctionReceivers.Server, nonEquipIndex, amount);
             return true;
         }
 
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            CallNetFunction(NetFuncEquipWeapon, FunctionReceivers.Server, nonEquipIndex, equipWeaponSet, isLeftHand);
+            CallNetFunction(ServerEquipWeapon, FunctionReceivers.Server, nonEquipIndex, equipWeaponSet, isLeftHand);
             return true;
         }
 
@@ -230,7 +230,7 @@ namespace MultiplayerARPG
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            CallNetFunction(NetFuncEquipArmor, FunctionReceivers.Server, nonEquipIndex, equipSlotIndex);
+            CallNetFunction(ServerEquipArmor, FunctionReceivers.Server, nonEquipIndex, equipSlotIndex);
             return true;
         }
 
@@ -252,7 +252,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            CallNetFunction(NetFuncUnEquipWeapon, FunctionReceivers.Server, equipWeaponSet, isLeftHand);
+            CallNetFunction(ServerUnEquipWeapon, FunctionReceivers.Server, equipWeaponSet, isLeftHand);
             return true;
         }
 
@@ -260,7 +260,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            CallNetFunction(NetFuncUnEquipArmor, FunctionReceivers.Server, equipItemIndex);
+            CallNetFunction(ServerUnEquipArmor, FunctionReceivers.Server, equipItemIndex);
             return true;
         }
 
@@ -284,13 +284,13 @@ namespace MultiplayerARPG
 
         public bool RequestUnSummon(PackedUInt objectId)
         {
-            CallNetFunction(NetFuncUnSummon, FunctionReceivers.Server, objectId);
+            CallNetFunction(ServerUnSummon, FunctionReceivers.Server, objectId);
             return true;
         }
 
         public bool RequestReload(bool isLeftHand)
         {
-            CallNetFunction(NetFuncReload, FunctionReceivers.Server, isLeftHand);
+            CallNetFunction(ServerReload, FunctionReceivers.Server, isLeftHand);
             return true;
         }
 
@@ -300,7 +300,7 @@ namespace MultiplayerARPG
                 return false;
             if (equipWeaponSet >= CurrentGameInstance.maxEquipWeaponSet)
                 equipWeaponSet = 0;
-            CallNetFunction(NetFuncSwitchEquipWeaponSet, FunctionReceivers.Server, equipWeaponSet);
+            CallNetFunction(ServerSwitchEquipWeaponSet, FunctionReceivers.Server, equipWeaponSet);
             return true;
         }
     }
