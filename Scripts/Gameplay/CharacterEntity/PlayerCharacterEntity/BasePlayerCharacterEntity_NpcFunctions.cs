@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +7,10 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
+        [ServerRpc]
         protected void ServerNpcActivate(PackedUInt objectId)
         {
+#if !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -21,6 +24,7 @@ namespace MultiplayerARPG
             CurrentNpcDialog = npcEntity.StartDialog;
             if (CurrentNpcDialog != null)
                 RequestShowNpcDialog(CurrentNpcDialog.DataId);
+#endif
         }
 
         protected void NetFuncShowNpcDialog(int dataId)
@@ -63,8 +67,10 @@ namespace MultiplayerARPG
                 onShowNpcRepairItem.Invoke();
         }
 
+        [ServerRpc]
         protected void ServerSelectNpcDialogMenu(byte menuIndex)
         {
+#if !CLIENT_BUILD
             if (CurrentNpcDialog == null)
                 return;
 
@@ -79,10 +85,13 @@ namespace MultiplayerARPG
                 // Hide Npc dialog on client
                 RequestShowNpcDialog(0);
             }
+#endif
         }
 
+        [ServerRpc]
         protected void ServerSellItem(short index, short amount)
         {
+#if !CLIENT_BUILD
             if (this.IsDead() || index >= nonEquipItems.Count)
                 return;
 
@@ -107,10 +116,13 @@ namespace MultiplayerARPG
 
             // Increase currencies
             CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
+#endif
         }
 
+        [ServerRpc]
         protected void ServerBuyNpcItem(short itemIndex, short amount)
         {
+#if !CLIENT_BUILD
             if (CurrentNpcDialog == null)
                 return;
 
@@ -147,6 +159,7 @@ namespace MultiplayerARPG
             this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
             this.FillEmptySlots();
             CurrentGameManager.SendNotifyRewardItem(ConnectionId, dataId, amount);
+#endif
         }
     }
 }

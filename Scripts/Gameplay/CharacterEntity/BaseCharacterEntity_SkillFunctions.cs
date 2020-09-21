@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -64,9 +65,12 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="dataId"></param>
         /// <param name="isLeftHand"></param>
+        [ServerRpc]
         protected void ServerUseSkill(int dataId, bool isLeftHand)
         {
+#if !CLIENT_BUILD
             UseSkillFunction(dataId, isLeftHand, null);
+#endif
         }
 
         /// <summary>
@@ -75,9 +79,12 @@ namespace MultiplayerARPG
         /// <param name="dataId"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="aimPosition"></param>
+        [ServerRpc]
         protected void ServerUseSkillWithAimPosition(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
+#if !CLIENT_BUILD
             UseSkillFunction(dataId, isLeftHand, aimPosition);
+#endif
         }
 
         protected virtual void UseSkillFunction(int dataId, bool isLeftHand, Vector3? aimPosition)
@@ -137,9 +144,12 @@ namespace MultiplayerARPG
         /// <summary>
         /// This will be called at server by owner client to stop playing skill casting
         /// </summary>
+        [ServerRpc]
         protected virtual void ServerSkillCastingInterrupt()
         {
+#if !CLIENT_BUILD
             InterruptCastingSkill();
+#endif
         }
 
         /// <summary>

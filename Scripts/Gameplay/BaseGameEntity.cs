@@ -531,15 +531,9 @@ namespace MultiplayerARPG
             // Remove sync field events
             passengingVehicle.onChange += OnPassengingVehicleChange;
             // Register network functions
-            RegisterNetFunction<PackedUInt>(ServerEnterVehicle);
-            RegisterNetFunction<PackedUInt, byte>(ServerEnterVehicleToSeat);
-            RegisterNetFunction(ServerExitVehicle);
             RegisterNetFunction(NetFuncExitVehicleResponse);
             RegisterNetFunction(NetFuncTriggerJump);
             RegisterNetFunction(NetFuncTriggerPickup);
-            RegisterNetFunction<MovementState>(ServerSetMovement);
-            RegisterNetFunction<ExtraMovementState>(ServerSetExtraMovement);
-            RegisterNetFunction<DirectionVector2>(ServerUpdateDirection2D);
 
             if (teleportingPosition.HasValue)
             {
@@ -580,8 +574,10 @@ namespace MultiplayerARPG
         }
 
         #region Net Functions
-        protected void ServerEnterVehicle(PackedUInt objectId)
+        [ServerRpc]
+        protected void ServerEnterVehicle(uint objectId)
         {
+#if !CLIENT_BUILD
             // Call this function at server
             LiteNetLibIdentity identity;
             if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
@@ -592,10 +588,13 @@ namespace MultiplayerARPG
                     vehicleEntity.GetAvailableSeat(out seatIndex))
                     EnterVehicle(vehicleEntity, seatIndex);
             }
+#endif
         }
 
-        protected void ServerEnterVehicleToSeat(PackedUInt objectId, byte seatIndex)
+        [ServerRpc]
+        protected void ServerEnterVehicleToSeat(uint objectId, byte seatIndex)
         {
+#if !CLIENT_BUILD
             // Call this function at server
             LiteNetLibIdentity identity;
             if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
@@ -604,12 +603,16 @@ namespace MultiplayerARPG
                 if (vehicleEntity != null)
                     EnterVehicle(vehicleEntity, seatIndex);
             }
+#endif
         }
 
+        [ServerRpc]
         protected void ServerExitVehicle()
         {
+#if !CLIENT_BUILD
             // Call this function at server
             ExitVehicle();
+#endif
         }
 
         protected void NetFuncExitVehicleResponse()
@@ -631,8 +634,10 @@ namespace MultiplayerARPG
                 (Model as IPickupableModel).PlayPickupAnimation();
         }
 
+        [ServerRpc]
         protected void ServerSetMovement(MovementState movementState)
         {
+#if !CLIENT_BUILD
             switch (MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
@@ -645,10 +650,13 @@ namespace MultiplayerARPG
                     MovementState = movementState;
                     break;
             }
+#endif
         }
 
+        [ServerRpc]
         protected void ServerSetExtraMovement(ExtraMovementState extraMovementState)
         {
+#if !CLIENT_BUILD
             switch (MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
@@ -661,29 +669,33 @@ namespace MultiplayerARPG
                     ExtraMovementState = extraMovementState;
                     break;
             }
+#endif
         }
 
+        [ServerRpc]
         protected void ServerUpdateDirection2D(DirectionVector2 direction)
         {
+#if !CLIENT_BUILD
             // Set data at server and sync to clients later
             Direction2D = direction;
+#endif
         }
         #endregion
 
         #region Net Function Requests
         public void RequestEnterVehicle(uint objectId)
         {
-            CallNetFunction(ServerEnterVehicle, FunctionReceivers.Server, new PackedUInt(objectId));
+            RPC(ServerEnterVehicle, objectId);
         }
 
         public void RequestEnterVehicleToSeat(uint objectId, byte seatIndex)
         {
-            CallNetFunction(ServerEnterVehicleToSeat, FunctionReceivers.Server, new PackedUInt(objectId), seatIndex);
+            RPC(ServerEnterVehicleToSeat, objectId, seatIndex);
         }
 
         public void RequestExitVehicle()
         {
-            CallNetFunction(ServerExitVehicle, FunctionReceivers.Server);
+            RPC(ServerExitVehicle);
         }
         #endregion
 
@@ -805,11 +817,11 @@ namespace MultiplayerARPG
                 if (IsServer)
                     MovementState = movementState;
                 else if (IsOwnerClient)
-                    CallNetFunction(ServerSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, movementState);
+                    RPC(ServerSetMovement, DeliveryMethod.Sequenced, movementState);
             }
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CallNetFunction(ServerSetMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, movementState);
+                RPC(ServerSetMovement, DeliveryMethod.Sequenced, movementState);
         }
 
         public void SetExtraMovement(ExtraMovementState extraMovementState)
@@ -850,11 +862,11 @@ namespace MultiplayerARPG
                 if (IsServer)
                     ExtraMovementState = extraMovementState;
                 else if (IsOwnerClient)
-                    CallNetFunction(ServerSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, extraMovementState);
+                    RPC(ServerSetExtraMovement, DeliveryMethod.Sequenced, extraMovementState);
             }
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CallNetFunction(ServerSetExtraMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, extraMovementState);
+                RPC(ServerSetExtraMovement, DeliveryMethod.Sequenced, extraMovementState);
         }
 
         public void SetDirection2D(Vector2 direction)
@@ -866,7 +878,7 @@ namespace MultiplayerARPG
                 Direction2D = direction;
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CallNetFunction(ServerUpdateDirection2D, FunctionReceivers.Server, new DirectionVector2(LocalDirection2D));
+                RPC(ServerUpdateDirection2D, DeliveryMethod.Sequenced, new DirectionVector2(LocalDirection2D));
         }
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)

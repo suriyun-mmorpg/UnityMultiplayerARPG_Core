@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,8 +135,10 @@ namespace MultiplayerARPG
             }
         }
 
+        [ServerRpc]
         protected virtual void ServerReload(bool isLeftHand)
         {
+#if !CLIENT_BUILD
             if (!CanAttack())
                 return;
 
@@ -166,6 +169,7 @@ namespace MultiplayerARPG
 
             // Play animations
             RequestPlayReloadAnimation(isLeftHand, reloadingAmmoAmount);
+#endif
         }
 
         protected async UniTaskVoid ReloadRoutine(bool isLeftHand, short reloadingAmmoAmount)
@@ -238,8 +242,10 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
+        [ServerRpc]
         protected virtual void ServerAttack(bool isLeftHand)
         {
+#if !CLIENT_BUILD
             if (!CanAttack())
                 return;
 
@@ -275,6 +281,7 @@ namespace MultiplayerARPG
 
             // Play animations
             RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex);
+#endif
         }
 
         protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex)

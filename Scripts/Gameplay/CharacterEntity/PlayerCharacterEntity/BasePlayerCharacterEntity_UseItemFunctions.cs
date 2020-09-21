@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,8 +12,10 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="itemIndex"></param>
         /// <param name="aimPosition"></param>
+        [ServerRpc]
         protected void ServerUseItem(short itemIndex)
         {
+#if !CLIENT_BUILD
             if (!CanUseItem())
                 return;
 
@@ -28,15 +31,19 @@ namespace MultiplayerARPG
                 return;
 
             usableItem.UseItem(this, itemIndex, characterItem);
+#endif
         }
 
         /// <summary>
         /// This function will be called at server to order character to use item
         /// </summary>
         /// <param name="itemIndex"></param>
+        [ServerRpc]
         protected void ServerUseSkillItem(short itemIndex, bool isLeftHand)
         {
+#if !CLIENT_BUILD
             UseItemSkill(itemIndex, isLeftHand, null);
+#endif
         }
 
         /// <summary>
@@ -44,9 +51,12 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="itemIndex"></param>
         /// <param name="aimPosition"></param>
+        [ServerRpc]
         protected void ServerUseSkillItemWithAimPosition(short itemIndex, bool isLeftHand, Vector3 aimPosition)
         {
+#if !CLIENT_BUILD
             UseItemSkill(itemIndex, isLeftHand, aimPosition);
+#endif
         }
 
         protected void UseItemSkill(short itemIndex, bool isLeftHand, Vector3? aimPosition)
