@@ -217,9 +217,9 @@ namespace MultiplayerARPG
 
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
-                playerCharacterEntity.RequestOnRespawn();
+                playerCharacterEntity.CallOwnerOnRespawn();
             else
-                playerCharacterEntity.RequestOnDead();
+                playerCharacterEntity.CallOwnerOnDead();
 
             // Register player, will use registered player to send chat / player messages
             RegisterPlayerCharacter(playerCharacterEntity);

@@ -388,7 +388,8 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected virtual void NetFuncOnDead()
+        [TargetRpc]
+        protected virtual void TargetOnDead()
         {
             CancelReload();
             CancelAttack();
@@ -398,14 +399,16 @@ namespace MultiplayerARPG
                 onDead.Invoke();
         }
 
-        protected virtual void NetFuncOnRespawn()
+        [TargetRpc]
+        protected virtual void TargetOnRespawn()
         {
             ClearActionStates();
             if (onRespawn != null)
                 onRespawn.Invoke();
         }
 
-        protected virtual void NetFuncOnLevelUp()
+        [TargetRpc]
+        protected virtual void TargetOnLevelUp()
         {
             if (CurrentGameInstance.levelUpEffect != null)
                 CharacterModel.InstantiateEffect(CurrentGameInstance.levelUpEffect);

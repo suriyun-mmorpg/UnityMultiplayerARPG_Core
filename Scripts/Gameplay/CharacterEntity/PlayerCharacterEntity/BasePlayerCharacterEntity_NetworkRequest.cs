@@ -171,35 +171,35 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestShowNpcDialog(int dataId)
+        public bool CallOwnerShowNpcDialog(int dataId)
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncShowNpcDialog, ConnectionId, dataId);
+            RPC(TargetShowNpcDialog, ConnectionId, dataId);
             return true;
         }
 
-        public bool RequestShowNpcRefineItem()
+        public bool CallOwnerShowNpcRefineItem()
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncShowNpcRefineItem, ConnectionId);
+            RPC(TargetShowNpcRefineItem, ConnectionId);
             return true;
         }
 
-        public bool RequestShowNpcDismantleItem()
+        public bool CallOwnerShowNpcDismantleItem()
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncShowNpcDismantleItem, ConnectionId);
+            RPC(TargetShowNpcDismantleItem, ConnectionId);
             return true;
         }
 
-        public bool RequestShowNpcRepairItem()
+        public bool CallOwnerShowNpcRepairItem()
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncShowNpcRepairItem, ConnectionId);
+            RPC(TargetShowNpcRepairItem, ConnectionId);
             return true;
         }
 
@@ -289,9 +289,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestReceiveDealingRequest(uint objectId)
+        public bool CallOwnerReceiveDealingRequest(uint objectId)
         {
-            CallNetFunction(NetFuncReceiveDealingRequest, ConnectionId, new PackedUInt(objectId));
+            RPC(TargetReceiveDealingRequest, ConnectionId, objectId);
             return true;
         }
 
@@ -307,9 +307,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAcceptedDealingRequest(uint objectId)
+        public bool CallOwnerAcceptedDealingRequest(uint objectId)
         {
-            CallNetFunction(NetFuncAcceptedDealingRequest, ConnectionId, new PackedUInt(objectId));
+            RPC(TargetAcceptedDealingRequest, ConnectionId, objectId);
             return true;
         }
 
@@ -343,39 +343,39 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUpdateDealingState(DealingState state)
+        public bool CallOwnerUpdateDealingState(DealingState state)
         {
-            CallNetFunction(NetFuncUpdateDealingState, ConnectionId, state);
+            RPC(TargetUpdateDealingState, ConnectionId, state);
             return true;
         }
 
-        public bool RequestUpdateAnotherDealingState(DealingState state)
+        public bool CallOwnerUpdateAnotherDealingState(DealingState state)
         {
-            CallNetFunction(NetFuncUpdateAnotherDealingState, ConnectionId, state);
+            RPC(TargetUpdateAnotherDealingState, ConnectionId, state);
             return true;
         }
 
-        public bool RequestUpdateDealingGold(int gold)
+        public bool CallOwnerUpdateDealingGold(int gold)
         {
-            CallNetFunction(NetFuncUpdateDealingGold, ConnectionId, gold);
+            RPC(TargetUpdateDealingGold, ConnectionId, gold);
             return true;
         }
 
-        public bool RequestUpdateAnotherDealingGold(int gold)
+        public bool CallOwnerUpdateAnotherDealingGold(int gold)
         {
-            CallNetFunction(NetFuncUpdateAnotherDealingGold, ConnectionId, gold);
+            RPC(TargetUpdateAnotherDealingGold, ConnectionId, gold);
             return true;
         }
 
-        public bool RequestUpdateDealingItems(DealingCharacterItems dealingItems)
+        public bool CallOwnerUpdateDealingItems(DealingCharacterItems dealingItems)
         {
-            CallNetFunction(NetFuncUpdateDealingItems, ConnectionId, dealingItems);
+            RPC(TargetUpdateDealingItems, ConnectionId, dealingItems);
             return true;
         }
 
-        public bool RequestUpdateAnotherDealingItems(DealingCharacterItems dealingItems)
+        public bool CallOwnerUpdateAnotherDealingItems(DealingCharacterItems dealingItems)
         {
-            CallNetFunction(NetFuncUpdateAnotherDealingItems, ConnectionId, dealingItems);
+            RPC(TargetUpdateAnotherDealingItems, ConnectionId, dealingItems);
             return true;
         }
 
@@ -403,9 +403,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestReceivePartyInvitation(uint objectId)
+        public bool CallOwnerReceivePartyInvitation(uint objectId)
         {
-            CallNetFunction(NetFuncReceivePartyInvitation, ConnectionId, new PackedUInt(objectId));
+            RPC(TargetReceivePartyInvitation, ConnectionId, objectId);
             return true;
         }
 
@@ -469,9 +469,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestReceiveGuildInvitation(uint objectId)
+        public bool CallOwnerReceiveGuildInvitation(uint objectId)
         {
-            CallNetFunction(NetFuncReceiveGuildInvitation, ConnectionId, new PackedUInt(objectId));
+            RPC(TargetReceiveGuildInvitation, ConnectionId, objectId);
             return true;
         }
 
@@ -550,6 +550,12 @@ namespace MultiplayerARPG
         public bool CallServerCloseStorage()
         {
             RPC(ServerCloseStorage);
+            return true;
+        }
+
+        public bool CallOwnerShowStorage(StorageType type, uint objectId, short weightLimit, short slotLimit)
+        {
+            RPC(TargetShowStorage, ConnectionId, type, objectId, weightLimit, slotLimit);
             return true;
         }
 

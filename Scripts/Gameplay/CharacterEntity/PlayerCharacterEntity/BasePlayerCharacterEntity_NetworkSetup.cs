@@ -68,22 +68,6 @@ namespace MultiplayerARPG
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
             storageItems.onChange += OnStorageItemsChange;
-            // Register Network functions
-            RegisterNetFunction<int>(NetFuncShowNpcDialog);
-            RegisterNetFunction(NetFuncShowNpcRefineItem);
-            RegisterNetFunction(NetFuncShowNpcDismantleItem);
-            RegisterNetFunction(NetFuncShowNpcRepairItem);
-            RegisterNetFunction<PackedUInt>(NetFuncReceiveDealingRequest);
-            RegisterNetFunction<PackedUInt>(NetFuncAcceptedDealingRequest);
-            RegisterNetFunction<DealingState>(NetFuncUpdateDealingState);
-            RegisterNetFunction<DealingState>(NetFuncUpdateAnotherDealingState);
-            RegisterNetFunction<int>(NetFuncUpdateDealingGold);
-            RegisterNetFunction<int>(NetFuncUpdateAnotherDealingGold);
-            RegisterNetFunction<DealingCharacterItems>(NetFuncUpdateDealingItems);
-            RegisterNetFunction<DealingCharacterItems>(NetFuncUpdateAnotherDealingItems);
-            RegisterNetFunction<PackedUInt>(NetFuncReceivePartyInvitation);
-            RegisterNetFunction<PackedUInt>(NetFuncReceiveGuildInvitation);
-            RegisterNetFunction<StorageType, uint, short, short>(NetFuncShowStorage);
         }
 
         protected override void EntityOnSetOwnerClient()

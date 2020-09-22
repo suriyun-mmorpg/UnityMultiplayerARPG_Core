@@ -55,9 +55,9 @@ namespace MultiplayerARPG
             set
             {
                 dealingState = value;
-                RequestUpdateDealingState(value);
+                CallOwnerUpdateDealingState(value);
                 if (DealingCharacter != null)
-                    DealingCharacter.RequestUpdateAnotherDealingState(value);
+                    DealingCharacter.CallOwnerUpdateAnotherDealingState(value);
             }
         }
 
@@ -67,9 +67,9 @@ namespace MultiplayerARPG
             set
             {
                 dealingGold = value;
-                RequestUpdateDealingGold(value);
+                CallOwnerUpdateDealingGold(value);
                 if (DealingCharacter != null)
-                    DealingCharacter.RequestUpdateAnotherDealingGold(value);
+                    DealingCharacter.CallOwnerUpdateAnotherDealingGold(value);
             }
         }
 
@@ -79,9 +79,9 @@ namespace MultiplayerARPG
             set
             {
                 dealingItems = value;
-                RequestUpdateDealingItems(value);
+                CallOwnerUpdateDealingItems(value);
                 if (DealingCharacter != null)
-                    DealingCharacter.RequestUpdateAnotherDealingItems(value);
+                    DealingCharacter.CallOwnerUpdateAnotherDealingItems(value);
             }
         }
 

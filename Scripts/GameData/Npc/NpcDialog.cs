@@ -473,7 +473,7 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.RequestShowNpcRefineItem();
+                            characterEntity.CallOwnerShowNpcRefineItem();
                             return null;
                         case CANCEL_MENU_INDEX:
                             nextDialog = refineItemCancelDialog;
@@ -484,7 +484,7 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.RequestShowNpcDismantleItem();
+                            characterEntity.CallOwnerShowNpcDismantleItem();
                             return null;
                         case CANCEL_MENU_INDEX:
                             nextDialog = dismantleItemCancelDialog;
@@ -517,7 +517,7 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.RequestShowNpcRepairItem();
+                            characterEntity.CallOwnerShowNpcRepairItem();
                             return null;
                         case CANCEL_MENU_INDEX:
                             nextDialog = repairItemCancelDialog;

@@ -392,7 +392,7 @@ namespace MultiplayerARPG
             buffs.Clear();
             skillUsages.Clear();
             // Send OnDead to owner player only
-            RequestOnDead();
+            CallOwnerOnDead();
         }
 
         public virtual void Respawn()
@@ -404,7 +404,7 @@ namespace MultiplayerARPG
             lastGroundedPosition = CacheTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
             // Send OnRespawn to owner player only
-            RequestOnRespawn();
+            CallOwnerOnRespawn();
         }
 
         public void RewardExp(Reward reward, float multiplier, RewardGivenType rewardGivenType)
@@ -415,7 +415,7 @@ namespace MultiplayerARPG
             if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType))
                 return;
             // Send OnLevelUp to owner player only
-            RequestOnLevelUp();
+            CallOwnerOnLevelUp();
         }
 
         public void RewardCurrencies(Reward reward, float multiplier, RewardGivenType rewardGivenType)

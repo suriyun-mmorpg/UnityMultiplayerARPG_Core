@@ -264,21 +264,21 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestOnDead()
+        public bool CallOwnerOnDead()
         {
-            CallNetFunction(NetFuncOnDead, ConnectionId);
+            RPC(TargetOnDead, ConnectionId);
             return true;
         }
 
-        public bool RequestOnRespawn()
+        public bool CallOwnerOnRespawn()
         {
-            CallNetFunction(NetFuncOnRespawn, ConnectionId);
+            RPC(TargetOnRespawn, ConnectionId);
             return true;
         }
 
-        public bool RequestOnLevelUp()
+        public bool CallOwnerOnLevelUp()
         {
-            CallNetFunction(NetFuncOnLevelUp, ConnectionId);
+            RPC(TargetOnLevelUp, ConnectionId);
             return true;
         }
 

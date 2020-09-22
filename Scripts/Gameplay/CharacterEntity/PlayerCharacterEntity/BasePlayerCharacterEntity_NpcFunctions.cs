@@ -23,18 +23,20 @@ namespace MultiplayerARPG
 
             CurrentNpcDialog = npcEntity.StartDialog;
             if (CurrentNpcDialog != null)
-                RequestShowNpcDialog(CurrentNpcDialog.DataId);
+                CallOwnerShowNpcDialog(CurrentNpcDialog.DataId);
 #endif
         }
 
-        protected void NetFuncShowNpcDialog(int dataId)
+        [TargetRpc]
+        protected void TargetShowNpcDialog(int dataId)
         {
             // Show npc dialog by dataId, if dataId = 0 it will hide
             if (onShowNpcDialog != null)
                 onShowNpcDialog.Invoke(dataId);
         }
 
-        protected void NetFuncShowNpcRefineItem()
+        [TargetRpc]
+        protected void TargetShowNpcRefineItem()
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
@@ -45,7 +47,8 @@ namespace MultiplayerARPG
                 onShowNpcRefineItem.Invoke();
         }
 
-        protected void NetFuncShowNpcDismantleItem()
+        [TargetRpc]
+        protected void TargetShowNpcDismantleItem()
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
@@ -56,7 +59,8 @@ namespace MultiplayerARPG
                 onShowNpcDismantleItem.Invoke();
         }
 
-        protected void NetFuncShowNpcRepairItem()
+        [TargetRpc]
+        protected void TargetShowNpcRepairItem()
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
@@ -78,12 +82,12 @@ namespace MultiplayerARPG
             if (CurrentNpcDialog != null)
             {
                 // Show Npc dialog on client
-                RequestShowNpcDialog(CurrentNpcDialog.DataId);
+                CallOwnerShowNpcDialog(CurrentNpcDialog.DataId);
             }
             else
             {
                 // Hide Npc dialog on client
-                RequestShowNpcDialog(0);
+                CallOwnerShowNpcDialog(0);
             }
 #endif
         }

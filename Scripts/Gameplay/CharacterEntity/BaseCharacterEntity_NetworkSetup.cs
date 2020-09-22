@@ -65,10 +65,6 @@ namespace MultiplayerARPG
             equipItems.onOperation += OnEquipItemsOperation;
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summons.onOperation += OnSummonsOperation;
-            // Register Network functions
-            RegisterNetFunction(NetFuncOnDead);
-            RegisterNetFunction(NetFuncOnRespawn);
-            RegisterNetFunction(NetFuncOnLevelUp);
         }
 
         protected override void EntityOnDestroy()

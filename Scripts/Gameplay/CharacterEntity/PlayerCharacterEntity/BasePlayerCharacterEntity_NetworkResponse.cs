@@ -230,20 +230,8 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected void NetFuncOpenBuildingStorage(PackedUInt objectId)
-        {
-            if (!CanDoActions())
-                return;
-
-            BuildingEntity buildingEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
-                return;
-
-            if (buildingEntity != null && buildingEntity is StorageEntity)
-                OpenStorage(StorageType.Building, buildingEntity as StorageEntity);
-        }
-
-        protected void NetFuncShowStorage(StorageType type, uint objectId, short weightLimit, short slotLimit)
+        [TargetRpc]
+        protected void TargetShowStorage(StorageType type, uint objectId, short weightLimit, short slotLimit)
         {
             if (onShowStorage != null)
                 onShowStorage.Invoke(type, objectId, weightLimit, slotLimit);
@@ -406,11 +394,12 @@ namespace MultiplayerARPG
             DealingCharacter = targetCharacterEntity;
             targetCharacterEntity.DealingCharacter = this;
             // Send receive dealing request to player
-            DealingCharacter.RequestReceiveDealingRequest(ObjectId);
+            DealingCharacter.CallOwnerReceiveDealingRequest(ObjectId);
 #endif
         }
 
-        protected void NetFuncReceiveDealingRequest(PackedUInt objectId)
+        [TargetRpc]
+        protected void TargetReceiveDealingRequest(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
@@ -438,11 +427,11 @@ namespace MultiplayerARPG
             // Set dealing state/data for co player character entity
             DealingCharacter.ClearDealingData();
             DealingCharacter.DealingState = DealingState.Dealing;
-            DealingCharacter.RequestAcceptedDealingRequest(ObjectId);
+            DealingCharacter.CallOwnerAcceptedDealingRequest(ObjectId);
             // Set dealing state/data for player character entity
             ClearDealingData();
             DealingState = DealingState.Dealing;
-            RequestAcceptedDealingRequest(DealingCharacter.ObjectId);
+            CallOwnerAcceptedDealingRequest(DealingCharacter.ObjectId);
 #endif
         }
 
@@ -457,9 +446,10 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected void NetFuncAcceptedDealingRequest(PackedUInt objectId)
+        [TargetRpc]
+        protected void TargetAcceptedDealingRequest(uint objectId)
         {
-            BasePlayerCharacterEntity playerCharacterEntity = null;
+            BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowDealingDialog != null)
@@ -572,37 +562,43 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected void NetFuncUpdateDealingState(DealingState dealingState)
+        [TargetRpc]
+        protected void TargetUpdateDealingState(DealingState dealingState)
         {
             if (onUpdateDealingState != null)
                 onUpdateDealingState.Invoke(dealingState);
         }
 
-        protected void NetFuncUpdateAnotherDealingState(DealingState dealingState)
+        [TargetRpc]
+        protected void TargetUpdateAnotherDealingState(DealingState dealingState)
         {
             if (onUpdateAnotherDealingState != null)
                 onUpdateAnotherDealingState.Invoke(dealingState);
         }
 
-        protected void NetFuncUpdateDealingGold(int gold)
+        [TargetRpc]
+        protected void TargetUpdateDealingGold(int gold)
         {
             if (onUpdateDealingGold != null)
                 onUpdateDealingGold.Invoke(gold);
         }
 
-        protected void NetFuncUpdateAnotherDealingGold(int gold)
+        [TargetRpc]
+        protected void TargetUpdateAnotherDealingGold(int gold)
         {
             if (onUpdateAnotherDealingGold != null)
                 onUpdateAnotherDealingGold.Invoke(gold);
         }
 
-        protected void NetFuncUpdateDealingItems(DealingCharacterItems items)
+        [TargetRpc]
+        protected void TargetUpdateDealingItems(DealingCharacterItems items)
         {
             if (onUpdateDealingItems != null)
                 onUpdateDealingItems.Invoke(items);
         }
 
-        protected void NetFuncUpdateAnotherDealingItems(DealingCharacterItems items)
+        [TargetRpc]
+        protected void TargetUpdateAnotherDealingItems(DealingCharacterItems items)
         {
             if (onUpdateAnotherDealingItems != null)
                 onUpdateAnotherDealingItems.Invoke(items);
@@ -644,11 +640,12 @@ namespace MultiplayerARPG
             DealingCharacter = targetCharacterEntity;
             targetCharacterEntity.DealingCharacter = this;
             // Send receive party invitation request to player
-            targetCharacterEntity.RequestReceivePartyInvitation(ObjectId);
+            targetCharacterEntity.CallOwnerReceivePartyInvitation(ObjectId);
 #endif
         }
 
-        protected void NetFuncReceivePartyInvitation(PackedUInt objectId)
+        [TargetRpc]
+        protected void TargetReceivePartyInvitation(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
@@ -745,11 +742,12 @@ namespace MultiplayerARPG
             DealingCharacter = targetCharacterEntity;
             targetCharacterEntity.DealingCharacter = this;
             // Send receive guild invitation request to player
-            targetCharacterEntity.RequestReceiveGuildInvitation(ObjectId);
+            targetCharacterEntity.CallOwnerReceiveGuildInvitation(ObjectId);
 #endif
         }
 
-        protected void NetFuncReceiveGuildInvitation(PackedUInt objectId)
+        [TargetRpc]
+        protected void TargetReceiveGuildInvitation(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
@@ -1234,7 +1232,7 @@ namespace MultiplayerARPG
                 CurrentGameManager.CloseStorage(this);
                 CurrentStorageId = storageId;
                 CurrentGameManager.OpenStorage(this);
-                CallNetFunction(NetFuncShowStorage, ConnectionId, type, targetEntity == null ? 0 : targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
+                CallOwnerShowStorage(type, targetEntity == null ? 0 : targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
             }
         }
     }
