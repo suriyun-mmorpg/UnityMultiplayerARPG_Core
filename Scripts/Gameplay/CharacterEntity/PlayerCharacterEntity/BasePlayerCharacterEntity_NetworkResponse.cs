@@ -142,7 +142,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerEnterWarp(PackedUInt objectId)
+        protected void ServerEnterWarp(uint objectId)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -384,7 +384,7 @@ namespace MultiplayerARPG
 
         #region Dealing
         [ServerRpc]
-        protected void ServerSendDealingRequest(PackedUInt objectId)
+        protected void ServerSendDealingRequest(uint objectId)
         {
 #if !CLIENT_BUILD
             BasePlayerCharacterEntity targetCharacterEntity;
@@ -635,7 +635,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerSendPartyInvitation(PackedUInt objectId)
+        protected void ServerSendPartyInvitation(uint objectId)
         {
 #if !CLIENT_BUILD
             BasePlayerCharacterEntity targetCharacterEntity;
@@ -648,16 +648,13 @@ namespace MultiplayerARPG
 #endif
         }
 
-        [ServerRpc]
         protected void NetFuncReceivePartyInvitation(PackedUInt objectId)
         {
-#if !CLIENT_BUILD
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowPartyInvitationDialog != null)
                 onShowPartyInvitationDialog.Invoke(playerCharacterEntity);
-#endif
         }
 
         [ServerRpc]
@@ -739,7 +736,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerSendGuildInvitation(PackedUInt objectId)
+        protected void ServerSendGuildInvitation(uint objectId)
         {
 #if !CLIENT_BUILD
             BasePlayerCharacterEntity targetCharacterEntity;
@@ -864,7 +861,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerOpenStorage(PackedUInt objectId, string password)
+        protected void ServerOpenStorage(uint objectId, string password)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -905,7 +902,7 @@ namespace MultiplayerARPG
 
         #region Building Entities
         [ServerRpc]
-        protected void ServerOpenDoor(PackedUInt objectId, string password)
+        protected void ServerOpenDoor(uint objectId, string password)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -935,7 +932,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerCloseDoor(PackedUInt objectId)
+        protected void ServerCloseDoor(uint objectId)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -959,7 +956,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerTurnOnCampFire(PackedUInt objectId)
+        protected void ServerTurnOnCampFire(uint objectId)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -983,7 +980,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerTurnOffCampFire(PackedUInt objectId)
+        protected void ServerTurnOffCampFire(uint objectId)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -1007,7 +1004,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerCraftItemByWorkbench(PackedUInt objectId, int dataId)
+        protected void ServerCraftItemByWorkbench(uint objectId, int dataId)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -1067,7 +1064,7 @@ namespace MultiplayerARPG
 
         #region Building Locking
         [ServerRpc]
-        protected void ServerSetBuildingPassword(PackedUInt objectId, string password)
+        protected void ServerSetBuildingPassword(uint objectId, string password)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -1104,7 +1101,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerLockBuilding(PackedUInt objectId)
+        protected void ServerLockBuilding(uint objectId)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -1140,7 +1137,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerUnlockBuilding(PackedUInt objectId)
+        protected void ServerUnlockBuilding(uint objectId)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
