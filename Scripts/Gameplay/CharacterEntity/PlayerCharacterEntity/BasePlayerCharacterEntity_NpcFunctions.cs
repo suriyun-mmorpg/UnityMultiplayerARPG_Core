@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             if (onShowNpcDialog != null)
                 onShowNpcDialog.Invoke(0);
 
-            // Show dismantle dialog
+            // Show repair dialog
             if (onShowNpcRepairItem != null)
                 onShowNpcRepairItem.Invoke();
         }
