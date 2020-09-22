@@ -183,20 +183,25 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             itemDropData.onChange += OnItemDropDataChange;
-            RegisterNetFunction(NetFuncOnItemDropDestroy);
             InitDropItems();
-        }
-
-        protected virtual void NetFuncOnItemDropDestroy()
-        {
-            if (onItemDropDestroy != null)
-                onItemDropDestroy.Invoke();
         }
 
         protected override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
             itemDropData.onChange -= OnItemDropDataChange;
+        }
+
+        [AllRpc]
+        protected virtual void AllOnItemDropDestroy()
+        {
+            if (onItemDropDestroy != null)
+                onItemDropDestroy.Invoke();
+        }
+
+        public void CallAllOnItemDropDestroy()
+        {
+            RPC(AllOnItemDropDestroy);
         }
 
         protected virtual void OnItemDropDataChange(bool isInitial, ItemDropData itemDropData)
@@ -236,7 +241,7 @@ namespace MultiplayerARPG
             isPickedUp = true;
 
             // Tell clients that the item drop destroy to play animation at client
-            CallNetFunction(NetFuncOnItemDropDestroy, FunctionReceivers.All);
+            CallAllOnItemDropDestroy();
 
             // Destroy and Respawn
             if (SpawnArea != null)

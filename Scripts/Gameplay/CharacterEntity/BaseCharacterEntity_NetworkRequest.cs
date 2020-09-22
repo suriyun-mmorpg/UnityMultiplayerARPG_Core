@@ -76,35 +76,35 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestPlayAttackAnimation(bool isLeftHand, byte animationIndex)
+        public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayAttack, FunctionReceivers.All, isLeftHand, animationIndex);
+            RPC(AllPlayAttackAnimation, isLeftHand, animationIndex);
             return true;
         }
 
-        public bool RequestPlaySkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
+        public bool CallAllPlaySkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayUseSkill, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel);
+            RPC(AllPlayUseSkillAnimation, isLeftHand, animationIndex, skillDataId, skillLevel);
             return true;
         }
 
-        public bool RequestPlaySkillAnimationWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
+        public bool CallAllPlaySkillAnimationWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayUseSkillWithAimPosition, FunctionReceivers.All, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+            RPC(AllPlayUseSkillAnimationWithAimPosition, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
             return true;
         }
 
-        public bool RequestPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
+        public bool CallAllPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncPlayReload, FunctionReceivers.All, isLeftHand, reloadingAmmoAmount);
+            RPC(AllPlayReloadAnimation, isLeftHand, reloadingAmmoAmount);
             return true;
         }
 
@@ -116,11 +116,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestSkillCastingInterrupted()
+        public bool CallAllOnSkillCastingInterrupt()
         {
             if (this.IsDead())
                 return false;
-            CallNetFunction(NetFuncSkillCastingInterrupted, FunctionReceivers.All);
+            RPC(AllOnSkillCastingInterrupt);
             return true;
         }
 
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return false;
             RPC(ServerPickupItem, objectId);
-            TriggerPickup();
+            CallAllPlayPickupAnimation();
             return true;
         }
 

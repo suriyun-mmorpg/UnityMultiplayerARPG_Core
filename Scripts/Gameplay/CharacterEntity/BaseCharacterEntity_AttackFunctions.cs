@@ -168,7 +168,7 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            RequestPlayReloadAnimation(isLeftHand, reloadingAmmoAmount);
+            CallAllPlayReloadAnimation(isLeftHand, reloadingAmmoAmount);
 #endif
         }
 
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            RequestPlayAttackAnimation(isLeftHand, (byte)animationIndex);
+            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex);
 #endif
         }
 

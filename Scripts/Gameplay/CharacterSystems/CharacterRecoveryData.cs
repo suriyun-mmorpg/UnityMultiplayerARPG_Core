@@ -27,7 +27,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)recoveryingHp;
                     characterEntity.CurrentHp += tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.HpRecovery, tempAmount);
                     recoveryingHp -= tempAmount;
                 }
             }
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)recoveryingMp;
                     characterEntity.CurrentMp += tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.MpRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.MpRecovery, tempAmount);
                     recoveryingMp -= tempAmount;
                 }
             }
@@ -69,7 +69,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)decreasingMp;
                     characterEntity.CurrentMp -= tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.MpRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.MpRecovery, tempAmount);
                     decreasingMp -= tempAmount;
                 }
             }
@@ -83,7 +83,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)recoveryingStamina;
                     characterEntity.CurrentStamina += tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
                     recoveryingStamina -= tempAmount;
                 }
             }
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)decreasingStamina;
                     characterEntity.CurrentStamina -= tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
                     decreasingStamina -= tempAmount;
                 }
             }
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)recoveryingFood;
                     characterEntity.CurrentFood += tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
                     recoveryingFood -= tempAmount;
                 }
             }
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)decreasingFood;
                     characterEntity.CurrentFood -= tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
                     decreasingFood -= tempAmount;
                 }
             }
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)recoveryingWater;
                     characterEntity.CurrentWater += tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
                     recoveryingWater -= tempAmount;
                 }
             }
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
                 {
                     tempAmount = (int)decreasingWater;
                     characterEntity.CurrentWater -= tempAmount;
-                    characterEntity.RequestCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
                     decreasingWater -= tempAmount;
                 }
             }

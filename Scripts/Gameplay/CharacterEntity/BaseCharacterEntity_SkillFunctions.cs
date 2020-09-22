@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
             {
                 IsCastingSkillInterrupted = true;
-                RequestSkillCastingInterrupted();
+                CallAllOnSkillCastingInterrupt();
             }
         }
 
@@ -136,9 +136,9 @@ namespace MultiplayerARPG
 
             // Play animations
             if (!aimPosition.HasValue)
-                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel);
+                CallAllPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel);
             else
-                RequestPlaySkillAnimationWithAimPosition(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition.Value);
+                CallAllPlaySkillAnimationWithAimPosition(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition.Value);
         }
 
         /// <summary>
@@ -155,7 +155,8 @@ namespace MultiplayerARPG
         /// <summary>
         /// This will be called at clients to stop playing skill casting
         /// </summary>
-        protected virtual void NetFuncSkillCastingInterrupted()
+        [AllRpc]
+        protected virtual void AllOnSkillCastingInterrupt()
         {
             IsCastingSkillInterrupted = true;
             IsAttackingOrUsingSkill = false;

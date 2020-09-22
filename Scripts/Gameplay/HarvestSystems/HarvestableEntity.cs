@@ -67,14 +67,14 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            RegisterNetFunction(NetFuncOnHarvestableDestroy);
             // Initial default data
             InitStats();
             if (SpawnArea == null)
                 SpawnPosition = CacheTransform.position;
         }
 
-        protected virtual void NetFuncOnHarvestableDestroy()
+        [AllRpc]
+        protected virtual void AllOnHarvestableDestroy()
         {
             if (onHarvestableDestroy != null)
                 onHarvestableDestroy.Invoke();
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
 
         public void RequestOnHarvestableDestroy()
         {
-            CallNetFunction(NetFuncOnHarvestableDestroy, FunctionReceivers.All);
+            RPC(AllOnHarvestableDestroy);
         }
 
         public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)

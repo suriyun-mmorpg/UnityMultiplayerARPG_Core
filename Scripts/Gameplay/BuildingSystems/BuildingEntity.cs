@@ -211,37 +211,37 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            RegisterNetFunction(NetFuncOnBuildingDestroy);
-            RegisterNetFunction(NetFuncOnBuildingConstruct);
             parentId.onChange += OnParentIdChange;
-        }
-
-        private void NetFuncOnBuildingDestroy()
-        {
-            if (onBuildingDestroy != null)
-                onBuildingDestroy.Invoke();
-        }
-
-        public void RequestOnBuildingDestroy()
-        {
-            CallNetFunction(NetFuncOnBuildingDestroy, FunctionReceivers.All);
-        }
-
-        private void NetFuncOnBuildingConstruct()
-        {
-            if (onBuildingConstruct != null)
-                onBuildingConstruct.Invoke();
-        }
-
-        public void RequestOnBuildingConstruct()
-        {
-            CallNetFunction(NetFuncOnBuildingConstruct, FunctionReceivers.All);
         }
 
         protected override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
             parentId.onChange -= OnParentIdChange;
+        }
+
+        [AllRpc]
+        private void AllOnBuildingDestroy()
+        {
+            if (onBuildingDestroy != null)
+                onBuildingDestroy.Invoke();
+        }
+
+        [AllRpc]
+        private void AllOnBuildingConstruct()
+        {
+            if (onBuildingConstruct != null)
+                onBuildingConstruct.Invoke();
+        }
+
+        public void CallAllOnBuildingDestroy()
+        {
+            RPC(AllOnBuildingDestroy);
+        }
+
+        public void CallAllOnBuildingConstruct()
+        {
+            RPC(AllOnBuildingConstruct);
         }
 
         private void OnParentIdChange(bool isInitial, string parentId)
@@ -300,7 +300,7 @@ namespace MultiplayerARPG
                 return;
             isDestroyed = true;
             // Tell clients that the building destroy to play animation at client
-            RequestOnBuildingDestroy();
+            CallAllOnBuildingDestroy();
             if (droppingItems != null && droppingItems.Count > 0)
             {
                 foreach (ItemAmount droppingItem in droppingItems)

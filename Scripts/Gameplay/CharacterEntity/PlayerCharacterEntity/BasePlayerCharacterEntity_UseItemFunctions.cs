@@ -118,9 +118,9 @@ namespace MultiplayerARPG
 
             // Play animations
             if (!aimPosition.HasValue)
-                RequestPlaySkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel);
+                CallAllPlaySkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel);
             else
-                RequestPlaySkillAnimationWithAimPosition(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, aimPosition.Value);
+                CallAllPlaySkillAnimationWithAimPosition(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, aimPosition.Value);
         }
     }
 }

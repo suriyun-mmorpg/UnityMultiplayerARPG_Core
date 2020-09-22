@@ -408,7 +408,7 @@ namespace MultiplayerARPG
             if (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
             {
                 airborneElapsed = airborneDelay;
-                CacheEntity.TriggerJump();
+                CacheEntity.CallAllPlayJumpAnimation();
                 applyingJumpForce = true;
                 applyJumpForceCountDown = 0f;
                 switch (applyJumpForceMode)

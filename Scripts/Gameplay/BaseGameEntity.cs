@@ -528,12 +528,7 @@ namespace MultiplayerARPG
 
             SetupNetElements();
 
-            // Remove sync field events
             passengingVehicle.onChange += OnPassengingVehicleChange;
-            // Register network functions
-            RegisterNetFunction(NetFuncExitVehicleResponse);
-            RegisterNetFunction(NetFuncTriggerJump);
-            RegisterNetFunction(NetFuncTriggerPickup);
 
             if (teleportingPosition.HasValue)
             {
@@ -615,20 +610,23 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected void NetFuncExitVehicleResponse()
+        [AllRpc]
+        protected void AllOnExitVehicle()
         {
             // Call this function at client
             foundPassengingVehicleEntity = true;
             passengingVehicleEntity = null;
         }
 
-        protected void NetFuncTriggerJump()
+        [AllRpc]
+        protected void AllPlayJumpAnimation()
         {
             if (Model && Model is IJumppableModel)
                 (Model as IJumppableModel).PlayJumpAnimation();
         }
 
-        protected void NetFuncTriggerPickup()
+        [AllRpc]
+        protected void AllPlayPickupAnimation()
         {
             if (Model && Model is IPickupableModel)
                 (Model as IPickupableModel).PlayPickupAnimation();
@@ -682,7 +680,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Net Function Requests
+        #region RPC Calls
         public void CallServerEnterVehicle(uint objectId)
         {
             RPC(ServerEnterVehicle, objectId);
@@ -797,14 +795,14 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void TriggerJump()
+        public void CallAllPlayJumpAnimation()
         {
-            CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
+            RPC(AllPlayJumpAnimation);
         }
 
-        public void TriggerPickup()
+        public void CallAllPlayPickupAnimation()
         {
-            CallNetFunction(NetFuncTriggerPickup, FunctionReceivers.All);
+            RPC(AllPlayPickupAnimation);
         }
 
         public void SetMovement(MovementState movementState)
@@ -943,7 +941,7 @@ namespace MultiplayerARPG
             PassengingVehicle = default(PassengingVehicle);
 
             // Clear vehicle entity at clients
-            CallNetFunction(NetFuncExitVehicleResponse, FunctionReceivers.All);
+            RPC(AllOnExitVehicle);
 
             // Teleport to exit transform
             Teleport(exitPosition);

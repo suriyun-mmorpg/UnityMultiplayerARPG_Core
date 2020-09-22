@@ -49,23 +49,17 @@ namespace MultiplayerARPG
                 opponentAimTransform = CombatTextTransform;
         }
 
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            RegisterNetFunction<byte, int>(NetFuncCombatAmount);
-        }
-
         /// <summary>
         /// This will be called on clients to display combat texts
         /// </summary>
         /// <param name="combatAmountType"></param>
         /// <param name="amount"></param>
-        protected void NetFuncCombatAmount(byte byteCombatAmountType, int amount)
+        [AllRpc]
+        protected void AllAppendCombatAmount(CombatAmountType combatAmountType, int amount)
         {
             if (!IsClient)
                 return;
 
-            CombatAmountType combatAmountType = (CombatAmountType)byteCombatAmountType;
             BaseUISceneGameplay.Singleton.PrepareCombatText(this, combatAmountType, amount);
             switch (combatAmountType)
             {
@@ -90,9 +84,9 @@ namespace MultiplayerARPG
             pendingHitEffects = null;
         }
 
-        public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
+        public void CallAllAppendCombatAmount(CombatAmountType combatAmountType, int amount)
         {
-            CallNetFunction(NetFuncCombatAmount, FunctionReceivers.All, (byte)combatAmountType, amount);
+            RPC(AllAppendCombatAmount, combatAmountType, amount);
         }
 
         public virtual void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
@@ -105,7 +99,7 @@ namespace MultiplayerARPG
 
         public virtual void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            RequestCombatAmount(combatAmountType, damage);
+            CallAllAppendCombatAmount(combatAmountType, damage);
             if (onReceivedDamage != null)
                 onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
         }

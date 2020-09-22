@@ -524,7 +524,7 @@ namespace MultiplayerARPG
 
                 if (isJumping)
                 {
-                    CacheEntity.TriggerJump();
+                    CacheEntity.CallAllPlayJumpAnimation();
                     applyingJumpForce = true;
                     applyJumpForceCountDown = 0f;
                     switch (applyJumpForceMode)

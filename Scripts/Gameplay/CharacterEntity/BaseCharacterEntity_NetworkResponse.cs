@@ -7,17 +7,20 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected void NetFuncPlayAttack(bool isLeftHand, byte animationIndex)
+        [AllRpc]
+        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
             AttackRoutine(isLeftHand, animationIndex).Forget();
         }
 
-        protected void NetFuncPlayUseSkill(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
+        [AllRpc]
+        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
         {
             PlayUseSkillFunction(isLeftHand, animationIndex, skillDataId, skillLevel, null);
         }
 
-        protected void NetFuncPlayUseSkillWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
+        [AllRpc]
+        protected void AllPlayUseSkillAnimationWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
         {
             PlayUseSkillFunction(isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
         }
@@ -35,7 +38,8 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncPlayReload(bool isLeftHand, short reloadingAmmoAmount)
+        [AllRpc]
+        protected void AllPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
         {
             ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
         }
