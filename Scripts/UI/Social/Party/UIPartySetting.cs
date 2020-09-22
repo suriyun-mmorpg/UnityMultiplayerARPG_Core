@@ -18,7 +18,7 @@ namespace MultiplayerARPG
 
         public void OnClickSetting()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestPartySetting(
+            BasePlayerCharacterController.OwningCharacter.CallServerPartySetting(
                 toggleShareExp != null && toggleShareExp.isOn,
                 toggleShareItem != null && toggleShareItem.isOn);
             Hide();

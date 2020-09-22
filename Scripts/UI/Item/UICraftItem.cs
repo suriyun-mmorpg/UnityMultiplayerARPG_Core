@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             if (OwningCharacter != null && CraftingItem != null)
             {
                 if (CrafterType == CrafterType.Workbench && TargetEntity)
-                    OwningCharacter.RequestCraftItemByWorkbench(TargetEntity.ObjectId, CraftingItem.DataId);
+                    OwningCharacter.CallServerCraftItemByWorkbench(TargetEntity.ObjectId, CraftingItem.DataId);
             }
         }
     }

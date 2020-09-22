@@ -279,14 +279,14 @@ namespace MultiplayerARPG
         {
             if (BaseGameNetworkManager.ClientGuild == null)
                 return;
-            BasePlayerCharacterController.OwningCharacter.RequestAddGuildSkill(GuildSkill.DataId);
+            BasePlayerCharacterController.OwningCharacter.CallServerAddGuildSkill(GuildSkill.DataId);
         }
 
         public void OnClickUse()
         {
             if (BaseGameNetworkManager.ClientGuild == null)
                 return;
-            BasePlayerCharacterController.OwningCharacter.RequestUseGuildSkill(GuildSkill.DataId);
+            BasePlayerCharacterController.OwningCharacter.CallServerUseGuildSkill(GuildSkill.DataId);
         }
     }
 }

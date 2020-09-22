@@ -6,7 +6,7 @@
         {
             base.OnEnable();
             BaseGameNetworkManager.Singleton.onClientUpdateFriends += UpdateFriendsUIs;
-            BasePlayerCharacterController.OwningCharacter.RequestGetFriends();
+            BasePlayerCharacterController.OwningCharacter.CallServerGetFriends();
         }
 
         protected override void OnDisable()
@@ -82,7 +82,7 @@
             SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.RequestRemoveFriend(friend.id);
+                BasePlayerCharacterController.OwningCharacter.CallServerRemoveFriend(friend.id);
             });
         }
     }

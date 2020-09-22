@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         {
             // Close storage
             if (StorageType != StorageType.None)
-                BasePlayerCharacterController.OwningCharacter.RequestCloseStorage();
+                BasePlayerCharacterController.OwningCharacter.CallServerCloseStorage();
             // Clear data
             StorageType = StorageType.None;
             TargetEntity = null;

@@ -26,14 +26,14 @@ namespace MultiplayerARPG
         public void OnClickAccept()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestAcceptGuildInvitation();
+            owningCharacter.CallServerAcceptGuildInvitation();
             Hide();
         }
 
         public void OnClickDecline()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestDeclineGuildInvitation();
+            owningCharacter.CallServerDeclineGuildInvitation();
             Hide();
         }
     }

@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUseItem(short index)
+        public bool CallServerUseItem(short index)
         {
             if (!ValidateRequestUseItem(index))
                 return false;
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUseSkillItem(short index, bool isLeftHand)
+        public bool CallServerUseSkillItem(short index, bool isLeftHand)
         {
             if (!ValidateRequestUseSkillItem(index, isLeftHand))
                 return false;
@@ -79,7 +79,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
+        public bool CallServerUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
         {
             if (!ValidateRequestUseSkillItem(index, isLeftHand))
                 return false;
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestSwapOrMergeItem(short fromIndex, short toIndex)
+        public bool CallServerSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (this.IsDead())
                 return false;
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAddAttribute(int dataId)
+        public bool CallServerAddAttribute(int dataId)
         {
             if (this.IsDead())
                 return false;
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAddSkill(int dataId)
+        public bool CallServerAddSkill(int dataId)
         {
             if (this.IsDead())
                 return false;
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAddGuildSkill(int dataId)
+        public bool CallServerAddGuildSkill(int dataId)
         {
             if (this.IsDead())
                 return false;
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUseGuildSkill(int dataId)
+        public bool CallServerUseGuildSkill(int dataId)
         {
             if (this.IsDead())
                 return false;
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestRespawn()
+        public bool CallServerRespawn()
         {
             if (!this.IsDead())
                 return false;
@@ -135,7 +135,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAssignHotkey(string hotkeyId, HotkeyType type, string id)
+        public bool CallServerAssignHotkey(string hotkeyId, HotkeyType type, string id)
         {
             RPC(ServerAssignHotkey, hotkeyId, type, id);
             return true;
@@ -150,20 +150,20 @@ namespace MultiplayerARPG
             {
                 relateId = characterItem.id;
             }
-            return RequestAssignHotkey(hotkeyId, HotkeyType.Item, relateId);
+            return CallServerAssignHotkey(hotkeyId, HotkeyType.Item, relateId);
         }
 
         public bool RequestAssignSkillHotkey(string hotkeyId, BaseSkill skill)
         {
-            return RequestAssignHotkey(hotkeyId, HotkeyType.Skill, skill.Id);
+            return CallServerAssignHotkey(hotkeyId, HotkeyType.Skill, skill.Id);
         }
 
         public bool RequestUnAssignHotkey(string hotkeyId)
         {
-            return RequestAssignHotkey(hotkeyId, HotkeyType.None, string.Empty);
+            return CallServerAssignHotkey(hotkeyId, HotkeyType.None, string.Empty);
         }
 
-        public bool RequestNpcActivate(uint objectId)
+        public bool CallServerNpcActivate(uint objectId)
         {
             if (this.IsDead())
                 return false;
@@ -203,7 +203,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestSelectNpcDialogMenu(byte menuIndex)
+        public bool CallServerSelectNpcDialogMenu(byte menuIndex)
         {
             if (this.IsDead())
                 return false;
@@ -211,7 +211,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestBuyNpcItem(short itemIndex, short amount)
+        public bool CallServerBuyNpcItem(short itemIndex, short amount)
         {
             if (this.IsDead())
                 return false;
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestEnterWarp(uint objectId)
+        public bool CallServerEnterWarp(uint objectId)
         {
             if (!CanDoActions())
                 return false;
@@ -227,7 +227,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestBuild(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
+        public bool CallServerConstructBuilding(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
             if (!CanDoActions())
                 return false;
@@ -235,7 +235,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestDestroyBuilding(uint objectId)
+        public bool CallServerDestroyBuilding(uint objectId)
         {
             if (!CanDoActions())
                 return false;
@@ -243,7 +243,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestSellItem(short nonEquipIndex, short amount)
+        public bool CallServerSellItem(short nonEquipIndex, short amount)
         {
             if (this.IsDead() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
@@ -251,7 +251,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestDismantleItem(short nonEquipIndex)
+        public bool CallServerDismantleItem(short nonEquipIndex)
         {
             if (this.IsDead() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
@@ -259,7 +259,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestRefineItem(InventoryType inventoryType, short index)
+        public bool CallServerRefineItem(InventoryType inventoryType, short index)
         {
             if (this.IsDead())
                 return false;
@@ -267,7 +267,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
+        public bool CallServerEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
         {
             if (this.IsDead())
                 return false;
@@ -275,7 +275,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestRepairItem(InventoryType inventoryType, short index)
+        public bool CallServerRepairItem(InventoryType inventoryType, short index)
         {
             if (this.IsDead())
                 return false;
@@ -283,7 +283,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestSendDealingRequest(uint objectId)
+        public bool CallServerSendDealingRequest(uint objectId)
         {
             RPC(ServerSendDealingRequest, objectId);
             return true;
@@ -295,13 +295,13 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAcceptDealingRequest()
+        public bool CallServerAcceptDealingRequest()
         {
             RPC(ServerAcceptDealingRequest);
             return true;
         }
 
-        public bool RequestDeclineDealingRequest()
+        public bool CallServerDeclineDealingRequest()
         {
             RPC(ServerDeclineDealingRequest);
             return true;
@@ -313,31 +313,31 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestSetDealingItem(short itemIndex, short amount)
+        public bool CallServerSetDealingItem(short itemIndex, short amount)
         {
             RPC(ServerSetDealingItem, itemIndex, amount);
             return true;
         }
 
-        public bool RequestSetDealingGold(int dealingGold)
+        public bool CallServerSetDealingGold(int dealingGold)
         {
             RPC(ServerSetDealingGold, dealingGold);
             return true;
         }
 
-        public bool RequestLockDealing()
+        public bool CallServerLockDealing()
         {
             RPC(ServerLockDealing);
             return true;
         }
 
-        public bool RequestConfirmDealing()
+        public bool CallServerConfirmDealing()
         {
             RPC(ServerConfirmDealing);
             return true;
         }
 
-        public bool RequestCancelDealing()
+        public bool CallServerCancelDealing()
         {
             RPC(ServerCancelDealing);
             return true;
@@ -379,25 +379,25 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestCreateParty(bool shareExp, bool shareItem)
+        public bool CallServerCreateParty(bool shareExp, bool shareItem)
         {
             RPC(ServerCreateParty, shareExp, shareItem);
             return true;
         }
 
-        public bool RequestChangePartyLeader(string characterId)
+        public bool CallServerChangePartyLeader(string characterId)
         {
             RPC(ServerChangePartyLeader, characterId);
             return true;
         }
 
-        public bool RequestPartySetting(bool shareExp, bool shareItem)
+        public bool CallServerPartySetting(bool shareExp, bool shareItem)
         {
             RPC(ServerPartySetting, shareExp, shareItem);
             return true;
         }
 
-        public bool RequestSendPartyInvitation(uint objectId)
+        public bool CallServerSendPartyInvitation(uint objectId)
         {
             RPC(ServerSendPartyInvitation, objectId);
             return true;
@@ -409,61 +409,61 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAcceptPartyInvitation()
+        public bool CallServerAcceptPartyInvitation()
         {
             RPC(ServerAcceptPartyInvitation);
             return true;
         }
 
-        public bool RequestDeclinePartyInvitation()
+        public bool CallServerDeclinePartyInvitation()
         {
             RPC(ServerDeclinePartyInvitation);
             return true;
         }
 
-        public bool RequestKickFromParty(string characterId)
+        public bool CallServerKickFromParty(string characterId)
         {
             RPC(ServerKickFromParty, characterId);
             return true;
         }
 
-        public bool RequestLeaveParty()
+        public bool CallServerLeaveParty()
         {
             RPC(ServerLeaveParty);
             return true;
         }
 
-        public bool RequestCreateGuild(string guildName)
+        public bool CallServerCreateGuild(string guildName)
         {
             RPC(ServerCreateGuild, guildName);
             return true;
         }
 
-        public bool RequestChangeGuildLeader(string characterId)
+        public bool CallServerChangeGuildLeader(string characterId)
         {
             RPC(ServerChangeGuildLeader, characterId);
             return true;
         }
 
-        public bool RequestSetGuildMessage(string guildMessage)
+        public bool CallServerSetGuildMessage(string guildMessage)
         {
             RPC(ServerSetGuildMessage, guildMessage);
             return true;
         }
 
-        public bool RequestSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        public bool CallServerSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             RPC(ServerSetGuildRole, guildRole, name, canInvite, canKick, shareExpPercentage);
             return true;
         }
 
-        public bool RequestSetGuildMemberRole(string characterId, byte guildRole)
+        public bool CallServerSetGuildMemberRole(string characterId, byte guildRole)
         {
             RPC(ServerSetGuildMemberRole, characterId, guildRole);
             return true;
         }
 
-        public bool RequestSendGuildInvitation(uint objectId)
+        public bool CallServerSendGuildInvitation(uint objectId)
         {
             RPC(ServerSendGuildInvitation, objectId);
             return true;
@@ -475,151 +475,151 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAcceptGuildInvitation()
+        public bool CallServerAcceptGuildInvitation()
         {
             RPC(ServerAcceptGuildInvitation);
             return true;
         }
 
-        public bool RequestDeclineGuildInvitation()
+        public bool CallServerDeclineGuildInvitation()
         {
             RPC(ServerDeclineGuildInvitation);
             return true;
         }
 
-        public bool RequestKickFromGuild(string characterId)
+        public bool CallServerKickFromGuild(string characterId)
         {
             RPC(ServerKickFromGuild, characterId);
             return true;
         }
 
-        public bool RequestLeaveGuild()
+        public bool CallServerLeaveGuild()
         {
             RPC(ServerLeaveGuild);
             return true;
         }
 
-        public bool RequestMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
+        public bool CallServerMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
         {
             RPC(ServerMoveItemToStorage, nonEquipIndex, amount, storageItemIndex);
             return true;
         }
 
-        public bool RequestMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
+        public bool CallServerMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
         {
             RPC(ServerMoveItemFromStorage, storageItemIndex, amount, nonEquipIndex);
             return true;
         }
 
-        public bool RequestSwapOrMergeStorageItem(short fromIndex, short toIndex)
+        public bool CallServerSwapOrMergeStorageItem(short fromIndex, short toIndex)
         {
             RPC(ServerSwapOrMergeStorageItem, fromIndex, toIndex);
             return true;
         }
 
-        public bool RequestDepositGold(int amount)
+        public bool CallServerDepositGold(int amount)
         {
             RPC(ServerDepositGold, amount);
             return true;
         }
 
-        public bool RequestWithdrawGold(int amount)
+        public bool CallServerWithdrawGold(int amount)
         {
             RPC(ServerWithdrawGold, amount);
             return true;
         }
 
-        public bool RequestDepositGuildGold(int amount)
+        public bool CallServerDepositGuildGold(int amount)
         {
             RPC(ServerDepositGuildGold, amount);
             return true;
         }
 
-        public bool RequestWithdrawGuildGold(int amount)
+        public bool CallServerWithdrawGuildGold(int amount)
         {
             RPC(ServerWithdrawGuildGold, amount);
             return true;
         }
 
-        public bool RequestOpenStorage(uint objectId, string password)
+        public bool CallServerOpenStorage(uint objectId, string password)
         {
             RPC(ServerOpenStorage, objectId, password);
             return true;
         }
 
-        public bool RequestCloseStorage()
+        public bool CallServerCloseStorage()
         {
             RPC(ServerCloseStorage);
             return true;
         }
 
-        public bool RequestOpenDoor(uint objectId, string password)
+        public bool CallServerOpenDoor(uint objectId, string password)
         {
             RPC(ServerOpenDoor, objectId, password);
             return true;
         }
 
-        public bool RequestCloseDoor(uint objectId)
+        public bool CallServerCloseDoor(uint objectId)
         {
             RPC(ServerCloseDoor, objectId);
             return true;
         }
 
-        public bool RequestTurnOnCampFire(uint objectId)
+        public bool CallServerTurnOnCampFire(uint objectId)
         {
             RPC(ServerTurnOnCampFire, objectId);
             return true;
         }
 
-        public bool RequestTurnOffCampFire(uint objectId)
+        public bool CallServerTurnOffCampFire(uint objectId)
         {
             RPC(ServerTurnOffCampFire, objectId);
             return true;
         }
 
-        public bool RequestCraftItemByWorkbench(uint objectId, int dataId)
+        public bool CallServerCraftItemByWorkbench(uint objectId, int dataId)
         {
             RPC(ServerCraftItemByWorkbench, objectId, dataId);
             return true;
         }
 
-        public bool RequestFindCharacters(string characterName)
+        public bool CallServerFindCharacters(string characterName)
         {
             RPC(ServerFindCharacters, characterName);
             return true;
         }
 
-        public bool RequestAddFriend(string friendCharacterId)
+        public bool CallServerAddFriend(string friendCharacterId)
         {
             RPC(ServerAddFriend, friendCharacterId);
             return true;
         }
 
-        public bool RequestRemoveFriend(string friendCharacterId)
+        public bool CallServerRemoveFriend(string friendCharacterId)
         {
             RPC(ServerRemoveFriend, friendCharacterId);
             return true;
         }
 
-        public bool RequestGetFriends()
+        public bool CallServerGetFriends()
         {
             RPC(ServerGetFriends);
             return true;
         }
 
-        public bool RequestSetBuildingPassword(uint objectId, string password)
+        public bool CallServerSetBuildingPassword(uint objectId, string password)
         {
             RPC(ServerSetBuildingPassword, objectId, password);
             return true;
         }
 
-        public bool RequestLockBuilding(uint objectId)
+        public bool CallServerLockBuilding(uint objectId)
         {
             RPC(ServerLockBuilding, objectId);
             return true;
         }
 
-        public bool RequestUnlockBuilding(uint objectId)
+        public bool CallServerUnlockBuilding(uint objectId)
         {
             RPC(ServerUnlockBuilding, objectId);
             return true;

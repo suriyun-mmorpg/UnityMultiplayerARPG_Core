@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString()));
                 return;
             }
-            BasePlayerCharacterController.OwningCharacter.RequestSetGuildRole(
+            BasePlayerCharacterController.OwningCharacter.CallServerSetGuildRole(
                 guildRole,
                 inputFieldRoleName.text,
                 toggleCanInvite != null && toggleCanInvite.isOn,

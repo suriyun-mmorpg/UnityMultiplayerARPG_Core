@@ -54,7 +54,7 @@ namespace MultiplayerARPG
             if (item.MaxStack == 1)
             {
                 if (owningCharacter != null)
-                    owningCharacter.RequestBuyNpcItem((short)indexOfData, 1);
+                    owningCharacter.CallServerBuyNpcItem((short)indexOfData, 1);
             }
             else
             {
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestBuyNpcItem((short)indexOfData, (short)amount);
+                owningCharacter.CallServerBuyNpcItem((short)indexOfData, (short)amount);
         }
     }
 }

@@ -176,7 +176,7 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            OwningCharacter.RequestRefineItem(InventoryType, (short)IndexOfData);
+            OwningCharacter.CallServerRefineItem(InventoryType, (short)IndexOfData);
         }
     }
 }

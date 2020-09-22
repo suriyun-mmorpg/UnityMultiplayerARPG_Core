@@ -131,7 +131,7 @@ namespace MultiplayerARPG
                 uint parentObjectId = 0;
                 if (ConstructingBuildingEntity.BuildingArea)
                     parentObjectId = ConstructingBuildingEntity.BuildingArea.GetObjectId();
-                PlayerCharacterEntity.RequestBuild((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
+                PlayerCharacterEntity.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
             }
             DestroyConstructingBuilding();
         }
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.RequestDestroyBuilding(TargetBuildingEntity.ObjectId);
+            PlayerCharacterEntity.CallServerDestroyBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                 (password) =>
                 {
-                    PlayerCharacterEntity.RequestSetBuildingPassword(objectId, password);
+                    PlayerCharacterEntity.CallServerSetBuildingPassword(objectId, password);
                 }, string.Empty, InputField.ContentType.Pin, 6);
             DeselectBuilding();
         }
@@ -189,7 +189,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.RequestLockBuilding(TargetBuildingEntity.ObjectId);
+            PlayerCharacterEntity.CallServerLockBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.RequestUnlockBuilding(TargetBuildingEntity.ObjectId);
+            PlayerCharacterEntity.CallServerUnlockBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -243,7 +243,7 @@ namespace MultiplayerARPG
                 {
                     if (!buildingEntity.Lockable || !buildingEntity.IsLocked)
                     {
-                        OwningCharacter.RequestOpenDoor(objectId, string.Empty);
+                        OwningCharacter.CallServerOpenDoor(objectId, string.Empty);
                     }
                     else
                     {
@@ -252,13 +252,13 @@ namespace MultiplayerARPG
                             LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                             (password) =>
                             {
-                                OwningCharacter.RequestOpenDoor(objectId, password);
+                                OwningCharacter.CallServerOpenDoor(objectId, password);
                             }, string.Empty, InputField.ContentType.Pin, 6);
                     }
                 }
                 else
                 {
-                    OwningCharacter.RequestCloseDoor(objectId);
+                    OwningCharacter.CallServerCloseDoor(objectId);
                 }
             }
 
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
             {
                 if (!buildingEntity.Lockable || !buildingEntity.IsLocked)
                 {
-                    OwningCharacter.RequestOpenStorage(objectId, string.Empty);
+                    OwningCharacter.CallServerOpenStorage(objectId, string.Empty);
                 }
                 else
                 {
@@ -275,7 +275,7 @@ namespace MultiplayerARPG
                             LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                         (password) =>
                         {
-                            OwningCharacter.RequestOpenStorage(objectId, password);
+                            OwningCharacter.CallServerOpenStorage(objectId, password);
                         }, string.Empty, InputField.ContentType.Pin, 6);
                 }
             }

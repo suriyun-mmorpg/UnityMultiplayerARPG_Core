@@ -64,7 +64,7 @@ namespace MultiplayerARPG
                 if (draggedItemUI.sourceLocation == UICharacterItemDragHandler.SourceLocation.Hotkey)
                 {
                     // Swap key
-                    BasePlayerCharacterController.OwningCharacter.RequestAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
+                    BasePlayerCharacterController.OwningCharacter.CallServerAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
                 }
             }
             // If dragged skill UI
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
                 if (draggedSkillUI.sourceLocation == UICharacterSkillDragHandler.SourceLocation.Hotkey)
                 {
                     // Swap key
-                    BasePlayerCharacterController.OwningCharacter.RequestAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
+                    BasePlayerCharacterController.OwningCharacter.CallServerAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
                 }
             }
         }

@@ -376,7 +376,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            OwningCharacter.RequestAddSkill(Skill.DataId);
+            OwningCharacter.CallServerAddSkill(Skill.DataId);
         }
     }
 }

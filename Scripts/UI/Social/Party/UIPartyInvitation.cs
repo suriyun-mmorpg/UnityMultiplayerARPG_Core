@@ -16,14 +16,14 @@
         public void OnClickAccept()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestAcceptPartyInvitation();
+            owningCharacter.CallServerAcceptPartyInvitation();
             Hide();
         }
 
         public void OnClickDecline()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestDeclinePartyInvitation();
+            owningCharacter.CallServerDeclinePartyInvitation();
             Hide();
         }
     }

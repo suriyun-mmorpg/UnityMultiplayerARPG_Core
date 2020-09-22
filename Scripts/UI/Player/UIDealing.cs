@@ -314,22 +314,22 @@ namespace MultiplayerARPG
 
         private void OnDealingGoldConfirmed(int amount)
         {
-            BasePlayerCharacterController.OwningCharacter.RequestSetDealingGold(amount);
+            BasePlayerCharacterController.OwningCharacter.CallServerSetDealingGold(amount);
         }
 
         public void OnClickLock()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestLockDealing();
+            BasePlayerCharacterController.OwningCharacter.CallServerLockDealing();
         }
 
         public void OnClickConfirm()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestConfirmDealing();
+            BasePlayerCharacterController.OwningCharacter.CallServerConfirmDealing();
         }
 
         public void OnClickCancel()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestCancelDealing();
+            BasePlayerCharacterController.OwningCharacter.CallServerCancelDealing();
         }
     }
 }

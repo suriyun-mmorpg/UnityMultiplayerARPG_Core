@@ -332,7 +332,7 @@ namespace MultiplayerARPG
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.RequestChangeGuildLeader(guildMember.id);
+                BasePlayerCharacterController.OwningCharacter.CallServerChangeGuildLeader(guildMember.id);
             });
         }
 
@@ -369,7 +369,7 @@ namespace MultiplayerARPG
 
             // Show setup guild dialog
             if (inputFieldMessage != null)
-                BasePlayerCharacterController.OwningCharacter.RequestSetGuildMessage(inputFieldMessage.text);
+                BasePlayerCharacterController.OwningCharacter.CallServerSetGuildMessage(inputFieldMessage.text);
         }
 
         public void OnClickKickFromGuild()
@@ -381,7 +381,7 @@ namespace MultiplayerARPG
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.RequestKickFromGuild(guildMember.id);
+                BasePlayerCharacterController.OwningCharacter.CallServerKickFromGuild(guildMember.id);
             });
         }
 
@@ -389,7 +389,7 @@ namespace MultiplayerARPG
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.RequestLeaveGuild();
+                BasePlayerCharacterController.OwningCharacter.CallServerLeaveGuild();
             });
         }
 

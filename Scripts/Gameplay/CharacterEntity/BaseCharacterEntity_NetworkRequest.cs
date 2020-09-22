@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAttack(bool isLeftHand)
+        public bool CallServerAttack(bool isLeftHand)
         {
             if (!ValidateRequestAttack(isLeftHand))
                 return false;
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUseSkill(int dataId, bool isLeftHand)
+        public bool CallServerUseSkill(int dataId, bool isLeftHand)
         {
             if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
+        public bool CallServerUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
             if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestSkillCastingInterrupt()
+        public bool CallServerSkillCastingInterrupt()
         {
             if (this.IsDead())
                 return false;
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestPickupItem(uint objectId)
+        public bool CallServerPickupItem(uint objectId)
         {
             if (!CanDoActions())
                 return false;
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestDropItem(short nonEquipIndex, short amount)
+        public bool CallServerDropItem(short nonEquipIndex, short amount)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -159,17 +159,17 @@ namespace MultiplayerARPG
                     IWeaponItem rightWeapon = EquipWeapons.GetRightHandWeaponItem();
                     // Equip at left-hand if able to do it
                     if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
-                        return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
+                        return CallServerEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
                     else
-                        return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, false);
+                        return CallServerEquipWeapon(nonEquipIndex, EquipWeaponSet, false);
                 }
                 else
-                    return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, false);
+                    return CallServerEquipWeapon(nonEquipIndex, EquipWeaponSet, false);
             }
             else if (equippingShieldItem != null)
             {
                 // Shield can equip at left-hand only
-                return RequestEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
+                return CallServerEquipWeapon(nonEquipIndex, EquipWeaponSet, true);
             }
             else if (equippingArmorItem != null)
             {
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
                         break;
                     }
                 }
-                return RequestEquipArmor(nonEquipIndex, equippingSlotIndex);
+                return CallServerEquipArmor(nonEquipIndex, equippingSlotIndex);
             }
             return false;
         }
@@ -207,16 +207,16 @@ namespace MultiplayerARPG
             switch (inventoryType)
             {
                 case InventoryType.EquipItems:
-                    return RequestEquipArmor(nonEquipIndex, equipSlotIndex);
+                    return CallServerEquipArmor(nonEquipIndex, equipSlotIndex);
                 case InventoryType.EquipWeaponRight:
-                    return RequestEquipWeapon(nonEquipIndex, equipSlotIndex, false);
+                    return CallServerEquipWeapon(nonEquipIndex, equipSlotIndex, false);
                 case InventoryType.EquipWeaponLeft:
-                    return RequestEquipWeapon(nonEquipIndex, equipSlotIndex, true);
+                    return CallServerEquipWeapon(nonEquipIndex, equipSlotIndex, true);
             }
             return false;
         }
 
-        private bool RequestEquipWeapon(short nonEquipIndex, byte equipWeaponSet, bool isLeftHand)
+        private bool CallServerEquipWeapon(short nonEquipIndex, byte equipWeaponSet, bool isLeftHand)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        private bool RequestEquipArmor(short nonEquipIndex, byte equipSlotIndex)
+        private bool CallServerEquipArmor(short nonEquipIndex, byte equipSlotIndex)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -239,16 +239,16 @@ namespace MultiplayerARPG
             switch (inventoryType)
             {
                 case InventoryType.EquipItems:
-                    return RequestUnEquipArmor(equipItemIndex);
+                    return CallServerUnEquipArmor(equipItemIndex);
                 case InventoryType.EquipWeaponRight:
-                    return RequestUnEquipWeapon(equipWeaponSet, false);
+                    return CallServerUnEquipWeapon(equipWeaponSet, false);
                 case InventoryType.EquipWeaponLeft:
-                    return RequestUnEquipWeapon(equipWeaponSet, true);
+                    return CallServerUnEquipWeapon(equipWeaponSet, true);
             }
             return false;
         }
 
-        private bool RequestUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
+        private bool CallServerUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
         {
             if (!CanDoActions())
                 return false;
@@ -256,7 +256,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        private bool RequestUnEquipArmor(short equipItemIndex)
+        private bool CallServerUnEquipArmor(short equipItemIndex)
         {
             if (!CanDoActions())
                 return false;
@@ -282,19 +282,19 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUnSummon(uint objectId)
+        public bool CallServerUnSummon(uint objectId)
         {
             RPC(ServerUnSummon, objectId);
             return true;
         }
 
-        public bool RequestReload(bool isLeftHand)
+        public bool CallServerReload(bool isLeftHand)
         {
             RPC(ServerReload, isLeftHand);
             return true;
         }
 
-        public bool RequestSwitchEquipWeaponSet(byte equipWeaponSet)
+        public bool CallServerSwitchEquipWeaponSet(byte equipWeaponSet)
         {
             if (!CanDoActions() || EquipWeaponSet == equipWeaponSet)
                 return false;

@@ -39,21 +39,21 @@ namespace MultiplayerARPG
         public void OnClickSendDealingRequest()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestSendDealingRequest(Data.ObjectId);
+            owningCharacter.CallServerSendDealingRequest(Data.ObjectId);
             Hide();
         }
 
         public void OnClickSendPartyInvitation()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestSendPartyInvitation(Data.ObjectId);
+            owningCharacter.CallServerSendPartyInvitation(Data.ObjectId);
             Hide();
         }
 
         public void OnClickSendGuildInvitation()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestSendGuildInvitation(Data.ObjectId);
+            owningCharacter.CallServerSendGuildInvitation(Data.ObjectId);
             Hide();
         }
     }

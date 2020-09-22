@@ -196,12 +196,12 @@ namespace MultiplayerARPG
                 if (queueSkill != null && CacheEntity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) < 0)
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
-                    CacheEntity.RequestUseSkill(queueSkill.DataId, false, tempTargetEnemy.OpponentAimTransform.position);
+                    CacheEntity.CallServerUseSkill(queueSkill.DataId, false, tempTargetEnemy.OpponentAimTransform.position);
                 }
                 else
                 {
                     // Attack when no queue skill
-                    CacheEntity.RequestAttack(false);
+                    CacheEntity.CallServerAttack(false);
                 }
 
                 ClearActionState();

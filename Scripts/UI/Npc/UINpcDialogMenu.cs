@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         public void OnClickMenu()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestSelectNpcDialogMenu((byte)Data.menuIndex);
+            owningCharacter.CallServerSelectNpcDialogMenu((byte)Data.menuIndex);
         }
     }
 }

@@ -59,7 +59,7 @@ namespace MultiplayerARPG
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_GUILD_ROLE.ToString()));
                 return;
             }
-            BasePlayerCharacterController.OwningCharacter.RequestSetGuildMemberRole(characterId, (byte)dropdownRoles.value);
+            BasePlayerCharacterController.OwningCharacter.CallServerSetGuildMemberRole(characterId, (byte)dropdownRoles.value);
             Hide();
         }
     }

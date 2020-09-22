@@ -18,7 +18,7 @@ namespace MultiplayerARPG
 
         public void OnClickCreate()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestCreateParty(
+            BasePlayerCharacterController.OwningCharacter.CallServerCreateParty(
                 toggleShareExp != null && toggleShareExp.isOn,
                 toggleShareItem != null && toggleShareItem.isOn);
             Hide();

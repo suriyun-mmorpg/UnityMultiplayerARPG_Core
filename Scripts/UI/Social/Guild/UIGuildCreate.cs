@@ -36,7 +36,7 @@ namespace MultiplayerARPG
 
         public void OnClickCreate()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestCreateGuild(
+            BasePlayerCharacterController.OwningCharacter.CallServerCreateGuild(
                 inputFieldGuildName != null ? inputFieldGuildName.text : string.Empty);
             Hide();
         }

@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_CHANGE_LEADER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.RequestChangePartyLeader(partyMember.id);
+                BasePlayerCharacterController.OwningCharacter.CallServerChangePartyLeader(partyMember.id);
             });
         }
 
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.RequestKickFromParty(partyMember.id);
+                BasePlayerCharacterController.OwningCharacter.CallServerKickFromParty(partyMember.id);
             });
         }
 
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.RequestLeaveParty();
+                BasePlayerCharacterController.OwningCharacter.CallServerLeaveParty();
             });
         }
 

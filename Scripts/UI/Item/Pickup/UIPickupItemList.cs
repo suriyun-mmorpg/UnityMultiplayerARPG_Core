@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             if (string.IsNullOrEmpty(selectedId))
                 return;
-            BasePlayerCharacterController.OwningCharacter.RequestPickupItem(uint.Parse(selectedId));
+            BasePlayerCharacterController.OwningCharacter.CallServerPickupItem(uint.Parse(selectedId));
         }
     }
 }

@@ -683,17 +683,17 @@ namespace MultiplayerARPG
         #endregion
 
         #region Net Function Requests
-        public void RequestEnterVehicle(uint objectId)
+        public void CallServerEnterVehicle(uint objectId)
         {
             RPC(ServerEnterVehicle, objectId);
         }
 
-        public void RequestEnterVehicleToSeat(uint objectId, byte seatIndex)
+        public void CallServerEnterVehicleToSeat(uint objectId, byte seatIndex)
         {
             RPC(ServerEnterVehicleToSeat, objectId, seatIndex);
         }
 
-        public void RequestExitVehicle()
+        public void CallServerExitVehicle()
         {
             RPC(ServerExitVehicle);
         }

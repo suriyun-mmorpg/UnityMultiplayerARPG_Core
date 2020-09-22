@@ -80,7 +80,7 @@
             string characterName = string.Empty;
             if (inputCharacterName != null)
                 characterName = inputCharacterName.text;
-            BasePlayerCharacterController.OwningCharacter.RequestFindCharacters(characterName);
+            BasePlayerCharacterController.OwningCharacter.CallServerFindCharacters(characterName);
         }
 
         public void OnClickAddFriend()
@@ -92,7 +92,7 @@
             UISceneGlobal.Singleton.ShowMessageDialog(
                 LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.RequestAddFriend(friend.id);
+                BasePlayerCharacterController.OwningCharacter.CallServerAddFriend(friend.id);
             });
         }
     }

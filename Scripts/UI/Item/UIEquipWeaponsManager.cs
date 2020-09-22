@@ -70,7 +70,7 @@ namespace MultiplayerARPG
 
         public void OnClickSwitchEquipWeaponSet(byte equipWeaponSet)
         {
-            BasePlayerCharacterController.OwningCharacter.RequestSwitchEquipWeaponSet(equipWeaponSet);
+            BasePlayerCharacterController.OwningCharacter.CallServerSwitchEquipWeaponSet(equipWeaponSet);
         }
 
         [System.Serializable]

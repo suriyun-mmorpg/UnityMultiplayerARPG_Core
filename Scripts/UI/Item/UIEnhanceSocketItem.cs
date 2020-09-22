@@ -82,7 +82,7 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            OwningCharacter.RequestEnhanceSocketItem(InventoryType, (short)IndexOfData, SelectedEnhancerId);
+            OwningCharacter.CallServerEnhanceSocketItem(InventoryType, (short)IndexOfData, SelectedEnhancerId);
         }
     }
 }

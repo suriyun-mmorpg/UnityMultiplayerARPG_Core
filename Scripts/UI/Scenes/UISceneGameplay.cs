@@ -253,7 +253,7 @@ namespace MultiplayerARPG
 
         public void OnClickRespawn()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestRespawn();
+            BasePlayerCharacterController.OwningCharacter.CallServerRespawn();
         }
 
         public void OnClickExit()

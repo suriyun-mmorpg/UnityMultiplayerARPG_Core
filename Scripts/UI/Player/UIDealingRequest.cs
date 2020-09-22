@@ -18,14 +18,14 @@
         public void OnClickAccept()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestAcceptDealingRequest();
+            owningCharacter.CallServerAcceptDealingRequest();
             Hide();
         }
 
         public void OnClickDecline()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestDeclineDealingRequest();
+            owningCharacter.CallServerDeclineDealingRequest();
             Hide();
         }
     }

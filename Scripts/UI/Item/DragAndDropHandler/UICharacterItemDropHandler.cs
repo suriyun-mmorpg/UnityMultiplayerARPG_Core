@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             {
                 case InventoryType.NonEquipItems:
                     // Drop non equip item to non equip item
-                    BasePlayerCharacterController.OwningCharacter.RequestSwapOrMergeItem((short)draggedItemUI.uiCharacterItem.IndexOfData, (short)uiCharacterItem.IndexOfData);
+                    BasePlayerCharacterController.OwningCharacter.CallServerSwapOrMergeItem((short)draggedItemUI.uiCharacterItem.IndexOfData, (short)uiCharacterItem.IndexOfData);
                     break;
                 case InventoryType.EquipItems:
                 case InventoryType.EquipWeaponRight:
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                     break;
                 case InventoryType.StorageItems:
                     // Drop non equip item to storage item
-                    BasePlayerCharacterController.OwningCharacter.RequestMoveItemToStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
+                    BasePlayerCharacterController.OwningCharacter.CallServerMoveItemToStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
                     break;
             }
         }
@@ -90,11 +90,11 @@ namespace MultiplayerARPG
             {
                 case InventoryType.NonEquipItems:
                     // Drop storage item to non equip item
-                    BasePlayerCharacterController.OwningCharacter.RequestMoveItemFromStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
+                    BasePlayerCharacterController.OwningCharacter.CallServerMoveItemFromStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
                     break;
                 case InventoryType.StorageItems:
                     // Drop storage item to storage item
-                    BasePlayerCharacterController.OwningCharacter.RequestSwapOrMergeStorageItem((short)draggedItemUI.uiCharacterItem.IndexOfData, (short)uiCharacterItem.IndexOfData);
+                    BasePlayerCharacterController.OwningCharacter.CallServerSwapOrMergeStorageItem((short)draggedItemUI.uiCharacterItem.IndexOfData, (short)uiCharacterItem.IndexOfData);
                     break;
             }
         }

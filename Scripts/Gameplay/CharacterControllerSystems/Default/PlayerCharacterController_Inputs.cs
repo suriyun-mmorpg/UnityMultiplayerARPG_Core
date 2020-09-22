@@ -58,7 +58,7 @@ namespace MultiplayerARPG
                     {
                         // Talk to NPC
                         SelectedEntity = targetNpc;
-                        PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                        PlayerCharacterEntity.CallServerNpcActivate(targetNpc.ObjectId);
                     }
                     else if (targetBuilding != null)
                     {
@@ -69,12 +69,12 @@ namespace MultiplayerARPG
                     else if (targetVehicle != null)
                     {
                         // Enter vehicle
-                        PlayerCharacterEntity.RequestEnterVehicle(targetVehicle.ObjectId);
+                        PlayerCharacterEntity.CallServerEnterVehicle(targetVehicle.ObjectId);
                     }
                     else if (targetWarpPortal != null)
                     {
                         // Enter warp, For some warp portals that `warpImmediatelyWhenEnter` is FALSE
-                        PlayerCharacterEntity.RequestEnterWarp(targetWarpPortal.ObjectId);
+                        PlayerCharacterEntity.CallServerEnterWarp(targetWarpPortal.ObjectId);
                     }
                 }
                 // Pick up nearby items
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
                     if (ItemDropEntityDetector.itemDrops.Count > 0)
                         targetItemDrop = ItemDropEntityDetector.itemDrops[0];
                     if (targetItemDrop != null)
-                        PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
+                        PlayerCharacterEntity.CallServerPickupItem(targetItemDrop.ObjectId);
                 }
                 // Reload
                 if (InputManager.GetButtonDown("Reload"))
@@ -115,12 +115,12 @@ namespace MultiplayerARPG
                 if (InputManager.GetButtonDown("ExitVehicle"))
                 {
                     // Exit vehicle
-                    PlayerCharacterEntity.RequestExitVehicle();
+                    PlayerCharacterEntity.CallServerExitVehicle();
                 }
                 if (InputManager.GetButtonDown("SwitchEquipWeaponSet"))
                 {
                     // Switch equip weapon set
-                    PlayerCharacterEntity.RequestSwitchEquipWeaponSet((byte)(PlayerCharacterEntity.EquipWeaponSet + 1));
+                    PlayerCharacterEntity.CallServerSwitchEquipWeaponSet((byte)(PlayerCharacterEntity.EquipWeaponSet + 1));
                 }
                 if (InputManager.GetButtonDown("Sprint"))
                 {
@@ -149,9 +149,9 @@ namespace MultiplayerARPG
         {
             // Reload ammo at server
             if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
-                PlayerCharacterEntity.RequestReload(false);
+                PlayerCharacterEntity.CallServerReload(false);
             else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
-                PlayerCharacterEntity.RequestReload(true);
+                PlayerCharacterEntity.CallServerReload(true);
         }
 
         public virtual void UpdatePointClickInput()
@@ -330,7 +330,7 @@ namespace MultiplayerARPG
                     if (PlayerCharacterEntity.IsPlayingActionAnimation())
                     {
                         if (pointClickInterruptCastingSkill)
-                            PlayerCharacterEntity.RequestSkillCastingInterrupt();
+                            PlayerCharacterEntity.CallServerSkillCastingInterrupt();
                     }
                     else
                     {
@@ -458,7 +458,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // No nearby target, so attack immediately
-                    if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
+                    if (PlayerCharacterEntity.CallServerAttack(isLeftHandAttacking))
                         isLeftHandAttacking = !isLeftHandAttacking;
                     isFollowingTarget = false;
                 }
@@ -478,7 +478,7 @@ namespace MultiplayerARPG
                     TurnCharacterToEntity(SelectedEntity);
                 }
                 // Not lock target, so not finding target and attack immediately
-                if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
+                if (PlayerCharacterEntity.CallServerAttack(isLeftHandAttacking))
                     isLeftHandAttacking = !isLeftHandAttacking;
                 isFollowingTarget = false;
             }
@@ -654,7 +654,7 @@ namespace MultiplayerARPG
                     if (!didActionOnTarget)
                     {
                         didActionOnTarget = true;
-                        PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                        PlayerCharacterEntity.CallServerNpcActivate(targetNpc.ObjectId);
                     }
                 });
             }
@@ -662,7 +662,7 @@ namespace MultiplayerARPG
             {
                 DoActionOrMoveToEntity(targetItemDrop, CurrentGameInstance.pickUpItemDistance, () =>
                 {
-                    PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
+                    PlayerCharacterEntity.CallServerPickupItem(targetItemDrop.ObjectId);
                     ClearTarget();
                 });
             }
@@ -692,7 +692,7 @@ namespace MultiplayerARPG
             {
                 DoActionOrMoveToEntity(targetVehicle, CurrentGameInstance.conversationDistance, () =>
                 {
-                    PlayerCharacterEntity.RequestEnterVehicle(targetVehicle.ObjectId);
+                    PlayerCharacterEntity.CallServerEnterVehicle(targetVehicle.ObjectId);
                     ClearTarget();
                 });
             }
@@ -905,7 +905,7 @@ namespace MultiplayerARPG
             }
             else if (item.IsUsable())
             {
-                PlayerCharacterEntity.RequestUseItem((short)itemIndex);
+                PlayerCharacterEntity.CallServerUseItem((short)itemIndex);
             }
         }
 
