@@ -223,7 +223,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerEnterWarp, new PackedUInt(objectId));
+            RPC(ServerEnterWarp, objectId);
             return true;
         }
 
@@ -285,7 +285,7 @@ namespace MultiplayerARPG
 
         public bool RequestSendDealingRequest(uint objectId)
         {
-            RPC(ServerSendDealingRequest, new PackedUInt(objectId));
+            RPC(ServerSendDealingRequest, objectId);
             return true;
         }
 
@@ -297,13 +297,13 @@ namespace MultiplayerARPG
 
         public bool RequestAcceptDealingRequest()
         {
-            CallNetFunction(ServerAcceptDealingRequest, FunctionReceivers.Server);
+            RPC(ServerAcceptDealingRequest);
             return true;
         }
 
         public bool RequestDeclineDealingRequest()
         {
-            CallNetFunction(ServerDeclineDealingRequest, FunctionReceivers.Server);
+            RPC(ServerDeclineDealingRequest);
             return true;
         }
 
@@ -327,19 +327,19 @@ namespace MultiplayerARPG
 
         public bool RequestLockDealing()
         {
-            CallNetFunction(ServerLockDealing, FunctionReceivers.Server);
+            RPC(ServerLockDealing);
             return true;
         }
 
         public bool RequestConfirmDealing()
         {
-            CallNetFunction(ServerConfirmDealing, FunctionReceivers.Server);
+            RPC(ServerConfirmDealing);
             return true;
         }
 
         public bool RequestCancelDealing()
         {
-            CallNetFunction(ServerCancelDealing, FunctionReceivers.Server);
+            RPC(ServerCancelDealing);
             return true;
         }
 
@@ -399,7 +399,7 @@ namespace MultiplayerARPG
 
         public bool RequestSendPartyInvitation(uint objectId)
         {
-            RPC(ServerSendPartyInvitation, new PackedUInt(objectId));
+            RPC(ServerSendPartyInvitation, objectId);
             return true;
         }
 
@@ -411,13 +411,13 @@ namespace MultiplayerARPG
 
         public bool RequestAcceptPartyInvitation()
         {
-            CallNetFunction(ServerAcceptPartyInvitation, FunctionReceivers.Server);
+            RPC(ServerAcceptPartyInvitation);
             return true;
         }
 
         public bool RequestDeclinePartyInvitation()
         {
-            CallNetFunction(ServerDeclinePartyInvitation, FunctionReceivers.Server);
+            RPC(ServerDeclinePartyInvitation);
             return true;
         }
 
@@ -429,7 +429,7 @@ namespace MultiplayerARPG
 
         public bool RequestLeaveParty()
         {
-            CallNetFunction(ServerLeaveParty, FunctionReceivers.Server);
+            RPC(ServerLeaveParty);
             return true;
         }
 
@@ -465,7 +465,7 @@ namespace MultiplayerARPG
 
         public bool RequestSendGuildInvitation(uint objectId)
         {
-            RPC(ServerSendGuildInvitation, new PackedUInt(objectId));
+            RPC(ServerSendGuildInvitation, objectId);
             return true;
         }
 
@@ -477,13 +477,13 @@ namespace MultiplayerARPG
 
         public bool RequestAcceptGuildInvitation()
         {
-            CallNetFunction(ServerAcceptGuildInvitation, FunctionReceivers.Server);
+            RPC(ServerAcceptGuildInvitation);
             return true;
         }
 
         public bool RequestDeclineGuildInvitation()
         {
-            CallNetFunction(ServerDeclineGuildInvitation, FunctionReceivers.Server);
+            RPC(ServerDeclineGuildInvitation);
             return true;
         }
 
@@ -495,7 +495,7 @@ namespace MultiplayerARPG
 
         public bool RequestLeaveGuild()
         {
-            CallNetFunction(ServerLeaveGuild, FunctionReceivers.Server);
+            RPC(ServerLeaveGuild);
             return true;
         }
 
@@ -543,43 +543,43 @@ namespace MultiplayerARPG
 
         public bool RequestOpenStorage(uint objectId, string password)
         {
-            RPC(ServerOpenStorage, new PackedUInt(objectId), password);
+            RPC(ServerOpenStorage, objectId, password);
             return true;
         }
 
         public bool RequestCloseStorage()
         {
-            CallNetFunction(ServerCloseStorage, FunctionReceivers.Server);
+            RPC(ServerCloseStorage);
             return true;
         }
 
         public bool RequestOpenDoor(uint objectId, string password)
         {
-            RPC(ServerOpenDoor, new PackedUInt(objectId), password);
+            RPC(ServerOpenDoor, objectId, password);
             return true;
         }
 
         public bool RequestCloseDoor(uint objectId)
         {
-            RPC(ServerCloseDoor, new PackedUInt(objectId));
+            RPC(ServerCloseDoor, objectId);
             return true;
         }
 
         public bool RequestTurnOnCampFire(uint objectId)
         {
-            RPC(ServerTurnOnCampFire, new PackedUInt(objectId));
+            RPC(ServerTurnOnCampFire, objectId);
             return true;
         }
 
         public bool RequestTurnOffCampFire(uint objectId)
         {
-            RPC(ServerTurnOffCampFire, new PackedUInt(objectId));
+            RPC(ServerTurnOffCampFire, objectId);
             return true;
         }
 
         public bool RequestCraftItemByWorkbench(uint objectId, int dataId)
         {
-            RPC(ServerCraftItemByWorkbench, new PackedUInt(objectId), dataId);
+            RPC(ServerCraftItemByWorkbench, objectId, dataId);
             return true;
         }
 
@@ -603,25 +603,25 @@ namespace MultiplayerARPG
 
         public bool RequestGetFriends()
         {
-            CallNetFunction(ServerGetFriends, FunctionReceivers.Server);
+            RPC(ServerGetFriends);
             return true;
         }
 
         public bool RequestSetBuildingPassword(uint objectId, string password)
         {
-            RPC(ServerSetBuildingPassword, new PackedUInt(objectId), password);
+            RPC(ServerSetBuildingPassword, objectId, password);
             return true;
         }
 
         public bool RequestLockBuilding(uint objectId)
         {
-            RPC(ServerLockBuilding, new PackedUInt(objectId));
+            RPC(ServerLockBuilding, objectId);
             return true;
         }
 
         public bool RequestUnlockBuilding(uint objectId)
         {
-            RPC(ServerUnlockBuilding, new PackedUInt(objectId));
+            RPC(ServerUnlockBuilding, objectId);
             return true;
         }
     }
