@@ -1122,6 +1122,12 @@ namespace MultiplayerARPG
                 case AnimActionType.SkillLeftHand:
                     CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
+                case AnimActionType.ReloadRightHand:
+                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    break;
+                case AnimActionType.ReloadLeftHand:
+                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    break;
             }
         }
 

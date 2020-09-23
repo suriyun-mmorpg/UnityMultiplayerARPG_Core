@@ -9,7 +9,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected readonly List<CancellationTokenSource> skillCancellationTokenSources = new List<CancellationTokenSource>();
+        protected CancellationTokenSource skillCancellationTokenSource;
         public bool IsCastingSkillCanBeInterrupted { get; protected set; }
         public bool IsCastingSkillInterrupted { get; protected set; }
         public float CastingSkillDuration { get; protected set; }
@@ -162,8 +162,11 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = false;
             CastingSkillDuration = CastingSkillCountDown = 0;
             CancelSkill();
-            CharacterModel.StopActionAnimation();
-            CharacterModel.StopSkillCastAnimation();
+            if (CharacterModel && CharacterModel.gameObject.activeSelf)
+            {
+                CharacterModel.StopActionAnimation();
+                CharacterModel.StopSkillCastAnimation();
+            }
             if (FpsModel && FpsModel.gameObject.activeSelf)
             {
                 FpsModel.StopActionAnimation();
@@ -173,6 +176,12 @@ namespace MultiplayerARPG
 
         protected async UniTaskVoid UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3? skillAimPosition)
         {
+            // Skill animation still playing, skip it
+            if (skillCancellationTokenSource != null)
+                return;
+            // Prepare cancellation
+            skillCancellationTokenSource = new CancellationTokenSource();
+
             // Prepare requires data and get skill data
             AnimActionType animActionType;
             int animActionDataId;
@@ -223,10 +232,6 @@ namespace MultiplayerARPG
 
             // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
-
-            // Prepare cancellation
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            skillCancellationTokenSources.Add(cancellationTokenSource);
             try
             {
                 if (CastingSkillDuration > 0f)
@@ -234,10 +239,13 @@ namespace MultiplayerARPG
                     // Tell clients that character is casting
                     if (IsClient)
                     {
-                        // Play special effect
-                        CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
-                        // Play casting animation
-                        CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                        {
+                            // Play special effect
+                            CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
+                            // Play casting animation
+                            CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        }
                         if (FpsModel && FpsModel.gameObject.activeSelf)
                         {
                             // Play special effect
@@ -247,13 +255,14 @@ namespace MultiplayerARPG
                         }
                     }
                     // Wait until end of cast duration
-                    await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
+                    await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
                 }
 
                 // Animations will plays on clients only
                 if (IsClient)
                 {
-                    CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                        CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                     if (FpsModel && FpsModel.gameObject.activeSelf)
                         FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
@@ -265,12 +274,13 @@ namespace MultiplayerARPG
                     // Play special effects after trigger duration
                     tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
                     {
-                        CharacterModel.PlayWeaponLaunchEffect(AnimActionType);
+                        if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                            CharacterModel.PlayWeaponLaunchEffect(AnimActionType);
                         if (FpsModel && FpsModel.gameObject.activeSelf)
                             FpsModel.PlayWeaponLaunchEffect(AnimActionType);
                     }
@@ -299,7 +309,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
                 }
             }
             catch
@@ -308,8 +318,8 @@ namespace MultiplayerARPG
             }
             finally
             {
-                skillCancellationTokenSources.Remove(cancellationTokenSource);
-                cancellationTokenSource.Dispose();
+                skillCancellationTokenSource.Dispose();
+                skillCancellationTokenSource = null;
             }
             // Clear action states at clients and server
             ClearActionStates();
@@ -317,15 +327,9 @@ namespace MultiplayerARPG
 
         protected void CancelSkill()
         {
-            if (skillCancellationTokenSources.Count > 0)
-            {
-                List<CancellationTokenSource> cancellationSources = new List<CancellationTokenSource>(skillCancellationTokenSources);
-                foreach (CancellationTokenSource cancellationSource in cancellationSources)
-                {
-                    if (!cancellationSource.IsCancellationRequested)
-                        cancellationSource.Cancel();
-                }
-            }
+            if (skillCancellationTokenSource != null &&
+                !skillCancellationTokenSource.IsCancellationRequested)
+                skillCancellationTokenSource.Cancel();
         }
     }
 }
