@@ -47,20 +47,13 @@ namespace MultiplayerARPG
         public override void ComponentOnEnable()
         {
             CacheNetTransform.enabled = true;
-            CacheNavMeshAgent.enabled = false;
-            Invoke("EnableNavMeshAgent", 0.125f);
+            CacheNavMeshAgent.enabled = true;
         }
 
         public override void ComponentOnDisable()
         {
             CacheNetTransform.enabled = false;
             CacheNavMeshAgent.enabled = false;
-        }
-
-        private void EnableNavMeshAgent()
-        {
-            CacheNavMeshAgent.enabled = true;
-            CacheNavMeshAgent.Warp(CacheTransform.position);
         }
 
         public override void OnSetup()
