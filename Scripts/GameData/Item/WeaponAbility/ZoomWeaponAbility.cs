@@ -45,6 +45,7 @@ namespace MultiplayerARPG
             zoomWeaponAbilityController.RotationSpeedScale = 1f;
             zoomWeaponAbilityController.ShowZoomCrosshair = false;
             zoomWeaponAbilityController.HideCrosshair = false;
+            zoomWeaponAbilityController.UpdateCameraSettings();
             if (disableRenderersOnZoom)
                 BasePlayerCharacterController.OwningCharacter.ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_CONTROLLER, false);
         }
