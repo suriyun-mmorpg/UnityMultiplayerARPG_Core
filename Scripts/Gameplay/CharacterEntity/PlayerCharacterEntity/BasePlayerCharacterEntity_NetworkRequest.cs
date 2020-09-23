@@ -141,7 +141,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAssignItemHotkey(string hotkeyId, CharacterItem characterItem)
+        public bool AssignItemHotkey(string hotkeyId, CharacterItem characterItem)
         {
             // Usable items will use item data id
             string relateId = characterItem.GetItem().Id;
@@ -153,12 +153,12 @@ namespace MultiplayerARPG
             return CallServerAssignHotkey(hotkeyId, HotkeyType.Item, relateId);
         }
 
-        public bool RequestAssignSkillHotkey(string hotkeyId, BaseSkill skill)
+        public bool AssignSkillHotkey(string hotkeyId, BaseSkill skill)
         {
             return CallServerAssignHotkey(hotkeyId, HotkeyType.Skill, skill.Id);
         }
 
-        public bool RequestUnAssignHotkey(string hotkeyId)
+        public bool UnAssignHotkey(string hotkeyId)
         {
             return CallServerAssignHotkey(hotkeyId, HotkeyType.None, string.Empty);
         }

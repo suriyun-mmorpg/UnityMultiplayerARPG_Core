@@ -143,19 +143,19 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterSkill(UICharacterSkill ui)
         {
-            BasePlayerCharacterController.OwningCharacter.RequestAssignSkillHotkey(uiCharacterHotkey.hotkeyId, ui.Skill);
+            BasePlayerCharacterController.OwningCharacter.AssignSkillHotkey(uiCharacterHotkey.hotkeyId, ui.Skill);
             Hide();
         }
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            BasePlayerCharacterController.OwningCharacter.RequestAssignItemHotkey(uiCharacterHotkey.hotkeyId, ui.Data.characterItem);
+            BasePlayerCharacterController.OwningCharacter.AssignItemHotkey(uiCharacterHotkey.hotkeyId, ui.Data.characterItem);
             Hide();
         }
 
         public void OnClickUnAssign()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestUnAssignHotkey(uiCharacterHotkey.hotkeyId);
+            BasePlayerCharacterController.OwningCharacter.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
             Hide();
         }
     }

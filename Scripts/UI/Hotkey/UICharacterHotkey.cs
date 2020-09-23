@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 {
                     if (!CanAssignCharacterItem(nonEquipItem))
                         continue;
-                    OwningCharacter.RequestAssignItemHotkey(hotkeyId, nonEquipItem);
+                    OwningCharacter.AssignItemHotkey(hotkeyId, nonEquipItem);
                     break;
                 }
             }
@@ -126,22 +126,20 @@ namespace MultiplayerARPG
                 {
                     InventoryType inventoryType;
                     byte equipWeaponSet;
-                    if (OwningCharacter.IsEquipped(
+                    OwningCharacter.IsEquipped(
                         Data.relateId,
                         out inventoryType,
                         out itemIndex,
                         out equipWeaponSet,
-                        out characterItem))
+                        out characterItem);
+                    switch (inventoryType)
                     {
-                        switch (inventoryType)
-                        {
-                            case InventoryType.EquipItems:
-                            case InventoryType.NonEquipItems:
-                                return itemIndex >= 0;
-                            case InventoryType.EquipWeaponRight:
-                            case InventoryType.EquipWeaponLeft:
-                                return true;
-                        }
+                        case InventoryType.EquipItems:
+                        case InventoryType.NonEquipItems:
+                            return itemIndex >= 0;
+                        case InventoryType.EquipWeaponRight:
+                        case InventoryType.EquipWeaponLeft:
+                            return true;
                     }
                 }
             }
