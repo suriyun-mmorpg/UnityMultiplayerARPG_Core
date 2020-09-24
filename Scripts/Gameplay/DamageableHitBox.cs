@@ -52,6 +52,8 @@ namespace MultiplayerARPG
 
         public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
+            if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
+                return;
             List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
             foreach (DamageElement key in keys)
             {

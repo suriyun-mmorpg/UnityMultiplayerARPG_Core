@@ -1166,7 +1166,7 @@ namespace MultiplayerARPG
             return !IsAlly(characterEntity) && !IsEnemy(characterEntity);
         }
 
-        public override sealed bool CanReceiveDamageFrom(IGameEntity attacker)
+        public override bool CanReceiveDamageFrom(IGameEntity attacker)
         {
             if (!base.CanReceiveDamageFrom(attacker))
                 return false;
