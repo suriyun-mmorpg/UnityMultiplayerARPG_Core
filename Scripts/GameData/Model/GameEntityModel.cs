@@ -107,111 +107,42 @@ namespace MultiplayerARPG
             if (VisibleState == visibleState)
                 return;
             VisibleState = visibleState;
-            int i = 0;
             switch (VisibleState)
             {
                 case EVisibleState.Visible:
-                    if (hiddingObjects != null && hiddingObjects.Length > 0)
-                    {
-                        for (i = 0; i < hiddingObjects.Length; ++i)
-                        {
-                            if (!hiddingObjects[i].activeSelf)
-                                hiddingObjects[i].SetActive(true);
-                        }
-                    }
-                    if (hiddingRenderers != null && hiddingRenderers.Length > 0)
-                    {
-                        for (i = 0; i < hiddingRenderers.Length; ++i)
-                        {
-                            if (!hiddingRenderers[i].enabled)
-                                hiddingRenderers[i].enabled = true;
-                        }
-                    }
-                    if (fpsHiddingObjects != null && fpsHiddingObjects.Length > 0)
-                    {
-                        for (i = 0; i < fpsHiddingObjects.Length; ++i)
-                        {
-                            if (fpsHiddingObjects[i].activeSelf)
-                                fpsHiddingObjects[i].SetActive(true);
-                        }
-                    }
-                    if (fpsHiddingRenderers != null && fpsHiddingRenderers.Length > 0)
-                    {
-                        for (i = 0; i < fpsHiddingRenderers.Length; ++i)
-                        {
-                            if (fpsHiddingRenderers[i].enabled)
-                                fpsHiddingRenderers[i].enabled = true;
-                        }
-                    }
+                    // Visible state is Visible, show all objects and renderers
+                    SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
+                    SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, false);
                     break;
                 case EVisibleState.Invisible:
-                    if (hiddingObjects != null && hiddingObjects.Length > 0)
-                    {
-                        for (i = 0; i < hiddingObjects.Length; ++i)
-                        {
-                            if (hiddingObjects[i].activeSelf)
-                                hiddingObjects[i].SetActive(false);
-                        }
-                    }
-                    if (hiddingRenderers != null && hiddingRenderers.Length > 0)
-                    {
-                        for (i = 0; i < hiddingRenderers.Length; ++i)
-                        {
-                            if (hiddingRenderers[i].enabled)
-                                hiddingRenderers[i].enabled = false;
-                        }
-                    }
-                    if (fpsHiddingObjects != null && fpsHiddingObjects.Length > 0)
-                    {
-                        for (i = 0; i < fpsHiddingObjects.Length; ++i)
-                        {
-                            if (fpsHiddingObjects[i].activeSelf)
-                                fpsHiddingObjects[i].SetActive(false);
-                        }
-                    }
-                    if (fpsHiddingRenderers != null && fpsHiddingRenderers.Length > 0)
-                    {
-                        for (i = 0; i < fpsHiddingRenderers.Length; ++i)
-                        {
-                            if (fpsHiddingRenderers[i].enabled)
-                                fpsHiddingRenderers[i].enabled = false;
-                        }
-                    }
+                    // Visible state is Visible, hide all objects and renderers
+                    SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, true);
+                    SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
                     break;
                 case EVisibleState.Fps:
-                    if (hiddingObjects != null && hiddingObjects.Length > 0)
-                    {
-                        for (i = 0; i < hiddingObjects.Length; ++i)
-                        {
-                            if (!hiddingObjects[i].activeSelf)
-                                hiddingObjects[i].SetActive(true);
-                        }
-                    }
-                    if (hiddingRenderers != null && hiddingRenderers.Length > 0)
-                    {
-                        for (i = 0; i < hiddingRenderers.Length; ++i)
-                        {
-                            if (!hiddingRenderers[i].enabled)
-                                hiddingRenderers[i].enabled = true;
-                        }
-                    }
-                    if (fpsHiddingObjects != null && fpsHiddingObjects.Length > 0)
-                    {
-                        for (i = 0; i < fpsHiddingObjects.Length; ++i)
-                        {
-                            if (fpsHiddingObjects[i].activeSelf)
-                                fpsHiddingObjects[i].SetActive(false);
-                        }
-                    }
-                    if (fpsHiddingRenderers != null && fpsHiddingRenderers.Length > 0)
-                    {
-                        for (i = 0; i < fpsHiddingRenderers.Length; ++i)
-                        {
-                            if (fpsHiddingRenderers[i].enabled)
-                                fpsHiddingRenderers[i].enabled = false;
-                        }
-                    }
+                    // Visible state is Fps, hide Fps objects and renderers
+                    SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
+                    SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
                     break;
+            }
+        }
+
+        private void SetHiddingObjectsAndRenderers(GameObject[] hiddingObjects, Renderer[] hiddingRenderers, bool isHidding)
+        {
+            int i;
+            if (hiddingObjects != null && hiddingObjects.Length > 0)
+            {
+                for (i = 0; i < hiddingObjects.Length; ++i)
+                {
+                    hiddingObjects[i].SetActive(!isHidding);
+                }
+            }
+            if (hiddingRenderers != null && hiddingRenderers.Length > 0)
+            {
+                for (i = 0; i < hiddingRenderers.Length; ++i)
+                {
+                    hiddingRenderers[i].forceRenderingOff = isHidding;
+                }
             }
         }
 
