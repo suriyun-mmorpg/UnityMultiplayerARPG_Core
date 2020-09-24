@@ -15,7 +15,7 @@
 
         public bool IsOwningCharacter()
         {
-            return Character != null && Character is BasePlayerCharacterEntity && (BasePlayerCharacterEntity)Character == OwningCharacter;
+            return Character != null && Character is BasePlayerCharacterEntity && (Character as BasePlayerCharacterEntity) == OwningCharacter;
         }
     }
 }

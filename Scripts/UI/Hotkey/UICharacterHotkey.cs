@@ -44,11 +44,7 @@ namespace MultiplayerARPG
         {
             if (!autoAssignItem)
                 return;
-            BaseSkill skill;
-            short skillLevel;
-            int itemIndex;
-            CharacterItem characterItem;
-            if (!GetAssignedSkill(out skill, out skillLevel) && !GetAssignedItem(out itemIndex, out characterItem))
+            if (!GetAssignedSkill(out _, out _) && !GetAssignedItem(out _, out _, out _))
             {
                 foreach (CharacterItem nonEquipItem in OwningCharacter.NonEquipItems)
                 {
@@ -105,8 +101,9 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool GetAssignedItem(out int itemIndex, out CharacterItem characterItem)
+        public bool GetAssignedItem(out InventoryType inventoryType, out int itemIndex, out CharacterItem characterItem)
         {
+            inventoryType = InventoryType.NonEquipItems;
             itemIndex = -1;
             characterItem = null;
             if (Data.type == HotkeyType.Item)
@@ -115,6 +112,7 @@ namespace MultiplayerARPG
                 if (GameInstance.Items.ContainsKey(dataId))
                 {
                     // Find usable items
+                    inventoryType = InventoryType.NonEquipItems;
                     itemIndex = OwningCharacter.IndexOfNonEquipItem(dataId);
                     if (itemIndex >= 0)
                     {
@@ -124,23 +122,12 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    InventoryType inventoryType;
-                    byte equipWeaponSet;
-                    OwningCharacter.IsEquipped(
+                    return OwningCharacter.FindItemById(
                         Data.relateId,
                         out inventoryType,
                         out itemIndex,
-                        out equipWeaponSet,
+                        out _,
                         out characterItem);
-                    switch (inventoryType)
-                    {
-                        case InventoryType.EquipItems:
-                        case InventoryType.NonEquipItems:
-                            return itemIndex >= 0;
-                        case InventoryType.EquipWeaponRight:
-                        case InventoryType.EquipWeaponLeft:
-                            return true;
-                    }
                 }
             }
             return false;
@@ -148,32 +135,22 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            usingItem = null;
+            UpdateSkillUI();
+            UpdateItemUI();
+        }
+
+        private void UpdateSkillUI()
+        {
+            // Find skill by relate Id
             usingSkill = null;
             usingSkillLevel = 0;
-
-            // Find skill by relate Id
             bool foundUsingSkill = GetAssignedSkill(out usingSkill, out usingSkillLevel);
-
-            // Find item by relate Id
-            int itemIndex;
-            CharacterItem characterItem;
-            bool foundUsingItem = GetAssignedItem(out itemIndex, out characterItem);
-            if (foundUsingItem)
-                usingItem = characterItem.GetUsableItem();
 
             if (uiCharacterSkill == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterSkillPrefab != null)
             {
                 uiCharacterSkill = Instantiate(UICharacterHotkeys.uiCharacterSkillPrefab, transform);
                 GenericUtils.SetAndStretchToParentSize(uiCharacterSkill.transform as RectTransform, transform as RectTransform);
                 uiCharacterSkill.transform.SetAsFirstSibling();
-            }
-
-            if (uiCharacterItem == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterItemPrefab != null)
-            {
-                uiCharacterItem = Instantiate(UICharacterHotkeys.uiCharacterItemPrefab, transform);
-                GenericUtils.SetAndStretchToParentSize(uiCharacterItem.transform as RectTransform, transform as RectTransform);
-                uiCharacterItem.transform.SetAsFirstSibling();
             }
 
             if (uiCharacterSkill != null)
@@ -185,14 +162,31 @@ namespace MultiplayerARPG
                 else
                 {
                     // Found skill, so create new skill entry if it's not existed in learn skill list
-                    int skillIndex = OwningCharacter.IndexOfSkill(BaseGameData.MakeDataId(Data.relateId));
-                    CharacterSkill characterSkill = skillIndex >= 0 ? OwningCharacter.Skills[skillIndex] : CharacterSkill.Create(usingSkill, usingSkillLevel);
-                    uiCharacterSkill.Setup(new UICharacterSkillData(characterSkill, usingSkillLevel), OwningCharacter, skillIndex);
+                    uiCharacterSkill.Setup(new UICharacterSkillData(usingSkill, usingSkillLevel), OwningCharacter, OwningCharacter.IndexOfSkill(usingSkill.DataId));
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)
                         dragHandler.SetupForHotkey(this);
                 }
+            }
+        }
+
+        private void UpdateItemUI()
+        {
+            // Find item by relate Id
+            usingItem = null;
+            InventoryType inventoryType;
+            int itemIndex;
+            CharacterItem characterItem;
+            bool foundUsingItem = GetAssignedItem(out inventoryType, out itemIndex, out characterItem);
+            if (foundUsingItem)
+                usingItem = characterItem.GetUsableItem();
+
+            if (uiCharacterItem == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterItemPrefab != null)
+            {
+                uiCharacterItem = Instantiate(UICharacterHotkeys.uiCharacterItemPrefab, transform);
+                GenericUtils.SetAndStretchToParentSize(uiCharacterItem.transform as RectTransform, transform as RectTransform);
+                uiCharacterItem.transform.SetAsFirstSibling();
             }
 
             if (uiCharacterItem != null)
@@ -204,7 +198,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Show only existed items
-                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), OwningCharacter, itemIndex);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, inventoryType), OwningCharacter, itemIndex);
                     uiCharacterItem.Show();
                     UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                     if (dragHandler != null)

@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, Level, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType), OwningCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }

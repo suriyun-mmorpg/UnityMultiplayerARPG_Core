@@ -474,7 +474,7 @@ public class CharacterItem : INetSerializableWithElement
         return cloneItem;
     }
 
-    public static CharacterItem Create(IItem item, short level = 1, short amount = 1)
+    public static CharacterItem Create(BaseItem item, short level = 1, short amount = 1)
     {
         return Create(item.DataId, level, amount);
     }

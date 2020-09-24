@@ -30,10 +30,15 @@ public class CharacterAttribute : INetSerializable
         return cacheAttribute;
     }
 
-    public static CharacterAttribute Create(Attribute attribute, short amount)
+    public static CharacterAttribute Create(Attribute attribute, short amount = 1)
+    {
+        return Create(attribute.DataId, amount);
+    }
+
+    public static CharacterAttribute Create(int dataId, short amount = 1)
     {
         CharacterAttribute newAttribute = new CharacterAttribute();
-        newAttribute.dataId = attribute.DataId;
+        newAttribute.dataId = dataId;
         newAttribute.amount = amount;
         return newAttribute;
     }

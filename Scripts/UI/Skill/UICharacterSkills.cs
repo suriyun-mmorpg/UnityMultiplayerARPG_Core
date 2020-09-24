@@ -190,7 +190,7 @@ namespace MultiplayerARPG
                             // Set character skill data
                             tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
                             // Set UI data
-                            tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), character, tempIndexOfSkill);
+                            tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill), character, tempIndexOfSkill);
                             tempUiCharacterSkill.Show();
                             UICharacterSkillDragHandler dragHandler = tempUiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                             if (dragHandler != null)

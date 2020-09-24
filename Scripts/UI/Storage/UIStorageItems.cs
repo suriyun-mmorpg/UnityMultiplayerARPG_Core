@@ -161,7 +161,7 @@ namespace MultiplayerARPG
             CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
-                tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
+                tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
                 tempUiCharacterItem.Show();
                 if (characterItem.NotEmptySlot())
                 {

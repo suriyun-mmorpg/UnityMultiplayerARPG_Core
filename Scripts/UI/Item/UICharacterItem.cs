@@ -757,7 +757,9 @@ namespace MultiplayerARPG
             if (uiNextLevelItem != null)
             {
                 if (Level + 1 > Item.MaxLevel)
+                {
                     uiNextLevelItem.Hide();
+                }
                 else
                 {
                     uiNextLevelItem.Setup(new UICharacterItemData(CharacterItem, (short)(Level + 1), InventoryType), Character, IndexOfData);

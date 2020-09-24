@@ -107,7 +107,7 @@ namespace MultiplayerARPG
                 tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
                 if (uiCharacterHotkey.CanAssignCharacterSkill(tempCharacterSkill))
                 {
-                    tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), BasePlayerCharacterController.OwningCharacter, tempIndexOfSkill);
+                    tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill), BasePlayerCharacterController.OwningCharacter, tempIndexOfSkill);
                     tempUiCharacterSkill.Show();
                     CacheSkillSelectionManager.Add(tempUiCharacterSkill);
                 }
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
                 if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
                 {
-                    tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, index);
+                    tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, index);
                     tempUiCharacterItem.Show();
                     CacheItemSelectionManager.Add(tempUiCharacterItem);
                 }

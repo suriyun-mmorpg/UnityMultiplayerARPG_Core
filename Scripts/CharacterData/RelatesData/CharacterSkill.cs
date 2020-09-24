@@ -35,10 +35,15 @@ public class CharacterSkill : INetSerializable
         return cacheSkill;
     }
 
-    public static CharacterSkill Create(BaseSkill skill, short level)
+    public static CharacterSkill Create(BaseSkill skill, short level = 1)
+    {
+        return Create(skill.DataId, level);
+    }
+
+    public static CharacterSkill Create(int dataId, short level = 1)
     {
         CharacterSkill newSkill = new CharacterSkill();
-        newSkill.dataId = skill.DataId;
+        newSkill.dataId = dataId;
         newSkill.level = level;
         return newSkill;
     }

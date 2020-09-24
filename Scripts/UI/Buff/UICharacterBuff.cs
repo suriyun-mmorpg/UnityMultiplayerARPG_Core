@@ -111,7 +111,9 @@ namespace MultiplayerARPG
             if (uiBuff != null)
             {
                 if (tempGameData == null)
+                {
                     uiBuff.Hide();
+                }
                 else
                 {
                     Buff buff = Data.GetBuff();

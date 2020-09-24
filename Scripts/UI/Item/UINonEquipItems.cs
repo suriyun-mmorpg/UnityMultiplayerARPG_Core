@@ -143,7 +143,7 @@ namespace MultiplayerARPG
                     if (filterItemTypes == null || filterItemTypes.Count == 0 ||
                         filterItemTypes.Contains(tempItem.ItemType))
                     {
-                        tempUiCharacterItem.Setup(new UICharacterItemData(nonEquipItem, nonEquipItem.level, InventoryType.NonEquipItems), this.character, index);
+                        tempUiCharacterItem.Setup(new UICharacterItemData(nonEquipItem, InventoryType.NonEquipItems), this.character, index);
                         tempUiCharacterItem.Show();
                         UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                         if (dragHandler != null)

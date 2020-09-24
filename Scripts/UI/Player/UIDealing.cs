@@ -280,7 +280,7 @@ namespace MultiplayerARPG
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
                 if (dealingItem.characterItem.NotEmptySlot())
                 {
-                    tempUiCharacterItem.Setup(new UICharacterItemData(dealingItem.characterItem, dealingItem.characterItem.level, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, -1);
+                    tempUiCharacterItem.Setup(new UICharacterItemData(dealingItem.characterItem, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, -1);
                     tempUiCharacterItem.Show();
                     uiList.Add(tempUiCharacterItem);
                 }

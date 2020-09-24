@@ -11,6 +11,12 @@ namespace MultiplayerARPG
             this.characterAttribute = characterAttribute;
             this.targetAmount = targetAmount;
         }
+        public UICharacterAttributeData(CharacterAttribute characterAttribute) : this(characterAttribute, characterAttribute.amount)
+        {
+        }
+        public UICharacterAttributeData(Attribute attribute, short targetLevel) : this(CharacterAttribute.Create(attribute, targetLevel), targetLevel)
+        {
+        }
     }
 
     public struct UICharacterSkillData
@@ -21,6 +27,12 @@ namespace MultiplayerARPG
         {
             this.characterSkill = characterSkill;
             this.targetLevel = targetLevel;
+        }
+        public UICharacterSkillData(CharacterSkill characterSkill) : this(characterSkill, characterSkill.level)
+        {
+        }
+        public UICharacterSkillData(BaseSkill skill, short targetLevel) : this(CharacterSkill.Create(skill, targetLevel), targetLevel)
+        {
         }
     }
 
@@ -34,6 +46,12 @@ namespace MultiplayerARPG
             this.characterItem = characterItem;
             this.targetLevel = targetLevel;
             this.inventoryType = inventoryType;
+        }
+        public UICharacterItemData(CharacterItem characterItem, InventoryType inventoryType) : this(characterItem, characterItem.level, inventoryType)
+        {
+        }
+        public UICharacterItemData(BaseItem item, short targetLevel, InventoryType inventoryType) : this(CharacterItem.Create(item, targetLevel), targetLevel, inventoryType)
+        {
         }
     }
 

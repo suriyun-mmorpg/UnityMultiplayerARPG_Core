@@ -230,7 +230,7 @@ namespace MultiplayerARPG
 
                 if (CacheEquipItemSlots.TryGetValue(GetEquipPosition(tempArmorItem.EquipPosition, tempEquipItem.equipSlotIndex), out tempSlot))
                 {
-                    tempSlot.Setup(new UICharacterItemData(tempEquipItem, tempEquipItem.level, InventoryType.EquipItems), character, i);
+                    tempSlot.Setup(new UICharacterItemData(tempEquipItem, InventoryType.EquipItems), character, i);
                     if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(tempEquipItem.id))
                         tempSlot.OnClickSelect();
                 }
@@ -276,7 +276,7 @@ namespace MultiplayerARPG
                 if (equipWeapon.GetEquipmentItem() != null)
                 {
                     equipWeapon.equipSlotIndex = equipWeaponSet;
-                    tempSlot.Setup(new UICharacterItemData(equipWeapon, equipWeapon.level, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), character, 0);
+                    tempSlot.Setup(new UICharacterItemData(equipWeapon, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), character, -1);
                     if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(equipWeapon.id))
                         tempSlot.OnClickSelect();
                 }

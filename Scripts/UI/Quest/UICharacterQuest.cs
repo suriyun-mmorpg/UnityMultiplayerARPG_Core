@@ -128,10 +128,8 @@ namespace MultiplayerARPG
             {
                 CacheRewardItemList.Generate(Quest.rewardItems, (index, rewardItem, ui) =>
                 {
-                    CharacterItem characterItem = CharacterItem.Create(rewardItem.item);
-                    characterItem.amount = rewardItem.amount;
                     UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, characterItem.level, InventoryType.NonEquipItems), OwningCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount), InventoryType.NonEquipItems), OwningCharacter, -1);
                     uiCharacterItem.Show();
                 });
             }

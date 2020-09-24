@@ -1020,8 +1020,7 @@ public static partial class CharacterDataExtension
 
     public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, bool isLimitInventorySlot)
     {
-        Dictionary<int, short> decreaseItems;
-        return DecreaseItems(data, dataId, amount, isLimitInventorySlot, out decreaseItems);
+        return DecreaseItems(data, dataId, amount, isLimitInventorySlot, out _);
     }
     #endregion
 
@@ -1059,8 +1058,7 @@ public static partial class CharacterDataExtension
 
     public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount)
     {
-        Dictionary<CharacterItem, short> decreaseItems;
-        return DecreaseAmmos(data, ammoType, amount, out decreaseItems);
+        return DecreaseAmmos(data, ammoType, amount, out _);
     }
     #endregion
 
@@ -1276,7 +1274,14 @@ public static partial class CharacterDataExtension
         return -1;
     }
 
-    public static bool IsEquipped(
+    public static bool FindItemById(
+        this ICharacterData data,
+        string id)
+    {
+        return data.FindItemById(id, out _, out _, out _, out _);
+    }
+
+    public static bool FindItemById(
         this ICharacterData data,
         string id,
         out InventoryType inventoryType,
@@ -1288,14 +1293,6 @@ public static partial class CharacterDataExtension
         itemIndex = -1;
         equipWeaponSet = 0;
         characterItem = CharacterItem.Empty;
-
-        itemIndex = data.IndexOfEquipItem(id);
-        if (itemIndex >= 0)
-        {
-            characterItem = data.EquipItems[itemIndex];
-            inventoryType = InventoryType.EquipItems;
-            return true;
-        }
 
         EquipWeapons tempEquipWeapons;
         for (byte i = 0; i < data.SelectableWeaponSets.Count; ++i)
@@ -1325,16 +1322,40 @@ public static partial class CharacterDataExtension
         {
             characterItem = data.NonEquipItems[itemIndex];
             inventoryType = InventoryType.NonEquipItems;
-            return false;
+            return true;
+        }
+
+        itemIndex = data.IndexOfEquipItem(id);
+        if (itemIndex >= 0)
+        {
+            characterItem = data.EquipItems[itemIndex];
+            inventoryType = InventoryType.EquipItems;
+            return true;
         }
 
         return false;
     }
 
+    public static bool IsEquipped(
+        this ICharacterData data,
+        string id,
+        out InventoryType inventoryType,
+        out int itemIndex,
+        out byte equipWeaponSet,
+        out CharacterItem characterItem)
+    {
+        if (data.FindItemById(id, out inventoryType, out itemIndex, out equipWeaponSet, out characterItem))
+        {
+            return inventoryType == InventoryType.EquipItems ||
+                inventoryType == InventoryType.EquipWeaponRight ||
+                inventoryType == InventoryType.EquipWeaponLeft;
+        }
+        return false;
+    }
+
     public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem)
     {
-        int index;
-        data.AddOrSetNonEquipItems(characterItem, out index);
+        data.AddOrSetNonEquipItems(characterItem, out _);
     }
 
     public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, out int index)
@@ -1344,8 +1365,7 @@ public static partial class CharacterDataExtension
 
     public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem)
     {
-        int index;
-        itemList.AddOrSetItems(characterItem, out index);
+        itemList.AddOrSetItems(characterItem, out _);
     }
 
     public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, out int index)
