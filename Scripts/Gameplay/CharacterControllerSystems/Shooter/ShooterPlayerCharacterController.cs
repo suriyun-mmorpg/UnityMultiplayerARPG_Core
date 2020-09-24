@@ -601,7 +601,6 @@ namespace MultiplayerARPG
         {
             // Prepare raycast distance / fov
             float attackDistance = 0f;
-            float attackFov = 90f;
             bool attacking = false;
             if (IsUsingHotkey())
             {
@@ -634,21 +633,18 @@ namespace MultiplayerARPG
                 {
                     // Increase aim distance by skill attack distance
                     attackDistance = PlayerCharacterEntity.UsingSkill.GetCastDistance(PlayerCharacterEntity, PlayerCharacterEntity.UsingSkillLevel, isLeftHandAttacking);
-                    attackFov = PlayerCharacterEntity.UsingSkill.GetCastFov(PlayerCharacterEntity, PlayerCharacterEntity.UsingSkillLevel, isLeftHandAttacking);
                     attacking = true;
                 }
                 else if (queueUsingSkill.skill != null && queueUsingSkill.skill.IsAttack())
                 {
                     // Increase aim distance by skill attack distance
                     attackDistance = queueUsingSkill.skill.GetCastDistance(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
-                    attackFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, isLeftHandAttacking);
                     attacking = true;
                 }
                 else
                 {
                     // Increase aim distance by attack distance
                     attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
-                    attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
                 }
             }
             // Temporary disable colliders
