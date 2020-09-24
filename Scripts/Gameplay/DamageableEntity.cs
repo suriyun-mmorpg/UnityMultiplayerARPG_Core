@@ -136,7 +136,7 @@ namespace MultiplayerARPG
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
-        protected virtual void ReceivingDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceivingDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (onReceiveDamage != null)
                 onReceiveDamage.Invoke(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
@@ -165,7 +165,7 @@ namespace MultiplayerARPG
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
-        protected virtual void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             CallAllAppendCombatAmount(combatAmountType, damage);
             if (onReceivedDamage != null)

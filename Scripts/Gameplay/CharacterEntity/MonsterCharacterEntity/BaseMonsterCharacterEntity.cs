@@ -226,7 +226,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             // Attacker can be null when character buff's buff applier is null, So avoid it
             if (attacker != null)
