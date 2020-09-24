@@ -317,7 +317,7 @@ namespace MultiplayerARPG
                 return false;
             if (UICharacterHotkeys.filterSkillTypes.Count > 0 &&
                 !UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().SkillType))
-                return true;
+                return false;
             return true;
         }
 
