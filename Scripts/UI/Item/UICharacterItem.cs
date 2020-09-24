@@ -1081,7 +1081,7 @@ namespace MultiplayerARPG
         #region Sell Item Functions
         public void OnClickSell()
         {
-            // Only unequipped equipment can be sell
+            // Only unequipped equipment can be sold
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
@@ -1106,7 +1106,7 @@ namespace MultiplayerARPG
         #region Set Dealing Item Functions
         public void OnClickSetDealingItem()
         {
-            // Only unequipped equipment can be sold
+            // Only unequipped equipment can be offered
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
@@ -1207,7 +1207,7 @@ namespace MultiplayerARPG
             // Only owning character can refine item
             if (!IsOwningCharacter())
                 return;
-            
+
             if (EquipmentItem != null)
             {
                 BaseUISceneGameplay.Singleton.ShowRefineItemDialog(InventoryType, IndexOfData);
@@ -1241,20 +1241,16 @@ namespace MultiplayerARPG
         /// </summary>
         public void OnClickSetDismantleItem()
         {
-            // Only items in inventory will be able to dismantle
-            if (InventoryType != InventoryType.NonEquipItems)
+            // Only unequipped equipment can be dismantled
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
-            // Only owning character can dismantle item
-            if (!IsOwningCharacter())
+            if (!GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
                 return;
-            
-            if (GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
-            {
-                BaseUISceneGameplay.Singleton.ShowDismantleItemDialog(InventoryType, IndexOfData);
-                if (selectionManager != null)
-                    selectionManager.DeselectSelectedUI();
-            }
+
+            BaseUISceneGameplay.Singleton.ShowDismantleItemDialog(InventoryType, IndexOfData);
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
         }
 
         /// <summary>
@@ -1265,18 +1261,28 @@ namespace MultiplayerARPG
             if (!GameInstance.Singleton.canDismantleItemByPlayer)
                 return;
 
-            // Only items in inventory will be able to dismantle
-            if (InventoryType != InventoryType.NonEquipItems)
+            // Only unequipped equipment can be dismantled
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
-            // Only owning character can repair item
-            if (!IsOwningCharacter())
+            if (!GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
                 return;
 
-            if (GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
+            if (CharacterItem.amount == 1)
             {
-                OwningCharacter.CallServerDismantleItem((short)IndexOfData);
+                if (selectionManager != null)
+                    selectionManager.DeselectSelectedUI();
+                OwningCharacter.CallServerDismantleItem((short)IndexOfData, 1);
             }
+            else
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM_DESCRIPTION.ToString()), OnDismantleItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+        }
+
+        private void OnDismantleItemAmountConfirmed(int amount)
+        {
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+            OwningCharacter.CallServerDismantleItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1326,7 +1332,7 @@ namespace MultiplayerARPG
             // Only owning character can enhance item
             if (!IsOwningCharacter())
                 return;
-            
+
             if (EquipmentItem != null)
             {
                 BaseUISceneGameplay.Singleton.ShowEnhanceSocketItemDialog(InventoryType, IndexOfData);

@@ -65,6 +65,8 @@ namespace MultiplayerARPG
         UI_DROP_ITEM_DESCRIPTION,
         UI_SELL_ITEM,
         UI_SELL_ITEM_DESCRIPTION,
+        UI_DISMANTLE_ITEM,
+        UI_DISMANTLE_ITEM_DESCRIPTION,
         UI_OFFER_ITEM,
         UI_OFFER_ITEM_DESCRIPTION,
         UI_MOVE_ITEM_TO_STORAGE,
@@ -958,6 +960,8 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
             Texts.Add(UITextKeys.UI_SELL_ITEM.ToString(), "Sell Item");
             Texts.Add(UITextKeys.UI_SELL_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
+            Texts.Add(UITextKeys.UI_DISMANTLE_ITEM.ToString(), "Dismantle Item");
+            Texts.Add(UITextKeys.UI_DISMANTLE_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
             Texts.Add(UITextKeys.UI_OFFER_ITEM.ToString(), "Offer Item");
             Texts.Add(UITextKeys.UI_OFFER_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
             Texts.Add(UITextKeys.UI_MOVE_ITEM_TO_STORAGE.ToString(), "Move To Storage");

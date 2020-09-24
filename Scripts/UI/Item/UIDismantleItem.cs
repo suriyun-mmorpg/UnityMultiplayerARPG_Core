@@ -9,27 +9,33 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Return Gold Amount}")]
         public UILocaleKeySetting formatKeyReturnGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
+        [Tooltip("Format => {0} = {Amount of Dismantle Item}")]
+        public UILocaleKeySetting formatKeyDismantleAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements for UI Dismantle Item")]
-        public InputFieldWrapper inputFieldDismantleAmount;
         public UIItemAmounts uiReturnItems;
         public TextWrapper uiTextReturnGold;
+        public TextWrapper uiTextDismantleAmount;
 
         protected bool activated;
         protected string activeItemId;
 
+        private short dismantleAmount;
         public short DismantleAmount
         {
-            get
+            get { return dismantleAmount; }
+            private set
             {
-                if (inputFieldDismantleAmount != null)
-                {
-                    short amount;
-                    if (short.TryParse(inputFieldDismantleAmount.text, out amount))
-                        return amount;
-                }
-                return Amount;
+                dismantleAmount = value;
+                if (uiTextDismantleAmount != null)
+                    uiTextDismantleAmount.text = string.Format(LanguageManager.GetText(formatKeyDismantleAmount), dismantleAmount.ToString("N0"));
             }
+        }
+
+        protected override void UpdateData()
+        {
+            base.UpdateData();
+            DismantleAmount = Amount;
         }
 
         public override void OnUpdateCharacterItems()
@@ -121,6 +127,17 @@ namespace MultiplayerARPG
             activated = true;
             activeItemId = CharacterItem.id;
             OwningCharacter.CallServerDismantleItem((short)IndexOfData, DismantleAmount);
+        }
+
+        public void OnClickSetDismantleAmount()
+        {
+            if (Amount > 1)
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM_DESCRIPTION.ToString()), OnDismantleItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+        }
+
+        private void OnDismantleItemAmountConfirmed(int amount)
+        {
+            DismantleAmount = (short)amount;
         }
     }
 }
