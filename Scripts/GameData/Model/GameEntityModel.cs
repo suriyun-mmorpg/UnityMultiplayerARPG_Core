@@ -115,7 +115,7 @@ namespace MultiplayerARPG
                     SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, false);
                     break;
                 case EVisibleState.Invisible:
-                    // Visible state is Visible, hide all objects and renderers
+                    // Visible state is Invisible, hide all objects and renderers
                     SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, true);
                     SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
                     break;
