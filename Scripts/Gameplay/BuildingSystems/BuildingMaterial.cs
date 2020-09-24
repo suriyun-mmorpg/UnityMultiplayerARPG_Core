@@ -92,9 +92,6 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            gameObject.tag = GameInstance.Singleton.buildingTag;
-            gameObject.layer = GameInstance.Singleton.buildingLayer;
-
             CacheTransform = transform;
 
             meshRenderer = GetComponent<MeshRenderer>();
