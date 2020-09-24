@@ -557,19 +557,19 @@ namespace MultiplayerARPG
 
         public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (!IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
-                return;
-
             if (HitBoxes != null && HitBoxes.Length > 0)
             {
                 // Character have hit boxes, let's hit boxes handle damages, so skip receive damage function here
                 return;
             }
 
+            if (!IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
+                return;
+
             ReceiveDamageFunction(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
 
-        internal void ReceiveDamageFunction(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        internal virtual void ReceiveDamageFunction(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
 
