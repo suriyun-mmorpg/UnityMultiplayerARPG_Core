@@ -18,6 +18,11 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 entity = GetComponentInParent<T>();
+            if (entity != null)
+            {
+                gameObject.tag = entity.GetGameObject().tag;
+                gameObject.layer = entity.GetGameObject().layer;
+            }
         }
 
         public virtual bool CanReceiveDamageFrom(IGameEntity attacker)
