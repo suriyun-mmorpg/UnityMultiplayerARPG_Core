@@ -92,19 +92,32 @@ namespace MultiplayerARPG
 #endif
         }
 
+        protected bool AccessingNpcShopDialog(out NpcDialog dialog)
+        {
+            dialog = null;
+
+            if (this.IsDead())
+                return false;
+
+            if (CurrentNpcDialog == null)
+                return false;
+
+            // Dialog must be built-in shop dialog
+            dialog = CurrentNpcDialog as NpcDialog;
+            if (dialog == null || dialog.type != NpcDialogType.Shop)
+                return false;
+
+            return true;
+        }
+
         [ServerRpc]
         protected void ServerSellItem(short index, short amount)
         {
 #if !CLIENT_BUILD
-            if (this.IsDead() || index >= nonEquipItems.Count)
+            if (!AccessingNpcShopDialog(out _))
                 return;
 
-            if (CurrentNpcDialog == null)
-                return;
-
-            // Dialog must be built-in shop dialog
-            NpcDialog builtInDialog = CurrentNpcDialog as NpcDialog;
-            if (builtInDialog == null || builtInDialog.type != NpcDialogType.Shop)
+            if (index >= nonEquipItems.Count)
                 return;
 
             // Found selling item or not?
@@ -124,24 +137,39 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerBuyNpcItem(short itemIndex, short amount)
+        protected void ServerSellItems(List<short> indexes)
         {
 #if !CLIENT_BUILD
-            if (CurrentNpcDialog == null)
+            if (!AccessingNpcShopDialog(out _))
                 return;
+            indexes.Sort();
+            short index;
+            for (int i = indexes.Count - 1; i >= 0; --i)
+            {
+                index = indexes[i];
+                if (index >= nonEquipItems.Count)
+                    continue;
+                ServerSellItem(index, nonEquipItems[index].amount);
+            }
+#endif
+        }
 
+        [ServerRpc]
+        protected void ServerBuyNpcItem(short index, short amount)
+        {
+#if !CLIENT_BUILD
             // Dialog must be built-in shop dialog
-            NpcDialog builtInDialog = CurrentNpcDialog as NpcDialog;
-            if (builtInDialog == null || builtInDialog.type != NpcDialogType.Shop)
+            NpcDialog dialog;
+            if (!AccessingNpcShopDialog(out dialog))
                 return;
 
             // Found buying item or not?
-            NpcSellItem[] sellItems = builtInDialog.sellItems;
-            if (sellItems == null || itemIndex >= sellItems.Length)
+            NpcSellItem[] sellItems = dialog.sellItems;
+            if (sellItems == null || index >= sellItems.Length)
                 return;
 
             // Currencies enough or not?
-            NpcSellItem sellItem = sellItems[itemIndex];
+            NpcSellItem sellItem = sellItems[index];
             if (!CurrentGameplayRule.CurrenciesEnoughToBuyItem(this, sellItem, amount))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);

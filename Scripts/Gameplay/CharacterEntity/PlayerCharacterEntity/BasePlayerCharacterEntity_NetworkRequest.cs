@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using LiteNetLibManager;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -251,11 +252,27 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerDismantleItem(short nonEquipIndex)
+        public bool CallServerSellItems(List<short> indexes)
+        {
+            if (this.IsDead() || indexes.Count == 0)
+                return false;
+            RPC(ServerSellItems, indexes);
+            return true;
+        }
+
+        public bool CallServerDismantleItem(short nonEquipIndex, short amount)
         {
             if (this.IsDead() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            RPC(ServerDismantleItem, nonEquipIndex);
+            RPC(ServerDismantleItem, nonEquipIndex, amount);
+            return true;
+        }
+
+        public bool CallServerDismantleItems(List<short> indexes)
+        {
+            if (this.IsDead() || indexes.Count == 0)
+                return false;
+            RPC(ServerDismantleItems, indexes);
             return true;
         }
 
@@ -280,6 +297,14 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return false;
             RPC(ServerRepairItem, inventoryType, index);
+            return true;
+        }
+
+        public bool CallServerRepairEquipItems()
+        {
+            if (this.IsDead())
+                return false;
+            RPC(ServerRepairEquipItems);
             return true;
         }
 

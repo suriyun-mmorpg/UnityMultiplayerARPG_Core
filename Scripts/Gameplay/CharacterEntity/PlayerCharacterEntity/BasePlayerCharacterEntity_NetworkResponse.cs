@@ -238,17 +238,20 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerDismantleItem(short index)
+        protected void ServerDismantleItem(short index, short amount)
         {
 #if !CLIENT_BUILD
-            if (this.IsDead() || index >= nonEquipItems.Count)
+            if (this.IsDead())
                 return;
 
+            if (index >= nonEquipItems.Count)
+                return;
+
+            // Found item or not?
             CharacterItem nonEquipItem = nonEquipItems[index];
-            if (nonEquipItem.IsEmptySlot() || !CurrentGameInstance.dismantleFilter.Filter(nonEquipItem))
+            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount ||
+                !CurrentGameInstance.dismantleFilter.Filter(nonEquipItem))
                 return;
-
-            BaseItem item = nonEquipItems[index].GetItem();
 
             // Simulate data before applies
             List<CharacterItem> tempNonEquipItems = new List<CharacterItem>(nonEquipItems);
@@ -258,8 +261,8 @@ namespace MultiplayerARPG
                 return;
             }
 
+            // Character can receives all items or not?
             List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(nonEquipItem);
-
             if (tempNonEquipItems.IncreasingItemsWillOverwhelming(
                 returningItems,
                 true,
@@ -273,10 +276,28 @@ namespace MultiplayerARPG
             }
 
             // Applies simulates data
-            this.DecreaseItemsByIndex(index, nonEquipItem.amount);
+            this.DecreaseItemsByIndex(index, amount);
             this.IncreaseItems(returningItems);
             this.FillEmptySlots();
-            Gold += item.DismantleReturnGold * nonEquipItem.amount;
+            Gold += nonEquipItems[index].GetItem().DismantleReturnGold * amount;
+#endif
+        }
+
+        [ServerRpc]
+        protected void ServerDismantleItems(List<short> indexes)
+        {
+#if !CLIENT_BUILD
+            if (this.IsDead())
+                return;
+            indexes.Sort();
+            short index;
+            for (int i = indexes.Count - 1; i >= 0; --i)
+            {
+                index = indexes[i];
+                if (index >= nonEquipItems.Count)
+                    continue;
+                ServerDismantleItem(index, nonEquipItems[index].amount);
+            }
 #endif
         }
 
@@ -367,6 +388,32 @@ namespace MultiplayerARPG
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
             }
+#endif
+        }
+
+        [ServerRpc]
+        protected void ServerRepairEquipItems()
+        {
+#if !CLIENT_BUILD
+            if (this.IsDead())
+                return;
+
+            bool success = false;
+            GameMessage.Type gameMessageType;
+            BaseItem.RepairRightHandItem(this, out gameMessageType);
+            success = success || gameMessageType == GameMessage.Type.RepairSuccess;
+            BaseItem.RepairLeftHandItem(this, out gameMessageType);
+            success = success || gameMessageType == GameMessage.Type.RepairSuccess;
+            for (int i = 0; i < EquipItems.Count; ++i)
+            {
+                BaseItem.RepairEquipItem(this, i, out gameMessageType);
+                success = success || gameMessageType == GameMessage.Type.RepairSuccess;
+            }
+            // Will send messages to inform that it can repair an items when any item can be repaired
+            if (success)
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RepairSuccess);
+            else
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotRepair);
 #endif
         }
 
