@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -20,8 +21,12 @@ namespace MultiplayerARPG
         [SerializeField]
         private BaseCharacterModel fpsModelPrefab;
         [SerializeField]
-        [Tooltip("Offsets from fps model container (Camera's transform)")]
-        private Vector3 fpsModelOffsets;
+        [FormerlySerializedAs("fpsModelOffsets")]
+        [Tooltip("Position offsets from fps model container (Camera's transform)")]
+        private Vector3 fpsModelPositionOffsets;
+        [SerializeField]
+        [Tooltip("Rotation offsets from fps model container (Camera's transform)")]
+        private Vector3 fpsModelRotationOffsets;
         public BaseCharacterModel FpsModel { get; private set; }
 
         [SerializeField]
@@ -181,8 +186,8 @@ namespace MultiplayerARPG
             if (fpsModelPrefab == null)
                 return null;
             FpsModel = Instantiate(fpsModelPrefab, container);
-            FpsModel.transform.localPosition = fpsModelOffsets;
-            FpsModel.transform.localRotation = Quaternion.identity;
+            FpsModel.transform.localPosition = fpsModelPositionOffsets;
+            FpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
             FpsModel.SetEquipItems(MainModel.equipItems);
             FpsModel.SetEquipWeapons(MainModel.equipWeapons);
             return FpsModel;
