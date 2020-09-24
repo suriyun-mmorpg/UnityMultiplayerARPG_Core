@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public abstract int MaxHp { get; }
         public float HpRate { get { return (float)CurrentHp / (float)MaxHp; } }
-        public DamageableEntity[] HitBoxes { get; protected set; }
+        public DamageableHitBox[] HitBoxes { get; protected set; }
 
         // Temp data
         private GameEffect[] pendingHitEffects;
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
                 combatTextTransform = CacheTransform;
             if (opponentAimTransform == null)
                 opponentAimTransform = CombatTextTransform;
-            HitBoxes = GetComponentsInChildren<DamageableEntity>();
+            HitBoxes = GetComponentsInChildren<DamageableHitBox>(true);
         }
 
         /// <summary>
@@ -120,6 +120,7 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         internal void ApplyDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
+            Debug.LogError("2");
             ReceivingDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
             CombatAmountType combatAmountType;
             int totalDamage;
