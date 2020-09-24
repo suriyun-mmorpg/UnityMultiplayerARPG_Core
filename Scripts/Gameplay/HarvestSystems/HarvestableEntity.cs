@@ -85,42 +85,37 @@ namespace MultiplayerARPG
             RPC(AllOnHarvestableDestroy);
         }
 
-        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            if (!IsServer || this.IsDead() || weapon == null)
-                return;
-
-            base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
-
             BaseCharacterEntity attackerCharacter = null;
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
                 attackerCharacter = attacker.Entity as BaseCharacterEntity;
 
             // Apply damages
-            int totalDamage = 0;
+            float calculatingTotalDamage = 0f;
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             HarvestEffectiveness harvestEffectiveness;
             WeightedRandomizer<ItemDropByWeight> itemRandomizer;
             if (harvestable.CacheHarvestEffectivenesses.TryGetValue(weaponItem.WeaponType, out harvestEffectiveness) &&
                 harvestable.CacheHarvestItems.TryGetValue(weaponItem.WeaponType, out itemRandomizer))
             {
-                totalDamage = (int)(weaponItem.HarvestDamageAmount.GetAmount(weapon.level).Random() * harvestEffectiveness.damageEffectiveness);
+                calculatingTotalDamage = weaponItem.HarvestDamageAmount.GetAmount(weapon.level).Random() * harvestEffectiveness.damageEffectiveness;
                 ItemDropByWeight receivingItem = itemRandomizer.TakeOne();
-                int dataId = receivingItem.item.DataId;
-                short amount = (short)(receivingItem.amountPerDamage * totalDamage);
+                int itemDataId = receivingItem.item.DataId;
+                short itemAmount = (short)(receivingItem.amountPerDamage * calculatingTotalDamage);
                 bool droppingToGround = collectType == HarvestableCollectType.DropToGround;
 
                 if (attackerCharacter != null)
                 {
-                    if (attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
+                    if (attackerCharacter.IncreasingItemsWillOverwhelming(itemDataId, itemAmount))
                         droppingToGround = true;
                     if (!droppingToGround)
                     {
-                        CurrentGameManager.SendNotifyRewardItem(attackerCharacter.ConnectionId, dataId, amount);
-                        attackerCharacter.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
+                        CurrentGameManager.SendNotifyRewardItem(attackerCharacter.ConnectionId, itemDataId, itemAmount);
+                        attackerCharacter.IncreaseItems(CharacterItem.Create(itemDataId, 1, itemAmount));
                         attackerCharacter.FillEmptySlots();
                     }
-                    attackerCharacter.RewardExp(new Reward() { exp = totalDamage * harvestable.expPerDamage }, 1, RewardGivenType.Harvestable);
+                    attackerCharacter.RewardExp(new Reward() { exp = (int)(harvestable.expPerDamage * calculatingTotalDamage) }, 1, RewardGivenType.Harvestable);
                 }
                 else
                 {
@@ -129,14 +124,24 @@ namespace MultiplayerARPG
                 }
 
                 if (droppingToGround)
-                    ItemDropEntity.DropItem(this, CharacterItem.Create(dataId, 1, amount), new uint[0]);
+                    ItemDropEntity.DropItem(this, CharacterItem.Create(itemDataId, 1, itemAmount), new uint[0]);
             }
 
+            // Apply damages
+            combatAmountType = CombatAmountType.NormalDamage;
+            totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
-            ReceivedDamage(fromPosition, attacker, CombatAmountType.NormalDamage, totalDamage, weapon, skill, skillLevel);
 
+            // Do something when character dead
             if (this.IsDead())
                 DestroyAndRespawn();
+        }
+
+        protected override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        {
+            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
+            if (attacker != null && attacker.Entity is BaseCharacterEntity)
+                CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
         }
 
         public void DestroyAndRespawn()
@@ -149,11 +154,12 @@ namespace MultiplayerARPG
             isDestroyed = true;
             // Tell clients that the harvestable destroy to play animation at client
             RequestOnHarvestableDestroy();
+            // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(destroyDelay + destroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 Manager.StartCoroutine(RespawnRoutine());
-
+            // Destroy this entity
             NetworkDestroy(destroyDelay);
         }
 
@@ -172,13 +178,6 @@ namespace MultiplayerARPG
         {
             // Harvestable entity can receive damage inside safe area
             return true;
-        }
-
-        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
-        {
-            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
-            if (attacker != null && attacker.Entity is BaseCharacterEntity)
-                CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
         }
 
 #if UNITY_EDITOR

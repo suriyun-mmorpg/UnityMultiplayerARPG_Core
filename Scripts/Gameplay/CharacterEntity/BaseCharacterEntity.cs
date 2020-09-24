@@ -93,7 +93,6 @@ namespace MultiplayerARPG
         public override sealed float MoveAnimationSpeedMultiplier { get { return this.GetCaches().BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState, ExtraMovementState.None) / this.GetCaches().BaseMoveSpeed : 1f; } }
         public override sealed bool MuteFootstepSound { get { return this.GetCaches().MuteFootstepSound; } }
         public abstract int DataId { get; set; }
-        public CharacterHitBox[] HitBoxes { get; protected set; }
 
         public CharacterModelManager ModelManager { get; private set; }
 
@@ -120,7 +119,6 @@ namespace MultiplayerARPG
             if (miniMapUITransform == null)
                 miniMapUITransform = CacheTransform;
             ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
-            HitBoxes = GetComponentsInChildren<CharacterHitBox>();
         }
 
         protected override void EntityAwake()
@@ -555,24 +553,8 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            if (HitBoxes != null && HitBoxes.Length > 0)
-            {
-                // Character have hit boxes, let's hit boxes handle damages, so skip receive damage function here
-                return;
-            }
-
-            if (!IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
-                return;
-
-            ReceiveDamageFunction(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
-        }
-
-        internal virtual void ReceiveDamageFunction(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
-        {
-            base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
-
             BaseCharacterEntity attackerCharacter = null;
             if (attacker != null)
                 attackerCharacter = attacker.Entity as BaseCharacterEntity;
@@ -589,24 +571,23 @@ namespace MultiplayerARPG
             {
                 if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(attackerCharacter, this, out isCritical, out isBlocked))
                 {
-                    ReceivedDamage(fromPosition, attackerCharacter, CombatAmountType.Miss, 0, weapon, skill, skillLevel);
+                    // Don't hit (Miss)
+                    combatAmountType = CombatAmountType.Miss;
+                    totalDamage = 0;
                     return;
                 }
             }
 
             // Calculate damages
             float calculatingTotalDamage = 0f;
-            if (damageAmounts != null && damageAmounts.Count > 0)
+            float calculatingDamage;
+            MinMaxFloat damageAmount;
+            foreach (DamageElement damageElement in damageAmounts.Keys)
             {
-                MinMaxFloat damageAmount;
-                float tempReceivingDamage;
-                foreach (DamageElement damageElement in damageAmounts.Keys)
-                {
-                    damageAmount = damageAmounts[damageElement];
-                    tempReceivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
-                    if (tempReceivingDamage > 0f)
-                        calculatingTotalDamage += tempReceivingDamage;
-                }
+                damageAmount = damageAmounts[damageElement];
+                calculatingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
+                if (calculatingDamage > 0f)
+                    calculatingTotalDamage += calculatingDamage;
             }
 
             if (attackerCharacter != null)
@@ -621,15 +602,13 @@ namespace MultiplayerARPG
             }
 
             // Apply damages
-            int totalDamage = (int)calculatingTotalDamage;
-            CurrentHp -= totalDamage;
-
-            CombatAmountType combatAmountType = CombatAmountType.NormalDamage;
+            combatAmountType = CombatAmountType.NormalDamage;
             if (isBlocked)
                 combatAmountType = CombatAmountType.BlockedDamage;
             else if (isCritical)
                 combatAmountType = CombatAmountType.CriticalDamage;
-            ReceivedDamage(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            totalDamage = (int)calculatingTotalDamage;
+            CurrentHp -= totalDamage;
 
             // Interrupt casting skill when receive damage
             InterruptCastingSkill();
@@ -637,7 +616,7 @@ namespace MultiplayerARPG
             // Only TPS model will plays hit animation
             CharacterModel.PlayHitAnimation();
 
-            // If current hp <= 0, character dead
+            // Do something when character dead
             if (this.IsDead())
             {
                 // Cancel actions
@@ -656,7 +635,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        protected override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
             if (attacker != null && attacker.Entity is BaseCharacterEntity)

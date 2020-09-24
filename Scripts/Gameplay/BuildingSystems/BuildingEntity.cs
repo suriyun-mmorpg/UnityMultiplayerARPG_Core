@@ -266,27 +266,26 @@ namespace MultiplayerARPG
             return buildingTypes.Contains(BuildingArea.buildingType);
         }
 
-        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            if (!IsServer || this.IsDead())
-                return;
-
-            base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
+            // Calculate damages
             float calculatingTotalDamage = 0f;
-            if (damageAmounts.Count > 0)
+            float calculatingDamage;
+            MinMaxFloat damageAmount;
+            foreach (DamageElement damageElement in damageAmounts.Keys)
             {
-                foreach (KeyValuePair<DamageElement, MinMaxFloat> allDamageAmount in damageAmounts)
-                {
-                    DamageElement damageElement = allDamageAmount.Key;
-                    MinMaxFloat damageAmount = allDamageAmount.Value;
+                damageAmount = damageAmounts[damageElement];
+                calculatingDamage = damageAmount.Random();
+                if (calculatingDamage > 0f)
                     calculatingTotalDamage += damageAmount.Random();
-                }
             }
 
-            int totalDamage = (int)calculatingTotalDamage;
+            // Apply damages
+            combatAmountType = CombatAmountType.NormalDamage;
+            totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
-            ReceivedDamage(fromPosition, attacker, CombatAmountType.NormalDamage, totalDamage, weapon, skill, skillLevel);
 
+            // Do something when character dead
             if (this.IsDead())
                 Destroy();
         }
@@ -301,6 +300,7 @@ namespace MultiplayerARPG
             isDestroyed = true;
             // Tell clients that the building destroy to play animation at client
             CallAllOnBuildingDestroy();
+            // Drop items
             if (droppingItems != null && droppingItems.Count > 0)
             {
                 foreach (ItemAmount droppingItem in droppingItems)
@@ -310,6 +310,7 @@ namespace MultiplayerARPG
                     ItemDropEntity.DropItem(this, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new uint[0]);
                 }
             }
+            // Destroy this entity
             NetworkDestroy(destroyDelay);
         }
 
