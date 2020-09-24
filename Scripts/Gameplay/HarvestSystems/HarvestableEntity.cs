@@ -88,7 +88,7 @@ namespace MultiplayerARPG
         protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
             BaseCharacterEntity attackerCharacter = null;
-            if (attacker != null && attacker.Entity is BaseCharacterEntity)
+            if (attacker != null)
                 attackerCharacter = attacker.Entity as BaseCharacterEntity;
 
             // Apply damages
