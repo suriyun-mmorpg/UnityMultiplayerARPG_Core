@@ -703,13 +703,12 @@ namespace MultiplayerARPG
 
         private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
-            // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             playSpeedMultiplier *= tempActionAnimation.GetAnimSpeedRate();
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-            bool hasClip = tempActionAnimation.clip != null;
+            bool hasClip = tempActionAnimation.clip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
                 CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
@@ -730,6 +729,7 @@ namespace MultiplayerARPG
             }
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            // Stop doing action animation
             if (hasClip)
             {
                 animator.SetBool(ANIM_DO_ACTION, false);
@@ -749,7 +749,7 @@ namespace MultiplayerARPG
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
         {
             AnimationClip castClip = GetSkillCastClip(dataId);
-            bool hasClip = castClip != null;
+            bool hasClip = castClip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
                 bool playAllLayers = IsSkillCastClipPlayingAllLayers(dataId);
@@ -769,7 +769,9 @@ namespace MultiplayerARPG
                     animator.Play(castSkillStateNameHashes[castSkillStateLayer], castSkillStateLayer, 0f);
                 }
             }
+            // Waits by skill cast duration
             yield return new WaitForSecondsRealtime(duration);
+            // Stop casting skill animation
             if (hasClip)
             {
                 animator.SetBool(ANIM_IS_CASTING_SKILL, false);
@@ -779,14 +781,20 @@ namespace MultiplayerARPG
 
         public override void StopActionAnimation()
         {
-            animator.SetBool(ANIM_DO_ACTION, false);
-            animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
+            if (animator.isActiveAndEnabled)
+            {
+                animator.SetBool(ANIM_DO_ACTION, false);
+                animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
+            }
         }
 
         public override void StopSkillCastAnimation()
         {
-            animator.SetBool(ANIM_IS_CASTING_SKILL, false);
-            animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
+            if (animator.isActiveAndEnabled)
+            {
+                animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+                animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
+            }
         }
 
         public override void PlayHitAnimation()
@@ -799,8 +807,11 @@ namespace MultiplayerARPG
         IEnumerator PlayHitAnimationRoutine()
         {
             yield return null;
-            animator.ResetTrigger(ANIM_HURT);
-            animator.SetTrigger(ANIM_HURT);
+            if (animator.isActiveAndEnabled)
+            {
+                animator.ResetTrigger(ANIM_HURT);
+                animator.SetTrigger(ANIM_HURT);
+            }
         }
 
         public override float GetJumpAnimationDuration()
@@ -820,8 +831,11 @@ namespace MultiplayerARPG
         IEnumerator PlayJumpAnimationRoutine()
         {
             yield return null;
-            animator.ResetTrigger(ANIM_JUMP);
-            animator.SetTrigger(ANIM_JUMP);
+            if (animator.isActiveAndEnabled)
+            {
+                animator.ResetTrigger(ANIM_JUMP);
+                animator.SetTrigger(ANIM_JUMP);
+            }
         }
 
         public override void PlayPickupAnimation()
@@ -834,8 +848,11 @@ namespace MultiplayerARPG
         IEnumerator PlayPickUpAnimationRoutine()
         {
             yield return null;
-            animator.ResetTrigger(ANIM_PICKUP);
-            animator.SetTrigger(ANIM_PICKUP);
+            if (animator.isActiveAndEnabled)
+            {
+                animator.ResetTrigger(ANIM_PICKUP);
+                animator.SetTrigger(ANIM_PICKUP);
+            }
         }
 
 #if UNITY_EDITOR
