@@ -201,17 +201,13 @@ namespace MultiplayerARPG
             return base.GetMoveSpeed();
         }
 
-        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            if (!IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
-                return;
-
-            base.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
+            base.ApplyReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel, out combatAmountType, out totalDamage);
 
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
             {
                 BaseCharacterEntity attackerCharacter = attacker.Entity as BaseCharacterEntity;
-
                 // If character is not dead, try to attack
                 if (!this.IsDead())
                 {
@@ -228,6 +224,36 @@ namespace MultiplayerARPG
                     }
                 }
             }
+        }
+
+        protected override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        {
+            // Attacker can be null when character buff's buff applier is null, So avoid it
+            if (attacker != null)
+            {
+                BaseCharacterEntity attackerCharacter = attacker.Entity as BaseCharacterEntity;
+
+                // If summoned by someone, summoner is attacker
+                if (attackerCharacter != null &&
+                    attackerCharacter is BaseMonsterCharacterEntity &&
+                    (attackerCharacter as BaseMonsterCharacterEntity).IsSummoned)
+                    attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).Summoner;
+
+                // Add received damage entry
+                if (attackerCharacter != null)
+                {
+                    ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
+                    receivedDamageRecord.totalReceivedDamage = damage;
+                    if (receivedDamageRecords.ContainsKey(attackerCharacter))
+                    {
+                        receivedDamageRecord = receivedDamageRecords[attackerCharacter];
+                        receivedDamageRecord.totalReceivedDamage += damage;
+                    }
+                    receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
+                    receivedDamageRecords[attackerCharacter] = receivedDamageRecord;
+                }
+            }
+            base.ReceivedDamage(fromPosition, attacker, damageAmountType, damage, weapon, skill, skillLevel);
         }
 
         public override void GetAttackingData(
@@ -291,36 +317,6 @@ namespace MultiplayerARPG
         public override float GetAttackFov(bool isLeftHand)
         {
             return CharacterDatabase.DamageInfo.GetFov();
-        }
-
-        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
-        {
-            // Attacker can be null when character buff's buff applier is null, So avoid it
-            if (attacker != null)
-            {
-                BaseCharacterEntity attackerCharacter = attacker.Entity as BaseCharacterEntity;
-
-                // If summoned by someone, summoner is attacker
-                if (attackerCharacter != null &&
-                    attackerCharacter is BaseMonsterCharacterEntity &&
-                    (attackerCharacter as BaseMonsterCharacterEntity).IsSummoned)
-                    attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).Summoner;
-
-                // Add received damage entry
-                if (attackerCharacter != null)
-                {
-                    ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
-                    receivedDamageRecord.totalReceivedDamage = damage;
-                    if (receivedDamageRecords.ContainsKey(attackerCharacter))
-                    {
-                        receivedDamageRecord = receivedDamageRecords[attackerCharacter];
-                        receivedDamageRecord.totalReceivedDamage += damage;
-                    }
-                    receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
-                    receivedDamageRecords[attackerCharacter] = receivedDamageRecord;
-                }
-            }
-            base.ReceivedDamage(fromPosition, attacker, damageAmountType, damage, weapon, skill, skillLevel);
         }
 
         public override void Killed(IGameEntity lastAttacker)
