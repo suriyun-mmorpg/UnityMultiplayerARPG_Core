@@ -11,11 +11,26 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyReturnGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
 
         [Header("UI Elements for UI Dismantle Item")]
+        public InputFieldWrapper inputFieldDismantleAmount;
         public UIItemAmounts uiReturnItems;
         public TextWrapper uiTextReturnGold;
 
         protected bool activated;
         protected string activeItemId;
+
+        public short DismantleAmount
+        {
+            get
+            {
+                if (inputFieldDismantleAmount != null)
+                {
+                    short amount;
+                    if (short.TryParse(inputFieldDismantleAmount.text, out amount))
+                        return amount;
+                }
+                return Amount;
+            }
+        }
 
         public override void OnUpdateCharacterItems()
         {
@@ -52,7 +67,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < returningItems.Count; ++i)
             {
                 tempReturningItem = returningItems[i];
-                tempReturningItem.amount *= Amount;
+                tempReturningItem.amount *= DismantleAmount;
                 returningItems[i] = tempReturningItem;
             }
             if (uiReturnItems != null)
@@ -81,7 +96,7 @@ namespace MultiplayerARPG
                 {
                     uiTextReturnGold.text = string.Format(
                             LanguageManager.GetText(formatKeyReturnGold),
-                            (characterItem.GetItem().DismantleReturnGold * Amount).ToString("N0"));
+                            (characterItem.GetItem().DismantleReturnGold * DismantleAmount).ToString("N0"));
                 }
             }
         }
@@ -105,7 +120,7 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            OwningCharacter.CallServerDismantleItem((short)IndexOfData);
+            OwningCharacter.CallServerDismantleItem((short)IndexOfData, DismantleAmount);
         }
     }
 }
