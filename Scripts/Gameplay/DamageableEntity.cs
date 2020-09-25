@@ -49,6 +49,8 @@ namespace MultiplayerARPG
             if (opponentAimTransform == null)
                 opponentAimTransform = CombatTextTransform;
             HitBoxes = GetComponentsInChildren<DamageableHitBox>(true);
+            if (HitBoxes != null && HitBoxes.Length > 0)
+                gameObject.GetOrAddComponent<UnHittable>();
         }
 
         /// <summary>
@@ -120,7 +122,6 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         internal void ApplyDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            Debug.LogError("2");
             ReceivingDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
             CombatAmountType combatAmountType;
             int totalDamage;

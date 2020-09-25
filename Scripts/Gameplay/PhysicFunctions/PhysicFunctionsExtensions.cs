@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public static class PhysicFunctionsExtensions
     {
-        public static bool OverlapEntity<T>(this IPhysicFunctions functions, T entity, Vector3 position, float radius, int layerMask) where T : BaseGameEntity
+        public static bool OverlapEntity<T>(this IPhysicFunctions functions, T entity, Vector3 position, float radius, int layerMask, bool includeUnHittable = true) where T : BaseGameEntity
         {
             int count = functions.OverlapObjects(position, radius, layerMask);
             GameObject obj;
@@ -12,6 +12,8 @@ namespace MultiplayerARPG
             for (int i = 0; i < count; ++i)
             {
                 obj = functions.GetOverlapObject(i);
+                if (!includeUnHittable && obj.GetComponent<IUnHittable>() != null)
+                    continue;
                 comp = obj.GetComponent<IGameEntity>();
                 if (comp != null && comp.Entity == entity)
                     return true;
