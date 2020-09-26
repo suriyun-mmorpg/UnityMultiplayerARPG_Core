@@ -16,7 +16,11 @@ namespace MultiplayerARPG
         public struct UIToggleUI
         {
             public UIBase ui;
-            public KeyCode key;
+            [Tooltip("It will toggle `ui` when key with `keyCode` pressed or button with `buttonName` pressed.")]
+            [FormerlySerializedAs("key")]
+            public KeyCode keyCode;
+            [Tooltip("It will toggle `ui` when key with `keyCode` pressed or button with `buttonName` pressed.")]
+            public string buttonName;
         }
 
         [Header("Selected Target UIs")]
@@ -28,25 +32,47 @@ namespace MultiplayerARPG
         public UIBaseGameEntity uiTargetVehicle;
 
         [Header("Other UIs")]
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UINpcDialog uiNpcDialog;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIRefineItem uiRefineItem;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDismantleItem uiDismantleItem;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
+        public UIBulkDismantleItems uiBulkDismantleItems;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIRepairItem uiRepairItem;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIEnhanceSocketItem uiEnhanceSocketItem;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIConstructBuilding uiConstructBuilding;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UICurrentBuilding uiCurrentBuilding;
+        [Tooltip("If this UI was not set, it will use the same object with `uiCurrentBuilding`")]
         public UICurrentBuilding uiCurrentDoor;
+        [Tooltip("If this UI was not set, it will use the same object with `uiCurrentBuilding`")]
         public UICurrentBuilding uiCurrentStorage;
+        [Tooltip("If this UI was not set, it will use the same object with `uiCurrentBuilding`")]
         public UICurrentBuilding uiCurrentWorkbench;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIPlayerActivateMenu uiPlayerActivateMenu;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDealingRequest uiDealingRequest;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDealing uiDealing;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIPartyInvitation uiPartyInvitation;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIGuildInvitation uiGuildInvitation;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIStorageItems uiPlayerStorageItems;
+        [Tooltip("If this UI was not set, it will use the same object with `uiPlayerStorageItems`")]
         public UIStorageItems uiGuildStorageItems;
+        [Tooltip("If this UI was not set, it will use the same object with `uiPlayerStorageItems`")]
         public UIStorageItems uiBuildingStorageItems;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UICampfireItems uiBuildingCampfireItems;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UICraftItems uiBuildingCraftItems;
         public UIBase uiIsWarping;
 
@@ -76,12 +102,49 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
+            if (uiNpcDialog == null)
+                uiNpcDialog = gameObject.GetComponentInChildren<UINpcDialog>(true);
+            if (uiRefineItem == null)
+                uiRefineItem = gameObject.GetComponentInChildren<UIRefineItem>(true);
+            if (uiDismantleItem == null)
+                uiDismantleItem = gameObject.GetComponentInChildren<UIDismantleItem>(true);
+            if (uiBulkDismantleItems == null)
+                uiBulkDismantleItems = gameObject.GetComponentInChildren<UIBulkDismantleItems>(true);
+            if (uiRepairItem == null)
+                uiRepairItem = gameObject.GetComponentInChildren<UIRepairItem>(true);
+            if (uiEnhanceSocketItem == null)
+                uiEnhanceSocketItem = gameObject.GetComponentInChildren<UIEnhanceSocketItem>(true);
+            if (uiConstructBuilding == null)
+                uiConstructBuilding = gameObject.GetComponentInChildren<UIConstructBuilding>(true);
+            if (uiCurrentBuilding == null)
+                uiCurrentBuilding = gameObject.GetComponentInChildren<UICurrentBuilding>(true);
             if (uiCurrentDoor == null)
                 uiCurrentDoor = uiCurrentBuilding;
             if (uiCurrentStorage == null)
                 uiCurrentStorage = uiCurrentBuilding;
             if (uiCurrentWorkbench == null)
                 uiCurrentWorkbench = uiCurrentBuilding;
+            if (uiCurrentWorkbench == null)
+                uiPlayerActivateMenu = gameObject.GetComponentInChildren<UIPlayerActivateMenu>(true);
+            if (uiDealingRequest == null)
+                uiDealingRequest = gameObject.GetComponentInChildren<UIDealingRequest>(true);
+            if (uiDealing == null)
+                uiDealing = gameObject.GetComponentInChildren<UIDealing>(true);
+            if (uiPartyInvitation == null)
+                uiPartyInvitation = gameObject.GetComponentInChildren<UIPartyInvitation>(true);
+            if (uiGuildInvitation == null)
+                uiGuildInvitation = gameObject.GetComponentInChildren<UIGuildInvitation>(true);
+            if (uiPlayerStorageItems == null)
+                uiPlayerStorageItems = gameObject.GetComponentInChildren<UIStorageItems>(true);
+            if (uiGuildStorageItems == null)
+                uiGuildStorageItems = uiPlayerStorageItems;
+            if (uiBuildingStorageItems == null)
+                uiBuildingStorageItems = uiPlayerStorageItems;
+            if (uiBuildingCampfireItems == null)
+                uiBuildingCampfireItems = gameObject.GetComponentInChildren<UICampfireItems>(true);
+            if (uiBuildingCraftItems == null)
+                uiBuildingCraftItems = gameObject.GetComponentInChildren<UICraftItems>(true);
+
             if (blockControllerUis != null && blockControllerUis.Count > 0)
             {
                 foreach (UIBase ui in blockControllerUis)
@@ -111,11 +174,8 @@ namespace MultiplayerARPG
 
             foreach (UIToggleUI toggleUi in toggleUis)
             {
-                if (Input.GetKeyDown(toggleUi.key))
-                {
-                    UIBase ui = toggleUi.ui;
-                    ui.Toggle();
-                }
+                if (Input.GetKeyDown(toggleUi.keyCode) || InputManager.GetButtonDown(toggleUi.buttonName))
+                    toggleUi.ui.Toggle();
             }
         }
 
@@ -527,8 +587,8 @@ namespace MultiplayerARPG
 
         public override bool IsDismantleItemDialogVisible()
         {
-            return uiDismantleItem != null &&
-                uiDismantleItem.IsVisible();
+            return (uiDismantleItem != null && uiDismantleItem.IsVisible()) ||
+                (uiBulkDismantleItems != null && uiBulkDismantleItems.IsVisible());
         }
 
         public override bool IsRepairItemDialogVisible()

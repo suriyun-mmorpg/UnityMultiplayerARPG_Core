@@ -1,15 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class UIToggler : MonoBehaviour
 {
     public UIBase ui;
-    public KeyCode key;
+    [Tooltip("It will toggle `ui` when key with `keyCode` pressed or button with `buttonName` pressed.")]
+    [FormerlySerializedAs("key")]
+    public KeyCode keyCode;
+    [Tooltip("It will toggle `ui` when key with `keyCode` pressed or button with `buttonName` pressed.")]
+    public string buttonName;
 
     private void Update()
     {
-        if (Input.GetKeyDown(key))
+        if (Input.GetKeyDown(keyCode) || InputManager.GetButtonDown(buttonName))
             ui.Toggle();
     }
 }
