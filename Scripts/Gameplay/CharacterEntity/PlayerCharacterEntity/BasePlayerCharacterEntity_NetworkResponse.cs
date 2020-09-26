@@ -255,14 +255,14 @@ namespace MultiplayerARPG
 
             // Simulate data before applies
             List<CharacterItem> tempNonEquipItems = new List<CharacterItem>(nonEquipItems);
-            if (!tempNonEquipItems.DecreaseItemsByIndex(index, tempNonEquipItems[index].amount, CurrentGameInstance.IsLimitInventorySlot))
+            if (!tempNonEquipItems.DecreaseItemsByIndex(index, amount, CurrentGameInstance.IsLimitInventorySlot))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
                 return;
             }
 
             // Character can receives all items or not?
-            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(nonEquipItem);
+            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(nonEquipItem, amount);
             if (tempNonEquipItems.IncreasingItemsWillOverwhelming(
                 returningItems,
                 true,
@@ -276,10 +276,10 @@ namespace MultiplayerARPG
             }
 
             // Applies simulates data
+            Gold += nonEquipItem.GetItem().DismantleReturnGold * amount;
             this.DecreaseItemsByIndex(index, amount);
             this.IncreaseItems(returningItems);
             this.FillEmptySlots();
-            Gold += nonEquipItems[index].GetItem().DismantleReturnGold * amount;
 #endif
         }
 
