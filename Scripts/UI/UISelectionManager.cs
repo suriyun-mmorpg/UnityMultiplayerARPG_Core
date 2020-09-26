@@ -7,6 +7,7 @@ public enum UISelectionMode
 {
     SelectSingle,
     Toggle,
+    SelectMultiple,
 }
 
 public abstract class UISelectionManager : MonoBehaviour
@@ -109,10 +110,13 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
             eventOnDataSelect.Invoke(castedUI.Data);
 
         SelectedUI = castedUI;
-        foreach (TUI deselectUI in uis)
+        if (selectionMode != UISelectionMode.SelectMultiple)
         {
-            if (deselectUI != castedUI)
-                deselectUI.Deselect();
+            foreach (TUI deselectUI in uis)
+            {
+                if (deselectUI != castedUI)
+                    deselectUI.Deselect();
+            }
         }
 
         if (eventOnSelected != null)

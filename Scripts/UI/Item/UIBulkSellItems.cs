@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            uiNonEquipItems.CacheItemSelectionManager.selectionMode = UISelectionMode.Toggle;
+            uiNonEquipItems.CacheItemSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
         }
 
         private void OnDisable()
