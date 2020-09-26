@@ -151,6 +151,17 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
             eventOnDataDeselected.Invoke(castedUI.Data);
     }
 
+    public List<TUI> GetSelectedUIs()
+    {
+        List<TUI> result = new List<TUI>();
+        foreach (TUI ui in uis)
+        {
+            if (ui.IsSelected)
+                result.Add(ui);
+        }
+        return result;
+    }
+
     public override sealed void DeselectAll()
     {
         SelectedUI = null;
