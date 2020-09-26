@@ -68,14 +68,6 @@ namespace MultiplayerARPG
             }
 
             List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(characterItem, DismantleAmount);
-            // Multiplies with dismantle item amount
-            ItemAmount tempReturningItem;
-            for (int i = 0; i < returningItems.Count; ++i)
-            {
-                tempReturningItem = returningItems[i];
-                tempReturningItem.amount *= DismantleAmount;
-                returningItems[i] = tempReturningItem;
-            }
             if (uiReturnItems != null)
             {
                 if (characterItem.IsEmptySlot() || returningItems.Count == 0)
