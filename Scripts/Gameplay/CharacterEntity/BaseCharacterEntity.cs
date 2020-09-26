@@ -929,6 +929,32 @@ namespace MultiplayerARPG
             return Vector3.Angle(targetDir, forward) < fov * 0.5f;
         }
 
+        public List<T> FindGameEntities<T>(float distance, int layerMask)
+            where T : class, IGameEntity
+        {
+            List<T> result = new List<T>();
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, layerMask);
+            if (tempOverlapSize == 0)
+                return result;
+            GameObject tempGameObject;
+            IGameEntity tempBaseEntity;
+            T tempEntity;
+            for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
+            {
+                tempGameObject = FindPhysicFunctions.GetOverlapObject(tempLoopCounter);
+                tempBaseEntity = tempGameObject.GetComponent<IGameEntity>();
+                if (tempBaseEntity == null)
+                    continue;
+                tempEntity = tempBaseEntity.Entity as T;
+                if (tempEntity == null)
+                    continue;
+                if (result.Contains(tempEntity))
+                    continue;
+                result.Add(tempEntity);
+            }
+            return result;
+        }
+
         public List<T> FindDamageableEntities<T>(float distance, int layerMask, bool findForAlive, bool findInFov = false, float fov = 0)
             where T : class, IDamageableEntity
         {

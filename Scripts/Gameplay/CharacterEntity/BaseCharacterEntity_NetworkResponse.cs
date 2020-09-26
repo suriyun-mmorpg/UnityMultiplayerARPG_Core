@@ -45,7 +45,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// This will be called at server to order character to pickup items
+        /// This will be called at server to order character to pickup selected item
         /// </summary>
         /// <param name="objectId"></param>
         [ServerRpc]
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out itemDropEntity))
                 return;
 
-            if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > CurrentGameInstance.pickUpItemDistance + 5f)
+            if (GameplayUtils.BoundsDistance(WorldBounds, itemDropEntity.WorldBounds) > CurrentGameInstance.pickUpItemDistance)
                 return;
 
             if (!itemDropEntity.IsAbleToLoot(this))
@@ -80,6 +80,22 @@ namespace MultiplayerARPG
             });
             this.FillEmptySlots();
             itemDropEntity.PickedUp();
+#endif
+        }
+
+        /// <summary>
+        /// This will be called at server to order character to pickup nearby items
+        /// </summary>
+        protected virtual void ServerPickupNearbyItems()
+        {
+#if !CLIENT_BUILD
+            if (!CanDoActions())
+                return;
+            List<ItemDropEntity> itemDropEntities = FindGameEntities<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
+            foreach (ItemDropEntity itemDropEntity in itemDropEntities)
+            {
+                ServerPickupItem(itemDropEntity.ObjectId);
+            }
 #endif
         }
 
