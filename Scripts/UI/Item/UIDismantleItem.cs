@@ -67,7 +67,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(characterItem);
+            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(characterItem, DismantleAmount);
             // Multiplies with dismantle item amount
             ItemAmount tempReturningItem;
             for (int i = 0; i < returningItems.Count; ++i)
@@ -133,6 +133,8 @@ namespace MultiplayerARPG
         {
             if (Amount > 1)
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM_DESCRIPTION.ToString()), OnDismantleItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+            else
+                DismantleAmount = Amount;
         }
 
         private void OnDismantleItemAmountConfirmed(int amount)
