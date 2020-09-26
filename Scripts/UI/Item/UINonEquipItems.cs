@@ -35,13 +35,15 @@ namespace MultiplayerARPG
             {
                 if (cacheItemSelectionManager == null)
                     cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheItemSelectionManager;
             }
         }
 
+        private UISelectionMode dirtySelectionMode;
+
         protected virtual void OnEnable()
         {
+            CacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
             CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
             CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
             CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
@@ -85,7 +87,7 @@ namespace MultiplayerARPG
                 CacheItemSelectionManager.DeselectSelectedUI();
                 return;
             }
-            if (uiItemDialog != null)
+            if (uiItemDialog != null && CacheItemSelectionManager.selectionMode == UISelectionMode.SelectSingle)
             {
                 uiItemDialog.selectionManager = CacheItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, character, ui.IndexOfData);
@@ -95,7 +97,7 @@ namespace MultiplayerARPG
 
         protected void OnDeselectCharacterItem(UICharacterItem ui)
         {
-            if (uiItemDialog != null)
+            if (uiItemDialog != null && CacheItemSelectionManager.selectionMode == UISelectionMode.SelectSingle)
             {
                 uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
                 uiItemDialog.Hide();
@@ -162,6 +164,21 @@ namespace MultiplayerARPG
                     tempUiCharacterItem.Hide();
                 }
             });
+        }
+
+        private void Update()
+        {
+            if (CacheItemSelectionManager.selectionMode != dirtySelectionMode)
+            {
+                CacheItemSelectionManager.DeselectAll();
+                dirtySelectionMode = CacheItemSelectionManager.selectionMode;
+                if (uiItemDialog != null)
+                {
+                    uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+                    uiItemDialog.Hide();
+                    uiItemDialog.onHide.AddListener(OnItemDialogHide);
+                }
+            }
         }
     }
 }
