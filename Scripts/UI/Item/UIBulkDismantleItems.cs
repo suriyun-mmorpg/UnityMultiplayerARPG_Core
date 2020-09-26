@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyReturnGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
 
         [Header("UI Elements")]
+        [Tooltip("UI which showing items in inventory, will use it to select items to dismantle")]
         public UINonEquipItems uiNonEquipItems;
         public UIItemAmounts uiReturnItems;
         public TextWrapper uiTextReturnGold;
@@ -27,6 +28,8 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
+            if (uiNonEquipItems == null)
+                uiNonEquipItems = FindObjectOfType<UINonEquipItems>();
             int returnGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
             CharacterItem tempCharacterItem;

@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyReturnGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
 
         [Header("UI Elements")]
+        [Tooltip("UI which showing items in inventory, will use it to select items to sell")]
         public UINonEquipItems uiNonEquipItems;
         public TextWrapper uiTextReturnGold;
 
@@ -26,6 +27,8 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
+            if (uiNonEquipItems == null)
+                uiNonEquipItems = FindObjectOfType<UINonEquipItems>();
             int returnGold = 0;
             CharacterItem tempCharacterItem;
             List<UICharacterItem> selectedUIs = uiNonEquipItems.CacheItemSelectionManager.GetSelectedUIs();
