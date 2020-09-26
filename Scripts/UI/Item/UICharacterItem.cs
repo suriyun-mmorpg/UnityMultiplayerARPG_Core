@@ -183,7 +183,7 @@ namespace MultiplayerARPG
 
             if (lockRemainsDuration <= 0f)
             {
-                lockRemainsDuration = CharacterItem.lockRemainsDuration;
+                lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
                 if (lockRemainsDuration <= 1f)
                     lockRemainsDuration = 0f;
             }
@@ -323,7 +323,7 @@ namespace MultiplayerARPG
 
             if (uiTextStack != null)
             {
-                string stackString = "";
+                string stackString;
                 if (Item == null)
                 {
                     stackString = string.Format(
@@ -344,7 +344,7 @@ namespace MultiplayerARPG
 
             if (uiTextDurability != null)
             {
-                string durabilityString = "";
+                string durabilityString;
                 if (Item == null)
                 {
                     durabilityString = string.Format(
