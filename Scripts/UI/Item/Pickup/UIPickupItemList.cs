@@ -78,5 +78,10 @@ namespace MultiplayerARPG
                 return;
             BasePlayerCharacterController.OwningCharacter.CallServerPickupItem(uint.Parse(selectedId));
         }
+
+        public void OnClickPickupNearbyItems()
+        {
+            BasePlayerCharacterController.OwningCharacter.CallServerPickupNearbyItems();
+        }
     }
 }
