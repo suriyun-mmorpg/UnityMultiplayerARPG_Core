@@ -284,8 +284,16 @@ namespace MultiplayerARPG
             combatAmountType = CombatAmountType.NormalDamage;
             totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
+        }
 
-            // Do something when character dead
+        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        {
+            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
+
+            if (combatAmountType == CombatAmountType.Miss)
+                return;
+
+            // Do something when entity dead
             if (this.IsDead())
                 Destroy();
         }

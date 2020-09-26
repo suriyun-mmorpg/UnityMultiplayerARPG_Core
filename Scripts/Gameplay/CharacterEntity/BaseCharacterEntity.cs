@@ -609,6 +609,16 @@ namespace MultiplayerARPG
                 combatAmountType = CombatAmountType.CriticalDamage;
             totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
+        }
+
+        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        {
+            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
+            if (attacker != null && attacker.Entity is BaseCharacterEntity)
+                CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
+
+            if (combatAmountType == CombatAmountType.Miss)
+                return;
 
             // Interrupt casting skill when receive damage
             InterruptCastingSkill();
@@ -633,13 +643,6 @@ namespace MultiplayerARPG
                 if (skill != null && skill.IsDebuff())
                     ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, attacker);
             }
-        }
-
-        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
-        {
-            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
-            if (attacker != null && attacker.Entity is BaseCharacterEntity)
-                CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
         }
         #endregion
 

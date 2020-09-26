@@ -131,10 +131,6 @@ namespace MultiplayerARPG
             combatAmountType = CombatAmountType.NormalDamage;
             totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
-
-            // Do something when character dead
-            if (this.IsDead())
-                DestroyAndRespawn();
         }
 
         public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
@@ -142,6 +138,13 @@ namespace MultiplayerARPG
             base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
                 CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
+
+            if (combatAmountType == CombatAmountType.Miss)
+                return;
+
+            // Do something when entity dead
+            if (this.IsDead())
+                DestroyAndRespawn();
         }
 
         public void DestroyAndRespawn()
