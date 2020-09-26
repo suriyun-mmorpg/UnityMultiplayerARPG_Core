@@ -66,6 +66,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            CanRefine = false;
             ItemRefineLevel refineLevel = default(ItemRefineLevel);
             if (!characterItem.IsEmptySlot())
             {

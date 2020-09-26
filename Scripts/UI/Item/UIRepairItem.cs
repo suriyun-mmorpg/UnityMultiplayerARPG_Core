@@ -41,6 +41,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            CanRepair = false;
             float maxDurability = 0f;
             ItemRepairPrice itemRepairPrice = default(ItemRepairPrice);
             if (!characterItem.IsEmptySlot())
