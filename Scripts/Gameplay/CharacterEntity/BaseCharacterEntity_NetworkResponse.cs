@@ -55,12 +55,18 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            ItemDropEntity itemDropEntity = null;
+            ItemDropEntity itemDropEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out itemDropEntity))
+            {
+                // Can't find the entity
                 return;
+            }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, itemDropEntity.WorldBounds) > CurrentGameInstance.pickUpItemDistance)
+            if (!IsGameEntityInDistance(itemDropEntity, CurrentGameInstance.pickUpItemDistance))
+            {
+                // Too far from the entity
                 return;
+            }
 
             if (!itemDropEntity.IsAbleToLoot(this))
             {
@@ -91,7 +97,7 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             if (!CanDoActions())
                 return;
-            List<ItemDropEntity> itemDropEntities = FindGameEntities<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
+            List<ItemDropEntity> itemDropEntities = FindGameEntitiesInDistance<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
             foreach (ItemDropEntity itemDropEntity in itemDropEntities)
             {
                 ServerPickupItem(itemDropEntity.ObjectId);

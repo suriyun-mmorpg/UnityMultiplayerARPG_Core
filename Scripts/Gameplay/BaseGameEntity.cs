@@ -73,10 +73,6 @@ namespace MultiplayerARPG
             get { return model; }
         }
 
-        public Bounds LocalBounds { get; protected set; }
-
-        public Bounds WorldBounds { get { return new Bounds(CacheTransform.position + LocalBounds.center, LocalBounds.size); } }
-
         public Transform CacheTransform { get; private set; }
 
         [Tooltip("Transform for position which camera will look at and follow while playing in TPS view mode")]
@@ -319,7 +315,6 @@ namespace MultiplayerARPG
             if (fpsCameraTargetTransform == null)
                 fpsCameraTargetTransform = CacheTransform;
             Movement = GetComponent<BaseEntityMovement>();
-            LocalBounds = MakeLocalBounds();
         }
 
         /// <summary>
@@ -346,11 +341,6 @@ namespace MultiplayerARPG
 
         protected virtual void OnDrawGizmosSelected()
         {
-            if (Application.isPlaying)
-            {
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawWireCube(WorldBounds.center, WorldBounds.size);
-            }
         }
 #endif
 

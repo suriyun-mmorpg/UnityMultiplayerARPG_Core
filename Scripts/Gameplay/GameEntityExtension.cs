@@ -25,20 +25,6 @@ namespace MultiplayerARPG
             return gameEntity.Entity.CacheTransform;
         }
 
-        public static Bounds GetLocalBounds(this IGameEntity gameEntity)
-        {
-            if (gameEntity == null || !gameEntity.Entity)
-                return new Bounds();
-            return gameEntity.Entity.LocalBounds;
-        }
-
-        public static Bounds GetWorldBounds(this IGameEntity gameEntity)
-        {
-            if (gameEntity == null || !gameEntity.Entity)
-                return new Bounds();
-            return gameEntity.Entity.WorldBounds;
-        }
-
         public static GameObject GetGameObject(this IGameEntity gameEntity)
         {
             if (gameEntity == null || !gameEntity.Entity)

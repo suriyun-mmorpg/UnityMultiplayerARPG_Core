@@ -151,13 +151,13 @@ namespace MultiplayerARPG
             WarpPortalEntity warpPortalEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out warpPortalEntity))
             {
-                // Can't find the building
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, warpPortalEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(warpPortalEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the warp portal
+                // Too far from the entity
                 return;
             }
 
@@ -210,13 +210,13 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
-                // Can't find the building
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, buildingEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the building
+                // Too far from the entity
                 return;
             }
 
@@ -433,7 +433,7 @@ namespace MultiplayerARPG
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return;
             }
-            if (GameplayUtils.BoundsDistance(WorldBounds, targetCharacterEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(targetCharacterEntity, CurrentGameInstance.conversationDistance))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
@@ -465,7 +465,7 @@ namespace MultiplayerARPG
                 StopDealing();
                 return;
             }
-            if (GameplayUtils.BoundsDistance(WorldBounds, DealingCharacter.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(DealingCharacter, CurrentGameInstance.conversationDistance))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 StopDealing();
@@ -915,13 +915,13 @@ namespace MultiplayerARPG
             StorageEntity storageEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out storageEntity))
             {
-                // Can't find the storage
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, storageEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(storageEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the storage
+                // Too far from the entity
                 return;
             }
 
@@ -956,13 +956,13 @@ namespace MultiplayerARPG
             DoorEntity doorEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out doorEntity))
             {
-                // Can't find the door
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, doorEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(doorEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the door
+                // Too far from the entity
                 return;
             }
 
@@ -986,13 +986,13 @@ namespace MultiplayerARPG
             DoorEntity doorEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out doorEntity))
             {
-                // Can't find the door
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, doorEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(doorEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the door
+                // Too far from the entity
                 return;
             }
 
@@ -1010,13 +1010,13 @@ namespace MultiplayerARPG
             CampFireEntity campfireEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out campfireEntity))
             {
-                // Can't find the door
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, campfireEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(campfireEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the door
+                // Too far from the entity
                 return;
             }
 
@@ -1034,13 +1034,13 @@ namespace MultiplayerARPG
             CampFireEntity campfireEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out campfireEntity))
             {
-                // Can't find the door
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, campfireEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(campfireEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the door
+                // Too far from the entity
                 return;
             }
 
@@ -1058,13 +1058,13 @@ namespace MultiplayerARPG
             WorkbenchEntity workbenchEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out workbenchEntity))
             {
-                // Can't find the workbench
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, workbenchEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(workbenchEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the workbench
+                // Too far from the entity
                 return;
             }
 
@@ -1118,13 +1118,13 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
-                // Can't find the building
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, buildingEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the building
+                // Too far from the entity
                 return;
             }
 
@@ -1155,13 +1155,13 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
-                // Can't find the building
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, buildingEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the building
+                // Too far from the entity
                 return;
             }
 
@@ -1191,13 +1191,13 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
             {
-                // Can't find the building
+                // Can't find the entity
                 return;
             }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, buildingEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the building
+                // Too far from the entity
                 return;
             }
 

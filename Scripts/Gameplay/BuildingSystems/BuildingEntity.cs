@@ -195,17 +195,7 @@ namespace MultiplayerARPG
         public void RegisterMaterial(BuildingMaterial material)
         {
             if (!buildingMaterials.Contains(material))
-            {
-                Bounds tempLocalBounds = LocalBounds;
-                Bounds tempMatLocalBounds = GameplayUtils.MakeLocalBoundsByCollider(material.CacheTransform);
-                tempMatLocalBounds.center = material.CacheTransform.position - CacheTransform.position;
-                if (tempLocalBounds.extents == Vector3.zero)
-                    tempLocalBounds = tempMatLocalBounds;
-                else
-                    tempLocalBounds.Encapsulate(tempMatLocalBounds);
-                LocalBounds = tempLocalBounds;
                 buildingMaterials.Add(material);
-            }
         }
 
         public override void OnSetup()

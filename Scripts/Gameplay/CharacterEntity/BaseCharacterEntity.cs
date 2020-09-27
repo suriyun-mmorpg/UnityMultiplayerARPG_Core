@@ -932,30 +932,16 @@ namespace MultiplayerARPG
             return Vector3.Angle(targetDir, forward) < fov * 0.5f;
         }
 
-        public List<T> FindGameEntities<T>(float distance, int layerMask)
+        public bool IsGameEntityInDistance<T>(T targetEntity, float distance, bool includeUnHittable = true)
             where T : class, IGameEntity
         {
-            List<T> result = new List<T>();
-            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, layerMask);
-            if (tempOverlapSize == 0)
-                return result;
-            GameObject tempGameObject;
-            IGameEntity tempBaseEntity;
-            T tempEntity;
-            for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
-            {
-                tempGameObject = FindPhysicFunctions.GetOverlapObject(tempLoopCounter);
-                tempBaseEntity = tempGameObject.GetComponent<IGameEntity>();
-                if (tempBaseEntity == null)
-                    continue;
-                tempEntity = tempBaseEntity.Entity as T;
-                if (tempEntity == null)
-                    continue;
-                if (result.Contains(tempEntity))
-                    continue;
-                result.Add(tempEntity);
-            }
-            return result;
+            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, CacheTransform.position, distance, includeUnHittable);
+        }
+
+        public List<T> FindGameEntitiesInDistance<T>(float distance, int layerMask)
+            where T : class, IGameEntity
+        {
+            return FindPhysicFunctions.FindGameEntitiesInDistance<T>(CacheTransform.position, distance, layerMask);
         }
 
         public List<T> FindDamageableEntities<T>(float distance, int layerMask, bool findForAlive, bool findInFov = false, float fov = 0)
@@ -965,13 +951,11 @@ namespace MultiplayerARPG
             int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, layerMask);
             if (tempOverlapSize == 0)
                 return result;
-            GameObject tempGameObject;
             IDamageableEntity tempBaseEntity;
             T tempEntity;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                tempGameObject = FindPhysicFunctions.GetOverlapObject(tempLoopCounter);
-                tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                tempBaseEntity = FindPhysicFunctions.GetOverlapObject(tempLoopCounter).GetComponent<IDamageableEntity>();
                 if (tempBaseEntity == null)
                     continue;
                 tempEntity = tempBaseEntity.Entity as T;
@@ -1001,13 +985,11 @@ namespace MultiplayerARPG
             int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
             if (tempOverlapSize == 0)
                 return result;
-            GameObject tempGameObject;
             IDamageableEntity tempBaseEntity;
             T tempEntity;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                tempGameObject = FindPhysicFunctions.GetOverlapObject(tempLoopCounter);
-                tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                tempBaseEntity = FindPhysicFunctions.GetOverlapObject(tempLoopCounter).GetComponent<IDamageableEntity>();
                 if (tempBaseEntity == null)
                     continue;
                 tempEntity = tempBaseEntity.Entity as T;
@@ -1032,7 +1014,6 @@ namespace MultiplayerARPG
             int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
             if (tempOverlapSize == 0)
                 return null;
-            GameObject tempGameObject;
             float tempDistance;
             IDamageableEntity tempBaseEntity;
             T tempEntity;
@@ -1040,8 +1021,7 @@ namespace MultiplayerARPG
             T nearestEntity = null;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                tempGameObject = FindPhysicFunctions.GetOverlapObject(tempLoopCounter);
-                tempBaseEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                tempBaseEntity = FindPhysicFunctions.GetOverlapObject(tempLoopCounter).GetComponent<IDamageableEntity>();
                 if (tempBaseEntity == null)
                     continue;
                 tempEntity = tempBaseEntity.Entity as T;

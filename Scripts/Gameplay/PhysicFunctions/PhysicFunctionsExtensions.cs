@@ -1,24 +1,50 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public static class PhysicFunctionsExtensions
     {
-        public static bool OverlapEntity<T>(this IPhysicFunctions functions, T entity, Vector3 position, float radius, int layerMask, bool includeUnHittable = true) where T : BaseGameEntity
+        public static bool IsGameEntityInDistance<T>(this IPhysicFunctions functions, T targetEntity, Vector3 position, float distance, bool includeUnHittable)
+            where T : class, IGameEntity
         {
-            int count = functions.OverlapObjects(position, radius, layerMask);
-            GameObject obj;
-            IGameEntity comp;
-            for (int i = 0; i < count; ++i)
+            int tempOverlapSize = functions.OverlapObjects(position, distance, 1 << targetEntity.GetGameObject().layer);
+            if (tempOverlapSize == 0)
+                return false;
+            IGameEntity tempBaseEntity;
+            for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                obj = functions.GetOverlapObject(i);
-                if (!includeUnHittable && obj.GetComponent<IUnHittable>() != null)
+                if (!includeUnHittable && functions.GetOverlapObject(tempLoopCounter).GetComponent<IUnHittable>() != null)
                     continue;
-                comp = obj.GetComponent<IGameEntity>();
-                if (comp != null && comp.Entity == entity)
+                tempBaseEntity = functions.GetOverlapObject(tempLoopCounter).GetComponent<IGameEntity>();
+                if (tempBaseEntity != null && tempBaseEntity.Entity == targetEntity.Entity)
                     return true;
             }
             return false;
+        }
+
+        public static List<T> FindGameEntitiesInDistance<T>(this IPhysicFunctions functions, Vector3 position, float distance, int layerMask)
+            where T : class, IGameEntity
+        {
+            List<T> result = new List<T>();
+            int tempOverlapSize = functions.OverlapObjects(position, distance, layerMask);
+            if (tempOverlapSize == 0)
+                return result;
+            IGameEntity tempBaseEntity;
+            T tempEntity;
+            for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
+            {
+                tempBaseEntity = functions.GetOverlapObject(tempLoopCounter).GetComponent<IGameEntity>();
+                if (tempBaseEntity == null)
+                    continue;
+                tempEntity = tempBaseEntity.Entity as T;
+                if (tempEntity == null)
+                    continue;
+                if (result.Contains(tempEntity))
+                    continue;
+                result.Add(tempEntity);
+            }
+            return result;
         }
     }
 }

@@ -16,10 +16,16 @@ namespace MultiplayerARPG
 
             NpcEntity npcEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out npcEntity))
+            {
+                // Can't find the entity
                 return;
+            }
 
-            if (GameplayUtils.BoundsDistance(WorldBounds, npcEntity.WorldBounds) > CurrentGameInstance.conversationDistance)
+            if (!IsGameEntityInDistance(npcEntity, CurrentGameInstance.conversationDistance))
+            {
+                // Too far from the entity
                 return;
+            }
 
             CurrentNpcDialog = npcEntity.StartDialog;
             if (CurrentNpcDialog != null)
