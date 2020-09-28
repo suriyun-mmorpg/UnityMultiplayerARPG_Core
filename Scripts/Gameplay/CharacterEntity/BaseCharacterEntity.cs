@@ -936,13 +936,13 @@ namespace MultiplayerARPG
         public bool IsGameEntityInDistance<T>(T targetEntity, float distance, bool includeUnHittable = true)
             where T : class, IGameEntity
         {
-            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, MovementTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
+            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, CacheTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
         }
 
         public List<T> FindGameEntitiesInDistance<T>(float distance, int layerMask)
             where T : class, IGameEntity
         {
-            return FindPhysicFunctions.FindGameEntitiesInDistance<T>(MovementTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, layerMask);
+            return FindPhysicFunctions.FindGameEntitiesInDistance<T>(CacheTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, layerMask);
         }
 
         public List<T> FindDamageableEntities<T>(float distance, int layerMask, bool findForAlive, bool findInFov = false, float fov = 0)

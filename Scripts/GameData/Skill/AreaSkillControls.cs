@@ -29,7 +29,7 @@ namespace MultiplayerARPG
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = GameplayUtils.CursorWorldPosition(Camera.main, cursorPosition);
-            position = GameplayUtils.ClampPosition(BasePlayerCharacterController.Singleton.MovementTransform.position, position, castDistance);
+            position = GameplayUtils.ClampPosition(BasePlayerCharacterController.OwningCharacter.CacheTransform.position, position, castDistance);
             position = PhysicUtils.FindGroundedPosition(position, GROUND_DETECTION_RAYCAST_LENGTH, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
             if (targetObject != null)
             {
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         public static Vector3? UpdateAimControls_Mobile(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
-            Vector3 position = BasePlayerCharacterController.Singleton.MovementTransform.position + (GameplayUtils.GetDirectionByAxes(Camera.main.transform, aimAxes.x, aimAxes.y) * castDistance);
+            Vector3 position = BasePlayerCharacterController.OwningCharacter.CacheTransform.position + (GameplayUtils.GetDirectionByAxes(Camera.main.transform, aimAxes.x, aimAxes.y) * castDistance);
             position = PhysicUtils.FindGroundedPosition(position, GROUND_DETECTION_RAYCAST_LENGTH, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
             if (targetObject != null)
             {

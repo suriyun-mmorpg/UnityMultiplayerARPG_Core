@@ -14,7 +14,7 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaByAxes(Vector2 aimAxes)
         {
-            LoopSetBuildingArea(physicFunctions.RaycastDown(MovementTransform.position + (GameplayUtils.GetDirectionByAxes(CacheGameplayCameraTransform, aimAxes.x, aimAxes.y) * ConstructingBuildingEntity.buildDistance), CurrentGameInstance.GetBuildLayerMask()));
+            LoopSetBuildingArea(physicFunctions.RaycastDown(CacheTransform.position + (GameplayUtils.GetDirectionByAxes(CacheGameplayCameraTransform, aimAxes.x, aimAxes.y) * ConstructingBuildingEntity.buildDistance), CurrentGameInstance.GetBuildLayerMask()));
         }
 
         public void FindAndSetBuildingAreaByMousePosition()
@@ -36,7 +36,7 @@ namespace MultiplayerARPG
             for (int tempCounter = 0; tempCounter < count; ++tempCounter)
             {
                 tempTransform = physicFunctions.GetRaycastTransform(tempCounter);
-                tempVector3 = GameplayUtils.ClampPosition(MovementTransform.position, physicFunctions.GetRaycastPoint(tempCounter), ConstructingBuildingEntity.buildDistance);
+                tempVector3 = GameplayUtils.ClampPosition(CacheTransform.position, physicFunctions.GetRaycastPoint(tempCounter), ConstructingBuildingEntity.buildDistance);
 
                 buildingArea = tempTransform.GetComponent<BuildingArea>();
                 if (buildingArea == null ||
