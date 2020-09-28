@@ -195,7 +195,7 @@ namespace MultiplayerARPG
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
-            if (lockingTarget != null && lockingTarget != target)
+            if (lockingTarget != null && lockingTarget.GetObjectId() != target.GetObjectId())
                 return false;
 
             return true;

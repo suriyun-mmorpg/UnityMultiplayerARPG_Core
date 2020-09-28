@@ -56,9 +56,19 @@ namespace MultiplayerARPG
             return raycasts[index].transform;
         }
 
+        public Transform GetRaycastColliderTransform(int index)
+        {
+            return raycasts[index].collider.transform;
+        }
+
         public GameObject GetRaycastObject(int index)
         {
             return raycasts[index].transform.gameObject;
+        }
+
+        public GameObject GetRaycastColliderGameObject(int index)
+        {
+            return raycasts[index].collider.gameObject;
         }
 
         public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false)

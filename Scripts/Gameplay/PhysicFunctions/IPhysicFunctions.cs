@@ -22,7 +22,11 @@ namespace MultiplayerARPG
 
         Transform GetRaycastTransform(int index);
 
+        Transform GetRaycastColliderTransform(int index);
+
         GameObject GetRaycastObject(int index);
+
+        GameObject GetRaycastColliderGameObject(int index);
 
         int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false);
 
