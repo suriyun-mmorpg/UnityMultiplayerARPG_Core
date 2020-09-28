@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float MOUNT_DELAY = 1f;
+        public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
 
         protected struct SyncListRecachingState
         {
@@ -935,13 +936,13 @@ namespace MultiplayerARPG
         public bool IsGameEntityInDistance<T>(T targetEntity, float distance, bool includeUnHittable = true)
             where T : class, IGameEntity
         {
-            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, CacheTransform.position, distance, includeUnHittable);
+            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, MovementTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
         }
 
         public List<T> FindGameEntitiesInDistance<T>(float distance, int layerMask)
             where T : class, IGameEntity
         {
-            return FindPhysicFunctions.FindGameEntitiesInDistance<T>(CacheTransform.position, distance, layerMask);
+            return FindPhysicFunctions.FindGameEntitiesInDistance<T>(MovementTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, layerMask);
         }
 
         public List<T> FindDamageableEntities<T>(float distance, int layerMask, bool findForAlive, bool findInFov = false, float fov = 0)
