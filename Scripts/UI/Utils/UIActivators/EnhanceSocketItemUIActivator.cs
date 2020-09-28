@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class EnhanceItemUIActivator : MonoBehaviour
+    public class EnhanceSocketItemUIActivator : MonoBehaviour
     {
         public GameObject[] activateObjects;
 
