@@ -157,7 +157,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(warpPortalEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -216,7 +216,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -921,7 +921,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(storageEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -962,7 +962,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(doorEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -992,7 +992,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(doorEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -1016,7 +1016,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(campfireEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -1040,7 +1040,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(campfireEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -1064,7 +1064,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(workbenchEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -1124,7 +1124,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -1161,7 +1161,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
@@ -1197,7 +1197,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 

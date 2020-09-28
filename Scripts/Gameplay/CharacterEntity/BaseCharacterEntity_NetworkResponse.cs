@@ -64,7 +64,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(itemDropEntity, CurrentGameInstance.pickUpItemDistance))
             {
-                // Too far from the entity
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
 
