@@ -143,10 +143,13 @@ namespace MultiplayerARPG
         public UnityEvent onExitDealingState;
 
         [Header("Options")]
-        [Tooltip("UIs set here will be cloned by this UI")]
+        [Tooltip("UIs in this list will use cloned item data from this UI")]
         public UICharacterItem[] clones;
         public UICharacterItemDragHandler uiDragging;
+        [Tooltip("UI which will be shown if this item level not reached max level")]
         public UICharacterItem uiNextLevelItem;
+        [Tooltip("UIs in this list will be shown when set this item is equipment item and inventory type is `NonEquipItems` or `EquipItems`")]
+        public UICharacterItem[] uiComparingEquipments;
         public bool showAmountWhenMaxIsOne;
         public bool showLevelAsDefault;
         public bool dontAppendRefineLevelToTitle;
@@ -766,6 +769,74 @@ namespace MultiplayerARPG
                     uiNextLevelItem.Show();
                 }
             }
+
+            if (uiComparingEquipments != null)
+            {
+                foreach (UICharacterItem uiComparingEquipment in uiComparingEquipments)
+                {
+                    uiComparingEquipment.Hide();
+                }
+                if ((InventoryType == InventoryType.NonEquipItems ||
+                    InventoryType == InventoryType.EquipItems) &&
+                    IsOwningCharacter())
+                {
+                    int comparingEquipmentIndex = 0;
+                    if (WeaponItem != null)
+                    {
+                        if (!OwningCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
+                            OwningCharacter.EquipWeapons.rightHand.GetWeaponItem() != null)
+                        {
+                            SetupAndShowUIComparingEquipment(comparingEquipmentIndex, 
+                                OwningCharacter.EquipWeapons.rightHand, 
+                                InventoryType.EquipWeaponRight, -1);
+                            comparingEquipmentIndex++;
+                        }
+                        if (!OwningCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
+                            OwningCharacter.EquipWeapons.leftHand.GetWeaponItem() != null)
+                        {
+                            SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
+                                OwningCharacter.EquipWeapons.leftHand,
+                                InventoryType.EquipWeaponLeft, -1);
+                            comparingEquipmentIndex++;
+                        }
+                    }
+                    if (ShieldItem != null)
+                    {
+                        if (!OwningCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
+                            OwningCharacter.EquipWeapons.rightHand.GetShieldItem() != null)
+                        {
+                            SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
+                                OwningCharacter.EquipWeapons.rightHand,
+                                InventoryType.EquipWeaponRight, -1);
+                            comparingEquipmentIndex++;
+                        }
+                        if (!OwningCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
+                            OwningCharacter.EquipWeapons.leftHand.GetShieldItem() != null)
+                        {
+                            SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
+                                OwningCharacter.EquipWeapons.leftHand,
+                                InventoryType.EquipWeaponLeft, -1);
+                            comparingEquipmentIndex++;
+                        }
+                    }
+                    if (ArmorItem != null)
+                    {
+                        CharacterItem equipItem;
+                        for (int equipItemIndex = 0; equipItemIndex < OwningCharacter.EquipItems.Count; ++equipItemIndex)
+                        {
+                            equipItem = OwningCharacter.EquipItems[equipItemIndex];
+                            if (!equipItem.IsEmptySlot() &&
+                                equipItem.GetArmorItem() != null &&
+                                equipItem.GetArmorItem().ArmorType == ArmorItem.ArmorType)
+                            {
+                                SetupAndShowUIComparingEquipment(comparingEquipmentIndex, equipItem, InventoryType.EquipItems, equipItemIndex);
+                                comparingEquipmentIndex++;
+                            }
+                        }
+                    }
+                }
+            }
+
             UpdateShopUIVisibility(true);
             UpdateRefineItemUIVisibility(true);
             UpdateDismantleItemUIVisibility(true);
@@ -773,6 +844,14 @@ namespace MultiplayerARPG
             UpdateEnhanceSocketUIVisibility(true);
             UpdateStorageUIVisibility(true);
             UpdateDealingState(true);
+        }
+
+        private void SetupAndShowUIComparingEquipment(int index, CharacterItem characterItem, InventoryType inventoryType, int indexOfData)
+        {
+            if (uiComparingEquipments == null || index >= uiComparingEquipments.Length)
+                return;
+            uiComparingEquipments[index].Setup(new UICharacterItemData(characterItem, inventoryType), OwningCharacter, indexOfData);
+            uiComparingEquipments[index].Show();
         }
 
         private void UpdateShopUIVisibility(bool initData)
