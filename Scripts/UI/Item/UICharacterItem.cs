@@ -776,22 +776,22 @@ namespace MultiplayerARPG
                 {
                     uiComparingEquipment.Hide();
                 }
-                if ((InventoryType == InventoryType.NonEquipItems ||
-                    InventoryType == InventoryType.EquipItems) &&
-                    IsOwningCharacter())
+                if (IsOwningCharacter())
                 {
                     int comparingEquipmentIndex = 0;
                     if (WeaponItem != null)
                     {
                         if (!OwningCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
+                            !OwningCharacter.EquipWeapons.rightHand.id.Equals(CharacterItem.id) &&
                             OwningCharacter.EquipWeapons.rightHand.GetWeaponItem() != null)
                         {
-                            SetupAndShowUIComparingEquipment(comparingEquipmentIndex, 
-                                OwningCharacter.EquipWeapons.rightHand, 
+                            SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
+                                OwningCharacter.EquipWeapons.rightHand,
                                 InventoryType.EquipWeaponRight, -1);
                             comparingEquipmentIndex++;
                         }
                         if (!OwningCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
+                            !OwningCharacter.EquipWeapons.leftHand.id.Equals(CharacterItem.id) &&
                             OwningCharacter.EquipWeapons.leftHand.GetWeaponItem() != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
@@ -803,6 +803,7 @@ namespace MultiplayerARPG
                     if (ShieldItem != null)
                     {
                         if (!OwningCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
+                            !OwningCharacter.EquipWeapons.rightHand.id.Equals(CharacterItem.id) &&
                             OwningCharacter.EquipWeapons.rightHand.GetShieldItem() != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
@@ -811,6 +812,7 @@ namespace MultiplayerARPG
                             comparingEquipmentIndex++;
                         }
                         if (!OwningCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
+                            !OwningCharacter.EquipWeapons.leftHand.id.Equals(CharacterItem.id) &&
                             OwningCharacter.EquipWeapons.leftHand.GetShieldItem() != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
@@ -826,6 +828,7 @@ namespace MultiplayerARPG
                         {
                             equipItem = OwningCharacter.EquipItems[equipItemIndex];
                             if (!equipItem.IsEmptySlot() &&
+                                !equipItem.id.Equals(CharacterItem.id) &&
                                 equipItem.GetArmorItem() != null &&
                                 equipItem.GetArmorItem().ArmorType == ArmorItem.ArmorType)
                             {
