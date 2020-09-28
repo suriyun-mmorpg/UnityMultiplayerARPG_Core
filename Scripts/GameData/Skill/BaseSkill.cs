@@ -411,14 +411,14 @@ namespace MultiplayerARPG
             if (RequiredTarget())
             {
                 BaseCharacterEntity targetEntity;
-                if (character.TryGetTargetEntity(out targetEntity) && !character.IsGameEntityInDistance(targetEntity, GetCastDistance(character, level, isLeftHand)))
-                {
-                    gameMessageType = GameMessage.Type.CharacterIsTooFar;
-                    return false;
-                }
-                else
+                if (!character.TryGetTargetEntity(out targetEntity))
                 {
                     gameMessageType = GameMessage.Type.NoSkillTarget;
+                    return false;
+                }
+                else if (!character.IsGameEntityInDistance(targetEntity, GetCastDistance(character, level, isLeftHand)))
+                {
+                    gameMessageType = GameMessage.Type.CharacterIsTooFar;
                     return false;
                 }
             }
