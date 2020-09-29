@@ -11,7 +11,7 @@ namespace MultiplayerARPG
 
         protected float applyDuration;
         protected float lastAppliedTime;
-        protected readonly Dictionary<uint, IDamageableEntity> receivingDamageEntities = new Dictionary<uint, IDamageableEntity>();
+        protected readonly Dictionary<uint, DamageableHitBox> receivingDamageHitBoxes = new Dictionary<uint, DamageableHitBox>();
 
         protected override void Awake()
         {
@@ -39,12 +39,12 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - lastAppliedTime >= applyDuration)
             {
                 lastAppliedTime = Time.unscaledTime;
-                foreach (IDamageableEntity entity in receivingDamageEntities.Values)
+                foreach (DamageableHitBox hitBox in receivingDamageHitBoxes.Values)
                 {
-                    if (entity == null)
+                    if (hitBox == null)
                         continue;
 
-                    ApplyDamageTo(entity);
+                    ApplyDamageTo(hitBox);
                 }
             }
         }
@@ -70,14 +70,14 @@ namespace MultiplayerARPG
             if (attacker != null && attacker.GetGameObject() == other)
                 return;
 
-            IDamageableEntity target = other.GetComponent<IDamageableEntity>();
+            DamageableHitBox target = other.GetComponent<DamageableHitBox>();
             if (target == null)
                 return;
 
-            if (receivingDamageEntities.ContainsKey(target.GetObjectId()))
+            if (receivingDamageHitBoxes.ContainsKey(target.GetObjectId()))
                 return;
 
-            receivingDamageEntities.Add(target.GetObjectId(), target);
+            receivingDamageHitBoxes.Add(target.GetObjectId(), target);
         }
 
         protected virtual void OnTriggerExit(Collider other)
@@ -99,10 +99,10 @@ namespace MultiplayerARPG
             if (target == null)
                 return;
 
-            if (!receivingDamageEntities.ContainsKey(target.GetObjectId()))
+            if (!receivingDamageHitBoxes.ContainsKey(target.GetObjectId()))
                 return;
 
-            receivingDamageEntities.Remove(target.GetObjectId());
+            receivingDamageHitBoxes.Remove(target.GetObjectId());
         }
     }
 }

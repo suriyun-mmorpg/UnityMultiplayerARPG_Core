@@ -49,8 +49,8 @@ namespace MultiplayerARPG
             if (opponentAimTransform == null)
                 opponentAimTransform = CombatTextTransform;
             HitBoxes = GetComponentsInChildren<DamageableHitBox>(true);
-            if (HitBoxes != null && HitBoxes.Length > 0)
-                gameObject.GetOrAddComponent<UnHittable>();
+            if (HitBoxes == null || HitBoxes.Length == 0)
+                HitBoxes = new DamageableHitBox[] { gameObject.AddComponent<DamageableHitBox>() };
         }
 
         /// <summary>
@@ -91,24 +91,6 @@ namespace MultiplayerARPG
         public void CallAllAppendCombatAmount(CombatAmountType combatAmountType, int amount)
         {
             RPC(AllAppendCombatAmount, combatAmountType, amount);
-        }
-
-        /// <summary>
-        /// Applying damage to this entity
-        /// </summary>
-        /// <param name="fromPosition">Where is attacker?</param>
-        /// <param name="attacker">Who is attacking this?</param>
-        /// <param name="damageAmounts">Damage amounts from attacker</param>
-        /// <param name="weapon">Weapon which used to attack</param>
-        /// <param name="skill">Skill which used to attack</param>
-        /// <param name="skillLevel">Skill level which used to attack</param>
-        public void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
-        {
-            if (HitBoxes != null && HitBoxes.Length > 0)
-                return;
-            if (!IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
-                return;
-            ApplyDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
 
         /// <summary>

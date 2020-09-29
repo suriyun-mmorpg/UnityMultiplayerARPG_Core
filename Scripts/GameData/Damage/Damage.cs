@@ -209,7 +209,7 @@ namespace MultiplayerARPG
             bool isClient = attacker.IsClient;
             int damageableLayerMask = GameInstance.Singleton.GetDamageableLayerMask();
 
-            IDamageableEntity tempDamageableEntity = null;
+            DamageableHitBox tempDamageableHitBox = null;
 
             // Damage transform data
             Vector3 damagePosition;
@@ -233,8 +233,8 @@ namespace MultiplayerARPG
                 case DamageType.Melee:
                     if (hitOnlySelectedTarget)
                     {
-                        IDamageableEntity damageTakenTarget = null;
-                        IDamageableEntity selectedTarget = null;
+                        DamageableHitBox damageTakenTarget = null;
+                        DamageableEntity selectedTarget = null;
                         bool hasSelectedTarget = attacker.TryGetTargetEntity(out selectedTarget);
                         // If hit only selected target, find selected character (only 1 character) to apply damage
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
@@ -249,32 +249,32 @@ namespace MultiplayerARPG
                             if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
 
-                            tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                            if (tempDamageableEntity == null)
+                            tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
+                            if (tempDamageableHitBox == null)
                                 continue;
 
-                            if (tempDamageableEntity.GetObjectId() == attacker.ObjectId ||
-                                hitObjectIds.Contains(tempDamageableEntity.GetObjectId()))
+                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId ||
+                                hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableEntity.GetObjectId());
+                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
 
                             // Target won't receive damage if dead or can't receive damage from this character
-                            if (tempDamageableEntity.IsDead() || !tempDamageableEntity.CanReceiveDamageFrom(attacker) ||
-                                !attacker.IsPositionInFov(hitFov, tempDamageableEntity.GetTransform().position))
+                            if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(attacker) ||
+                                !attacker.IsPositionInFov(hitFov, tempDamageableHitBox.GetTransform().position))
                                 continue;
 
                             // Check with selected target
-                            if (hasSelectedTarget && selectedTarget.GetObjectId() == tempDamageableEntity.GetObjectId())
+                            if (hasSelectedTarget && selectedTarget.GetObjectId() == tempDamageableHitBox.GetObjectId())
                             {
                                 // This is selected target, so this is character which must receives damages
-                                damageTakenTarget = tempDamageableEntity;
+                                damageTakenTarget = tempDamageableHitBox;
                                 break;
                             }
                             // Set damage taken targetit will be used in-case it can't find selected target
-                            damageTakenTarget = tempDamageableEntity;
+                            damageTakenTarget = tempDamageableHitBox;
                         }
                         // Only 1 target will receives damages
                         if (damageTakenTarget != null)
@@ -301,29 +301,29 @@ namespace MultiplayerARPG
                             if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
 
-                            tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                            if (tempDamageableEntity == null)
+                            tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
+                            if (tempDamageableHitBox == null)
                                 continue;
 
-                            if (tempDamageableEntity.GetObjectId() == attacker.ObjectId ||
-                                hitObjectIds.Contains(tempDamageableEntity.GetObjectId()))
+                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId ||
+                                hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableEntity.GetObjectId());
+                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
 
                             // Target won't receive damage if dead or can't receive damage from this character
-                            if (tempDamageableEntity.IsDead() ||
-                                !tempDamageableEntity.CanReceiveDamageFrom(attacker) ||
-                                !attacker.IsPositionInFov(hitFov, tempDamageableEntity.GetTransform().position))
+                            if (tempDamageableHitBox.IsDead() ||
+                                !tempDamageableHitBox.CanReceiveDamageFrom(attacker) ||
+                                !attacker.IsPositionInFov(hitFov, tempDamageableHitBox.GetTransform().position))
                                 continue;
 
                             // Target receives damages
                             if (isClient)
-                                tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
+                                tempDamageableHitBox.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
-                                tempDamageableEntity.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
                         }
                     }
                     break;
@@ -334,11 +334,11 @@ namespace MultiplayerARPG
                     {
                         if (hitOnlySelectedTarget)
                         {
-                            if (!attacker.TryGetTargetEntity(out tempDamageableEntity))
-                                tempDamageableEntity = null;
+                            if (!attacker.TryGetTargetEntity(out tempDamageableHitBox))
+                                tempDamageableHitBox = null;
                         }
                         PoolSystem.GetInstance(missileDamageEntity, damageEffectPosition, damageEffectRotation)
-                            .Setup(attacker, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableEntity);
+                            .Setup(attacker, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableHitBox);
                     }
                     break;
                 case DamageType.Raycast:
@@ -373,29 +373,29 @@ namespace MultiplayerARPG
                             if (distance < minDistance)
                                 minDistance = distance;
 
-                            tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                            tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
                             // Hit wall... so break the loop
-                            if (tempDamageableEntity == null)
+                            if (tempDamageableHitBox == null)
                                 break;
 
-                            if (tempDamageableEntity.GetObjectId() == attacker.ObjectId ||
-                                hitObjectIds.Contains(tempDamageableEntity.GetObjectId()))
+                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId ||
+                                hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableEntity.GetObjectId());
+                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
 
                             // Target won't receive damage if dead or can't receive damage from this character
-                            if (tempDamageableEntity.IsDead() ||
-                                !tempDamageableEntity.CanReceiveDamageFrom(attacker))
+                            if (tempDamageableHitBox.IsDead() ||
+                                !tempDamageableHitBox.CanReceiveDamageFrom(attacker))
                                 continue;
 
                             // Target receives damages
                             if (isClient)
-                                tempDamageableEntity.PlayHitEffects(damageAmounts.Keys, skill);
+                                tempDamageableHitBox.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
-                                tempDamageableEntity.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)

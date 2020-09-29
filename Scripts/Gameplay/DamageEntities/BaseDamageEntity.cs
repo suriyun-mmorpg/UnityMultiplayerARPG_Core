@@ -75,7 +75,7 @@ namespace MultiplayerARPG
             this.skillLevel = skillLevel;
         }
 
-        public virtual void ApplyDamageTo(IDamageableEntity target)
+        public virtual void ApplyDamageTo(DamageableHitBox target)
         {
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
                 return;

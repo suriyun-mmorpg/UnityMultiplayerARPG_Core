@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 namespace MultiplayerARPG
 {
-    public class BuildingMaterial : DamageableHitBox<BuildingEntity>
+    public class BuildingMaterial : DamageableHitBox
     {
         public enum State
         {
@@ -88,11 +88,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform CacheTransform { get; private set; }
+        public BuildingEntity BuildingEntity { get; private set; }
 
-        private void Awake()
+        protected override void Start()
         {
-            CacheTransform = transform;
+            base.Start();
+            BuildingEntity = entity as BuildingEntity;
 
             meshRenderer = GetComponent<MeshRenderer>();
             if (meshRenderer != null)
@@ -108,12 +109,8 @@ namespace MultiplayerARPG
 
             CurrentState = State.Unknow;
             CurrentState = State.Default;
-        }
 
-        protected override void Start()
-        {
-            base.Start();
-            entity.RegisterMaterial(this);
+            BuildingEntity.RegisterMaterial(this);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -121,19 +118,19 @@ namespace MultiplayerARPG
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
 
-            if (entity != null && entity.IsBuildMode)
+            if (BuildingEntity.IsBuildMode)
             {
-                entity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
-                entity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
+                BuildingEntity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (entity != null && entity.IsBuildMode)
+            if (BuildingEntity.IsBuildMode)
             {
-                entity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
-                entity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                BuildingEntity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
+                BuildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
         }
 
@@ -142,21 +139,21 @@ namespace MultiplayerARPG
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
 
-            if (entity != null && entity.IsBuildMode)
+            if (BuildingEntity.IsBuildMode)
             {
-                entity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
-                entity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
-                entity.TriggerEnterTilemap(other.GetComponent<TilemapCollider2D>());
+                BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
+                BuildingEntity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                BuildingEntity.TriggerEnterTilemap(other.GetComponent<TilemapCollider2D>());
             }
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (entity != null && entity.IsBuildMode)
+            if (BuildingEntity.IsBuildMode)
             {
-                entity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
-                entity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
-                entity.TriggerExitTilemap(other.GetComponent<TilemapCollider2D>());
+                BuildingEntity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
+                BuildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                BuildingEntity.TriggerExitTilemap(other.GetComponent<TilemapCollider2D>());
             }
         }
 
@@ -166,4 +163,3 @@ namespace MultiplayerARPG
         }
     }
 }
-;

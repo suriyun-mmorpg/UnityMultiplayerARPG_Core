@@ -149,8 +149,8 @@ namespace MultiplayerARPG
             if (attacker != null && attacker.GetGameObject() == other)
                 return;
 
-            IDamageableEntity target;
-            if (FindTargetEntity(other, out target))
+            DamageableHitBox target;
+            if (FindTargetHitBox(other, out target))
             {
                 if (explodeDistance > 0f)
                 {
@@ -183,14 +183,17 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual bool FindTargetEntity(GameObject other, out IDamageableEntity target)
+        protected virtual bool FindTargetHitBox(GameObject other, out DamageableHitBox target)
         {
             target = null;
+
+            if (other.GetComponent<IUnHittable>() != null)
+                return false;
 
             if (attacker != null && attacker.GetGameObject() == other)
                 return false;
 
-            target = other.GetComponent<IDamageableEntity>();
+            target = other.GetComponent<DamageableHitBox>();
 
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
                 return false;
@@ -203,8 +206,8 @@ namespace MultiplayerARPG
 
         protected virtual bool FindAndApplyDamage(GameObject other)
         {
-            IDamageableEntity target;
-            if (FindTargetEntity(other, out target))
+            DamageableHitBox target;
+            if (FindTargetHitBox(other, out target))
             {
                 ApplyDamageTo(target);
                 return true;

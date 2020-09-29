@@ -353,8 +353,7 @@ namespace MultiplayerARPG
         public void TriggerEnterBuildingMaterial(BuildingMaterial buildingMaterial)
         {
             if (buildingMaterial != null &&
-                buildingMaterial.TargetEntity != null &&
-                buildingMaterial.TargetEntity != this &&
+                buildingMaterial.BuildingEntity != this &&
                 !triggerMaterials.Contains(buildingMaterial))
                 triggerMaterials.Add(buildingMaterial);
         }

@@ -4,20 +4,21 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public class DamageableHitBox<T> : MonoBehaviour, IDamageableEntity where T : IDamageableEntity
+    public class DamageableHitBox : MonoBehaviour, IDamageableEntity
     {
         [SerializeField]
-        protected T entity;
+        protected DamageableEntity entity;
+        [SerializeField]
+        protected float damageRate = 1f;
         public int CurrentHp { get { return entity.CurrentHp; } set { entity.CurrentHp = value; } }
         public Transform OpponentAimTransform { get { return entity.OpponentAimTransform; } }
         public BaseGameEntity Entity { get { return entity.Entity; } }
         public LiteNetLibIdentity Identity { get { return entity.Identity; } }
-        public T TargetEntity { get { return entity; } }
 
         protected virtual void Start()
         {
             if (entity == null)
-                entity = GetComponentInParent<T>();
+                entity = GetComponentInParent<DamageableEntity>();
             if (entity != null)
             {
                 gameObject.tag = entity.GetGameObject().tag;
@@ -37,21 +38,6 @@ namespace MultiplayerARPG
 
         public virtual void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            entity.ReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
-        }
-
-        public virtual void PrepareRelatesData()
-        {
-            // Do nothing
-        }
-    }
-
-    public class DamageableHitBox : DamageableHitBox<DamageableEntity>
-    {
-        public float damageRate = 1f;
-
-        public override void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
-        {
             if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
             List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
@@ -60,6 +46,11 @@ namespace MultiplayerARPG
                 damageAmounts[key] = damageAmounts[key] * damageRate;
             }
             entity.ApplyDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
+        }
+
+        public virtual void PrepareRelatesData()
+        {
+            // Do nothing
         }
     }
 }
