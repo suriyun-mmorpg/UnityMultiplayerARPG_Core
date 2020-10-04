@@ -562,7 +562,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerEnterVehicle(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             // Call this function at server
             LiteNetLibIdentity identity;
             if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
@@ -579,7 +579,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerEnterVehicleToSeat(uint objectId, byte seatIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             // Call this function at server
             LiteNetLibIdentity identity;
             if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
@@ -594,7 +594,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerExitVehicle()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             // Call this function at server
             ExitVehicle();
 #endif
@@ -625,7 +625,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetMovement(MovementState movementState)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             switch (MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
@@ -644,7 +644,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetExtraMovement(ExtraMovementState extraMovementState)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             switch (MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
@@ -663,7 +663,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUpdateDirection2D(DirectionVector2 direction)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             // Set data at server and sync to clients later
             Direction2D = direction;
 #endif

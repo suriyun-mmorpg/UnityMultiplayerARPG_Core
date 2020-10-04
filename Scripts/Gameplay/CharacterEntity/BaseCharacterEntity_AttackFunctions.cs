@@ -148,7 +148,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerReload(bool isLeftHand)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerAttack(bool isLeftHand)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanAttack())
                 return;
 

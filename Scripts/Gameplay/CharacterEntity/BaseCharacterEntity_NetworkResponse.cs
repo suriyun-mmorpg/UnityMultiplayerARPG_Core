@@ -51,7 +51,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerPickupItem(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void ServerPickupNearbyItems()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
             List<ItemDropEntity> itemDropEntities = FindGameEntitiesInDistance<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
@@ -113,7 +113,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerDropItem(short index, short amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions() ||
                 index >= nonEquipItems.Count)
                 return;
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerEquipWeapon(short nonEquipIndex, byte equipWeaponSet, bool isLeftHand)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions() ||
                 nonEquipIndex >= nonEquipItems.Count)
                 return;
@@ -258,7 +258,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerEquipArmor(short nonEquipIndex, byte equipSlotIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions() ||
                 nonEquipIndex >= nonEquipItems.Count)
                 return;
@@ -308,7 +308,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerUnEquipWeapon(byte equipWeaponSet, bool isLeftHand)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             GameMessage.Type gameMessageType;
             int unEquippedIndex;
             if (!UnEquipWeapon(equipWeaponSet, isLeftHand, false, out gameMessageType, out unEquippedIndex))
@@ -373,7 +373,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerUnEquipArmor(short index)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             GameMessage.Type gameMessageType;
             int unEquippedIndex;
             if (!UnEquipArmor(index, false, out gameMessageType, out unEquippedIndex))
@@ -441,7 +441,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerUnSummon(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int index = this.IndexOfSummon(objectId);
             if (index < 0)
                 return;
@@ -458,7 +458,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSwitchEquipWeaponSet(byte equipWeaponSet)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 

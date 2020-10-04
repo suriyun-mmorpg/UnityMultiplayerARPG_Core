@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUseItem(short itemIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanUseItem())
                 return;
 
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUseSkillItem(short itemIndex, bool isLeftHand)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             UseItemSkill(itemIndex, isLeftHand, null);
 #endif
         }
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUseSkillItemWithAimPosition(short itemIndex, bool isLeftHand, Vector3 aimPosition)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             UseItemSkill(itemIndex, isLeftHand, aimPosition);
 #endif
         }

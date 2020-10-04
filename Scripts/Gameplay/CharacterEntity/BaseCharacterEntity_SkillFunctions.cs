@@ -68,7 +68,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUseSkill(int dataId, bool isLeftHand)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             UseSkillFunction(dataId, isLeftHand, null);
 #endif
         }
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUseSkillWithAimPosition(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             UseSkillFunction(dataId, isLeftHand, aimPosition);
 #endif
         }
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerSkillCastingInterrupt()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             InterruptCastingSkill();
 #endif
         }

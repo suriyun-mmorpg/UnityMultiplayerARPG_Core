@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSwapOrMergeItem(short fromIndex, short toIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions() || fromIndex >= NonEquipItems.Count || toIndex >= NonEquipItems.Count)
                 return;
 
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAddAttribute(int dataId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
             GameMessage.Type gameMessageType;
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAddSkill(int dataId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
             GameMessage.Type gameMessageType;
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAddGuildSkill(int dataId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
             CurrentGameManager.AddGuildSkill(this, dataId);
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUseGuildSkill(int dataId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
 
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerRespawn()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             Respawn();
 #endif
         }
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CharacterHotkey characterHotkey = new CharacterHotkey();
             characterHotkey.hotkeyId = hotkeyId;
             characterHotkey.type = type;
@@ -144,7 +144,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerEnterWarp(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerConstructBuilding(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions() ||
                 itemIndex >= NonEquipItems.Count)
                 return;
@@ -203,7 +203,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDestroyBuilding(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -240,7 +240,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDismantleItem(short index, short amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
 
@@ -286,7 +286,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDismantleItems(List<short> indexes)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
             indexes.Sort();
@@ -304,7 +304,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerRefineItem(InventoryType inventoryType, short index)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
 
@@ -334,7 +334,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
 
@@ -364,7 +364,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerRepairItem(InventoryType inventoryType, short index)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
 
@@ -394,7 +394,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerRepairEquipItems()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead())
                 return;
 
@@ -421,7 +421,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSendDealingRequest(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             BasePlayerCharacterEntity targetCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
@@ -458,7 +458,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAcceptDealingRequest()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingCharacter == null)
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAcceptDealingRequest);
@@ -485,7 +485,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDeclineDealingRequest()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingCharacter != null)
                 CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.DealingRequestDeclined);
             CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingRequestDeclined);
@@ -506,7 +506,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetDealingItem(short itemIndex, short amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingState != DealingState.Dealing)
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
@@ -539,7 +539,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetDealingGold(int gold)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingState != DealingState.Dealing)
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
@@ -556,7 +556,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerLockDealing()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingState != DealingState.Dealing)
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
@@ -569,7 +569,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerConfirmDealing()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingState != DealingState.LockDealing || !(DealingCharacter.DealingState == DealingState.LockDealing || DealingCharacter.DealingState == DealingState.ConfirmDealing))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
@@ -601,7 +601,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCancelDealing()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingCharacter != null)
                 CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.DealingCanceled);
             CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingCanceled);
@@ -656,7 +656,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCreateParty(bool shareExp, bool shareItem)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.CreateParty(this, shareExp, shareItem);
 #endif
         }
@@ -664,7 +664,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerChangePartyLeader(string characterId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.ChangePartyLeader(this, characterId);
 #endif
         }
@@ -672,7 +672,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerPartySetting(bool shareExp, bool shareItem)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.PartySetting(this, shareExp, shareItem);
 #endif
         }
@@ -680,7 +680,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSendPartyInvitation(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             BasePlayerCharacterEntity targetCharacterEntity;
             if (!CurrentGameManager.CanSendPartyInvitation(this, objectId, out targetCharacterEntity))
                 return;
@@ -704,7 +704,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAcceptPartyInvitation()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.AddPartyMember(DealingCharacter, this);
             StopPartyInvitation();
 #endif
@@ -713,7 +713,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDeclinePartyInvitation()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingCharacter != null)
                 CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
             CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.PartyInvitationDeclined);
@@ -724,7 +724,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerKickFromParty(string characterId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.KickFromParty(this, characterId);
 #endif
         }
@@ -732,7 +732,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerLeaveParty()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.LeaveParty(this);
 #endif
         }
@@ -742,7 +742,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCreateGuild(string guildName)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.CreateGuild(this, guildName);
 #endif
         }
@@ -750,7 +750,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerChangeGuildLeader(string characterId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.ChangeGuildLeader(this, characterId);
 #endif
         }
@@ -758,7 +758,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetGuildMessage(string guildMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.SetGuildMessage(this, guildMessage);
 #endif
         }
@@ -766,7 +766,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.SetGuildRole(this, guildRole, name, canInvite, canKick, shareExpPercentage);
 #endif
         }
@@ -774,7 +774,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetGuildMemberRole(string characterId, byte guildRole)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.SetGuildMemberRole(this, characterId, guildRole);
 #endif
         }
@@ -782,7 +782,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSendGuildInvitation(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             BasePlayerCharacterEntity targetCharacterEntity;
             if (!CurrentGameManager.CanSendGuildInvitation(this, objectId, out targetCharacterEntity))
                 return;
@@ -806,7 +806,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAcceptGuildInvitation()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.AddGuildMember(DealingCharacter, this);
             StopGuildInvitation();
 #endif
@@ -815,7 +815,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDeclineGuildInvitation()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (DealingCharacter != null)
                 CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
             CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.GuildInvitationDeclined);
@@ -826,7 +826,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerKickFromGuild(string characterId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.KickFromGuild(this, characterId);
 #endif
         }
@@ -834,7 +834,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerLeaveGuild()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.LeaveGuild(this);
 #endif
         }
@@ -844,7 +844,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead() || nonEquipIndex >= nonEquipItems.Count)
                 return;
             CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, nonEquipIndex, amount, storageItemIndex);
@@ -854,7 +854,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead() || storageItemIndex >= storageItems.Length)
                 return;
             CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, nonEquipIndex);
@@ -864,7 +864,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSwapOrMergeStorageItem(short fromIndex, short toIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (this.IsDead() || fromIndex >= storageItems.Length || toIndex >= storageItems.Length)
                 return;
             CurrentGameManager.SwapOrMergeStorageItem(this, CurrentStorageId, fromIndex, toIndex);
@@ -876,7 +876,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDepositGold(int amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.DepositGold(this, amount);
 #endif
         }
@@ -884,7 +884,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerWithdrawGold(int amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.WithdrawGold(this, amount);
 #endif
         }
@@ -892,7 +892,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDepositGuildGold(int amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.DepositGuildGold(this, amount);
 #endif
         }
@@ -900,7 +900,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerWithdrawGuildGold(int amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.WithdrawGuildGold(this, amount);
 #endif
         }
@@ -908,7 +908,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerOpenStorage(uint objectId, string password)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -938,7 +938,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCloseStorage()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.CloseStorage(this);
             CurrentStorageId = StorageId.Empty;
 #endif
@@ -949,7 +949,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerOpenDoor(uint objectId, string password)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -979,7 +979,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCloseDoor(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -1003,7 +1003,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerTurnOnCampFire(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -1027,7 +1027,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerTurnOffCampFire(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -1051,7 +1051,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCraftItemByWorkbench(uint objectId, int dataId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -1077,7 +1077,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerFindCharacters(string characterName)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.FindCharacters(this, characterName);
 #endif
         }
@@ -1085,7 +1085,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAddFriend(string friendCharacterId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.AddFriend(this, friendCharacterId);
 #endif
         }
@@ -1093,7 +1093,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerRemoveFriend(string friendCharacterId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.RemoveFriend(this, friendCharacterId);
 #endif
         }
@@ -1101,7 +1101,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerGetFriends()
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CurrentGameManager.GetFriends(this);
 #endif
         }
@@ -1111,7 +1111,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetBuildingPassword(uint objectId, string password)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -1148,7 +1148,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerLockBuilding(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -1184,7 +1184,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUnlockBuilding(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 

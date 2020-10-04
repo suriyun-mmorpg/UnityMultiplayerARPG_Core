@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerNpcActivate(PackedUInt objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanDoActions())
                 return;
 
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSelectNpcDialogMenu(byte menuIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (CurrentNpcDialog == null)
                 return;
 
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSellItem(short index, short amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!AccessingNpcShopDialog(out _))
                 return;
 
@@ -145,7 +145,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSellItems(List<short> indexes)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!AccessingNpcShopDialog(out _))
                 return;
             indexes.Sort();
@@ -163,7 +163,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerBuyNpcItem(short index, short amount)
         {
-#if !CLIENT_BUILD
+#if UNITY_STANDALONE && !CLIENT_BUILD
             // Dialog must be built-in shop dialog
             NpcDialog dialog;
             if (!AccessingNpcShopDialog(out dialog))
