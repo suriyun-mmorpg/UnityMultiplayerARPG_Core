@@ -62,12 +62,12 @@ namespace MultiplayerARPG
 
             if (uiTextRequireGold != null)
             {
-                if (!CanRepair)
+                if (maxDurability <= 0)
                 {
                     uiTextRequireGold.text = string.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
-                        "0",
-                        "0");
+                        0.ToString("N0"),
+                        0.ToString("N0"));
                 }
                 else
                 {
@@ -82,19 +82,19 @@ namespace MultiplayerARPG
 
             if (uiTextDurability != null)
             {
-                if (!CanRepair)
+                if (maxDurability <= 0)
                 {
                     uiTextDurability.text = string.Format(
                         LanguageManager.GetText(formatKeyDurability),
-                        "0.00",
-                        "0.00");
+                        0.ToString("N0"),
+                        0.ToString("N0"));
                 }
                 else
                 {
                     uiTextDurability.text = string.Format(
                         LanguageManager.GetText(formatKeyDurability),
-                        characterItem.durability.ToString("N2"),
-                        maxDurability.ToString("N2"));
+                        characterItem.durability.ToString("N0"),
+                        maxDurability.ToString("N0"));
                 }
             }
         }
