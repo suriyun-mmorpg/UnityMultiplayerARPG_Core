@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             {
                 uiTextSellPrice.text = string.Format(
                     LanguageManager.GetText(formatKeySellPrice),
-                    Data == null ? "0" : Data.sellPrice.ToString("N0"));
+                    Data == null ? 0.ToString("N0") : Data.sellPrice.ToString("N0"));
             }
         }
 
