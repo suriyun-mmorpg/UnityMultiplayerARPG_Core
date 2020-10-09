@@ -76,8 +76,7 @@ namespace MultiplayerARPG
 
         protected virtual bool ValidateToUpdateUI()
         {
-            return Data != null &&
-                BasePlayerCharacterController.OwningCharacter != null;
+            return Data != null && BasePlayerCharacterController.OwningCharacter != null;
         }
 
         protected override void UpdateUI()
