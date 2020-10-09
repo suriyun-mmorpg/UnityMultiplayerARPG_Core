@@ -9,6 +9,7 @@ namespace MultiplayerARPG
     {
         public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public bool CanRefine { get; private set; }
+        public bool ReachedMaxLevel { get; private set; }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
@@ -67,12 +68,29 @@ namespace MultiplayerARPG
             }
 
             CanRefine = false;
-            ItemRefineLevel refineLevel = default(ItemRefineLevel);
+            ReachedMaxLevel = false;
+            ItemRefineLevel? refineLevel = null;
             if (!characterItem.IsEmptySlot())
             {
-                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(OwningCharacter, Level);
+                GameMessage.Type gameMessageType = GameMessage.Type.CannotRefine;
+                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(OwningCharacter, Level, out gameMessageType);
                 if (CanRefine)
+                {
                     refineLevel = EquipmentItem.ItemRefine.levels[Level - 1];
+                }
+                else
+                {
+                    switch (gameMessageType)
+                    {
+                        case GameMessage.Type.RefineItemReachedMaxLevel:
+                            ReachedMaxLevel = true;
+                            break;
+                        case GameMessage.Type.NotEnoughGold:
+                        case GameMessage.Type.NotEnoughItems:
+                            refineLevel = EquipmentItem.ItemRefine.levels[Level - 1];
+                            break;
+                    }
+                }
             }
 
             if (uiCharacterItem != null)
@@ -88,9 +106,10 @@ namespace MultiplayerARPG
                 }
             }
 
+
             if (uiRequireItemAmounts != null)
             {
-                if (!CanRefine || refineLevel.CacheRequireItems.Count == 0)
+                if (!refineLevel.HasValue || refineLevel.Value.CacheRequireItems.Count == 0)
                 {
                     uiRequireItemAmounts.Hide();
                 }
@@ -98,13 +117,13 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.showAsRequirement = true;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = refineLevel.CacheRequireItems;
+                    uiRequireItemAmounts.Data = refineLevel.Value.CacheRequireItems;
                 }
             }
 
             if (uiTextRequireGold != null)
             {
-                if (!CanRefine)
+                if (!refineLevel.HasValue)
                 {
                     uiTextRequireGold.text = string.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
@@ -117,17 +136,17 @@ namespace MultiplayerARPG
                     if (OwningCharacter != null)
                         currentAmount = OwningCharacter.Gold;
                     uiTextRequireGold.text = string.Format(
-                        currentAmount >= refineLevel.RequireGold ?
+                        currentAmount >= refineLevel.Value.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
                         currentAmount.ToString("N0"),
-                        refineLevel.RequireGold.ToString("N0"));
+                        refineLevel.Value.RequireGold.ToString("N0"));
                 }
             }
 
             if (uiTextSuccessRate != null)
             {
-                if (!CanRefine)
+                if (!refineLevel.HasValue)
                 {
                     uiTextSuccessRate.text = string.Format(
                         LanguageManager.GetText(formatKeySuccessRate),
@@ -137,13 +156,13 @@ namespace MultiplayerARPG
                 {
                     uiTextSuccessRate.text = string.Format(
                         LanguageManager.GetText(formatKeySuccessRate),
-                        (refineLevel.SuccessRate * 100).ToString("N2"));
+                        (refineLevel.Value.SuccessRate * 100).ToString("N2"));
                 }
             }
 
             if (uiTextRefiningLevel != null)
             {
-                if (!CanRefine)
+                if (!refineLevel.HasValue)
                 {
                     uiTextRefiningLevel.text = string.Format(
                         LanguageManager.GetText(formatKeyRefiningLevel),
