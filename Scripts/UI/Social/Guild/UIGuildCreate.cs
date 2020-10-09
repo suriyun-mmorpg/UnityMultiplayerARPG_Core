@@ -7,6 +7,8 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
         public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
+        [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
+        public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
 
         [Header("UI Elements")]
         public InputFieldWrapper inputFieldGuildName;
@@ -15,15 +17,15 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             SocialSystemSetting systemSetting = GameInstance.Singleton.SocialSystemSetting;
             if (textRequireGold != null)
             {
-                int currentAmount = 0;
-                if (BasePlayerCharacterController.OwningCharacter)
-                    currentAmount = BasePlayerCharacterController.OwningCharacter.Gold;
                 textRequireGold.text = string.Format(
-                    LanguageManager.GetText(formatKeyRequireGold),
-                    currentAmount,
+                    owningCharacter.Gold >= systemSetting.CreateGuildRequiredGold ?
+                        LanguageManager.GetText(formatKeyRequireGold) :
+                        LanguageManager.GetText(formatKeyRequireGoldNotEnough),
+                    owningCharacter.Gold.ToString("N0"),
                     systemSetting.CreateGuildRequiredGold.ToString("N0"));
             }
 
