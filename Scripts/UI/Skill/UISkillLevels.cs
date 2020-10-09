@@ -137,13 +137,13 @@ namespace MultiplayerARPG
                     text.text = string.Format(
                         LanguageManager.GetText(formatKeyLevel),
                         title,
-                        "0", "0");
+                        0.ToString("N0"), 0.ToString("N0"));
                     break;
                 case DisplayType.Simple:
                     text.text = string.Format(
                         LanguageManager.GetText(formatKeySimpleLevel),
                         title,
-                        isBonus ? "+0" : "0");
+                        isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"));
                     break;
             }
         }
