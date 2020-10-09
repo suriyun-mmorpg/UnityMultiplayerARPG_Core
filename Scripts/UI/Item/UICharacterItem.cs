@@ -321,7 +321,7 @@ namespace MultiplayerARPG
             {
                 uiTextSellPrice.text = string.Format(
                     LanguageManager.GetText(formatKeySellPrice),
-                    Item == null ? "0" : Item.SellPrice.ToString("N0"));
+                    Item == null ? 0.ToString("N0") : Item.SellPrice.ToString("N0"));
             }
 
             if (uiTextStack != null)
@@ -331,8 +331,8 @@ namespace MultiplayerARPG
                 {
                     stackString = string.Format(
                         LanguageManager.GetText(formatKeyStack),
-                        "0",
-                        "0");
+                        0.ToString("N0"),
+                        0.ToString("N0"));
                 }
                 else
                 {
@@ -352,15 +352,15 @@ namespace MultiplayerARPG
                 {
                     durabilityString = string.Format(
                         LanguageManager.GetText(formatKeyDurability),
-                        "0",
-                        "0");
+                        0.ToString("N0"),
+                        0.ToString("N0"));
                 }
                 else
                 {
                     durabilityString = string.Format(
                         LanguageManager.GetText(formatKeyDurability),
                         CharacterItem.durability.ToString("N0"),
-                        EquipmentItem != null ? EquipmentItem.MaxDurability.ToString("N0") : "0");
+                        EquipmentItem != null ? EquipmentItem.MaxDurability.ToString("N0") : 0.ToString("N0"));
                 }
                 uiTextDurability.text = durabilityString;
                 uiTextDurability.gameObject.SetActive(EquipmentItem != null && EquipmentItem.MaxDurability > 0);
@@ -370,7 +370,7 @@ namespace MultiplayerARPG
             {
                 uiTextWeight.text = string.Format(
                     LanguageManager.GetText(formatKeyWeight),
-                    Item == null ? "0" : Item.Weight.ToString("N2"));
+                    Item == null ? 0f.ToString("N2") : Item.Weight.ToString("N2"));
             }
 
             if (uiRequirement != null)
