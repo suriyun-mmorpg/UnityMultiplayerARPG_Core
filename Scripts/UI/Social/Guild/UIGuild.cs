@@ -117,7 +117,7 @@ namespace MultiplayerARPG
             {
                 textLevel.text = string.Format(
                     LanguageManager.GetText(formatKeyLevel),
-                    Guild == null ? "0" : Guild.level.ToString("N0"));
+                    Guild == null ? 0.ToString("N0") : Guild.level.ToString("N0"));
             }
 
             int[] expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
@@ -141,7 +141,7 @@ namespace MultiplayerARPG
             {
                 textSkillPoint.text = string.Format(
                     LanguageManager.GetText(formatKeySkillPoint),
-                    Guild == null ? "0" : Guild.skillPoint.ToString("N0"));
+                    Guild == null ? 0.ToString("N0") : Guild.skillPoint.ToString("N0"));
             }
 
             if (Guild == null)
