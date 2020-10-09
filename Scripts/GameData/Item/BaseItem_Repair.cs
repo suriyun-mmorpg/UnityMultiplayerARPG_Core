@@ -25,15 +25,26 @@ namespace MultiplayerARPG
                 // Cannot repair because there is no item refine info
                 return false;
             }
+            return GetRepairPrice(durability, out maxDurability).CanRepair(character, out gameMessageType);
+        }
+
+        public ItemRepairPrice GetRepairPrice(float durability)
+        {
+            return GetRepairPrice(durability, out _);
+        }
+
+        public ItemRepairPrice GetRepairPrice(float durability, out float maxDurability)
+        {
+            ItemRepairPrice repairPrice = default(ItemRepairPrice);
             maxDurability = (this as IEquipmentItem).MaxDurability;
             float durabilityRate = durability / maxDurability;
             for (int i = 0; i < itemRefine.repairPrices.Length; ++i)
             {
                 repairPrice = itemRefine.repairPrices[i];
                 if (durabilityRate < repairPrice.DurabilityRate)
-                    return repairPrice.CanRepair(character, out gameMessageType);
+                    break;
             }
-            return true;
+            return repairPrice;
         }
 
         public static void RepairRightHandItem(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
