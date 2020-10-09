@@ -42,6 +42,7 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
+            if (!OwningCharacter) return;
             OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
             OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
             OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
@@ -51,6 +52,7 @@ namespace MultiplayerARPG
         protected override void OnDisable()
         {
             base.OnDisable();
+            if (!OwningCharacter) return;
             OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
             OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
             OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
