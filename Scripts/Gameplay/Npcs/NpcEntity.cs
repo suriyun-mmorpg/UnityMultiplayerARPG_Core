@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public sealed class NpcEntity : BaseGameEntity
+    public class NpcEntity : BaseGameEntity
     {
         [SerializeField]
         [Tooltip("It will use `startDialog` if `graph` is empty")]
