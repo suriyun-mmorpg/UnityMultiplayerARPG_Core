@@ -60,14 +60,14 @@ namespace MultiplayerARPG
             {
                 uiTextSellPrice.text = string.Format(
                     LanguageManager.GetText(formatKeySellPrice),
-                    Data == null ? "0" : Data.GetSellPrice());
+                    Data == null ? 0.ToString("N0") : Data.GetSellPrice());
             }
 
             if (uiTextCashAmount != null)
             {
                 uiTextCashAmount.text = string.Format(
                     LanguageManager.GetText(formatKeyRewardCash),
-                    Data == null ? "0" : Data.cashAmount.ToString("N0"));
+                    Data == null ? 0.ToString("N0") : Data.cashAmount.ToString("N0"));
             }
         }
 
