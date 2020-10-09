@@ -25,7 +25,8 @@ namespace MultiplayerARPG
                 // Cannot repair because there is no item refine info
                 return false;
             }
-            return GetRepairPrice(durability, out maxDurability).CanRepair(character, out gameMessageType);
+            repairPrice = GetRepairPrice(durability, out maxDurability);
+            return repairPrice.CanRepair(character, out gameMessageType);
         }
 
         public ItemRepairPrice GetRepairPrice(float durability)
@@ -37,12 +38,16 @@ namespace MultiplayerARPG
         {
             ItemRepairPrice repairPrice = default(ItemRepairPrice);
             maxDurability = (this as IEquipmentItem).MaxDurability;
+            if (maxDurability <= 0f)
+                return repairPrice;
             float durabilityRate = durability / maxDurability;
+            if (durabilityRate >= 0.99f)
+                return repairPrice;
             for (int i = 0; i < itemRefine.repairPrices.Length; ++i)
             {
                 repairPrice = itemRefine.repairPrices[i];
                 if (durabilityRate < repairPrice.DurabilityRate)
-                    break;
+                    return repairPrice;
             }
             return repairPrice;
         }
