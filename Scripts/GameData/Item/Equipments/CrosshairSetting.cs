@@ -9,5 +9,6 @@
         public float shrinkPerFrame;
         public float minSpread;
         public float maxSpread;
+        public float recoil;
     }
 }

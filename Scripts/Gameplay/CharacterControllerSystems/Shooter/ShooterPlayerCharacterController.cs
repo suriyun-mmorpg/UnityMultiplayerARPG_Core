@@ -123,6 +123,18 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool aimAssistHarvestable = false;
 
+        [Header("Recoil Settings")]
+        [SerializeField]
+        private float recoilRateWhileMoving = 1.5f;
+        [SerializeField]
+        private float recoilRateWhileSprinting = 2f;
+        [SerializeField]
+        private float recoilRateWhileCrouching = 0.5f;
+        [SerializeField]
+        private float recoilRateWhileCrawling = 0.5f;
+        [SerializeField]
+        private float recoilRateWhileSwimming = 0.5f;
+
         public bool IsBlockController { get; private set; }
         public FollowCameraControls CacheGameplayCameraControls { get; private set; }
         public FollowCameraControls CacheMinimapCameraControls { get; private set; }
@@ -975,6 +987,31 @@ namespace MultiplayerARPG
             if (isDoingAction)
             {
                 UpdateCrosshair(CurrentCrosshairSetting, CurrentCrosshairSetting.expandPerFrameWhileAttacking);
+
+                if (movementState.HasFlag(MovementState.Forward) ||
+                    movementState.HasFlag(MovementState.Backward) ||
+                    movementState.HasFlag(MovementState.Left) ||
+                    movementState.HasFlag(MovementState.Right))
+                {
+                    if (movementState.HasFlag(MovementState.IsUnderWater))
+                        CacheGameplayCameraControls.Recoil(CurrentCrosshairSetting.recoil * recoilRateWhileSwimming);
+                    else if (extraMovementState.HasFlag(ExtraMovementState.IsSprinting))
+                        CacheGameplayCameraControls.Recoil(CurrentCrosshairSetting.recoil * recoilRateWhileSprinting);
+                    else
+                        CacheGameplayCameraControls.Recoil(CurrentCrosshairSetting.recoil * recoilRateWhileMoving);
+                }
+                else if (extraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+                {
+                    CacheGameplayCameraControls.Recoil(CurrentCrosshairSetting.recoil * recoilRateWhileCrouching);
+                }
+                else if (extraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+                {
+                    CacheGameplayCameraControls.Recoil(CurrentCrosshairSetting.recoil * recoilRateWhileCrawling);
+                }
+                else
+                {
+                    CacheGameplayCameraControls.Recoil(CurrentCrosshairSetting.recoil);
+                }
             }
             else if (movementState.HasFlag(MovementState.Forward) ||
                 movementState.HasFlag(MovementState.Backward) ||
