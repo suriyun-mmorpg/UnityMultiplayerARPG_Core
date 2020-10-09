@@ -906,7 +906,7 @@ namespace MultiplayerARPG
             // Check visible item dialog
             if (BaseUISceneGameplay.Singleton.IsRefineItemDialogVisible() &&
                 EquipmentItem != null &&
-                InventoryType == InventoryType.NonEquipItems)
+                InventoryType != InventoryType.StorageItems)
             {
                 if (initData || !isRefineItemDialogAppeared)
                 {
@@ -976,7 +976,7 @@ namespace MultiplayerARPG
             // Check visible item dialog
             if (BaseUISceneGameplay.Singleton.IsRepairItemDialogVisible() &&
                 EquipmentItem != null &&
-                InventoryType == InventoryType.NonEquipItems)
+                InventoryType != InventoryType.StorageItems)
             {
                 if (initData || !isRepairItemDialogAppeared)
                 {
@@ -1011,7 +1011,7 @@ namespace MultiplayerARPG
             // Check visible item dialog
             if (BaseUISceneGameplay.Singleton.IsEnhanceSocketItemDialogVisible() &&
                 EquipmentItem != null &&
-                InventoryType == InventoryType.NonEquipItems)
+                InventoryType != InventoryType.StorageItems)
             {
                 if (initData || !isEnhanceSocketItemDialogAppeared)
                 {
