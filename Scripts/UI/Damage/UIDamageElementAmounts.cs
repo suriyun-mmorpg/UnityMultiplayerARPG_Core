@@ -36,8 +36,8 @@ namespace MultiplayerARPG
                         tempTextComponent.text = string.Format(
                             LanguageManager.GetText(formatKeyDamage),
                             tempElement.Title,
-                            isBonus ? "+0" : "0",
-                            "0");
+                            isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
+                            0.ToString("N0"));
                         cacheTextDamages[tempElement] = tempTextComponent;
                     }
                 }
@@ -52,16 +52,16 @@ namespace MultiplayerARPG
             {
                 uiTextSumDamage.text = string.Format(
                     LanguageManager.GetText(formatKeySumDamage),
-                    isBonus ? "+0" : "0",
-                    "0");
+                    isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
+                    0.ToString("N0"));
             }
             foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextDamages)
             {
                 entry.Value.text = string.Format(
                     LanguageManager.GetText(formatKeyDamage),
                     entry.Key.Title,
-                    isBonus ? "+0" : "0",
-                    "0");
+                    isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
+                    0.ToString("N0"));
             }
             // Set number by updated data
             if (Data == null || Data.Count == 0)
