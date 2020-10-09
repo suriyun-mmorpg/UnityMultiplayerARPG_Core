@@ -92,6 +92,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// This will be called at server to order character to pickup nearby items
         /// </summary>
+        [ServerRpc]
         protected virtual void ServerPickupNearbyItems()
         {
 #if !CLIENT_BUILD
