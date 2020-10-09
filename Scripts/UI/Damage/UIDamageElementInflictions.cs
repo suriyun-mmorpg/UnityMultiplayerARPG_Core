@@ -34,7 +34,7 @@ namespace MultiplayerARPG
                         tempTextComponent.text = string.Format(
                             LanguageManager.GetText(formatKeyInflictionAsElemental),
                             tempElement.Title,
-                            "0");
+                            0.ToString("N0"));
                         cacheTextInflictions[tempElement] = tempTextComponent;
                     }
                 }
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                             LanguageManager.GetText(formatKeyInfliction) :
                             LanguageManager.GetText(formatKeyInflictionAsElemental),
                         textAmount.Key.Title,
-                        "0");
+                        0.ToString("N0"));
                 }
             }
             else
