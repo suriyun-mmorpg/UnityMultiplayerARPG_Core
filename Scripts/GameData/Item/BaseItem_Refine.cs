@@ -7,8 +7,7 @@ namespace MultiplayerARPG
     {
         public bool CanRefine(IPlayerCharacterData character, short level)
         {
-            GameMessage.Type gameMessageType;
-            return CanRefine(character, level, out gameMessageType);
+            return CanRefine(character, level, out _);
         }
 
         public bool CanRefine(IPlayerCharacterData character, short level, out GameMessage.Type gameMessageType)

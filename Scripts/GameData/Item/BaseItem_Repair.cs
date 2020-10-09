@@ -7,8 +7,7 @@ namespace MultiplayerARPG
     {
         public bool CanRepair(IPlayerCharacterData character, float durability, out float maxDurability, out ItemRepairPrice repairPrice)
         {
-            GameMessage.Type gameMessageType;
-            return CanRepair(character, durability, out maxDurability, out repairPrice, out gameMessageType);
+            return CanRepair(character, durability, out maxDurability, out repairPrice, out _);
         }
 
         public bool CanRepair(IPlayerCharacterData character, float durability, out float maxDurability, out ItemRepairPrice repairPrice, out GameMessage.Type gameMessageType)

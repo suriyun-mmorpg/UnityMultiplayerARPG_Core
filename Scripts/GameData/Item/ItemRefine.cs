@@ -52,8 +52,7 @@ namespace MultiplayerARPG
 
         public bool CanRefine(IPlayerCharacterData character)
         {
-            GameMessage.Type gameMessageType;
-            return CanRefine(character, out gameMessageType);
+            return CanRefine(character, out _);
         }
 
         public bool CanRefine(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
@@ -93,8 +92,7 @@ namespace MultiplayerARPG
 
         public bool CanRepair(IPlayerCharacterData character)
         {
-            GameMessage.Type gameMessageType;
-            return CanRepair(character, out gameMessageType);
+            return CanRepair(character, out _);
         }
 
         public bool CanRepair(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
