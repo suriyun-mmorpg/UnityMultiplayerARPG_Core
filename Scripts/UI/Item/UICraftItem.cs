@@ -60,14 +60,11 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    int currentAmount = 0;
-                    if (OwningCharacter != null)
-                        currentAmount = OwningCharacter.Gold;
                     uiTextRequireGold.text = string.Format(
-                        currentAmount >= ItemCraft.RequireGold ?
+                        OwningCharacter.Gold >= ItemCraft.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
-                        currentAmount.ToString("N0"),
+                        OwningCharacter.Gold.ToString("N0"),
                         ItemCraft.RequireGold.ToString("N0"));
                 }
             }
