@@ -65,10 +65,9 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (coolDownRemainsDuration <= 0f)
             {
-                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null && GuildSkill != null)
                 {
                     int indexOfSkillUsage = owningCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
