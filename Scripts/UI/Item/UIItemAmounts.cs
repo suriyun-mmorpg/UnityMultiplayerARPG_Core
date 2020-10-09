@@ -37,8 +37,8 @@ namespace MultiplayerARPG
                         tempTextComponent.text = string.Format(
                             LanguageManager.GetText(formatKeyAmount),
                             tempItem.Title,
-                            "0",
-                            "0");
+                            0.ToString("N0"),
+                            0.ToString("N0"));
                         cacheTextLevels[tempItem] = tempTextComponent;
                     }
                 }
@@ -59,8 +59,8 @@ namespace MultiplayerARPG
                     entry.Value.text = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
                         entry.Key.Title,
-                        "0",
-                        "0");
+                        0.ToString("N0"),
+                        0.ToString("N0"));
                 }
             }
             else
