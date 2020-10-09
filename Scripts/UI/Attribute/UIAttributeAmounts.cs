@@ -152,19 +152,19 @@ namespace MultiplayerARPG
                     text.text = string.Format(
                         LanguageManager.GetText(formatKeyRateAmount),
                         title,
-                        isBonus ? "+0.00%" : "0.00%");
+                        isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
                     break;
                 case DisplayType.Requirement:
                     text.text = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
                         title,
-                        "0", "0");
+                        0f.ToString("N0"), 0f.ToString("N0"));
                     break;
                 case DisplayType.Simple:
                     text.text = string.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
                         title,
-                        isBonus ? "+0" : "0");
+                        isBonus ? 0f.ToBonusString("N0") : 0f.ToString("N0"));
                     break;
             }
         }
