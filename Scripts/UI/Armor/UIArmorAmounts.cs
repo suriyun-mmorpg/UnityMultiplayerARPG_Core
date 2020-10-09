@@ -33,7 +33,7 @@ namespace MultiplayerARPG
                         tempTextComponent.text = string.Format(
                             LanguageManager.GetText(formatKeyAmount),
                             tempElement.Title,
-                            isBonus ? "+0" : "0");
+                            isBonus ? 0f.ToBonusString("N0") : 0f.ToString("N0"));
                         cacheTextAmounts[tempElement] = tempTextComponent;
                     }
                 }
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                 entry.Value.text = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
                         entry.Key.Title,
-                        isBonus ? "+0" : "0");
+                        isBonus ? 0f.ToBonusString("N0") : 0f.ToString("N0"));
             }
             // Set number by updated data
             if (Data == null || Data.Count == 0)
