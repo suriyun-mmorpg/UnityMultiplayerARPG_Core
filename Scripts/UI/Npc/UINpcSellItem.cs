@@ -50,11 +50,9 @@ namespace MultiplayerARPG
                 return;
             }
 
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (item.MaxStack == 1)
             {
-                if (owningCharacter != null)
-                    owningCharacter.CallServerBuyNpcItem((short)indexOfData, 1);
+                BasePlayerCharacterController.OwningCharacter.CallServerBuyNpcItem((short)indexOfData, 1);
             }
             else
             {
@@ -70,9 +68,7 @@ namespace MultiplayerARPG
 
         private void OnBuyAmountConfirmed(int amount)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null)
-                owningCharacter.CallServerBuyNpcItem((short)indexOfData, (short)amount);
+            BasePlayerCharacterController.OwningCharacter.CallServerBuyNpcItem((short)indexOfData, (short)amount);
         }
     }
 }
