@@ -54,6 +54,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             // Reset number
             foreach (KeyValuePair<Attribute, TextWrapper> entry in CacheTextAmounts)
             {
@@ -85,8 +86,8 @@ namespace MultiplayerARPG
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
                     // Get attribute amount from character
-                    if (BasePlayerCharacterController.OwningCharacter != null)
-                        BasePlayerCharacterController.OwningCharacter.GetCaches().Attributes.TryGetValue(tempAttribute, out tempCurrentAmount);
+                    if (owningCharacter != null)
+                        owningCharacter.GetCaches().Attributes.TryGetValue(tempAttribute, out tempCurrentAmount);
                     // Use difference format by option 
                     switch (displayType)
                     {
