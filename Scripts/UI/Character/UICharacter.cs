@@ -45,6 +45,7 @@ namespace MultiplayerARPG
         public UICharacterStats uiCharacterStats;
         public UICharacterBuffs uiCharacterBuffs;
         public UIResistanceAmounts uiCharacterResistances;
+        public UIDamageElementAmounts uiCharacterElementalDamages;
         public UIArmorAmounts uiCharacterArmors;
         public UICharacterAttributePair[] uiCharacterAttributes;
         public UICharacterClass uiCharacterClass;
@@ -437,6 +438,12 @@ namespace MultiplayerARPG
             {
                 uiCharacterResistances.isBonus = false;
                 uiCharacterResistances.Data = cacheResistances;
+            }
+
+            if (uiCharacterElementalDamages != null)
+            {
+                uiCharacterElementalDamages.isBonus = false;
+                uiCharacterElementalDamages.Data = cacheDamages;
             }
 
             if (uiCharacterArmors != null)
