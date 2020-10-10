@@ -297,7 +297,7 @@ namespace MultiplayerARPG
                         for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
                             tempGameObject = attacker.AttackPhysicFunctions.GetOverlapObject(tempLoopCounter);
-                            // Skip unhittable entities
+
                             if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
 
@@ -360,13 +360,11 @@ namespace MultiplayerARPG
                             distance = attacker.AttackPhysicFunctions.GetRaycastDistance(tempLoopCounter);
                             tempGameObject = attacker.AttackPhysicFunctions.GetRaycastColliderGameObject(tempLoopCounter);
 
-                            // Skip layers
                             if (tempGameObject.layer == PhysicLayers.TransparentFX ||
                                 tempGameObject.layer == PhysicLayers.IgnoreRaycast ||
                                 tempGameObject.layer == PhysicLayers.Water)
                                 return;
 
-                            // Skip unhittable entities
                             if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
 
