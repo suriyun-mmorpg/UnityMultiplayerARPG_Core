@@ -1,33 +1,32 @@
-﻿using LiteNetLibManager;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class BuildingArea : MonoBehaviour, IGameEntity, IUnHittable
+    /// <summary>
+    /// Attach this component to any objects in scene to make it able to construct building.
+    /// If this is child of building entity it will attach `UnHittable` component to avoid anything hitting it.
+    /// </summary>
+    public class BuildingArea : MonoBehaviour
     {
         public BuildingEntity entity;
         public string buildingType;
         public bool snapBuildingObject;
-        
-        public BaseGameEntity Entity
-        {
-            get { return entity; }
-        }
 
-        public LiteNetLibIdentity Identity
-        {
-            get { return entity.Identity; }
-        }
+        /// <summary>
+        /// Object id will be 0, if this component attached to objects in scene
+        /// </summary>
+        public uint ObjectId { get; private set; }
 
-        private void Start()
+        private void Awake()
         {
+            ObjectId = 0;
             if (entity == null)
                 entity = GetComponentInParent<BuildingEntity>();
-        }
-
-        public virtual void PrepareRelatesData()
-        {
-            // Do nothing
+            if (entity != null)
+            {
+                ObjectId = entity.ObjectId;
+                gameObject.GetOrAddComponent<UnHittable>();
+            }
         }
     }
 }
