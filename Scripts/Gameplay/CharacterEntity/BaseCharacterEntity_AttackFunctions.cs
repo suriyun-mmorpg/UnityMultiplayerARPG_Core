@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                     return targetEntity.CacheTransform.position;
                 }
             }
-            return damageInfo.GetDamageTransform(this, isLeftHand).position + CacheTransform.forward;
+            return damageInfo.GetDamageTransform(this, isLeftHand).position + CacheTransform.forward * damageInfo.GetDistance();
         }
 
         public virtual void GetReloadingData(
