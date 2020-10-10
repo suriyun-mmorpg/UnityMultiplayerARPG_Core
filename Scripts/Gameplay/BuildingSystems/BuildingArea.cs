@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public string buildingType;
         public bool snapBuildingObject;
 
-        private void Awake()
+        private void Start()
         {
             if (entity == null)
                 entity = GetComponentInParent<BuildingEntity>();
