@@ -913,12 +913,16 @@ namespace MultiplayerARPG
         {
             // Instantiate constructing building
             if (ConstructingBuildingEntity == null)
+            {
                 InstantiateConstructingBuilding(prefab);
+                buildYRotate = 0;
+            }
             // Rotate by keys
             if (InputManager.GetButtonDown("RotateLeft"))
-                ConstructingBuildingEntity.CacheTransform.eulerAngles -= Vector3.up * buildRotateAngle;
+                buildYRotate -= buildRotateAngle;
             else if (InputManager.GetButtonDown("RotateRight"))
-                ConstructingBuildingEntity.CacheTransform.eulerAngles += Vector3.up * buildRotateAngle;
+                buildYRotate += buildRotateAngle;
+            ConstructingBuildingEntity.Rotation = GetBuildingPlaceRotation(buildYRotate);
             // Find position to place building
             if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
                 FindAndSetBuildingAreaByAxes(aimAxes);

@@ -128,9 +128,7 @@ namespace MultiplayerARPG
                 return;
             if (ConstructingBuildingEntity.CanBuild())
             {
-                uint parentObjectId = 0;
-                if (ConstructingBuildingEntity.BuildingArea)
-                    parentObjectId = ConstructingBuildingEntity.BuildingArea.ObjectId;
+                uint parentObjectId = ConstructingBuildingEntity.BuildingArea.GetEntityObjectId();
                 PlayerCharacterEntity.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
             }
             DestroyConstructingBuilding();

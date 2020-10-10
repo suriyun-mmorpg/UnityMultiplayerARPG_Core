@@ -6,7 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class PlayerCharacterController
     {
-
         public int FindClickObjects(out Vector3 worldPosition2D)
         {
             return physicFunctions.RaycastPickObjects(CacheGameplayCamera, InputManager.MousePosition(), CurrentGameInstance.GetTargetLayerMask(), 100f, out worldPosition2D);
@@ -19,8 +18,7 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaByMousePosition()
         {
-            Vector3 worldPosition2D;
-            LoopSetBuildingArea(physicFunctions.RaycastPickObjects(CacheGameplayCamera, InputManager.MousePosition(), CurrentGameInstance.GetBuildLayerMask(), 100f, out worldPosition2D));
+            LoopSetBuildingArea(physicFunctions.RaycastPickObjects(CacheGameplayCamera, InputManager.MousePosition(), CurrentGameInstance.GetBuildLayerMask(), 100f, out _));
         }
 
         /// <summary>
@@ -30,6 +28,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         private bool LoopSetBuildingArea(int count)
         {
+            IGameEntity gameEntity;
             BuildingArea buildingArea;
             Transform tempTransform;
             Vector3 tempVector3;
@@ -37,10 +36,23 @@ namespace MultiplayerARPG
             {
                 tempTransform = physicFunctions.GetRaycastTransform(tempCounter);
                 tempVector3 = GameplayUtils.ClampPosition(CacheTransform.position, physicFunctions.GetRaycastPoint(tempCounter), ConstructingBuildingEntity.buildDistance);
+                tempVector3.y = physicFunctions.GetRaycastPoint(tempCounter).y;
 
                 buildingArea = tempTransform.GetComponent<BuildingArea>();
-                if (buildingArea == null ||
-                    buildingArea.ObjectId == ConstructingBuildingEntity.ObjectId ||
+                if (buildingArea == null)
+                {
+                    gameEntity = tempTransform.GetComponent<IGameEntity>();
+                    if (gameEntity == null || gameEntity.Entity != ConstructingBuildingEntity)
+                    {
+                        // Hit something and it is not part of constructing building entity, assume that it is ground
+                        ConstructingBuildingEntity.BuildingArea = null;
+                        ConstructingBuildingEntity.Position = GetBuildingPlacePosition(tempVector3);
+                        break;
+                    }
+                    continue;
+                }
+
+                if (buildingArea.IsPartOfBuildingEntity(ConstructingBuildingEntity) ||
                     !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                 {
                     // Skip because this area is not allowed to build the building that you are going to build

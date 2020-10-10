@@ -12,21 +12,26 @@ namespace MultiplayerARPG
         public string buildingType;
         public bool snapBuildingObject;
 
-        /// <summary>
-        /// Object id will be 0, if this component attached to objects in scene
-        /// </summary>
-        public uint ObjectId { get; private set; }
-
         private void Awake()
         {
-            ObjectId = 0;
             if (entity == null)
                 entity = GetComponentInParent<BuildingEntity>();
             if (entity != null)
-            {
-                ObjectId = entity.ObjectId;
                 gameObject.GetOrAddComponent<UnHittable>();
-            }
+        }
+
+        public bool IsPartOfBuildingEntity(BuildingEntity entity)
+        {
+            if (this.entity == null)
+                return false;
+            return this.entity.ObjectId == entity.ObjectId;
+        }
+
+        public uint GetEntityObjectId()
+        {
+            if (entity == null)
+                return 0;
+            return entity.ObjectId;
         }
     }
 }

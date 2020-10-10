@@ -105,6 +105,7 @@ namespace MultiplayerARPG
         protected bool isLeftHandAttacking;
         protected bool isFollowingTarget;
         protected bool didActionOnTarget;
+        protected float buildYRotate;
 
         protected override void Awake()
         {
@@ -152,13 +153,9 @@ namespace MultiplayerARPG
             EnemyEntityDetector.findMonsterToAttack = true;
             // Initial physic functions
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-            {
                 physicFunctions = new PhysicFunctions(512);
-            }
             else
-            {
                 physicFunctions = new PhysicFunctions2D(512);
-            }
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -235,14 +232,13 @@ namespace MultiplayerARPG
             return position;
         }
 
-        private Vector3 GetBuildingPlaceEulerAngles(Vector3 eulerAngles)
+        private Quaternion GetBuildingPlaceRotation(float anglesY)
         {
-            eulerAngles.x = 0;
-            eulerAngles.z = 0;
+            Vector3 eulerAngles = Vector3.zero;
             // Make Y rotation set to 0, 90, 180
             if (buildRotationSnap)
-                eulerAngles.y = Mathf.Round(eulerAngles.y / 90) * 90;
-            return eulerAngles;
+                eulerAngles.y = Mathf.Round(anglesY / 90) * 90;
+            return Quaternion.Euler(eulerAngles);
         }
 
         public bool TryGetSelectedTargetAsAttackingEntity(out BaseCharacterEntity character)

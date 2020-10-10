@@ -1380,7 +1380,7 @@ namespace MultiplayerARPG
             if (!hitGround)
             {
                 // Find nearest grounded position
-                FindConstructingBuildingArea(new Ray(aimPosition, Vector3.down), 100f, out hitGround);
+                FindConstructingBuildingArea(new Ray(aimPosition, Vector3.down), 100f, out _);
             }
             // Place constructing building
             if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
@@ -1418,30 +1418,25 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                gameEntity = tempHitInfo.transform.GetComponent<IGameEntity>();
-                if (gameEntity != null && gameEntity.Entity == ConstructingBuildingEntity)
-                {
-                    // Hit the constructing building entity, skip it
-                    continue;
-                }
-
-                buildingArea = gameEntity == null ? null : (gameEntity as BuildingArea);
+                buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
                 if (buildingArea == null)
                 {
-                    if (tempHitInfo.transform.GetComponentInParent<IGameEntity>() != null)
+                    // Hit something but it is not building area
+                    gameEntity = tempHitInfo.transform.GetComponent<IGameEntity>();
+                    if (gameEntity == null || gameEntity.Entity != ConstructingBuildingEntity)
                     {
-                        // If this is part of other game entity, skip it
-                        continue;
+                        // Hit something and it is not part of constructing building entity, assume that it is ground
+                        aimPosition = tempHitInfo.point;
+                        hitGround = true;
+                        break;
                     }
-                    // Hit something but it's not building area
-                    aimPosition = tempHitInfo.point;
-                    hitGround = true;
                     continue;
                 }
 
-                if (!ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
+                if (buildingArea.IsPartOfBuildingEntity(ConstructingBuildingEntity) || 
+                    !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                 {
-                    // Hit building area but skip it because this area is not allow to construct the building
+                    // Skip because this area is not allowed to build the building that you are going to build
                     continue;
                 }
 
