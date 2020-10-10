@@ -669,6 +669,12 @@ namespace MultiplayerARPG
             {
                 tempHitInfo = raycasts[tempCounter];
 
+                if (tempHitInfo.collider.GetComponent<IUnHittable>() != null)
+                {
+                    // Don't aim to unhittable objects
+                    continue;
+                }
+
                 // Get distance between character and raycast hit point
                 tempDistance = Vector3.Distance(CacheTransform.position, tempHitInfo.point);
                 tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
