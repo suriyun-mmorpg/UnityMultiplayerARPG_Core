@@ -787,7 +787,7 @@ namespace MultiplayerARPG
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
                                 OwningCharacter.EquipWeapons.rightHand,
-                                InventoryType.EquipWeaponRight, -1);
+                                InventoryType.EquipWeaponRight, 0);
                             comparingEquipmentIndex++;
                         }
                         if (!OwningCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
@@ -796,7 +796,7 @@ namespace MultiplayerARPG
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
                                 OwningCharacter.EquipWeapons.leftHand,
-                                InventoryType.EquipWeaponLeft, -1);
+                                InventoryType.EquipWeaponLeft, 0);
                             comparingEquipmentIndex++;
                         }
                     }
@@ -808,7 +808,7 @@ namespace MultiplayerARPG
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
                                 OwningCharacter.EquipWeapons.rightHand,
-                                InventoryType.EquipWeaponRight, -1);
+                                InventoryType.EquipWeaponRight, 0);
                             comparingEquipmentIndex++;
                         }
                         if (!OwningCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
@@ -817,7 +817,7 @@ namespace MultiplayerARPG
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
                                 OwningCharacter.EquipWeapons.leftHand,
-                                InventoryType.EquipWeaponLeft, -1);
+                                InventoryType.EquipWeaponLeft, 0);
                             comparingEquipmentIndex++;
                         }
                     }
