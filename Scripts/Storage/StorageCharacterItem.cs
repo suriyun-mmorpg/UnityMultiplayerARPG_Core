@@ -1,6 +1,6 @@
 ﻿using LiteNetLib.Utils;
 
-public enum StorageType
+public enum StorageType : byte
 {
     None,
     Player,
