@@ -37,11 +37,11 @@
                 case NpcDialogConditionType.QuestNotStarted:
                     return indexOfQuest < 0;
                 case NpcDialogConditionType.QuestOngoing:
-                    return !questTasksCompleted;
+                    return indexOfQuest >= 0 && !questTasksCompleted;
                 case NpcDialogConditionType.QuestTasksCompleted:
-                    return questTasksCompleted;
+                    return indexOfQuest >= 0 && questTasksCompleted;
                 case NpcDialogConditionType.QuestCompleted:
-                    return questCompleted;
+                    return indexOfQuest >= 0 && questCompleted;
                 case NpcDialogConditionType.FactionIs:
                     return character.FactionId == faction.DataId;
                 case NpcDialogConditionType.Custom:
