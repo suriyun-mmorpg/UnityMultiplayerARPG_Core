@@ -39,6 +39,10 @@ namespace MultiplayerARPG
         [SerializeField]
         private ExtraMoveActiveMode crawlActiveMode;
         [SerializeField]
+        private bool unToggleCrouchWhenJump;
+        [SerializeField]
+        private bool unToggleCrawlWhenJump;
+        [SerializeField]
         private float findTargetRaycastDistance = 16f;
         [SerializeField]
         private bool showConfirmConstructionUI = false;
@@ -538,25 +542,34 @@ namespace MultiplayerARPG
 
             // If jumping add jump state
             if (InputManager.GetButtonDown("Jump"))
-                movementState |= MovementState.IsJump;
-
-            if (DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn))
             {
-                extraMovementState = ExtraMovementState.IsSprinting;
-                toggleCrouchOn = false;
-                toggleCrawlOn = false;
+                if (unToggleCrouchWhenJump && PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+                    toggleCrouchOn = false;
+                else if (unToggleCrawlWhenJump && PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+                    toggleCrawlOn = false;
+                else
+                    movementState |= MovementState.IsJump;
             }
-            if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
+            else if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsGrounded))
             {
-                extraMovementState = ExtraMovementState.IsCrouching;
-                toggleSprintOn = false;
-                toggleCrawlOn = false;
-            }
-            if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
-            {
-                extraMovementState = ExtraMovementState.IsCrawling;
-                toggleSprintOn = false;
-                toggleCrouchOn = false;
+                if (DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn))
+                {
+                    extraMovementState = ExtraMovementState.IsSprinting;
+                    toggleCrouchOn = false;
+                    toggleCrawlOn = false;
+                }
+                if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
+                {
+                    extraMovementState = ExtraMovementState.IsCrouching;
+                    toggleSprintOn = false;
+                    toggleCrawlOn = false;
+                }
+                if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
+                {
+                    extraMovementState = ExtraMovementState.IsCrawling;
+                    toggleSprintOn = false;
+                    toggleCrouchOn = false;
+                }
             }
 
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
