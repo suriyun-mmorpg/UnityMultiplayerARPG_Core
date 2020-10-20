@@ -48,28 +48,31 @@ public static partial class BuildingSaveDataExtension
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SerializeBuildingSaveData", buildingSaveData, writer);
     }
 
-    public static BuildingSaveData DeserializeBuildingSaveData(NetDataReader reader)
+    public static BuildingSaveData DeserializeBuildingSaveData(this NetDataReader reader)
     {
-        BuildingSaveData result = new BuildingSaveData();
-        result.Id = reader.GetString();
-        result.ParentId = reader.GetString();
-        result.EntityId = reader.GetInt();
-        result.CurrentHp = reader.GetInt();
-        result.RemainsLifeTime = reader.GetFloat();
-        result.IsLocked = reader.GetBool();
-        result.LockPassword = reader.GetString();
-        result.Position = reader.GetVector3();
-        result.Rotation = reader.GetQuaternion();
-        result.CreatorId = reader.GetString();
-        result.CreatorName = reader.GetString();
-        result.ExtraData = reader.GetString();
-        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeBuildingSaveData", result, reader);
-        return result;
+        return new BuildingSaveData().DeserializeBuildingSaveData(reader);
+    }
+
+    public static void DeserializeBuildingSaveData(this NetDataReader reader, ref BuildingSaveData buildingSaveData)
+    {
+        buildingSaveData = reader.DeserializeBuildingSaveData();
     }
 
     public static T DeserializeBuildingSaveData<T>(this T buildingSaveData, NetDataReader reader) where T : IBuildingSaveData
     {
-        DeserializeBuildingSaveData(reader).CloneTo(buildingSaveData);
+        buildingSaveData.Id = reader.GetString();
+        buildingSaveData.ParentId = reader.GetString();
+        buildingSaveData.EntityId = reader.GetInt();
+        buildingSaveData.CurrentHp = reader.GetInt();
+        buildingSaveData.RemainsLifeTime = reader.GetFloat();
+        buildingSaveData.IsLocked = reader.GetBool();
+        buildingSaveData.LockPassword = reader.GetString();
+        buildingSaveData.Position = reader.GetVector3();
+        buildingSaveData.Rotation = reader.GetQuaternion();
+        buildingSaveData.CreatorId = reader.GetString();
+        buildingSaveData.CreatorName = reader.GetString();
+        buildingSaveData.ExtraData = reader.GetString();
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeBuildingSaveData", buildingSaveData, reader);
         return buildingSaveData;
     }
 }
