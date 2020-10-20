@@ -93,7 +93,7 @@ public partial struct BuildingSaveData : IBuildingSaveData, INetSerializable
 
     public void Deserialize(NetDataReader reader)
     {
-        this.DeserializeBuildingSaveData(reader);
+        reader.DeserializeBuildingSaveData(ref this);
     }
 
     public void Serialize(NetDataWriter writer)
