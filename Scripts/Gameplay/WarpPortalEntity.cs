@@ -3,7 +3,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class WarpPortalEntity : BaseGameEntity, IUnHittable
+    public class WarpPortalEntity : BaseGameEntity
     {
         [Tooltip("Signal to tell players that their character can enter the portal")]
         public GameObject[] warpSignals;
