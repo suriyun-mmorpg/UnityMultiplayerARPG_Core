@@ -492,6 +492,8 @@ namespace MultiplayerARPG
 
             IWeaponItem weaponItem = equipWeapons.GetRightHandWeaponItem();
             if (weaponItem == null)
+                weaponItem = equipWeapons.GetLeftHandWeaponItem();
+            if (weaponItem == null)
                 weaponItem = GameInstance.Singleton.DefaultWeaponItem;
 
             SetClipBasedOnWeaponType(weaponItem.WeaponType);

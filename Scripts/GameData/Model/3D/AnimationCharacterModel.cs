@@ -510,7 +510,10 @@ namespace MultiplayerARPG
 
             IWeaponItem weaponItem = equipWeapons.GetRightHandWeaponItem();
             if (weaponItem == null)
+                weaponItem = equipWeapons.GetLeftHandWeaponItem();
+            if (weaponItem == null)
                 weaponItem = GameInstance.Singleton.DefaultWeaponItem;
+
             WeaponAnimations weaponAnimations;
             GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
 
