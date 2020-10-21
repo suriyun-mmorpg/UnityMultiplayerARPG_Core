@@ -253,8 +253,10 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox == null)
                                 continue;
 
-                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId ||
-                                hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
+                                continue;
+
+                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
@@ -305,8 +307,10 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox == null)
                                 continue;
 
-                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId ||
-                                hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
+                                continue;
+
+                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
@@ -372,12 +376,20 @@ namespace MultiplayerARPG
                                 minDistance = distance;
 
                             tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
-                            // Hit wall... so break the loop
                             if (tempDamageableHitBox == null)
-                                break;
+                            {
+                                if (!GameInstance.Singleton.IsDamageableLayer(tempGameObject.layer))
+                                {
+                                    // Hit wall... so break the loop
+                                    break;
+                                }
+                                continue;
+                            }
 
-                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId ||
-                                hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
+                                continue;
+
+                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 

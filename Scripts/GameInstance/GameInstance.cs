@@ -522,6 +522,18 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Check is layer is layer for any damageable entities or not
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <returns></returns>
+        public bool IsDamageableLayer(int layer)
+        {
+            return layer == characterLayer ||
+                layer == buildingLayer ||
+                layer == harvestableLayer;
+        }
+
+        /// <summary>
         /// Only `characterLayer`, `buildingLayer`, `harvestableLayer` will be used for sphere casts
         /// </summary>
         /// <returns></returns>
