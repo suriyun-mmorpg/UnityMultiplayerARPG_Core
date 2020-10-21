@@ -196,18 +196,9 @@ public static class GenericUtils
         }
     }
 
-    public static string GetUniqueId(int length = 8, string mask = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+    public static string GetUniqueId(int length = 12, string mask = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-")
     {
-        char[] chars = mask.ToCharArray();
-        RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider();
-        byte[] data = new byte[length];
-        crypto.GetNonZeroBytes(data);
-        StringBuilder result = new StringBuilder(length);
-        foreach (byte b in data)
-        {
-            result.Append(chars[b % (chars.Length - 1)]);
-        }
-        return result.ToString();
+        return Nanoid.Nanoid.Generate(mask, length);
     }
 
     public static string GetMD5(this string text)
