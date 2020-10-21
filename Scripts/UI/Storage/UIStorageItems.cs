@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         protected virtual void OnDisable()
         {
             // Close storage
-            if (StorageType != StorageType.None)
+            if (StorageType != StorageType.None && BasePlayerCharacterController.OwningCharacter)
                 BasePlayerCharacterController.OwningCharacter.CallServerCloseStorage();
             // Clear data
             StorageType = StorageType.None;
