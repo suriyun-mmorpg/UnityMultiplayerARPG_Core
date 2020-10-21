@@ -76,11 +76,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
+        public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex, int randomSeed)
         {
             if (this.IsDead())
                 return false;
-            RPC(AllPlayAttackAnimation, isLeftHand, animationIndex);
+            RPC(AllPlayAttackAnimation, isLeftHand, animationIndex, randomSeed);
             return true;
         }
 

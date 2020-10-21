@@ -25,8 +25,10 @@ namespace MultiplayerARPG
         bool isLeftHand,
         CharacterItem weapon,
         int hitIndex,
+        DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-        Vector3 aimPosition);
+        Vector3 aimPosition,
+        int randomSeed);
     public delegate void UseSkillRoutineDelegate(
         BaseSkill skill,
         short level,

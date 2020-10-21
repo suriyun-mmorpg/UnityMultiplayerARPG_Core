@@ -61,7 +61,6 @@ namespace MultiplayerARPG
 
         protected void UseItemSkill(short itemIndex, bool isLeftHand, Vector3? aimPosition)
         {
-            GameMessage.Type gameMessageType;
             if (!CanUseItem() || !CanUseSkill())
                 return;
 
@@ -77,7 +76,7 @@ namespace MultiplayerARPG
                 return;
 
             // Validate mp amount, skill level
-            if (!item.UsingSkill.CanUse(this, item.UsingSkillLevel, isLeftHand, out gameMessageType, true))
+            if (!item.UsingSkill.CanUse(this, item.UsingSkillLevel, isLeftHand, out _, true))
                 return;
 
             // Prepare requires data and get skill data
@@ -97,16 +96,13 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get animation data
             int animationIndex;
-            float animSpeedRate;
-            float[] triggerDurations;
-            float totalDuration;
             GetRandomAnimationData(
                 animActionType,
                 animActionDataId,
                 out animationIndex,
-                out animSpeedRate,
-                out triggerDurations,
-                out totalDuration);
+                out _,
+                out _,
+                out _);
 
             // Validate skill item
             if (!this.DecreaseItemsByIndex(itemIndex, 1))

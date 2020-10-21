@@ -305,11 +305,11 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex);
+            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex, Random.Range(int.MinValue, int.MaxValue));
 #endif
         }
 
-        protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex)
+        protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex, int randomSeed)
         {
             // Attack animation still playing, skip it
             if (attackCancellationTokenSource != null)
@@ -402,7 +402,16 @@ namespace MultiplayerARPG
                     {
                         // Trigger attack event
                         if (onAttackRoutine != null)
-                            onAttackRoutine.Invoke(isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+                        {
+                            onAttackRoutine.Invoke(
+                                isLeftHand,
+                                weapon,
+                                hitIndex,
+                                damageInfo,
+                                damageAmounts,
+                                aimPosition,
+                                randomSeed);
+                        }
 
                         // Apply attack damages
                         ApplyAttack(
@@ -410,7 +419,8 @@ namespace MultiplayerARPG
                             weapon,
                             damageInfo,
                             damageAmounts,
-                            aimPosition);
+                            aimPosition,
+                            randomSeed);
                     }
 
                     if (remainsDuration <= 0f)
@@ -439,7 +449,7 @@ namespace MultiplayerARPG
             ClearActionStates();
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition, int randomSeed)
         {
             // Increase damage with ammo damage
             if (IsServer)
@@ -462,6 +472,7 @@ namespace MultiplayerARPG
             Vector3 stagger;
             for (int i = 0; i < fireSpread + 1; ++i)
             {
+                Random.InitState(unchecked(randomSeed++));
                 stagger = new Vector3(Random.Range(-fireStagger.x, fireStagger.x), Random.Range(-fireStagger.y, fireStagger.y));
                 damageInfo.LaunchDamageEntity(
                     this,

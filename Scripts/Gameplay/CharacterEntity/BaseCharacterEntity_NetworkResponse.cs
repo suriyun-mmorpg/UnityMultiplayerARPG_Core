@@ -8,9 +8,9 @@ namespace MultiplayerARPG
     public partial class BaseCharacterEntity
     {
         [AllRpc]
-        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
+        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex, int randomSeed)
         {
-            AttackRoutine(isLeftHand, animationIndex).Forget();
+            AttackRoutine(isLeftHand, animationIndex, randomSeed).Forget();
         }
 
         [AllRpc]
@@ -392,7 +392,6 @@ namespace MultiplayerARPG
             if (!CanDoActions() || index >= equipItems.Count)
                 return false;
 
-            EquipWeapons tempEquipWeapons = EquipWeapons;
             CharacterItem unEquipItem = equipItems[index];
             if (!doNotValidate && unEquipItem.NotEmptySlot() &&
                 this.UnEquipItemWillOverwhelming())

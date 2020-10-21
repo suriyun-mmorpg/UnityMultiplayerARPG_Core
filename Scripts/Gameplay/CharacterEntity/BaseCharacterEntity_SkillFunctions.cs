@@ -99,8 +99,7 @@ namespace MultiplayerARPG
                 return;
 
             // Validate mp amount, skill level, 
-            GameMessage.Type gameMessageType;
-            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessageType))
+            if (!skill.CanUse(this, skillLevel, isLeftHand, out _))
                 return;
 
             // Prepare requires data and get skill data
@@ -120,16 +119,13 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get animation data
             int animationIndex;
-            float animSpeedRate;
-            float[] triggerDurations;
-            float totalDuration;
             GetRandomAnimationData(
                 animActionType,
                 animatonDataId,
                 out animationIndex,
-                out animSpeedRate,
-                out triggerDurations,
-                out totalDuration);
+                out _,
+                out _,
+                out _);
 
             // Start use skill routine
             IsAttackingOrUsingSkill = true;
