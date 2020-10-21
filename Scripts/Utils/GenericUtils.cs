@@ -224,6 +224,9 @@ public static class GenericUtils
 
     public static int GenerateHashId(this string id)
     {
+        if (string.IsNullOrEmpty(id))
+            return 0;
+
         unchecked
         {
             int hash1 = 5381;
