@@ -10,7 +10,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Player Character", menuName = "Create GameData/Player Character", order = -4999)]
-    public sealed partial class PlayerCharacter : BaseCharacter
+    public partial class PlayerCharacter : BaseCharacter
     {
         [Header("Skills")]
         [SerializeField]
