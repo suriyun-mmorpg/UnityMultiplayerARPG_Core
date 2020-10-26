@@ -143,10 +143,6 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.GameMessage, HandleGameMessageAtClient);
             RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
             RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
-            RegisterClientMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
-            RegisterClientMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
-            RegisterClientMessage(MsgTypes.CashPackageInfo, HandleResponseCashPackageInfo);
-            RegisterClientMessage(MsgTypes.CashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
             RegisterClientMessage(MsgTypes.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
             RegisterClientMessage(MsgTypes.UpdateParty, HandleUpdatePartyAtClient);
             RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
@@ -354,26 +350,26 @@ namespace MultiplayerARPG
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
-        public virtual uint RequestCashShopInfo(AckMessageCallback callback)
+        public virtual uint RequestCashShopInfo(AckMessageCallback<ResponseCashShopInfoMessage> callback)
         {
             BaseAckMessage message = new BaseAckMessage();
             return ClientSendRequest(MsgTypes.CashShopInfo, message, callback);
         }
 
-        public virtual uint RequestCashPackageInfo(AckMessageCallback callback)
+        public virtual uint RequestCashPackageInfo(AckMessageCallback<ResponseCashPackageInfoMessage> callback)
         {
             BaseAckMessage message = new BaseAckMessage();
             return ClientSendRequest(MsgTypes.CashPackageInfo, message, callback);
         }
 
-        public virtual uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
+        public virtual uint RequestCashShopBuy(int dataId, AckMessageCallback<ResponseCashShopBuyMessage> callback)
         {
             RequestCashShopBuyMessage message = new RequestCashShopBuyMessage();
             message.dataId = dataId;
             return ClientSendRequest(MsgTypes.CashShopBuy, message, callback);
         }
 
-        public virtual uint RequestCashPackageBuyValidation(int dataId, string receipt, AckMessageCallback callback)
+        public virtual uint RequestCashPackageBuyValidation(int dataId, string receipt, AckMessageCallback<ResponseCashPackageBuyValidationMessage> callback)
         {
             RequestCashPackageBuyValidationMessage message = new RequestCashPackageBuyValidationMessage();
             message.dataId = dataId;
@@ -405,34 +401,6 @@ namespace MultiplayerARPG
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             if (onClientReceiveChat != null)
                 onClientReceiveChat.Invoke(message);
-        }
-
-        protected virtual void HandleResponseCashShopInfo(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseCashShopInfoMessage message = messageHandler.ReadMessage<ResponseCashShopInfoMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
-
-        protected virtual void HandleResponseCashShopBuy(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseCashShopBuyMessage message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
-
-        protected virtual void HandleResponseCashPackageInfo(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseCashPackageInfoMessage message = messageHandler.ReadMessage<ResponseCashPackageInfoMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
-
-        protected virtual void HandleResponseCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseCashPackageBuyValidationMessage message = messageHandler.ReadMessage<ResponseCashPackageBuyValidationMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleUpdatePartyMemberAtClient(LiteNetLibMessageHandler messageHandler)
@@ -1150,7 +1118,7 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = new UpdateMapInfoMessage();
             message.mapId = CurrentMapInfo.Id;
-            ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MsgTypes.UpdateMapInfo, message);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.UpdateMapInfo, message);
         }
 
         public bool IsReadyToInstantiateObjects()

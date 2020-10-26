@@ -25,11 +25,6 @@ namespace MultiplayerARPG
             HostOnly,
         }
 
-        public struct PendingSpawnPlayerCharacter
-        {
-            public long connectionId;
-            public PlayerCharacterData playerCharacterData;
-        }
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
@@ -40,7 +35,7 @@ namespace MultiplayerARPG
         private Vector3? teleportPosition;
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
-        private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
+        private readonly Dictionary<long, PlayerCharacterData> pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
         
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
         public BaseGameSaveSystem SaveSystem { get { return GameInstance.Singleton.SaveSystem; } }
@@ -122,9 +117,13 @@ namespace MultiplayerARPG
             if (IsServer && pendingSpawnPlayerCharacters.Count > 0 && isReadyToInstantiatePlayers)
             {
                 // Spawn pending player characters
-                foreach (PendingSpawnPlayerCharacter spawnPlayerCharacter in pendingSpawnPlayerCharacters)
+                LiteNetLibPlayer player;
+                foreach (KeyValuePair<long, PlayerCharacterData> spawnPlayerCharacter in pendingSpawnPlayerCharacters)
                 {
-                    SpawnPlayerCharacter(spawnPlayerCharacter.connectionId, spawnPlayerCharacter.playerCharacterData);
+                    if (!Players.TryGetValue(spawnPlayerCharacter.Key, out player))
+                        continue;
+                    player.IsReady = true;
+                    SpawnPlayerCharacter(spawnPlayerCharacter.Key, spawnPlayerCharacter.Value);
                 }
                 pendingSpawnPlayerCharacters.Clear();
             }
@@ -145,27 +144,25 @@ namespace MultiplayerARPG
             base.OnPeerDisconnected(connectionId, disconnectInfo);
         }
 
-        public override void SerializeClientReadyExtra(NetDataWriter writer)
+        public override void SerializeClientReadyData(NetDataWriter writer)
         {
             selectedCharacter.SerializeCharacterData(writer);
         }
 
-        public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
+        public override bool DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
             if (!isReadyToInstantiatePlayers)
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
                 if (LogDev) Logging.Log("[LanRpgNetworkManager] Not ready to deserializing client ready extra");
-                pendingSpawnPlayerCharacters.Add(new PendingSpawnPlayerCharacter()
-                {
-                    connectionId = connectionId,
-                    playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader)
-                });
-                return;
+                if (!pendingSpawnPlayerCharacters.ContainsKey(connectionId))
+                    pendingSpawnPlayerCharacters.Add(connectionId, new PlayerCharacterData().DeserializeCharacterData(reader));
+                return false;
             }
 
             if (LogDev) Logging.Log("[LanRpgNetworkManager] Deserializing client ready extra");
             SpawnPlayerCharacter(connectionId, new PlayerCharacterData().DeserializeCharacterData(reader));
+            return true;
         }
 
         private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData)
