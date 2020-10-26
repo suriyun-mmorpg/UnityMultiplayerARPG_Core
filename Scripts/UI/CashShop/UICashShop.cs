@@ -97,15 +97,14 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.RequestCashShopBuy(dataId, ResponseCashShopBuy);
         }
 
-        private void ResponseCashShopInfo(AckResponseCode responseCode, BaseAckMessage message)
+        private void ResponseCashShopInfo(ResponseCashShopInfoMessage message)
         {
-            if (responseCode == AckResponseCode.Timeout)
+            if (message.responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseCashShopInfoMessage castedMessage = message as ResponseCashShopInfoMessage;
-            switch (responseCode)
+            switch (message.responseCode)
             {
                 case AckResponseCode.Error:
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString()));
@@ -115,11 +114,11 @@ namespace MultiplayerARPG
                     {
                         uiTextCash.text = string.Format(
                             LanguageManager.GetText(formatKeyCash),
-                            castedMessage.cash.ToString("N0"));
+                            message.cash.ToString("N0"));
                     }
 
                     List<CashShopItem> cashShopItems = new List<CashShopItem>();
-                    foreach (int cashShopItemId in castedMessage.cashShopItemIds)
+                    foreach (int cashShopItemId in message.cashShopItemIds)
                     {
                         CashShopItem cashShopItem;
                         if (GameInstance.CashShopItems.TryGetValue(cashShopItemId, out cashShopItem))
@@ -144,19 +143,18 @@ namespace MultiplayerARPG
             }
         }
 
-        private void ResponseCashShopBuy(AckResponseCode responseCode, BaseAckMessage message)
+        private void ResponseCashShopBuy(ResponseCashShopBuyMessage message)
         {
-            if (responseCode == AckResponseCode.Timeout)
+            if (message.responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseCashShopBuyMessage castedMessage = message as ResponseCashShopBuyMessage;
-            switch (responseCode)
+            switch (message.responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedMessage.error)
+                    switch (message.error)
                     {
                         case ResponseCashShopBuyMessage.Error.UserNotFound:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());

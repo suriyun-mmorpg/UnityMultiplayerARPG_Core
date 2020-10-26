@@ -108,15 +108,14 @@ namespace MultiplayerARPG
             RefreshCashPackageInfo();
         }
 
-        private void ResponseCashPackageInfo(AckResponseCode responseCode, BaseAckMessage message)
+        private void ResponseCashPackageInfo(ResponseCashPackageInfoMessage message)
         {
-            if (responseCode == AckResponseCode.Timeout)
+            if (message.responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseCashPackageInfoMessage castedMessage = message as ResponseCashPackageInfoMessage;
-            switch (responseCode)
+            switch (message.responseCode)
             {
                 case AckResponseCode.Error:
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
@@ -126,11 +125,11 @@ namespace MultiplayerARPG
                     {
                         uiTextCash.text = string.Format(
                             LanguageManager.GetText(formatKeyCash),
-                            castedMessage.cash.ToString("N0"));
+                            message.cash.ToString("N0"));
                     }
 
                     List<CashPackage> cashPackages = new List<CashPackage>();
-                    foreach (int cashPackageId in castedMessage.cashPackageIds)
+                    foreach (int cashPackageId in message.cashPackageIds)
                     {
                         CashPackage cashPackage;
                         if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))
