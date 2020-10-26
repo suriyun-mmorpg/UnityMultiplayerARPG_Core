@@ -262,6 +262,8 @@ namespace MultiplayerARPG
         InputStateManager reloadInput;
         InputStateManager exitVehicleInput;
         InputStateManager switchEquipWeaponSetInput;
+        // Entity detector
+        NearbyEntityDetector warpPortalEntityDetector;
         // Temp physic variables
         RaycastHit[] raycasts = new RaycastHit[512];
         Collider[] overlapColliders = new Collider[512];
@@ -321,6 +323,11 @@ namespace MultiplayerARPG
             reloadInput = new InputStateManager("Reload");
             exitVehicleInput = new InputStateManager("ExitVehicle");
             switchEquipWeaponSetInput = new InputStateManager("SwitchEquipWeaponSet");
+            // Initialize warp portal entity detector
+            GameObject tempGameObject = new GameObject("_WarpPortalEntityDetector");
+            warpPortalEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            warpPortalEntityDetector.detectingRadius = CurrentGameInstance.conversationDistance;
+            warpPortalEntityDetector.findWarpPortal = true;
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -366,6 +373,8 @@ namespace MultiplayerARPG
                 Destroy(CacheGameplayCameraControls.gameObject);
             if (CacheMinimapCameraControls != null)
                 Destroy(CacheMinimapCameraControls.gameObject);
+            if (warpPortalEntityDetector != null)
+                Destroy(warpPortalEntityDetector.gameObject);
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
@@ -879,16 +888,27 @@ namespace MultiplayerARPG
                     }
                     else if (activateInput.IsRelease)
                     {
-                        if (SelectedEntity is BasePlayerCharacterEntity)
-                            targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
-                        if (SelectedEntity is NpcEntity)
-                            targetNpc = SelectedEntity as NpcEntity;
-                        if (SelectedEntity is BuildingEntity)
-                            targetBuilding = SelectedEntity as BuildingEntity;
-                        if (SelectedEntity is VehicleEntity)
-                            targetVehicle = SelectedEntity as VehicleEntity;
-                        if (SelectedEntity is WarpPortalEntity)
-                            targetWarpPortal = SelectedEntity as WarpPortalEntity;
+                        if (SelectedEntity == null)
+                        {
+                            if (warpPortalEntityDetector?.warpPortals.Count > 0)
+                            {
+                                // It may not able to raycast from inside warp portal, so try to get it from the detector
+                                targetWarpPortal = warpPortalEntityDetector.warpPortals[0];
+                            }
+                        }
+                        else
+                        {
+                            if (SelectedEntity is BasePlayerCharacterEntity)
+                                targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
+                            if (SelectedEntity is NpcEntity)
+                                targetNpc = SelectedEntity as NpcEntity;
+                            if (SelectedEntity is BuildingEntity)
+                                targetBuilding = SelectedEntity as BuildingEntity;
+                            if (SelectedEntity is VehicleEntity)
+                                targetVehicle = SelectedEntity as VehicleEntity;
+                            if (SelectedEntity is WarpPortalEntity)
+                                targetWarpPortal = SelectedEntity as WarpPortalEntity;
+                        }
                     }
                 }
                 // Update look direction
