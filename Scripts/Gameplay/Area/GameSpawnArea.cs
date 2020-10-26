@@ -54,7 +54,7 @@ namespace MultiplayerARPG
         public virtual void Spawn(float delay)
         {
             if (asset != null)
-                Invoke("SpawnInternal", delay);
+                Invoke(nameof(SpawnInternal), delay);
         }
 
         protected abstract void SpawnInternal();
