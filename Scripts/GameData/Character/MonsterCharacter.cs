@@ -19,7 +19,7 @@ namespace MultiplayerARPG
     }
 
     [CreateAssetMenu(fileName = "Monster Character", menuName = "Create GameData/Monster Character", order = -4998)]
-    public sealed partial class MonsterCharacter : BaseCharacter
+    public partial class MonsterCharacter : BaseCharacter
     {
         [Header("Monster Data")]
         public short defaultLevel = 1;
@@ -79,9 +79,33 @@ namespace MultiplayerARPG
             {
                 if (cacheRandomItems == null)
                 {
-                    cacheRandomItems = new List<ItemDrop>(randomItems);
-                    if (itemDropTable != null)
-                        cacheRandomItems.AddRange(itemDropTable.randomItems);
+                    int i = 0;
+                    cacheRandomItems = new List<ItemDrop>();
+                    if (randomItems != null &&
+                        randomItems.Length > 0)
+                    {
+                        for (i = 0; i < randomItems.Length; ++i)
+                        {
+                            if (randomItems[i].item == null ||
+                                randomItems[i].amount <= 0 ||
+                                randomItems[i].dropRate <= 0)
+                                continue;
+                            cacheRandomItems.Add(randomItems[i]);
+                        }
+                    }
+                    if (itemDropTable != null &&
+                        itemDropTable.randomItems != null &&
+                        itemDropTable.randomItems.Length > 0)
+                    {
+                        for (i = 0; i < itemDropTable.randomItems.Length; ++i)
+                        {
+                            if (itemDropTable.randomItems[i].item == null ||
+                                itemDropTable.randomItems[i].amount <= 0 ||
+                                itemDropTable.randomItems[i].dropRate <= 0)
+                                continue;
+                            cacheRandomItems.Add(itemDropTable.randomItems[i]);
+                        }
+                    }
                 }
                 return cacheRandomItems;
             }
@@ -265,7 +289,7 @@ namespace MultiplayerARPG
 
         private readonly List<MonsterSkill> tempRandomSkills = new List<MonsterSkill>();
 
-        public int RandomExp()
+        public virtual int RandomExp()
         {
             int min = randomExpMin;
             int max = randomExpMax;
@@ -274,7 +298,7 @@ namespace MultiplayerARPG
             return Random.Range(min, max);
         }
 
-        public int RandomGold()
+        public virtual int RandomGold()
         {
             int min = randomGoldMin;
             int max = randomGoldMax;
@@ -283,22 +307,21 @@ namespace MultiplayerARPG
             return Random.Range(min, max);
         }
 
-        public void RandomItems(System.Action<BaseItem, short> onRandomItem)
+        public virtual void RandomItems(System.Action<BaseItem, short> onRandomItem)
         {
+            if (CacheRandomItems.Count == 0)
+                return;
             ItemDrop randomItem;
             for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
             {
                 randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                if (randomItem.item == null ||
-                    randomItem.amount == 0 ||
-                    Random.value > randomItem.dropRate)
+                if (Random.value > randomItem.dropRate)
                     continue;
-
                 onRandomItem.Invoke(randomItem.item, randomItem.amount);
             }
         }
 
-        public bool RandomSkill(BaseMonsterCharacterEntity entity, out BaseSkill skill, out short level)
+        public virtual bool RandomSkill(BaseMonsterCharacterEntity entity, out BaseSkill skill, out short level)
         {
             skill = null;
             level = 1;
