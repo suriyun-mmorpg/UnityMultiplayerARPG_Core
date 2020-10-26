@@ -50,9 +50,33 @@ namespace MultiplayerARPG
             {
                 if (cacheRandomItems == null)
                 {
-                    cacheRandomItems = new List<ItemDrop>(randomItems);
-                    if (itemDropTable != null)
-                        cacheRandomItems.AddRange(itemDropTable.randomItems);
+                    int i = 0;
+                    cacheRandomItems = new List<ItemDrop>();
+                    if (randomItems != null && 
+                        randomItems.Length > 0)
+                    {
+                        for (i = 0; i < randomItems.Length; ++i)
+                        {
+                            if (randomItems[i].item == null ||
+                                randomItems[i].amount <= 0 ||
+                                randomItems[i].dropRate <= 0)
+                                continue;
+                            cacheRandomItems.Add(randomItems[i]);
+                        }
+                    }
+                    if (itemDropTable != null && 
+                        itemDropTable.randomItems != null && 
+                        itemDropTable.randomItems.Length >0)
+                    {
+                        for (i = 0; i < itemDropTable.randomItems.Length; ++i)
+                        {
+                            if (itemDropTable.randomItems[i].item == null ||
+                                itemDropTable.randomItems[i].amount <= 0 ||
+                                itemDropTable.randomItems[i].dropRate <= 0)
+                                continue;
+                            cacheRandomItems.Add(itemDropTable.randomItems[i]);
+                        }
+                    }
                 }
                 return cacheRandomItems;
             }
@@ -134,21 +158,27 @@ namespace MultiplayerARPG
                     // Random drop items
                     DropItems = new List<CharacterItem>();
                     Looters = new HashSet<uint>();
-                    ItemDrop randomItem;
-                    for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
+                    if (CacheRandomItems.Count > 0)
                     {
-                        randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                        if (randomItem.item == null ||
-                            randomItem.amount == 0 ||
-                            Random.value > randomItem.dropRate)
-                            continue;
-                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
+                        ItemDrop randomItem;
+                        for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
+                        {
+                            randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
+                            if (Random.value > randomItem.dropRate)
+                                continue;
+                            DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
+                        }
+                        if (DropItems.Count == 0)
+                        {
+                            randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
+                            DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
+                        }
                     }
                 }
                 if (DropItems == null || DropItems.Count == 0 ||
                     !GameInstance.Items.ContainsKey(DropItems[0].dataId))
                 {
-                    NetworkDestroy();
+                    NetworkDestroy(1f);
                     return;
                 }
                 ItemDropData = new ItemDropData()
