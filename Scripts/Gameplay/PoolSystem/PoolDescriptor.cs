@@ -28,7 +28,7 @@ namespace MultiplayerARPG
 
         protected virtual void PushBack(float delay)
         {
-            Invoke("PushBack", delay);
+            Invoke(nameof(PushBack), delay);
         }
 
         protected virtual void PushBack()
