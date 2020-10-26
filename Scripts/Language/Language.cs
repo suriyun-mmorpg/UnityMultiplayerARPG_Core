@@ -684,6 +684,7 @@ namespace MultiplayerARPG
         static DefaultLocale()
         {
             Texts.Add(GameMessage.Type.ServiceNotAvailable.ToString(), "Service not available");
+            Texts.Add(GameMessage.Type.RequestTimeout.ToString(), "Request timeout");
             Texts.Add(GameMessage.Type.InvalidItemData.ToString(), "Invalid item data");
             Texts.Add(GameMessage.Type.NotFoundCharacter.ToString(), "Character not found");
             Texts.Add(GameMessage.Type.NotAbleToLoot.ToString(), "Cannot get this item");

@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         {
             None,
             ServiceNotAvailable,
+            RequestTimeout,
             InvalidItemData,
             NotFoundCharacter,
             NotAbleToLoot,
