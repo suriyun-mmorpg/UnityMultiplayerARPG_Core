@@ -5,7 +5,6 @@ using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine.Profiling;
-using System;
 using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
@@ -36,7 +35,7 @@ namespace MultiplayerARPG
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         private readonly Dictionary<long, PlayerCharacterData> pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
-        
+
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
         public BaseGameSaveSystem SaveSystem { get { return GameInstance.Singleton.SaveSystem; } }
 
@@ -315,10 +314,10 @@ namespace MultiplayerARPG
         }
 
         #region Implement Singleplayer / Lan - in-app purchasing
-        protected override void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
+        protected override UniTaskVoid HandleRequestCashShopInfo(
+            long connectionId, NetDataReader reader, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
-            long connectionId = messageHandler.connectionId;
-            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
             // Set response data
             ResponseCashShopInfoMessage.Error error = ResponseCashShopInfoMessage.Error.None;
             int cash = 0;
@@ -337,22 +336,24 @@ namespace MultiplayerARPG
                 cashShopItemIds.AddRange(GameInstance.CashShopItems.Keys);
             }
             // Send response message
-            ResponseCashShopInfoMessage responseMessage = new ResponseCashShopInfoMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.cash = cash;
-            responseMessage.cashShopItemIds = cashShopItemIds.ToArray();
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
+            result.Invoke(
+                error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                 new ResponseCashShopInfoMessage()
+                 {
+                     error = error,
+                     cash = cash,
+                     cashShopItemIds = cashShopItemIds.ToArray(),
+                 });
+            return default;
         }
 
-        protected override void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        protected override UniTaskVoid HandleRequestCashShopBuy(
+            long connectionId, NetDataReader reader, RequestCashShopBuyMessage request,
+            RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
-            long connectionId = messageHandler.connectionId;
-            RequestCashShopBuyMessage message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
             // Set response data
             ResponseCashShopBuyMessage.Error error = ResponseCashShopBuyMessage.Error.None;
-            int dataId = message.dataId;
+            int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
@@ -397,19 +398,21 @@ namespace MultiplayerARPG
                 }
             }
             // Send response message
-            ResponseCashShopBuyMessage responseMessage = new ResponseCashShopBuyMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.dataId = dataId;
-            responseMessage.cash = cash;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
+            result.Invoke(
+                error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCashShopBuyMessage()
+                {
+                    error = error,
+                    dataId = dataId,
+                    cash = cash,
+                });
+            return default;
         }
 
-        protected override void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        protected override UniTaskVoid HandleRequestCashPackageInfo(
+            long connectionId, NetDataReader reader, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
-            long connectionId = messageHandler.connectionId;
-            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
             // Set response data
             ResponseCashPackageInfoMessage.Error error = ResponseCashPackageInfoMessage.Error.None;
             int cash = 0;
@@ -428,23 +431,25 @@ namespace MultiplayerARPG
                 cashPackageIds.AddRange(GameInstance.CashPackages.Keys);
             }
             // Send response message
-            ResponseCashPackageInfoMessage responseMessage = new ResponseCashPackageInfoMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.cash = cash;
-            responseMessage.cashPackageIds = cashPackageIds.ToArray();
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
+            result.Invoke(
+                error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCashPackageInfoMessage()
+                {
+                    error = error,
+                    cash = cash,
+                    cashPackageIds = cashPackageIds.ToArray(),
+                });
+            return default;
         }
 
-        protected override void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        protected override UniTaskVoid HandleRequestCashPackageBuyValidation(
+            long connectionId, NetDataReader reader, RequestCashPackageBuyValidationMessage request,
+            RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
-            long connectionId = messageHandler.connectionId;
-            RequestCashPackageBuyValidationMessage message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
             // TODO: Validate purchasing at server side
             // Set response data
             ResponseCashPackageBuyValidationMessage.Error error = ResponseCashPackageBuyValidationMessage.Error.None;
-            int dataId = message.dataId;
+            int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
@@ -470,13 +475,15 @@ namespace MultiplayerARPG
                 }
             }
             // Send response message
-            ResponseCashPackageBuyValidationMessage responseMessage = new ResponseCashPackageBuyValidationMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.dataId = dataId;
-            responseMessage.cash = cash;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
+            result.Invoke(
+                error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCashPackageBuyValidationMessage()
+                {
+                    error = error,
+                    dataId = dataId,
+                    cash = cash,
+                });
+            return default;
         }
         #endregion
 
@@ -619,7 +626,7 @@ namespace MultiplayerARPG
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
+        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, System.Action<bool> callback)
         {
             if (addingItem.IsEmptySlot())
             {
@@ -648,7 +655,7 @@ namespace MultiplayerARPG
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
+        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, System.Action<bool, Dictionary<int, short>> callback)
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
@@ -860,7 +867,7 @@ namespace MultiplayerARPG
             base.OnStartServer();
             SaveSystem.OnServerStart();
         }
-        
+
         protected override async UniTask PreSpawnEntities()
         {
             await SaveSystem.PreSpawnEntities(selectedCharacter, buildingEntities, storageItems);

@@ -1,25 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using LiteNetLib.Utils;
 using UnityEngine;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public class RequestCashPackageBuyValidationMessage : BaseAckMessage
+    public class RequestCashPackageBuyValidationMessage : INetSerializable
     {
         public int dataId;
         public RuntimePlatform platform;
         public string receipt;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             dataId = reader.GetInt();
             platform = (RuntimePlatform)reader.GetByte();
             receipt = reader.GetString();
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put(dataId);
             writer.Put((byte)platform);

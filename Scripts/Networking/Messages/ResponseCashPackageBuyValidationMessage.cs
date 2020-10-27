@@ -1,9 +1,8 @@
-﻿using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public class ResponseCashPackageBuyValidationMessage : BaseAckMessage
+    public class ResponseCashPackageBuyValidationMessage : INetSerializable
     {
         public enum Error : byte
         {
@@ -16,7 +15,7 @@ namespace MultiplayerARPG
         public int dataId;
         public int cash;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
             if (error == Error.None)
@@ -26,7 +25,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)error);
             if (error == Error.None)

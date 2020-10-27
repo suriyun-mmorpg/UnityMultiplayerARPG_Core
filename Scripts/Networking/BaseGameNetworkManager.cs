@@ -7,6 +7,7 @@ using LiteNetLibManager.SuperGrid2D;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
@@ -14,13 +15,9 @@ namespace MultiplayerARPG
     {
         public class MsgTypes
         {
-            public const ushort GameMessage = 99;
-            public const ushort Warp = 100;
-            public const ushort Chat = 101;
-            public const ushort CashShopInfo = 102;
-            public const ushort CashShopBuy = 103;
-            public const ushort CashPackageInfo = 104;
-            public const ushort CashPackageBuyValidation = 105;
+            public const ushort GameMessage = 100;
+            public const ushort Warp = 101;
+            public const ushort Chat = 102;
             public const ushort UpdatePartyMember = 106;
             public const ushort UpdateParty = 107;
             public const ushort UpdateGuildMember = 108;
@@ -32,6 +29,14 @@ namespace MultiplayerARPG
             public const ushort NotifyRewardExp = 114;
             public const ushort NotifyRewardGold = 115;
             public const ushort NotifyRewardItem = 116;
+        }
+
+        public class ReqTypes
+        {
+            public const ushort CashShopInfo = 100;
+            public const ushort CashShopBuy = 101;
+            public const ushort CashPackageInfo = 102;
+            public const ushort CashPackageBuyValidation = 103;
         }
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
@@ -160,12 +165,14 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             base.RegisterServerMessages();
+            // Networking messages
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
-            RegisterServerMessage(MsgTypes.CashShopInfo, HandleRequestCashShopInfo);
-            RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
-            RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
-            RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
             RegisterServerMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
+            // Requests
+            RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, HandleRequestCashShopInfo, HandleResponseCashShopInfo);
+            RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, HandleRequestCashPackageInfo, HandleResponseCashPackageInfo);
+            RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, HandleRequestCashShopBuy, HandleResponseCashShopBuy);
+            RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
         }
 
         protected virtual void Clean()
@@ -350,32 +357,32 @@ namespace MultiplayerARPG
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
-        public virtual uint RequestCashShopInfo(AckMessageCallback<ResponseCashShopInfoMessage> callback)
+        public virtual bool RequestCashShopInfo()
         {
-            BaseAckMessage message = new BaseAckMessage();
-            return ClientSendRequest(MsgTypes.CashShopInfo, message, callback);
+            return ClientSendRequest(ReqTypes.CashShopInfo, new EmptyMessage());
         }
 
-        public virtual uint RequestCashPackageInfo(AckMessageCallback<ResponseCashPackageInfoMessage> callback)
+        public virtual bool RequestCashPackageInfo()
         {
-            BaseAckMessage message = new BaseAckMessage();
-            return ClientSendRequest(MsgTypes.CashPackageInfo, message, callback);
+            return ClientSendRequest(ReqTypes.CashPackageInfo, new EmptyMessage());
         }
 
-        public virtual uint RequestCashShopBuy(int dataId, AckMessageCallback<ResponseCashShopBuyMessage> callback)
+        public virtual bool RequestCashShopBuy(int dataId)
         {
-            RequestCashShopBuyMessage message = new RequestCashShopBuyMessage();
-            message.dataId = dataId;
-            return ClientSendRequest(MsgTypes.CashShopBuy, message, callback);
+            return ClientSendRequest(ReqTypes.CashShopBuy, new RequestCashShopBuyMessage()
+            {
+                dataId = dataId,
+            });
         }
 
-        public virtual uint RequestCashPackageBuyValidation(int dataId, string receipt, AckMessageCallback<ResponseCashPackageBuyValidationMessage> callback)
+        public virtual bool RequestCashPackageBuyValidation(int dataId, string receipt)
         {
-            RequestCashPackageBuyValidationMessage message = new RequestCashPackageBuyValidationMessage();
-            message.dataId = dataId;
-            message.platform = Application.platform;
-            message.receipt = receipt;
-            return ClientSendRequest(MsgTypes.CashPackageBuyValidation, message, callback);
+            return ClientSendRequest(ReqTypes.CashPackageBuyValidation, new RequestCashPackageBuyValidationMessage()
+            {
+                dataId = dataId,
+                platform = Application.platform,
+                receipt = receipt,
+            });
         }
 
         protected virtual void HandleGameMessageAtClient(LiteNetLibMessageHandler messageHandler)
@@ -668,48 +675,84 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
+        protected virtual UniTaskVoid HandleRequestCashShopInfo(
+            long connectionId, NetDataReader reader, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
-            long connectionId = messageHandler.connectionId;
-            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
-            ResponseCashShopInfoMessage responseMessage = new ResponseCashShopInfoMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = AckResponseCode.Error;
-            responseMessage.error = ResponseCashShopInfoMessage.Error.NotAvailable;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
+            result.Invoke(AckResponseCode.Error, new ResponseCashShopInfoMessage()
+            {
+                error = ResponseCashShopInfoMessage.Error.NotAvailable,
+            });
+            return default;
         }
 
-        protected virtual void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        protected virtual UniTaskVoid HandleResponseCashShopInfo(
+            long connectionId, NetDataReader reader,
+            AckResponseCode responseCode,
+            ResponseCashShopInfoMessage response)
         {
-            long connectionId = messageHandler.connectionId;
-            RequestCashShopBuyMessage message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
-            ResponseCashShopBuyMessage responseMessage = new ResponseCashShopBuyMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = AckResponseCode.Error;
-            responseMessage.error = ResponseCashShopBuyMessage.Error.NotAvailable;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
+            // TODO: Implement this
+            return default;
         }
 
-        protected virtual void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        protected virtual UniTaskVoid HandleRequestCashPackageInfo(
+            long connectionId, NetDataReader reader, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
-            long connectionId = messageHandler.connectionId;
-            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
-            ResponseCashPackageInfoMessage responseMessage = new ResponseCashPackageInfoMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = AckResponseCode.Error;
-            responseMessage.error = ResponseCashPackageInfoMessage.Error.NotAvailable;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
+            result.Invoke(AckResponseCode.Error, new ResponseCashPackageInfoMessage()
+            {
+                error = ResponseCashPackageInfoMessage.Error.NotAvailable,
+            });
+            return default;
         }
 
-        protected virtual void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        protected virtual UniTaskVoid HandleResponseCashPackageInfo(
+            long connectionId, NetDataReader reader,
+            AckResponseCode responseCode,
+            ResponseCashPackageInfoMessage response)
         {
-            long connectionId = messageHandler.connectionId;
-            RequestCashPackageBuyValidationMessage message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
-            ResponseCashPackageBuyValidationMessage responseMessage = new ResponseCashPackageBuyValidationMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = AckResponseCode.Error;
-            responseMessage.error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
+            // TODO: Implement this
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleRequestCashShopBuy(
+            long connectionId, NetDataReader reader, RequestCashShopBuyMessage request,
+            RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
+        {
+            result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+            {
+                error = ResponseCashShopBuyMessage.Error.NotAvailable,
+            });
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleResponseCashShopBuy(
+            long connectionId, NetDataReader reader,
+            AckResponseCode responseCode,
+            ResponseCashShopBuyMessage response)
+        {
+            // TODO: Implement this
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleRequestCashPackageBuyValidation(
+            long connectionId, NetDataReader reader, RequestCashPackageBuyValidationMessage request,
+            RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
+        {
+            result.Invoke(AckResponseCode.Error, new ResponseCashPackageBuyValidationMessage()
+            {
+                error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable,
+            });
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleResponseCashPackageBuyValidation(
+            long connectionId, NetDataReader reader,
+            AckResponseCode responseCode,
+            ResponseCashPackageBuyValidationMessage response)
+        {
+            // TODO: Implement this
+            return default;
         }
 
         protected virtual void HandleRequestOnlineCharacter(LiteNetLibMessageHandler messageHandler)
