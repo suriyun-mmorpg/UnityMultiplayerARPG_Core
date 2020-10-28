@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
@@ -97,14 +98,15 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.RequestCashShopBuy(dataId, ResponseCashShopBuy);
         }
 
-        private void ResponseCashShopInfo(ResponseCashShopInfoMessage message)
+        private void ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
         {
-            if (message.responseCode == AckResponseCode.Timeout)
+            if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            switch (message.responseCode)
+            ResponseCashShopInfoMessage castedResponse = response as ResponseCashShopInfoMessage;
+            switch (responseCode)
             {
                 case AckResponseCode.Error:
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString()));
@@ -114,11 +116,11 @@ namespace MultiplayerARPG
                     {
                         uiTextCash.text = string.Format(
                             LanguageManager.GetText(formatKeyCash),
-                            message.cash.ToString("N0"));
+                            castedResponse.cash.ToString("N0"));
                     }
 
                     List<CashShopItem> cashShopItems = new List<CashShopItem>();
-                    foreach (int cashShopItemId in message.cashShopItemIds)
+                    foreach (int cashShopItemId in castedResponse.cashShopItemIds)
                     {
                         CashShopItem cashShopItem;
                         if (GameInstance.CashShopItems.TryGetValue(cashShopItemId, out cashShopItem))
@@ -143,18 +145,19 @@ namespace MultiplayerARPG
             }
         }
 
-        private void ResponseCashShopBuy(ResponseCashShopBuyMessage message)
+        private void ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
         {
-            if (message.responseCode == AckResponseCode.Timeout)
+            if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            switch (message.responseCode)
+            ResponseCashShopBuyMessage castedResponse = response as ResponseCashShopBuyMessage;
+            switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (message.error)
+                    switch (castedResponse.error)
                     {
                         case ResponseCashShopBuyMessage.Error.UserNotFound:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());

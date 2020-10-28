@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
@@ -108,14 +109,15 @@ namespace MultiplayerARPG
             RefreshCashPackageInfo();
         }
 
-        private void ResponseCashPackageInfo(ResponseCashPackageInfoMessage message)
+        private void ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
         {
-            if (message.responseCode == AckResponseCode.Timeout)
+            if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            switch (message.responseCode)
+            ResponseCashPackageInfoMessage castedResponse = response as ResponseCashPackageInfoMessage;
+            switch (responseCode)
             {
                 case AckResponseCode.Error:
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
@@ -125,11 +127,11 @@ namespace MultiplayerARPG
                     {
                         uiTextCash.text = string.Format(
                             LanguageManager.GetText(formatKeyCash),
-                            message.cash.ToString("N0"));
+                            castedResponse.cash.ToString("N0"));
                     }
 
                     List<CashPackage> cashPackages = new List<CashPackage>();
-                    foreach (int cashPackageId in message.cashPackageIds)
+                    foreach (int cashPackageId in castedResponse.cashPackageIds)
                     {
                         CashPackage cashPackage;
                         if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))

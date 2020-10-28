@@ -357,32 +357,32 @@ namespace MultiplayerARPG
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
-        public virtual bool RequestCashShopInfo()
+        public virtual bool RequestCashShopInfo(ResponseDelegate callback)
         {
-            return ClientSendRequest(ReqTypes.CashShopInfo, new EmptyMessage());
+            return ClientSendRequest(ReqTypes.CashShopInfo, new EmptyMessage(), responseDelegate: callback);
         }
 
-        public virtual bool RequestCashPackageInfo()
+        public virtual bool RequestCashPackageInfo(ResponseDelegate callback)
         {
-            return ClientSendRequest(ReqTypes.CashPackageInfo, new EmptyMessage());
+            return ClientSendRequest(ReqTypes.CashPackageInfo, new EmptyMessage(), responseDelegate: callback);
         }
 
-        public virtual bool RequestCashShopBuy(int dataId)
+        public virtual bool RequestCashShopBuy(int dataId, ResponseDelegate callback)
         {
             return ClientSendRequest(ReqTypes.CashShopBuy, new RequestCashShopBuyMessage()
             {
                 dataId = dataId,
-            });
+            }, responseDelegate: callback);
         }
 
-        public virtual bool RequestCashPackageBuyValidation(int dataId, string receipt)
+        public virtual bool RequestCashPackageBuyValidation(int dataId, string receipt, ResponseDelegate callback)
         {
             return ClientSendRequest(ReqTypes.CashPackageBuyValidation, new RequestCashPackageBuyValidationMessage()
             {
                 dataId = dataId,
                 platform = Application.platform,
                 receipt = receipt,
-            });
+            }, responseDelegate: callback);
         }
 
         protected virtual void HandleGameMessageAtClient(MessageHandlerData messageHandler)

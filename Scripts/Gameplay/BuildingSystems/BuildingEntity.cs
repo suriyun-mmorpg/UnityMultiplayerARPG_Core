@@ -379,7 +379,7 @@ namespace MultiplayerARPG
         public override void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
-            if (reasons == LiteNetLibGameManager.DestroyObjectReasons.RequestedToDestroy)
+            if (reasons == DestroyObjectReasons.RequestedToDestroy)
             {
                 // Chain destroy
                 foreach (BuildingEntity child in children)
