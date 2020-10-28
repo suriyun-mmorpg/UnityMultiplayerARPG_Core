@@ -169,10 +169,10 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
             RegisterServerMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
             // Requests
-            RegisterServerRequestHandler<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, HandleRequestCashShopInfo, HandleResponseCashShopInfo);
-            RegisterServerRequestHandler<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, HandleRequestCashPackageInfo, HandleResponseCashPackageInfo);
-            RegisterServerRequestHandler<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, HandleRequestCashShopBuy, HandleResponseCashShopBuy);
-            RegisterServerRequestHandler<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
+            RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, HandleRequestCashShopInfo);
+            RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, HandleRequestCashPackageInfo);
+            RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, HandleRequestCashShopBuy);
+            RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
         }
 
         protected virtual void Clean()
@@ -385,7 +385,7 @@ namespace MultiplayerARPG
             });
         }
 
-        protected virtual void HandleGameMessageAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleGameMessageAtClient(MessageHandlerData messageHandler)
         {
             GameMessage message = messageHandler.ReadMessage<GameMessage>();
             ClientReceiveGameMessage(message);
@@ -397,27 +397,27 @@ namespace MultiplayerARPG
                 onClientReceiveGameMessage.Invoke(message);
         }
 
-        protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleWarpAtClient(MessageHandlerData messageHandler)
         {
             if (onClientWarp != null)
                 onClientWarp.Invoke();
         }
 
-        protected virtual void HandleChatAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleChatAtClient(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             if (onClientReceiveChat != null)
                 onClientReceiveChat.Invoke(message);
         }
 
-        protected virtual void HandleUpdatePartyMemberAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdatePartyMemberAtClient(MessageHandlerData messageHandler)
         {
             UpdateSocialGroupMember(ClientParty, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
             if (onClientUpdateParty != null)
                 onClientUpdateParty.Invoke(ClientParty);
         }
 
-        protected virtual void HandleUpdatePartyAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdatePartyAtClient(MessageHandlerData messageHandler)
         {
             UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (message.type == UpdatePartyMessage.UpdateType.Create)
@@ -443,14 +443,14 @@ namespace MultiplayerARPG
                 onClientUpdateParty.Invoke(ClientParty);
         }
 
-        protected virtual void HandleUpdateGuildMemberAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdateGuildMemberAtClient(MessageHandlerData messageHandler)
         {
             UpdateSocialGroupMember(ClientGuild, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
             if (onClientUpdateGuild != null)
                 onClientUpdateGuild.Invoke(ClientGuild);
         }
 
-        protected virtual void HandleUpdateGuildAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdateGuildAtClient(MessageHandlerData messageHandler)
         {
             UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (message.type == UpdateGuildMessage.UpdateType.Create)
@@ -497,7 +497,7 @@ namespace MultiplayerARPG
                 onClientUpdateGuild.Invoke(ClientGuild);
         }
 
-        protected virtual void HandleUpdateMapInfoAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdateMapInfoAtClient(MessageHandlerData messageHandler)
         {
             // Don't set map info again at server
             if (IsServer)
@@ -506,7 +506,7 @@ namespace MultiplayerARPG
             SetMapInfo(message.mapId);
         }
 
-        protected virtual void HandleUpdateFoundCharactersAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdateFoundCharactersAtClient(MessageHandlerData messageHandler)
         {
             UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
             ClientFoundCharacters.ClearMembers();
@@ -518,7 +518,7 @@ namespace MultiplayerARPG
                 onClientUpdateFoundCharacters.Invoke(ClientFoundCharacters);
         }
 
-        protected virtual void HandleUpdateFriendsAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdateFriendsAtClient(MessageHandlerData messageHandler)
         {
             UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
             ClientFriends.ClearMembers();
@@ -530,30 +530,30 @@ namespace MultiplayerARPG
                 onClientUpdateFriends.Invoke(ClientFriends);
         }
 
-        protected virtual void HandleNotifyOnlineCharacterAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleNotifyOnlineCharacterAtClient(MessageHandlerData messageHandler)
         {
-            NotifyOnlineCharacter(messageHandler.reader.GetString());
+            NotifyOnlineCharacter(messageHandler.Reader.GetString());
         }
 
-        protected virtual void HandleNotifyRewardExpAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleNotifyRewardExpAtClient(MessageHandlerData messageHandler)
         {
             if (onNotifyRewardExp != null)
-                onNotifyRewardExp.Invoke(messageHandler.reader.GetInt());
+                onNotifyRewardExp.Invoke(messageHandler.Reader.GetInt());
         }
 
-        protected virtual void HandleNotifyRewardGoldAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleNotifyRewardGoldAtClient(MessageHandlerData messageHandler)
         {
             if (onNotifyRewardGold != null)
-                onNotifyRewardGold.Invoke(messageHandler.reader.GetInt());
+                onNotifyRewardGold.Invoke(messageHandler.Reader.GetInt());
         }
 
-        protected virtual void HandleNotifyRewardItemAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleNotifyRewardItemAtClient(MessageHandlerData messageHandler)
         {
             if (onNotifyRewardItem != null)
-                onNotifyRewardItem.Invoke(messageHandler.reader.GetInt(), messageHandler.reader.GetShort());
+                onNotifyRewardItem.Invoke(messageHandler.Reader.GetInt(), messageHandler.Reader.GetShort());
         }
 
-        protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ReadChatMessage(FillChatChannelId(messageHandler.ReadMessage<ChatMessage>()));
         }
@@ -676,7 +676,7 @@ namespace MultiplayerARPG
         }
 
         protected virtual UniTaskVoid HandleRequestCashShopInfo(
-            long connectionId, NetDataReader reader, EmptyMessage request,
+            RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
             result.Invoke(AckResponseCode.Error, new ResponseCashShopInfoMessage()
@@ -686,17 +686,8 @@ namespace MultiplayerARPG
             return default;
         }
 
-        protected virtual UniTaskVoid HandleResponseCashShopInfo(
-            long connectionId, NetDataReader reader,
-            AckResponseCode responseCode,
-            ResponseCashShopInfoMessage response)
-        {
-            // TODO: Implement this
-            return default;
-        }
-
         protected virtual UniTaskVoid HandleRequestCashPackageInfo(
-            long connectionId, NetDataReader reader, EmptyMessage request,
+            RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
             result.Invoke(AckResponseCode.Error, new ResponseCashPackageInfoMessage()
@@ -706,17 +697,8 @@ namespace MultiplayerARPG
             return default;
         }
 
-        protected virtual UniTaskVoid HandleResponseCashPackageInfo(
-            long connectionId, NetDataReader reader,
-            AckResponseCode responseCode,
-            ResponseCashPackageInfoMessage response)
-        {
-            // TODO: Implement this
-            return default;
-        }
-
         protected virtual UniTaskVoid HandleRequestCashShopBuy(
-            long connectionId, NetDataReader reader, RequestCashShopBuyMessage request,
+            RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
             result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
@@ -726,17 +708,8 @@ namespace MultiplayerARPG
             return default;
         }
 
-        protected virtual UniTaskVoid HandleResponseCashShopBuy(
-            long connectionId, NetDataReader reader,
-            AckResponseCode responseCode,
-            ResponseCashShopBuyMessage response)
-        {
-            // TODO: Implement this
-            return default;
-        }
-
         protected virtual UniTaskVoid HandleRequestCashPackageBuyValidation(
-            long connectionId, NetDataReader reader, RequestCashPackageBuyValidationMessage request,
+            RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
             RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
             result.Invoke(AckResponseCode.Error, new ResponseCashPackageBuyValidationMessage()
@@ -746,22 +719,13 @@ namespace MultiplayerARPG
             return default;
         }
 
-        protected virtual UniTaskVoid HandleResponseCashPackageBuyValidation(
-            long connectionId, NetDataReader reader,
-            AckResponseCode responseCode,
-            ResponseCashPackageBuyValidationMessage response)
+        protected virtual void HandleRequestOnlineCharacter(MessageHandlerData messageHandler)
         {
-            // TODO: Implement this
-            return default;
-        }
-
-        protected virtual void HandleRequestOnlineCharacter(LiteNetLibMessageHandler messageHandler)
-        {
-            string characterId = messageHandler.reader.GetString();
+            string characterId = messageHandler.Reader.GetString();
             if (IsCharacterOnline(characterId))
             {
                 // Notify back online character
-                ServerSendPacket(messageHandler.connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, (writer) =>
+                ServerSendPacket(messageHandler.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, (writer) =>
                 {
                     writer.Put(characterId);
                 });

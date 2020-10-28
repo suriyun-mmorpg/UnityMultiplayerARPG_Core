@@ -315,7 +315,7 @@ namespace MultiplayerARPG
 
         #region Implement Singleplayer / Lan - in-app purchasing
         protected override UniTaskVoid HandleRequestCashShopInfo(
-            long connectionId, NetDataReader reader, EmptyMessage request,
+            RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
             // Set response data
@@ -323,7 +323,7 @@ namespace MultiplayerARPG
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
@@ -348,7 +348,7 @@ namespace MultiplayerARPG
         }
 
         protected override UniTaskVoid HandleRequestCashShopBuy(
-            long connectionId, NetDataReader reader, RequestCashShopBuyMessage request,
+            RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
             // Set response data
@@ -356,7 +356,7 @@ namespace MultiplayerARPG
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashShopBuyMessage.Error.UserNotFound;
@@ -410,7 +410,7 @@ namespace MultiplayerARPG
         }
 
         protected override UniTaskVoid HandleRequestCashPackageInfo(
-            long connectionId, NetDataReader reader, EmptyMessage request,
+            RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
             // Set response data
@@ -418,7 +418,7 @@ namespace MultiplayerARPG
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
@@ -443,7 +443,7 @@ namespace MultiplayerARPG
         }
 
         protected override UniTaskVoid HandleRequestCashPackageBuyValidation(
-            long connectionId, NetDataReader reader, RequestCashPackageBuyValidationMessage request,
+            RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
             RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
             // TODO: Validate purchasing at server side
@@ -452,7 +452,7 @@ namespace MultiplayerARPG
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
