@@ -169,10 +169,10 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
             RegisterServerMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
             // Requests
-            RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, HandleRequestCashShopInfo, HandleResponseCashShopInfo);
-            RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, HandleRequestCashPackageInfo, HandleResponseCashPackageInfo);
-            RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, HandleRequestCashShopBuy, HandleResponseCashShopBuy);
-            RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
+            RegisterServerRequestHandler<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, HandleRequestCashShopInfo, HandleResponseCashShopInfo);
+            RegisterServerRequestHandler<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, HandleRequestCashPackageInfo, HandleResponseCashPackageInfo);
+            RegisterServerRequestHandler<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, HandleRequestCashShopBuy, HandleResponseCashShopBuy);
+            RegisterServerRequestHandler<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
         }
 
         protected virtual void Clean()
