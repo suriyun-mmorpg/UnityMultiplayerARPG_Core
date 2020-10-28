@@ -774,7 +774,7 @@ namespace MultiplayerARPG
             return base.StartServer();
         }
 
-        public override LiteNetLibClient StartClient(string networkAddress, int networkPort)
+        public override bool StartClient(string networkAddress, int networkPort)
         {
             Init();
             return base.StartClient(networkAddress, networkPort);
