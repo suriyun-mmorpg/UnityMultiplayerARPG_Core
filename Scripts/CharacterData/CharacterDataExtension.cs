@@ -852,13 +852,13 @@ public static partial class CharacterDataExtension
     #endregion
 
     #region Increase Items
-    public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem addingItem)
+    public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem increasingItem)
     {
         // If item not valid
-        if (addingItem.IsEmptySlot()) return false;
+        if (increasingItem.IsEmptySlot()) return false;
 
-        BaseItem itemData = addingItem.GetItem();
-        short amount = addingItem.amount;
+        BaseItem itemData = increasingItem.GetItem();
+        short amount = increasingItem.amount;
 
         short maxStack = itemData.MaxStack;
         Dictionary<int, CharacterItem> emptySlots = new Dictionary<int, CharacterItem>();
@@ -873,7 +873,7 @@ public static partial class CharacterDataExtension
                 // If current entry is not valid, add it to empty list, going to replacing it later
                 emptySlots[i] = tempNonEquipItem;
             }
-            else if (tempNonEquipItem.dataId == addingItem.dataId)
+            else if (tempNonEquipItem.dataId == increasingItem.dataId)
             {
                 // If same item id, increase its amount
                 if (tempNonEquipItem.amount + amount <= maxStack)
@@ -899,7 +899,7 @@ public static partial class CharacterDataExtension
             // If there are no changes and there are an empty entries, fill them
             foreach (int emptySlotIndex in emptySlots.Keys)
             {
-                tempNewItem = addingItem.Clone(true);
+                tempNewItem = increasingItem.Clone(true);
                 short addAmount = 0;
                 if (amount - maxStack >= 0)
                 {
@@ -927,7 +927,7 @@ public static partial class CharacterDataExtension
         // Add new items to new slots
         while (amount > 0)
         {
-            tempNewItem = addingItem.Clone(true);
+            tempNewItem = increasingItem.Clone(true);
             short addAmount;
             if (amount - maxStack >= 0)
             {
@@ -947,12 +947,34 @@ public static partial class CharacterDataExtension
         return true;
     }
 
-    public static bool IncreaseItems(this ICharacterData data, CharacterItem addingItem, System.Action<int, short, short> onIncrease = null)
+    public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, System.Action<int, short, short> onIncrease = null)
     {
-        if (data.NonEquipItems.IncreaseItems(addingItem))
+        foreach (ItemAmount increasingItem in increasingItems)
+        {
+            if (increasingItem.item == null || increasingItem.amount <= 0) continue;
+            itemList.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount));
+            if (onIncrease != null)
+                onIncrease.Invoke(increasingItem.item.DataId, 1, increasingItem.amount);
+        }
+    }
+
+    public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> increasingItems, System.Action<int, short, short> onIncrease = null)
+    {
+        foreach (CharacterItem increasingItem in increasingItems)
+        {
+            if (increasingItem.IsEmptySlot()) continue;
+            itemList.IncreaseItems(CharacterItem.Create(increasingItem.dataId, increasingItem.level, increasingItem.amount));
+            if (onIncrease != null)
+                onIncrease.Invoke(increasingItem.dataId, increasingItem.level, increasingItem.amount);
+        }
+    }
+
+    public static bool IncreaseItems(this ICharacterData data, CharacterItem increasingItem, System.Action<int, short, short> onIncrease = null)
+    {
+        if (data.NonEquipItems.IncreaseItems(increasingItem))
         {
             if (onIncrease != null)
-                onIncrease.Invoke(addingItem.dataId, addingItem.level, addingItem.amount);
+                onIncrease.Invoke(increasingItem.dataId, increasingItem.level, increasingItem.amount);
             return true;
         }
         return false;

@@ -132,12 +132,11 @@ namespace MultiplayerARPG
                 return;
 
             // Remove item from inventory
-            BaseItem item = nonEquipItem.GetItem();
-            if (!this.DecreaseItemsByIndex(index, amount))
-                return;
+            this.DecreaseItemsByIndex(index, amount);
             this.FillEmptySlots();
 
             // Increase currencies
+            BaseItem item = nonEquipItem.GetItem();
             CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
 #endif
         }
@@ -149,13 +148,13 @@ namespace MultiplayerARPG
             if (!AccessingNpcShopDialog(out _))
                 return;
             indexes.Sort();
-            short index;
+            short tempIndex;
             for (int i = indexes.Count - 1; i >= 0; --i)
             {
-                index = indexes[i];
-                if (index >= nonEquipItems.Count)
+                tempIndex = indexes[i];
+                if (tempIndex >= nonEquipItems.Count)
                     continue;
-                ServerSellItem(index, nonEquipItems[index].amount);
+                ServerSellItem(tempIndex, nonEquipItems[tempIndex].amount);
             }
 #endif
         }

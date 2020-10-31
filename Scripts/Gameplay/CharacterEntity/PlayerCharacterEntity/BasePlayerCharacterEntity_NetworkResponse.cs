@@ -237,6 +237,52 @@ namespace MultiplayerARPG
                 onShowStorage.Invoke(type, objectId, weightLimit, slotLimit);
         }
 
+        private bool VerifyDismantleItem(short index, short amount, List<CharacterItem> simulatingNonEquipItems, out int returningGold, out List<ItemAmount> returningItems)
+        {
+            returningGold = 0;
+            returningItems = new List<ItemAmount>();
+
+            // Found item or not?
+            CharacterItem nonEquipItem = nonEquipItems[index];
+            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+            {
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
+                return false;
+            }
+
+            if (!CurrentGameInstance.dismantleFilter.Filter(nonEquipItem))
+            {
+                return false;
+            }
+
+            // Simulate data before applies
+            simulatingNonEquipItems.AddRange(nonEquipItems);
+            if (!simulatingNonEquipItems.DecreaseItemsByIndex(index, amount, CurrentGameInstance.IsLimitInventorySlot))
+            {
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
+                return false;
+            }
+
+            // Character can receives all items or not?
+            returningItems.AddRange(BaseItem.GetDismantleReturnItems(nonEquipItem, amount));
+            if (simulatingNonEquipItems.IncreasingItemsWillOverwhelming(
+                returningItems,
+                true,
+                this.GetCaches().LimitItemWeight,
+                this.GetCaches().TotalItemWeight,
+                CurrentGameInstance.IsLimitInventorySlot,
+                this.GetCaches().LimitItemSlot))
+            {
+                returningItems.Clear();
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                return false;
+            }
+
+            simulatingNonEquipItems.IncreaseItems(returningItems);
+            returningGold = nonEquipItem.GetItem().DismantleReturnGold * amount;
+            return true;
+        }
+
         [ServerRpc]
         protected void ServerDismantleItem(short index, short amount)
         {
@@ -247,36 +293,14 @@ namespace MultiplayerARPG
             if (index >= nonEquipItems.Count)
                 return;
 
-            // Found item or not?
-            CharacterItem nonEquipItem = nonEquipItems[index];
-            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount ||
-                !CurrentGameInstance.dismantleFilter.Filter(nonEquipItem))
+            int returningGold;
+            List<ItemAmount> returningItems;
+
+            List<CharacterItem> simulatingNonEquipItems = new List<CharacterItem>();
+            if (!VerifyDismantleItem(index, amount, simulatingNonEquipItems, out returningGold, out returningItems))
                 return;
 
-            // Simulate data before applies
-            List<CharacterItem> tempNonEquipItems = new List<CharacterItem>(nonEquipItems);
-            if (!tempNonEquipItems.DecreaseItemsByIndex(index, amount, CurrentGameInstance.IsLimitInventorySlot))
-            {
-                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
-                return;
-            }
-
-            // Character can receives all items or not?
-            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(nonEquipItem, amount);
-            if (tempNonEquipItems.IncreasingItemsWillOverwhelming(
-                returningItems,
-                true,
-                this.GetCaches().LimitItemWeight,
-                this.GetCaches().TotalItemWeight,
-                CurrentGameInstance.IsLimitInventorySlot,
-                this.GetCaches().LimitItemSlot))
-            {
-                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
-                return;
-            }
-
-            // Applies simulates data
-            Gold += nonEquipItem.GetItem().DismantleReturnGold * amount;
+            Gold += returningGold;
             this.DecreaseItemsByIndex(index, amount);
             this.IncreaseItems(returningItems);
             this.FillEmptySlots();
@@ -290,14 +314,38 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return;
             indexes.Sort();
-            short index;
+            Dictionary<short, short> indexAmountPairs = new Dictionary<short, short>();
+            List<CharacterItem> simulatingNonEquipItems = new List<CharacterItem>();
+            int returningGold = 0;
+            List<ItemAmount> returningItems = new List<ItemAmount>();
+            short tempIndex;
+            short tempAmount;
+            int tempReturningGold;
+            List<ItemAmount> tempReturningItems;
             for (int i = indexes.Count - 1; i >= 0; --i)
             {
-                index = indexes[i];
-                if (index >= nonEquipItems.Count)
+                tempIndex = indexes[i];
+                if (indexAmountPairs.ContainsKey(tempIndex))
                     continue;
-                ServerDismantleItem(index, nonEquipItems[index].amount);
+                if (tempIndex >= nonEquipItems.Count)
+                    continue;
+                tempAmount = nonEquipItems[tempIndex].amount;
+                if (!VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out tempReturningGold, out tempReturningItems))
+                    return;
+                returningGold += tempReturningGold;
+                returningItems.AddRange(tempReturningItems);
+                indexAmountPairs.Add(tempIndex, tempAmount);
             }
+            Gold += returningGold;
+            indexes.Clear();
+            indexes.AddRange(indexAmountPairs.Keys);
+            indexes.Sort();
+            for (int i = indexes.Count - 1; i >= 0; --i)
+            {
+                this.DecreaseItemsByIndex(indexes[i], indexAmountPairs[indexes[i]]);
+            }
+            this.IncreaseItems(returningItems);
+            this.FillEmptySlots();
 #endif
         }
 
