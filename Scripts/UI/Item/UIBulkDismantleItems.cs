@@ -16,14 +16,14 @@ namespace MultiplayerARPG
         public UIItemAmounts uiReturnItems;
         public TextWrapper uiTextReturnGold;
 
-        private void OnEnable()
-        {
-            uiNonEquipItems.CacheItemSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
-        }
-
         private void OnDisable()
         {
             uiNonEquipItems.CacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+        }
+
+        private void Update()
+        {
+            uiNonEquipItems.CacheItemSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
         }
 
         private void LateUpdate()
