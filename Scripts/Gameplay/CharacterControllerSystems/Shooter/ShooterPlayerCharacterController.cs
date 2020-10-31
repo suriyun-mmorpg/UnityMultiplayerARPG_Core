@@ -863,7 +863,8 @@ namespace MultiplayerARPG
                     !GetSecondaryAttackButton()))
                     mustReleaseFireKey = false;
             }
-
+            bool anyKeyPressed = false;
+            bool activatingEntityOrDoAction = false;
             if (queueUsingSkill.skill != null ||
                 tempPressAttackRight ||
                 tempPressAttackLeft ||
@@ -872,6 +873,7 @@ namespace MultiplayerARPG
                 activateInput.IsHold ||
                 PlayerCharacterEntity.IsPlayingActionAnimation())
             {
+                anyKeyPressed = true;
                 // Find forward character / npc / building / warp entity from camera center
                 // Check is character playing action animation to turn character forwarding to aim position
                 targetPlayer = null;
@@ -884,7 +886,10 @@ namespace MultiplayerARPG
                     if (activateInput.IsHold)
                     {
                         if (SelectedEntity is BuildingEntity)
+                        {
+                            activatingEntityOrDoAction = true;
                             targetBuilding = SelectedEntity as BuildingEntity;
+                        }
                     }
                     else if (activateInput.IsRelease)
                     {
@@ -892,6 +897,7 @@ namespace MultiplayerARPG
                         {
                             if (warpPortalEntityDetector?.warpPortals.Count > 0)
                             {
+                                activatingEntityOrDoAction = true;
                                 // It may not able to raycast from inside warp portal, so try to get it from the detector
                                 targetWarpPortal = warpPortalEntityDetector.warpPortals[0];
                             }
@@ -899,42 +905,61 @@ namespace MultiplayerARPG
                         else
                         {
                             if (SelectedEntity is BasePlayerCharacterEntity)
+                            {
+                                activatingEntityOrDoAction = true;
                                 targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
+                            }
                             if (SelectedEntity is NpcEntity)
+                            {
+                                activatingEntityOrDoAction = true;
                                 targetNpc = SelectedEntity as NpcEntity;
+                            }
                             if (SelectedEntity is BuildingEntity)
+                            {
+                                activatingEntityOrDoAction = true;
                                 targetBuilding = SelectedEntity as BuildingEntity;
+                            }
                             if (SelectedEntity is VehicleEntity)
+                            {
+                                activatingEntityOrDoAction = true;
                                 targetVehicle = SelectedEntity as VehicleEntity;
+                            }
                             if (SelectedEntity is WarpPortalEntity)
+                            {
+                                activatingEntityOrDoAction = true;
                                 targetWarpPortal = SelectedEntity as WarpPortalEntity;
+                            }
                         }
                     }
                 }
+
                 // Update look direction
                 if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
                 {
+                    activatingEntityOrDoAction = true;
                     SetTargetLookDirectionWhileDoingAction();
                 }
                 else if (queueUsingSkill.skill != null)
                 {
+                    activatingEntityOrDoAction = true;
                     SetTargetLookDirectionWhileDoingAction();
                     UpdateLookAtTarget();
                     UseSkill(isLeftHandAttacking);
                 }
                 else if (tempPressAttackRight || tempPressAttackLeft)
                 {
+                    activatingEntityOrDoAction = true;
                     SetTargetLookDirectionWhileDoingAction();
                     UpdateLookAtTarget();
                     Attack(isLeftHandAttacking);
                 }
-                else if (activateInput.IsHold)
+                else if (activateInput.IsHold && activatingEntityOrDoAction)
                 {
                     SetTargetLookDirectionWhileDoingAction();
                     UpdateLookAtTarget();
                     HoldActivate();
                 }
-                else if (activateInput.IsRelease)
+                else if (activateInput.IsRelease && activatingEntityOrDoAction)
                 {
                     SetTargetLookDirectionWhileDoingAction();
                     UpdateLookAtTarget();
@@ -945,8 +970,10 @@ namespace MultiplayerARPG
                     SetTargetLookDirectionWhileMoving();
                 }
             }
-            else if (tempPressWeaponAbility)
+
+            if (tempPressWeaponAbility && !activatingEntityOrDoAction)
             {
+                anyKeyPressed = true;
                 // Toggle weapon ability
                 switch (WeaponAbilityState)
                 {
@@ -960,28 +987,40 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            else if (pickupItemInput.IsPress)
+
+            if (pickupItemInput.IsPress && !activatingEntityOrDoAction)
             {
+                anyKeyPressed = true;
                 // Find for item to pick up
                 if (SelectedEntity != null && SelectedEntity is ItemDropEntity)
+                {
+                    activatingEntityOrDoAction = true;
                     PlayerCharacterEntity.CallServerPickupItem(SelectedEntity.ObjectId);
+                }
             }
-            else if (reloadInput.IsPress)
+
+            if (reloadInput.IsPress && !activatingEntityOrDoAction)
             {
+                anyKeyPressed = true;
                 // Reload ammo when press the button
                 ReloadAmmo();
             }
-            else if (exitVehicleInput.IsPress)
+
+            if (exitVehicleInput.IsPress && !activatingEntityOrDoAction)
             {
+                anyKeyPressed = true;
                 // Exit vehicle
                 PlayerCharacterEntity.CallServerExitVehicle();
             }
-            else if (switchEquipWeaponSetInput.IsPress)
+
+            if (switchEquipWeaponSetInput.IsPress && !activatingEntityOrDoAction)
             {
+                anyKeyPressed = true;
                 // Switch equip weapon set
                 PlayerCharacterEntity.CallServerSwitchEquipWeaponSet((byte)(PlayerCharacterEntity.EquipWeaponSet + 1));
             }
-            else
+
+            if (!anyKeyPressed && !activatingEntityOrDoAction)
             {
                 // Update look direction while moving without doing any action
                 SetTargetLookDirectionWhileMoving();
@@ -1482,7 +1521,7 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                if (buildingArea.IsPartOfBuildingEntity(ConstructingBuildingEntity) || 
+                if (buildingArea.IsPartOfBuildingEntity(ConstructingBuildingEntity) ||
                     !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
                 {
                     // Skip because this area is not allowed to build the building that you are going to build
