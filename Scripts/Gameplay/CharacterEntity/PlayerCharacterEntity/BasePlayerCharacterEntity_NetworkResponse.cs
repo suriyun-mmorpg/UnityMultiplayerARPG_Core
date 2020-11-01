@@ -256,7 +256,6 @@ namespace MultiplayerARPG
             }
 
             // Simulate data before applies
-            simulatingNonEquipItems.AddRange(nonEquipItems);
             if (!simulatingNonEquipItems.DecreaseItemsByIndex(index, amount, CurrentGameInstance.IsLimitInventorySlot))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
@@ -296,7 +295,7 @@ namespace MultiplayerARPG
             int returningGold;
             List<ItemAmount> returningItems;
 
-            List<CharacterItem> simulatingNonEquipItems = new List<CharacterItem>();
+            List<CharacterItem> simulatingNonEquipItems = nonEquipItems.Clone();
             if (!VerifyDismantleItem(index, amount, simulatingNonEquipItems, out returningGold, out returningItems))
                 return;
 
@@ -315,7 +314,7 @@ namespace MultiplayerARPG
                 return;
             indexes.Sort();
             Dictionary<short, short> indexAmountPairs = new Dictionary<short, short>();
-            List<CharacterItem> simulatingNonEquipItems = new List<CharacterItem>();
+            List<CharacterItem> simulatingNonEquipItems = nonEquipItems.Clone();
             int returningGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
             short tempIndex;
