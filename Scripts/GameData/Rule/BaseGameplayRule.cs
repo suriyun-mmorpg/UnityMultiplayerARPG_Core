@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseGameplayRule : ScriptableObject
+    public abstract partial class BaseGameplayRule : ScriptableObject
     {
         public abstract bool RandomAttackHitOccurs(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, out bool isCritical, out bool isBlocked);
         public abstract float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
