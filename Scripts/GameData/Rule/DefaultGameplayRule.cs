@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Default Gameplay Rule", menuName = "Create GameplayRule/Default Gameplay Rule", order = -2999)]
-    public class DefaultGameplayRule : BaseGameplayRule
+    public partial class DefaultGameplayRule : BaseGameplayRule
     {
         [Header("Levelling/Stat/Skill")]
         public short increaseStatPointEachLevel = 5;
