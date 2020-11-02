@@ -63,9 +63,10 @@ namespace MultiplayerARPG
 
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
         public virtual bool HasDriver { get { return passengers.ContainsKey(0); } }
+        public virtual bool ShouldBeAttackTarget { get { return HasDriver && canBeAttacked && !this.IsDead(); } }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
-        public override int MaxHp { get { return hp.GetAmount(level); } }
+        public override int MaxHp { get { return canBeAttacked ? hp.GetAmount(level) : 1; } }
         public Vector3 SpawnPosition { get; protected set; }
 
         // Private variables
@@ -79,14 +80,13 @@ namespace MultiplayerARPG
             gameObject.layer = CurrentGameInstance.characterLayer;
             isDestroyed = false;
             defaultMovementSecure = MovementSecure;
-            UpdateStats();
         }
 
         protected virtual void InitStats()
         {
             if (!IsServer)
                 return;
-
+            UpdateStats();
             CurrentHp = MaxHp;
         }
 
@@ -251,6 +251,11 @@ namespace MultiplayerARPG
 
         protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
+            combatAmountType = CombatAmountType.Miss;
+            totalDamage = 0;
+            if (!canBeAttacked)
+                return;
+
             // Calculate damages
             float calculatingTotalDamage = 0f;
             float calculatingDamage;

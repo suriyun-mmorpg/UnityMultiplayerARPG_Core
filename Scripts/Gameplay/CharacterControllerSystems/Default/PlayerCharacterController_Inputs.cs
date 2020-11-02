@@ -286,7 +286,10 @@ namespace MultiplayerARPG
                         else if (targetVehicle)
                         {
                             // Found activating entity as vehicle entity
-                            SetTarget(targetVehicle, TargetActionType.Activate);
+                            if (targetVehicle.ShouldBeAttackTarget)
+                                SetTarget(targetVehicle, TargetActionType.Attack);
+                            else
+                                SetTarget(targetVehicle, TargetActionType.Activate);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
