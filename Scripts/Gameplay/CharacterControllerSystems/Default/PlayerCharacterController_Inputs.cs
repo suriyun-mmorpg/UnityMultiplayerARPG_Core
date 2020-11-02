@@ -890,7 +890,7 @@ namespace MultiplayerARPG
 
             if (item.IsEquipment())
             {
-                PlayerCharacterEntity.RequestEquipItem((short)itemIndex);
+                PlayerCharacterEntity.CallServerEquipItem((short)itemIndex);
             }
             else if (item.IsSkill())
             {

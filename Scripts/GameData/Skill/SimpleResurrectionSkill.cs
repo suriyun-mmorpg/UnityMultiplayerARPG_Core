@@ -36,7 +36,7 @@ namespace MultiplayerARPG
             targetEntity.CurrentFood = Mathf.CeilToInt(targetEntity.GetCaches().MaxFood * resurrectFoodRate);
             targetEntity.CurrentWater = Mathf.CeilToInt(targetEntity.GetCaches().MaxWater * resurrectWaterRate);
             targetEntity.StopMove();
-            targetEntity.CallOwnerOnRespawn();
+            targetEntity.CallAllOnRespawn();
             targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
         }
 

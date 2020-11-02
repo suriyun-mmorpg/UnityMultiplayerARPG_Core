@@ -669,8 +669,8 @@ namespace MultiplayerARPG
             characterEntity.onShowNpcRefineItem += OnShowNpcRefineItem;
             characterEntity.onShowNpcDismantleItem += OnShowNpcDismantleItem;
             characterEntity.onShowNpcRepairItem += OnShowNpcRepairItem;
-            characterEntity.onDead += OnCharacterDead;
-            characterEntity.onRespawn += OnCharacterRespawn;
+            characterEntity.onDead.AddListener(OnCharacterDead);
+            characterEntity.onRespawn.AddListener(OnCharacterRespawn);
             characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
             characterEntity.onShowDealingDialog += OnShowDealing;
             characterEntity.onShowPartyInvitationDialog += OnShowPartyInvitation;
@@ -685,8 +685,8 @@ namespace MultiplayerARPG
             characterEntity.onShowNpcRefineItem -= OnShowNpcRefineItem;
             characterEntity.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
             characterEntity.onShowNpcRepairItem -= OnShowNpcRepairItem;
-            characterEntity.onDead -= OnCharacterDead;
-            characterEntity.onRespawn -= OnCharacterRespawn;
+            characterEntity.onDead.RemoveListener(OnCharacterDead);
+            characterEntity.onRespawn.RemoveListener(OnCharacterRespawn);
             characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;
             characterEntity.onShowDealingDialog -= OnShowDealing;
             characterEntity.onShowPartyInvitationDialog -= OnShowPartyInvitation;

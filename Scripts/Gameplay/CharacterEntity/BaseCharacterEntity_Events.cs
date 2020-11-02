@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
@@ -9,9 +10,11 @@ namespace MultiplayerARPG
     {
         // Note: You may use `Awake` dev extension to setup an events and `OnDestroy` to desetup an events
         // Generic events
-        public System.Action onDead;
-        public System.Action onRespawn;
-        public System.Action onLevelUp;
+        [Header("Events")]
+        public UnityEvent onHit = new UnityEvent();
+        public UnityEvent onDead = new UnityEvent();
+        public UnityEvent onRespawn = new UnityEvent();
+        public UnityEvent onLevelUp = new UnityEvent();
         // Attack functions
         public event AttackRoutineDelegate onAttackRoutine;
         // Use skill functions

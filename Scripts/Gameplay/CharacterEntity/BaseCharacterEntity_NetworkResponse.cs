@@ -410,30 +410,33 @@ namespace MultiplayerARPG
             return true;
         }
 
-        [TargetRpc]
-        protected virtual void TargetOnDead()
+        [AllRpc]
+        protected virtual void AllOnDead()
         {
-            CancelReload();
-            CancelAttack();
-            CancelSkill();
-            ClearActionStates();
+            if (IsOwnerClient)
+            {
+                CancelReload();
+                CancelAttack();
+                CancelSkill();
+                ClearActionStates();
+            }
             if (onDead != null)
                 onDead.Invoke();
         }
 
-        [TargetRpc]
-        protected virtual void TargetOnRespawn()
+        [AllRpc]
+        protected virtual void AllOnRespawn()
         {
-            ClearActionStates();
+            if (IsOwnerClient)
+                ClearActionStates();
             if (onRespawn != null)
                 onRespawn.Invoke();
         }
 
-        [TargetRpc]
-        protected virtual void TargetOnLevelUp()
+        [AllRpc]
+        protected virtual void AllOnLevelUp()
         {
-            if (CurrentGameInstance.levelUpEffect != null)
-                CharacterModel.InstantiateEffect(CurrentGameInstance.levelUpEffect);
+            CharacterModel.InstantiateEffect(CurrentGameInstance.levelUpEffect);
             if (onLevelUp != null)
                 onLevelUp.Invoke();
         }

@@ -144,7 +144,7 @@ namespace MultiplayerARPG
             }
             // Can equip the item
             // so tell the server that this client want to equip the item
-            owningCharacter.RequestEquipItem(
+            owningCharacter.CallServerEquipItem(
                 (short)draggedItemUI.uiCharacterItem.IndexOfData,
                 uiCharacterItem.InventoryType,
                 uiCharacterItem.EquipSlotIndex);

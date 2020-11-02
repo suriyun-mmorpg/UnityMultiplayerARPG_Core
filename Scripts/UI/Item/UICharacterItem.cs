@@ -1108,7 +1108,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            OwningCharacter.RequestEquipItem((short)IndexOfData);
+            OwningCharacter.CallServerEquipItem((short)IndexOfData);
         }
 
         public void OnClickUnEquip()

@@ -151,7 +151,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestEquipItem(short nonEquipIndex)
+        public bool CallServerEquipItem(short nonEquipIndex)
         {
             if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -211,7 +211,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool RequestEquipItem(short nonEquipIndex, InventoryType inventoryType, byte equipSlotIndex)
+        public bool CallServerEquipItem(short nonEquipIndex, InventoryType inventoryType, byte equipSlotIndex)
         {
             switch (inventoryType)
             {
@@ -273,21 +273,21 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallOwnerOnDead()
+        public bool CallAllOnDead()
         {
-            RPC(TargetOnDead, ConnectionId);
+            RPC(AllOnDead);
             return true;
         }
 
-        public bool CallOwnerOnRespawn()
+        public bool CallAllOnRespawn()
         {
-            RPC(TargetOnRespawn, ConnectionId);
+            RPC(AllOnRespawn);
             return true;
         }
 
-        public bool CallOwnerOnLevelUp()
+        public bool CallAllOnLevelUp()
         {
-            RPC(TargetOnLevelUp, ConnectionId);
+            RPC(AllOnLevelUp);
             return true;
         }
 
