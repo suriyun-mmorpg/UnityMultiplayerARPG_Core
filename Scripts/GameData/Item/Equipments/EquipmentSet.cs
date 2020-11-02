@@ -8,25 +8,6 @@ namespace MultiplayerARPG
         [Header("Equipment Set Configs")]
         public EquipmentBonus[] effects;
 
-        public override bool Validate()
-        {
-            bool hasChanges = false;
-            if (effects != null && effects.Length > 0)
-            {
-                EquipmentBonus effect;
-                for (int i = 0; i < effects.Length; ++i)
-                {
-                    effect = effects[i];
-                    if (GameDataMigration.MigrateArmor(effect.stats, effect.armors, out effect.stats, out effect.armors))
-                    {
-                        effects[i] = effect;
-                        hasChanges = true;
-                    }
-                }
-            }
-            return hasChanges;
-        }
-
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();

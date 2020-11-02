@@ -17,6 +17,11 @@ namespace MultiplayerARPG
             set { }
         }
 
+        /// <summary>
+        /// If this is `TRUE` it will be able to select by player to do something
+        /// </summary>
+        public virtual bool CanBeActivated { get { return true; } }
+
         [Header("Game Entity Settings")]
         [SerializeField]
         private Text textTitle;
@@ -90,6 +95,7 @@ namespace MultiplayerARPG
                 return cameraTargetTransform;
             }
         }
+
         [Tooltip("Transform for position which camera will look at and follow while playing in FPS view mode")]
         [SerializeField]
         private Transform fpsCameraTargetTransform;

@@ -41,11 +41,6 @@ namespace MultiplayerARPG
 
         public abstract Dictionary<BaseSkill, short> CacheSkillLevels { get; }
 
-        public override bool Validate()
-        {
-            return GameDataMigration.MigrateArmor(stats, armors, out stats, out armors);
-        }
-
         public CharacterStats GetCharacterStats(short level)
         {
             return Stats.GetCharacterStats(level);

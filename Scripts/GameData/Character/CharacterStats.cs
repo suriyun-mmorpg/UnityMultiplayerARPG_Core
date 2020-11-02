@@ -24,9 +24,6 @@ namespace MultiplayerARPG
         public float stamina;
         public float food;
         public float water;
-        // TODO: This is deprecated, will be removed later
-        [Header("Deprecated")]
-        public float armor;
 
         public CharacterStats Add(CharacterStats b)
         {
