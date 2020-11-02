@@ -9,35 +9,19 @@ namespace MultiplayerARPG
         [Header("Stats/Attributes")]
         [SerializeField]
         private CharacterStatsIncremental stats;
+        public virtual CharacterStatsIncremental Stats { get { return stats; } }
         [SerializeField]
         [ArrayElementTitle("attribute")]
         private AttributeIncremental[] attributes;
+        public virtual AttributeIncremental[] Attributes { get { return attributes; } }
         [SerializeField]
         [ArrayElementTitle("damageElement")]
         private ResistanceIncremental[] resistances;
+        public virtual ResistanceIncremental[] Resistances { get { return resistances; } }
         [SerializeField]
         [ArrayElementTitle("damageElement")]
         private ArmorIncremental[] armors;
-
-        public virtual CharacterStatsIncremental Stats
-        {
-            get { return stats; }
-        }
-
-        public virtual AttributeIncremental[] Attributes
-        {
-            get { return attributes; }
-        }
-
-        public virtual ResistanceIncremental[] Resistances
-        {
-            get { return resistances; }
-        }
-
-        public virtual ArmorIncremental[] Armors
-        {
-            get { return armors; }
-        }
+        public virtual ArmorIncremental[] Armors { get { return armors; } }
 
         public abstract Dictionary<BaseSkill, short> CacheSkillLevels { get; }
 
