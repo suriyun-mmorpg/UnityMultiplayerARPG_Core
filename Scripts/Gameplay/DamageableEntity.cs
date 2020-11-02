@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
     public abstract partial class DamageableEntity : BaseGameEntity, IDamageableEntity
     {
-        // Events
-        public event ReceiveDamageDelegate onReceiveDamage;
-        public event ReceivedDamageDelegate onReceivedDamage;
-
         [Header("Damageable Settings")]
         [Tooltip("This is transform where combat texts will be instantiates from")]
         [SerializeField]
@@ -26,6 +23,14 @@ namespace MultiplayerARPG
         {
             get { return opponentAimTransform; }
         }
+
+        [Header("Damageable Entity Events")]
+        public UnityEvent onNormalDamageHit = new UnityEvent();
+        public UnityEvent onCriticalDamageHit = new UnityEvent();
+        public UnityEvent onBlockedDamageHit = new UnityEvent();
+        public UnityEvent onDamageMissed = new UnityEvent();
+        public event ReceiveDamageDelegate onReceiveDamage;
+        public event ReceivedDamageDelegate onReceivedDamage;
 
         [Header("Damageable Sync Fields")]
         [SerializeField]
@@ -61,6 +66,22 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllAppendCombatAmount(CombatAmountType combatAmountType, int amount)
         {
+            switch (combatAmountType)
+            {
+                case CombatAmountType.NormalDamage:
+                    onNormalDamageHit.Invoke();
+                    break;
+                case CombatAmountType.CriticalDamage:
+                    onCriticalDamageHit.Invoke();
+                    break;
+                case CombatAmountType.BlockedDamage:
+                    onBlockedDamageHit.Invoke();
+                    break;
+                case CombatAmountType.Miss:
+                    onDamageMissed.Invoke();
+                    break;
+            }
+
             if (!IsClient)
                 return;
 

@@ -10,8 +10,7 @@ namespace MultiplayerARPG
     {
         // Note: You may use `Awake` dev extension to setup an events and `OnDestroy` to desetup an events
         // Generic events
-        [Header("Events")]
-        public UnityEvent onHit = new UnityEvent();
+        [Header("Character Entity Events")]
         public UnityEvent onDead = new UnityEvent();
         public UnityEvent onRespawn = new UnityEvent();
         public UnityEvent onLevelUp = new UnityEvent();
