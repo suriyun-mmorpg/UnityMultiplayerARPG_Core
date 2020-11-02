@@ -60,7 +60,6 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-
             CurrentHp = MaxHp;
         }
 
