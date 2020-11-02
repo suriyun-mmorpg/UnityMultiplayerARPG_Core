@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         public virtual float DeadY { get { return deadY; } }
 
         public virtual bool AutoRespawnWhenDead { get { return false; } }
-        public virtual bool SaveCurrentPosition { get { return true; } }
+        public virtual bool IsInstanceMap { get { return false; } }
 
         public virtual void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position)
         {
