@@ -76,7 +76,6 @@ namespace MultiplayerARPG
         public TextWrapper uiTextStats;
         public TextWrapper uiTextHp;
         public TextWrapper uiTextMp;
-        public TextWrapper uiTextArmor;
         public TextWrapper uiTextAccuracy;
         public TextWrapper uiTextEvasion;
         public TextWrapper uiTextCriRate;
@@ -121,7 +120,6 @@ namespace MultiplayerARPG
                         formatKeyWaterRateStats,
                         uiTextHp,
                         uiTextMp,
-                        uiTextArmor,
                         uiTextAccuracy,
                         uiTextEvasion,
                         uiTextCriRate,
@@ -158,7 +156,6 @@ namespace MultiplayerARPG
                         formatKeyWaterStats,
                         uiTextHp,
                         uiTextMp,
-                        uiTextArmor,
                         uiTextAccuracy,
                         uiTextEvasion,
                         uiTextCriRate,

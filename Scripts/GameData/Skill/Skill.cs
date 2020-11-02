@@ -67,13 +67,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override bool Validate()
-        {
-            return base.Validate() ||
-                GameDataMigration.MigrateBuffArmor(buff, out buff) ||
-                GameDataMigration.MigrateBuffArmor(debuff, out debuff);
-        }
-
         public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
         {
             // Craft item

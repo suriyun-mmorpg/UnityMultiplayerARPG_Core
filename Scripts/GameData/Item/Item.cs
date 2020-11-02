@@ -416,18 +416,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public override bool Validate()
-        {
-            bool hasChanges = false;
-            // Migrate character stats → armor (equipment)
-            if (GameDataMigration.MigrateArmor(increaseStats, increaseArmors, out increaseStats, out increaseArmors))
-                hasChanges = true;
-            // Migrate character stats → armor (armor)
-            if (GameDataMigration.MigrateBuffArmor(buff, out buff))
-                hasChanges = true;
-            return hasChanges || base.Validate();
-        }
-
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();

@@ -121,7 +121,6 @@ namespace MultiplayerARPG
             string waterStatsFormat,
             TextWrapper uiTextHp = null,
             TextWrapper uiTextMp = null,
-            TextWrapper uiTextArmor = null,
             TextWrapper uiTextAccuracy = null,
             TextWrapper uiTextEvasion = null,
             TextWrapper uiTextCriRate = null,
@@ -137,7 +136,7 @@ namespace MultiplayerARPG
             TextWrapper uiTextWater = null)
         {
             string statsString = string.Empty;
-            string statsStringPart = string.Empty;
+            string statsStringPart;
             string tempValue;
 
             // Hp
