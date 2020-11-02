@@ -219,7 +219,7 @@ namespace MultiplayerARPG
 
         public bool IsSeatAvailable(byte seatIndex)
         {
-            return seatIndex < syncPassengerIds.Count && syncPassengerIds[seatIndex] == 0;
+            return !isDestroyed && seatIndex < syncPassengerIds.Count && syncPassengerIds[seatIndex] == 0;
         }
 
         public bool GetAvailableSeat(out byte seatIndex)
