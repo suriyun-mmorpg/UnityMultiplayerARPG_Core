@@ -88,6 +88,11 @@ namespace MultiplayerARPG
 
             base.Killed(lastAttacker);
             CurrentNpcDialog = null;
+
+#if !CLIENT_BUILD
+            if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
+                Respawn();
+#endif
         }
 
         public void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
