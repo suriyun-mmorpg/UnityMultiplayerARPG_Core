@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    // TODO: Derived from damageable entity
-    public class VehicleEntity : BaseGameEntity, IVehicleEntity
+    public class VehicleEntity : DamageableEntity, IVehicleEntity
     {
         [Header("Vehicle Settings")]
         [SerializeField]
@@ -27,30 +27,83 @@ namespace MultiplayerARPG
         [Tooltip("First seat is for driver")]
         [SerializeField]
         private List<VehicleSeat> seats = new List<VehicleSeat>();
-        public List<VehicleSeat> Seats
-        {
-            get { return seats; }
-        }
+        public List<VehicleSeat> Seats { get { return seats; } }
+
+        [SerializeField]
+        protected bool canBeAttacked;
+
+        [Header("Stats/Attributes")]
+        // TODO: Vehicle can level up?
+        [SerializeField]
+        private short level;
+
+        [SerializeField]
+        private IncrementalInt hp;
+
+        [SerializeField]
+        [ArrayElementTitle("damageElement")]
+        private ResistanceIncremental[] resistances;
+
+        [SerializeField]
+        [ArrayElementTitle("damageElement")]
+        private ArmorIncremental[] armors;
+
+        [SerializeField]
+        [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onVehicleDestroy` event before it's going to be destroyed from the game.")]
+        protected float destroyDelay = 2f;
+
+        [SerializeField]
+        protected float destroyRespawnDelay = 5f;
+
+        [Header("Events")]
+        public UnityEvent onVehicleDestroy = new UnityEvent();
 
         [SerializeField]
         private SyncListUInt syncPassengerIds = new SyncListUInt();
 
-        private readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
-
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
         public virtual bool HasDriver { get { return passengers.ContainsKey(0); } }
+        public Dictionary<DamageElement, float> Resistances { get; private set; }
+        public Dictionary<DamageElement, float> Armors { get; private set; }
+        public override int MaxHp { get { return hp.GetAmount(level); } }
+        public Vector3 SpawnPosition { get; protected set; }
+
+        // Private variables
+        private readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
         private MovementSecure defaultMovementSecure;
+        private bool isDestroyed;
 
         protected override sealed void EntityAwake()
         {
             base.EntityAwake();
             gameObject.layer = CurrentGameInstance.characterLayer;
+            isDestroyed = false;
             defaultMovementSecure = MovementSecure;
+            UpdateStats();
+        }
+
+        protected virtual void InitStats()
+        {
+            if (!IsServer)
+                return;
+
+            CurrentHp = MaxHp;
+        }
+
+        /// <summary>
+        /// Call this when vehicle level up
+        /// </summary>
+        public void UpdateStats()
+        {
+            Resistances = GameDataHelpers.CombineResistances(resistances, new Dictionary<DamageElement, float>(), level, 1);
+            Armors = GameDataHelpers.CombineArmors(armors, new Dictionary<DamageElement, float>(), level, 1);
         }
 
         public override void OnSetup()
         {
             base.OnSetup();
+            InitStats();
+            SpawnPosition = CacheTransform.position;
             syncPassengerIds.onOperation = (op, index) =>
             {
                 LiteNetLibIdentity identity;
@@ -182,6 +235,78 @@ namespace MultiplayerARPG
                 }
             }
             return false;
+        }
+
+        [AllRpc]
+        private void AllOnVehicleDestroy()
+        {
+            if (onVehicleDestroy != null)
+                onVehicleDestroy.Invoke();
+        }
+
+        public void CallAllOnVehicleDestroy()
+        {
+            RPC(AllOnVehicleDestroy);
+        }
+
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
+        {
+            // Calculate damages
+            float calculatingTotalDamage = 0f;
+            float calculatingDamage;
+            MinMaxFloat damageAmount;
+            foreach (DamageElement damageElement in damageAmounts.Keys)
+            {
+                damageAmount = damageAmounts[damageElement];
+                calculatingDamage = damageElement.GetDamageReducedByResistance(Resistances, Armors, damageAmount.Random());
+                if (calculatingDamage > 0f)
+                    calculatingTotalDamage += calculatingDamage;
+            }
+
+            // Apply damages
+            combatAmountType = CombatAmountType.NormalDamage;
+            totalDamage = (int)calculatingTotalDamage;
+            CurrentHp -= totalDamage;
+        }
+
+        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        {
+            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
+
+            if (combatAmountType == CombatAmountType.Miss)
+                return;
+
+            // Do something when entity dead
+            if (this.IsDead())
+                Destroy();
+        }
+
+        public virtual void Destroy()
+        {
+            if (!IsServer)
+                return;
+            CurrentHp = 0;
+            if (isDestroyed)
+                return;
+            isDestroyed = true;
+            // Tell clients that the vehicle destroy to play animation at client
+            CallAllOnVehicleDestroy();
+            // Respawning later
+            if (Identity.IsSceneObject)
+                Manager.StartCoroutine(RespawnRoutine());
+            // Destroy this entity
+            NetworkDestroy(destroyDelay);
+        }
+
+        protected IEnumerator RespawnRoutine()
+        {
+            yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
+            isDestroyed = false;
+            InitStats();
+            Manager.Assets.NetworkSpawnScene(
+                Identity.ObjectId,
+                SpawnPosition,
+                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
     }
 }
