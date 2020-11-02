@@ -309,7 +309,7 @@ namespace MultiplayerARPG
                 Destroy();
         }
 
-        public void Destroy()
+        public virtual void Destroy()
         {
             if (!IsServer)
                 return;
