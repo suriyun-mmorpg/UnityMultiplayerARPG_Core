@@ -294,6 +294,8 @@ namespace MultiplayerARPG
             if (isDestroyed)
                 return;
             isDestroyed = true;
+            // Kick passengers
+            RemoveAllPassengers();
             // Tell clients that the vehicle destroy to play animation at client
             CallAllOnVehicleDestroy();
             // Respawning later
