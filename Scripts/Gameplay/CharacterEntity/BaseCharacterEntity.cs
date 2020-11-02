@@ -613,7 +613,8 @@ namespace MultiplayerARPG
             if (attacker != null && attacker.Entity is BaseCharacterEntity)
                 CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
 
-            if (combatAmountType == CombatAmountType.Miss)
+            if (combatAmountType == CombatAmountType.Miss ||
+                combatAmountType == CombatAmountType.None)
                 return;
 
             // Interrupt casting skill when receive damage

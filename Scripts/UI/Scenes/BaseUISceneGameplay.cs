@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         StaminaRecovery,
         FoodRecovery,
         WaterRecovery,
+        None = 254,
     }
 
     [DisallowMultipleComponent]

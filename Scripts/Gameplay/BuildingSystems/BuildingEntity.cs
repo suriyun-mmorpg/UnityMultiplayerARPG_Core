@@ -301,7 +301,8 @@ namespace MultiplayerARPG
         {
             base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
 
-            if (combatAmountType == CombatAmountType.Miss)
+            if (combatAmountType == CombatAmountType.Miss ||
+                combatAmountType == CombatAmountType.None)
                 return;
 
             // Do something when entity dead
