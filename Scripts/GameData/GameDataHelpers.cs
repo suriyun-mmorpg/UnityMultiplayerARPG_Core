@@ -531,7 +531,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, float>();
-            if (sourceEffectivesses != null)
+            if (sourceEffectivesses != null && sourceEffectivesses.Length > 0)
             {
                 foreach (DamageEffectivenessAttribute sourceEffectivess in sourceEffectivesses)
                 {
@@ -557,7 +557,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
-            if (sourceAmounts != null)
+            if (sourceAmounts != null && sourceAmounts.Length > 0)
             {
                 KeyValuePair<DamageElement, MinMaxFloat> pair;
                 foreach (DamageAmount sourceAmount in sourceAmounts)
@@ -581,7 +581,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
-            if (sourceIncrementals != null)
+            if (sourceIncrementals != null && sourceIncrementals.Length > 0)
             {
                 KeyValuePair<DamageElement, MinMaxFloat> pair;
                 foreach (DamageIncremental sourceIncremental in sourceIncrementals)
@@ -604,7 +604,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
-            if (sourceIncrementals != null)
+            if (sourceIncrementals != null && sourceIncrementals.Length > 0)
             {
                 KeyValuePair<DamageElement, float> pair;
                 foreach (DamageInflictionIncremental sourceIncremental in sourceIncrementals)
@@ -627,7 +627,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, float>();
-            if (sourceAmounts != null)
+            if (sourceAmounts != null && sourceAmounts.Length > 0)
             {
                 KeyValuePair<Attribute, float> pair;
                 foreach (AttributeAmount sourceAmount in sourceAmounts)
@@ -651,7 +651,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, float>();
-            if (sourceIncrementals != null)
+            if (sourceIncrementals != null && sourceIncrementals.Length > 0)
             {
                 KeyValuePair<Attribute, float> pair;
                 foreach (AttributeIncremental sourceIncremental in sourceIncrementals)
@@ -674,7 +674,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
-            if (sourceAmounts != null)
+            if (sourceAmounts != null && sourceAmounts.Length > 0)
             {
                 KeyValuePair<DamageElement, float> pair;
                 foreach (ResistanceAmount sourceAmount in sourceAmounts)
@@ -698,7 +698,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
-            if (sourceIncrementals != null)
+            if (sourceIncrementals != null && sourceIncrementals.Length > 0)
             {
                 KeyValuePair<DamageElement, float> pair;
                 foreach (ResistanceIncremental sourceIncremental in sourceIncrementals)
@@ -722,7 +722,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
-            if (sourceAmounts != null)
+            if (sourceAmounts != null && sourceAmounts.Length > 0)
             {
                 KeyValuePair<DamageElement, float> pair;
                 foreach (ArmorAmount sourceAmount in sourceAmounts)
@@ -746,7 +746,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
-            if (sourceIncrementals != null)
+            if (sourceIncrementals != null && sourceIncrementals.Length > 0)
             {
                 KeyValuePair<DamageElement, float> pair;
                 foreach (ArmorIncremental sourceIncremental in sourceIncrementals)
@@ -768,7 +768,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<BaseSkill, short>();
-            if (sourceLevels != null)
+            if (sourceLevels != null && sourceLevels.Length > 0)
             {
                 KeyValuePair<BaseSkill, short> pair;
                 foreach (SkillLevel sourceLevel in sourceLevels)
@@ -790,7 +790,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<BaseSkill, short>();
-            if (sourceMonsterSkills != null)
+            if (sourceMonsterSkills != null && sourceMonsterSkills.Length > 0)
             {
                 KeyValuePair<BaseSkill, short> pair;
                 foreach (MonsterSkill sourceMonsterSkill in sourceMonsterSkills)
@@ -812,7 +812,7 @@ namespace MultiplayerARPG
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<BaseItem, short>();
-            if (sourceAmounts != null)
+            if (sourceAmounts != null && sourceAmounts.Length > 0)
             {
                 KeyValuePair<BaseItem, short> pair;
                 foreach (ItemAmount sourceAmount in sourceAmounts)
@@ -844,7 +844,7 @@ namespace MultiplayerARPG
         public static CharacterStats GetStatsFromAttributes(Dictionary<Attribute, float> attributeAmounts)
         {
             CharacterStats stats = new CharacterStats();
-            if (attributeAmounts != null)
+            if (attributeAmounts != null && attributeAmounts.Count > 0)
             {
                 foreach (Attribute attribute in attributeAmounts.Keys)
                 {
