@@ -12,20 +12,27 @@ namespace MultiplayerARPG
     {
         [SerializeField]
         protected int maxHp = 100;
+
         [SerializeField]
         protected Harvestable harvestable;
+
         [SerializeField]
         protected HarvestableCollectType collectType;
+
         [SerializeField]
         [Tooltip("Radius to detect other entities to avoid spawn this harvestable nearby other entities")]
         protected float colliderDetectionRadius = 2f;
+
         [SerializeField]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onHarvestableDestroy` event before it's going to be destroyed from the game.")]
         protected float destroyDelay = 2f;
+
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
+
+        [Header("Events")]
         [SerializeField]
-        protected UnityEvent onHarvestableDestroy;
+        protected UnityEvent onHarvestableDestroy = new UnityEvent();
 
         public override string Title { get { return harvestable.Title; } set { } }
         public override int MaxHp { get { return maxHp; } }

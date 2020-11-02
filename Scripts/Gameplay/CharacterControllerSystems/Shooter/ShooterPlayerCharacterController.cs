@@ -1480,7 +1480,7 @@ namespace MultiplayerARPG
                 if (!clampBuildPositionByBuildDistance)
                     ConstructingBuildingEntity.Position = aimPosition;
                 else
-                    ConstructingBuildingEntity.Position = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.buildDistance);
+                    ConstructingBuildingEntity.Position = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.BuildDistance);
                 // Rotate to camera
                 Vector3 direction = aimPosition - CacheGameplayCameraTransform.position;
                 direction.y = 0f;
@@ -1522,7 +1522,7 @@ namespace MultiplayerARPG
                 }
 
                 if (buildingArea.IsPartOfBuildingEntity(ConstructingBuildingEntity) ||
-                    !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
+                    !ConstructingBuildingEntity.BuildingTypes.Contains(buildingArea.buildingType))
                 {
                     // Skip because this area is not allowed to build the building that you are going to build
                     continue;

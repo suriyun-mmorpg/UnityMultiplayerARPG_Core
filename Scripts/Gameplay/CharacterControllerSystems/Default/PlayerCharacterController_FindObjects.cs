@@ -13,7 +13,7 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaByAxes(Vector2 aimAxes)
         {
-            LoopSetBuildingArea(physicFunctions.RaycastDown(CacheTransform.position + (GameplayUtils.GetDirectionByAxes(CacheGameplayCameraTransform, aimAxes.x, aimAxes.y) * ConstructingBuildingEntity.buildDistance), CurrentGameInstance.GetBuildLayerMask()));
+            LoopSetBuildingArea(physicFunctions.RaycastDown(CacheTransform.position + (GameplayUtils.GetDirectionByAxes(CacheGameplayCameraTransform, aimAxes.x, aimAxes.y) * ConstructingBuildingEntity.BuildDistance), CurrentGameInstance.GetBuildLayerMask()));
         }
 
         public void FindAndSetBuildingAreaByMousePosition()
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
             for (int tempCounter = 0; tempCounter < count; ++tempCounter)
             {
                 tempTransform = physicFunctions.GetRaycastTransform(tempCounter);
-                tempVector3 = GameplayUtils.ClampPosition(CacheTransform.position, physicFunctions.GetRaycastPoint(tempCounter), ConstructingBuildingEntity.buildDistance);
+                tempVector3 = GameplayUtils.ClampPosition(CacheTransform.position, physicFunctions.GetRaycastPoint(tempCounter), ConstructingBuildingEntity.BuildDistance);
                 tempVector3.y = physicFunctions.GetRaycastPoint(tempCounter).y;
 
                 buildingArea = tempTransform.GetComponent<BuildingArea>();
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                 }
 
                 if (buildingArea.IsPartOfBuildingEntity(ConstructingBuildingEntity) ||
-                    !ConstructingBuildingEntity.buildingTypes.Contains(buildingArea.buildingType))
+                    !ConstructingBuildingEntity.BuildingTypes.Contains(buildingArea.buildingType))
                 {
                     // Skip because this area is not allowed to build the building that you are going to build
                     continue;

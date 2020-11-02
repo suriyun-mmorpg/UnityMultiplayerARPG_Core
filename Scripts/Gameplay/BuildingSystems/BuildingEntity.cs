@@ -14,26 +14,50 @@ namespace MultiplayerARPG
     public class BuildingEntity : DamageableEntity, IBuildingSaveData
     {
         public const float BUILD_DISTANCE_BUFFER = 0.1f;
-        [Header("Building Data")]
-        [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
-        public string buildingType;
-        public List<string> buildingTypes;
-        [Tooltip("This is a distance that allows a player to build the building")]
-        public float buildDistance = 5f;
-        [Tooltip("If this is value `TRUE`, this entity will be destroyed when its parent building entity was destroyed")]
-        public bool destroyWhenParentDestroyed;
-        [Tooltip("Building's max HP. If its HP <= 0, it will be destroyed")]
-        public int maxHp = 100;
-        [Tooltip("If life time is <= 0, it's unlimit lifetime")]
-        public float lifeTime = 0f;
-        [Tooltip("Items which will be dropped when building destroyed")]
-        public List<ItemAmount> droppingItems;
-        [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
-        public float destroyDelay = 2f;
-        public UnityEvent onBuildingDestroy;
-        public UnityEvent onBuildingConstruct;
 
+        [Header("Building Data")]
+        [SerializeField]
+        [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
+        protected string buildingType;
+
+        [SerializeField]
+        protected List<string> buildingTypes;
+
+        [SerializeField]
+        [Tooltip("This is a distance that allows a player to build the building")]
+        protected float buildDistance = 5f;
+
+        [SerializeField]
+        [Tooltip("If this is value `TRUE`, this entity will be destroyed when its parent building entity was destroyed")]
+        protected bool destroyWhenParentDestroyed;
+
+        [SerializeField]
+        [Tooltip("Building's max HP. If its HP <= 0, it will be destroyed")]
+        protected int maxHp = 100;
+
+        [SerializeField]
+        [Tooltip("If life time is <= 0, it's unlimit lifetime")]
+        protected float lifeTime = 0f;
+
+        [SerializeField]
+        [Tooltip("Items which will be dropped when building destroyed")]
+        protected List<ItemAmount> droppingItems;
+
+        [SerializeField]
+        [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
+        protected float destroyDelay = 2f;
+
+        [Header("Events")]
+        [SerializeField]
+        protected UnityEvent onBuildingDestroy = new UnityEvent();
+
+        [SerializeField]
+        protected UnityEvent onBuildingConstruct = new UnityEvent();
+
+        public List<string> BuildingTypes { get { return buildingTypes; } }
+        public float BuildDistance { get { return buildDistance; } }
         public override int MaxHp { get { return maxHp; } }
+        public float LifeTime { get { return lifeTime; } }
 
         /// <summary>
         /// Use this as reference for area to build this object while in build mode
@@ -251,9 +275,9 @@ namespace MultiplayerARPG
                 return false;
             if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
                 return false;
-            if (Vector3.Distance(CacheTransform.position, Builder.CacheTransform.position) - BUILD_DISTANCE_BUFFER > buildDistance)
+            if (Vector3.Distance(CacheTransform.position, Builder.CacheTransform.position) - BUILD_DISTANCE_BUFFER > BuildDistance)
                 return false;
-            return buildingTypes.Contains(BuildingArea.buildingType);
+            return BuildingTypes.Contains(BuildingArea.buildingType);
         }
 
         protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
