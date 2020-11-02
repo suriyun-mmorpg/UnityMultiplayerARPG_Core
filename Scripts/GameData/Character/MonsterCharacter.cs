@@ -22,25 +22,65 @@ namespace MultiplayerARPG
     public partial class MonsterCharacter : BaseCharacter
     {
         [Header("Monster Data")]
-        public short defaultLevel = 1;
+        [SerializeField]
+        private short defaultLevel = 1;
+        public short DefaultLevel { get { return defaultLevel; } }
+        [SerializeField]
         [Tooltip("`Normal` will attack when being attacked, `Aggressive` will attack when enemy nearby, `Assist` will attack when other with same `Ally Id` being attacked.")]
-        public MonsterCharacteristic characteristic;
+        private MonsterCharacteristic characteristic;
+        public MonsterCharacteristic Characteristic { get { return characteristic; } }
+        [SerializeField]
         [Tooltip("This will work with assist characteristic only, to detect ally")]
-        public ushort allyId;
+        private ushort allyId;
+        public ushort AllyId { get { return allyId; } }
+        [SerializeField]
         [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
-        public float wanderMoveSpeed;
+        private float wanderMoveSpeed;
+        public float WanderMoveSpeed { get { return wanderMoveSpeed; } }
+        [SerializeField]
         [Tooltip("Range to see an enemies and allies")]
-        public float visualRange = 5f;
+        private float visualRange = 5f;
+        public float VisualRange { get { return visualRange; } }
         [SerializeField]
         private MonsterSkill[] monsterSkills;
 
         [Header("Weapon/Attack Abilities")]
         [SerializeField]
         private DamageInfo damageInfo;
+        public DamageInfo DamageInfo { get { return damageInfo; } }
         [SerializeField]
         private DamageIncremental damageAmount;
+        public DamageIncremental DamageAmount
+        {
+            get
+            {
+                // Adjust base stats by default level
+                if (defaultLevel <= 1)
+                {
+                    return damageAmount;
+                }
+                else
+                {
+                    if (!adjustDamageAmount.HasValue)
+                    {
+                        adjustDamageAmount = new DamageIncremental()
+                        {
+                            damageElement = damageAmount.damageElement,
+                            amount = new IncrementalMinMaxFloat()
+                            {
+                                baseAmount = damageAmount.amount.baseAmount + (damageAmount.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
+                                amountIncreaseEachLevel = damageAmount.amount.amountIncreaseEachLevel,
+                            }
+                        };
+                    }
+                    return adjustDamageAmount.Value;
+                }
+            }
+        }
         [SerializeField]
         private float moveSpeedRateWhileAttacking = 0f;
+        public float MoveSpeedRateWhileAttacking { get { return moveSpeedRateWhileAttacking; } }
+
 
         [Header("Killing Rewards")]
         [SerializeField]
@@ -54,8 +94,8 @@ namespace MultiplayerARPG
         [Tooltip("Max kind of items that will be dropped in ground")]
         [SerializeField]
         private byte maxDropItems = 5;
-        [ArrayElementTitle("item")]
         [SerializeField]
+        [ArrayElementTitle("item")]
         private ItemDrop[] randomItems;
         [SerializeField]
         private ItemDropTable itemDropTable;
@@ -235,44 +275,6 @@ namespace MultiplayerARPG
                     return adjustArmors;
                 }
             }
-        }
-
-        public DamageInfo DamageInfo
-        {
-            get { return damageInfo; }
-        }
-
-        public DamageIncremental DamageAmount
-        {
-            get
-            {
-                // Adjust base stats by default level
-                if (defaultLevel <= 1)
-                {
-                    return damageAmount;
-                }
-                else
-                {
-                    if (!adjustDamageAmount.HasValue)
-                    {
-                        adjustDamageAmount = new DamageIncremental()
-                        {
-                            damageElement = damageAmount.damageElement,
-                            amount = new IncrementalMinMaxFloat()
-                            {
-                                baseAmount = damageAmount.amount.baseAmount + (damageAmount.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
-                                amountIncreaseEachLevel = damageAmount.amount.amountIncreaseEachLevel,
-                            }
-                        };
-                    }
-                    return adjustDamageAmount.Value;
-                }
-            }
-        }
-
-        public float MoveSpeedRateWhileAttacking
-        {
-            get { return moveSpeedRateWhileAttacking; }
         }
 
         [System.NonSerialized]

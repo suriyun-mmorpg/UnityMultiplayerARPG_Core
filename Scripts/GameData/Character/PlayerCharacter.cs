@@ -18,17 +18,26 @@ namespace MultiplayerARPG
         private SkillLevel[] skillLevels;
 
         [Header("Start Equipments")]
-        public BaseItem rightHandEquipItem;
-        public BaseItem leftHandEquipItem;
-        public BaseItem[] armorItems;
+        [SerializeField]
+        private BaseItem rightHandEquipItem;
+        public BaseItem RightHandEquipItem { get { return rightHandEquipItem; } }
+        [SerializeField]
+        private BaseItem leftHandEquipItem;
+        public BaseItem LeftHandEquipItem { get { return leftHandEquipItem; } }
+        [SerializeField]
+        private BaseItem[] armorItems;
+        public BaseItem[] ArmorItems { get { return armorItems; } }
 
         [Header("Start Items")]
+        [SerializeField]
         [Tooltip("Items that will be added to character when create new character")]
         [ArrayElementTitle("item")]
-        public ItemAmount[] startItems;
+        private ItemAmount[] startItems;
+        public ItemAmount[] StartItems { get { return startItems; } }
 
         [Header("Start Map")]
-        public BaseMapInfo startMap;
+        [SerializeField]
+        private BaseMapInfo startMap;
         public BaseMapInfo StartMap
         {
             get
@@ -38,19 +47,16 @@ namespace MultiplayerARPG
                 return startMap;
             }
         }
-        public bool useOverrideStartPosition;
-        public Vector3 overrideStartPosition;
+        [SerializeField]
+        private bool useOverrideStartPosition;
+        [SerializeField]
+        private Vector3 overrideStartPosition;
         public Vector3 StartPosition
         {
             get
             {
                 return useOverrideStartPosition ? overrideStartPosition : StartMap.StartPosition;
             }
-        }
-
-        public SkillLevel[] SkillLevels
-        {
-            get { return skillLevels; }
         }
 
         [System.NonSerialized]
@@ -60,7 +66,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(SkillLevels, new Dictionary<BaseSkill, short>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, short>());
                 return cacheSkillLevels;
             }
         }

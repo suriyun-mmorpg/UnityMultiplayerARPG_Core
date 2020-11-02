@@ -112,7 +112,7 @@ namespace MultiplayerARPG
                 BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
                 if (targetMonster.IsSummoned)
                     return monsterCharacter.IsAlly(targetMonster.Summoner);
-                return targetMonster.CharacterDatabase.allyId == monsterCharacter.CharacterDatabase.allyId;
+                return targetMonster.CharacterDatabase.AllyId == monsterCharacter.CharacterDatabase.AllyId;
             }
 
             return false;

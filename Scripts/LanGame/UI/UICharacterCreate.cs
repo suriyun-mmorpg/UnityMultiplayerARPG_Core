@@ -286,7 +286,7 @@ namespace MultiplayerARPG
                 SelectedDataId = baseCharacter.DataId;
                 // Prepare equip items
                 List<CharacterItem> equipItems = new List<CharacterItem>();
-                foreach (BaseItem armorItem in SelectedPlayerCharacter.armorItems)
+                foreach (BaseItem armorItem in SelectedPlayerCharacter.ArmorItems)
                 {
                     if (armorItem == null)
                         continue;
@@ -296,10 +296,10 @@ namespace MultiplayerARPG
                 SelectedModel.SetEquipItems(equipItems);
                 // Prepare equip weapons
                 EquipWeapons equipWeapons = new EquipWeapons();
-                if (SelectedPlayerCharacter.rightHandEquipItem != null)
-                    equipWeapons.rightHand = CharacterItem.Create(SelectedPlayerCharacter.rightHandEquipItem);
-                if (SelectedPlayerCharacter.leftHandEquipItem != null)
-                    equipWeapons.leftHand = CharacterItem.Create(SelectedPlayerCharacter.leftHandEquipItem);
+                if (SelectedPlayerCharacter.RightHandEquipItem != null)
+                    equipWeapons.rightHand = CharacterItem.Create(SelectedPlayerCharacter.RightHandEquipItem);
+                if (SelectedPlayerCharacter.LeftHandEquipItem != null)
+                    equipWeapons.leftHand = CharacterItem.Create(SelectedPlayerCharacter.LeftHandEquipItem);
                 // Set model equip weapons
                 SelectedModel.SetEquipWeapons(equipWeapons);
             }

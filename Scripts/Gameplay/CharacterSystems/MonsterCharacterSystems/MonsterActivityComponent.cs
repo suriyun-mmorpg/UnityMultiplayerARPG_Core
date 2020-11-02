@@ -283,7 +283,7 @@ namespace MultiplayerARPG
         public bool FindEnemy(Vector3 currentPosition)
         {
             // Aggressive monster or summoned monster will find target to attack
-            if (MonsterDatabase.characteristic != MonsterCharacteristic.Aggressive &&
+            if (MonsterDatabase.Characteristic != MonsterCharacteristic.Aggressive &&
                 CacheEntity.Summoner == null)
                 return false;
 
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
                 List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(
-                    MonsterDatabase.visualRange,
+                    MonsterDatabase.VisualRange,
                     false, /* Don't find an allies */
                     true,  /* Always find an enemies */
                     CacheEntity.IsSummoned && isAggressiveWhileSummonerIdle /* Find enemy while summoned and aggresively */);
@@ -313,7 +313,7 @@ namespace MultiplayerARPG
                 if (!isAttackBuilding)
                     return false;
                 // Find building to attack
-                List<BuildingEntity> buildingEntities = CacheEntity.FindAliveDamageableEntities<BuildingEntity>(MonsterDatabase.visualRange, CurrentGameInstance.buildingLayer.Mask);
+                List<BuildingEntity> buildingEntities = CacheEntity.FindAliveDamageableEntities<BuildingEntity>(MonsterDatabase.VisualRange, CurrentGameInstance.buildingLayer.Mask);
                 foreach (BuildingEntity buildingEntity in buildingEntities)
                 {
                     // Attack target settings

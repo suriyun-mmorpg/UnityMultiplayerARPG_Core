@@ -129,7 +129,7 @@ namespace MultiplayerARPG
                 return;
 
             if (Level <= 0)
-                Level = CharacterDatabase.defaultLevel;
+                Level = CharacterDatabase.DefaultLevel;
 
             ForceMakeCaches();
             CharacterStats stats = this.GetCaches().Stats;
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
         public override float GetMoveSpeed()
         {
             if (ExtraMovementState.HasFlag(ExtraMovementState.IsWalking))
-                return CharacterDatabase.wanderMoveSpeed;
+                return CharacterDatabase.WanderMoveSpeed;
             return base.GetMoveSpeed();
         }
 
@@ -554,10 +554,10 @@ namespace MultiplayerARPG
 
         protected override void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
-            if (CharacterDatabase.characteristic != MonsterCharacteristic.Assist)
+            if (CharacterDatabase.Characteristic != MonsterCharacteristic.Assist)
                 return;
             // Warn that this character received damage to nearby characters
-            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(CharacterDatabase.visualRange, true, false, false);
+            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(CharacterDatabase.VisualRange, true, false, false);
             if (foundCharacters == null || foundCharacters.Count == 0) return;
             foreach (BaseCharacterEntity foundCharacter in foundCharacters)
             {
@@ -568,7 +568,7 @@ namespace MultiplayerARPG
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
         {
             if ((Summoner && Summoner == ally) ||
-                CharacterDatabase.characteristic == MonsterCharacteristic.Assist)
+                CharacterDatabase.Characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
 
