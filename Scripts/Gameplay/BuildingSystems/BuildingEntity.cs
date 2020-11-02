@@ -48,11 +48,8 @@ namespace MultiplayerARPG
         protected float destroyDelay = 2f;
 
         [Header("Events")]
-        [SerializeField]
-        protected UnityEvent onBuildingDestroy = new UnityEvent();
-
-        [SerializeField]
-        protected UnityEvent onBuildingConstruct = new UnityEvent();
+        public UnityEvent onBuildingDestroy = new UnityEvent();
+        public UnityEvent onBuildingConstruct = new UnityEvent();
 
         public List<string> BuildingTypes { get { return buildingTypes; } }
         public float BuildDistance { get { return buildDistance; } }

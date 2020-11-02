@@ -31,8 +31,7 @@ namespace MultiplayerARPG
         protected float destroyRespawnDelay = 5f;
 
         [Header("Events")]
-        [SerializeField]
-        protected UnityEvent onHarvestableDestroy = new UnityEvent();
+        public UnityEvent onHarvestableDestroy = new UnityEvent();
 
         public override string Title { get { return harvestable.Title; } set { } }
         public override int MaxHp { get { return maxHp; } }
