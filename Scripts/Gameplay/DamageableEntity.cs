@@ -103,8 +103,6 @@ namespace MultiplayerARPG
                             Model.InstantiateEffect(pendingHitEffects);
                     }
                     break;
-                case CombatAmountType.Miss:
-                    break;
             }
             pendingHitEffects = null;
         }
