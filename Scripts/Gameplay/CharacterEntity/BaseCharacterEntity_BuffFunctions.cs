@@ -31,7 +31,7 @@ namespace MultiplayerARPG
                 {
                     damageElement = damageOverTime.Key;
                     damageAmount = damageOverTime.Value;
-                    tempReceivingDamage = (float)damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
+                    tempReceivingDamage = (float)damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors, damageAmount.Random());
                     if (tempReceivingDamage > 0f)
                         tempAmount += (int)tempReceivingDamage;
                 }

@@ -155,21 +155,25 @@ namespace MultiplayerARPG
             return damage - (damage * blockDmgRate);
         }
 
-        public override float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, DamageElement damageElement)
+        public override float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount, DamageElement damageElement)
         {
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             // Reduce damage by resistance
-            float resistanceAmount = 0f;
-            damageReceiver.GetCaches().Resistances.TryGetValue(damageElement, out resistanceAmount);
-            if (resistanceAmount > damageElement.maxResistanceAmount)
-                resistanceAmount = damageElement.maxResistanceAmount;
-            damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
+            float resistanceAmount;
+            if (damageReceiverResistances.TryGetValue(damageElement, out resistanceAmount))
+            {
+                if (resistanceAmount > damageElement.maxResistanceAmount)
+                    resistanceAmount = damageElement.maxResistanceAmount;
+                damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
+            }
             // Reduce damage by armor
-            float armorAmount = 0f;
-            damageReceiver.GetCaches().Armors.TryGetValue(damageElement, out armorAmount);
-            // Formula: Attack * 100 / (100 + Defend)
-            damageAmount *= 100f / (100f + armorAmount);
+            float armorAmount;
+            if (damageReceiverArmors.TryGetValue(damageElement, out armorAmount))
+            {
+                // Formula: Attack * 100 / (100 + Defend)
+                damageAmount *= 100f / (100f + armorAmount);
+            }
             return damageAmount;
         }
 

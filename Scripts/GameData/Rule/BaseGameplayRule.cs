@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public abstract float GetCriticalDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
         public abstract float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetBlockDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
-        public abstract float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, DamageElement damageElement);
+        public abstract float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount, DamageElement damageElement);
         public abstract float GetRecoveryHpPerSeconds(BaseCharacterEntity character);
         public abstract float GetRecoveryMpPerSeconds(BaseCharacterEntity character);
         public abstract float GetRecoveryStaminaPerSeconds(BaseCharacterEntity character);

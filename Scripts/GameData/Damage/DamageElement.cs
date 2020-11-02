@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -10,9 +11,9 @@ namespace MultiplayerARPG
         public float maxResistanceAmount;
         public GameEffect[] damageHitEffects;
 
-        public float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount)
+        public float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount)
         {
-            return GameInstance.Singleton.GameplayRule.GetDamageReducedByResistance(damageReceiver, damageAmount, this);
+            return GameInstance.Singleton.GameplayRule.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, this);
         }
 
         public GameEffect[] GetDamageHitEffects()

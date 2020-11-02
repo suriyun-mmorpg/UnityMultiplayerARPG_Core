@@ -426,7 +426,6 @@ namespace MultiplayerARPG
         #region Inventory Helpers
         public bool CanEquipWeapon(CharacterItem equippingItem, byte equipWeaponSet, bool isLeftHand, out GameMessage.Type gameMessageType, out bool shouldUnequipRightHand, out bool shouldUnequipLeftHand)
         {
-            gameMessageType = GameMessage.Type.None;
             shouldUnequipRightHand = false;
             shouldUnequipLeftHand = false;
 
@@ -528,7 +527,6 @@ namespace MultiplayerARPG
 
         public bool CanEquipItem(CharacterItem equippingItem, byte equipSlotIndex, out GameMessage.Type gameMessageType, out int unEquippingIndex)
         {
-            gameMessageType = GameMessage.Type.None;
             unEquippingIndex = -1;
 
             if (equippingItem.GetArmorItem() == null)
@@ -583,7 +581,7 @@ namespace MultiplayerARPG
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
                 damageAmount = damageAmounts[damageElement];
-                calculatingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
+                calculatingDamage = damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors, damageAmount.Random());
                 if (calculatingDamage > 0f)
                     calculatingTotalDamage += calculatingDamage;
             }
