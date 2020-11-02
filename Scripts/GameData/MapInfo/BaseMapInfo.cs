@@ -19,6 +19,8 @@ namespace MultiplayerARPG
         public virtual Vector3 StartPosition { get { return startPosition; } }
         public virtual float DeadY { get { return deadY; } }
 
+        public virtual bool AutoRespawnWhenDead { get { return false; } }
+
         public virtual void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position)
         {
             mapName = playerCharacterData.RespawnMapName;
