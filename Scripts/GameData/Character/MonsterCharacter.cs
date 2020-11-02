@@ -23,6 +23,7 @@ namespace MultiplayerARPG
     {
         [Header("Monster Data")]
         [SerializeField]
+        [Tooltip("This will be used to adjust stats. If this value is 100, it means current stats which set to this character data it is stats for character level 100, it will be used to adjust stats for character level 1.")]
         private short defaultLevel = 1;
         public short DefaultLevel { get { return defaultLevel; } }
         [SerializeField]
@@ -119,7 +120,7 @@ namespace MultiplayerARPG
             {
                 if (cacheRandomItems == null)
                 {
-                    int i = 0;
+                    int i;
                     cacheRandomItems = new List<ItemDrop>();
                     if (randomItems != null &&
                         randomItems.Length > 0)
