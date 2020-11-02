@@ -39,6 +39,7 @@ namespace MultiplayerARPG
             public const ushort CashPackageBuyValidation = 103;
         }
 
+        public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
         public const string INSTANTIATES_OBJECTS_DELAY_STATE_KEY = "INSTANTIATES_OBJECTS_DELAY";
         public const float INSTANTIATES_OBJECTS_DELAY = 0.5f;
@@ -668,10 +669,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case ChatChannel.System:
-                    // TODO: Don't use fixed user level
-                    if (!string.IsNullOrEmpty(message.sender) &&
-                        TryGetPlayerCharacterByName(message.sender, out playerCharacter) &&
-                        playerCharacter.UserLevel > 0)
+                    if (CanSendSystemAnnounce(message.sender))
                     {
                         // Send message to all clients
                         ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
@@ -1147,6 +1145,29 @@ namespace MultiplayerARPG
                 isReadyToInstantiateObjects = true;
             }
             return true;
+        }
+
+        public bool CanSendSystemAnnounce(string sender)
+        {
+            // TODO: Don't use fixed user level
+            BasePlayerCharacterEntity playerCharacter;
+            return (!string.IsNullOrEmpty(sender) &&
+                    TryGetPlayerCharacterByName(sender, out playerCharacter) &&
+                    playerCharacter.UserLevel > 0) ||
+                    CHAT_SYSTEM_ANNOUNCER_SENDER.Equals(sender);
+        }
+
+        public void SendSystemAnnounce(string message)
+        {
+            NetDataWriter writer = new NetDataWriter();
+            ChatMessage chatMessage = new ChatMessage()
+            {
+                channel = ChatChannel.System,
+                sender = CHAT_SYSTEM_ANNOUNCER_SENDER,
+                message = message,
+            };
+            chatMessage.Serialize(writer);
+            HandleChatAtServer(new MessageHandlerData(MsgTypes.Chat, Server, -1, new NetDataReader(writer.CopyData())));
         }
     }
 }
