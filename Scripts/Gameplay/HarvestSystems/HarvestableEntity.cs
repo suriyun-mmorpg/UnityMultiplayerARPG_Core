@@ -61,7 +61,7 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            CurrentHp = maxHp;
+            CurrentHp = MaxHp;
         }
 
         public virtual void SetSpawnArea(HarvestableSpawnArea spawnArea, Vector3 spawnPosition)
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                 onHarvestableDestroy.Invoke();
         }
 
-        public void RequestOnHarvestableDestroy()
+        public void CallAllOnHarvestableDestroy()
         {
             RPC(AllOnHarvestableDestroy);
         }
@@ -150,10 +150,10 @@ namespace MultiplayerARPG
 
             // Do something when entity dead
             if (this.IsDead())
-                DestroyAndRespawn();
+                Destroy();
         }
 
-        public void DestroyAndRespawn()
+        public virtual void Destroy()
         {
             if (!IsServer)
                 return;
@@ -162,7 +162,7 @@ namespace MultiplayerARPG
                 return;
             isDestroyed = true;
             // Tell clients that the harvestable destroy to play animation at client
-            RequestOnHarvestableDestroy();
+            CallAllOnHarvestableDestroy();
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(destroyDelay + destroyRespawnDelay);
