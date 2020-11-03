@@ -758,7 +758,7 @@ namespace MultiplayerARPG
             GuildData guild;
             if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
                 return;
-            
+
             guild.AddSkillLevel(dataId);
             guilds[guildId] = guild;
             SendSetGuildSkillLevelToClients(guild, dataId);
@@ -773,7 +773,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
+            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition ||
+                !CurrentMapInfo.SaveCurrentMapPosition)
                 return playerCharacterEntity.RespawnMapName;
             return CurrentMapInfo.Id;
         }
@@ -785,7 +786,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition)
+            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition ||
+                !CurrentMapInfo.SaveCurrentMapPosition)
                 return playerCharacterEntity.RespawnPosition;
             return playerCharacterEntity.CacheTransform.position;
         }
