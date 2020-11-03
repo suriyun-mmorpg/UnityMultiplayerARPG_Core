@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         public const byte LeaderRole = 0;
 
-        public string guildName { get; private set; }
+        public string guildName;
         public short level;
         public int exp;
         public short skillPoint;
@@ -324,6 +324,7 @@ namespace MultiplayerARPG
         public override void Serialize(NetDataWriter writer)
         {
             base.Serialize(writer);
+            writer.Put(guildName);
             writer.Put(level);
             writer.Put(exp);
             writer.Put(skillPoint);
@@ -337,6 +338,7 @@ namespace MultiplayerARPG
         public override void Deserialize(NetDataReader reader)
         {
             base.Deserialize(reader);
+            guildName = reader.GetString();
             level = reader.GetShort();
             exp = reader.GetInt();
             skillPoint = reader.GetShort();
