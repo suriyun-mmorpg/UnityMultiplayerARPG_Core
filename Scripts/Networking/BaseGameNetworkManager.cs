@@ -227,6 +227,7 @@ namespace MultiplayerARPG
 
         public override void OnPeerConnected(long connectionId)
         {
+            this.InvokeInstanceDevExtMethods("OnPeerConnected", connectionId);
             base.OnPeerConnected(connectionId);
             SendMapInfo(connectionId);
         }
@@ -1159,6 +1160,8 @@ namespace MultiplayerARPG
 
         public void SendSystemAnnounce(string message)
         {
+            if (!IsServer)
+                return;
             NetDataWriter writer = new NetDataWriter();
             ChatMessage chatMessage = new ChatMessage()
             {
