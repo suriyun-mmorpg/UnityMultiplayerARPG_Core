@@ -44,6 +44,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private BaseGameplayRule gameplayRule;
         [SerializeField]
+        private BaseDayNightTimeUpdater dayNightTimeUpdater;
+        [SerializeField]
         private BaseGMCommands gmCommands;
         [SerializeField]
         private NetworkSetting networkSetting;
@@ -254,6 +256,11 @@ namespace MultiplayerARPG
             get { return gameplayRule; }
         }
 
+        public BaseDayNightTimeUpdater DayNightTimeUpdater
+        {
+            get { return dayNightTimeUpdater; }
+        }
+
         public BaseGMCommands GMCommands
         {
             get { return gmCommands; }
@@ -387,6 +394,10 @@ namespace MultiplayerARPG
             // Setup gameplay rule if not existed
             if (gameplayRule == null)
                 gameplayRule = ScriptableObject.CreateInstance<DefaultGameplayRule>();
+
+            // Setup day night time updater if not existed
+            if (dayNightTimeUpdater == null)
+                dayNightTimeUpdater = ScriptableObject.CreateInstance<DefaultDayNightTimeUpdater>();
 
             // Setup GM commands if not existed
             if (gmCommands == null)

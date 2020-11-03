@@ -29,6 +29,7 @@ namespace MultiplayerARPG
             public const ushort NotifyRewardExp = 114;
             public const ushort NotifyRewardGold = 115;
             public const ushort NotifyRewardItem = 116;
+            public const ushort UpdateTimeOfDay = 117;
         }
 
         public class ReqTypes
@@ -82,12 +83,17 @@ namespace MultiplayerARPG
         public System.Action<int> onNotifyRewardExp;
         public System.Action<int> onNotifyRewardGold;
         public System.Action<int, short> onNotifyRewardItem;
-        protected float lastUpdateOnlineCharacterTime;
+        protected float updateOnlineCharactersCountDown;
         protected float serverSceneLoadedTime;
         // Spawn entities events
         public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish;
+
+        public override uint PacketVersion()
+        {
+            return 3;
+        }
 
         public Dictionary<long, BasePlayerCharacterEntity>.ValueCollection GetPlayerCharacters()
         {
@@ -131,14 +137,21 @@ namespace MultiplayerARPG
         protected override void LateUpdate()
         {
             base.LateUpdate();
-            float tempUnscaledTime = Time.unscaledTime;
-            if (tempUnscaledTime - lastUpdateOnlineCharacterTime > UPDATE_ONLINE_CHARACTER_DURATION)
+            float tempDeltaTime = Time.unscaledDeltaTime;
+            if (IsServer)
             {
-                // Update social members, every seconds
-                // Update at server
-                if (IsServer)
+                updateOnlineCharactersCountDown -= tempDeltaTime;
+                if (updateOnlineCharactersCountDown <= 0f)
+                {
+                    updateOnlineCharactersCountDown = UPDATE_ONLINE_CHARACTER_DURATION;
+                    // Update social members, every seconds
                     UpdateOnlineCharacters();
-                lastUpdateOnlineCharacterTime = tempUnscaledTime;
+                }
+            }
+            if (IsNetworkActive)
+            {
+                // Update day-night time on both client and server, will sync from server sometime to make sure that clients time of day won't very difference
+                CurrentGameInstance.DayNightTimeUpdater.Update(tempDeltaTime);
             }
         }
 
@@ -160,6 +173,7 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.NotifyRewardExp, HandleNotifyRewardExpAtClient);
             RegisterClientMessage(MsgTypes.NotifyRewardGold, HandleNotifyRewardGoldAtClient);
             RegisterClientMessage(MsgTypes.NotifyRewardItem, HandleNotifyRewardItemAtClient);
+            RegisterClientMessage(MsgTypes.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
             // Responses
             RegisterClientResponse<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo);
             RegisterClientResponse<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo);
@@ -204,6 +218,7 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
+            CurrentGameInstance.DayNightTimeUpdater.Init(this);
         }
 
         public override void OnStopServer()
@@ -230,6 +245,7 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("OnPeerConnected", connectionId);
             base.OnPeerConnected(connectionId);
             SendMapInfo(connectionId);
+            SendTimeOfDay(connectionId);
         }
 
         public static void NotifyOnlineCharacter(string characterId)
@@ -511,6 +527,11 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
             SetMapInfo(message.mapId);
+        }
+
+        protected virtual void HandleUpdateDayNightTimeAtClient(MessageHandlerData messageHandler)
+        {
+            UpdateTimeOfDayMessage message = messageHandler.ReadMessage<UpdateTimeOfDayMessage>();
         }
 
         protected virtual void HandleUpdateFoundCharactersAtClient(MessageHandlerData messageHandler)
@@ -1130,6 +1151,25 @@ namespace MultiplayerARPG
             UpdateMapInfoMessage message = new UpdateMapInfoMessage();
             message.mapId = CurrentMapInfo.Id;
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.UpdateMapInfo, message);
+        }
+
+        public void SendTimeOfDay()
+        {
+            if (!IsServer)
+                return;
+            foreach (long connectionId in ConnectionIds)
+            {
+                SendTimeOfDay(connectionId);
+            }
+        }
+
+        public void SendTimeOfDay(long connectionId)
+        {
+            if (!IsServer)
+                return;
+            UpdateTimeOfDayMessage message = new UpdateTimeOfDayMessage();
+            message.timeOfDay = CurrentGameInstance.DayNightTimeUpdater.TimeOfDay;
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.UpdateTimeOfDay, message);
         }
 
         public bool IsReadyToInstantiateObjects()
