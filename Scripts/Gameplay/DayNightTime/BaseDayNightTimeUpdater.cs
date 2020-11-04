@@ -9,7 +9,8 @@ namespace MultiplayerARPG
         public float TimeOfDay { get; protected set; }
 
         /// <summary>
-        /// Init day of time, this function will be called at server to init time 
+        /// Init day of time, this function will be called at server to init time of day.
+        /// For an offline games which may load saved time of day, developer may implement time of day loading in this function
         /// </summary>
         /// <returns>Current time of day (0-24)</returns>
         public abstract void InitTimeOfDay(BaseGameNetworkManager manager);
