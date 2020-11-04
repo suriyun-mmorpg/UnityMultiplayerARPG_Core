@@ -150,8 +150,8 @@ namespace MultiplayerARPG
             }
             if (IsNetworkActive)
             {
-                // Update day-night time on both client and server, will sync from server sometime to make sure that clients time of day won't very difference
-                CurrentGameInstance.DayNightTimeUpdater.Update(tempDeltaTime);
+                // Update day-night time on both client and server. It will sync from server some time to make sure that clients time of day won't very difference
+                CurrentGameInstance.DayNightTimeUpdater.UpdateTimeOfDay(tempDeltaTime);
             }
         }
 
@@ -218,7 +218,7 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
-            CurrentGameInstance.DayNightTimeUpdater.Init(this);
+            CurrentGameInstance.DayNightTimeUpdater.InitTimeOfDay(this);
         }
 
         public override void OnStopServer()

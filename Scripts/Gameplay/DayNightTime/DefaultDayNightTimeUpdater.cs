@@ -15,14 +15,15 @@ namespace MultiplayerARPG
         [Range(0, 23)]
         private int startHourOfDay = 12;
 
-        public override void Init(BaseGameNetworkManager manager)
+        public override void InitTimeOfDay(BaseGameNetworkManager manager)
         {
             // Initial time of day based on real world time of day
             double totalSeconds = DateTime.Now.TimeOfDay.TotalSeconds;
-            TimeOfDay = startHourOfDay;
+            TimeOfDay = ((float)(totalSeconds / (secondsToOneDay / 24f)) % 24f) + startHourOfDay;
+            TimeOfDay %= 24;
         }
 
-        public override void Update(float deltaTime)
+        public override void UpdateTimeOfDay(float deltaTime)
         {
             TimeOfDay += Time.deltaTime / (secondsToOneDay / 24f);
             TimeOfDay %= 24; // Modulus to ensure always between 0-24
