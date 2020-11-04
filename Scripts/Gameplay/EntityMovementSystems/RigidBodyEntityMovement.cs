@@ -59,6 +59,7 @@ namespace MultiplayerARPG
         }
 
         // Movement codes
+        private PhysicFunctions physicFunctions;
         private float airborneElapsed;
         private bool isUnderWater;
         private bool isJumping;
@@ -86,6 +87,7 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
+            physicFunctions = new PhysicFunctions(30);
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
             // Prepare network transform component
@@ -290,16 +292,18 @@ namespace MultiplayerARPG
 
         public override void Teleport(Vector3 position)
         {
-            CacheNetTransform.Teleport(position + Vector3.up * GROUND_BUFFER, Quaternion.Euler(0, CacheEntity.MovementTransform.eulerAngles.y, 0));
+            CacheNetTransform.Teleport(position + (Vector3.up * GROUND_BUFFER), Quaternion.Euler(0, CacheEntity.MovementTransform.eulerAngles.y, 0));
         }
 
         public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
-            RaycastHit hit;
-            if (Physics.Raycast(fromPosition, Vector3.down, out hit, findDistance, CacheOpenCharacterController.GetCollisionLayerMask(), QueryTriggerInteraction.Ignore))
+            int foundCount = physicFunctions.RaycastDown(fromPosition, Physics.DefaultRaycastLayers, findDistance);
+            for (int i = 0; i < foundCount; ++i)
             {
-                result = hit.point;
+                if (physicFunctions.GetRaycastTransform(i).root == CacheTransform.root)
+                    continue;
+                result = physicFunctions.GetRaycastPoint(i);
                 return true;
             }
             return false;

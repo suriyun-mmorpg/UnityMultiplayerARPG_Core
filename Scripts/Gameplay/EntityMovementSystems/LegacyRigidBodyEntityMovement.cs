@@ -51,6 +51,7 @@ namespace MultiplayerARPG
         }
 
         // Movement codes
+        private PhysicFunctions physicFunctions;
         private bool isGrounded;
         private bool isUnderWater;
         private bool isJumping;
@@ -79,6 +80,7 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
+            physicFunctions = new PhysicFunctions(30);
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
             // Prepare network transform component
@@ -269,10 +271,12 @@ namespace MultiplayerARPG
         public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
-            RaycastHit hit;
-            if (Physics.Raycast(fromPosition, Vector3.down, out hit, findDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            int foundCount = physicFunctions.RaycastDown(fromPosition, Physics.DefaultRaycastLayers, findDistance);
+            for (int i = 0; i < foundCount; ++i)
             {
-                result = hit.point;
+                if (physicFunctions.GetRaycastTransform(i).root == CacheTransform.root)
+                    continue;
+                result = physicFunctions.GetRaycastPoint(i);
                 return true;
             }
             return false;
