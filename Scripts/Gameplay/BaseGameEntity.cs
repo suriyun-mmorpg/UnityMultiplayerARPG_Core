@@ -269,6 +269,7 @@ namespace MultiplayerARPG
         }
 
         protected IGameEntityComponent[] EntityComponents { get; private set; }
+        protected virtual bool UpdateEntityComponents { get { return true; } }
 
         #region Enter Area States
         // This will be TRUE when this character enter to safe area
@@ -397,10 +398,13 @@ namespace MultiplayerARPG
         private void Update()
         {
             Profiler.BeginSample("Entity Components - Update");
-            for (int i = 0; i < EntityComponents.Length; ++i)
+            if (UpdateEntityComponents)
             {
-                if (EntityComponents[i].Enabled)
-                    EntityComponents[i].EntityUpdate();
+                for (int i = 0; i < EntityComponents.Length; ++i)
+                {
+                    if (EntityComponents[i].Enabled)
+                        EntityComponents[i].EntityUpdate();
+                }
             }
             Profiler.EndSample();
             EntityUpdate();
@@ -445,10 +449,13 @@ namespace MultiplayerARPG
         private void LateUpdate()
         {
             Profiler.BeginSample("Entity Components - LateUpdate");
-            for (int i = 0; i < EntityComponents.Length; ++i)
+            if (UpdateEntityComponents)
             {
-                if (EntityComponents[i].Enabled)
-                    EntityComponents[i].EntityLateUpdate();
+                for (int i = 0; i < EntityComponents.Length; ++i)
+                {
+                    if (EntityComponents[i].Enabled)
+                        EntityComponents[i].EntityLateUpdate();
+                }
             }
             Profiler.EndSample();
             EntityLateUpdate();
@@ -473,10 +480,13 @@ namespace MultiplayerARPG
         private void FixedUpdate()
         {
             Profiler.BeginSample("Entity Components - FixedUpdate");
-            for (int i = 0; i < EntityComponents.Length; ++i)
+            if (UpdateEntityComponents)
             {
-                if (EntityComponents[i].Enabled)
-                    EntityComponents[i].EntityFixedUpdate();
+                for (int i = 0; i < EntityComponents.Length; ++i)
+                {
+                    if (EntityComponents[i].Enabled)
+                        EntityComponents[i].EntityFixedUpdate();
+                }
             }
             Profiler.EndSample();
             EntityFixedUpdate();

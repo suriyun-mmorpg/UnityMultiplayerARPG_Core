@@ -80,6 +80,15 @@ namespace MultiplayerARPG
         public override int DataId { get { return CharacterDatabase.DataId; } set { } }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
+        protected override bool UpdateEntityComponents
+        {
+            get
+            {
+                if (IsServer && Identity.CountSubscribers() == 0)
+                    return false;
+                return true;
+            }
+        }
 
         private readonly HashSet<uint> looters = new HashSet<uint>();
 
