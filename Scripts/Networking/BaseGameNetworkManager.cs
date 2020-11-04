@@ -42,6 +42,7 @@ namespace MultiplayerARPG
 
         public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
+        public const float UPDATE_TIME_OF_DAY_DURATION = 5f;
         public const string INSTANTIATES_OBJECTS_DELAY_STATE_KEY = "INSTANTIATES_OBJECTS_DELAY";
         public const float INSTANTIATES_OBJECTS_DELAY = 0.5f;
 
@@ -84,6 +85,7 @@ namespace MultiplayerARPG
         public System.Action<int> onNotifyRewardGold;
         public System.Action<int, short> onNotifyRewardItem;
         protected float updateOnlineCharactersCountDown;
+        protected float updateTimeOfDayCountDown;
         protected float serverSceneLoadedTime;
         // Spawn entities events
         public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
@@ -144,8 +146,13 @@ namespace MultiplayerARPG
                 if (updateOnlineCharactersCountDown <= 0f)
                 {
                     updateOnlineCharactersCountDown = UPDATE_ONLINE_CHARACTER_DURATION;
-                    // Update social members, every seconds
                     UpdateOnlineCharacters();
+                }
+                updateTimeOfDayCountDown -= tempDeltaTime;
+                if (updateTimeOfDayCountDown <= 0f)
+                {
+                    updateTimeOfDayCountDown = UPDATE_TIME_OF_DAY_DURATION;
+                    SendTimeOfDay();
                 }
             }
             if (IsNetworkActive)
@@ -531,7 +538,11 @@ namespace MultiplayerARPG
 
         protected virtual void HandleUpdateDayNightTimeAtClient(MessageHandlerData messageHandler)
         {
+            // Don't set time of day again at server
+            if (IsServer)
+                return;
             UpdateTimeOfDayMessage message = messageHandler.ReadMessage<UpdateTimeOfDayMessage>();
+            CurrentGameInstance.DayNightTimeUpdater.SetTimeOfDay(message.timeOfDay);
         }
 
         protected virtual void HandleUpdateFoundCharactersAtClient(MessageHandlerData messageHandler)

@@ -20,5 +20,15 @@ namespace MultiplayerARPG
         /// <param name="deltaTime"></param>
         /// <returns>Current time of day (0-24)</returns>
         public abstract void UpdateTimeOfDay(float deltaTime);
+
+        /// <summary>
+        /// This function will be called when receive update time of day message from server
+        /// </summary>
+        /// <param name="timeOfDay"></param>
+        /// <param name=""></param>
+        public virtual void SetTimeOfDay(float timeOfDay)
+        {
+            TimeOfDay = timeOfDay;
+        }
     }
 }
