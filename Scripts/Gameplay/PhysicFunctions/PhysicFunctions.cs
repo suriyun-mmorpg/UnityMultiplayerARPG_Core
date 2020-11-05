@@ -15,20 +15,20 @@ namespace MultiplayerARPG
             overlapColliders = new Collider[allocSize];
         }
 
-        public int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask)
+        public int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            return PhysicUtils.SortedRaycastNonAlloc3D(origin, direction, raycasts, distance, layerMask);
+            return PhysicUtils.SortedRaycastNonAlloc3D(origin, direction, raycasts, distance, layerMask, queryTriggerInteraction);
         }
 
-        public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 worldPosition2D)
+        public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 worldPosition2D, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
             worldPosition2D = Vector3.zero;
-            return PhysicUtils.SortedRaycastNonAlloc3D(camera.ScreenPointToRay(mousePosition), raycasts, distance, layerMask);
+            return PhysicUtils.SortedRaycastNonAlloc3D(camera.ScreenPointToRay(mousePosition), raycasts, distance, layerMask, queryTriggerInteraction);
         }
 
-        public int RaycastDown(Vector3 position, int layerMask, float distance = 100f)
+        public int RaycastDown(Vector3 position, int layerMask, float distance = 100f, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            return PhysicUtils.SortedRaycastNonAlloc3D(position + (Vector3.up * distance * 0.5f), Vector3.down, raycasts, distance, layerMask);
+            return PhysicUtils.SortedRaycastNonAlloc3D(position + (Vector3.up * distance * 0.5f), Vector3.down, raycasts, distance, layerMask, queryTriggerInteraction);
         }
 
         public bool GetRaycastIsTrigger(int index)
@@ -71,10 +71,10 @@ namespace MultiplayerARPG
             return raycasts[index].collider.gameObject;
         }
 
-        public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false)
+        public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            return sort ? PhysicUtils.SortedOverlapSphereNonAlloc(position, radius, overlapColliders, layerMask) :
-                Physics.OverlapSphereNonAlloc(position, radius, overlapColliders, layerMask);
+            return sort ? PhysicUtils.SortedOverlapSphereNonAlloc(position, radius, overlapColliders, layerMask, queryTriggerInteraction) :
+                Physics.OverlapSphereNonAlloc(position, radius, overlapColliders, layerMask, queryTriggerInteraction);
         }
 
         public GameObject GetOverlapObject(int index)

@@ -795,7 +795,6 @@ namespace MultiplayerARPG
         public virtual void SetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity, Vector3 position)
         {
             playerCharacterEntity.Teleport(position);
-            playerCharacterEntity.CacheTransform.position = position;
         }
 
         public void WarpCharacter(WarpPortalType warpPortalType, BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)

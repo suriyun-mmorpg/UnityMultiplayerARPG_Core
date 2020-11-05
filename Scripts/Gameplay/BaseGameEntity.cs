@@ -11,6 +11,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibIdentity))]
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
+        public const float GROUND_DETECTION_DISTANCE = 30f;
+
         public int EntityId
         {
             get { return Identity.HashAssetId; }
@@ -773,6 +775,9 @@ namespace MultiplayerARPG
                 teleportingPosition = position;
                 return;
             }
+            Vector3 groundedPosition;
+            if (FindGroundedPosition(position, GROUND_DETECTION_DISTANCE, out groundedPosition))
+                position = groundedPosition;
             OnTeleport(position);
             ActiveMovement.Teleport(position);
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)

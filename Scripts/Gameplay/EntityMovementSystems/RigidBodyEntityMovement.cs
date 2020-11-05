@@ -298,7 +298,7 @@ namespace MultiplayerARPG
         public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
-            int foundCount = physicFunctions.RaycastDown(fromPosition, Physics.DefaultRaycastLayers, findDistance);
+            int foundCount = physicFunctions.RaycastDown(fromPosition, Physics.DefaultRaycastLayers, findDistance, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < foundCount; ++i)
             {
                 if (physicFunctions.GetRaycastTransform(i).root == CacheTransform.root)
