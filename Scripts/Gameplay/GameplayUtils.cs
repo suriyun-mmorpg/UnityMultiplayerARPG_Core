@@ -51,43 +51,23 @@ namespace MultiplayerARPG
 
         public static DirectionType2D GetDirectionTypeByVector2(Vector2 direction)
         {
-            float absX = Mathf.Abs(direction.x);
-            float absY = Mathf.Abs(direction.y);
-            if (absX / absY > 0.8f)
-            {
-                if (direction.x < 0) return DirectionType2D.Left;
-                if (direction.x > 0) return DirectionType2D.Right;
-            }
-            else if (absY / absX > 0.8f)
-            {
-                if (direction.y < 0) return DirectionType2D.Down;
-                if (direction.y > 0) return DirectionType2D.Up;
-            }
-            else
-            {
-                DirectionType2D result = DirectionType2D.Down;
-                if (direction.x > 0.01f)
-                {
-                    result = DirectionType2D.Left;
-                    if (direction.y > 0.01f)
-                        result |= DirectionType2D.Up;
-                    if (direction.y < -0.01f)
-                        result |= DirectionType2D.Down;
-                }
-                else if (direction.x < -0.01f)
-                {
-                    result = DirectionType2D.Right;
-                    if (direction.y > 0.01f)
-                        result |= DirectionType2D.Up;
-                    if (direction.y < -0.01f)
-                        result |= DirectionType2D.Down;
-                }
-                else if (direction.y > 0.01f)
-                {
-                    result = DirectionType2D.Up;
-                }
-                return result;
-            }
+            float angle = Vector2.SignedAngle(direction, Vector2.down);
+            if (angle < 0)
+                angle += 360f;
+            if (angle > 22.5f && angle <= 67.5f)
+                return DirectionType2D.DownLeft;
+            else if (angle > 67.5f && angle <= 112.5f)
+                return DirectionType2D.Left;
+            else if (angle > 112.5f && angle <= 157.5f)
+                return DirectionType2D.UpLeft;
+            else if (angle > 157.5f && angle <= 202.5f)
+                return DirectionType2D.Up;
+            else if (angle > 202.5f && angle <= 247.5f)
+                return DirectionType2D.UpRight;
+            else if (angle > 247.5f && angle <= 292.5f)
+                return DirectionType2D.Right;
+            else if (angle > 292.5f && angle <= 337.5f)
+                return DirectionType2D.DownRight;
             return DirectionType2D.Down;
         }
 
