@@ -35,8 +35,7 @@ namespace MultiplayerARPG
 
         public bool CanCraft(IPlayerCharacterData character)
         {
-            GameMessage.Type gameMessageType;
-            return CanCraft(character, out gameMessageType);
+            return CanCraft(character, out _);
         }
 
         public bool CanCraft(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
