@@ -14,15 +14,16 @@ namespace MultiplayerARPG
         {
             maxDurability = 0f;
             repairPrice = default(ItemRepairPrice);
-            gameMessageType = GameMessage.Type.CannotRepair;
             if (!this.IsEquipment())
             {
                 // Cannot repair because it's not equipment item
+                gameMessageType = GameMessage.Type.CannotRepair;
                 return false;
             }
             if (itemRefine == null)
             {
                 // Cannot repair because there is no item refine info
+                gameMessageType = GameMessage.Type.CannotRepair;
                 return false;
             }
             repairPrice = GetRepairPrice(durability, out maxDurability);

@@ -97,7 +97,6 @@ namespace MultiplayerARPG
 
         public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out GameMessage.Type gameMessageType, bool isItem = false)
         {
-            gameMessageType = GameMessage.Type.None;
             if (!base.CanUse(character, level, isLeftHand, out gameMessageType, isItem))
                 return false;
             

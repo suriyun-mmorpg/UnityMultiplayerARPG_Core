@@ -45,16 +45,18 @@ namespace MultiplayerARPG
 
         private static void EnhanceSocketItem(IPlayerCharacterData character, CharacterItem enhancingItem, int enhancerId, System.Action<CharacterItem> onEnhanceSocket, out GameMessage.Type gameMessageType)
         {
-            gameMessageType = GameMessage.Type.CannotEnhanceSocket;
+            gameMessageType = GameMessage.Type.None;
             if (enhancingItem.IsEmptySlot())
             {
                 // Cannot enhance socket because character item is empty
+                gameMessageType = GameMessage.Type.CannotEnhanceSocket;
                 return;
             }
             IEquipmentItem equipmentItem = enhancingItem.GetEquipmentItem();
             if (equipmentItem == null)
             {
                 // Cannot enhance socket because it's not equipment item
+                gameMessageType = GameMessage.Type.CannotEnhanceSocket;
                 return;
             }
             byte maxSocket = GameInstance.Singleton.GameplayRule.GetItemMaxSocket(character, enhancingItem);
@@ -74,6 +76,7 @@ namespace MultiplayerARPG
             if (!GameInstance.Items.TryGetValue(enhancerId, out enhancerItem) || !enhancerItem.IsSocketEnhancer())
             {
                 // Cannot enhance socket because enhancer id is invalid
+                gameMessageType = GameMessage.Type.CannotEnhanceSocket;
                 return;
             }
             if (character.CountNonEquipItems(enhancerId) == 0)

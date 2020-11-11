@@ -12,15 +12,16 @@ namespace MultiplayerARPG
 
         public bool CanRefine(IPlayerCharacterData character, short level, out GameMessage.Type gameMessageType)
         {
-            gameMessageType = GameMessage.Type.CannotRefine;
             if (!this.IsEquipment())
             {
                 // Cannot refine because it's not equipment item
+                gameMessageType = GameMessage.Type.CannotRefine;
                 return false;
             }
             if (ItemRefine == null)
             {
                 // Cannot refine because there is no item refine info
+                gameMessageType = GameMessage.Type.CannotRefine;
                 return false;
             }
             if (level >= ItemRefine.levels.Length)
