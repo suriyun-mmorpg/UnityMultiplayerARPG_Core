@@ -1,0 +1,172 @@
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace MultiplayerARPG
+{
+    public partial class UICharacterItems : UIBase
+    {
+        public UICharacterItem uiItemDialog;
+        public List<string> filterCategories;
+        public List<ItemType> filterItemTypes;
+        [FormerlySerializedAs("uiCharacterItemPrefab")]
+        public UICharacterItem uiPrefab;
+        [FormerlySerializedAs("uiCharacterItemContainer")]
+        public Transform uiContainer;
+
+        public virtual ICharacterData Character { get; set; }
+
+        private UIList cacheItemList;
+        public UIList CacheItemList
+        {
+            get
+            {
+                if (cacheItemList == null)
+                {
+                    cacheItemList = gameObject.AddComponent<UIList>();
+                    cacheItemList.uiPrefab = uiPrefab.gameObject;
+                    cacheItemList.uiContainer = uiContainer;
+                }
+                return cacheItemList;
+            }
+        }
+
+        private UICharacterItemSelectionManager cacheItemSelectionManager;
+        public UICharacterItemSelectionManager CacheItemSelectionManager
+        {
+            get
+            {
+                if (cacheItemSelectionManager == null)
+                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
+                return cacheItemSelectionManager;
+            }
+        }
+
+        private UISelectionMode dirtySelectionMode;
+
+        protected virtual void OnEnable()
+        {
+            CacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
+        }
+
+        protected virtual void OnDisable()
+        {
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+            CacheItemSelectionManager.DeselectSelectedUI();
+        }
+
+        protected void OnItemDialogHide()
+        {
+            CacheItemSelectionManager.DeselectSelectedUI();
+        }
+
+        protected void OnSelectCharacterItem(UICharacterItem ui)
+        {
+            if (ui.Data.characterItem.IsEmptySlot())
+            {
+                CacheItemSelectionManager.DeselectSelectedUI();
+                return;
+            }
+            if (uiItemDialog != null && CacheItemSelectionManager.selectionMode == UISelectionMode.SelectSingle)
+            {
+                uiItemDialog.selectionManager = CacheItemSelectionManager;
+                uiItemDialog.Setup(ui.Data, Character, ui.IndexOfData);
+                uiItemDialog.Show();
+            }
+        }
+
+        protected void OnDeselectCharacterItem(UICharacterItem ui)
+        {
+            if (uiItemDialog != null && CacheItemSelectionManager.selectionMode == UISelectionMode.SelectSingle)
+            {
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+                uiItemDialog.Hide();
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
+            }
+        }
+
+        public void UpdateData(ICharacterData character, IList<CharacterItem> characterItems)
+        {
+            Character = character;
+            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
+            CacheItemSelectionManager.DeselectSelectedUI();
+            CacheItemSelectionManager.Clear();
+
+            if (character == null || characterItems == null || characterItems.Count == 0)
+            {
+                CacheItemList.HideAll();
+                return;
+            }
+
+            // Filter items to show by specific item types
+            BaseItem tempItem;
+            UICharacterItem tempUiCharacterItem;
+            CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
+            {
+                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
+                tempItem = characterItem.GetItem();
+                if (!GameInstance.Singleton.IsLimitInventorySlot ||
+                    (filterCategories != null && filterCategories.Count > 0) ||
+                    (filterItemTypes != null && filterItemTypes.Count > 0))
+                {
+                    // If inventory type isn't limit inventory slot, hide empty slot
+                    if (tempItem == null)
+                    {
+                        tempUiCharacterItem.Hide();
+                        return;
+                    }
+                }
+
+                if (tempItem == null ||
+                    string.IsNullOrEmpty(tempItem.category) ||
+                    filterCategories == null || filterCategories.Count == 0 ||
+                    filterCategories.Contains(tempItem.category))
+                {
+                    if (filterItemTypes == null || filterItemTypes.Count == 0 ||
+                        filterItemTypes.Contains(tempItem.ItemType))
+                    {
+                        tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), Character, index);
+                        tempUiCharacterItem.Show();
+                        UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
+                        if (dragHandler != null)
+                            dragHandler.SetupForNonEquipItems(tempUiCharacterItem);
+                        CacheItemSelectionManager.Add(tempUiCharacterItem);
+                        if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
+                            tempUiCharacterItem.OnClickSelect();
+                    }
+                    else
+                    {
+                        tempUiCharacterItem.Hide();
+                    }
+                }
+                else
+                {
+                    tempUiCharacterItem.Hide();
+                }
+            });
+        }
+
+        protected virtual void Update()
+        {
+            if (CacheItemSelectionManager.selectionMode != dirtySelectionMode)
+            {
+                CacheItemSelectionManager.DeselectAll();
+                dirtySelectionMode = CacheItemSelectionManager.selectionMode;
+                if (uiItemDialog != null)
+                {
+                    uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+                    uiItemDialog.Hide();
+                    uiItemDialog.onHide.AddListener(OnItemDialogHide);
+                }
+            }
+        }
+    }
+}

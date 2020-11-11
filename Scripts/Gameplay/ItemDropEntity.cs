@@ -9,7 +9,6 @@ namespace MultiplayerARPG
 {
     public class ItemDropEntity : BaseGameEntity
     {
-        public const float GROUND_DETECTION_DISTANCE = 100f;
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];

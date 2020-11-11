@@ -20,8 +20,20 @@ namespace MultiplayerARPG
             }
         }
 
+        public int SelectedSocketIndex
+        {
+            get
+            {
+                if (uiAppliedSocketEnhancerItems.CacheItemSelectionManager != null &&
+                    uiAppliedSocketEnhancerItems.CacheItemSelectionManager.SelectedUI != null)
+                    return uiAppliedSocketEnhancerItems.CacheItemSelectionManager.SelectedUI.IndexOfData;
+                return -1;
+            }
+        }
+
         [Header("UI Elements for UI Enhance Socket Item")]
         public UINonEquipItems uiSocketEnhancerItems;
+        public UICharacterItems uiAppliedSocketEnhancerItems;
 
         protected bool activated;
         protected string activeItemId;
@@ -61,6 +73,24 @@ namespace MultiplayerARPG
                 uiSocketEnhancerItems.filterCategories = new List<string>();
                 uiSocketEnhancerItems.UpdateData(OwningCharacter);
             }
+
+            if (uiAppliedSocketEnhancerItems != null)
+            {
+                uiAppliedSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
+                uiAppliedSocketEnhancerItems.filterCategories = new List<string>();
+                List<CharacterItem> characterItems = new List<CharacterItem>();
+                if (EquipmentItem != null)
+                {
+                    for (int i = 0; i < characterItem.Sockets.Count; ++i)
+                    {
+                        if (characterItem.Sockets[i] == 0)
+                            characterItems.Add(CharacterItem.CreateEmptySlot());
+                        else
+                            characterItems.Add(CharacterItem.Create(characterItem.Sockets[i]));
+                    }
+                }
+                uiAppliedSocketEnhancerItems.UpdateData(OwningCharacter, characterItems);
+            }
         }
 
         public override void Show()
@@ -82,7 +112,16 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            OwningCharacter.CallServerEnhanceSocketItem(InventoryType, (short)IndexOfData, SelectedEnhancerId);
+            OwningCharacter.CallServerEnhanceSocketItem(InventoryType, (short)IndexOfData, SelectedEnhancerId, -1);
+        }
+
+        public void OnClickRemoveEnhancer()
+        {
+            if (CharacterItem.IsEmptySlot() || SelectedSocketIndex < 0)
+                return;
+            activated = true;
+            activeItemId = CharacterItem.id;
+            OwningCharacter.CallServerRemoveEnhancerFromItem(InventoryType, (short)IndexOfData, (short)SelectedSocketIndex);
         }
     }
 }

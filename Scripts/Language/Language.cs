@@ -698,7 +698,10 @@ namespace MultiplayerARPG
             // Enhance
             Texts.Add(GameMessage.Type.CannotEnhanceSocket.ToString(), "Cannot enhance the item");
             Texts.Add(GameMessage.Type.NotEnoughSocketEnchaner.ToString(), "Have not enough items");
-            Texts.Add(GameMessage.Type.NoEmptySocket.ToString(), "No empty slot");
+            Texts.Add(GameMessage.Type.NoEmptySocket.ToString(), "No empty socket");
+            Texts.Add(GameMessage.Type.SocketNotEmpty.ToString(), "Socket is not empty");
+            Texts.Add(GameMessage.Type.CannotRemoveEnhancer.ToString(), "Cannot remove enhancer item from socket");
+            Texts.Add(GameMessage.Type.NoEnhancer.ToString(), "Socket is empty");
             // Repair
             Texts.Add(GameMessage.Type.CannotRepair.ToString(), "Cannot repair the item");
             Texts.Add(GameMessage.Type.RepairSuccess.ToString(), "Repair success");

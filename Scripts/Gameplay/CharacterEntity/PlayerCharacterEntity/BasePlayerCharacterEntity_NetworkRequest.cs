@@ -284,11 +284,19 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
+        public bool CallServerEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId, short socketIndex)
         {
             if (this.IsDead())
                 return false;
-            RPC(ServerEnhanceSocketItem, inventoryType, index, enhancerId);
+            RPC(ServerEnhanceSocketItem, inventoryType, index, enhancerId, socketIndex);
+            return true;
+        }
+
+        public bool CallServerRemoveEnhancerFromItem(InventoryType inventoryType, short index, short socketIndex)
+        {
+            if (this.IsDead())
+                return false;
+            RPC(ServerRemoveEnhancerFromItem, inventoryType, index, socketIndex);
             return true;
         }
 

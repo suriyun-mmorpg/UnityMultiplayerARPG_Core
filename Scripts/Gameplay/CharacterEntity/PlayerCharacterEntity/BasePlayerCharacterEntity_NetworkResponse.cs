@@ -379,7 +379,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId)
+        protected void ServerEnhanceSocketItem(InventoryType inventoryType, short index, int enhancerId, short socketIndex)
         {
 #if !CLIENT_BUILD
             if (this.IsDead())
@@ -389,19 +389,51 @@ namespace MultiplayerARPG
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
-                    BaseItem.EnhanceSocketNonEquipItem(this, index, enhancerId, out gameMessageType);
+                    BaseItem.EnhanceSocketNonEquipItem(this, index, enhancerId, socketIndex, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipItems:
-                    BaseItem.EnhanceSocketEquipItem(this, index, enhancerId, out gameMessageType);
+                    BaseItem.EnhanceSocketEquipItem(this, index, enhancerId, socketIndex, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponRight:
-                    BaseItem.EnhanceSocketRightHandItem(this, enhancerId, out gameMessageType);
+                    BaseItem.EnhanceSocketRightHandItem(this, enhancerId, socketIndex, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponLeft:
-                    BaseItem.EnhanceSocketLeftHandItem(this, enhancerId, out gameMessageType);
+                    BaseItem.EnhanceSocketLeftHandItem(this, enhancerId, socketIndex, out gameMessageType);
+                    CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+            }
+#endif
+        }
+
+        [ServerRpc]
+        protected void ServerRemoveEnhancerFromItem(InventoryType inventoryType, short index, short socketIndex)
+        {
+#if !CLIENT_BUILD
+            if (this.IsDead())
+                return;
+
+            // Required gold
+            bool returnEnhancer = true;
+            GameMessage.Type gameMessageType;
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    BaseItem.RemoveEnhancerFromNonEquipItem(this, index, socketIndex, returnEnhancer, out gameMessageType);
+                    CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipItems:
+                    BaseItem.RemoveEnhancerFromEquipItem(this, index, socketIndex, returnEnhancer, out gameMessageType);
+                    CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipWeaponRight:
+                    BaseItem.RemoveEnhancerFromRightHandItem(this, socketIndex, returnEnhancer, out gameMessageType);
+                    CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipWeaponLeft:
+                    BaseItem.RemoveEnhancerFromLeftHandItem(this, socketIndex, returnEnhancer, out gameMessageType);
                     CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
             }
