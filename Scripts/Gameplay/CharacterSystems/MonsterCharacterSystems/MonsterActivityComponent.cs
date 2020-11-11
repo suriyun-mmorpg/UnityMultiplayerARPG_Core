@@ -242,7 +242,7 @@ namespace MultiplayerARPG
             CacheEntity.PointClickMovement(destination);
         }
 
-        public void RandomWanderDestination()
+        public virtual void RandomWanderDestination()
         {
             // Random position around spawn point
             Vector3 randomPosition;
@@ -259,7 +259,7 @@ namespace MultiplayerARPG
             randomedWanderDelay = Random.Range(randomWanderDelayMin, randomWanderDelayMax);
         }
 
-        public void FollowSummoner()
+        public virtual void FollowSummoner()
         {
             // Random position around spawn point
             Vector3 randomPosition;
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="currentPosition"></param>
         /// <returns></returns>
-        public bool FindEnemy(Vector3 currentPosition)
+        public virtual bool FindEnemy(Vector3 currentPosition)
         {
             // Aggressive monster or summoned monster will find target to attack
             if (MonsterDatabase.Characteristic != MonsterCharacteristic.Aggressive &&
