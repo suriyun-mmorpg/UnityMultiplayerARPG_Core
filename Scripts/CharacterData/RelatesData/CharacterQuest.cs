@@ -10,7 +10,7 @@ public class CharacterQuest : INetSerializable
     public int dataId;
     public bool isComplete;
     public Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
-    public List<int> talkedNpcs = new List<int>();
+    public List<int> completedTasks = new List<int>();
 
     [System.NonSerialized]
     private int dirtyDataId;
@@ -28,13 +28,13 @@ public class CharacterQuest : INetSerializable
         }
     }
 
-    public List<int> TalkedNpcs
+    public List<int> CompletedTasks
     {
         get
         {
-            if (talkedNpcs == null)
-                talkedNpcs = new List<int>();
-            return talkedNpcs;
+            if (completedTasks == null)
+                completedTasks = new List<int>();
+            return completedTasks;
         }
     }
 
@@ -143,11 +143,11 @@ public class CharacterQuest : INetSerializable
                 writer.PutPackedInt(killedMonster.Value);
             }
         }
-        byte talkedNpcsCount = (byte)TalkedNpcs.Count;
+        byte talkedNpcsCount = (byte)CompletedTasks.Count;
         writer.Put(talkedNpcsCount);
         if (talkedNpcsCount > 0)
         {
-            foreach (int talkedNpc in TalkedNpcs)
+            foreach (int talkedNpc in CompletedTasks)
             {
                 writer.PutPackedInt(talkedNpc);
             }
@@ -165,10 +165,10 @@ public class CharacterQuest : INetSerializable
             KilledMonsters.Add(reader.GetPackedInt(), reader.GetPackedInt());
         }
         int talkedNpcsCount = reader.GetByte();
-        TalkedNpcs.Clear();
+        CompletedTasks.Clear();
         for (int i = 0; i < talkedNpcsCount; ++i)
         {
-            TalkedNpcs.Add(reader.GetPackedInt());
+            CompletedTasks.Add(reader.GetPackedInt());
         }
     }
 }
