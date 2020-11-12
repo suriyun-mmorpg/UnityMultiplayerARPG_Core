@@ -504,6 +504,29 @@ public class CharacterItem : INetSerializableWithElement
         return Create(0, 1, 0);
     }
 
+    public List<int> ReadSockets(string sockets)
+    {
+        Sockets.Clear();
+        string[] splitTexts = sockets.Split(';');
+        foreach (string text in splitTexts)
+        {
+            if (string.IsNullOrEmpty(text))
+                continue;
+            Sockets.Add(int.Parse(text));
+        }
+        return Sockets;
+    }
+
+    public string WriteSockets()
+    {
+        string result = string.Empty;
+        foreach (int socket in Sockets)
+        {
+            result += $"{socket};";
+        }
+        return result;
+    }
+
     public void Serialize(NetDataWriter writer)
     {
         Serialize(writer, true);

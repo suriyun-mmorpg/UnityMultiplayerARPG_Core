@@ -129,6 +129,55 @@ public class CharacterQuest : INetSerializable
         return newQuest;
     }
 
+    public Dictionary<int, int> ReadKillMonsters(string killMonsters)
+    {
+        KilledMonsters.Clear();
+        string[] splitSets = killMonsters.Split(';');
+        foreach (string set in splitSets)
+        {
+            if (string.IsNullOrEmpty(set))
+                continue;
+            string[] splitData = set.Split(':');
+            if (splitData.Length != 2)
+                continue;
+            KilledMonsters[int.Parse(splitData[0])] = int.Parse(splitData[1]);
+        }
+        return KilledMonsters;
+    }
+
+    public string WriteKillMonsters()
+    {
+        string result = string.Empty;
+        foreach (KeyValuePair<int, int> keyValue in KilledMonsters)
+        {
+            result += $"{keyValue.Key}:{keyValue.Value};";
+        }
+        return result;
+    }
+
+    public List<int> ReadCompletedTasks(string completedTasks)
+    {
+        CompletedTasks.Clear();
+        string[] splitTexts = completedTasks.Split(';');
+        foreach (string text in splitTexts)
+        {
+            if (string.IsNullOrEmpty(text))
+                continue;
+            CompletedTasks.Add(int.Parse(text));
+        }
+        return CompletedTasks;
+    }
+
+    public string WriteCompletedTasks()
+    {
+        string result = string.Empty;
+        foreach (int completedTask in CompletedTasks)
+        {
+            result += $"{completedTask};";
+        }
+        return result;
+    }
+
     public void Serialize(NetDataWriter writer)
     {
         writer.PutPackedInt(dataId);
