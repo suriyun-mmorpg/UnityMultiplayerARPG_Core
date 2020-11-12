@@ -11,6 +11,7 @@ public class CharacterQuestSerializationSurrogate : ISerializationSurrogate
         info.AddValue("dataId", data.dataId);
         info.AddValue("isComplete", data.isComplete);
         info.AddValue("killedMonsters", data.killedMonsters);
+        info.AddValue("talkedNpcs", data.talkedNpcs);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -21,6 +22,7 @@ public class CharacterQuestSerializationSurrogate : ISerializationSurrogate
         data.dataId = info.GetInt32("dataId");
         data.isComplete = info.GetBoolean("isComplete");
         data.killedMonsters = (Dictionary<int, int>)info.GetValue("killedMonsters", typeof(Dictionary<int, int>));
+        data.talkedNpcs = (List<int>)info.GetValue("talkedNpcs", typeof(List<int>));
         obj = data;
         return obj;
     }

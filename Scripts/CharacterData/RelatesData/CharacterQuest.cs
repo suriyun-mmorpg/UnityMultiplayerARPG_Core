@@ -10,6 +10,7 @@ public class CharacterQuest : INetSerializable
     public int dataId;
     public bool isComplete;
     public Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
+    public List<int> talkedNpcs = new List<int>();
 
     [System.NonSerialized]
     private int dirtyDataId;
@@ -24,6 +25,16 @@ public class CharacterQuest : INetSerializable
             if (killedMonsters == null)
                 killedMonsters = new Dictionary<int, int>();
             return killedMonsters;
+        }
+    }
+
+    public List<int> TalkedNpcs
+    {
+        get
+        {
+            if (talkedNpcs == null)
+                talkedNpcs = new List<int>();
+            return talkedNpcs;
         }
     }
 
@@ -105,9 +116,9 @@ public class CharacterQuest : INetSerializable
 
     public int CountKillMonster(int monsterDataId)
     {
-        int count = 0;
-        KilledMonsters.TryGetValue(monsterDataId, out count);
-        return count;
+        if (!KilledMonsters.ContainsKey(monsterDataId))
+            return 0;
+        return KilledMonsters[monsterDataId];
     }
 
     public static CharacterQuest Create(Quest quest)
@@ -122,14 +133,23 @@ public class CharacterQuest : INetSerializable
     {
         writer.PutPackedInt(dataId);
         writer.Put(isComplete);
-        byte killMonsterCount = (byte)KilledMonsters.Count;
-        writer.Put(killMonsterCount);
-        if (killMonsterCount > 0)
+        byte killMonstersCount = (byte)KilledMonsters.Count;
+        writer.Put(killMonstersCount);
+        if (killMonstersCount > 0)
         {
             foreach (KeyValuePair<int, int> killedMonster in KilledMonsters)
             {
                 writer.PutPackedInt(killedMonster.Key);
                 writer.PutPackedInt(killedMonster.Value);
+            }
+        }
+        byte talkedNpcsCount = (byte)TalkedNpcs.Count;
+        writer.Put(talkedNpcsCount);
+        if (talkedNpcsCount > 0)
+        {
+            foreach (int talkedNpc in TalkedNpcs)
+            {
+                writer.PutPackedInt(talkedNpc);
             }
         }
     }
@@ -138,11 +158,17 @@ public class CharacterQuest : INetSerializable
     {
         dataId = reader.GetPackedInt();
         isComplete = reader.GetBool();
-        int killMonsterCount = reader.GetByte();
+        int killMonstersCount = reader.GetByte();
         KilledMonsters.Clear();
-        for (int i = 0; i < killMonsterCount; ++i)
+        for (int i = 0; i < killMonstersCount; ++i)
         {
             KilledMonsters.Add(reader.GetPackedInt(), reader.GetPackedInt());
+        }
+        int talkedNpcsCount = reader.GetByte();
+        TalkedNpcs.Clear();
+        for (int i = 0; i < talkedNpcsCount; ++i)
+        {
+            TalkedNpcs.Add(reader.GetPackedInt());
         }
     }
 }

@@ -8,6 +8,8 @@ namespace MultiplayerARPG
     {
         KillMonster,
         CollectItem,
+        TalkToNpc,
+        Custom = 254,
     }
 
     [CreateAssetMenu(fileName = "Quest", menuName = "Create GameData/Quest", order = -4796)]
@@ -99,5 +101,7 @@ namespace MultiplayerARPG
         public MonsterCharacterAmount monsterCharacterAmount;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
         public ItemAmount itemAmount;
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        public NpcEntity npcEntity;
     }
 }
