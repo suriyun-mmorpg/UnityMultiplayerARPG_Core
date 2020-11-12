@@ -14,6 +14,8 @@ namespace MultiplayerARPG
     public partial class Quest : BaseGameData
     {
         [Header("Quest Configs")]
+        [Tooltip("Requirement to receive quest")]
+        public QuestRequirement requirement;
         public QuestTask[] tasks;
         public int rewardExp;
         public int rewardGold;
@@ -58,6 +60,34 @@ namespace MultiplayerARPG
                     GameInstance.AddItems(rewardItem.item);
                 }
             }
+            GameInstance.AddQuests(requirement.completedQuests);
+        }
+
+        public bool CanReceiveQuest(IPlayerCharacterData character)
+        {
+            // Quest is completed, so don't show the menu which navigate to this dialog
+            int indexOfQuest = character.IndexOfQuest(DataId);
+            if (indexOfQuest >= 0 && character.Quests[indexOfQuest].isComplete)
+                return false;
+            // Character's level is lower than requirement
+            if (character.Level < requirement.level)
+                return false;
+            // Character's has difference class
+            if (requirement.character != null && requirement.character.DataId != character.DataId)
+                return false;
+            // Character's not complete all required quests
+            if (requirement.completedQuests != null && requirement.completedQuests.Length > 0)
+            {
+                foreach (Quest quest in requirement.completedQuests)
+                {
+                    indexOfQuest = character.IndexOfQuest(quest.DataId);
+                    if (indexOfQuest < 0)
+                        return false;
+                    if (!character.Quests[indexOfQuest].isComplete)
+                        return false;
+                }
+            }
+            return true;
         }
     }
 

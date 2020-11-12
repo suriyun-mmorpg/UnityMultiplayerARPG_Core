@@ -223,7 +223,9 @@ namespace MultiplayerARPG
             }
             foreach (int questId in questIds)
             {
-                if (!clearedQuests.Contains(questId))
+                if (!clearedQuests.Contains(questId) &&
+                    GameInstance.Quests.ContainsKey(questId) &&
+                    GameInstance.Quests[questId].CanReceiveQuest(playerCharacterEntity))
                     return true;
             }
             return false;
