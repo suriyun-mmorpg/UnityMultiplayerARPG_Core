@@ -9,6 +9,7 @@
         QuestTasksCompleted,
         QuestCompleted,
         FactionIs,
+        PlayerCharacterIs,
         Custom = 254
     }
 }

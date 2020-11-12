@@ -1,15 +1,20 @@
-﻿namespace MultiplayerARPG
+﻿using UnityEngine.Serialization;
+
+namespace MultiplayerARPG
 {
     [System.Serializable]
     public struct NpcDialogCondition
     {
         public NpcDialogConditionType conditionType;
+        [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.PlayerCharacterIs) })]
+        public PlayerCharacter playerCharacter;
         [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.FactionIs) })]
         public Faction faction;
         [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.QuestNotStarted), nameof(NpcDialogConditionType.QuestOngoing), nameof(NpcDialogConditionType.QuestTasksCompleted), nameof(NpcDialogConditionType.QuestCompleted) })]
         public Quest quest;
         [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.LevelMoreThanOrEqual), nameof(NpcDialogConditionType.LevelLessThanOrEqual) })]
-        public int conditionalLevel;
+        [FormerlySerializedAs("conditionalLevel")]
+        public int level;
         [NpcDialogConditionData]
         public NpcDialogConditionData conditionData;
 
@@ -31,9 +36,9 @@
             switch (conditionType)
             {
                 case NpcDialogConditionType.LevelMoreThanOrEqual:
-                    return character.Level >= conditionalLevel;
+                    return character.Level >= level;
                 case NpcDialogConditionType.LevelLessThanOrEqual:
-                    return character.Level <= conditionalLevel;
+                    return character.Level <= level;
                 case NpcDialogConditionType.QuestNotStarted:
                     return indexOfQuest < 0;
                 case NpcDialogConditionType.QuestOngoing:
@@ -44,6 +49,8 @@
                     return indexOfQuest >= 0 && questCompleted;
                 case NpcDialogConditionType.FactionIs:
                     return character.FactionId == faction.DataId;
+                case NpcDialogConditionType.PlayerCharacterIs:
+                    return character.DataId == playerCharacter.DataId;
                 case NpcDialogConditionType.Custom:
                     return conditionData.Invoke(character);
             }
