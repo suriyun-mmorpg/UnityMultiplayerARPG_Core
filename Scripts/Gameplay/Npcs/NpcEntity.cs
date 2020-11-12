@@ -214,12 +214,14 @@ namespace MultiplayerARPG
         {
             if (playerCharacterEntity == null)
                 return false;
+            Quest quest;
             List<int> clearedQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacterEntity.Quests)
             {
-                Quest quest = characterQuest.GetQuest();
-                if (quest != null && characterQuest.isComplete)
-                    clearedQuests.Add(quest.DataId);
+                quest = characterQuest.GetQuest();
+                if (quest == null || characterQuest.isComplete)
+                    continue;
+                clearedQuests.Add(quest.DataId);
             }
             foreach (int questId in questIds)
             {
@@ -235,12 +237,16 @@ namespace MultiplayerARPG
         {
             if (playerCharacterEntity == null)
                 return false;
+            Quest quest;
             List<int> inProgressQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacterEntity.Quests)
             {
-                Quest quest = characterQuest.GetQuest();
-                if (quest != null && !characterQuest.isComplete)
-                    inProgressQuests.Add(quest.DataId);
+                quest = characterQuest.GetQuest();
+                if (quest == null || characterQuest.isComplete)
+                    continue;
+                if (quest.HaveToTalkToNpc(playerCharacterEntity, this))
+                    return true;
+                inProgressQuests.Add(quest.DataId);
             }
             foreach (int questId in questIds)
             {

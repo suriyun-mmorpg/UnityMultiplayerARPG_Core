@@ -65,6 +65,26 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(requirement.completedQuests);
         }
 
+        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity)
+        {
+            if (tasks == null || tasks.Length == 0)
+                return false;
+            int indexOfQuest = character.IndexOfQuest(DataId);
+            if (indexOfQuest < 0 || character.Quests[indexOfQuest].isComplete)
+                return false;
+            for (int i = 0; i < tasks.Length; ++i)
+            {
+                if (tasks[i].taskType != QuestTaskType.TalkToNpc ||
+                    tasks[i].npcEntity == null)
+                    continue;
+                if (character.Quests[indexOfQuest].CompletedTasks.Contains(i))
+                    continue;
+                if (tasks[i].npcEntity.EntityId == npcEntity.EntityId)
+                    return true;
+            }
+            return false;
+        }
+
         public bool CanReceiveQuest(IPlayerCharacterData character)
         {
             // Quest is completed, so don't show the menu which navigate to this dialog
