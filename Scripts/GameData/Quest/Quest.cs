@@ -53,6 +53,7 @@ namespace MultiplayerARPG
                 {
                     GameInstance.AddCharacters(task.monsterCharacterAmount.monster);
                     GameInstance.AddItems(task.itemAmount.item);
+                    GameInstance.AddNpcDialogs(task.talkToNpcDialog);
                 }
             }
             if (rewardItems != null && rewardItems.Length > 0)
@@ -65,9 +66,10 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(requirement.completedQuests);
         }
 
-        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, out int taskIndex)
+        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, out int taskIndex, out BaseNpcDialog dialog)
         {
             taskIndex = -1;
+            dialog = null;
             if (tasks == null || tasks.Length == 0)
                 return false;
             int indexOfQuest = character.IndexOfQuest(DataId);
@@ -83,6 +85,7 @@ namespace MultiplayerARPG
                 if (tasks[i].npcEntity.EntityId == npcEntity.EntityId)
                 {
                     taskIndex = i;
+                    dialog = tasks[i].talkToNpcDialog;
                     return true;
                 }
             }
@@ -127,5 +130,7 @@ namespace MultiplayerARPG
         public ItemAmount itemAmount;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
         public NpcEntity npcEntity;
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        public BaseNpcDialog talkToNpcDialog;
     }
 }
