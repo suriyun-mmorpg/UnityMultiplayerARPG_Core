@@ -192,9 +192,9 @@ public class CharacterQuest : INetSerializable
                 writer.PutPackedInt(killedMonster.Value);
             }
         }
-        byte talkedNpcsCount = (byte)CompletedTasks.Count;
-        writer.Put(talkedNpcsCount);
-        if (talkedNpcsCount > 0)
+        byte completedTasksCount = (byte)CompletedTasks.Count;
+        writer.Put(completedTasksCount);
+        if (completedTasksCount > 0)
         {
             foreach (int talkedNpc in CompletedTasks)
             {
@@ -213,9 +213,9 @@ public class CharacterQuest : INetSerializable
         {
             KilledMonsters.Add(reader.GetPackedInt(), reader.GetPackedInt());
         }
-        int talkedNpcsCount = reader.GetByte();
+        int completedTasksCount = reader.GetByte();
         CompletedTasks.Clear();
-        for (int i = 0; i < talkedNpcsCount; ++i)
+        for (int i = 0; i < completedTasksCount; ++i)
         {
             CompletedTasks.Add(reader.GetPackedInt());
         }
