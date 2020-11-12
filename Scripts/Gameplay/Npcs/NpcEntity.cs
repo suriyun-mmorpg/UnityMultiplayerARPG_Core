@@ -244,7 +244,7 @@ namespace MultiplayerARPG
                 quest = characterQuest.GetQuest();
                 if (quest == null || characterQuest.isComplete)
                     continue;
-                if (quest.HaveToTalkToNpc(playerCharacterEntity, this))
+                if (quest.HaveToTalkToNpc(playerCharacterEntity, this, out _))
                     return true;
                 inProgressQuests.Add(quest.DataId);
             }

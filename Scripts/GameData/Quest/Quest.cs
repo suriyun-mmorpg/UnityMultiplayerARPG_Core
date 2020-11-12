@@ -65,8 +65,9 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(requirement.completedQuests);
         }
 
-        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity)
+        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, out int taskIndex)
         {
+            taskIndex = -1;
             if (tasks == null || tasks.Length == 0)
                 return false;
             int indexOfQuest = character.IndexOfQuest(DataId);
@@ -80,7 +81,10 @@ namespace MultiplayerARPG
                 if (character.Quests[indexOfQuest].CompletedTasks.Contains(i))
                     continue;
                 if (tasks[i].npcEntity.EntityId == npcEntity.EntityId)
+                {
+                    taskIndex = i;
                     return true;
+                }
             }
             return false;
         }

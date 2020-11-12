@@ -27,6 +27,22 @@ namespace MultiplayerARPG
                 return;
             }
 
+            // Update task
+            Quest quest;
+            int taskIndex;
+            CharacterQuest characterQuest;
+            for (int i = 0; i < Quests.Count; ++i)
+            {
+                characterQuest = Quests[i];
+                if (characterQuest.isComplete)
+                    continue;
+                quest = characterQuest.GetQuest();
+                if (quest == null || !quest.HaveToTalkToNpc(this, npcEntity, out taskIndex))
+                    continue;
+                characterQuest.CompletedTasks.Add(taskIndex);
+                Quests[i] = characterQuest;
+            }
+
             CurrentNpcDialog = npcEntity.StartDialog;
             if (CurrentNpcDialog != null)
                 CallOwnerShowNpcDialog(CurrentNpcDialog.DataId);
