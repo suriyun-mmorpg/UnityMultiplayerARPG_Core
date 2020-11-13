@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     {
         protected BasePlayerCharacterController controller;
         protected CharacterItem weapon;
+        public virtual bool ShouldDeactivateWhenReload { get { return false; } }
 
         public virtual void Setup(BasePlayerCharacterController controller, CharacterItem weapon)
         {
@@ -15,7 +16,6 @@ namespace MultiplayerARPG
             this.weapon = weapon;
         }
 
-        // TODO: May add more abstract functions later
         public virtual void Desetup() { }
         public virtual void ForceDeactivated() { }
         public abstract void OnPreActivate();

@@ -25,6 +25,7 @@ namespace MultiplayerARPG
         private ShooterControllerViewMode? preActivateViewMode;
 
         // TODO: Add rotate scale player's config
+        public override bool ShouldDeactivateWhenReload { get { return true; } }
 
         public override void Setup(BasePlayerCharacterController controller, CharacterItem weapon)
         {
