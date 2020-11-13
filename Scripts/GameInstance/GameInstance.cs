@@ -34,7 +34,7 @@ namespace MultiplayerARPG
 #endif
     {
         // Events
-        private System.Action onGameDataLoaded;
+        public System.Action onGameDataLoaded;
         public static GameInstance Singleton { get; protected set; }
         [Header("Game Instance Configs")]
         [SerializeField]
@@ -340,6 +340,8 @@ namespace MultiplayerARPG
         }
 
         public HashSet<int> IgnoreRaycastLayersValues { get; private set; }
+
+        public bool DoNotLoadHomeScene { get; set; }
         #endregion
 
         protected virtual void Awake()
@@ -470,25 +472,25 @@ namespace MultiplayerARPG
 
             InitializePurchasing();
 
-            if (onGameDataLoaded != null)
-                onGameDataLoaded.Invoke();
-            else
-                OnGameDataLoaded();
+            OnGameDataLoaded();
 
             System.GC.Collect();
         }
 
-        public void SetOnGameDataLoadedCallback(System.Action callback)
-        {
-            onGameDataLoaded = callback;
-        }
-
         public void OnGameDataLoaded()
         {
-            StartCoroutine(LoadHomeSceneOnLoadedGameDataRoutine());
+            if (onGameDataLoaded != null)
+                onGameDataLoaded.Invoke();
+            if (!DoNotLoadHomeScene)
+                LoadHomeScene();
         }
 
-        IEnumerator LoadHomeSceneOnLoadedGameDataRoutine()
+        public void LoadHomeScene()
+        {
+            StartCoroutine(LoadHomeSceneRoutine());
+        }
+
+        IEnumerator LoadHomeSceneRoutine()
         {
             yield return UISceneLoading.Singleton.LoadScene(HomeSceneName);
         }
