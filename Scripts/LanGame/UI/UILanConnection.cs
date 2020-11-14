@@ -55,9 +55,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheSelectionManager == null)
-                {
                     cacheSelectionManager = gameObject.AddComponent<UIDiscoveryEntrySelectionManager>();
-                }
                 cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return cacheSelectionManager;
             }
