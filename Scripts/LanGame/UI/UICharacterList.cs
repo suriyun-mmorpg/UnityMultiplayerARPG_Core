@@ -150,18 +150,21 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
         {
-            OnSelectCharacter(uiCharacter.Data as IPlayerCharacterData);
-        }
-
-        protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
-        {
+            selectedPlayerCharacterData = uiCharacter.Data as PlayerCharacterData;
             if (buttonStart)
                 buttonStart.gameObject.SetActive(true);
             if (buttonDelete)
                 buttonDelete.gameObject.SetActive(true);
             characterModelContainer.SetChildrenActive(false);
-            // Load selected character, set selected player character data and also validate its data
-            PlayerCharacterDataById.TryGetValue(playerCharacterData.Id, out selectedPlayerCharacterData);
+            // Show selected character model
+            CharacterModelById.TryGetValue(selectedPlayerCharacterData.Id, out selectedModel);
+            if (SelectedModel != null)
+                SelectedModel.gameObject.SetActive(true);
+            OnSelectCharacter(uiCharacter.Data as IPlayerCharacterData);
+        }
+
+        protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
+        {
             // Validate map data
             if (!GameInstance.Singleton.GetGameMapIds().Contains(SelectedPlayerCharacterData.CurrentMapName))
             {
@@ -171,10 +174,6 @@ namespace MultiplayerARPG
             }
             // Set selected character to network manager
             (BaseGameNetworkManager.Singleton as LanRpgNetworkManager).selectedCharacter = SelectedPlayerCharacterData;
-            // Show selected character model
-            CharacterModelById.TryGetValue(playerCharacterData.Id, out selectedModel);
-            if (SelectedModel != null)
-                SelectedModel.gameObject.SetActive(true);
         }
 
         public virtual void OnClickStart()
