@@ -148,8 +148,10 @@ namespace MultiplayerARPG
             selectedCharacter.SerializeCharacterData(writer);
         }
 
-        public override bool DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
+        public override async UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
+            await UniTask.Yield();
+
             if (!isReadyToInstantiatePlayers)
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
