@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
@@ -492,7 +493,10 @@ namespace MultiplayerARPG
 
         IEnumerator LoadHomeSceneRoutine()
         {
-            yield return UISceneLoading.Singleton.LoadScene(HomeSceneName);
+            if (UISceneLoading.Singleton)
+                yield return UISceneLoading.Singleton.LoadScene(HomeSceneName);
+            else
+                yield return SceneManager.LoadSceneAsync(HomeSceneName);
         }
 
         public List<string> GetGameMapIds()
