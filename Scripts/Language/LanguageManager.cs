@@ -9,11 +9,9 @@ namespace MultiplayerARPG
 {
     public class LanguageManager : MonoBehaviour
     {
-        public static readonly Dictionary<string, Dictionary<string, string>> Languages = new Dictionary<string, Dictionary<string, string>>();
-        private static Dictionary<string, string> texts = new Dictionary<string, string>();
-        public static Dictionary<string, string> Texts { get { return texts; } }
-        private static string currentLanguageKey = string.Empty;
-        public static string CurrentLanguageKey { get { return currentLanguageKey; } }
+        public static Dictionary<string, Dictionary<string, string>> Languages { get; protected set; } = new Dictionary<string, Dictionary<string, string>>();
+        public static Dictionary<string, string> Texts { get; protected set; } = new Dictionary<string, string>();
+        public static string CurrentLanguageKey { get; protected set; }
         private static string currentPlayerPrefsKey = string.Empty;
 
         [Header("Language Manager Configs")]
@@ -30,7 +28,7 @@ namespace MultiplayerARPG
         private void Awake()
         {
             currentPlayerPrefsKey = playerPrefsKey;
-            currentLanguageKey = PlayerPrefs.GetString(currentPlayerPrefsKey, defaultLanguageKey);
+            CurrentLanguageKey = PlayerPrefs.GetString(currentPlayerPrefsKey, defaultLanguageKey);
             Languages.Clear();
             Dictionary<string, string> tempNewData;
             foreach (Language language in languageList)
@@ -47,7 +45,7 @@ namespace MultiplayerARPG
                 }
                 Languages[language.languageKey] = tempNewData;
             }
-            ChangeLanguage(currentLanguageKey);
+            ChangeLanguage(CurrentLanguageKey);
         }
 
         public Language GetLanguageFromList(string languageKey)
@@ -95,18 +93,21 @@ namespace MultiplayerARPG
             if (!Languages.ContainsKey(languageKey))
                 return;
 
-            currentLanguageKey = languageKey;
-            texts = Languages[languageKey];
-            PlayerPrefs.SetString(currentPlayerPrefsKey, currentLanguageKey);
+            CurrentLanguageKey = languageKey;
+            Texts = Languages[languageKey];
+            PlayerPrefs.SetString(currentPlayerPrefsKey, CurrentLanguageKey);
             PlayerPrefs.Save();
         }
 
         public static string GetText(string key, string defaultValue = "")
         {
-            if (Texts.ContainsKey(key))
-                return Texts[key];
-            if (DefaultLocale.Texts.ContainsKey(key))
-                return DefaultLocale.Texts[key];
+            if (!string.IsNullOrEmpty(key))
+            {
+                if (Texts.ContainsKey(key))
+                    return Texts[key];
+                if (DefaultLocale.Texts.ContainsKey(key))
+                    return DefaultLocale.Texts[key];
+            }
             return defaultValue;
         }
 
