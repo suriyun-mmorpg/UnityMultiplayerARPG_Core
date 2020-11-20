@@ -930,12 +930,13 @@ namespace MultiplayerARPG
             {
                 await UniTask.Yield();
             }
+            float progress = 0f;
             string sceneName = SceneManager.GetActiveScene().name;
-            onSpawnEntitiesStart.Invoke(sceneName, true, 0f);
+            onSpawnEntitiesStart.Invoke(sceneName, true, progress);
             await PreSpawnEntities();
             RegisterEntities();
+            await UniTask.SwitchToMainThread();
             int i;
-            float progress = 0f;
             // Spawn Warp Portals
             if (LogInfo)
                 Logging.Log("Spawning warp portals");
