@@ -25,6 +25,7 @@ public static partial class PlayerCharacterDataExtension
         to.Id = from.Id;
         to.DataId = from.DataId;
         to.EntityId = from.EntityId;
+        to.UserId = from.UserId;
         to.FactionId = from.FactionId;
         to.CharacterName = from.CharacterName;
         to.Level = from.Level;
@@ -369,6 +370,7 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(characterData.Id);
         writer.PutPackedInt(characterData.DataId);
         writer.PutPackedInt(characterData.EntityId);
+        writer.Put(characterData.UserId);
         writer.PutPackedInt(characterData.FactionId);
         writer.Put(characterData.CharacterName);
         writer.PutPackedShort(characterData.Level);
@@ -471,6 +473,7 @@ public static partial class PlayerCharacterDataExtension
         characterData.Id = reader.GetString();
         characterData.DataId = reader.GetPackedInt();
         characterData.EntityId = reader.GetPackedInt();
+        characterData.UserId = reader.GetString();
         characterData.FactionId = reader.GetPackedInt();
         characterData.CharacterName = reader.GetString();
         characterData.Level = reader.GetPackedShort();

@@ -4,6 +4,10 @@ using UnityEngine;
 public partial interface IPlayerCharacterData : ICharacterData
 {
     /// <summary>
+    /// User Account ID
+    /// </summary>
+    string UserId { get; set; }
+    /// <summary>
     /// Current Faction
     /// </summary>
     int FactionId { get; set; }

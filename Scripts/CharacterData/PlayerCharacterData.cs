@@ -6,6 +6,7 @@ using LiteNetLib.Utils;
 [System.Serializable]
 public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData, INetSerializable
 {
+    private string userId;
     private int factionId;
     private short statPoint;
     private short skillPoint;
@@ -26,6 +27,7 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData, 
     private List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
     private List<CharacterQuest> quests = new List<CharacterQuest>();
 
+    public string UserId { get { return userId; } set { userId = value; } }
     public int FactionId { get { return factionId; } set { factionId = value; } }
     public short StatPoint { get { return statPoint; } set { statPoint = value; } }
     public short SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
