@@ -1051,7 +1051,7 @@ namespace MultiplayerARPG
             {
                 if (LogInfo)
                     Logging.Log("Spawning server character");
-                Instantiate(GameInstance.Singleton.serverCharacterPrefab);
+                Instantiate(GameInstance.Singleton.serverCharacterPrefab, CurrentMapInfo.StartPosition, Quaternion.identity);
             }
             await UniTask.Yield();
             progress = 1f;
