@@ -48,6 +48,7 @@ namespace MultiplayerARPG
             info.AddValue("lastUpdate", data.LastUpdate);
             info.AddListValue("hotkeys", data.Hotkeys);
             info.AddListValue("quests", data.Quests);
+            info.AddListValue("currencies", data.Currencies);
             this.InvokeInstanceDevExtMethods("GetObjectData", obj, info, context);
         }
 
@@ -120,6 +121,12 @@ namespace MultiplayerARPG
             data.LastUpdate = info.GetInt32("lastUpdate");
             data.Hotkeys = info.GetListValue<CharacterHotkey>("hotkeys");
             data.Quests = info.GetListValue<CharacterQuest>("quests");
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.Currencies = info.GetListValue<CharacterCurrency>("currencies");
+            }
+            catch { }
             this.InvokeInstanceDevExtMethods("SetObjectData", obj, info, context, selector);
 
             obj = data;
