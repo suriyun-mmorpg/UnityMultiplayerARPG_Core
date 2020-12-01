@@ -1,0 +1,58 @@
+﻿using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+
+namespace MultiplayerARPG
+{
+    public partial class UICharacterCurrency : UIDataForCharacter<UICharacterCurrencyData>
+    {
+        public CharacterCurrency CharacterCurrency { get { return Data.characterCurrency; } }
+        public float Amount { get { return Data.targetAmount; } }
+        public Currency Currency { get { return CharacterCurrency != null ? CharacterCurrency.GetCurrency() : null; } }
+        
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Description}")]
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+
+        [Header("UI Elements")]
+        public TextWrapper uiTextTitle;
+        public TextWrapper uiTextDescription;
+        public TextWrapper uiTextAmount;
+        public Image imageIcon;
+
+        protected override void UpdateData()
+        {
+            if (uiTextTitle != null)
+            {
+                uiTextTitle.text = string.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    Currency == null ? LanguageManager.GetUnknowTitle() : Currency.Title);
+            }
+
+            if (uiTextDescription != null)
+            {
+                uiTextDescription.text = string.Format(
+                    LanguageManager.GetText(formatKeyDescription),
+                    Currency == null ? LanguageManager.GetUnknowDescription() : Currency.Description);
+            }
+
+            if (uiTextAmount != null)
+            {
+                uiTextAmount.text = string.Format(
+                    LanguageManager.GetText(formatKeyAmount),
+                    Amount.ToString("N0"));
+            }
+
+            if (imageIcon != null)
+            {
+                Sprite iconSprite = Currency == null ? null : Currency.icon;
+                imageIcon.gameObject.SetActive(iconSprite != null);
+                imageIcon.sprite = iconSprite;
+            }
+        }
+    }
+}
