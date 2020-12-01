@@ -71,6 +71,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRarity;
         public TextWrapper uiTextLevel;
         public Image imageIcon;
+        public Image imageRarity;
         public TextWrapper uiTextItemType;
         public TextWrapper uiTextSellPrice;
         public TextWrapper uiTextStack;
@@ -308,6 +309,13 @@ namespace MultiplayerARPG
                 Sprite iconSprite = Item == null ? null : Item.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
+            }
+
+            if (imageRarity != null)
+            {
+                Sprite iconSprite = Item == null || Item.ItemRefine == null ? null : Item.ItemRefine.icon;
+                imageRarity.gameObject.SetActive(iconSprite != null);
+                imageRarity.sprite = iconSprite;
             }
 
             if (uiTextItemType != null)
