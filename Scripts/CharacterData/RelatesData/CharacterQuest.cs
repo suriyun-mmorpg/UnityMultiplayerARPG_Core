@@ -130,7 +130,7 @@ namespace MultiplayerARPG
             return newQuest;
         }
 
-        public Dictionary<int, int> ReadKillMonsters(string killMonsters)
+        public Dictionary<int, int> ReadKilledMonsters(string killMonsters)
         {
             KilledMonsters.Clear();
             string[] splitSets = killMonsters.Split(';');
@@ -146,7 +146,7 @@ namespace MultiplayerARPG
             return KilledMonsters;
         }
 
-        public string WriteKillMonsters()
+        public string WriteKilledMonsters()
         {
             string result = string.Empty;
             foreach (KeyValuePair<int, int> keyValue in KilledMonsters)
