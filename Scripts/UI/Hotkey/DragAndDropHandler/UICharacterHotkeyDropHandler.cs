@@ -3,11 +3,11 @@ using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterHotkeyDropHandler : MonoBehaviour, IDropHandler
+    public partial class UICharacterHotkeyDropHandler : MonoBehaviour, IDropHandler
     {
         public UICharacterHotkey uiCharacterHotkey;
 
-        private RectTransform dropRect;
+        protected RectTransform dropRect;
         public RectTransform DropRect
         {
             get
@@ -18,13 +18,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Start()
+        protected virtual void Start()
         {
             if (uiCharacterHotkey == null)
                 uiCharacterHotkey = GetComponent<UICharacterHotkey>();
         }
 
-        public void OnDrop(PointerEventData eventData)
+        public virtual void OnDrop(PointerEventData eventData)
         {
             if (uiCharacterHotkey == null)
             {

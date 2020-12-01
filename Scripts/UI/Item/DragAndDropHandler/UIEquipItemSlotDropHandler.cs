@@ -3,11 +3,11 @@ using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
-    public class UIEquipItemSlotDropHandler : MonoBehaviour, IDropHandler
+    public partial class UIEquipItemSlotDropHandler : MonoBehaviour, IDropHandler
     {
         public UICharacterItem uiCharacterItem;
 
-        private RectTransform dropRect;
+        protected RectTransform dropRect;
         public RectTransform DropRect
         {
             get
@@ -18,13 +18,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Start()
+        protected virtual void Start()
         {
             if (uiCharacterItem == null)
                 uiCharacterItem = GetComponent<UICharacterItem>();
         }
 
-        public void OnDrop(PointerEventData eventData)
+        public virtual void OnDrop(PointerEventData eventData)
         {
             if (uiCharacterItem == null)
             {
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void EquipItem(UICharacterItemDragHandler draggedItemUI)
+        protected virtual void EquipItem(UICharacterItemDragHandler draggedItemUI)
         {
             // Don't equip the item if drop area is not setup as equip slot UI
             if (!uiCharacterItem.IsSetupAsEquipSlot)

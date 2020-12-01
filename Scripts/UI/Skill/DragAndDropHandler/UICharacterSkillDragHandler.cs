@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class UICharacterSkillDragHandler : UIDragHandler
+    public partial class UICharacterSkillDragHandler : UIDragHandler
     {
         public enum SourceLocation
         {
@@ -10,13 +10,13 @@ namespace MultiplayerARPG
             Hotkey,
         }
 
-        public SourceLocation sourceLocation { get; private set; }
+        public SourceLocation sourceLocation { get; protected set; }
         // Skills data
-        public UICharacterSkill uiCharacterSkill { get; private set; }
+        public UICharacterSkill uiCharacterSkill { get; protected set; }
         // Hotkey data
-        public UICharacterHotkey uiCharacterHotkey { get; private set; }
+        public UICharacterHotkey uiCharacterHotkey { get; protected set; }
 
-        private UICharacterSkill cacheUI;
+        protected UICharacterSkill cacheUI;
         public UICharacterSkill CacheUI
         {
             get

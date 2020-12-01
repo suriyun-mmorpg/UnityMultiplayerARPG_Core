@@ -3,9 +3,9 @@ using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
-    public class UISellItemDropHandler : MonoBehaviour, IDropHandler
+    public partial class UISellItemDropHandler : MonoBehaviour, IDropHandler
     {
-        private RectTransform dropRect;
+        protected RectTransform dropRect;
         public RectTransform DropRect
         {
             get
@@ -16,7 +16,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void OnDrop(PointerEventData eventData)
+        public virtual void OnDrop(PointerEventData eventData)
         {
             // Validate drop position
             if (!RectTransformUtility.RectangleContainsScreenPoint(DropRect, Input.mousePosition))

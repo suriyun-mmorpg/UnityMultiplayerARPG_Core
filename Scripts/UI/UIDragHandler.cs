@@ -4,15 +4,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public static readonly HashSet<GameObject> DraggingObjects = new HashSet<GameObject>();
 
     public Transform rootTransform;
 
-    public Canvas CacheCanvas { get; private set; }
+    public Canvas CacheCanvas { get; protected set; }
 
-    public List<Graphic> CacheGraphics { get; private set; }
+    public List<Graphic> CacheGraphics { get; protected set; }
 
     public virtual bool CanDrag { get { return true; } }
 
