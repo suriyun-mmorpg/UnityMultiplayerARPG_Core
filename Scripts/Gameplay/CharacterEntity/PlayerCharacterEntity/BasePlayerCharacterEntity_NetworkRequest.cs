@@ -252,11 +252,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerSellItems(List<short> indexes)
+        public bool CallServerSellItems(short[] selectedIndexes)
         {
-            if (this.IsDead() || indexes.Count == 0)
+            if (this.IsDead() || selectedIndexes.Length == 0)
                 return false;
-            RPC(ServerSellItems, indexes);
+            RPC(ServerSellItems, selectedIndexes);
             return true;
         }
 
@@ -268,11 +268,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerDismantleItems(List<short> indexes)
+        public bool CallServerDismantleItems(short[] selectedIndexes)
         {
-            if (this.IsDead() || indexes.Count == 0)
+            if (this.IsDead() || selectedIndexes.Length == 0)
                 return false;
-            RPC(ServerDismantleItems, indexes);
+            RPC(ServerDismantleItems, selectedIndexes);
             return true;
         }
 

@@ -307,11 +307,12 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerDismantleItems(List<short> indexes)
+        protected void ServerDismantleItems(short[] selectedIndexes)
         {
 #if !CLIENT_BUILD
             if (this.IsDead())
                 return;
+            List<short> indexes = new List<short>(selectedIndexes);
             indexes.Sort();
             Dictionary<short, short> indexAmountPairs = new Dictionary<short, short>();
             List<CharacterItem> simulatingNonEquipItems = nonEquipItems.Clone();

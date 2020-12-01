@@ -77,7 +77,7 @@ namespace MultiplayerARPG
                     continue;
                 indexes.Add((short)selectedUI.IndexOfData);
             }
-            BasePlayerCharacterController.OwningCharacter.CallServerDismantleItems(indexes);
+            BasePlayerCharacterController.OwningCharacter.CallServerDismantleItems(indexes.ToArray());
         }
     }
 }

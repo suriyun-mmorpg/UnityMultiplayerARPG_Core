@@ -161,11 +161,12 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerSellItems(List<short> indexes)
+        protected void ServerSellItems(short[] selectedIndexes)
         {
 #if !CLIENT_BUILD
             if (!AccessingNpcShopDialog(out _))
                 return;
+            List<short> indexes = new List<short>(selectedIndexes);
             indexes.Sort();
             short tempIndex;
             for (int i = indexes.Count - 1; i >= 0; --i)
