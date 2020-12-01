@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial class Mail
     {
+        public string Id { get; set; }
         public string EventId { get; set; }
         public string SenderId { get; set; }
         public string SenderName { get; set; }
@@ -16,8 +17,9 @@ namespace MultiplayerARPG
         public Dictionary<int, short> Items { get; set; } = new Dictionary<int, short>();
         public bool IsRead { get; set; }
         public int ReadTimestamp { get; set; }
-        public int SentTimestamp { get; set; }
         public bool IsDelete { get; set; }
+        public int DeleteTimestamp { get; set; }
+        public int SentTimestamp { get; set; }
 
         public Dictionary<int, int> ReadCurrencies(string currencies)
         {
