@@ -774,5 +774,64 @@ namespace MultiplayerARPG
             characterData.SkillPoint += countSkillPoint;
             return true;
         }
+
+        public static void IncreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
+        {
+            foreach (CurrencyAmount currencyAmount in currencyAmounts)
+            {
+                if (currencyAmount.currency == null ||
+                    currencyAmount.amount == 0)
+                    continue;
+                int indexOfCurrency = character.IndexOfCurrency(currencyAmount.currency.DataId);
+                int increaseAmount = Mathf.CeilToInt(currencyAmount.amount * multiplier);
+                if (indexOfCurrency >= 0)
+                {
+                    CharacterCurrency currency = character.Currencies[indexOfCurrency];
+                    currency.amount += increaseAmount;
+                    character.Currencies[indexOfCurrency] = currency;
+                }
+                else
+                {
+                    character.Currencies.Add(CharacterCurrency.Create(currencyAmount.currency, increaseAmount));
+                }
+            }
+        }
+
+        public static void DecreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
+        {
+            foreach (CurrencyAmount currencyAmount in currencyAmounts)
+            {
+                if (currencyAmount.currency == null ||
+                    currencyAmount.amount == 0)
+                    continue;
+                int indexOfCurrency = character.IndexOfCurrency(currencyAmount.currency.DataId);
+                int decreaseAmount = Mathf.CeilToInt(currencyAmount.amount * multiplier);
+                if (indexOfCurrency >= 0)
+                {
+                    CharacterCurrency currency = character.Currencies[indexOfCurrency];
+                    currency.amount -= decreaseAmount;
+                    character.Currencies[indexOfCurrency] = currency;
+                }
+                else
+                {
+                    character.Currencies.Add(CharacterCurrency.Create(currencyAmount.currency, -decreaseAmount));
+                }
+            }
+        }
+
+        public static bool HasEnoughCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
+        {
+            foreach (CurrencyAmount currencyAmount in currencyAmounts)
+            {
+                if (currencyAmount.currency == null ||
+                    currencyAmount.amount == 0)
+                    continue;
+                int indexOfCurrency = character.IndexOfCurrency(currencyAmount.currency.DataId);
+                int checkAmount = Mathf.CeilToInt(currencyAmount.amount * multiplier);
+                if (indexOfCurrency < 0 || character.Currencies[indexOfCurrency].amount < checkAmount)
+                    return false;
+            }
+            return true;
+        }
     }
 }

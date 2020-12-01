@@ -10,6 +10,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected int sellPrice;
         [SerializeField]
+        public CurrencyAmount[] sellPrices;
+        [SerializeField]
         protected float weight;
         [SerializeField]
         [Range(1, 1000)]
@@ -53,6 +55,8 @@ namespace MultiplayerARPG
         public GameObject DropModel { get { return dropModel; } }
 
         public int SellPrice { get { return sellPrice; } }
+
+        public CurrencyAmount[] SellPrices { get { return sellPrices; } }
 
         public float Weight { get { return weight; } }
 

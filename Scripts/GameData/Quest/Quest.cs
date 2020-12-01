@@ -21,6 +21,8 @@ namespace MultiplayerARPG
         public QuestTask[] tasks;
         public int rewardExp;
         public int rewardGold;
+        [ArrayElementTitle("currency")]
+        public CurrencyAmount[] rewardCurrencies;
         [ArrayElementTitle("item")]
         public ItemAmount[] rewardItems;
         public bool canRepeat;
@@ -54,6 +56,13 @@ namespace MultiplayerARPG
                     GameInstance.AddCharacters(task.monsterCharacterAmount.monster);
                     GameInstance.AddItems(task.itemAmount.item);
                     GameInstance.AddNpcDialogs(task.talkToNpcDialog);
+                }
+            }
+            if (rewardCurrencies != null && rewardCurrencies.Length > 0)
+            {
+                foreach (CurrencyAmount rewardCurrency in rewardCurrencies)
+                {
+                    GameInstance.AddCurrencies(rewardCurrency.currency);
                 }
             }
             if (rewardItems != null && rewardItems.Length > 0)

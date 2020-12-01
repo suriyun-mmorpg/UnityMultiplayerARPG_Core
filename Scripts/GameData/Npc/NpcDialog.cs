@@ -84,6 +84,13 @@ namespace MultiplayerARPG
                 foreach (NpcSellItem sellItem in sellItems)
                 {
                     GameInstance.AddItems(sellItem.item);
+                    if (sellItem.sellPrices != null && sellItem.sellPrices.Length > 0)
+                    {
+                        foreach (CurrencyAmount rewardCurrency in sellItem.sellPrices)
+                        {
+                            GameInstance.AddCurrencies(rewardCurrency.currency);
+                        }
+                    }
                 }
             }
             GameInstance.AddItems(itemCraft.CraftingItem);

@@ -461,6 +461,8 @@ namespace MultiplayerARPG
                 {
                     playerCharacter.Gold += int.MaxValue;
                 }
+
+                playerCharacter.IncreaseCurrencies(reward.currencies, multiplier);
             }
         }
 
@@ -625,17 +627,27 @@ namespace MultiplayerARPG
 
         public override bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
         {
-            return character.Gold >= sellItem.sellPrice * amount;
+            if (character.Gold < sellItem.sellPrice * amount)
+                return false;
+            if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
+                return true;
+            return character.HasEnoughCurrencies(sellItem.sellPrices, amount);
         }
 
         public override void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
         {
             character.Gold -= sellItem.sellPrice * amount;
+            if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
+                return;
+            character.DecreaseCurrencies(sellItem.sellPrices, amount);
         }
 
         public override void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, short amount)
         {
             character.Gold += item.SellPrice * amount;
+            if (item.sellPrices == null || item.sellPrices.Length == 0)
+                return;
+            character.IncreaseCurrencies(item.SellPrices, amount);
         }
 
         public override bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
@@ -691,6 +703,7 @@ namespace MultiplayerARPG
             Reward result = new Reward();
             result.exp = quest.rewardExp;
             result.gold = quest.rewardGold;
+            result.currencies = quest.rewardCurrencies;
             return result;
         }
 
