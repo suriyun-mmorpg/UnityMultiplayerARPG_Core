@@ -208,6 +208,7 @@ namespace MultiplayerARPG
         public TestInEditorMode testInEditorMode;
 
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
+        public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, Harvestable> Harvestables = new Dictionary<int, Harvestable>();
         public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
@@ -427,6 +428,7 @@ namespace MultiplayerARPG
 
             // Load game data
             Attributes.Clear();
+            Currencies.Clear();
             Items.Clear();
             WeaponTypes.Clear();
             Characters.Clear();
@@ -651,6 +653,16 @@ namespace MultiplayerARPG
         public static void AddAttributes(IEnumerable<Attribute> attributes)
         {
             AddManyGameData(Attributes, attributes);
+        }
+
+        public static void AddCurrencies(params Currency[] currencies)
+        {
+            AddCurrencies((IEnumerable<Currency>)currencies);
+        }
+
+        public static void AddCurrencies(IEnumerable<Currency> currencies)
+        {
+            AddManyGameData(Currencies, currencies);
         }
 
         public static void AddItems(params ItemAmount[] itemAmounts)

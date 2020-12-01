@@ -67,6 +67,7 @@ namespace MultiplayerARPG
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
+            currencies.onOperation += OnCurrenciesOperation;
             storageItems.onChange += OnStorageItemsChange;
         }
 
@@ -143,6 +144,7 @@ namespace MultiplayerARPG
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
             quests.onOperation -= OnQuestsOperation;
+            currencies.onOperation -= OnCurrenciesOperation;
             storageItems.onChange -= OnStorageItemsChange;
 
             if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)

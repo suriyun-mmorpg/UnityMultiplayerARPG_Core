@@ -27,6 +27,7 @@ namespace MultiplayerARPG
         private int lastUpdate;
         private List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
         private List<CharacterQuest> quests = new List<CharacterQuest>();
+        private List<CharacterCurrency> currencies = new List<CharacterCurrency>();
 
         public string UserId { get { return userId; } set { userId = value; } }
         public int FactionId { get { return factionId; } set { factionId = value; } }
@@ -64,6 +65,16 @@ namespace MultiplayerARPG
             {
                 quests = new List<CharacterQuest>();
                 quests.AddRange(value);
+            }
+        }
+
+        public IList<CharacterCurrency> Currencies
+        {
+            get { return currencies; }
+            set
+            {
+                currencies = new List<CharacterCurrency>();
+                currencies.AddRange(value);
             }
         }
 

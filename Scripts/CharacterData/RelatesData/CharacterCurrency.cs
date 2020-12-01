@@ -1,0 +1,64 @@
+﻿using LiteNetLib.Utils;
+using LiteNetLibManager;
+
+namespace MultiplayerARPG
+{
+    [System.Serializable]
+    public class CharacterCurrency : INetSerializable
+    {
+        public static readonly CharacterCurrency Empty = new CharacterCurrency();
+        public int dataId;
+        public int amount;
+
+        [System.NonSerialized]
+        private int dirtyDataId;
+        [System.NonSerialized]
+        private Currency cacheCurrency;
+
+        private void MakeCache()
+        {
+            if (dirtyDataId != dataId)
+            {
+                dirtyDataId = dataId;
+                cacheCurrency = null;
+                GameInstance.Currencies.TryGetValue(dataId, out cacheCurrency);
+            }
+        }
+
+        public Currency GetCurrency()
+        {
+            MakeCache();
+            return cacheCurrency;
+        }
+
+        public static CharacterCurrency Create(Currency currency, short amount = 1)
+        {
+            return Create(currency.DataId, amount);
+        }
+
+        public static CharacterCurrency Create(int dataId, short amount = 1)
+        {
+            CharacterCurrency newCurrency = new CharacterCurrency();
+            newCurrency.dataId = dataId;
+            newCurrency.amount = amount;
+            return newCurrency;
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.PutPackedInt(dataId);
+            writer.PutPackedInt(amount);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            dataId = reader.GetPackedInt();
+            amount = reader.GetPackedInt();
+        }
+    }
+
+    [System.Serializable]
+    public class SyncListCharacterCurrency : LiteNetLibSyncList<CharacterCurrency>
+    {
+    }
+}

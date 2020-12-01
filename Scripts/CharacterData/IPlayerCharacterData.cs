@@ -66,5 +66,6 @@ namespace MultiplayerARPG
         int LastUpdate { get; set; }
         IList<CharacterHotkey> Hotkeys { get; set; }
         IList<CharacterQuest> Quests { get; set; }
+        IList<CharacterCurrency> Currencies { get; set; }
     }
 }

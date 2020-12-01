@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         [Header("Game Data")]
         public UnityHelpBox gameDataHelpBox = new UnityHelpBox("Only Attributes, Items, Guild Skills, Map Infos, Quests and Factions game data are required. Other game data can be loaded because they were referred by those game data.");
         public Attribute[] attributes;
+        public Currency[] currencies;
         public BaseItem[] items;
         public GuildSkill[] guildSkills;
         public BaseMapInfo[] mapInfos;
@@ -28,6 +29,7 @@ namespace MultiplayerARPG
         // TODO: WIP game database editor
         /*
         public Attribute[] attributes;
+        public Currency[] currencies;
         public DamageElement[] damageElements;
         public BaseItem[] items;
         public ArmorType[] armorTypes;
@@ -46,6 +48,7 @@ namespace MultiplayerARPG
         public override void LoadData(GameInstance gameInstance)
         {
             GameInstance.AddAttributes(attributes);
+            GameInstance.AddCurrencies(currencies);
             GameInstance.AddItems(items);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddCharacterEntities(playerCharacterEntities);

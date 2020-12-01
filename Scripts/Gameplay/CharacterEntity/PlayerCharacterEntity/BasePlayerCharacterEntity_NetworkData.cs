@@ -43,6 +43,8 @@ namespace MultiplayerARPG
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
         [SerializeField]
         protected SyncListCharacterQuest quests = new SyncListCharacterQuest();
+        [SerializeField]
+        protected SyncListCharacterCurrency currencies = new SyncListCharacterCurrency();
         #endregion
 
         #region Dealing System
@@ -195,6 +197,16 @@ namespace MultiplayerARPG
                 quests.AddRange(value);
             }
         }
+
+        public IList<CharacterCurrency> Currencies
+        {
+            get { return currencies; }
+            set
+            {
+                currencies.Clear();
+                currencies.AddRange(value);
+            }
+        }
         #endregion
 
         public void ClearParty()
@@ -283,6 +295,12 @@ namespace MultiplayerARPG
         {
             if (onQuestsOperation != null)
                 onQuestsOperation.Invoke(operation, index);
+        }
+
+        protected virtual void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (onCurrenciesOperation != null)
+                onCurrenciesOperation.Invoke(operation, index);
         }
 
         protected virtual void OnStorageItemsChange(bool isInitial, CharacterItem[] storageItems)

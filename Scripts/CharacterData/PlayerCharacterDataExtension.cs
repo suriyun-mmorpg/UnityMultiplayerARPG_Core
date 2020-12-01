@@ -58,6 +58,7 @@ namespace MultiplayerARPG
             to.Buffs = new List<CharacterBuff>(from.Buffs);
             to.Hotkeys = new List<CharacterHotkey>(from.Hotkeys);
             to.Quests = new List<CharacterQuest>(from.Quests);
+            to.Currencies = new List<CharacterCurrency>(from.Currencies);
             to.EquipItems = new List<CharacterItem>(from.EquipItems);
             to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
             to.Skills = new List<CharacterSkill>(from.Skills);
@@ -270,6 +271,7 @@ namespace MultiplayerARPG
             CharacterHotkeySerializationSurrogate hotkeySS = new CharacterHotkeySerializationSurrogate();
             CharacterItemSerializationSurrogate itemSS = new CharacterItemSerializationSurrogate();
             CharacterQuestSerializationSurrogate questSS = new CharacterQuestSerializationSurrogate();
+            CharacterCurrencySerializationSurrogate currencySS = new CharacterCurrencySerializationSurrogate();
             CharacterSkillSerializationSurrogate skillSS = new CharacterSkillSerializationSurrogate();
             CharacterSkillUsageSerializationSurrogate skillUsageSS = new CharacterSkillUsageSerializationSurrogate();
             CharacterSummonSerializationSurrogate summonSS = new CharacterSummonSerializationSurrogate();
@@ -279,6 +281,7 @@ namespace MultiplayerARPG
             surrogateSelector.AddSurrogate(typeof(CharacterHotkey), new StreamingContext(StreamingContextStates.All), hotkeySS);
             surrogateSelector.AddSurrogate(typeof(CharacterItem), new StreamingContext(StreamingContextStates.All), itemSS);
             surrogateSelector.AddSurrogate(typeof(CharacterQuest), new StreamingContext(StreamingContextStates.All), questSS);
+            surrogateSelector.AddSurrogate(typeof(CharacterCurrency), new StreamingContext(StreamingContextStates.All), currencySS);
             surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
             surrogateSelector.AddSurrogate(typeof(CharacterSkillUsage), new StreamingContext(StreamingContextStates.All), skillUsageSS);
             surrogateSelector.AddSurrogate(typeof(CharacterSummon), new StreamingContext(StreamingContextStates.All), summonSS);
@@ -450,6 +453,11 @@ namespace MultiplayerARPG
             {
                 entry.Serialize(writer);
             }
+            writer.Put((byte)characterData.Currencies.Count);
+            foreach (CharacterCurrency entry in characterData.Currencies)
+            {
+                entry.Serialize(writer);
+            }
             // Equip weapon set
             writer.Put(characterData.EquipWeaponSet);
             // Selectable weapon sets
@@ -566,6 +574,13 @@ namespace MultiplayerARPG
                 entry.Deserialize(reader);
                 characterData.Quests.Add(entry);
             }
+            count = reader.GetByte();
+            for (int i = 0; i < count; ++i)
+            {
+                CharacterCurrency entry = new CharacterCurrency();
+                entry.Deserialize(reader);
+                characterData.Currencies.Add(entry);
+            }
             // Equip weapon set
             characterData.EquipWeaponSet = reader.GetByte();
             // Selectable weapon sets
@@ -607,6 +622,23 @@ namespace MultiplayerARPG
             {
                 tempQuest = list[i];
                 if (tempQuest.dataId == dataId)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+
+        public static int IndexOfCurrency(this IPlayerCharacterData data, int dataId)
+        {
+            IList<CharacterCurrency> list = data.Currencies;
+            CharacterCurrency tempCurrency;
+            int index = -1;
+            for (int i = 0; i < list.Count; ++i)
+            {
+                tempCurrency = list[i];
+                if (tempCurrency.dataId == dataId)
                 {
                     index = i;
                     break;
