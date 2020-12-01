@@ -1,34 +1,40 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-public class CharacterQuestSerializationSurrogate : ISerializationSurrogate
+namespace MultiplayerARPG
 {
-    public void GetObjectData(System.Object obj,
-                              SerializationInfo info, StreamingContext context)
+    public class CharacterQuestSerializationSurrogate : ISerializationSurrogate
     {
-        CharacterQuest data = (CharacterQuest)obj;
-        info.AddValue("dataId", data.dataId);
-        info.AddValue("isComplete", data.isComplete);
-        info.AddValue("killedMonsters", data.killedMonsters);
-        info.AddValue("completedTasks", data.completedTasks);
-    }
-
-    public System.Object SetObjectData(System.Object obj,
-                                       SerializationInfo info, StreamingContext context,
-                                       ISurrogateSelector selector)
-    {
-        CharacterQuest data = (CharacterQuest)obj;
-        data.dataId = info.GetInt32("dataId");
-        data.isComplete = info.GetBoolean("isComplete");
-        data.killedMonsters = (Dictionary<int, int>)info.GetValue("killedMonsters", typeof(Dictionary<int, int>));
-        // TODO: Backward compatible, this will be removed in future version
-        try
+        public void GetObjectData(
+            object obj,
+            SerializationInfo info,
+            StreamingContext context)
         {
-            data.completedTasks = (List<int>)info.GetValue("completedTasks", typeof(List<int>));
+            CharacterQuest data = (CharacterQuest)obj;
+            info.AddValue("dataId", data.dataId);
+            info.AddValue("isComplete", data.isComplete);
+            info.AddValue("killedMonsters", data.killedMonsters);
+            info.AddValue("completedTasks", data.completedTasks);
         }
-        catch { }
-        obj = data;
-        return obj;
+
+        public object SetObjectData(
+            object obj,
+            SerializationInfo info,
+            StreamingContext context,
+            ISurrogateSelector selector)
+        {
+            CharacterQuest data = (CharacterQuest)obj;
+            data.dataId = info.GetInt32("dataId");
+            data.isComplete = info.GetBoolean("isComplete");
+            data.killedMonsters = (Dictionary<int, int>)info.GetValue("killedMonsters", typeof(Dictionary<int, int>));
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.completedTasks = (List<int>)info.GetValue("completedTasks", typeof(List<int>));
+            }
+            catch { }
+            obj = data;
+            return obj;
+        }
     }
 }

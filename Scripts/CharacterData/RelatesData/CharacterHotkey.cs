@@ -1,37 +1,40 @@
 ﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
 
-public enum HotkeyType : byte
+namespace MultiplayerARPG
 {
-    None,
-    Skill,
-    Item,
-}
-
-[System.Serializable]
-public class CharacterHotkey : INetSerializable
-{
-    public static readonly CharacterHotkey Empty = new CharacterHotkey();
-    public string hotkeyId;
-    public HotkeyType type;
-    public string relateId;
-
-    public void Serialize(NetDataWriter writer)
+    public enum HotkeyType : byte
     {
-        writer.Put(hotkeyId);
-        writer.Put((byte)type);
-        writer.Put(relateId);
+        None,
+        Skill,
+        Item,
     }
 
-    public void Deserialize(NetDataReader reader)
+    [System.Serializable]
+    public class CharacterHotkey : INetSerializable
     {
-        hotkeyId = reader.GetString();
-        type = (HotkeyType)reader.GetByte();
-        relateId = reader.GetString();
-    }
-}
+        public static readonly CharacterHotkey Empty = new CharacterHotkey();
+        public string hotkeyId;
+        public HotkeyType type;
+        public string relateId;
 
-[System.Serializable]
-public class SyncListCharacterHotkey : LiteNetLibSyncList<CharacterHotkey>
-{
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put(hotkeyId);
+            writer.Put((byte)type);
+            writer.Put(relateId);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            hotkeyId = reader.GetString();
+            type = (HotkeyType)reader.GetByte();
+            relateId = reader.GetString();
+        }
+    }
+
+    [System.Serializable]
+    public class SyncListCharacterHotkey : LiteNetLibSyncList<CharacterHotkey>
+    {
+    }
 }

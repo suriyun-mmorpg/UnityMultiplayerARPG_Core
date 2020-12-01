@@ -1,27 +1,32 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
-public class CharacterSkillUsageSerializationSurrogate : ISerializationSurrogate
+namespace MultiplayerARPG
 {
-    public void GetObjectData(System.Object obj,
-                              SerializationInfo info, StreamingContext context)
+    public class CharacterSkillUsageSerializationSurrogate : ISerializationSurrogate
     {
-        CharacterSkillUsage data = (CharacterSkillUsage)obj;
-        info.AddValue("type", (byte)data.type);
-        info.AddValue("dataId", data.dataId);
-        info.AddValue("coolDownRemainsDuration", data.coolDownRemainsDuration);
-    }
+        public void GetObjectData(
+            object obj,
+            SerializationInfo info,
+            StreamingContext context)
+        {
+            CharacterSkillUsage data = (CharacterSkillUsage)obj;
+            info.AddValue("type", (byte)data.type);
+            info.AddValue("dataId", data.dataId);
+            info.AddValue("coolDownRemainsDuration", data.coolDownRemainsDuration);
+        }
 
-    public System.Object SetObjectData(System.Object obj,
-                                       SerializationInfo info, StreamingContext context,
-                                       ISurrogateSelector selector)
-    {
-        CharacterSkillUsage data = (CharacterSkillUsage)obj;
-        data.type = (SkillUsageType)info.GetByte("type");
-        data.dataId = info.GetInt32("dataId");
-        data.coolDownRemainsDuration = info.GetSingle("coolDownRemainsDuration");
-        obj = data;
-        return obj;
+        public object SetObjectData(
+            object obj,
+            SerializationInfo info,
+            StreamingContext context,
+            ISurrogateSelector selector)
+        {
+            CharacterSkillUsage data = (CharacterSkillUsage)obj;
+            data.type = (SkillUsageType)info.GetByte("type");
+            data.dataId = info.GetInt32("dataId");
+            data.coolDownRemainsDuration = info.GetSingle("coolDownRemainsDuration");
+            obj = data;
+            return obj;
+        }
     }
 }

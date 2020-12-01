@@ -1,32 +1,37 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
-public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
+namespace MultiplayerARPG
 {
-    public void GetObjectData(System.Object obj,
-                              SerializationInfo info, StreamingContext context)
+    public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
     {
-        CharacterHotkey data = (CharacterHotkey)obj;
-        info.AddValue("hotkeyId", data.hotkeyId);
-        info.AddValue("type", (byte)data.type);
-        info.AddValue("relateId", data.relateId);
-    }
-
-    public System.Object SetObjectData(System.Object obj,
-                                       SerializationInfo info, StreamingContext context,
-                                       ISurrogateSelector selector)
-    {
-        CharacterHotkey data = (CharacterHotkey)obj;
-        data.hotkeyId = info.GetString("hotkeyId");
-        data.type = (HotkeyType)info.GetByte("type");
-        // TODO: Backward compatible, this will be removed in future version
-        try
+        public void GetObjectData(
+            object obj,
+            SerializationInfo info,
+            StreamingContext context)
         {
-            data.relateId = info.GetString("relateId");
+            CharacterHotkey data = (CharacterHotkey)obj;
+            info.AddValue("hotkeyId", data.hotkeyId);
+            info.AddValue("type", (byte)data.type);
+            info.AddValue("relateId", data.relateId);
         }
-        catch { }
-        obj = data;
-        return obj;
+
+        public object SetObjectData(
+            object obj,
+            SerializationInfo info,
+            StreamingContext context,
+            ISurrogateSelector selector)
+        {
+            CharacterHotkey data = (CharacterHotkey)obj;
+            data.hotkeyId = info.GetString("hotkeyId");
+            data.type = (HotkeyType)info.GetByte("type");
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.relateId = info.GetString("relateId");
+            }
+            catch { }
+            obj = data;
+            return obj;
+        }
     }
 }

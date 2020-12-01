@@ -1,67 +1,68 @@
-﻿using System.Collections.Generic;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
-using MultiplayerARPG;
 
-[System.Serializable]
-public class CharacterSkill : INetSerializable
+namespace MultiplayerARPG
 {
-    public static readonly CharacterSkill Empty = new CharacterSkill();
-    public int dataId;
-    public short level;
-
-    [System.NonSerialized]
-    private int dirtyDataId;
-    [System.NonSerialized]
-    private short dirtyLevel;
-
-    [System.NonSerialized]
-    private BaseSkill cacheSkill;
-
-    private void MakeCache()
+    [System.Serializable]
+    public class CharacterSkill : INetSerializable
     {
-        if (dirtyDataId != dataId || dirtyLevel != level)
+        public static readonly CharacterSkill Empty = new CharacterSkill();
+        public int dataId;
+        public short level;
+
+        [System.NonSerialized]
+        private int dirtyDataId;
+        [System.NonSerialized]
+        private short dirtyLevel;
+
+        [System.NonSerialized]
+        private BaseSkill cacheSkill;
+
+        private void MakeCache()
         {
-            dirtyDataId = dataId;
-            dirtyLevel = level;
-            cacheSkill = null;
-            GameInstance.Skills.TryGetValue(dataId, out cacheSkill);
+            if (dirtyDataId != dataId || dirtyLevel != level)
+            {
+                dirtyDataId = dataId;
+                dirtyLevel = level;
+                cacheSkill = null;
+                GameInstance.Skills.TryGetValue(dataId, out cacheSkill);
+            }
+        }
+
+        public BaseSkill GetSkill()
+        {
+            MakeCache();
+            return cacheSkill;
+        }
+
+        public static CharacterSkill Create(BaseSkill skill, short level = 1)
+        {
+            return Create(skill.DataId, level);
+        }
+
+        public static CharacterSkill Create(int dataId, short level = 1)
+        {
+            CharacterSkill newSkill = new CharacterSkill();
+            newSkill.dataId = dataId;
+            newSkill.level = level;
+            return newSkill;
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.PutPackedInt(dataId);
+            writer.PutPackedShort(level);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            dataId = reader.GetPackedInt();
+            level = reader.GetPackedShort();
         }
     }
 
-    public BaseSkill GetSkill()
+    [System.Serializable]
+    public class SyncListCharacterSkill : LiteNetLibSyncList<CharacterSkill>
     {
-        MakeCache();
-        return cacheSkill;
     }
-
-    public static CharacterSkill Create(BaseSkill skill, short level = 1)
-    {
-        return Create(skill.DataId, level);
-    }
-
-    public static CharacterSkill Create(int dataId, short level = 1)
-    {
-        CharacterSkill newSkill = new CharacterSkill();
-        newSkill.dataId = dataId;
-        newSkill.level = level;
-        return newSkill;
-    }
-
-    public void Serialize(NetDataWriter writer)
-    {
-        writer.PutPackedInt(dataId);
-        writer.PutPackedShort(level);
-    }
-
-    public void Deserialize(NetDataReader reader)
-    {
-        dataId = reader.GetPackedInt();
-        level = reader.GetPackedShort();
-    }
-}
-
-[System.Serializable]
-public class SyncListCharacterSkill : LiteNetLibSyncList<CharacterSkill>
-{
 }

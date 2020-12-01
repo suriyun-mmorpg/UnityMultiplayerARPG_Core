@@ -1,228 +1,230 @@
 ﻿using System.Collections.Generic;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using MultiplayerARPG;
 
-[System.Serializable]
-public class CharacterQuest : INetSerializable
+namespace MultiplayerARPG
 {
-    public static readonly CharacterQuest Empty = new CharacterQuest();
-    public int dataId;
-    public bool isComplete;
-    public Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
-    public List<int> completedTasks = new List<int>();
-
-    [System.NonSerialized]
-    private int dirtyDataId;
-
-    [System.NonSerialized]
-    private Quest cacheQuest;
-
-    public Dictionary<int, int> KilledMonsters
+    [System.Serializable]
+    public class CharacterQuest : INetSerializable
     {
-        get
+        public static readonly CharacterQuest Empty = new CharacterQuest();
+        public int dataId;
+        public bool isComplete;
+        public Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
+        public List<int> completedTasks = new List<int>();
+
+        [System.NonSerialized]
+        private int dirtyDataId;
+
+        [System.NonSerialized]
+        private Quest cacheQuest;
+
+        public Dictionary<int, int> KilledMonsters
         {
-            if (killedMonsters == null)
-                killedMonsters = new Dictionary<int, int>();
-            return killedMonsters;
+            get
+            {
+                if (killedMonsters == null)
+                    killedMonsters = new Dictionary<int, int>();
+                return killedMonsters;
+            }
         }
-    }
 
-    public List<int> CompletedTasks
-    {
-        get
+        public List<int> CompletedTasks
         {
-            if (completedTasks == null)
-                completedTasks = new List<int>();
-            return completedTasks;
+            get
+            {
+                if (completedTasks == null)
+                    completedTasks = new List<int>();
+                return completedTasks;
+            }
         }
-    }
 
-    private void MakeCache()
-    {
-        if (!GameInstance.Quests.ContainsKey(dataId))
+        private void MakeCache()
         {
-            cacheQuest = null;
-            return;
+            if (!GameInstance.Quests.ContainsKey(dataId))
+            {
+                cacheQuest = null;
+                return;
+            }
+            if (dirtyDataId != dataId)
+            {
+                dirtyDataId = dataId;
+                cacheQuest = GameInstance.Quests.TryGetValue(dataId, out cacheQuest) ? cacheQuest : null;
+            }
         }
-        if (dirtyDataId != dataId)
+
+        public Quest GetQuest()
         {
-            dirtyDataId = dataId;
-            cacheQuest = GameInstance.Quests.TryGetValue(dataId, out cacheQuest) ? cacheQuest : null;
+            MakeCache();
+            return cacheQuest;
         }
-    }
 
-    public Quest GetQuest()
-    {
-        MakeCache();
-        return cacheQuest;
-    }
-
-    public bool IsAllTasksDone(ICharacterData character)
-    {
-        Quest quest = GetQuest();
-        if (character == null || quest == null)
-            return false;
-        QuestTask[] tasks = quest.tasks;
-        for (int i = 0; i < tasks.Length; ++i)
+        public bool IsAllTasksDone(ICharacterData character)
         {
-            bool isComplete = false;
-            GetProgress(character, i, out isComplete);
-            if (!isComplete)
+            Quest quest = GetQuest();
+            if (character == null || quest == null)
                 return false;
-        }
-        return true;
-    }
-
-    public int GetProgress(ICharacterData character, int taskIndex, out bool isComplete)
-    {
-        isComplete = false;
-        Quest quest = GetQuest();
-        if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
-            return 0;
-        QuestTask task = quest.tasks[taskIndex];
-        int progress = 0;
-        switch (task.taskType)
-        {
-            case QuestTaskType.KillMonster:
-                MonsterCharacterAmount monsterCharacterAmount = task.monsterCharacterAmount;
-                progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.DataId);
-                isComplete = progress >= monsterCharacterAmount.amount;
-                return progress;
-            case QuestTaskType.CollectItem:
-                ItemAmount itemAmount = task.itemAmount;
-                progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.DataId);
-                isComplete = progress >= itemAmount.amount;
-                return progress;
-        }
-        return 0;
-    }
-
-    public bool AddKillMonster(BaseMonsterCharacterEntity monsterEntity, int killCount)
-    {
-        return AddKillMonster(monsterEntity.DataId, killCount);
-    }
-
-    public bool AddKillMonster(int monsterDataId, int killCount)
-    {
-        Quest quest = GetQuest();
-        if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterDataId))
-            return false;
-        if (!KilledMonsters.ContainsKey(monsterDataId))
-            KilledMonsters.Add(monsterDataId, 0);
-        KilledMonsters[monsterDataId] += killCount;
-        return true;
-    }
-
-    public int CountKillMonster(int monsterDataId)
-    {
-        if (!KilledMonsters.ContainsKey(monsterDataId))
-            return 0;
-        return KilledMonsters[monsterDataId];
-    }
-
-    public static CharacterQuest Create(Quest quest)
-    {
-        CharacterQuest newQuest = new CharacterQuest();
-        newQuest.dataId = quest.DataId;
-        newQuest.isComplete = false;
-        return newQuest;
-    }
-
-    public Dictionary<int, int> ReadKillMonsters(string killMonsters)
-    {
-        KilledMonsters.Clear();
-        string[] splitSets = killMonsters.Split(';');
-        foreach (string set in splitSets)
-        {
-            if (string.IsNullOrEmpty(set))
-                continue;
-            string[] splitData = set.Split(':');
-            if (splitData.Length != 2)
-                continue;
-            KilledMonsters[int.Parse(splitData[0])] = int.Parse(splitData[1]);
-        }
-        return KilledMonsters;
-    }
-
-    public string WriteKillMonsters()
-    {
-        string result = string.Empty;
-        foreach (KeyValuePair<int, int> keyValue in KilledMonsters)
-        {
-            result += $"{keyValue.Key}:{keyValue.Value};";
-        }
-        return result;
-    }
-
-    public List<int> ReadCompletedTasks(string completedTasks)
-    {
-        CompletedTasks.Clear();
-        string[] splitTexts = completedTasks.Split(';');
-        foreach (string text in splitTexts)
-        {
-            if (string.IsNullOrEmpty(text))
-                continue;
-            CompletedTasks.Add(int.Parse(text));
-        }
-        return CompletedTasks;
-    }
-
-    public string WriteCompletedTasks()
-    {
-        string result = string.Empty;
-        foreach (int completedTask in CompletedTasks)
-        {
-            result += $"{completedTask};";
-        }
-        return result;
-    }
-
-    public void Serialize(NetDataWriter writer)
-    {
-        writer.PutPackedInt(dataId);
-        writer.Put(isComplete);
-        byte killMonstersCount = (byte)KilledMonsters.Count;
-        writer.Put(killMonstersCount);
-        if (killMonstersCount > 0)
-        {
-            foreach (KeyValuePair<int, int> killedMonster in KilledMonsters)
+            QuestTask[] tasks = quest.tasks;
+            for (int i = 0; i < tasks.Length; ++i)
             {
-                writer.PutPackedInt(killedMonster.Key);
-                writer.PutPackedInt(killedMonster.Value);
+                bool isComplete = false;
+                GetProgress(character, i, out isComplete);
+                if (!isComplete)
+                    return false;
+            }
+            return true;
+        }
+
+        public int GetProgress(ICharacterData character, int taskIndex, out bool isComplete)
+        {
+            isComplete = false;
+            Quest quest = GetQuest();
+            if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
+                return 0;
+            QuestTask task = quest.tasks[taskIndex];
+            int progress = 0;
+            switch (task.taskType)
+            {
+                case QuestTaskType.KillMonster:
+                    MonsterCharacterAmount monsterCharacterAmount = task.monsterCharacterAmount;
+                    progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.DataId);
+                    isComplete = progress >= monsterCharacterAmount.amount;
+                    return progress;
+                case QuestTaskType.CollectItem:
+                    ItemAmount itemAmount = task.itemAmount;
+                    progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.DataId);
+                    isComplete = progress >= itemAmount.amount;
+                    return progress;
+            }
+            return 0;
+        }
+
+        public bool AddKillMonster(BaseMonsterCharacterEntity monsterEntity, int killCount)
+        {
+            return AddKillMonster(monsterEntity.DataId, killCount);
+        }
+
+        public bool AddKillMonster(int monsterDataId, int killCount)
+        {
+            Quest quest = GetQuest();
+            if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterDataId))
+                return false;
+            if (!KilledMonsters.ContainsKey(monsterDataId))
+                KilledMonsters.Add(monsterDataId, 0);
+            KilledMonsters[monsterDataId] += killCount;
+            return true;
+        }
+
+        public int CountKillMonster(int monsterDataId)
+        {
+            if (!KilledMonsters.ContainsKey(monsterDataId))
+                return 0;
+            return KilledMonsters[monsterDataId];
+        }
+
+        public static CharacterQuest Create(Quest quest)
+        {
+            CharacterQuest newQuest = new CharacterQuest();
+            newQuest.dataId = quest.DataId;
+            newQuest.isComplete = false;
+            return newQuest;
+        }
+
+        public Dictionary<int, int> ReadKillMonsters(string killMonsters)
+        {
+            KilledMonsters.Clear();
+            string[] splitSets = killMonsters.Split(';');
+            foreach (string set in splitSets)
+            {
+                if (string.IsNullOrEmpty(set))
+                    continue;
+                string[] splitData = set.Split(':');
+                if (splitData.Length != 2)
+                    continue;
+                KilledMonsters[int.Parse(splitData[0])] = int.Parse(splitData[1]);
+            }
+            return KilledMonsters;
+        }
+
+        public string WriteKillMonsters()
+        {
+            string result = string.Empty;
+            foreach (KeyValuePair<int, int> keyValue in KilledMonsters)
+            {
+                result += $"{keyValue.Key}:{keyValue.Value};";
+            }
+            return result;
+        }
+
+        public List<int> ReadCompletedTasks(string completedTasks)
+        {
+            CompletedTasks.Clear();
+            string[] splitTexts = completedTasks.Split(';');
+            foreach (string text in splitTexts)
+            {
+                if (string.IsNullOrEmpty(text))
+                    continue;
+                CompletedTasks.Add(int.Parse(text));
+            }
+            return CompletedTasks;
+        }
+
+        public string WriteCompletedTasks()
+        {
+            string result = string.Empty;
+            foreach (int completedTask in CompletedTasks)
+            {
+                result += $"{completedTask};";
+            }
+            return result;
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.PutPackedInt(dataId);
+            writer.Put(isComplete);
+            byte killMonstersCount = (byte)KilledMonsters.Count;
+            writer.Put(killMonstersCount);
+            if (killMonstersCount > 0)
+            {
+                foreach (KeyValuePair<int, int> killedMonster in KilledMonsters)
+                {
+                    writer.PutPackedInt(killedMonster.Key);
+                    writer.PutPackedInt(killedMonster.Value);
+                }
+            }
+            byte completedTasksCount = (byte)CompletedTasks.Count;
+            writer.Put(completedTasksCount);
+            if (completedTasksCount > 0)
+            {
+                foreach (int talkedNpc in CompletedTasks)
+                {
+                    writer.PutPackedInt(talkedNpc);
+                }
             }
         }
-        byte completedTasksCount = (byte)CompletedTasks.Count;
-        writer.Put(completedTasksCount);
-        if (completedTasksCount > 0)
+
+        public void Deserialize(NetDataReader reader)
         {
-            foreach (int talkedNpc in CompletedTasks)
+            dataId = reader.GetPackedInt();
+            isComplete = reader.GetBool();
+            int killMonstersCount = reader.GetByte();
+            KilledMonsters.Clear();
+            for (int i = 0; i < killMonstersCount; ++i)
             {
-                writer.PutPackedInt(talkedNpc);
+                KilledMonsters.Add(reader.GetPackedInt(), reader.GetPackedInt());
+            }
+            int completedTasksCount = reader.GetByte();
+            CompletedTasks.Clear();
+            for (int i = 0; i < completedTasksCount; ++i)
+            {
+                CompletedTasks.Add(reader.GetPackedInt());
             }
         }
     }
 
-    public void Deserialize(NetDataReader reader)
+    [System.Serializable]
+    public class SyncListCharacterQuest : LiteNetLibSyncList<CharacterQuest>
     {
-        dataId = reader.GetPackedInt();
-        isComplete = reader.GetBool();
-        int killMonstersCount = reader.GetByte();
-        KilledMonsters.Clear();
-        for (int i = 0; i < killMonstersCount; ++i)
-        {
-            KilledMonsters.Add(reader.GetPackedInt(), reader.GetPackedInt());
-        }
-        int completedTasksCount = reader.GetByte();
-        CompletedTasks.Clear();
-        for (int i = 0; i < completedTasksCount; ++i)
-        {
-            CompletedTasks.Add(reader.GetPackedInt());
-        }
     }
-}
-
-[System.Serializable]
-public class SyncListCharacterQuest : LiteNetLibSyncList<CharacterQuest>
-{
 }
