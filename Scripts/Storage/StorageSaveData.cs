@@ -21,6 +21,7 @@ namespace MultiplayerARPG
             surrogateSelector.AddSurrogate(typeof(StorageCharacterItem), new StreamingContext(StreamingContextStates.All), storageCharacterItemSS);
             surrogateSelector.AddSurrogate(typeof(StorageSaveData), new StreamingContext(StreamingContextStates.All), storageSaveDataSS);
             binaryFormatter.SurrogateSelector = surrogateSelector;
+            binaryFormatter.Binder = new PlayerCharacterDataTypeBinder();
             string path = Application.persistentDataPath + "/" + id + "_storage.sav";
             FileStream file = File.Open(path, FileMode.OpenOrCreate);
             binaryFormatter.Serialize(file, this);
@@ -41,6 +42,7 @@ namespace MultiplayerARPG
                 surrogateSelector.AddSurrogate(typeof(StorageCharacterItem), new StreamingContext(StreamingContextStates.All), storageCharacterItemSS);
                 surrogateSelector.AddSurrogate(typeof(StorageSaveData), new StreamingContext(StreamingContextStates.All), storageSaveDataSS);
                 binaryFormatter.SurrogateSelector = surrogateSelector;
+                binaryFormatter.Binder = new PlayerCharacterDataTypeBinder();
                 FileStream file = File.Open(path, FileMode.Open);
                 StorageSaveData result = (StorageSaveData)binaryFormatter.Deserialize(file);
                 storageItems = result.storageItems;
