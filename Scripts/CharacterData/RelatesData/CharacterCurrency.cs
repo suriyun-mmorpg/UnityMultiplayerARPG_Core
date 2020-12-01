@@ -31,12 +31,12 @@ namespace MultiplayerARPG
             return cacheCurrency;
         }
 
-        public static CharacterCurrency Create(Currency currency, short amount = 1)
+        public static CharacterCurrency Create(Currency currency, int amount = 0)
         {
             return Create(currency.DataId, amount);
         }
 
-        public static CharacterCurrency Create(int dataId, short amount = 1)
+        public static CharacterCurrency Create(int dataId, int amount = 0)
         {
             CharacterCurrency newCurrency = new CharacterCurrency();
             newCurrency.dataId = dataId;
