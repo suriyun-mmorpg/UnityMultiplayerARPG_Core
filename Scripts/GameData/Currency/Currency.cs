@@ -11,6 +11,6 @@ namespace MultiplayerARPG
     public struct CurrencyAmount
     {
         public Currency currency;
-        public float amount;
+        public int amount;
     }
 }
