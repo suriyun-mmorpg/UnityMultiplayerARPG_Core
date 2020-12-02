@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -10,7 +11,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected int sellPrice;
         [SerializeField]
-        public CurrencyAmount[] sellPrices;
+        protected CurrencyAmount[] sellPrices;
         [SerializeField]
         protected float weight;
         [SerializeField]
@@ -58,6 +59,18 @@ namespace MultiplayerARPG
 
         public CurrencyAmount[] SellPrices { get { return sellPrices; } }
 
+        [System.NonSerialized]
+        private Dictionary<Currency, int> cacheSellPrices;
+        public Dictionary<Currency, int> CacheSellPrices
+        {
+            get
+            {
+                if (cacheSellPrices == null)
+                    cacheSellPrices = GameDataHelpers.CombineCurrencies(sellPrices, new Dictionary<Currency, int>());
+                return cacheSellPrices;
+            }
+        }
+
         public float Weight { get { return weight; } }
 
         public short MaxStack { get { return maxStack; } }
@@ -99,6 +112,18 @@ namespace MultiplayerARPG
                     break;
             }
             return hasChanges;
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            if (sellPrices != null && sellPrices.Length > 0)
+            {
+                foreach (CurrencyAmount sellPrice in sellPrices)
+                {
+                    GameInstance.AddCurrencies(sellPrice.currency);
+                }
+            }
         }
     }
 }

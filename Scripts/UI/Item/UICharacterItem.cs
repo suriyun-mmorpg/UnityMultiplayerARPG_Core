@@ -74,6 +74,7 @@ namespace MultiplayerARPG
         public Image imageRarity;
         public TextWrapper uiTextItemType;
         public TextWrapper uiTextSellPrice;
+        public UICurrencyAmounts uiSellPrices;
         public TextWrapper uiTextStack;
         public TextWrapper uiTextDurability;
         public TextWrapper uiTextWeight;
@@ -330,6 +331,13 @@ namespace MultiplayerARPG
                 uiTextSellPrice.text = string.Format(
                     LanguageManager.GetText(formatKeySellPrice),
                     Item == null ? 0.ToString("N0") : Item.SellPrice.ToString("N0"));
+            }
+
+            if (uiSellPrices != null)
+            {
+                uiSellPrices.displayType = UICurrencyAmounts.DisplayType.Simple;
+                uiSellPrices.isBonus = false;
+                uiSellPrices.Data = Item == null ? null : Item.CacheSellPrices;
             }
 
             if (uiTextStack != null)

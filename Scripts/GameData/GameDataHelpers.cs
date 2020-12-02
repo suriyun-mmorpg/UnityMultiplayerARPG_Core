@@ -86,6 +86,26 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Combine currency amounts dictionary
+        /// </summary>
+        /// <param name="targetDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<Currency, int> CombineCurrencies(Dictionary<Currency, int> targetDictionary, KeyValuePair<Currency, int> newEntry)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Currency, int>();
+            if (newEntry.Key != null)
+            {
+                if (!targetDictionary.ContainsKey(newEntry.Key))
+                    targetDictionary[newEntry.Key] = newEntry.Value;
+                else
+                    targetDictionary[newEntry.Key] += newEntry.Value;
+            }
+            return targetDictionary;
+        }
+
+        /// <summary>
         /// Combine resistance amounts dictionary
         /// </summary>
         /// <param name="targetDictionary"></param>
@@ -426,6 +446,16 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Make currency - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static KeyValuePair<Currency, int> MakeCurrency(CurrencyAmount source)
+        {
+            return new KeyValuePair<Currency, int>(source.currency, source.amount);
+        }
+
+        /// <summary>
         /// Make resistance - amount key-value pair
         /// </summary>
         /// <param name="source"></param>
@@ -658,6 +688,29 @@ namespace MultiplayerARPG
                 {
                     pair = MakeAttribute(sourceIncremental, level, rate);
                     targetDictionary = CombineAttributes(targetDictionary, pair);
+                }
+            }
+            return targetDictionary;
+        }
+
+        /// <summary>
+        /// Combine currency amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public static Dictionary<Currency, int> CombineCurrencies(CurrencyAmount[] sourceAmounts, Dictionary<Currency, int> targetDictionary)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Currency, int>();
+            if (sourceAmounts != null && sourceAmounts.Length > 0)
+            {
+                KeyValuePair<Currency, int> pair;
+                foreach (CurrencyAmount sourceAmount in sourceAmounts)
+                {
+                    pair = MakeCurrency(sourceAmount);
+                    targetDictionary = CombineCurrencies(targetDictionary, pair);
                 }
             }
             return targetDictionary;

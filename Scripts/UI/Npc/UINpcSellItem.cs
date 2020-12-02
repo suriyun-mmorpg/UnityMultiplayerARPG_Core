@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -11,6 +12,7 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public UICharacterItem uiCharacterItem;
         public TextWrapper uiTextSellPrice;
+        public UICurrencyAmounts uiSellPrices;
 
         public int indexOfData { get; protected set; }
 
@@ -38,6 +40,13 @@ namespace MultiplayerARPG
                 uiTextSellPrice.text = string.Format(
                     LanguageManager.GetText(formatKeySellPrice),
                     Data.sellPrice.ToString("N0"));
+            }
+
+            if (uiSellPrices != null)
+            {
+                uiSellPrices.displayType = UICurrencyAmounts.DisplayType.Simple;
+                uiSellPrices.isBonus = false;
+                uiSellPrices.Data = GameDataHelpers.CombineCurrencies(Data.sellPrices, new Dictionary<Currency, int>());
             }
         }
 
