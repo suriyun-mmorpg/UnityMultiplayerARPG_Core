@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -7,7 +6,8 @@ using UnityEngine.UI;
 using TMPro;
 #endif
 
-public class DropdownWrapper : MonoBehaviour {
+public class DropdownWrapper : MonoBehaviour
+{
     public Dropdown unityDropdown;
 #if USE_TEXT_MESH_PRO
     public TMP_Dropdown textMeshDropdown;
@@ -135,6 +135,25 @@ public class DropdownWrapper : MonoBehaviour {
             if (textMeshDropdown != null) textMeshDropdown.onValueChanged = value as TMP_Dropdown.DropdownEvent;
 #endif
         }
+    }
+
+    void Awake()
+    {
+        if (unityDropdown == null) unityDropdown = GetComponent<Dropdown>();
+#if USE_TEXT_MESH_PRO
+        if (textMeshDropdown == null) textMeshDropdown = GetComponent<TMP_Dropdown>();
+#endif
+    }
+
+    public void SetGameObjectActive(bool isActive)
+    {
+        if (unityDropdown != null)
+            unityDropdown.gameObject.SetActive(isActive);
+#if USE_TEXT_MESH_PRO
+        if (textMeshDropdown != null)
+            textMeshDropdown.gameObject.SetActive(isActive);
+#endif
+        gameObject.SetActive(isActive);
     }
 
     public class OptionData

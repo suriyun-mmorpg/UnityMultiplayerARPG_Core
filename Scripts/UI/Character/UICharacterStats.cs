@@ -175,7 +175,7 @@ namespace MultiplayerARPG
             // All stats text
             if (uiTextStats != null)
             {
-                uiTextStats.gameObject.SetActive(!string.IsNullOrEmpty(statsString));
+                uiTextStats.SetGameObjectActive(!string.IsNullOrEmpty(statsString));
                 uiTextStats.text = statsString;
             }
         }

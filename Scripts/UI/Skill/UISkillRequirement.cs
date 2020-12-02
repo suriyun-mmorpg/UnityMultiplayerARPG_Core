@@ -22,11 +22,11 @@ namespace MultiplayerARPG
             {
                 if (skill == null)
                 {
-                    uiTextRequireLevel.gameObject.SetActive(false);
+                    uiTextRequireLevel.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextRequireLevel.gameObject.SetActive(true);
+                    uiTextRequireLevel.SetGameObjectActive(true);
                     uiTextRequireLevel.text = string.Format(
                         LanguageManager.GetText(formatKeyRequireLevel),
                         skill.GetRequireCharacterLevel(level).ToString("N0"));

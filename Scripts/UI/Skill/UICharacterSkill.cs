@@ -118,10 +118,10 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(coolDownRemainsDuration > 0);
                 uiTextCoolDownRemainsDuration.text = string.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
                     coolDownRemainsDuration.ToString("N0"));
-                uiTextCoolDownRemainsDuration.gameObject.SetActive(coolDownRemainsDuration > 0);
             }
 
             if (imageCoolDownGage != null)
@@ -201,14 +201,14 @@ namespace MultiplayerARPG
             {
                 if (string.IsNullOrEmpty(Skill.AvailableWeaponsText))
                 {
-                    uiTextAvailableWeapons.gameObject.SetActive(false);
+                    uiTextAvailableWeapons.SetGameObjectActive(false);
                 }
                 else
                 {
+                    uiTextAvailableWeapons.SetGameObjectActive(true);
                     uiTextAvailableWeapons.text = string.Format(
                         LanguageManager.GetText(formatKeyAvailableWeapons),
                         Skill.AvailableWeaponsText);
-                    uiTextAvailableWeapons.gameObject.SetActive(true);
                 }
             }
 
@@ -238,11 +238,11 @@ namespace MultiplayerARPG
             {
                 if (Skill == null || !Skill.IsActive() || Skill.GetSummon().MonsterEntity == null)
                 {
-                    uiTextSummon.gameObject.SetActive(false);
+                    uiTextSummon.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextSummon.gameObject.SetActive(true);
+                    uiTextSummon.SetGameObjectActive(true);
                     uiTextSummon.text = string.Format(
                         LanguageManager.GetText(formatKeySummon),
                         Skill.GetSummon().MonsterEntity.Title,
@@ -257,11 +257,11 @@ namespace MultiplayerARPG
             {
                 if (Skill == null || !Skill.IsActive() || Skill.GetMount().MountEntity == null)
                 {
-                    uiTextMount.gameObject.SetActive(false);
+                    uiTextMount.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextMount.gameObject.SetActive(true);
+                    uiTextMount.SetGameObjectActive(true);
                     uiTextMount.text = string.Format(
                         LanguageManager.GetText(formatKeyMount),
                         Skill.GetMount().MountEntity.Title);

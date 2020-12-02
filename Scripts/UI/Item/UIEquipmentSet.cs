@@ -36,7 +36,7 @@ namespace MultiplayerARPG
 
             if (uiTextAllBonus != null)
             {
-                uiTextAllBonus.gameObject.SetActive(!string.IsNullOrEmpty(allBonusText));
+                uiTextAllBonus.SetGameObjectActive(!string.IsNullOrEmpty(allBonusText));
                 uiTextAllBonus.text = string.Format(
                     LanguageManager.GetText(formatKeySet),
                     Data.equipmentSet.Title,

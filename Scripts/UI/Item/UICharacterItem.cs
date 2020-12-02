@@ -201,10 +201,10 @@ namespace MultiplayerARPG
 
             if (uiTextLockRemainsDuration != null)
             {
+                uiTextLockRemainsDuration.SetGameObjectActive(lockRemainsDuration > 0);
                 uiTextLockRemainsDuration.text = string.Format(
                     LanguageManager.GetText(formatKeyLockRemainsDuration),
                     lockRemainsDuration.ToString("N0"));
-                uiTextLockRemainsDuration.gameObject.SetActive(lockRemainsDuration > 0);
             }
         }
 
@@ -278,6 +278,7 @@ namespace MultiplayerARPG
 
             if (uiTextLevel != null)
             {
+                uiTextLevel.SetGameObjectActive(EquipmentItem != null || PetItem != null);
                 if (EquipmentItem != null)
                 {
                     if (showLevelAsDefault)
@@ -299,7 +300,6 @@ namespace MultiplayerARPG
                         LanguageManager.GetText(formatKeyLevel),
                         Level.ToString("N0"));
                 }
-                uiTextLevel.gameObject.SetActive(EquipmentItem != null || PetItem != null);
             }
 
             if (imageIcon != null)
@@ -354,8 +354,8 @@ namespace MultiplayerARPG
                         CharacterItem.amount.ToString("N0"),
                         Item.MaxStack);
                 }
+                uiTextStack.SetGameObjectActive(CharacterItem.NotEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
                 uiTextStack.text = stackString;
-                uiTextStack.gameObject.SetActive(CharacterItem.NotEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
             }
 
             if (uiTextDurability != null)
@@ -375,8 +375,8 @@ namespace MultiplayerARPG
                         CharacterItem.durability.ToString("N0"),
                         EquipmentItem != null ? EquipmentItem.MaxDurability.ToString("N0") : 0.ToString("N0"));
                 }
+                uiTextDurability.SetGameObjectActive(EquipmentItem != null && EquipmentItem.MaxDurability > 0);
                 uiTextDurability.text = durabilityString;
-                uiTextDurability.gameObject.SetActive(EquipmentItem != null && EquipmentItem.MaxDurability > 0);
             }
 
             if (uiTextWeight != null)
@@ -687,28 +687,28 @@ namespace MultiplayerARPG
 
                 if (uiTextExp != null)
                 {
+                    uiTextExp.SetGameObjectActive(true);
                     uiTextExp.text = string.Format(
                         LanguageManager.GetText(formatKeyExp),
                         currentExp.ToString("N0"),
                         nextLevelExp.ToString("N0"));
-                    uiTextExp.gameObject.SetActive(true);
                 }
             }
             else
             {
                 if (uiTextExp != null)
-                    uiTextExp.gameObject.SetActive(false);
+                    uiTextExp.SetGameObjectActive(false);
             }
 
             if (uiTextBuilding != null)
             {
                 if (BuildingItem == null || BuildingItem.BuildingEntity == null)
                 {
-                    uiTextBuilding.gameObject.SetActive(false);
+                    uiTextBuilding.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextBuilding.gameObject.SetActive(true);
+                    uiTextBuilding.SetGameObjectActive(true);
                     uiTextBuilding.text = string.Format(
                         LanguageManager.GetText(formatKeyBuilding),
                         BuildingItem.BuildingEntity.Title);
@@ -719,11 +719,11 @@ namespace MultiplayerARPG
             {
                 if (PetItem == null || PetItem.PetEntity == null)
                 {
-                    uiTextPet.gameObject.SetActive(false);
+                    uiTextPet.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextPet.gameObject.SetActive(true);
+                    uiTextPet.SetGameObjectActive(true);
                     uiTextPet.text = string.Format(
                         LanguageManager.GetText(formatKeyPet),
                         PetItem.PetEntity.Title);
@@ -734,11 +734,11 @@ namespace MultiplayerARPG
             {
                 if (MountItem == null || MountItem.MountEntity == null)
                 {
-                    uiTextMount.gameObject.SetActive(false);
+                    uiTextMount.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextMount.gameObject.SetActive(true);
+                    uiTextMount.SetGameObjectActive(true);
                     uiTextMount.text = string.Format(
                         LanguageManager.GetText(formatKeyMount),
                         MountItem.MountEntity.Title);
@@ -749,11 +749,11 @@ namespace MultiplayerARPG
             {
                 if (SkillItem == null || SkillItem.UsingSkill == null)
                 {
-                    uiTextSkill.gameObject.SetActive(false);
+                    uiTextSkill.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextSkill.gameObject.SetActive(true);
+                    uiTextSkill.SetGameObjectActive(true);
                     uiTextSkill.text = string.Format(
                         LanguageManager.GetText(formatKeySkill),
                         SkillItem.UsingSkill.Title,

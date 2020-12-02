@@ -58,19 +58,19 @@ namespace MultiplayerARPG
             if (uiTextTitle != null)
             {
                 tempTitle = Data == null ? string.Empty : Data.Title;
+                uiTextTitle.SetGameObjectActive(!string.IsNullOrEmpty(tempTitle));
                 uiTextTitle.text = string.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     tempTitle);
-                uiTextTitle.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
             }
 
             if (uiTextTitleB != null)
             {
                 tempTitle = Data == null ? string.Empty : Data.TitleB;
+                uiTextTitleB.SetGameObjectActive(!string.IsNullOrEmpty(tempTitle));
                 uiTextTitleB.text = string.Format(
                     LanguageManager.GetText(formatKeyTitleB),
                     tempTitle);
-                uiTextTitleB.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
             }
         }
 

@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllInflictions != null)
-                    uiTextAllInflictions.gameObject.SetActive(false);
+                    uiTextAllInflictions.SetGameObjectActive(false);
             }
             else
             {
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
 
                 if (uiTextAllInflictions != null)
                 {
-                    uiTextAllInflictions.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));
+                    uiTextAllInflictions.SetGameObjectActive(!string.IsNullOrEmpty(tempAllText));
                     uiTextAllInflictions.text = tempAllText;
                 }
             }

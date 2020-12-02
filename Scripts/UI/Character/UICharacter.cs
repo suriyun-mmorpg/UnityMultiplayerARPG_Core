@@ -150,6 +150,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterController.OwningCharacter.onBuffsOperation += OnBuffsOperation;
             BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
             BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onCurrenciesOperation += OnCurrenciesOperation;
         }
 
         public void UnregisterOwningCharacterEvents()
@@ -164,6 +165,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterController.OwningCharacter.onBuffsOperation -= OnBuffsOperation;
             BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
             BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            BasePlayerCharacterController.OwningCharacter.onCurrenciesOperation -= OnCurrenciesOperation;
         }
 
         private void OnDataIdChange(int dataId)
@@ -207,6 +209,11 @@ namespace MultiplayerARPG
         }
 
         private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             UpdateOwningCharacterData();
         }

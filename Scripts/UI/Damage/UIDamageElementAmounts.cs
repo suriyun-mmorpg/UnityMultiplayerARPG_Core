@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllDamages != null)
-                    uiTextAllDamages.gameObject.SetActive(false);
+                    uiTextAllDamages.SetGameObjectActive(false);
             }
             else
             {
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
 
                 if (uiTextAllDamages != null)
                 {
-                    uiTextAllDamages.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));
+                    uiTextAllDamages.SetGameObjectActive(!string.IsNullOrEmpty(tempAllText));
                     uiTextAllDamages.text = tempAllText;
                 }
 

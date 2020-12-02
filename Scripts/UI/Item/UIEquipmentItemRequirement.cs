@@ -22,11 +22,11 @@ namespace MultiplayerARPG
                 if (Data == null || Data.Requirement.level <= 0)
                 {
                     // Hide require level label when require level <= 0
-                    uiTextRequireLevel.gameObject.SetActive(false);
+                    uiTextRequireLevel.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextRequireLevel.gameObject.SetActive(true);
+                    uiTextRequireLevel.SetGameObjectActive(true);
                     uiTextRequireLevel.text = string.Format(
                         LanguageManager.GetText(formatKeyRequireLevel),
                         Data.Requirement.level.ToString("N0"));
@@ -38,11 +38,11 @@ namespace MultiplayerARPG
                 if (Data == null || Data.Requirement.character == null)
                 {
                     // Hide require class label when require character is null
-                    uiTextRequireClass.gameObject.SetActive(false);
+                    uiTextRequireClass.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextRequireClass.gameObject.SetActive(true);
+                    uiTextRequireClass.SetGameObjectActive(true);
                     uiTextRequireClass.text = string.Format(
                         LanguageManager.GetText(formatKeyRequireClass),
                         Data.Requirement.character.Title);

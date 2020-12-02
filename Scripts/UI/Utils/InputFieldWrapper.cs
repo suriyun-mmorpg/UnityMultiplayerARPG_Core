@@ -63,6 +63,19 @@ public class InputFieldWrapper : MonoBehaviour
         }
     }
 
+    public bool isFocused
+    {
+        get
+        {
+            bool result = false;
+            if (unityInputField != null) result = unityInputField.isFocused;
+#if USE_TEXT_MESH_PRO
+            if (textMeshInputField != null) result = result || textMeshInputField.isFocused;
+#endif
+            return result;
+        }
+    }
+
     public virtual UnityEvent<string> onValueChanged
     {
         get
@@ -280,6 +293,17 @@ public class InputFieldWrapper : MonoBehaviour
 #endif
     }
 
+    public void SetGameObjectActive(bool isActive)
+    {
+        if (unityInputField != null)
+            unityInputField.gameObject.SetActive(isActive);
+#if USE_TEXT_MESH_PRO
+        if (textMeshInputField != null)
+            textMeshInputField.gameObject.SetActive(isActive);
+#endif
+        gameObject.SetActive(isActive);
+    }
+
     public void DeactivateInputField()
     {
         if (unityInputField != null) unityInputField.DeactivateInputField();
@@ -318,18 +342,5 @@ public class InputFieldWrapper : MonoBehaviour
 #if USE_TEXT_MESH_PRO
         if (textMeshInputField != null) textMeshInputField.MoveTextEnd(shift);
 #endif
-    }
-
-    public bool isFocused
-    {
-        get
-        {
-            bool result = false;
-            if (unityInputField != null) result = unityInputField.isFocused;
-#if USE_TEXT_MESH_PRO
-        if (textMeshInputField != null) result = result || textMeshInputField.isFocused;
-#endif
-            return result;
-        }
     }
 }

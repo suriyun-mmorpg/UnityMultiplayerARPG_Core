@@ -63,10 +63,10 @@ namespace MultiplayerARPG
             // Update UIs
             if (uiTextRemainsDuration != null)
             {
+                uiTextRemainsDuration.SetGameObjectActive(summonRemainsDuration > 0);
                 uiTextRemainsDuration.text = string.Format(
                     LanguageManager.GetText(formatKeySummonRemainsDuration),
                     summonRemainsDuration.ToString("N0"));
-                uiTextRemainsDuration.gameObject.SetActive(summonRemainsDuration > 0);
             }
         }
 

@@ -64,10 +64,10 @@ namespace MultiplayerARPG
 
             if (uiTextRemainsDuration != null)
             {
+                uiTextRemainsDuration.SetGameObjectActive(buffRemainsDuration > 0);
                 uiTextRemainsDuration.text = string.Format(
                     LanguageManager.GetText(formatKeyBuffRemainsDuration),
                     buffRemainsDuration.ToString("N0"));
-                uiTextRemainsDuration.gameObject.SetActive(buffRemainsDuration > 0);
             }
 
             if (imageDurationGage != null)

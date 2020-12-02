@@ -37,4 +37,15 @@ public class TextWrapper : MonoBehaviour
         if (textMeshText == null) textMeshText = GetComponent<TextMeshProUGUI>();
 #endif
     }
+
+    public void SetGameObjectActive(bool isActive)
+    {
+        if (unityText != null)
+            unityText.gameObject.SetActive(isActive);
+#if USE_TEXT_MESH_PRO
+        if (textMeshText != null)
+            textMeshText.gameObject.SetActive(isActive);
+#endif
+        gameObject.SetActive(isActive);
+    }
 }

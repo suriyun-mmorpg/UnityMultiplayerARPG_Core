@@ -78,7 +78,7 @@ namespace MultiplayerARPG
             {
                 uiGageHp.Update(currentHp, maxHp);
                 if (uiGageHp.textValue != null)
-                    uiGageHp.textValue.gameObject.SetActive(maxHp > 0);
+                    uiGageHp.textValue.SetGameObjectActive(maxHp > 0);
             }
 
             // Mp
@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             {
                 uiGageMp.Update(currentMp, maxMp);
                 if (uiGageMp.textValue != null)
-                    uiGageMp.textValue.gameObject.SetActive(maxMp > 0);
+                    uiGageMp.textValue.SetGameObjectActive(maxMp > 0);
             }
 
             // Buffs
