@@ -17,28 +17,22 @@ namespace MultiplayerARPG
         public UIDamageElementTextPair[] textDamages;
         public bool isBonus;
 
-        private Dictionary<DamageElement, TextWrapper> cacheTextDamages;
-        public Dictionary<DamageElement, TextWrapper> CacheTextDamages
+        private Dictionary<DamageElement, UIDamageElementTextPair> cacheTextDamages;
+        public Dictionary<DamageElement, UIDamageElementTextPair> CacheTextDamages
         {
             get
             {
                 if (cacheTextDamages == null)
                 {
-                    cacheTextDamages = new Dictionary<DamageElement, TextWrapper>();
+                    cacheTextDamages = new Dictionary<DamageElement, UIDamageElementTextPair>();
                     DamageElement tempElement;
-                    TextWrapper tempTextComponent;
-                    foreach (UIDamageElementTextPair textAmount in textDamages)
+                    foreach (UIDamageElementTextPair componentPair in textDamages)
                     {
-                        if (textAmount.uiText == null)
+                        if (componentPair.uiText == null)
                             continue;
-                        tempElement = textAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : textAmount.damageElement;
-                        tempTextComponent = textAmount.uiText;
-                        tempTextComponent.text = string.Format(
-                            LanguageManager.GetText(formatKeyDamage),
-                            tempElement.Title,
-                            isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
-                            0.ToString("N0"));
-                        cacheTextDamages[tempElement] = tempTextComponent;
+                        tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
+                        SetDefaultValue(componentPair);
+                        cacheTextDamages[tempElement] = componentPair;
                     }
                 }
                 return cacheTextDamages;
@@ -55,13 +49,9 @@ namespace MultiplayerARPG
                     isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
                     0.ToString("N0"));
             }
-            foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextDamages)
+            foreach (UIDamageElementTextPair entry in CacheTextDamages.Values)
             {
-                entry.Value.text = string.Format(
-                    LanguageManager.GetText(formatKeyDamage),
-                    entry.Key.Title,
-                    isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
-                    0.ToString("N0"));
+                SetDefaultValue(entry);
             }
             // Set number by updated data
             if (Data == null || Data.Count == 0)
@@ -78,7 +68,7 @@ namespace MultiplayerARPG
                 string tempMinValue;
                 string tempMaxValue;
                 string tempAmountText;
-                TextWrapper tempTextWrapper;
+                UIDamageElementTextPair tempComponentPair;
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> dataEntry in Data)
                 {
                     if (dataEntry.Key == null)
@@ -106,8 +96,8 @@ namespace MultiplayerARPG
                         tempAllText += tempAmountText;
                     }
                     // Set current elemental damage text to UI
-                    if (CacheTextDamages.TryGetValue(dataEntry.Key, out tempTextWrapper))
-                        tempTextWrapper.text = tempAmountText;
+                    if (CacheTextDamages.TryGetValue(dataEntry.Key, out tempComponentPair))
+                        tempComponentPair.uiText.text = tempAmountText;
                     sumDamage += tempAmount;
                 }
 
@@ -130,6 +120,18 @@ namespace MultiplayerARPG
                         tempMaxValue);
                 }
             }
+        }
+
+        private void SetDefaultValue(UIDamageElementTextPair componentPair)
+        {
+            DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
+            componentPair.uiText.text = string.Format(
+                LanguageManager.GetText(formatKeyDamage),
+                tempElement.Title,
+                isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
+                0.ToString("N0"));
+            if (componentPair.imageIcon != null)
+                componentPair.imageIcon.sprite = tempElement.icon;
         }
     }
 }

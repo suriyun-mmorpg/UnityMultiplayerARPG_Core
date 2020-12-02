@@ -14,27 +14,22 @@ namespace MultiplayerARPG
         public UIResistanceTextPair[] textAmounts;
         public bool isBonus;
 
-        private Dictionary<DamageElement, TextWrapper> cacheTextAmounts;
-        public Dictionary<DamageElement, TextWrapper> CacheTextAmounts
+        private Dictionary<DamageElement, UIResistanceTextPair> cacheTextAmounts;
+        public Dictionary<DamageElement, UIResistanceTextPair> CacheTextAmounts
         {
             get
             {
                 if (cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<DamageElement, TextWrapper>();
+                    cacheTextAmounts = new Dictionary<DamageElement, UIResistanceTextPair>();
                     DamageElement tempElement;
-                    TextWrapper tempTextComponent;
-                    foreach (UIResistanceTextPair textAmount in textAmounts)
+                    foreach (UIResistanceTextPair componentPair in textAmounts)
                     {
-                        if (textAmount.uiText == null)
+                        if (componentPair.uiText == null)
                             continue;
-                        tempElement = textAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : textAmount.damageElement;
-                        tempTextComponent = textAmount.uiText;
-                        tempTextComponent.text = string.Format(
-                            LanguageManager.GetText(formatKeyAmount),
-                            tempElement.Title,
-                            isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
-                        cacheTextAmounts[tempElement] = tempTextComponent;
+                        tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
+                        SetDefaultValue(componentPair);
+                        cacheTextAmounts[tempElement] = componentPair;
                     }
                 }
                 return cacheTextAmounts;
@@ -44,12 +39,9 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             // Reset number
-            foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextAmounts)
+            foreach (UIResistanceTextPair entry in CacheTextAmounts.Values)
             {
-                entry.Value.text = string.Format(
-                        LanguageManager.GetText(formatKeyAmount),
-                        entry.Key.Title,
-                        isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
+                SetDefaultValue(entry);
             }
             // Set number by updated data
             if (Data == null || Data.Count == 0)
@@ -64,7 +56,7 @@ namespace MultiplayerARPG
                 float tempAmount;
                 string tempValue;
                 string tempAmountText;
-                TextWrapper tempTextWarpper;
+                UIResistanceTextPair tempComponentPair;
                 foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null)
@@ -90,8 +82,8 @@ namespace MultiplayerARPG
                         tempAllText += tempAmountText;
                     }
                     // Set current elemental resistance text to UI
-                    if (CacheTextAmounts.TryGetValue(dataEntry.Key, out tempTextWarpper))
-                        tempTextWarpper.text = tempAmountText;
+                    if (CacheTextAmounts.TryGetValue(dataEntry.Key, out tempComponentPair))
+                        tempComponentPair.uiText.text = tempAmountText;
                 }
 
                 if (uiTextAllAmounts != null)
@@ -100,6 +92,17 @@ namespace MultiplayerARPG
                     uiTextAllAmounts.text = tempAllText;
                 }
             }
+        }
+
+        private void SetDefaultValue(UIResistanceTextPair componentPair)
+        {
+            DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
+            componentPair.uiText.text = string.Format(
+                    LanguageManager.GetText(formatKeyAmount),
+                    tempElement.Title,
+                    isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
+            if (componentPair.imageIcon != null)
+                componentPair.imageIcon.sprite = tempElement.icon;
         }
     }
 }

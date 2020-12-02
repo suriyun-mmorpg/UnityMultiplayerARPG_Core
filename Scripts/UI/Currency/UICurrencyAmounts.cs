@@ -13,11 +13,11 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Currency Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
-        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_ATTRIBUTE);
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_CURRENCY);
         [Tooltip("Format => {0} = {Currency Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
-        public UILocaleKeySetting formatKeyAmountNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH);
+        public UILocaleKeySetting formatKeyAmountNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_CURRENCY_NOT_ENOUGH);
         [Tooltip("Format => {0} = {Currency Title}, {1} = {Amount}")]
-        public UILocaleKeySetting formatKeySimpleAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ATTRIBUTE_AMOUNT);
+        public UILocaleKeySetting formatKeySimpleAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
@@ -25,24 +25,22 @@ namespace MultiplayerARPG
         public DisplayType displayType;
         public bool isBonus;
 
-        private Dictionary<Currency, TextWrapper> cacheTextAmounts;
-        public Dictionary<Currency, TextWrapper> CacheTextAmounts
+        private Dictionary<Currency, UICurrencyTextPair> cacheTextAmounts;
+        public Dictionary<Currency, UICurrencyTextPair> CacheTextAmounts
         {
             get
             {
                 if (cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<Currency, TextWrapper>();
+                    cacheTextAmounts = new Dictionary<Currency, UICurrencyTextPair>();
                     Currency tempCurrency;
-                    TextWrapper tempTextComponent;
-                    foreach (UICurrencyTextPair textAmount in textAmounts)
+                    foreach (UICurrencyTextPair componentPair in textAmounts)
                     {
-                        if (textAmount.currency == null || textAmount.uiText == null)
+                        if (componentPair.currency == null || componentPair.uiText == null)
                             continue;
-                        tempCurrency = textAmount.currency;
-                        tempTextComponent = textAmount.uiText;
-                        SetDefaultText(tempTextComponent, tempCurrency.Title);
-                        cacheTextAmounts[tempCurrency] = tempTextComponent;
+                        tempCurrency = componentPair.currency;
+                        SetDefaultValue(componentPair);
+                        cacheTextAmounts[tempCurrency] = componentPair;
                     }
                 }
                 return cacheTextAmounts;
@@ -53,9 +51,9 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             // Reset number
-            foreach (KeyValuePair<Currency, TextWrapper> entry in CacheTextAmounts)
+            foreach (UICurrencyTextPair entry in CacheTextAmounts.Values)
             {
-                SetDefaultText(entry.Value, entry.Key.Title);
+                SetDefaultValue(entry);
             }
             // Set number by updated data
             if (Data == null || Data.Count == 0)
@@ -73,7 +71,7 @@ namespace MultiplayerARPG
                 string tempTargetValue;
                 string tempFormat;
                 string tempAmountText;
-                TextWrapper tempTextWrapper;
+                UICurrencyTextPair tempComponentPair;
                 foreach (KeyValuePair<Currency, int> dataEntry in Data)
                 {
                     if (dataEntry.Key == null)
@@ -122,8 +120,8 @@ namespace MultiplayerARPG
                         tempAllText += tempAmountText;
                     }
                     // Set current currency text to UI
-                    if (CacheTextAmounts.TryGetValue(tempCurrency, out tempTextWrapper))
-                        tempTextWrapper.text = tempAmountText;
+                    if (CacheTextAmounts.TryGetValue(tempCurrency, out tempComponentPair))
+                        tempComponentPair.uiText.text = tempAmountText;
                 }
 
                 if (uiTextAllAmounts != null)
@@ -134,23 +132,25 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetDefaultText(TextWrapper text, string title)
+        private void SetDefaultValue(UICurrencyTextPair componentPair)
         {
             switch (displayType)
             {
                 case DisplayType.Requirement:
-                    text.text = string.Format(
+                    componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
-                        title,
+                        componentPair.currency.title,
                         0f.ToString("N0"), 0f.ToString("N0"));
                     break;
                 case DisplayType.Simple:
-                    text.text = string.Format(
+                    componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
-                        title,
+                        componentPair.currency.title,
                         isBonus ? 0f.ToBonusString("N0") : 0f.ToString("N0"));
                     break;
             }
+            if (componentPair.imageIcon != null)
+                componentPair.imageIcon.sprite = componentPair.currency.icon;
         }
     }
 }

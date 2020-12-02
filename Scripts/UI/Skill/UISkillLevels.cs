@@ -25,24 +25,22 @@ namespace MultiplayerARPG
         public DisplayType displayType;
         public bool isBonus;
 
-        private Dictionary<BaseSkill, TextWrapper> cacheTextLevels;
-        public Dictionary<BaseSkill, TextWrapper> CacheTextLevels
+        private Dictionary<BaseSkill, UISkillTextPair> cacheTextLevels;
+        public Dictionary<BaseSkill, UISkillTextPair> CacheTextLevels
         {
             get
             {
                 if (cacheTextLevels == null)
                 {
-                    cacheTextLevels = new Dictionary<BaseSkill, TextWrapper>();
+                    cacheTextLevels = new Dictionary<BaseSkill, UISkillTextPair>();
                     BaseSkill tempSkill;
-                    TextWrapper tempTextComponent;
-                    foreach (UISkillTextPair textLevel in textLevels)
+                    foreach (UISkillTextPair componentPair in textLevels)
                     {
-                        if (textLevel.skill == null || textLevel.uiText == null)
+                        if (componentPair.skill == null || componentPair.uiText == null)
                             continue;
-                        tempSkill = textLevel.skill;
-                        tempTextComponent = textLevel.uiText;
-                        SetDefaultText(tempTextComponent, tempSkill.Title);
-                        cacheTextLevels[tempSkill] = tempTextComponent;
+                        tempSkill = componentPair.skill;
+                        SetDefaultValue(componentPair);
+                        cacheTextLevels[tempSkill] = componentPair;
                     }
                 }
                 return cacheTextLevels;
@@ -52,15 +50,16 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            // Reset number
+            foreach (UISkillTextPair entry in CacheTextLevels.Values)
+            {
+                SetDefaultValue(entry);
+            }
+            // Set number by updated data
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllLevels != null)
                     uiTextAllLevels.gameObject.SetActive(false);
-
-                foreach (KeyValuePair<BaseSkill, TextWrapper> entry in CacheTextLevels)
-                {
-                    SetDefaultText(entry.Value, entry.Key.Title);
-                }
             }
             else
             {
@@ -70,7 +69,7 @@ namespace MultiplayerARPG
                 short tempTargetLevel;
                 string tempFormat;
                 string tempLevelText;
-                TextWrapper tempTextWrapper;
+                UISkillTextPair tempComponentPair;
                 foreach (KeyValuePair<BaseSkill, short> dataEntry in Data)
                 {
                     if (dataEntry.Key == null)
@@ -117,8 +116,8 @@ namespace MultiplayerARPG
                         tempAllText += tempLevelText;
                     }
                     // Set current skill text to UI
-                    if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempTextWrapper))
-                        tempTextWrapper.text = tempLevelText;
+                    if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempComponentPair))
+                        tempComponentPair.uiText.text = tempLevelText;
                 }
 
                 if (uiTextAllLevels != null)
@@ -129,23 +128,25 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetDefaultText(TextWrapper text, string title)
+        private void SetDefaultValue(UISkillTextPair componentPair)
         {
             switch (displayType)
             {
                 case DisplayType.Requirement:
-                    text.text = string.Format(
+                    componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeyLevel),
-                        title,
+                        componentPair.skill.Title,
                         0.ToString("N0"), 0.ToString("N0"));
                     break;
                 case DisplayType.Simple:
-                    text.text = string.Format(
+                    componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeySimpleLevel),
-                        title,
+                        componentPair.skill.Title,
                         isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"));
                     break;
             }
+            if (componentPair.imageIcon != null)
+                componentPair.imageIcon.sprite = componentPair.skill.icon;
         }
     }
 }

@@ -15,27 +15,22 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllInflictions;
         public UIDamageElementTextPair[] textInflictions;
 
-        private Dictionary<DamageElement, TextWrapper> cacheTextInflictions;
-        public Dictionary<DamageElement, TextWrapper> CacheTextInflictions
+        private Dictionary<DamageElement, UIDamageElementTextPair> cacheTextInflictions;
+        public Dictionary<DamageElement, UIDamageElementTextPair> CacheTextInflictions
         {
             get
             {
                 if (cacheTextInflictions == null)
                 {
-                    cacheTextInflictions = new Dictionary<DamageElement, TextWrapper>();
+                    cacheTextInflictions = new Dictionary<DamageElement, UIDamageElementTextPair>();
                     DamageElement tempElement;
-                    TextWrapper tempTextComponent;
-                    foreach (UIDamageElementTextPair textAmount in textInflictions)
+                    foreach (UIDamageElementTextPair componentPair in textInflictions)
                     {
-                        if (textAmount.uiText == null)
+                        if (componentPair.uiText == null)
                             continue;
-                        tempElement = textAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : textAmount.damageElement;
-                        tempTextComponent = textAmount.uiText;
-                        tempTextComponent.text = string.Format(
-                            LanguageManager.GetText(formatKeyInflictionAsElemental),
-                            tempElement.Title,
-                            0.ToString("N0"));
-                        cacheTextInflictions[tempElement] = tempTextComponent;
+                        tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
+                        SetDefaultValue(componentPair);
+                        cacheTextInflictions[tempElement] = componentPair;
                     }
                 }
                 return cacheTextInflictions;
@@ -44,20 +39,16 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            // Reset number
+            foreach (UIDamageElementTextPair entry in CacheTextInflictions.Values)
+            {
+                SetDefaultValue(entry);
+            }
+            // Set number by updated data
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllInflictions != null)
                     uiTextAllInflictions.gameObject.SetActive(false);
-
-                foreach (KeyValuePair<DamageElement, TextWrapper> textAmount in CacheTextInflictions)
-                {
-                    textAmount.Value.text = string.Format(
-                        textAmount.Key == GameInstance.Singleton.DefaultDamageElement ?
-                            LanguageManager.GetText(formatKeyInfliction) :
-                            LanguageManager.GetText(formatKeyInflictionAsElemental),
-                        textAmount.Key.Title,
-                        0.ToString("N0"));
-                }
             }
             else
             {
@@ -65,6 +56,7 @@ namespace MultiplayerARPG
                 DamageElement tempElement;
                 float tempInfliction;
                 string tempAmountText;
+                UIDamageElementTextPair tempComponentPair;
                 foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null)
@@ -88,9 +80,8 @@ namespace MultiplayerARPG
                         tempAllText += tempAmountText;
                     }
                     // Set current elemental damage infliction text to UI
-                    TextWrapper textDamages;
-                    if (CacheTextInflictions.TryGetValue(dataEntry.Key, out textDamages))
-                        textDamages.text = tempAmountText;
+                    if (CacheTextInflictions.TryGetValue(dataEntry.Key, out tempComponentPair))
+                        tempComponentPair.uiText.text = tempAmountText;
                 }
 
                 if (uiTextAllInflictions != null)
@@ -99,6 +90,19 @@ namespace MultiplayerARPG
                     uiTextAllInflictions.text = tempAllText;
                 }
             }
+        }
+
+        private void SetDefaultValue(UIDamageElementTextPair componentPair)
+        {
+            DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
+            componentPair.uiText.text = string.Format(
+                tempElement == GameInstance.Singleton.DefaultDamageElement ?
+                    LanguageManager.GetText(formatKeyInfliction) :
+                    LanguageManager.GetText(formatKeyInflictionAsElemental),
+                tempElement.Title,
+                0.ToString("N0"));
+            if (componentPair.imageIcon != null)
+                componentPair.imageIcon.sprite = tempElement.icon;
         }
     }
 }

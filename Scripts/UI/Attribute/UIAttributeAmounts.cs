@@ -28,24 +28,22 @@ namespace MultiplayerARPG
         public DisplayType displayType;
         public bool isBonus;
 
-        private Dictionary<Attribute, TextWrapper> cacheTextAmounts;
-        public Dictionary<Attribute, TextWrapper> CacheTextAmounts
+        private Dictionary<Attribute, UIAttributeTextPair> cacheTextAmounts;
+        public Dictionary<Attribute, UIAttributeTextPair> CacheTextAmounts
         {
             get
             {
                 if (cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<Attribute, TextWrapper>();
+                    cacheTextAmounts = new Dictionary<Attribute, UIAttributeTextPair>();
                     Attribute tempAttribute;
-                    TextWrapper tempTextComponent;
-                    foreach (UIAttributeTextPair textAmount in textAmounts)
+                    foreach (UIAttributeTextPair componentPair in textAmounts)
                     {
-                        if (textAmount.attribute == null || textAmount.uiText == null)
+                        if (componentPair.attribute == null || componentPair.uiText == null)
                             continue;
-                        tempAttribute = textAmount.attribute;
-                        tempTextComponent = textAmount.uiText;
-                        SetDefaultText(tempTextComponent, tempAttribute.Title);
-                        cacheTextAmounts[tempAttribute] = tempTextComponent;
+                        tempAttribute = componentPair.attribute;
+                        SetDefaultValue(componentPair);
+                        cacheTextAmounts[tempAttribute] = componentPair;
                     }
                 }
                 return cacheTextAmounts;
@@ -56,9 +54,9 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             // Reset number
-            foreach (KeyValuePair<Attribute, TextWrapper> entry in CacheTextAmounts)
+            foreach (UIAttributeTextPair entry in CacheTextAmounts.Values)
             {
-                SetDefaultText(entry.Value, entry.Key.Title);
+                SetDefaultValue(entry);
             }
             // Set number by updated data
             if (Data == null || Data.Count == 0)
@@ -76,7 +74,7 @@ namespace MultiplayerARPG
                 string tempTargetValue;
                 string tempFormat;
                 string tempAmountText;
-                TextWrapper tempTextWrapper;
+                UIAttributeTextPair tempComponentPair;
                 foreach (KeyValuePair<Attribute, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null)
@@ -132,8 +130,8 @@ namespace MultiplayerARPG
                         tempAllText += tempAmountText;
                     }
                     // Set current attribute text to UI
-                    if (CacheTextAmounts.TryGetValue(tempAttribute, out tempTextWrapper))
-                        tempTextWrapper.text = tempAmountText;
+                    if (CacheTextAmounts.TryGetValue(tempAttribute, out tempComponentPair))
+                        tempComponentPair.uiText.text = tempAmountText;
                 }
 
                 if (uiTextAllAmounts != null)
@@ -144,29 +142,31 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetDefaultText(TextWrapper text, string title)
+        private void SetDefaultValue(UIAttributeTextPair componentPair)
         {
             switch (displayType)
             {
                 case DisplayType.Rate:
-                    text.text = string.Format(
+                    componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeyRateAmount),
-                        title,
+                        componentPair.attribute.Title,
                         isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
                     break;
                 case DisplayType.Requirement:
-                    text.text = string.Format(
+                    componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
-                        title,
+                        componentPair.attribute.Title,
                         0f.ToString("N0"), 0f.ToString("N0"));
                     break;
                 case DisplayType.Simple:
-                    text.text = string.Format(
+                    componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
-                        title,
+                        componentPair.attribute.Title,
                         isBonus ? 0f.ToBonusString("N0") : 0f.ToString("N0"));
                     break;
             }
+            if (componentPair.imageIcon != null)
+                componentPair.imageIcon.sprite = componentPair.attribute.icon;
         }
     }
 }

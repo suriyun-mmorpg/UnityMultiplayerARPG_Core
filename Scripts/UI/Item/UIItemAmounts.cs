@@ -18,28 +18,22 @@ namespace MultiplayerARPG
         public UIItemTextPair[] textAmounts;
         public bool showAsRequirement;
 
-        private Dictionary<BaseItem, TextWrapper> cacheTextLevels;
-        public Dictionary<BaseItem, TextWrapper> CacheTextLevels
+        private Dictionary<BaseItem, UIItemTextPair> cacheTextLevels;
+        public Dictionary<BaseItem, UIItemTextPair> CacheTextLevels
         {
             get
             {
                 if (cacheTextLevels == null)
                 {
-                    cacheTextLevels = new Dictionary<BaseItem, TextWrapper>();
+                    cacheTextLevels = new Dictionary<BaseItem, UIItemTextPair>();
                     BaseItem tempItem;
-                    TextWrapper tempTextComponent;
-                    foreach (UIItemTextPair textLevel in textAmounts)
+                    foreach (UIItemTextPair componentPair in textAmounts)
                     {
-                        if (textLevel.item == null || textLevel.uiText == null)
+                        if (componentPair.item == null || componentPair.uiText == null)
                             continue;
-                        tempItem = textLevel.item;
-                        tempTextComponent = textLevel.uiText;
-                        tempTextComponent.text = string.Format(
-                            LanguageManager.GetText(formatKeyAmount),
-                            tempItem.Title,
-                            0.ToString("N0"),
-                            0.ToString("N0"));
-                        cacheTextLevels[tempItem] = tempTextComponent;
+                        tempItem = componentPair.item;
+                        SetDefaultValue(componentPair);
+                        cacheTextLevels[tempItem] = componentPair;
                     }
                 }
                 return cacheTextLevels;
@@ -49,19 +43,16 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            // Reset number
+            foreach (UIItemTextPair entry in CacheTextLevels.Values)
+            {
+                SetDefaultValue(entry);
+            }
+            // Set number by updated data
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
-
-                foreach (KeyValuePair<BaseItem, TextWrapper> entry in CacheTextLevels)
-                {
-                    entry.Value.text = string.Format(
-                        LanguageManager.GetText(formatKeyAmount),
-                        entry.Key.Title,
-                        0.ToString("N0"),
-                        0.ToString("N0"));
-                }
             }
             else
             {
@@ -71,7 +62,7 @@ namespace MultiplayerARPG
                 short tempTargetAmount;
                 string tempFormat;
                 string tempAmountText;
-                TextWrapper tempTextWrapper;
+                UIItemTextPair tempComponentPair;
                 foreach (KeyValuePair<BaseItem, short> dataEntry in Data)
                 {
                     if (dataEntry.Key == null)
@@ -109,8 +100,8 @@ namespace MultiplayerARPG
                         tempAllText += tempAmountText;
                     }
                     // Set current item text to UI
-                    if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempTextWrapper))
-                        tempTextWrapper.text = tempAmountText;
+                    if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempComponentPair))
+                        tempComponentPair.uiText.text = tempAmountText;
                 }
 
                 if (uiTextAllAmounts != null)
@@ -119,6 +110,17 @@ namespace MultiplayerARPG
                     uiTextAllAmounts.text = tempAllText;
                 }
             }
+        }
+
+        private void SetDefaultValue(UIItemTextPair componentPair)
+        {
+            componentPair.uiText.text = string.Format(
+                LanguageManager.GetText(formatKeyAmount),
+                componentPair.item.Title,
+                0.ToString("N0"),
+                0.ToString("N0"));
+            if (componentPair.imageIcon != null)
+                componentPair.imageIcon.sprite = componentPair.item.icon;
         }
     }
 }
