@@ -22,8 +22,11 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAllLevels;
         public UISkillTextPair[] textLevels;
+
+        [Header("Options")]
         public DisplayType displayType;
         public bool isBonus;
+        public bool inactiveIfLevelZero;
 
         private Dictionary<BaseSkill, UISkillTextPair> cacheTextLevels;
         public Dictionary<BaseSkill, UISkillTextPair> CacheTextLevels
@@ -117,7 +120,11 @@ namespace MultiplayerARPG
                     }
                     // Set current skill text to UI
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempComponentPair))
+                    {
                         tempComponentPair.uiText.text = tempLevelText;
+                        if (tempComponentPair.root != null)
+                            tempComponentPair.root.SetActive(!inactiveIfLevelZero || tempTargetLevel != 0);
+                    }
                 }
 
                 if (uiTextAllLevels != null)
@@ -147,6 +154,8 @@ namespace MultiplayerARPG
             }
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = componentPair.skill.icon;
+            if (inactiveIfLevelZero && componentPair.root != null)
+                componentPair.root.SetActive(false);
         }
     }
 }

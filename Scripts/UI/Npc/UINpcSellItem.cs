@@ -14,6 +14,10 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSellPrice;
         public UICurrencyAmounts uiSellPrices;
 
+        [Header("Options")]
+        [Tooltip("If this is `TRUE`, `uiTextSellPrice` will be inactivated when item's sell price is 0")]
+        public bool inactiveSellPriceIfZero;
+
         public int indexOfData { get; protected set; }
 
         public void Setup(NpcSellItem data, int indexOfData)
@@ -40,7 +44,7 @@ namespace MultiplayerARPG
                 uiTextSellPrice.text = string.Format(
                     LanguageManager.GetText(formatKeySellPrice),
                     Data.sellPrice.ToString("N0"));
-                uiTextSellPrice.SetGameObjectActive(Data.sellPrice > 0);
+                uiTextSellPrice.SetGameObjectActive(!inactiveSellPriceIfZero || Data.sellPrice != 0);
             }
 
             if (uiSellPrices != null)

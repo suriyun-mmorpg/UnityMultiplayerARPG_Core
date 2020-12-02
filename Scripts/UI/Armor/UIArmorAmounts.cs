@@ -12,7 +12,10 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
         public UIArmorTextPair[] textAmounts;
+
+        [Header("Options")]
         public bool isBonus;
+        public bool inactiveIfAmountZero;
 
         private Dictionary<DamageElement, UIArmorTextPair> cacheTextAmounts;
         public Dictionary<DamageElement, UIArmorTextPair> CacheTextAmounts
@@ -83,7 +86,11 @@ namespace MultiplayerARPG
                     }
                     // Set current elemental armor text to UI
                     if (CacheTextAmounts.TryGetValue(dataEntry.Key, out tempComponentPair))
+                    {
                         tempComponentPair.uiText.text = tempAmountText;
+                        if (tempComponentPair.root != null)
+                            tempComponentPair.root.SetActive(!inactiveIfAmountZero || tempAmount != 0);
+                    }
                 }
 
                 if (uiTextAllAmounts != null)
@@ -103,6 +110,8 @@ namespace MultiplayerARPG
                     isBonus ? 0f.ToBonusString("N0") : 0f.ToString("N0"));
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.icon;
+            if (inactiveIfAmountZero && componentPair.root != null)
+                componentPair.root.SetActive(false);
         }
     }
 }

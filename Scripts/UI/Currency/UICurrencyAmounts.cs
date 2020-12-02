@@ -22,8 +22,11 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
         public UICurrencyTextPair[] textAmounts;
+
+        [Header("Options")]
         public DisplayType displayType;
         public bool isBonus;
+        public bool inactiveIfAmountZero;
 
         private Dictionary<Currency, UICurrencyTextPair> cacheTextAmounts;
         public Dictionary<Currency, UICurrencyTextPair> CacheTextAmounts
@@ -121,7 +124,11 @@ namespace MultiplayerARPG
                     }
                     // Set current currency text to UI
                     if (CacheTextAmounts.TryGetValue(tempCurrency, out tempComponentPair))
+                    {
                         tempComponentPair.uiText.text = tempAmountText;
+                        if (tempComponentPair.root != null)
+                            tempComponentPair.root.SetActive(!inactiveIfAmountZero || tempTargetAmount != 0);
+                    }
                 }
 
                 if (uiTextAllAmounts != null)
@@ -151,6 +158,8 @@ namespace MultiplayerARPG
             }
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = componentPair.currency.icon;
+            if (inactiveIfAmountZero && componentPair.root != null)
+                componentPair.root.SetActive(false);
         }
     }
 }

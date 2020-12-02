@@ -15,7 +15,10 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllDamages;
         public TextWrapper uiTextSumDamage;
         public UIDamageElementTextPair[] textDamages;
+
+        [Header("Options")]
         public bool isBonus;
+        public bool inactiveIfAmountZero;
 
         private Dictionary<DamageElement, UIDamageElementTextPair> cacheTextDamages;
         public Dictionary<DamageElement, UIDamageElementTextPair> CacheTextDamages
@@ -97,7 +100,11 @@ namespace MultiplayerARPG
                     }
                     // Set current elemental damage text to UI
                     if (CacheTextDamages.TryGetValue(dataEntry.Key, out tempComponentPair))
+                    {
                         tempComponentPair.uiText.text = tempAmountText;
+                        if (tempComponentPair.root != null)
+                            tempComponentPair.root.SetActive(!inactiveIfAmountZero || (tempAmount.min != 0 && tempAmount.max != 0));
+                    }
                     sumDamage += tempAmount;
                 }
 
@@ -132,6 +139,8 @@ namespace MultiplayerARPG
                 0.ToString("N0"));
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.icon;
+            if (inactiveIfAmountZero && componentPair.root != null)
+                componentPair.root.SetActive(false);
         }
     }
 }

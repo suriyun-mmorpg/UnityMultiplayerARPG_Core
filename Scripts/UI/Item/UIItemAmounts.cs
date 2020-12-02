@@ -16,7 +16,10 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
         public UIItemTextPair[] textAmounts;
+
+        [Header("Options")]
         public bool showAsRequirement;
+        public bool inactiveIfAmountZero;
 
         private Dictionary<BaseItem, UIItemTextPair> cacheTextLevels;
         public Dictionary<BaseItem, UIItemTextPair> CacheTextLevels
@@ -101,7 +104,11 @@ namespace MultiplayerARPG
                     }
                     // Set current item text to UI
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempComponentPair))
+                    {
                         tempComponentPair.uiText.text = tempAmountText;
+                        if (tempComponentPair.root != null)
+                            tempComponentPair.root.SetActive(!inactiveIfAmountZero || tempTargetAmount != 0);
+                    }
                 }
 
                 if (uiTextAllAmounts != null)
@@ -121,6 +128,8 @@ namespace MultiplayerARPG
                 0.ToString("N0"));
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = componentPair.item.icon;
+            if (inactiveIfAmountZero && componentPair.root != null)
+                componentPair.root.SetActive(false);
         }
     }
 }

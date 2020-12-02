@@ -1,4 +1,5 @@
-﻿using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -8,5 +9,6 @@ namespace MultiplayerARPG
         public BaseSkill skill;
         public TextWrapper uiText;
         public Image imageIcon;
+        public GameObject root;
     }
 }

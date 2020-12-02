@@ -15,6 +15,9 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllInflictions;
         public UIDamageElementTextPair[] textInflictions;
 
+        [Header("Options")]
+        public bool inactiveIfAmountZero;
+
         private Dictionary<DamageElement, UIDamageElementTextPair> cacheTextInflictions;
         public Dictionary<DamageElement, UIDamageElementTextPair> CacheTextInflictions
         {
@@ -81,7 +84,11 @@ namespace MultiplayerARPG
                     }
                     // Set current elemental damage infliction text to UI
                     if (CacheTextInflictions.TryGetValue(dataEntry.Key, out tempComponentPair))
+                    {
                         tempComponentPair.uiText.text = tempAmountText;
+                        if (tempComponentPair.root != null)
+                            tempComponentPair.root.SetActive(!inactiveIfAmountZero || tempInfliction != 0);
+                    }
                 }
 
                 if (uiTextAllInflictions != null)
@@ -103,6 +110,8 @@ namespace MultiplayerARPG
                 0.ToString("N0"));
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.icon;
+            if (inactiveIfAmountZero && componentPair.root != null)
+                componentPair.root.SetActive(false);
         }
     }
 }
