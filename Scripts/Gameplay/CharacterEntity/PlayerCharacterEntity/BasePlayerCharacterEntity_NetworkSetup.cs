@@ -47,6 +47,7 @@ namespace MultiplayerARPG
             // Sync lists
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
+            currencies.forOwnerOnly = true;
             storageItems.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
         }
 
