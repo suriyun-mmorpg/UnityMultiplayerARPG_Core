@@ -25,7 +25,10 @@ namespace MultiplayerARPG
         public CurrencyAmount[] rewardCurrencies;
         [ArrayElementTitle("item")]
         public ItemAmount[] rewardItems;
+        [Tooltip("If this is `TRUE` character will be able to do this quest repeatedly")]
         public bool canRepeat;
+        [Tooltip("If this is `TRUE` quest will be completed immediately after talked to NPC and all tasks done")]
+        public bool completeAfterTalked;
 
         [System.NonSerialized]
         private HashSet<int> cacheKillMonsterIds;

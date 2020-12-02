@@ -45,6 +45,8 @@ namespace MultiplayerARPG
                 CurrentNpcDialog = talkToNpcTaskDialog;
                 characterQuest.CompletedTasks.Add(taskIndex);
                 Quests[i] = characterQuest;
+                if (quest.completeAfterTalked && characterQuest.IsAllTasksDone(this))
+                    CompleteQuest(quest.DataId);
             }
 
             if (CurrentNpcDialog != null)
