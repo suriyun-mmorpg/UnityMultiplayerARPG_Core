@@ -395,9 +395,9 @@ namespace MultiplayerARPG
                     tempContainer.DeactivateInstantiatedObjects();
                     tempContainer.SetActiveDefaultModel(false);
                     tempEquipmentObject = Instantiate(tempEquipmentModel.model, tempContainer.transform);
-                    tempEquipmentObject.transform.localPosition = Vector3.zero;
-                    tempEquipmentObject.transform.localEulerAngles = Vector3.zero;
-                    tempEquipmentObject.transform.localScale = Vector3.one;
+                    tempEquipmentObject.transform.localPosition = tempEquipmentModel.localPosition;
+                    tempEquipmentObject.transform.localEulerAngles = tempEquipmentModel.localEulerAngles;
+                    tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale;
                     tempEquipmentObject.gameObject.SetActive(true);
                     tempEquipmentObject.gameObject.SetLayerRecursively(CurrentGameInstance.characterLayer.LayerIndex, true);
                     tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
