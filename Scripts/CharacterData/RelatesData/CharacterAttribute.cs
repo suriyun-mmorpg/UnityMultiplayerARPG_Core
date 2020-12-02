@@ -31,12 +31,12 @@ namespace MultiplayerARPG
             return cacheAttribute;
         }
 
-        public static CharacterAttribute Create(Attribute attribute, short amount = 1)
+        public static CharacterAttribute Create(Attribute attribute, short amount = 0)
         {
             return Create(attribute.DataId, amount);
         }
 
-        public static CharacterAttribute Create(int dataId, short amount = 1)
+        public static CharacterAttribute Create(int dataId, short amount = 0)
         {
             CharacterAttribute newAttribute = new CharacterAttribute();
             newAttribute.dataId = dataId;
