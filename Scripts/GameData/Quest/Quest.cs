@@ -155,7 +155,7 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
         public ItemAmount itemAmount;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
-        [Tooltip("Have to talk to this NPC to complete task.")]
+        [Tooltip("Have to talk to this NPC to complete task")]
         public NpcEntity npcEntity;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
         [Tooltip("This dialog will be shown immediately instead of start dialog which set to the NPC")]
