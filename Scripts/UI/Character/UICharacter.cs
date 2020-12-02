@@ -48,6 +48,7 @@ namespace MultiplayerARPG
         public UIDamageElementAmounts uiCharacterElementalDamages;
         public UIArmorAmounts uiCharacterArmors;
         public UICharacterAttributePair[] uiCharacterAttributes;
+        public UICharacterCurrencyPair[] uiCharacterCurrencies;
         public UICharacterClass uiCharacterClass;
 
         [Header("Options")]
@@ -100,6 +101,26 @@ namespace MultiplayerARPG
                     }
                 }
                 return cacheUICharacterAttributes;
+            }
+        }
+
+        private Dictionary<Currency, UICharacterCurrency> cacheUICharacterCurrencies;
+        public Dictionary<Currency, UICharacterCurrency> CacheUICharacterCurrencies
+        {
+            get
+            {
+                if (cacheUICharacterCurrencies == null)
+                {
+                    cacheUICharacterCurrencies = new Dictionary<Currency, UICharacterCurrency>();
+                    foreach (UICharacterCurrencyPair uiCharacterCurrency in uiCharacterCurrencies)
+                    {
+                        if (uiCharacterCurrency.currency != null &&
+                            uiCharacterCurrency.ui != null &&
+                            !cacheUICharacterCurrencies.ContainsKey(uiCharacterCurrency.currency))
+                            cacheUICharacterCurrencies.Add(uiCharacterCurrency.currency, uiCharacterCurrency.ui);
+                    }
+                }
+                return cacheUICharacterCurrencies;
             }
         }
 
@@ -326,6 +347,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
             cacheStats = new CharacterStats();
             cacheAttributes = new Dictionary<Attribute, float>();
             cacheResistances = new Dictionary<DamageElement, float>();
@@ -466,6 +488,19 @@ namespace MultiplayerARPG
                         tempAmount = cacheAttributes[attribute];
                     CacheUICharacterAttributes[attribute].Setup(new UICharacterAttributeData(tempCharacterAttribute, tempAmount), Data, tempIndexOfAttribute);
                     CacheUICharacterAttributes[attribute].Show();
+                }
+            }
+
+            if (CacheUICharacterCurrencies.Count > 0 && playerCharacter != null)
+            {
+                int tempIndexOfCurrency;
+                CharacterCurrency tempCharacterCurrency;
+                foreach (Currency currency in CacheUICharacterCurrencies.Keys)
+                {
+                    tempIndexOfCurrency = playerCharacter.IndexOfCurrency(currency.DataId);
+                    tempCharacterCurrency = tempIndexOfCurrency >= 0 ? playerCharacter.Currencies[tempIndexOfCurrency] : CharacterCurrency.Create(currency, 0);
+                    CacheUICharacterCurrencies[currency].Setup(new UICharacterCurrencyData(tempCharacterCurrency, tempCharacterCurrency.amount), Data, tempIndexOfCurrency);
+                    CacheUICharacterCurrencies[currency].Show();
                 }
             }
 
