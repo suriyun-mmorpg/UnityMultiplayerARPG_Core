@@ -8,7 +8,6 @@ namespace MultiplayerARPG
         ItemType ItemType { get; }
         GameObject DropModel { get; }
         int SellPrice { get; }
-        CurrencyAmount[] SellPrices { get; }
         float Weight { get; }
         short MaxStack { get; }
         ItemRefine ItemRefine { get; }

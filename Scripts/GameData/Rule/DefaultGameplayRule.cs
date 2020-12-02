@@ -645,9 +645,6 @@ namespace MultiplayerARPG
         public override void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, short amount)
         {
             character.Gold += item.SellPrice * amount;
-            if (item.SellPrices == null || item.SellPrices.Length == 0)
-                return;
-            character.IncreaseCurrencies(item.SellPrices, amount);
         }
 
         public override bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
