@@ -16,13 +16,17 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyTaskCollectItem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM);
         [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
         public UILocaleKeySetting formatKeyTaskCollectItemComplete = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE);
+        [Tooltip("Format => {0} = {Title}")]
+        public UILocaleKeySetting formatKeyTaskTalkToNpc = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_TALK_TO_NPC);
+        [Tooltip("Format => {0} = {Title}")]
+        public UILocaleKeySetting formatKeyTaskTalkToNpcComplete = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_TALK_TO_NPC_COMPLETE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTaskDescription;
 
         protected override void UpdateData()
         {
-            bool isComplete = false;
+            bool isComplete;
             switch (QuestTask.taskType)
             {
                 case QuestTaskType.KillMonster:
@@ -54,6 +58,21 @@ namespace MultiplayerARPG
                             Progress.ToString("N0"),
                             itemCollectAmount.ToString("N0"));
                     }
+                    break;
+                case QuestTaskType.TalkToNpc:
+                    string npcTitle = QuestTask.npcEntity == null ? LanguageManager.GetUnknowTitle() : QuestTask.npcEntity.Title;
+                    isComplete = Progress > 0;
+                    if (uiTextTaskDescription != null)
+                    {
+                        uiTextTaskDescription.text = string.Format(
+                            isComplete ?
+                                LanguageManager.GetText(formatKeyTaskTalkToNpcComplete) :
+                                LanguageManager.GetText(formatKeyTaskTalkToNpc), npcTitle);
+                    }
+                    break;
+                case QuestTaskType.Custom:
+                    if (uiTextTaskDescription)
+                        uiTextTaskDescription.text = QuestTask.customQuestTask.GetTaskDescription(BasePlayerCharacterController.OwningCharacter, Progress);
                     break;
             }
         }

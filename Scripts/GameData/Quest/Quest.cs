@@ -26,6 +26,8 @@ namespace MultiplayerARPG
         [ArrayElementTitle("item")]
         public ItemAmount[] rewardItems;
         public bool canRepeat;
+
+        [System.NonSerialized]
         private HashSet<int> cacheKillMonsterIds;
         public HashSet<int> CacheKillMonsterIds
         {
@@ -43,6 +45,18 @@ namespace MultiplayerARPG
                     }
                 }
                 return cacheKillMonsterIds;
+            }
+        }
+
+        [System.NonSerialized]
+        private Dictionary<Currency, int> cacheRewardCurrencies;
+        public Dictionary<Currency, int> CacheRewardCurrencies
+        {
+            get
+            {
+                if (cacheRewardCurrencies == null)
+                    cacheRewardCurrencies = GameDataHelpers.CombineCurrencies(rewardCurrencies, new Dictionary<Currency, int>());
+                return cacheRewardCurrencies;
             }
         }
 
@@ -141,5 +155,7 @@ namespace MultiplayerARPG
         public NpcEntity npcEntity;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
         public BaseNpcDialog talkToNpcDialog;
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.Custom))]
+        public BaseCustomQuestTask customQuestTask;
     }
 }

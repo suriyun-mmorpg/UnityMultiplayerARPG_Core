@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             return cacheQuest;
         }
 
-        public bool IsAllTasksDone(ICharacterData character)
+        public bool IsAllTasksDone(IPlayerCharacterData character)
         {
             Quest quest = GetQuest();
             if (character == null || quest == null)
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             QuestTask[] tasks = quest.tasks;
             for (int i = 0; i < tasks.Length; ++i)
             {
-                bool isComplete = false;
+                bool isComplete;
                 GetProgress(character, i, out isComplete);
                 if (!isComplete)
                     return false;
@@ -75,14 +75,16 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public int GetProgress(ICharacterData character, int taskIndex, out bool isComplete)
+        public int GetProgress(IPlayerCharacterData character, int taskIndex, out bool isComplete)
         {
-            isComplete = false;
             Quest quest = GetQuest();
             if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
+            {
+                isComplete = false;
                 return 0;
+            }
             QuestTask task = quest.tasks[taskIndex];
-            int progress = 0;
+            int progress;
             switch (task.taskType)
             {
                 case QuestTaskType.KillMonster:
@@ -95,7 +97,14 @@ namespace MultiplayerARPG
                     progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.DataId);
                     isComplete = progress >= itemAmount.amount;
                     return progress;
+                case QuestTaskType.TalkToNpc:
+                    progress = CompletedTasks.Contains(taskIndex) ? 1 : 0;
+                    isComplete = progress > 0;
+                    return progress;
+                case QuestTaskType.Custom:
+                    return task.customQuestTask.GetTaskProgress(character, out isComplete);
             }
+            isComplete = false;
             return 0;
         }
 

@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         public CharacterQuest CharacterQuest { get { return Data; } }
         public Quest Quest { get { return CharacterQuest != null ? CharacterQuest.GetQuest() : null; } }
-        
+
         [Header("Generic Info Format")]
         [Tooltip("Format => {0} = {Title}")]
         public UILocaleKeySetting formatKeyTitleOnGoing = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TITLE_ON_GOING);
@@ -32,6 +32,9 @@ namespace MultiplayerARPG
         public GameObject uiRewardItemRoot;
         public UICharacterItem uiRewardItemPrefab;
         public Transform uiRewardItemContainer;
+        [Header("Reward Currencies")]
+        public bool showRewardCurrencies;
+        public UICurrencyAmounts uiRewardCurrencies;
         [Header("Quest Tasks")]
         public bool showQuestTaskList;
         public GameObject uiQuestTaskRoot;
@@ -82,7 +85,7 @@ namespace MultiplayerARPG
                 {
                     tempUiQuestTask = ui.GetComponent<UIQuestTask>();
                     bool isComplete = false;
-                    int progress = Data.GetProgress(Character, index, out isComplete);
+                    int progress = Data.GetProgress(OwningCharacter, index, out isComplete);
                     tempUiQuestTask.Data = new UIQuestTaskData(task, progress);
                     tempUiQuestTask.Show();
                 });
@@ -92,7 +95,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             bool isComplete = CharacterQuest.isComplete;
-            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(Character);
+            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(OwningCharacter);
 
             string titleFormat = isComplete ?
                 LanguageManager.GetText(formatKeyTitleComplete) :
@@ -136,6 +139,19 @@ namespace MultiplayerARPG
 
             if (uiRewardItemRoot != null)
                 uiRewardItemRoot.SetActive(showRewardItemList && Quest.rewardItems.Length > 0);
+
+            if (uiRewardCurrencies != null)
+            {
+                if (showRewardCurrencies)
+                {
+                    uiRewardCurrencies.Data = Quest.CacheRewardCurrencies;
+                    uiRewardCurrencies.Show();
+                }
+                else
+                {
+                    uiRewardCurrencies.Hide();
+                }
+            }
 
             if (uiQuestTaskRoot != null)
                 uiQuestTaskRoot.SetActive(showQuestTaskList && Quest.tasks.Length > 0);
