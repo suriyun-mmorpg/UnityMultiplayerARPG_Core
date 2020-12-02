@@ -27,8 +27,6 @@ namespace MultiplayerARPG
         public ItemAmount[] rewardItems;
         [Tooltip("If this is `TRUE` character will be able to do this quest repeatedly")]
         public bool canRepeat;
-        [Tooltip("If this is `TRUE` quest will be completed immediately after talked to NPC and all tasks done")]
-        public bool completeAfterTalked;
 
         [System.NonSerialized]
         private HashSet<int> cacheKillMonsterIds;
@@ -92,10 +90,11 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(requirement.completedQuests);
         }
 
-        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, out int taskIndex, out BaseNpcDialog dialog)
+        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, out int taskIndex, out BaseNpcDialog dialog, out bool completeAfterTalked)
         {
             taskIndex = -1;
             dialog = null;
+            completeAfterTalked = false;
             if (tasks == null || tasks.Length == 0)
                 return false;
             int indexOfQuest = character.IndexOfQuest(DataId);
@@ -112,6 +111,7 @@ namespace MultiplayerARPG
                 {
                     taskIndex = i;
                     dialog = tasks[i].talkToNpcDialog;
+                    completeAfterTalked = tasks[i].completeAfterTalked;
                     return true;
                 }
             }
@@ -155,9 +155,14 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
         public ItemAmount itemAmount;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        [Tooltip("Have to talk to this NPC to complete task.")]
         public NpcEntity npcEntity;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        [Tooltip("This dialog will be shown immediately instead of start dialog which set to the NPC")]
         public BaseNpcDialog talkToNpcDialog;
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        [Tooltip("If this is `TRUE` quest will be completed immediately after talked to NPC and all tasks done")]
+        public bool completeAfterTalked;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.Custom))]
         public BaseCustomQuestTask customQuestTask;
     }

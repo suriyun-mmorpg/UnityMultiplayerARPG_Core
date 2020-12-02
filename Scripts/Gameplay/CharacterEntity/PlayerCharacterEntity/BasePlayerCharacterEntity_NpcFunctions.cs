@@ -33,6 +33,7 @@ namespace MultiplayerARPG
             Quest quest;
             int taskIndex;
             BaseNpcDialog talkToNpcTaskDialog;
+            bool completeAfterTalked;
             CharacterQuest characterQuest;
             for (int i = 0; i < Quests.Count; ++i)
             {
@@ -40,12 +41,12 @@ namespace MultiplayerARPG
                 if (characterQuest.isComplete)
                     continue;
                 quest = characterQuest.GetQuest();
-                if (quest == null || !quest.HaveToTalkToNpc(this, npcEntity, out taskIndex, out talkToNpcTaskDialog))
+                if (quest == null || !quest.HaveToTalkToNpc(this, npcEntity, out taskIndex, out talkToNpcTaskDialog, out completeAfterTalked))
                     continue;
                 CurrentNpcDialog = talkToNpcTaskDialog;
                 characterQuest.CompletedTasks.Add(taskIndex);
                 Quests[i] = characterQuest;
-                if (quest.completeAfterTalked && characterQuest.IsAllTasksDone(this))
+                if (completeAfterTalked && characterQuest.IsAllTasksDone(this))
                     CompleteQuest(quest.DataId);
             }
 
