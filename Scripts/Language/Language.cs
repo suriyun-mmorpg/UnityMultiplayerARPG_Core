@@ -400,7 +400,7 @@ namespace MultiplayerARPG
         /// </summary>
         UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH,
         /// <summary>
-        /// Format => {0} = {Attribute Title}, {1} = {Amount * 100}
+        /// Format => {0} = {Attribute Title}, {1} = {Amount}
         /// </summary>
         UI_FORMAT_ATTRIBUTE_AMOUNT,
         // Format - Resistance Amount
@@ -685,6 +685,19 @@ namespace MultiplayerARPG
         /// Format => {0} = {Title}
         /// </summary>
         UI_FORMAT_QUEST_TASK_TALK_TO_NPC_COMPLETE,
+        // Format - Currency Amount
+        /// <summary>
+        /// Format => {0} = {Currency Title}, {1} = {Current Amount}, {2} = {Target Amount}
+        /// </summary>
+        UI_FORMAT_CURRENT_CURRENCY,
+        /// <summary>
+        /// Format => {0} = {Currency Title}, {1} = {Current Amount}, {2} = {Target Amount}
+        /// </summary>
+        UI_FORMAT_CURRENT_CURRENCY_NOT_ENOUGH,
+        /// <summary>
+        /// Format => {0} = {Currency Title}, {1} = {Amount}
+        /// </summary>
+        UI_FORMAT_CURRENCY_AMOUNT,
     }
 
     public static class DefaultLocale
@@ -1069,6 +1082,10 @@ namespace MultiplayerARPG
             // Format - 1.61 - Talk to NPC quest task
             Texts.Add(UIFormatKeys.UI_FORMAT_QUEST_TASK_TALK_TO_NPC.ToString(), "Talk to {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_QUEST_TASK_TALK_TO_NPC_COMPLETE.ToString(), "Talk to {0}: Complete");
+            // Format - Currency Amount
+            Texts.Add(UIFormatKeys.UI_FORMAT_CURRENT_CURRENCY.ToString(), "{0}: {1}/{2}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CURRENT_CURRENCY_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString(), "{0}: {1}");
         }
     }
 
