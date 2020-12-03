@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -567,10 +565,17 @@ namespace MultiplayerARPG
                 // Not attack skill, so use skill immediately
                 if (skill.RequiredTarget())
                 {
+                    if (SelectedEntity == null)
+                    {
+                        PlayerCharacterEntity.QueueGameMessage(GameMessage.Type.NoSkillTarget);
+                        ClearQueueUsingSkill();
+                        isFollowingTarget = false;
+                        return;
+                    }
                     if (wasdLockAttackTarget)
                     {
                         // Set target, then use skill later when moved nearby target
-                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
+                        if (SelectedEntity is BaseCharacterEntity)
                         {
                             SetTarget(SelectedEntity, TargetActionType.UseSkill, false);
                             isFollowingTarget = true;
@@ -584,7 +589,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Try apply skill to selected entity immediately, it will fail if selected entity is far from the character
-                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
+                        if (SelectedEntity is BaseCharacterEntity)
                         {
                             if (SelectedEntity != PlayerCharacterEntity)
                             {

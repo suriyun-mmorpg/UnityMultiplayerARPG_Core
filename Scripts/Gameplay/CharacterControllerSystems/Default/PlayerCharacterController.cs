@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -20,7 +18,7 @@ namespace MultiplayerARPG
             UseSkill,
             ViewOptions,
         }
-        
+
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
 
@@ -358,7 +356,16 @@ namespace MultiplayerARPG
 
         public void RequestUsePendingSkill()
         {
-            if (queueUsingSkill.skill != null && PlayerCharacterEntity.CanUseSkill())
+            if (PlayerCharacterEntity.IsDead() ||
+                PlayerCharacterEntity.DealingState != DealingState.None)
+            {
+                ClearQueueUsingSkill();
+                return;
+            }
+
+            if (queueUsingSkill.skill != null &&
+                !PlayerCharacterEntity.IsPlayingActionAnimation() &&
+                !PlayerCharacterEntity.IsAttackingOrUsingSkill)
             {
                 bool canUseSkill;
                 if (queueUsingSkill.itemIndex >= 0)
