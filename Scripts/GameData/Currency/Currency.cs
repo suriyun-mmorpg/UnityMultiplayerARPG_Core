@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Currency", menuName = "Create GameData/Currency", order = -4992)]
+    [CreateAssetMenu(fileName = "Currency", menuName = "Create GameData/Currency", order = -5999)]
     public class Currency : BaseGameData
     {
     }
