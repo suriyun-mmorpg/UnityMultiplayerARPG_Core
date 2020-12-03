@@ -528,7 +528,7 @@ namespace MultiplayerARPG
             playerCharacterEntity.StorageItems = new CharacterItem[0];
         }
 
-        public override void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
+        public override void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short inventoryIndex, short amount, short storageItemIndex)
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
@@ -575,7 +575,7 @@ namespace MultiplayerARPG
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
+        public override void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, short inventoryIndex)
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
@@ -591,6 +591,9 @@ namespace MultiplayerARPG
             short slotLimit = storage.slotLimit;
             // Prepare item data
             CharacterItem movingItem = storageItemList[storageItemIndex].Clone(true);
+            IArmorItem equippingArmorItem = movingItem.GetArmorItem();
+            IWeaponItem equippingWeaponItem = movingItem.GetWeaponItem();
+            IShieldItem equippingShieldItem = movingItem.GetShieldItem();
             movingItem.amount = amount;
             if (inventoryIndex < 0 ||
                 inventoryIndex >= playerCharacter.NonEquipItems.Count ||
@@ -666,13 +669,8 @@ namespace MultiplayerARPG
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
+        public override void SwapOrMergeStorageItem(IPlayerCharacterData playerCharacter, StorageId storageId, short fromIndex, short toIndex)
         {
-            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
-            {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
             List<CharacterItem> storageItemList = storageItems[storageId];

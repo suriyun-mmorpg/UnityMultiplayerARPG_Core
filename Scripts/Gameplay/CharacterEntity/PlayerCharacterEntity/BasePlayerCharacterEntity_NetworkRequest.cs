@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using LiteNetLibManager;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -532,15 +530,15 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerMoveItemToStorage(InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
+        public bool CallServerMoveItemToStorage(short inventoryIndex, short amount, short storageItemIndex)
         {
-            RPC(ServerMoveItemToStorage, inventoryType, inventoryIndex, amount, storageItemIndex);
+            RPC(ServerMoveItemToStorage, inventoryIndex, amount, storageItemIndex);
             return true;
         }
 
-        public bool CallServerMoveItemFromStorage(short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
+        public bool CallServerMoveItemFromStorage(short storageItemIndex, short amount, short inventoryIndex)
         {
-            RPC(ServerMoveItemFromStorage, storageItemIndex, amount, inventoryType, inventoryIndex);
+            RPC(ServerMoveItemFromStorage, storageItemIndex, amount, inventoryIndex);
             return true;
         }
 

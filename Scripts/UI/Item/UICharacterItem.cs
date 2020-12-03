@@ -1226,7 +1226,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacter.CallServerMoveItemToStorage(InventoryType, (short)IndexOfData, 1, -1);
+                OwningCharacter.CallServerMoveItemToStorage((short)IndexOfData, 1, -1);
             }
             else
             {
@@ -1241,7 +1241,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacter.CallServerMoveItemToStorage(InventoryType, (short)IndexOfData, (short)amount, -1);
+            OwningCharacter.CallServerMoveItemToStorage((short)IndexOfData, (short)amount, -1);
         }
         #endregion
 
@@ -1256,7 +1256,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacter.CallServerMoveItemFromStorage((short)IndexOfData, 1, InventoryType.NonEquipItems, -1);
+                OwningCharacter.CallServerMoveItemFromStorage((short)IndexOfData, 1, -1);
             }
             else
             {
@@ -1271,7 +1271,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacter.CallServerMoveItemFromStorage((short)IndexOfData, (short)amount, InventoryType.NonEquipItems, -1);
+            OwningCharacter.CallServerMoveItemFromStorage((short)IndexOfData, (short)amount, -1);
         }
         #endregion
 

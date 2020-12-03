@@ -885,11 +885,10 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="playerCharacter">Character who move item from inventory to storage</param>
         /// <param name="storageId">Storage id</param>
-        /// <param name="inventoryType">Type of inventory</param>
         /// <param name="inventoryIndex">Index of inventory</param>
         /// <param name="amount">Amount of item</param>
         /// <param name="storageItemIndex">Index of storage</param>
-        public abstract void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex);
+        public abstract void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short inventoryIndex, short amount, short storageItemIndex);
 
         /// <summary>
         /// Move item from storage
@@ -898,9 +897,8 @@ namespace MultiplayerARPG
         /// <param name="storageId">Storage id</param>
         /// <param name="storageItemIndex">Index of storage</param>
         /// <param name="amount">Amount of item</param>
-        /// <param name="inventoryType">Type of inventory</param>
         /// <param name="inventoryIndex">Index of inventory</param>
-        public abstract void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex);
+        public abstract void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, short inventoryIndex);
 
         /// <summary>
         /// Increase items to storage
@@ -922,11 +920,11 @@ namespace MultiplayerARPG
         /// <summary>
         /// Swap or merge storage item
         /// </summary>
-        /// <param name="playerCharacterEntity"></param>
+        /// <param name="playerCharacter"></param>
         /// <param name="storageId">Storage id</param>
         /// <param name="storageItemIndex">Index of storage</param>
         /// <param name="nonEquipIndex">Index of inventory</param>
-        public abstract void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex);
+        public abstract void SwapOrMergeStorageItem(IPlayerCharacterData playerCharacter, StorageId storageId, short fromIndex, short toIndex);
 
         /// <summary>
         /// Check if storage entity is opened or not

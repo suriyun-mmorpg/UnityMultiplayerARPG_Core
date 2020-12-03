@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                     break;
                 case InventoryType.StorageItems:
                     // Drop non equip item to storage item
-                    BasePlayerCharacterController.OwningCharacter.CallServerMoveItemToStorage(draggedItemUI.uiCharacterItem.InventoryType, (short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
+                    BasePlayerCharacterController.OwningCharacter.CallServerMoveItemToStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
                     break;
             }
         }
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             {
                 case InventoryType.NonEquipItems:
                     // Drop storage item to non equip item
-                    BasePlayerCharacterController.OwningCharacter.CallServerMoveItemFromStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, uiCharacterItem.InventoryType, (short)uiCharacterItem.IndexOfData);
+                    BasePlayerCharacterController.OwningCharacter.CallServerMoveItemFromStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
                     break;
                 case InventoryType.StorageItems:
                     // Drop storage item to storage item

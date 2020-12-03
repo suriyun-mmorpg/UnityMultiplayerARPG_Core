@@ -922,7 +922,7 @@ namespace MultiplayerARPG
 
         #region Storage
         [ServerRpc]
-        protected void ServerMoveItemToStorage(InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
+        protected void ServerMoveItemToStorage(short inventoryIndex, short amount, short storageItemIndex)
         {
 #if !CLIENT_BUILD
             if (this.IsDead())
@@ -932,12 +932,12 @@ namespace MultiplayerARPG
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, inventoryType, inventoryIndex, amount, storageItemIndex);
+            CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, inventoryIndex, amount, storageItemIndex);
 #endif
         }
 
         [ServerRpc]
-        protected void ServerMoveItemFromStorage(short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
+        protected void ServerMoveItemFromStorage(short storageItemIndex, short amount, short inventoryIndex)
         {
 #if !CLIENT_BUILD
             if (this.IsDead())
@@ -947,7 +947,7 @@ namespace MultiplayerARPG
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, inventoryType, inventoryIndex);
+            CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, inventoryIndex);
 #endif
         }
 
@@ -955,8 +955,13 @@ namespace MultiplayerARPG
         protected void ServerSwapOrMergeStorageItem(short fromIndex, short toIndex)
         {
 #if !CLIENT_BUILD
-            if (this.IsDead() || fromIndex >= storageItems.Length || toIndex >= storageItems.Length)
+            if (this.IsDead())
                 return;
+            if (!CurrentGameManager.CanAccessStorage(this, CurrentStorageId))
+            {
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
+                return;
+            }
             CurrentGameManager.SwapOrMergeStorageItem(this, CurrentStorageId, fromIndex, toIndex);
 #endif
         }
