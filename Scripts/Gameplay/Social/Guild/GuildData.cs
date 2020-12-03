@@ -16,13 +16,67 @@ namespace MultiplayerARPG
         private List<GuildRoleData> roles;
         private Dictionary<string, byte> memberRoles;
         private Dictionary<int, short> skillLevels;
+        private bool isCached;
 
-        public int IncreaseMaxMember { get; private set; }
-        public float IncreaseExpGainPercentage { get; private set; }
-        public float IncreaseGoldGainPercentage { get; private set; }
-        public float IncreaseShareExpGainPercentage { get; private set; }
-        public float IncreaseShareGoldGainPercentage { get; private set; }
-        public float DecreaseExpLostPercentage { get; private set; }
+        private int increaseMaxMember;
+        public int IncreaseMaxMember
+        {
+            get
+            {
+                MakeCaches();
+                return increaseMaxMember;
+            }
+        }
+
+        private float increaseExpGainPercentage;
+        public float IncreaseExpGainPercentage
+        {
+            get
+            {
+                MakeCaches();
+                return increaseExpGainPercentage;
+            }
+        }
+
+        private float increaseGoldGainPercentage;
+        public float IncreaseGoldGainPercentage
+        {
+            get
+            {
+                MakeCaches();
+                return increaseGoldGainPercentage;
+            }
+        }
+
+        private float increaseShareExpGainPercentage;
+        public float IncreaseShareExpGainPercentage
+        {
+            get
+            {
+                MakeCaches();
+                return increaseShareExpGainPercentage;
+            }
+        }
+
+        private float increaseShareGoldGainPercentage;
+        public float IncreaseShareGoldGainPercentage
+        {
+            get
+            {
+                MakeCaches();
+                return increaseShareGoldGainPercentage;
+            }
+        }
+
+        private float decreaseExpLostPercentage;
+        public float DecreaseExpLostPercentage
+        {
+            get
+            {
+                MakeCaches();
+                return decreaseExpLostPercentage;
+            }
+        }
 
         public byte LowestMemberRole
         {
@@ -257,7 +311,7 @@ namespace MultiplayerARPG
                 level += 1;
                 skillPoint -= 1;
                 skillLevels[dataId] = level;
-                MakeCaches();
+                isCached = false;
             }
         }
 
@@ -266,18 +320,21 @@ namespace MultiplayerARPG
             if (GameInstance.GuildSkills.ContainsKey(dataId))
             {
                 skillLevels[dataId] = level;
-                MakeCaches();
+                isCached = false;
             }
         }
 
         private void MakeCaches()
         {
-            IncreaseMaxMember = 0;
-            IncreaseExpGainPercentage = 0;
-            IncreaseGoldGainPercentage = 0;
-            IncreaseShareExpGainPercentage = 0;
-            IncreaseShareGoldGainPercentage = 0;
-            DecreaseExpLostPercentage = 0;
+            if (isCached)
+                return;
+            isCached = true;
+            increaseMaxMember = 0;
+            increaseExpGainPercentage = 0;
+            increaseGoldGainPercentage = 0;
+            increaseShareExpGainPercentage = 0;
+            increaseShareGoldGainPercentage = 0;
+            decreaseExpLostPercentage = 0;
 
             GuildSkill tempGuildSkill;
             short tempLevel;
@@ -287,12 +344,12 @@ namespace MultiplayerARPG
                 if (!GameInstance.GuildSkills.TryGetValue(skill.Key, out tempGuildSkill) || tempLevel <= 0)
                     continue;
 
-                IncreaseMaxMember += tempGuildSkill.GetIncreaseMaxMember(tempLevel);
-                IncreaseExpGainPercentage += tempGuildSkill.GetIncreaseExpGainPercentage(tempLevel);
-                IncreaseGoldGainPercentage += tempGuildSkill.GetIncreaseGoldGainPercentage(tempLevel);
-                IncreaseShareExpGainPercentage += tempGuildSkill.GetIncreaseShareExpGainPercentage(tempLevel);
-                IncreaseShareGoldGainPercentage += tempGuildSkill.GetIncreaseShareGoldGainPercentage(tempLevel);
-                DecreaseExpLostPercentage += tempGuildSkill.GetDecreaseExpLostPercentage(tempLevel);
+                increaseMaxMember += tempGuildSkill.GetIncreaseMaxMember(tempLevel);
+                increaseExpGainPercentage += tempGuildSkill.GetIncreaseExpGainPercentage(tempLevel);
+                increaseGoldGainPercentage += tempGuildSkill.GetIncreaseGoldGainPercentage(tempLevel);
+                increaseShareExpGainPercentage += tempGuildSkill.GetIncreaseShareExpGainPercentage(tempLevel);
+                increaseShareGoldGainPercentage += tempGuildSkill.GetIncreaseShareGoldGainPercentage(tempLevel);
+                decreaseExpLostPercentage += tempGuildSkill.GetDecreaseExpLostPercentage(tempLevel);
             }
         }
 
