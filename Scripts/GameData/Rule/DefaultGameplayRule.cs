@@ -320,8 +320,9 @@ namespace MultiplayerARPG
             return waterDecreasePerSeconds > 0 && character.CurrentWater < thirstyWhenWaterLowerThan;
         }
 
-        public override bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType)
+        public override bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, out int rewardedExp)
         {
+            rewardedExp = 0;
             if ((character is BaseMonsterCharacterEntity) &&
                 (character as BaseMonsterCharacterEntity).SummonType != SummonType.Pet)
             {
@@ -420,12 +421,13 @@ namespace MultiplayerARPG
                 if (recoverStaminaWhenLevelUp)
                     character.CurrentStamina = character.MaxStamina;
             }
-
+            rewardedExp = exp;
             return isLevelUp;
         }
 
-        public override void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType)
+        public override void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, out int rewardedGold)
         {
+            rewardedGold = 0;
             if (character is BaseMonsterCharacterEntity)
             {
                 // Don't give reward currencies to monsters
@@ -463,6 +465,7 @@ namespace MultiplayerARPG
                 }
 
                 playerCharacter.IncreaseCurrencies(reward.currencies, multiplier);
+                rewardedGold = gold;
             }
         }
 

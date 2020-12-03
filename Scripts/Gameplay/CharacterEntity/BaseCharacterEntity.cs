@@ -408,9 +408,13 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            CurrentGameManager.SendNotifyRewardExp(ConnectionId, reward.exp);
-            if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType))
+            int rewardedExp;
+            if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType, out rewardedExp))
+            {
+                CurrentGameManager.SendNotifyRewardExp(ConnectionId, rewardedExp);
                 return;
+            }
+            CurrentGameManager.SendNotifyRewardExp(ConnectionId, rewardedExp);
             CallAllOnLevelUp();
         }
 
@@ -418,8 +422,9 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            CurrentGameManager.SendNotifyRewardGold(ConnectionId, reward.gold);
-            CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType);
+            int rewardedGold;
+            CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType, out rewardedGold);
+            CurrentGameManager.SendNotifyRewardGold(ConnectionId, rewardedGold);
         }
         #endregion
 
