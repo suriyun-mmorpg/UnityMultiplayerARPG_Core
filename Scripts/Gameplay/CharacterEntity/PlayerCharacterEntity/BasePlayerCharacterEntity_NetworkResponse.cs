@@ -922,22 +922,32 @@ namespace MultiplayerARPG
 
         #region Storage
         [ServerRpc]
-        protected void ServerMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
+        protected void ServerMoveItemToStorage(InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
         {
 #if !CLIENT_BUILD
-            if (this.IsDead() || nonEquipIndex >= nonEquipItems.Count)
+            if (this.IsDead())
                 return;
-            CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, nonEquipIndex, amount, storageItemIndex);
+            if (!CurrentGameManager.CanAccessStorage(this, CurrentStorageId))
+            {
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
+                return;
+            }
+            CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, inventoryType, inventoryIndex, amount, storageItemIndex);
 #endif
         }
 
         [ServerRpc]
-        protected void ServerMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
+        protected void ServerMoveItemFromStorage(short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
         {
 #if !CLIENT_BUILD
-            if (this.IsDead() || storageItemIndex >= storageItems.Length)
+            if (this.IsDead())
                 return;
-            CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, nonEquipIndex);
+            if (!CurrentGameManager.CanAccessStorage(this, CurrentStorageId))
+            {
+                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
+                return;
+            }
+            CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, inventoryType, inventoryIndex);
 #endif
         }
 

@@ -528,17 +528,12 @@ namespace MultiplayerARPG
             playerCharacterEntity.StorageItems = new CharacterItem[0];
         }
 
-        public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
+        public override void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
         {
-            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
-            {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
             List<CharacterItem> storageItemList = storageItems[storageId];
-            if (nonEquipIndex < 0 || nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count)
+            if (inventoryIndex < 0 || inventoryIndex >= playerCharacter.NonEquipItems.Count)
             {
                 // Don't do anything, if non equip item index is invalid
                 return;
@@ -550,7 +545,7 @@ namespace MultiplayerARPG
             short weightLimit = storage.weightLimit;
             short slotLimit = storage.slotLimit;
             // Prepare item data
-            CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone(true);
+            CharacterItem movingItem = playerCharacter.NonEquipItems[inventoryIndex].Clone(true);
             movingItem.amount = amount;
             if (storageItemIndex < 0 ||
                 storageItemIndex >= storageItemList.Count ||
@@ -563,30 +558,25 @@ namespace MultiplayerARPG
                 if (!isOverwhelming && storageItemList.IncreaseItems(movingItem))
                 {
                     // Decrease from inventory
-                    playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
-                    playerCharacterEntity.FillEmptySlots();
+                    playerCharacter.DecreaseItemsByIndex(inventoryIndex, amount);
+                    playerCharacter.FillEmptySlots();
                 }
             }
             else
             {
                 // Swapping
                 CharacterItem storageItem = storageItemList[storageItemIndex];
-                CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
+                CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryIndex];
 
                 storageItemList[storageItemIndex] = nonEquipItem;
-                playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
+                playerCharacter.NonEquipItems[inventoryIndex] = storageItem;
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
+        public override void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
         {
-            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
-            {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
             List<CharacterItem> storageItemList = storageItems[storageId];
@@ -602,13 +592,13 @@ namespace MultiplayerARPG
             // Prepare item data
             CharacterItem movingItem = storageItemList[storageItemIndex].Clone(true);
             movingItem.amount = amount;
-            if (nonEquipIndex < 0 ||
-                nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
-                playerCharacterEntity.NonEquipItems[nonEquipIndex].dataId == movingItem.dataId)
+            if (inventoryIndex < 0 ||
+                inventoryIndex >= playerCharacter.NonEquipItems.Count ||
+                playerCharacter.NonEquipItems[inventoryIndex].dataId == movingItem.dataId)
             {
                 // Add to inventory or merge
-                bool isOverwhelming = playerCharacterEntity.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
-                if (!isOverwhelming && playerCharacterEntity.IncreaseItems(movingItem))
+                bool isOverwhelming = playerCharacter.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
+                if (!isOverwhelming && playerCharacter.IncreaseItems(movingItem))
                 {
                     // Decrease from storage
                     storageItemList.DecreaseItemsByIndex(storageItemIndex, amount, isLimitSlot);
@@ -618,13 +608,13 @@ namespace MultiplayerARPG
             {
                 // Swapping
                 CharacterItem storageItem = storageItemList[storageItemIndex];
-                CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
+                CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryIndex];
 
                 storageItemList[storageItemIndex] = nonEquipItem;
-                playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
+                playerCharacter.NonEquipItems[inventoryIndex] = storageItem;
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            playerCharacterEntity.FillEmptySlots();
+            playerCharacter.FillEmptySlots();
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 

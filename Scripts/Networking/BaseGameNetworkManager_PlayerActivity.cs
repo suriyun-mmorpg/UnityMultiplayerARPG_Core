@@ -883,22 +883,24 @@ namespace MultiplayerARPG
         /// <summary>
         /// Move item to storage
         /// </summary>
-        /// <param name="playerCharacterEntity">Character who move item from inventory to storage</param>
+        /// <param name="playerCharacter">Character who move item from inventory to storage</param>
         /// <param name="storageId">Storage id</param>
-        /// <param name="nonEquipIndex">Index of inventory</param>
+        /// <param name="inventoryType">Type of inventory</param>
+        /// <param name="inventoryIndex">Index of inventory</param>
         /// <param name="amount">Amount of item</param>
         /// <param name="storageItemIndex">Index of storage</param>
-        public abstract void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex);
+        public abstract void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex);
 
         /// <summary>
         /// Move item from storage
         /// </summary>
-        /// <param name="playerCharacterEntity">Character who move item from storage to inventory</param>
+        /// <param name="playerCharacter">Character who move item from storage to inventory</param>
         /// <param name="storageId">Storage id</param>
         /// <param name="storageItemIndex">Index of storage</param>
         /// <param name="amount">Amount of item</param>
-        /// <param name="nonEquipIndex">Index of inventory</param>
-        public abstract void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex);
+        /// <param name="inventoryType">Type of inventory</param>
+        /// <param name="inventoryIndex">Index of inventory</param>
+        public abstract void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex);
 
         /// <summary>
         /// Increase items to storage

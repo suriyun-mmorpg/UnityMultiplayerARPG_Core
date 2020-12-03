@@ -532,15 +532,15 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
+        public bool CallServerMoveItemToStorage(InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
         {
-            RPC(ServerMoveItemToStorage, nonEquipIndex, amount, storageItemIndex);
+            RPC(ServerMoveItemToStorage, inventoryType, inventoryIndex, amount, storageItemIndex);
             return true;
         }
 
-        public bool CallServerMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
+        public bool CallServerMoveItemFromStorage(short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
         {
-            RPC(ServerMoveItemFromStorage, storageItemIndex, amount, nonEquipIndex);
+            RPC(ServerMoveItemFromStorage, storageItemIndex, amount, inventoryType, inventoryIndex);
             return true;
         }
 
