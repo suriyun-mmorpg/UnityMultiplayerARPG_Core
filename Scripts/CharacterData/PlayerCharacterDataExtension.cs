@@ -777,6 +777,8 @@ namespace MultiplayerARPG
 
         public static void IncreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
         {
+            if (currencyAmounts == null)
+                return;
             foreach (CurrencyAmount currencyAmount in currencyAmounts)
             {
                 if (currencyAmount.currency == null ||
@@ -799,6 +801,8 @@ namespace MultiplayerARPG
 
         public static void DecreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
         {
+            if (currencyAmounts == null)
+                return;
             foreach (CurrencyAmount currencyAmount in currencyAmounts)
             {
                 if (currencyAmount.currency == null ||
@@ -821,6 +825,8 @@ namespace MultiplayerARPG
 
         public static bool HasEnoughCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
         {
+            if (currencyAmounts == null)
+                return true;
             foreach (CurrencyAmount currencyAmount in currencyAmounts)
             {
                 if (currencyAmount.currency == null ||
