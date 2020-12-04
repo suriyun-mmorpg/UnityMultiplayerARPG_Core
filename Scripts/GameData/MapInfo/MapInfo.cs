@@ -23,7 +23,7 @@ namespace MultiplayerARPG
                 if (cacheOverrideRespawnPoints == null)
                 {
                     cacheOverrideRespawnPoints = new Dictionary<int, List<OverrideRespawnPoint>>();
-                    int factionDataId = 0;
+                    int factionDataId;
                     foreach (OverrideRespawnPoint overrideRespawnPoint in overrideRespawnPoints)
                     {
                         factionDataId = 0;
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                     case PvpMode.GuildPvp:
                         return targetPlayer.GuildId != 0 && targetPlayer.GuildId == playerCharacter.GuildId;
                     default:
-                        return false;
+                        return true;
                 }
             }
 
