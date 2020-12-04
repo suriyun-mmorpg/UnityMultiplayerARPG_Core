@@ -226,7 +226,17 @@ namespace MultiplayerARPG
         private Vector3 GetBuildingPlacePosition(Vector3 position)
         {
             if (buildGridSnap)
-                position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize) + buildGridOffsets;
+            {
+                switch (CurrentGameInstance.DimensionType)
+                {
+                    case DimensionType.Dimension3D:
+                        position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize) + buildGridOffsets;
+                        break;
+                    case DimensionType.Dimension2D:
+                        position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, Mathf.Round(position.y / buildGridSize) * buildGridSize) + buildGridOffsets;
+                        break;
+                }
+            }
             return position;
         }
 
