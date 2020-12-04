@@ -225,16 +225,15 @@ namespace MultiplayerARPG
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
         {
-            switch (CurrentGameInstance.DimensionType)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
-                case DimensionType.Dimension3D:
-                    if (buildGridSnap)
-                        position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize) + buildGridOffsets;
-                    break;
-                case DimensionType.Dimension2D:
-                    if (buildGridSnap)
-                        position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, Mathf.Round(position.y / buildGridSize) * buildGridSize) + buildGridOffsets;
-                    break;
+                if (buildGridSnap)
+                    position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize) + buildGridOffsets;
+            }
+            else
+            {
+                if (buildGridSnap)
+                    position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, Mathf.Round(position.y / buildGridSize) * buildGridSize) + buildGridOffsets;
             }
             return position;
         }
@@ -242,20 +241,18 @@ namespace MultiplayerARPG
         private Quaternion GetBuildingPlaceRotation(float angles)
         {
             Vector3 eulerAngles = Vector3.zero;
-            switch (CurrentGameInstance.DimensionType)
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
-                case DimensionType.Dimension3D:
-                    if (buildRotationSnap)
-                    {
-                        // Make Y rotation set to 0, 90, 180
-                        eulerAngles.y = Mathf.Round(angles / 90) * 90;
-                    }
-                    else
-                    {
-                        // Rotate by set angles
-                        eulerAngles.y = angles;
-                    }
-                    break;
+                if (buildRotationSnap)
+                {
+                    // Make Y rotation set to 0, 90, 180
+                    eulerAngles.y = Mathf.Round(angles / 90) * 90;
+                }
+                else
+                {
+                    // Rotate by set angles
+                    eulerAngles.y = angles;
+                }
             }
             return Quaternion.Euler(eulerAngles);
         }

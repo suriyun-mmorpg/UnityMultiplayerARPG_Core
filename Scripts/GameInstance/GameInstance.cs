@@ -566,7 +566,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// All layers except `characterLayer`, `itemDropLayer, `harvestableLayer`, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `characterLayer`, `itemDropLayer, `harvestableLayer`, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetBuildLayerMask()
@@ -574,10 +574,10 @@ namespace MultiplayerARPG
             int layerMask = 0;
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
+            layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
             layerMask = layerMask | characterLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
-            layerMask = MixWithIgnoreRaycastLayers(layerMask);
             return ~layerMask;
         }
 

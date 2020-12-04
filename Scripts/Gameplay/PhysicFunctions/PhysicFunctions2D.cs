@@ -20,10 +20,11 @@ namespace MultiplayerARPG
             return PhysicUtils.SortedRaycastNonAlloc2D(origin, direction, raycasts2D, distance, layerMask);
         }
 
-        public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 worldPosition2D, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 raycastPosition, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            worldPosition2D = camera.ScreenToWorldPoint(mousePosition);
-            return PhysicUtils.SortedLinecastNonAlloc2D(worldPosition2D, worldPosition2D, raycasts2D, layerMask);
+            raycastPosition = camera.ScreenToWorldPoint(mousePosition);
+            raycastPosition.z = 0;
+            return PhysicUtils.SortedLinecastNonAlloc2D(raycastPosition, raycastPosition, raycasts2D, layerMask);
         }
 
         public int RaycastDown(Vector3 position, int layerMask, float distance = 100f, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
