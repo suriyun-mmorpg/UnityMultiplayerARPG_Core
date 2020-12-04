@@ -341,11 +341,11 @@ namespace MultiplayerARPG
                 {
                     case RewardGivenType.KillMonster:
                         if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
-                            exp += (int)(exp * guildData.IncreaseExpGainPercentage * 0.01f);
+                            exp += Mathf.CeilToInt(exp * guildData.IncreaseExpGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
                         if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
-                            exp += (int)(exp * guildData.IncreaseShareExpGainPercentage * 0.01f);
+                            exp += Mathf.CeilToInt(exp * guildData.IncreaseShareExpGainPercentage * 0.01f);
                         break;
                 }
             }
@@ -444,11 +444,11 @@ namespace MultiplayerARPG
                 {
                     case RewardGivenType.KillMonster:
                         if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
-                            gold += (int)(gold * guildData.IncreaseGoldGainPercentage * 0.01f);
+                            gold += Mathf.CeilToInt(gold * guildData.IncreaseGoldGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
                         if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
-                            gold += (int)(gold * guildData.IncreaseShareGoldGainPercentage * 0.01f);
+                            gold += Mathf.CeilToInt(gold * guildData.IncreaseShareGoldGainPercentage * 0.01f);
                         break;
                 }
 
@@ -719,7 +719,7 @@ namespace MultiplayerARPG
             float dist = lastGroundedPosition.y - character.CacheTransform.position.y;
             if (dist < fallDamageMinDistance)
                 return;
-            int damage = (int)(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
+            int damage = Mathf.CeilToInt(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
             character.CurrentHp -= damage;
             character.ReceivedDamage(character.CacheTransform.position, null, CombatAmountType.NormalDamage, damage, null, null, 0);
             if (character.IsDead())
