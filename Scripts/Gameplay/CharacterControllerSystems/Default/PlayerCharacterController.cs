@@ -225,27 +225,38 @@ namespace MultiplayerARPG
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
         {
-            if (buildGridSnap)
+            switch (CurrentGameInstance.DimensionType)
             {
-                switch (CurrentGameInstance.DimensionType)
-                {
-                    case DimensionType.Dimension3D:
+                case DimensionType.Dimension3D:
+                    if (buildGridSnap)
                         position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize) + buildGridOffsets;
-                        break;
-                    case DimensionType.Dimension2D:
+                    break;
+                case DimensionType.Dimension2D:
+                    if (buildGridSnap)
                         position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, Mathf.Round(position.y / buildGridSize) * buildGridSize) + buildGridOffsets;
-                        break;
-                }
+                    break;
             }
             return position;
         }
 
-        private Quaternion GetBuildingPlaceRotation(float anglesY)
+        private Quaternion GetBuildingPlaceRotation(float angles)
         {
             Vector3 eulerAngles = Vector3.zero;
-            // Make Y rotation set to 0, 90, 180
-            if (buildRotationSnap)
-                eulerAngles.y = Mathf.Round(anglesY / 90) * 90;
+            switch (CurrentGameInstance.DimensionType)
+            {
+                case DimensionType.Dimension3D:
+                    if (buildRotationSnap)
+                    {
+                        // Make Y rotation set to 0, 90, 180
+                        eulerAngles.y = Mathf.Round(angles / 90) * 90;
+                    }
+                    else
+                    {
+                        // Rotate by set angles
+                        eulerAngles.y = angles;
+                    }
+                    break;
+            }
             return Quaternion.Euler(eulerAngles);
         }
 
