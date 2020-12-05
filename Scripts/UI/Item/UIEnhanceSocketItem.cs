@@ -31,12 +31,44 @@ namespace MultiplayerARPG
             }
         }
 
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
+        public UILocaleKeySetting formatKeyRemoveRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
+        [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
+        public UILocaleKeySetting formatKeyRemoveRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
+
         [Header("UI Elements for UI Enhance Socket Item")]
         public UINonEquipItems uiSocketEnhancerItems;
         public UICharacterItems uiAppliedSocketEnhancerItems;
+        public TextWrapper uiTextRemoveRequireGold;
 
         protected bool activated;
         protected string activeItemId;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (uiTextRemoveRequireGold != null)
+            {
+                if (SelectedEnhancerId == 0)
+                {
+                    uiTextRemoveRequireGold.text = string.Format(
+                        LanguageManager.GetText(formatKeyRemoveRequireGold),
+                        0.ToString("N0"),
+                        0.ToString("N0"));
+                }
+                else
+                {
+                    uiTextRemoveRequireGold.text = string.Format(
+                        OwningCharacter.Gold >= GameInstance.Singleton.enhancerRemoval.RequireGold ?
+                            LanguageManager.GetText(formatKeyRemoveRequireGold) :
+                            LanguageManager.GetText(formatKeyRemoveRequireGoldNotEnough),
+                        OwningCharacter.Gold.ToString("N0"),
+                        GameInstance.Singleton.enhancerRemoval.RequireGold.ToString("N0"));
+                }
+            }
+        }
 
         public override void OnUpdateCharacterItems()
         {

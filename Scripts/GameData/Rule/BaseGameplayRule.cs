@@ -48,6 +48,8 @@ namespace MultiplayerARPG
         public abstract void DecreaseCurrenciesWhenRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice);
         public abstract bool CurrenciesEnoughToCraftItem(IPlayerCharacterData character, ItemCraft itemCraft);
         public abstract void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft);
+        public abstract bool CurrenciesEnoughToRemoveEnhancer(IPlayerCharacterData character, EnhancerRemoval enhancerRemoval);
+        public abstract void DecreaseCurrenciesWhenRemoveEnhancer(IPlayerCharacterData character, EnhancerRemoval enhancerRemoval);
         public abstract bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
         public abstract void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
         public abstract Reward MakeMonsterReward(MonsterCharacter monster);

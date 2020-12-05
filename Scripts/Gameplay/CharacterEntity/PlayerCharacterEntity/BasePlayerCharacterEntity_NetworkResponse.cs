@@ -416,9 +416,13 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return;
 
-            // Required gold
-            bool returnEnhancer = true;
             GameMessage.Type gameMessageType;
+            if (!CurrentGameInstance.enhancerRemoval.CanRemove(this, out gameMessageType))
+            {
+                CurrentGameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                return;
+            }
+            bool returnEnhancer = CurrentGameInstance.enhancerRemoval.ReturnEnhancerItem;
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:

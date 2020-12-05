@@ -680,6 +680,16 @@ namespace MultiplayerARPG
             character.Gold -= itemCraft.RequireGold;
         }
 
+        public override bool CurrenciesEnoughToRemoveEnhancer(IPlayerCharacterData character, EnhancerRemoval enhancerRemoval)
+        {
+            return character.Gold >= enhancerRemoval.RequireGold;
+        }
+
+        public override void DecreaseCurrenciesWhenRemoveEnhancer(IPlayerCharacterData character, EnhancerRemoval enhancerRemoval)
+        {
+            character.Gold -= enhancerRemoval.RequireGold;
+        }
+
         public override bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
         {
             return character.Gold >= setting.CreateGuildRequiredGold;

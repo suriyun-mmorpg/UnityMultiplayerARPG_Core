@@ -159,7 +159,7 @@ namespace MultiplayerARPG
             gameMessageType = GameMessage.Type.None;
             if (enhancedItem.IsEmptySlot())
             {
-                gameMessageType = GameMessage.Type.CannotEnhanceSocket;
+                gameMessageType = GameMessage.Type.CannotRemoveEnhancer;
                 return;
             }
             if (enhancedItem.Sockets.Count == 0 || socketIndex >= enhancedItem.Sockets.Count)
