@@ -2,36 +2,30 @@
 
 namespace MultiplayerARPG
 {
-    public class ResponseCashPackageInfoMessage : INetSerializable
+    public class ResponseClaimMailItemsMessage : INetSerializable
     {
         public enum Error : byte
         {
             None,
             NotAvailable,
-            UserNotFound,
+            NotAllowed,
+            AlreadyClaimed,
         }
         public Error error;
-        public int cash;
-        public int[] cashPackageIds;
+        public Mail mail;
 
         public void Deserialize(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
             if (error == Error.None)
-            {
-                cash = reader.GetInt();
-                cashPackageIds = reader.GetArray<int>();
-            }
+                mail = reader.GetValue<Mail>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)error);
             if (error == Error.None)
-            {
-                writer.Put(cash);
-                writer.PutArray(cashPackageIds);
-            }
+                writer.PutValue(mail);
         }
     }
 }

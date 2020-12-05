@@ -38,6 +38,11 @@ namespace MultiplayerARPG
             public const ushort CashShopBuy = 101;
             public const ushort CashPackageInfo = 102;
             public const ushort CashPackageBuyValidation = 103;
+            public const ushort MailList = 104;
+            public const ushort ReadMail = 105;
+            public const ushort ClaimMailItems = 106;
+            public const ushort DeleteMail = 107;
+            public const ushort SendMail = 108;
         }
 
         public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
@@ -94,7 +99,7 @@ namespace MultiplayerARPG
 
         public override uint PacketVersion()
         {
-            return 3;
+            return 4;
         }
 
         public Dictionary<long, BasePlayerCharacterEntity>.ValueCollection GetPlayerCharacters()
@@ -186,6 +191,11 @@ namespace MultiplayerARPG
             RegisterClientResponse<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo);
             RegisterClientResponse<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy);
             RegisterClientResponse<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation);
+            RegisterClientResponse<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList);
+            RegisterClientResponse<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail);
+            RegisterClientResponse<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems);
+            RegisterClientResponse<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail);
+            RegisterClientResponse<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail);
         }
 
         protected override void RegisterServerMessages()
@@ -200,6 +210,11 @@ namespace MultiplayerARPG
             RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, HandleRequestCashPackageInfo);
             RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, HandleRequestCashShopBuy);
             RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
+            RegisterServerRequest<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList, HandleRequestMailList);
+            RegisterServerRequest<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail, HandleRequestReadMail);
+            RegisterServerRequest<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems, HandleRequestClaimMailItems);
+            RegisterServerRequest<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail, HandleRequestDeleteMail);
+            RegisterServerRequest<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail, HandleRequestSendMail);
         }
 
         protected virtual void Clean()
@@ -751,6 +766,58 @@ namespace MultiplayerARPG
             result.Invoke(AckResponseCode.Error, new ResponseCashPackageBuyValidationMessage()
             {
                 error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable,
+            });
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleRequestMailList(
+            RequestHandlerData requestHandler, RequestMailListMessage request,
+            RequestProceedResultDelegate<ResponseMailListMessage> result)
+        {
+            result.Invoke(AckResponseCode.Success, new ResponseMailListMessage());
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleRequestReadMail(
+            RequestHandlerData requestHandler, RequestReadMailMessage request,
+            RequestProceedResultDelegate<ResponseReadMailMessage> result)
+        {
+            result.Invoke(AckResponseCode.Error, new ResponseReadMailMessage()
+            {
+                error = ResponseReadMailMessage.Error.NotAvailable,
+            });
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleRequestClaimMailItems(
+            RequestHandlerData requestHandler, RequestClaimMailItemsMessage request,
+            RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
+        {
+            result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
+            {
+                error = ResponseClaimMailItemsMessage.Error.NotAvailable,
+            });
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleRequestDeleteMail(
+            RequestHandlerData requestHandler, RequestDeleteMailMessage request,
+            RequestProceedResultDelegate<ResponseDeleteMailMessage> result)
+        {
+            result.Invoke(AckResponseCode.Error, new ResponseDeleteMailMessage()
+            {
+                error = ResponseDeleteMailMessage.Error.NotAvailable,
+            });
+            return default;
+        }
+
+        protected virtual UniTaskVoid HandleRequestSendMail(
+            RequestHandlerData requestHandler, RequestSendMailMessage request,
+            RequestProceedResultDelegate<ResponseSendMailMessage> result)
+        {
+            result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
+            {
+                error = ResponseSendMailMessage.Error.NotAvailable,
             });
             return default;
         }

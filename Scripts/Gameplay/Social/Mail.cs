@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial class Mail
+    public partial class Mail : INetSerializable
     {
         public string Id { get; set; }
         public string EventId { get; set; }
@@ -13,8 +14,8 @@ namespace MultiplayerARPG
         public string Title { get; set; }
         public string Content { get; set; }
         public int Gold { get; set; }
-        public Dictionary<int, int> Currencies { get; set; } = new Dictionary<int, int>();
-        public Dictionary<int, short> Items { get; set; } = new Dictionary<int, short>();
+        public Dictionary<int, int> Currencies { get; } = new Dictionary<int, int>();
+        public Dictionary<int, short> Items { get; } = new Dictionary<int, short>();
         public bool IsRead { get; set; }
         public int ReadTimestamp { get; set; }
         public bool IsClaim { get; set; }
@@ -73,6 +74,48 @@ namespace MultiplayerARPG
                 result += $"{keyValue.Key}:{keyValue.Value};";
             }
             return result;
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put(Id);
+            writer.Put(EventId);
+            writer.Put(SenderId);
+            writer.Put(SenderName);
+            writer.Put(ReceiverId);
+            writer.Put(Title);
+            writer.Put(Content);
+            writer.Put(Gold);
+            writer.Put(WriteCurrencies());
+            writer.Put(WriteItems());
+            writer.Put(IsRead);
+            writer.Put(ReadTimestamp);
+            writer.Put(IsClaim);
+            writer.Put(ClaimTimestamp);
+            writer.Put(IsDelete);
+            writer.Put(DeleteTimestamp);
+            writer.Put(SentTimestamp);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            Id = reader.GetString();
+            EventId = reader.GetString();
+            SenderId = reader.GetString();
+            SenderName = reader.GetString();
+            ReceiverId = reader.GetString();
+            Title = reader.GetString();
+            Content = reader.GetString();
+            Gold = reader.GetInt();
+            ReadCurrencies(reader.GetString());
+            ReadItems(reader.GetString());
+            IsRead = reader.GetBool();
+            ReadTimestamp = reader.GetInt();
+            IsClaim = reader.GetBool();
+            ClaimTimestamp = reader.GetInt();
+            IsDelete = reader.GetBool();
+            DeleteTimestamp = reader.GetInt();
+            SentTimestamp = reader.GetInt();
         }
     }
 }

@@ -20,12 +20,7 @@ namespace MultiplayerARPG
             if (error == Error.None)
             {
                 cash = reader.GetInt();
-                int size = reader.GetInt();
-                cashShopItemIds = new int[size];
-                for (int i = 0; i < size; ++i)
-                {
-                    cashShopItemIds[i] = reader.GetInt();
-                }
+                cashShopItemIds = reader.GetArray<int>();
             }
         }
 
@@ -35,11 +30,7 @@ namespace MultiplayerARPG
             if (error == Error.None)
             {
                 writer.Put(cash);
-                writer.Put(cashShopItemIds.Length);
-                foreach (int cashShopItemId in cashShopItemIds)
-                {
-                    writer.Put(cashShopItemId);
-                }
+                writer.PutArray(cashShopItemIds);
             }
         }
     }
