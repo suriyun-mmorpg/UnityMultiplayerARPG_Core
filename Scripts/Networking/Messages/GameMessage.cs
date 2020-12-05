@@ -82,7 +82,9 @@ namespace MultiplayerARPG
             CannotAccessStorage,
             // Combatant
             NoAmmo,
+            NotEnoughHp,
             NotEnoughMp,
+            NotEnoughStamina,
             // Guild Name
             TooShortGuildName,
             TooLongGuildName,

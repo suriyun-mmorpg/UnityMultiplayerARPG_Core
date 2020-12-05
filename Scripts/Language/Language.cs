@@ -698,6 +698,15 @@ namespace MultiplayerARPG
         /// Format => {0} = {Currency Title}, {1} = {Amount}
         /// </summary>
         UI_FORMAT_CURRENCY_AMOUNT,
+        // 1.61b New Formats
+        /// <summary>
+        /// Format => {0} = {Consume Hp}
+        /// </summary>
+        UI_FORMAT_CONSUME_HP,
+        /// <summary>
+        /// Format => {0} = {Consume Stamina}
+        /// </summary>
+        UI_FORMAT_CONSUME_STAMINA,
     }
 
     public static class DefaultLocale
@@ -770,7 +779,9 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.CannotAccessStorage.ToString(), "Cannot access storage");
             // Combatant
             Texts.Add(GameMessage.Type.NoAmmo.ToString(), "No Ammo");
+            Texts.Add(GameMessage.Type.NotEnoughHp.ToString(), "Have not enough Hp");
             Texts.Add(GameMessage.Type.NotEnoughMp.ToString(), "Have not enough Mp");
+            Texts.Add(GameMessage.Type.NotEnoughStamina.ToString(), "Have not enough Stamina");
             // Guild Name
             Texts.Add(GameMessage.Type.TooShortGuildName.ToString(), "Guild name is too short");
             Texts.Add(GameMessage.Type.TooLongGuildName.ToString(), "Guild name is too long");
@@ -839,7 +850,9 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL.ToString(), "Require Level: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_CLASS.ToString(), "Require Class: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS.ToString(), "Available Weapons: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CONSUME_HP.ToString(), "Consume Hp: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_CONSUME_MP.ToString(), "Consume Mp: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CONSUME_STAMINA.ToString(), "Consume Stamina: {0}");
             // Format - Skill
             Texts.Add(UIFormatKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION.ToString(), "Cooldown: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_SKILL_TYPE.ToString(), "Skill Type: {0}");

@@ -20,8 +20,12 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {List Of Weapon Type}")]
         public UILocaleKeySetting formatKeyAvailableWeapons = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS);
+        [Tooltip("Format => {0} = {Consume Hp Amount}")]
+        public UILocaleKeySetting formatKeyConsumeHp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CONSUME_HP);
         [Tooltip("Format => {0} = {Consume Mp Amount}")]
         public UILocaleKeySetting formatKeyConsumeMp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CONSUME_MP);
+        [Tooltip("Format => {0} = {Consume Stamina Amount}")]
+        public UILocaleKeySetting formatKeyConsumeStamina = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CONSUME_STAMINA);
         [Tooltip("Format => {0} = {Cooldown Duration}")]
         public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
         [Tooltip("Format => {0} = {Cooldown Remains Duration}")]
@@ -40,7 +44,9 @@ namespace MultiplayerARPG
         public Image imageIcon;
         public TextWrapper uiTextSkillType;
         public TextWrapper uiTextAvailableWeapons;
+        public TextWrapper uiTextConsumeHp;
         public TextWrapper uiTextConsumeMp;
+        public TextWrapper uiTextConsumeStamina;
         public TextWrapper uiTextCoolDownDuration;
         public TextWrapper uiTextCoolDownRemainsDuration;
         public Image imageCoolDownGage;
@@ -212,6 +218,15 @@ namespace MultiplayerARPG
                 }
             }
 
+            if (uiTextConsumeHp != null)
+            {
+                uiTextConsumeHp.text = string.Format(
+                    LanguageManager.GetText(formatKeyConsumeHp),
+                    (Skill == null || Level <= 0) ?
+                        LanguageManager.GetUnknowDescription() :
+                        Skill.GetConsumeHp(Level).ToString("N0"));
+            }
+
             if (uiTextConsumeMp != null)
             {
                 uiTextConsumeMp.text = string.Format(
@@ -219,6 +234,15 @@ namespace MultiplayerARPG
                     (Skill == null || Level <= 0) ?
                         LanguageManager.GetUnknowDescription() :
                         Skill.GetConsumeMp(Level).ToString("N0"));
+            }
+
+            if (uiTextConsumeStamina != null)
+            {
+                uiTextConsumeStamina.text = string.Format(
+                    LanguageManager.GetText(formatKeyConsumeStamina),
+                    (Skill == null || Level <= 0) ?
+                        LanguageManager.GetUnknowDescription() :
+                        Skill.GetConsumeStamina(Level).ToString("N0"));
             }
 
             if (uiRequirement != null)

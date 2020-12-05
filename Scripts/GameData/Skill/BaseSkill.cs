@@ -25,8 +25,14 @@ namespace MultiplayerARPG
         [Tooltip("An available weapons, if it not set every weapons is available")]
         public WeaponType[] availableWeapons;
 
+        [Header("Consume Hp")]
+        public IncrementalInt consumeHp;
+
         [Header("Consume Mp")]
         public IncrementalInt consumeMp;
+
+        [Header("Consume Stamina")]
+        public IncrementalInt consumeStamina;
 
         [Header("Cool Down")]
         public IncrementalFloat coolDownDuration;
@@ -125,9 +131,19 @@ namespace MultiplayerARPG
             return damageHitEffects;
         }
 
+        public int GetConsumeHp(short level)
+        {
+            return consumeHp.GetAmount(level);
+        }
+
         public int GetConsumeMp(short level)
         {
             return consumeMp.GetAmount(level);
+        }
+
+        public int GetConsumeStamina(short level)
+        {
+            return consumeStamina.GetAmount(level);
         }
 
         public float GetCoolDownDuration(short level)
@@ -395,9 +411,21 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            if (character.CurrentHp < GetConsumeHp(level))
+            {
+                gameMessageType = GameMessage.Type.NotEnoughHp;
+                return false;
+            }
+
             if (character.CurrentMp < GetConsumeMp(level))
             {
                 gameMessageType = GameMessage.Type.NotEnoughMp;
+                return false;
+            }
+
+            if (character.CurrentStamina < GetConsumeStamina(level))
+            {
+                gameMessageType = GameMessage.Type.NotEnoughStamina;
                 return false;
             }
 

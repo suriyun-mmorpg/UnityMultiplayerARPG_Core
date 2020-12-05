@@ -64,9 +64,9 @@ namespace MultiplayerARPG
                     if (GetSkill() != null)
                     {
                         coolDownRemainsDuration = GetSkill().GetCoolDownDuration(level);
-                        int consumeMp = GetSkill().GetConsumeMp(level);
-                        if (character.CurrentMp >= consumeMp)
-                            character.CurrentMp -= consumeMp;
+                        character.CurrentHp -= GetSkill().GetConsumeHp(level);
+                        character.CurrentMp -= GetSkill().GetConsumeMp(level);
+                        character.CurrentStamina -= GetSkill().GetConsumeStamina(level);
                     }
                     break;
                 case SkillUsageType.GuildSkill:
