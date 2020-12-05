@@ -17,6 +17,8 @@ namespace MultiplayerARPG
         public Dictionary<int, short> Items { get; set; } = new Dictionary<int, short>();
         public bool IsRead { get; set; }
         public int ReadTimestamp { get; set; }
+        public bool IsClaim { get; set; }
+        public int ClaimTimestamp { get; set; }
         public bool IsDelete { get; set; }
         public int DeleteTimestamp { get; set; }
         public int SentTimestamp { get; set; }
