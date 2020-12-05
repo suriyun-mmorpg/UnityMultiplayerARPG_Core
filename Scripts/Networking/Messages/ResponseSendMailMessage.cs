@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         {
             None,
             NotAvailable,
+            NotAllowed,
             NoReceiver,
         }
         public Error error;
