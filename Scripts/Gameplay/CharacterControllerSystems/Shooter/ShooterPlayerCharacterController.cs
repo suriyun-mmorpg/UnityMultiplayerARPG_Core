@@ -1055,7 +1055,7 @@ namespace MultiplayerARPG
 
         private void ReloadAmmo()
         {
-            if (WeaponAbility.ShouldDeactivateWhenReload)
+            if (WeaponAbility != null && WeaponAbility.ShouldDeactivateWhenReload)
                 WeaponAbility.ForceDeactivated();
             // Reload ammo at server
             if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
