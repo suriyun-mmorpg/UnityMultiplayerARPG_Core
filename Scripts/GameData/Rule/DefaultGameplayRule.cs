@@ -354,18 +354,7 @@ namespace MultiplayerARPG
             if (nextLevelExp > 0)
             {
                 // Increasing level if character not reached max level yet
-                try
-                {
-                    checked
-                    {
-                        character.Exp += exp;
-                    }
-                }
-                catch (System.OverflowException)
-                {
-                    character.Exp = int.MaxValue;
-                }
-
+                character.Exp = character.Exp.Increase(exp);
                 while (nextLevelExp > 0 && character.Exp >= nextLevelExp)
                 {
                     character.Exp = character.Exp - nextLevelExp;
@@ -452,18 +441,7 @@ namespace MultiplayerARPG
                         break;
                 }
 
-                try
-                {
-                    checked
-                    {
-                        playerCharacter.Gold += gold;
-                    }
-                }
-                catch (System.OverflowException)
-                {
-                    playerCharacter.Gold += int.MaxValue;
-                }
-
+                playerCharacter.Gold = playerCharacter.Gold.Increase(gold);
                 playerCharacter.IncreaseCurrencies(reward.currencies, multiplier);
                 rewardedGold = gold;
             }
@@ -647,7 +625,7 @@ namespace MultiplayerARPG
 
         public override void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, short amount)
         {
-            character.Gold += item.SellPrice * amount;
+            character.Gold = character.Gold.Increase(item.SellPrice * amount);
         }
 
         public override bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)

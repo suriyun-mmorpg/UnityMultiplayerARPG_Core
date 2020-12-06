@@ -389,7 +389,7 @@ namespace MultiplayerARPG
                     cash -= cashShopItem.sellPrice;
                     playerCharacter.UserCash = cash;
                     // Increase character gold
-                    playerCharacter.Gold += cashShopItem.receiveGold;
+                    playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.receiveGold);
                     // Increase character item
                     foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
                     {
@@ -754,7 +754,7 @@ namespace MultiplayerARPG
             if (playerCharacterEntity.Gold - amount >= 0)
             {
                 playerCharacterEntity.Gold -= amount;
-                playerCharacterEntity.UserGold += amount;
+                playerCharacterEntity.UserGold = playerCharacterEntity.UserGold.Increase(amount);
             }
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
@@ -765,7 +765,7 @@ namespace MultiplayerARPG
             if (playerCharacterEntity.UserGold - amount >= 0)
             {
                 playerCharacterEntity.UserGold -= amount;
-                playerCharacterEntity.Gold += amount;
+                playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
             }
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
@@ -798,7 +798,7 @@ namespace MultiplayerARPG
                 if (guild.gold - amount >= 0)
                 {
                     guild.gold -= amount;
-                    playerCharacterEntity.Gold += amount;
+                    playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
                     guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
                 }

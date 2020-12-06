@@ -153,7 +153,7 @@ namespace MultiplayerARPG
                     short amount;
                     if (manager.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[2], out amount))
-                        playerCharacter.Gold += amount;
+                        playerCharacter.Gold = playerCharacter.Gold.Increase(amount);
                 }
                 if (commandKey.Equals(GiveItem))
                 {

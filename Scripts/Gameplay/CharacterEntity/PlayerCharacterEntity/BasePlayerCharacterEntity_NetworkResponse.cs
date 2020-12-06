@@ -299,7 +299,7 @@ namespace MultiplayerARPG
             if (!VerifyDismantleItem(index, amount, simulatingNonEquipItems, out returningGold, out returningItems))
                 return;
 
-            Gold += returningGold;
+            Gold = Gold.Increase(returningGold);
             this.DecreaseItemsByIndex(index, amount);
             this.IncreaseItems(returningItems);
             this.FillEmptySlots();
@@ -336,7 +336,7 @@ namespace MultiplayerARPG
                 returningItems.AddRange(tempReturningItems);
                 indexAmountPairs.Add(tempIndex, tempAmount);
             }
-            Gold += returningGold;
+            Gold = Gold.Increase(returningGold);
             indexes.Clear();
             indexes.AddRange(indexAmountPairs.Keys);
             indexes.Sort();

@@ -286,4 +286,19 @@ public static class GenericUtils
             list[tempRandomIndex] = tempEntry;
         }
     }
+
+    public static int Increase(this int a, int b)
+    {
+        try
+        {
+            checked
+            {
+                return a + b;
+            }
+        }
+        catch (System.OverflowException)
+        {
+            return int.MaxValue;
+        }
+    }
 }
