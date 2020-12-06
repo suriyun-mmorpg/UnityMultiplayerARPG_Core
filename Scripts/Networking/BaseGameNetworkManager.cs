@@ -430,6 +430,49 @@ namespace MultiplayerARPG
             }, responseDelegate: callback);
         }
 
+        public virtual bool RequestMailList(bool onlyNewMails, ResponseDelegate callback)
+        {
+            return ClientSendRequest(ReqTypes.MailList, new RequestMailListMessage()
+            {
+                onlyNewMails = onlyNewMails,
+            }, responseDelegate: callback);
+        }
+
+        public virtual bool RequestReadMail(string mailId, ResponseDelegate callback)
+        {
+            return ClientSendRequest(ReqTypes.ReadMail, new RequestReadMailMessage()
+            {
+                id = mailId,
+            }, responseDelegate: callback);
+        }
+
+        public virtual bool RequestClaimMailItems(string mailId, ResponseDelegate callback)
+        {
+            return ClientSendRequest(ReqTypes.ClaimMailItems, new RequestClaimMailItemsMessage()
+            {
+                id = mailId,
+            }, responseDelegate: callback);
+        }
+
+        public virtual bool RequestDeleteMail(string mailId, ResponseDelegate callback)
+        {
+            return ClientSendRequest(ReqTypes.DeleteMail, new RequestDeleteMailMessage()
+            {
+                id = mailId,
+            }, responseDelegate: callback);
+        }
+
+        public virtual bool RequestSendMail(string receiverName, string title, string content, int gold, ResponseDelegate callback)
+        {
+            return ClientSendRequest(ReqTypes.SendMail, new RequestSendMailMessage()
+            {
+                receiverName = receiverName,
+                title = title,
+                content = content,
+                gold = gold,
+            }, responseDelegate: callback);
+        }
+
         protected virtual void HandleGameMessageAtClient(MessageHandlerData messageHandler)
         {
             GameMessage message = messageHandler.ReadMessage<GameMessage>();

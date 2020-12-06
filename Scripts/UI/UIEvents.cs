@@ -131,4 +131,12 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class UIFactionEvent : UnityEvent<UIFaction> { }
     #endregion
+
+    #region Events for UI Mail List
+    [System.Serializable]
+    public class MailListEntryEvent : UnityEvent<MailListEntry> { }
+
+    [System.Serializable]
+    public class UIMailListEntryEvent : UnityEvent<UIMailListEntry> { }
+    #endregion
 }

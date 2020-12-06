@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         UI_LABEL_ERROR,
         UI_LABEL_NONE,
         // Error - Generic Error
+        UI_ERROR_SERVICE_NOT_AVAILABLE,
         UI_ERROR_KICKED_FROM_SERVER,
         UI_ERROR_CONNECTION_FAILED,
         UI_ERROR_CONNECTION_REJECTED,
@@ -127,6 +128,17 @@ namespace MultiplayerARPG
         UI_ERROR_IAP_PAYMENT_DECLINED,
         UI_ERROR_IAP_DUPLICATE_TRANSACTION,
         UI_ERROR_IAP_UNKNOW,
+        // Mail
+        UI_ERROR_MAIL_SEND_NOT_ALLOWED,
+        UI_ERROR_MAIL_SEND_NO_RECEIVER,
+        UI_MAIL_SEND_SUCCESS,
+        UI_ERROR_MAIL_READ_NOT_ALLOWED,
+        UI_ERROR_MAIL_CLAIM_NOT_ALLOWED,
+        UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED,
+        UI_ERROR_MAIL_CLAIM_CANNOT_CARRY,
+        UI_MAIL_CLAIM_SUCCESS,
+        UI_ERROR_MAIL_DELETE_NOT_ALLOWED,
+        UI_MAIL_DELETE_SUCCESS,
     }
 
     public enum UIItemTypeKeys : byte
@@ -1047,6 +1059,17 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
             Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString(), "Set password");
             Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
+            // UI Mail
+            Texts.Add(UITextKeys.UI_ERROR_MAIL_SEND_NOT_ALLOWED.ToString(), "You're not allowed to send mail");
+            Texts.Add(UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER.ToString(), "No receiver, you may entered wrong name");
+            Texts.Add(UITextKeys.UI_MAIL_SEND_SUCCESS.ToString(), "Mail sent");
+            Texts.Add(UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED.ToString(), "You're not allowed to read the mail");
+            Texts.Add(UITextKeys.UI_ERROR_MAIL_CLAIM_NOT_ALLOWED.ToString(), "You're not allowed to claim attached items");
+            Texts.Add(UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED.ToString(), "Cannot claim items, it was already claimed");
+            Texts.Add(UITextKeys.UI_ERROR_MAIL_CLAIM_CANNOT_CARRY.ToString(), "Cannot carry all items");
+            Texts.Add(UITextKeys.UI_MAIL_CLAIM_SUCCESS.ToString(), "Claimed an items");
+            Texts.Add(UITextKeys.UI_ERROR_MAIL_DELETE_NOT_ALLOWED.ToString(), "You're not allowed to delete the mail");
+            Texts.Add(UITextKeys.UI_MAIL_DELETE_SUCCESS.ToString(), "Mail deleted");
             // Error - IAP
             Texts.Add(UITextKeys.UI_ERROR_IAP_NOT_INITIALIZED.ToString(), "In-App Purchasing system not initialized yet");
             Texts.Add(UITextKeys.UI_ERROR_IAP_PURCHASING_UNAVAILABLE.ToString(), "Purchasing is unavailable");
