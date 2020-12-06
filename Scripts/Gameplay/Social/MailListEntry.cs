@@ -10,7 +10,6 @@ namespace MultiplayerARPG
         public string Title { get; set; }
         public bool IsRead { get; set; }
         public bool IsClaim { get; set; }
-        public bool IsDelete { get; set; }
         public int SentTimestamp { get; set; }
 
         public void Serialize(NetDataWriter writer)
@@ -20,7 +19,6 @@ namespace MultiplayerARPG
             writer.Put(Title);
             writer.Put(IsRead);
             writer.Put(IsClaim);
-            writer.Put(IsDelete);
             writer.Put(SentTimestamp);
         }
 
@@ -31,7 +29,6 @@ namespace MultiplayerARPG
             Title = reader.GetString();
             IsRead = reader.GetBool();
             IsClaim = reader.GetBool();
-            IsDelete = reader.GetBool();
             SentTimestamp = reader.GetInt();
         }
     }
