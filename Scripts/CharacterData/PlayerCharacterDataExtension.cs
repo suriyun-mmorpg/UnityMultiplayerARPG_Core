@@ -775,6 +775,30 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public static void IncreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CharacterCurrency> characterCurrencies, float multiplier = 1)
+        {
+            if (characterCurrencies == null)
+                return;
+            foreach (CharacterCurrency characterCurrency in characterCurrencies)
+            {
+                if (characterCurrency.GetCurrency() == null ||
+                    characterCurrency.amount == 0)
+                    continue;
+                int indexOfCurrency = character.IndexOfCurrency(characterCurrency.dataId);
+                int increaseAmount = Mathf.CeilToInt(characterCurrency.amount * multiplier);
+                if (indexOfCurrency >= 0)
+                {
+                    CharacterCurrency currency = character.Currencies[indexOfCurrency];
+                    currency.amount += increaseAmount;
+                    character.Currencies[indexOfCurrency] = currency;
+                }
+                else
+                {
+                    character.Currencies.Add(characterCurrency);
+                }
+            }
+        }
+
         public static void IncreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
         {
             if (currencyAmounts == null)
