@@ -20,6 +20,14 @@ namespace MultiplayerARPG
     public class UICharacterClassEvent : UnityEvent<UICharacterClass> { }
     #endregion
 
+    #region Events for UI Character Currency
+    [System.Serializable]
+    public class CharacterCurrencyEvent : UnityEvent<UICharacterCurrencyData> { }
+
+    [System.Serializable]
+    public class UICharacterCurrencyEvent : UnityEvent<UICharacterCurrency> { }
+    #endregion
+
     #region Events for UI Character Buff
     [System.Serializable]
     public class CharacterBuffEvent : UnityEvent<CharacterBuff> { }
