@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -14,6 +12,7 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Sent Date}")]
         public UILocaleKeySetting formatSentDate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
+        [Header("UI Elements")]
         public TextWrapper textSenderName;
         public TextWrapper textTitle;
         public TextWrapper textSentDate;

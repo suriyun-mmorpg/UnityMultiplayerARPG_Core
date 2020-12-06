@@ -1,6 +1,5 @@
 ﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +7,26 @@ namespace MultiplayerARPG
 {
     public class UIMail : UIBase
     {
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Sender Name}")]
+        public UILocaleKeySetting formatSenderName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Title}")]
+        public UILocaleKeySetting formatTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Content}")]
+        public UILocaleKeySetting formatContent = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Gold}")]
+        public UILocaleKeySetting formatGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
+        [Tooltip("Format => {0} = {Sent Date}")]
+        public UILocaleKeySetting formatSentDate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+
+        [Header("UI Elements")]
+        public TextWrapper textSenderName;
+        public TextWrapper textTitle;
+        public TextWrapper textContent;
+        public TextWrapper textGold;
+        public UICharacterCurrencies uiCurrencies;
+        public UICharacterItems uiItems;
+        public TextWrapper textSentDate;
         public UIMailList uiMailList;
 
         private string mailId;
@@ -135,7 +154,63 @@ namespace MultiplayerARPG
 
         private void UpdateData(Mail mail)
         {
+            if (textSenderName != null)
+            {
+                textSenderName.text = string.Format(
+                    LanguageManager.GetText(formatSenderName),
+                    mail == null ? LanguageManager.GetUnknowTitle() : mail.SenderName);
+            }
 
+            if (textTitle != null)
+            {
+                textTitle.text = string.Format(
+                    LanguageManager.GetText(formatTitle),
+                    mail == null ? LanguageManager.GetUnknowTitle() : mail.Title);
+            }
+
+            if (textContent != null)
+            {
+                textContent.text = string.Format(
+                    LanguageManager.GetText(formatContent),
+                    mail == null ? string.Empty : mail.Content);
+            }
+
+            if (textGold != null)
+            {
+                textGold.text = string.Format(
+                    LanguageManager.GetText(formatGold),
+                    mail == null ? "0" : mail.Gold.ToString("N0"));
+            }
+
+            if (uiCurrencies != null)
+            {
+                List<CharacterCurrency> increasingCurrencies = new List<CharacterCurrency>();
+                foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
+                {
+                    increasingCurrencies.Add(CharacterCurrency.Create(mailCurrency.Key, amount: mailCurrency.Value));
+                }
+                uiCurrencies.UpdateData(BasePlayerCharacterController.OwningCharacter, increasingCurrencies);
+            }
+
+            if (uiItems != null)
+            {
+                List<CharacterItem> increasingItems = new List<CharacterItem>();
+                foreach (KeyValuePair<int, short> mailItem in mail.Items)
+                {
+                    increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
+                }
+                uiItems.UpdateData(BasePlayerCharacterController.OwningCharacter, increasingItems);
+            }
+
+            if (textSentDate != null)
+            {
+                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+                if (mail != null)
+                    dateTime = dateTime.AddSeconds(mail.SentTimestamp);
+                textSentDate.text = string.Format(
+                    LanguageManager.GetText(formatSentDate),
+                    dateTime.ToShortDateString());
+            }
         }
     }
 }
