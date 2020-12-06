@@ -4,71 +4,15 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-	public class UIPickupItemList : UIBase
+	public class UIPickupItemList : UICharacterItems
     {
-        public UICharacterItem uiCharacterItemPrefab;
-        public Transform uiCharacterItemContainer;
         public bool pickUpOnSelect;
 
-        private UIList cacheItemList;
-        public UIList CacheItemList
+        protected override void OnSelectCharacterItem(UICharacterItem ui)
         {
-            get
-            {
-                if (cacheItemList == null)
-                {
-                    cacheItemList = gameObject.AddComponent<UIList>();
-                    cacheItemList.uiPrefab = uiCharacterItemPrefab.gameObject;
-                    cacheItemList.uiContainer = uiCharacterItemContainer;
-                }
-                return cacheItemList;
-            }
-        }
-
-        private UICharacterItemSelectionManager cacheItemSelectionManager;
-        public UICharacterItemSelectionManager CacheItemSelectionManager
-        {
-            get
-            {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
-            }
-        }
-
-        protected virtual void OnEnable()
-        {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-        }
-
-        protected void OnSelectCharacterItem(UICharacterItem ui)
-        {
-            if (ui.Data.characterItem.IsEmptySlot())
-            {
-                CacheItemSelectionManager.DeselectSelectedUI();
-                return;
-            }
+            base.OnSelectCharacterItem(ui);
             if (pickUpOnSelect)
                 OnClickPickUpSelectedItem();
-        }
-
-        public void UpdateData(List<CharacterItem> droppedItems)
-        {
-            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
-            CacheItemSelectionManager.DeselectSelectedUI();
-            CacheItemSelectionManager.Clear();
-            UICharacterItem tempUiCharacterItem;
-            CacheItemList.Generate(droppedItems, (index, characterItem, ui) =>
-            {
-                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
-                tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), null, -1);
-                tempUiCharacterItem.Show();
-                CacheItemSelectionManager.Add(tempUiCharacterItem);
-                if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
-                    tempUiCharacterItem.OnClickSelect();
-            });
         }
 
         public void OnClickPickUpSelectedItem()

@@ -1,5 +1,4 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -63,12 +62,12 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnItemDialogHide()
+        protected virtual void OnItemDialogHide()
         {
             CacheItemSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelectCharacterItem(UICharacterItem ui)
+        protected virtual void OnSelectCharacterItem(UICharacterItem ui)
         {
             if (ui.Data.characterItem.IsEmptySlot())
             {
@@ -83,7 +82,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnDeselectCharacterItem(UICharacterItem ui)
+        protected virtual void OnDeselectCharacterItem(UICharacterItem ui)
         {
             if (uiItemDialog != null && CacheItemSelectionManager.selectionMode == UISelectionMode.SelectSingle)
             {
@@ -93,7 +92,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void UpdateData(ICharacterData character, IList<CharacterItem> characterItems)
+        public virtual void UpdateData(ICharacterData character, IList<CharacterItem> characterItems)
         {
             Character = character;
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;

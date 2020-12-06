@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             // Update list
             if (uiList != null)
             {
-                uiList.UpdateData(droppedItems);
+                uiList.UpdateData(BasePlayerCharacterController.OwningCharacter, droppedItems);
                 if (droppedItems.Count == 0)
                 {
                     if (uiList.IsVisible())
