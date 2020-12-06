@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             NotAvailable,
             NotAllowed,
             AlreadyClaimed,
+            CannotCarry,
         }
         public Error error;
         public Mail mail;
