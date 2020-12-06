@@ -189,7 +189,15 @@ namespace MultiplayerARPG
                 {
                     increasingCurrencies.Add(CharacterCurrency.Create(mailCurrency.Key, amount: mailCurrency.Value));
                 }
-                uiCurrencies.UpdateData(BasePlayerCharacterController.OwningCharacter, increasingCurrencies);
+                if (increasingCurrencies.Count > 0)
+                {
+                    uiCurrencies.UpdateData(BasePlayerCharacterController.OwningCharacter, increasingCurrencies);
+                    uiCurrencies.Show();
+                }
+                else
+                {
+                    uiCurrencies.Hide();
+                }
             }
 
             if (uiItems != null)
@@ -199,7 +207,15 @@ namespace MultiplayerARPG
                 {
                     increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
                 }
-                uiItems.UpdateData(BasePlayerCharacterController.OwningCharacter, increasingItems);
+                if (increasingItems.Count > 0)
+                {
+                    uiItems.UpdateData(BasePlayerCharacterController.OwningCharacter, increasingItems);
+                    uiItems.Show();
+                }
+                else
+                {
+                    uiItems.Hide();
+                }
             }
 
             if (textSentDate != null)

@@ -1,7 +1,5 @@
 ﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -12,7 +10,6 @@ namespace MultiplayerARPG
         public UIMail uiDialog;
         public UIMailListEntry uiPrefab;
         public Transform uiContainer;
-        public TextWrapper uiTextCash;
 
         [Header("Options")]
         public bool onlyNewMails = true;
