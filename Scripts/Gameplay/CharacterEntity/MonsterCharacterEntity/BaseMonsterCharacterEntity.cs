@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 using LiteNetLibManager;
 using LiteNetLib;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -73,8 +73,9 @@ namespace MultiplayerARPG
 
         public SummonType SummonType { get { return (SummonType)summonType.Value; } protected set { summonType.Value = (byte)value; } }
         public bool IsSummoned { get { return SummonType != SummonType.None; } }
-
-        public MonsterSpawnArea SpawnArea { get; protected set; }
+        public GameSpawnArea<BaseMonsterCharacterEntity> SpawnArea { get; protected set; }
+        public BaseMonsterCharacterEntity SpawnPrefab { get; protected set; }
+        public short SpawnLevel { get; protected set; }
         public Vector3 SpawnPosition { get; protected set; }
         public MonsterCharacter CharacterDatabase { get { return characterDatabase; } }
         public override int DataId { get { return CharacterDatabase.DataId; } set { } }
@@ -90,6 +91,8 @@ namespace MultiplayerARPG
             }
         }
 
+        // Private variables
+        private bool isDestroyed;
         private readonly HashSet<uint> looters = new HashSet<uint>();
 
         public override void PrepareRelatesData()
@@ -102,6 +105,7 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.monsterTag;
+            isDestroyed = false;
         }
 
         protected override void EntityUpdate()
@@ -136,10 +140,9 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-
+            isDestroyed = false;
             if (Level <= 0)
                 Level = CharacterDatabase.DefaultLevel;
-
             ForceMakeCaches();
             CharacterStats stats = this.GetCaches().Stats;
             CurrentHp = (int)stats.hp;
@@ -149,9 +152,11 @@ namespace MultiplayerARPG
             CurrentWater = (int)stats.water;
         }
 
-        public void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
+        public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, short spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
+            SpawnPrefab = spawnPrefab;
+            SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
 
@@ -524,22 +529,27 @@ namespace MultiplayerARPG
             Teleport(SpawnPosition);
         }
 
-        public void DestroyAndRespawn()
+        public virtual void DestroyAndRespawn()
         {
             if (!IsServer)
                 return;
-
+            CurrentHp = 0;
+            if (isDestroyed)
+                return;
+            // Mark as destroyed
+            isDestroyed = true;
+            // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(DestroyDelay + DestroyRespawnDelay);
+                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay).Forget();
             else if (Identity.IsSceneObject)
-                Manager.StartCoroutine(RespawnRoutine());
-
+                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
+            // Destroy this entity
             NetworkDestroy(DestroyDelay);
         }
 
-        private IEnumerator RespawnRoutine()
+        private async UniTaskVoid RespawnRoutine(float delay)
         {
-            yield return new WaitForSecondsRealtime(DestroyDelay + DestroyRespawnDelay);
+            await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
             InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -51,7 +52,7 @@ namespace MultiplayerARPG
                 {
                     int i = 0;
                     cacheRandomItems = new List<ItemDrop>();
-                    if (randomItems != null && 
+                    if (randomItems != null &&
                         randomItems.Length > 0)
                     {
                         for (i = 0; i < randomItems.Length; ++i)
@@ -63,9 +64,9 @@ namespace MultiplayerARPG
                             cacheRandomItems.Add(randomItems[i]);
                         }
                     }
-                    if (itemDropTable != null && 
-                        itemDropTable.randomItems != null && 
-                        itemDropTable.randomItems.Length >0)
+                    if (itemDropTable != null &&
+                        itemDropTable.randomItems != null &&
+                        itemDropTable.randomItems.Length > 0)
                     {
                         for (i = 0; i < itemDropTable.randomItems.Length; ++i)
                         {
@@ -83,8 +84,12 @@ namespace MultiplayerARPG
         public bool PutOnPlaceholder { get; protected set; }
         public List<CharacterItem> DropItems { get; protected set; }
         public HashSet<uint> Looters { get; protected set; }
-        public ItemDropSpawnArea SpawnArea { get; protected set; }
+        public GameSpawnArea<ItemDropEntity> SpawnArea { get; protected set; }
+        public ItemDropEntity SpawnPrefab { get; protected set; }
+        public short SpawnLevel { get; protected set; }
         public Vector3 SpawnPosition { get; protected set; }
+        public float DestroyDelay { get { return destroyDelay; } }
+        public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
         public string ItemTitle
         {
@@ -149,49 +154,48 @@ namespace MultiplayerARPG
 
         protected virtual void InitDropItems()
         {
-            if (IsServer)
+            if (!IsServer)
+                return;
+            isPickedUp = false;
+            if (!PutOnPlaceholder)
             {
-                isPickedUp = false;
-                if (!PutOnPlaceholder)
+                // Random drop items
+                DropItems = new List<CharacterItem>();
+                Looters = new HashSet<uint>();
+                if (CacheRandomItems.Count > 0)
                 {
-                    // Random drop items
-                    DropItems = new List<CharacterItem>();
-                    Looters = new HashSet<uint>();
-                    if (CacheRandomItems.Count > 0)
+                    ItemDrop randomItem;
+                    for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
                     {
-                        ItemDrop randomItem;
-                        for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
-                        {
-                            randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                            if (Random.value > randomItem.dropRate)
-                                continue;
-                            DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
-                        }
-                        if (DropItems.Count == 0)
-                        {
-                            randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                            DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
-                        }
+                        randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
+                        if (Random.value > randomItem.dropRate)
+                            continue;
+                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
+                    }
+                    if (DropItems.Count == 0)
+                    {
+                        randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
+                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
                     }
                 }
-                if (DropItems == null || DropItems.Count == 0 ||
-                    !GameInstance.Items.ContainsKey(DropItems[0].dataId))
-                {
-                    NetworkDestroy(1f);
-                    return;
-                }
-                ItemDropData = new ItemDropData()
-                {
-                    putOnPlaceholder = PutOnPlaceholder,
-                    dataId = DropItems[0].dataId,
-                    level = DropItems[0].level,
-                    amount = DropItems[0].amount,
-                };
-                if (PutOnPlaceholder)
-                {
-                    // Destroy later by duration value
-                    NetworkDestroy(CurrentGameInstance.itemAppearDuration);
-                }
+            }
+            if (DropItems == null || DropItems.Count == 0 ||
+                !GameInstance.Items.ContainsKey(DropItems[0].dataId))
+            {
+                NetworkDestroy(1f);
+                return;
+            }
+            ItemDropData = new ItemDropData()
+            {
+                putOnPlaceholder = PutOnPlaceholder,
+                dataId = DropItems[0].dataId,
+                level = DropItems[0].level,
+                amount = DropItems[0].amount,
+            };
+            if (PutOnPlaceholder)
+            {
+                // Destroy later by duration value
+                NetworkDestroy(CurrentGameInstance.itemAppearDuration);
             }
         }
 
@@ -202,9 +206,11 @@ namespace MultiplayerARPG
             itemDropData.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
-        public virtual void SetSpawnArea(ItemDropSpawnArea spawnArea, Vector3 spawnPosition)
+        public virtual void SetSpawnArea(GameSpawnArea<ItemDropEntity> spawnArea, ItemDropEntity spawnPrefab, short spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
+            SpawnPrefab = spawnPrefab;
+            SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
 
@@ -265,25 +271,24 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-
+            if (isPickedUp)
+                return;
             // Mark as picked up
             isPickedUp = true;
-
             // Tell clients that the item drop destroy to play animation at client
             CallAllOnItemDropDestroy();
-
-            // Destroy and Respawn
+            // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(destroyDelay + destroyRespawnDelay);
+                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay).Forget();
             else if (Identity.IsSceneObject)
-                Manager.StartCoroutine(RespawnRoutine());
-
+                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
+            // Destroy this entity
             NetworkDestroy(destroyDelay);
         }
 
-        private IEnumerator RespawnRoutine()
+        protected async UniTaskVoid RespawnRoutine(float delay)
         {
-            yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
+            await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
             InitDropItems();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,

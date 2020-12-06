@@ -1,5 +1,5 @@
-﻿using LiteNetLibManager;
-using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -36,8 +36,12 @@ namespace MultiplayerARPG
         public override string Title { get { return harvestable.Title; } set { } }
         public override int MaxHp { get { return maxHp; } }
         public float ColliderDetectionRadius { get { return colliderDetectionRadius; } }
-        public HarvestableSpawnArea SpawnArea { get; protected set; }
+        public GameSpawnArea<HarvestableEntity> SpawnArea { get; protected set; }
+        public HarvestableEntity SpawnPrefab { get; protected set; }
+        public short SpawnLevel { get; protected set; }
         public Vector3 SpawnPosition { get; protected set; }
+        public float DestroyDelay { get { return destroyDelay; } }
+        public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
         // Private variables
         private bool isDestroyed;
@@ -60,12 +64,15 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
+            isDestroyed = false;
             CurrentHp = MaxHp;
         }
 
-        public virtual void SetSpawnArea(HarvestableSpawnArea spawnArea, Vector3 spawnPosition)
+        public virtual void SetSpawnArea(GameSpawnArea<HarvestableEntity> spawnArea, HarvestableEntity spawnPrefab, short spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
+            SpawnPrefab = spawnPrefab;
+            SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
 
@@ -150,32 +157,32 @@ namespace MultiplayerARPG
 
             // Do something when entity dead
             if (this.IsDead())
-                Destroy();
+                DestroyAndRespawn();
         }
 
-        public virtual void Destroy()
+        public virtual void DestroyAndRespawn()
         {
             if (!IsServer)
                 return;
             CurrentHp = 0;
             if (isDestroyed)
                 return;
+            // Mark as destroyed
             isDestroyed = true;
             // Tell clients that the harvestable destroy to play animation at client
             CallAllOnHarvestableDestroy();
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(destroyDelay + destroyRespawnDelay);
+                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay).Forget();
             else if (Identity.IsSceneObject)
-                Manager.StartCoroutine(RespawnRoutine());
+                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
             // Destroy this entity
-            NetworkDestroy(destroyDelay);
+            NetworkDestroy(DestroyDelay);
         }
 
-        protected IEnumerator RespawnRoutine()
+        protected async UniTaskVoid RespawnRoutine(float delay)
         {
-            yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
-            isDestroyed = false;
+            await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
             InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,

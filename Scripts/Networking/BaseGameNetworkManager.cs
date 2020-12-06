@@ -918,19 +918,19 @@ namespace MultiplayerARPG
             MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
             foreach (MonsterSpawnArea monsterSpawnArea in monsterSpawnAreas)
             {
-                monsterSpawnArea.RegisterAssets();
+                monsterSpawnArea.RegisterPrefabs();
             }
 
             HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
             foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
             {
-                harvestableSpawnArea.RegisterAssets();
+                harvestableSpawnArea.RegisterPrefabs();
             }
 
             ItemDropSpawnArea[] itemDropSpawnAreas = FindObjectsOfType<ItemDropSpawnArea>();
             foreach (ItemDropSpawnArea itemDropSpawnArea in itemDropSpawnAreas)
             {
-                itemDropSpawnArea.RegisterAssets();
+                itemDropSpawnArea.RegisterPrefabs();
             }
 
             // Register scene entities
