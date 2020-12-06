@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             if (error == Error.None)
             {
                 writer.Put(cash);
-                writer.PutArray(cashShopItemIds);
+                writer.PutArray<int>(cashShopItemIds);
             }
         }
     }
