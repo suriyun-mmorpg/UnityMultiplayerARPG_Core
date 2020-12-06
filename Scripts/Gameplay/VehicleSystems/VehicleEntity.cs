@@ -68,6 +68,8 @@ namespace MultiplayerARPG
         public Dictionary<DamageElement, float> Armors { get; private set; }
         public override int MaxHp { get { return canBeAttacked ? hp.GetAmount(level) : 1; } }
         public Vector3 SpawnPosition { get; protected set; }
+        public float DestroyDelay { get { return destroyDelay; } }
+        public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
         // Private variables
         private readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
