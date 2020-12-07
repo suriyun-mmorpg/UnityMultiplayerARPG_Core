@@ -294,7 +294,7 @@ namespace MultiplayerARPG
             characterData.CloneTo(savingData);
             if (string.IsNullOrEmpty(savingData.Id))
                 return;
-            savingData.LastUpdate = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
+            savingData.LastUpdate = (int)System.DateTimeOffset.Now.ToUnixTimeSeconds();
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             SurrogateSelector surrogateSelector = new SurrogateSelector();
             surrogateSelector.AddAllUnitySurrogate();
