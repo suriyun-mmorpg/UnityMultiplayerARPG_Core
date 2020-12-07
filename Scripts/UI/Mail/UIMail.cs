@@ -123,7 +123,7 @@ namespace MultiplayerARPG
 
         public void OnClickDelete()
         {
-            BaseGameNetworkManager.Singleton.RequestReadMail(MailId, DeleteMailCallback);
+            BaseGameNetworkManager.Singleton.RequestDeleteMail(MailId, DeleteMailCallback);
         }
 
         private void DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
