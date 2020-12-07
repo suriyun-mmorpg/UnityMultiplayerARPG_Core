@@ -9,15 +9,15 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Sender Name}")]
-        public UILocaleKeySetting formatSenderName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatSenderName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_SENDER_NAME);
         [Tooltip("Format => {0} = {Title}")]
-        public UILocaleKeySetting formatTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_TITLE);
         [Tooltip("Format => {0} = {Content}")]
-        public UILocaleKeySetting formatContent = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatContent = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_CONTENT);
         [Tooltip("Format => {0} = {Gold}")]
         public UILocaleKeySetting formatGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Sent Date}")]
-        public UILocaleKeySetting formatSentDate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatSentDate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_SENT_DATE);
 
         [Header("UI Elements")]
         public TextWrapper textSenderName;
@@ -42,6 +42,7 @@ namespace MultiplayerARPG
 
         private void ReadMail()
         {
+            UpdateData(null);
             BaseGameNetworkManager.Singleton.RequestReadMail(MailId, ReadMailCallback);
         }
 
@@ -109,8 +110,10 @@ namespace MultiplayerARPG
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;
                 default:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_SEND_SUCCESS.ToString()));
-                    UpdateData(castedResponse.mail);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_CLAIM_SUCCESS.ToString()));
+                    Hide();
+                    if (uiMailList)
+                        uiMailList.Refresh();
                     break;
             }
         }
@@ -225,7 +228,7 @@ namespace MultiplayerARPG
                     dateTime = dateTime.AddSeconds(mail.SentTimestamp);
                 textSentDate.text = string.Format(
                     LanguageManager.GetText(formatSentDate),
-                    dateTime.ToShortDateString());
+                    dateTime.GetPrettyDate());
             }
         }
     }

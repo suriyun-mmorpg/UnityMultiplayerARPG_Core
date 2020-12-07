@@ -6,11 +6,11 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Sender Name}")]
-        public UILocaleKeySetting formatSenderName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatSenderName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_SENDER_NAME);
         [Tooltip("Format => {0} = {Title}")]
-        public UILocaleKeySetting formatTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_TITLE);
         [Tooltip("Format => {0} = {Sent Date}")]
-        public UILocaleKeySetting formatSentDate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatSentDate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_SENT_DATE);
 
         [Header("UI Elements")]
         public TextWrapper textSenderName;
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
                     dateTime = dateTime.AddSeconds(Data.SentTimestamp);
                 textSentDate.text = string.Format(
                     LanguageManager.GetText(formatSentDate),
-                    dateTime.ToShortDateString());
+                    dateTime.GetPrettyDate());
             }
         }
     }

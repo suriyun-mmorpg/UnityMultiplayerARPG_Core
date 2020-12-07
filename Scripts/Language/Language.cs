@@ -719,6 +719,22 @@ namespace MultiplayerARPG
         /// Format => {0} = {Consume Stamina}
         /// </summary>
         UI_FORMAT_CONSUME_STAMINA,
+        /// <summary>
+        /// Format => {0} = {Sender Name}
+        /// </summary>
+        UI_FORMAT_MAIL_SENDER_NAME,
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        UI_FORMAT_MAIL_TITLE,
+        /// <summary>
+        /// Format => {0} = {Content}
+        /// </summary>
+        UI_FORMAT_MAIL_CONTENT,
+        /// <summary>
+        /// Format => {0} = {Sent Date}
+        /// </summary>
+        UI_FORMAT_MAIL_SENT_DATE,
     }
 
     public static class DefaultLocale
@@ -959,6 +975,11 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_PARTY.ToString(), "<color=cyan>(PARTY) {0}: {1}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_GUILD.ToString(), "<color=blue>(GUILD) {0}: {1}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_SYSTEM.ToString(), "<color=orange>{0}</color>");
+            // Format - UI Mail
+            Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_SENDER_NAME.ToString(), "From: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_TITLE.ToString(), "Title: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_CONTENT.ToString(), "{0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_SENT_DATE.ToString(), "Date: {0}");
             // Error - Generic Error
             Texts.Add(UITextKeys.UI_ERROR_KICKED_FROM_SERVER.ToString(), "You have been kicked from server");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_FAILED.ToString(), "Cannot connect to the server");
