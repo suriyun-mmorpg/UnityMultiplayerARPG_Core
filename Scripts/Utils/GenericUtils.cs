@@ -327,7 +327,7 @@ public static class GenericUtils
         // Don't allow out of range values.
         if (dayDiff < 0 || dayDiff >= 31)
         {
-            return null;
+            return d.ToShortDateString();
         }
 
         // 5.
@@ -379,6 +379,6 @@ public static class GenericUtils
         {
             return string.Format(formatWeeksAgo, Mathf.CeilToInt((float)dayDiff / 7f));
         }
-        return null;
+        return "Unknow";
     }
 }
