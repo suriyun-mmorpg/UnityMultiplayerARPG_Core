@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public FactionEvent eventOnSelectFaction = new FactionEvent();
         public CharacterClassEvent eventOnSelectCharacterClass = new CharacterClassEvent();
 
+        private Toggle firstRaceToggle;
         private Dictionary<CharacterRace, Toggle> cacheRaceToggles;
         public Dictionary<CharacterRace, Toggle> CacheRaceToggles
         {
@@ -42,6 +43,8 @@ namespace MultiplayerARPG
                         if (raceToggle.race == null || raceToggle.toggle == null)
                             continue;
                         cacheRaceToggles[raceToggle.race] = raceToggle.toggle;
+                        if (firstRaceToggle == null)
+                            firstRaceToggle = raceToggle.toggle;
                     }
                 }
                 return cacheRaceToggles;
@@ -249,14 +252,17 @@ namespace MultiplayerARPG
             CacheFactionSelectionManager.eventOnSelect.RemoveListener(OnSelectFaction);
             CacheFactionSelectionManager.eventOnSelect.AddListener(OnSelectFaction);
             selectedRace = null;
-            foreach (KeyValuePair<CharacterRace, Toggle> raceToggle in CacheRaceToggles)
+            if (CacheRaceToggles.Count > 0)
             {
-                raceToggle.Value.onValueChanged.RemoveAllListeners();
-                raceToggle.Value.onValueChanged.AddListener((isOn) =>
+                foreach (KeyValuePair<CharacterRace, Toggle> raceToggle in CacheRaceToggles)
                 {
-                    OnRaceToggleUpdate(raceToggle.Key, isOn);
-                });
-                OnRaceToggleUpdate(raceToggle.Key, raceToggle.Value.isOn);
+                    raceToggle.Value.onValueChanged.RemoveAllListeners();
+                    raceToggle.Value.onValueChanged.AddListener((isOn) =>
+                    {
+                        OnRaceToggleUpdate(raceToggle.Key, isOn);
+                    });
+                }
+                firstRaceToggle.isOn = true;
             }
             // Load characters and factions
             LoadCharacters();
