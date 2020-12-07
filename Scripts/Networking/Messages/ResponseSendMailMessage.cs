@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             NotAvailable,
             NotAllowed,
             NoReceiver,
+            NotEnoughGold,
         }
         public Error error;
 

@@ -105,6 +105,9 @@ namespace MultiplayerARPG
                         case ResponseSendMailMessage.Error.NoReceiver:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER.ToString());
                             break;
+                        case ResponseSendMailMessage.Error.NotEnoughGold:
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString());
+                            break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;
