@@ -35,8 +35,11 @@ namespace MultiplayerARPG
             get { return mailId; }
             set
             {
-                mailId = value;
-                ReadMail();
+                if (mailId != value)
+                {
+                    mailId = value;
+                    ReadMail();
+                }
             }
         }
 
@@ -188,9 +191,12 @@ namespace MultiplayerARPG
             if (uiCurrencies != null)
             {
                 List<CharacterCurrency> increasingCurrencies = new List<CharacterCurrency>();
-                foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
+                if (mail != null)
                 {
-                    increasingCurrencies.Add(CharacterCurrency.Create(mailCurrency.Key, amount: mailCurrency.Value));
+                    foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
+                    {
+                        increasingCurrencies.Add(CharacterCurrency.Create(mailCurrency.Key, amount: mailCurrency.Value));
+                    }
                 }
                 if (increasingCurrencies.Count > 0)
                 {
@@ -206,9 +212,12 @@ namespace MultiplayerARPG
             if (uiItems != null)
             {
                 List<CharacterItem> increasingItems = new List<CharacterItem>();
-                foreach (KeyValuePair<int, short> mailItem in mail.Items)
+                if (mail != null)
                 {
-                    increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
+                    foreach (KeyValuePair<int, short> mailItem in mail.Items)
+                    {
+                        increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
+                    }
                 }
                 if (increasingItems.Count > 0)
                 {

@@ -12,7 +12,10 @@ namespace MultiplayerARPG
         public Transform uiContainer;
 
         [Header("Options")]
-        public bool onlyNewMails = true;
+        public bool onlyNewMails = false;
+        public float autoRefreshDuration = 5f;
+
+        private float refreshCountDown = 0f;
 
         private UIList cacheList;
         public UIList CacheList
@@ -43,6 +46,7 @@ namespace MultiplayerARPG
 
         public void Refresh()
         {
+            refreshCountDown = autoRefreshDuration;
             BaseGameNetworkManager.Singleton.RequestMailList(onlyNewMails, MailListCallback);
         }
 
@@ -62,6 +66,13 @@ namespace MultiplayerARPG
             if (uiDialog != null)
                 uiDialog.onHide.RemoveListener(OnDialogHide);
             CacheSelectionManager.DeselectSelectedUI();
+        }
+
+        protected virtual void Update()
+        {
+            refreshCountDown -= Time.deltaTime;
+            if (refreshCountDown <= 0)
+                Refresh();
         }
 
         protected void OnDialogHide()
@@ -97,6 +108,7 @@ namespace MultiplayerARPG
                 return;
             }
             ResponseMailListMessage castedResponse = response as ResponseMailListMessage;
+            string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
@@ -107,6 +119,8 @@ namespace MultiplayerARPG
                 tempUi.Data = mailListEntry;
                 tempUi.Show();
                 CacheSelectionManager.Add(tempUi);
+                if (selectedId == mailListEntry.Id)
+                    tempUi.OnClickSelect();
             });
         }
     }
