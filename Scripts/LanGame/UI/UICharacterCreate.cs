@@ -8,6 +8,11 @@ namespace MultiplayerARPG
 {
     public class UICharacterCreate : UIBase
     {
+        [Header("Game Object Elements")]
+        public Transform characterModelContainer;
+
+        [Header("UI Elements")]
+        public CharacterRaceTogglePair[] raceToggles = new CharacterRaceTogglePair[0];
         public UICharacter uiCharacterPrefab;
         public Transform uiCharacterContainer;
         public UICharacterClass uiCharacterClassPrefab;
@@ -15,15 +20,33 @@ namespace MultiplayerARPG
         public UIFaction uiFactionPrefab;
         public Transform uiFactionContainer;
 
-        public Transform characterModelContainer;
-        [Header("UI Elements")]
         public InputField inputCharacterName;
         public Button buttonCreate;
+
         [Header("Event")]
-        public UnityEvent eventOnCreateCharacter;
-        public CharacterDataEvent eventOnSelectCharacter;
-        public FactionEvent eventOnSelectFaction;
-        public CharacterClassEvent eventOnSelectCharacterClass;
+        public UnityEvent eventOnCreateCharacter = new UnityEvent();
+        public CharacterDataEvent eventOnSelectCharacter = new CharacterDataEvent();
+        public FactionEvent eventOnSelectFaction = new FactionEvent();
+        public CharacterClassEvent eventOnSelectCharacterClass = new CharacterClassEvent();
+
+        private Dictionary<CharacterRace, Toggle> cacheRaceToggles;
+        public Dictionary<CharacterRace, Toggle> CacheRaceToggles
+        {
+            get
+            {
+                if (cacheRaceToggles == null)
+                {
+                    cacheRaceToggles = new Dictionary<CharacterRace, Toggle>();
+                    foreach (CharacterRaceTogglePair raceToggle in raceToggles)
+                    {
+                        if (raceToggle.race == null || raceToggle.toggle == null)
+                            continue;
+                        cacheRaceToggles[raceToggle.race] = raceToggle.toggle;
+                    }
+                }
+                return cacheRaceToggles;
+            }
+        }
 
         private UIList cacheCharacterList;
         public UIList CacheCharacterList
@@ -125,6 +148,8 @@ namespace MultiplayerARPG
         public PlayerCharacter[] SelectableCharacterClasses { get { return selectableCharacterClasses; } }
         protected PlayerCharacter selectedPlayerCharacter;
         public PlayerCharacter SelectedPlayerCharacter { get { return selectedPlayerCharacter; } }
+        protected CharacterRace selectedRace;
+        public CharacterRace SelectedRace { get { return selectedRace; } }
         protected Faction selectedFaction;
         public Faction SelectedFaction { get { return selectedFaction; } }
         public int SelectedEntityId { get; protected set; }
@@ -133,7 +158,10 @@ namespace MultiplayerARPG
 
         protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
         {
-            return GameInstance.PlayerCharacterEntities.Values.ToList();
+            if (CacheRaceToggles.Count == 0)
+                return GameInstance.PlayerCharacterEntities.Values.ToList();
+            else
+                return GameInstance.PlayerCharacterEntities.Values.Where((a) => SelectedRace == a.Race).ToList();
         }
 
         protected virtual List<Faction> GetSelectableFactions()
@@ -220,6 +248,16 @@ namespace MultiplayerARPG
             CacheCharacterClassSelectionManager.eventOnSelect.AddListener(OnSelectCharacterClass);
             CacheFactionSelectionManager.eventOnSelect.RemoveListener(OnSelectFaction);
             CacheFactionSelectionManager.eventOnSelect.AddListener(OnSelectFaction);
+            selectedRace = null;
+            foreach (KeyValuePair<CharacterRace, Toggle> raceToggle in CacheRaceToggles)
+            {
+                raceToggle.Value.onValueChanged.RemoveAllListeners();
+                raceToggle.Value.onValueChanged.AddListener((isOn) =>
+                {
+                    OnRaceToggleUpdate(raceToggle.Key, isOn);
+                });
+                OnRaceToggleUpdate(raceToggle.Key, raceToggle.Value.isOn);
+            }
             // Load characters and factions
             LoadCharacters();
             LoadFactions();
@@ -318,6 +356,15 @@ namespace MultiplayerARPG
             {
                 // Set creating player character's faction
                 SelectedFactionId = faction.DataId;
+            }
+        }
+
+        protected virtual void OnRaceToggleUpdate(CharacterRace race, bool isOn)
+        {
+            if (isOn)
+            {
+                selectedRace = race;
+                LoadCharacters();
             }
         }
 

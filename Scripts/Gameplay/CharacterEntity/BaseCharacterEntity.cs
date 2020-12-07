@@ -60,12 +60,20 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        [Header("Character Attack Debug")]
+        [Header("Character Attack Debugging")]
+        public Color debugFovColor = new Color(0, 1, 0, 0.04f);
         public Vector3? debugDamagePosition;
         public Vector3? debugDamageDirection;
         public Quaternion? debugDamageRotation;
-        public Color debugFovColor = new Color(0, 1, 0, 0.04f);
 #endif
+
+        [Header("Generic Character Profile")]
+        [SerializeField]
+        private CharacterRace race;
+        public CharacterRace Race
+        {
+            get { return race; }
+        }
 
         #region Protected data
         public UICharacterEntity UICharacterEntity { get; protected set; }

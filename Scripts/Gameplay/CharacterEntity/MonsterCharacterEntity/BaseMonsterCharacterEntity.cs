@@ -12,7 +12,7 @@ namespace MultiplayerARPG
     {
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
-        [Header("Monster Character Settings")]
+        [Header("Monster Character Profile")]
         [Tooltip("The title which will override `Monster Character`'s title")]
         [SerializeField]
         protected string characterTitle;

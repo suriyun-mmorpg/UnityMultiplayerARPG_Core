@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     {
         public BaseNpcDialog CurrentNpcDialog { get; set; }
 
-        [Header("Player Character Settings")]
+        [Header("Player Character Profile")]
         [Tooltip("The title which will be shown in create scene")]
         [SerializeField]
         protected string characterTitle;
