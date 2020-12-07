@@ -232,7 +232,7 @@ namespace MultiplayerARPG
 
             if (textSentDate != null)
             {
-                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime();
                 if (mail != null)
                     dateTime = dateTime.AddSeconds(mail.SentTimestamp);
                 textSentDate.text = string.Format(

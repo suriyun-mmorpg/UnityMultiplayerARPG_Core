@@ -35,7 +35,7 @@ namespace MultiplayerARPG
 
             if (textSentDate != null)
             {
-                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime();
                 if (Data != null)
                     dateTime = dateTime.AddSeconds(Data.SentTimestamp);
                 textSentDate.text = string.Format(
