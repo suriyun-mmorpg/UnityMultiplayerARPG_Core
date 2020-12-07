@@ -97,7 +97,6 @@ namespace MultiplayerARPG
                 return;
             }
             ResponseMailListMessage castedResponse = response as ResponseMailListMessage;
-            //castedResponse.mails;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
