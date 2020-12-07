@@ -255,6 +255,7 @@ namespace MultiplayerARPG
             {
                 foreach (KeyValuePair<CharacterRace, Toggle> raceToggle in CacheRaceToggles)
                 {
+                    raceToggle.Value.SetIsOnWithoutNotify(false);
                     raceToggle.Value.onValueChanged.RemoveAllListeners();
                     raceToggle.Value.onValueChanged.AddListener((isOn) =>
                     {
