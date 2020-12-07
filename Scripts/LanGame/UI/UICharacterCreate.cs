@@ -151,8 +151,7 @@ namespace MultiplayerARPG
         public PlayerCharacter[] SelectableCharacterClasses { get { return selectableCharacterClasses; } }
         protected PlayerCharacter selectedPlayerCharacter;
         public PlayerCharacter SelectedPlayerCharacter { get { return selectedPlayerCharacter; } }
-        protected CharacterRace selectedRace;
-        public CharacterRace SelectedRace { get { return selectedRace; } }
+        protected readonly HashSet<CharacterRace> SelectedRaces = new HashSet<CharacterRace>();
         protected Faction selectedFaction;
         public Faction SelectedFaction { get { return selectedFaction; } }
         public int SelectedEntityId { get; protected set; }
@@ -164,7 +163,7 @@ namespace MultiplayerARPG
             if (CacheRaceToggles.Count == 0)
                 return GameInstance.PlayerCharacterEntities.Values.ToList();
             else
-                return GameInstance.PlayerCharacterEntities.Values.Where((a) => SelectedRace == a.Race).ToList();
+                return GameInstance.PlayerCharacterEntities.Values.Where((a) => SelectedRaces.Contains(a.Race)).ToList();
         }
 
         protected virtual List<Faction> GetSelectableFactions()
@@ -251,7 +250,7 @@ namespace MultiplayerARPG
             CacheCharacterClassSelectionManager.eventOnSelect.AddListener(OnSelectCharacterClass);
             CacheFactionSelectionManager.eventOnSelect.RemoveListener(OnSelectFaction);
             CacheFactionSelectionManager.eventOnSelect.AddListener(OnSelectFaction);
-            selectedRace = null;
+            SelectedRaces.Clear();
             if (CacheRaceToggles.Count > 0)
             {
                 foreach (KeyValuePair<CharacterRace, Toggle> raceToggle in CacheRaceToggles)
@@ -264,8 +263,10 @@ namespace MultiplayerARPG
                 }
                 firstRaceToggle.isOn = true;
             }
-            // Load characters and factions
-            LoadCharacters();
+            else
+            {
+                LoadCharacters();
+            }
             LoadFactions();
         }
 
@@ -369,8 +370,12 @@ namespace MultiplayerARPG
         {
             if (isOn)
             {
-                selectedRace = race;
+                SelectedRaces.Add(race);
                 LoadCharacters();
+            }
+            else
+            {
+                SelectedRaces.Remove(race);
             }
         }
 
