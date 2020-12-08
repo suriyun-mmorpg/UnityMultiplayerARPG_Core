@@ -213,7 +213,7 @@ namespace MultiplayerARPG
             }
 
             // Prepare requires data and get damages data
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null; 
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
 
@@ -285,7 +285,7 @@ namespace MultiplayerARPG
                         if (weaponItem != null &&
                             (AnimActionType == AnimActionType.AttackRightHand ||
                             AnimActionType == AnimActionType.AttackLeftHand))
-                            AudioManager.PlaySfxClipAtPoint(weaponItem.LaunchClip, CacheTransform.position);
+                            AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, CharacterModel.GenericAudioSource);
                     }
 
                     // Get aim position by character's forward

@@ -707,7 +707,7 @@ namespace MultiplayerARPG
         {
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             playSpeedMultiplier *= tempActionAnimation.GetAnimSpeedRate();
-            AudioManager.PlaySfxClipAtPoint(tempActionAnimation.GetRandomAudioClip(), CacheTransform.position);
+            AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), genericAudioSource);
             bool hasClip = tempActionAnimation.clip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {

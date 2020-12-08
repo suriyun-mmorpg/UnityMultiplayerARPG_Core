@@ -263,7 +263,7 @@ namespace MultiplayerARPG
                 AnimationClip2D anim = animation2D.GetClipByDirection(DirectionType2D);
                 if (anim != null)
                 {
-                    AudioManager.PlaySfxClipAtPoint(animation2D.GetRandomAudioClip(), CacheTransform.position);
+                    AudioManager.PlaySfxClipAtAudioSource(animation2D.GetRandomAudioClip(), genericAudioSource);
                     // Waits by current transition + clip duration before end animation
                     Play(anim);
                     yield return new WaitForSecondsRealtime(anim.length / playSpeedMultiplier);

@@ -31,8 +31,8 @@ namespace MultiplayerARPG
             bool hasChanges = false;
             bool isFound = false;
             List<EquipmentContainer> equipmentContainers = new List<EquipmentContainer>();
-            if (characterModel.equipmentContainers != null)
-                equipmentContainers.AddRange(characterModel.equipmentContainers);
+            if (characterModel.EquipmentContainers != null)
+                equipmentContainers.AddRange(characterModel.EquipmentContainers);
             for (int i = 0; i < equipmentContainers.Count; ++i)
             {
                 EquipmentContainer equipmentContainer = equipmentContainers[i];
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             }
             if (hasChanges)
             {
-                characterModel.equipmentContainers = equipmentContainers.ToArray();
+                characterModel.EquipmentContainers = equipmentContainers.ToArray();
             }
         }
 

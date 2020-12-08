@@ -17,20 +17,62 @@ namespace MultiplayerARPG
             Fps
         }
 
-        [Tooltip("These object will be deactivated while hidding")]
-        public GameObject[] hiddingObjects;
-        [Tooltip("These renderers will be disabled while hidding")]
-        public Renderer[] hiddingRenderers;
-        [Tooltip("These object will be deactivated while view mode is FPS")]
-        public GameObject[] fpsHiddingObjects;
-        [Tooltip("These renderers will be disabled while view mode is FPS")]
-        public Renderer[] fpsHiddingRenderers;
-
         public EVisibleState VisibleState { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
+        [Tooltip("These object will be deactivated while hidding")]
+        [SerializeField] 
+        protected GameObject[] hiddingObjects;
+        public GameObject[] HiddingObjects
+        {
+            get { return hiddingObjects; }
+            set { hiddingObjects = value; }
+        }
+
+        [Tooltip("These renderers will be disabled while hidding")]
+        [SerializeField]
+        protected Renderer[] hiddingRenderers;
+        public Renderer[] HiddingRenderers
+        {
+            get { return hiddingRenderers; }
+            set { hiddingRenderers = value; }
+        }
+
+        [Tooltip("These object will be deactivated while view mode is FPS")]
+        [SerializeField]
+        protected GameObject[] fpsHiddingObjects;
+        public GameObject[] FpsHiddingObjects
+        {
+            get { return fpsHiddingObjects; }
+            set { fpsHiddingObjects = value; }
+        }
+
+        [Tooltip("These renderers will be disabled while view mode is FPS")]
+        [SerializeField]
+        protected Renderer[] fpsHiddingRenderers;
+        public Renderer[] FpsHiddingRenderers
+        {
+            get { return fpsHiddingRenderers; }
+            set { fpsHiddingRenderers = value; }
+        }
+
+        [Tooltip("Generic audio source which will be used to play sound effects")]
+        [SerializeField]
+        protected AudioSource genericAudioSource;
+        public AudioSource GenericAudioSource
+        {
+            get { return genericAudioSource; }
+        }
+
         [Header("Effect Containers")]
-        public EffectContainer[] effectContainers;
+        [SerializeField]
+        protected EffectContainer[] effectContainers;
+        public EffectContainer[] EffectContainers
+        {
+            get { return effectContainers; }
+            set { effectContainers = value; }
+        }
+
 #if UNITY_EDITOR
         [InspectorButton(nameof(SetEffectContainersBySetters))]
         public bool setEffectContainersBySetters;
@@ -65,6 +107,8 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             CacheTransform = transform;
+            if (genericAudioSource == null)
+                genericAudioSource = gameObject.GetOrAddComponent<AudioSource>();
         }
 
         protected virtual void OnValidate() { }

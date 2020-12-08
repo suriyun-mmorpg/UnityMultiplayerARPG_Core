@@ -216,7 +216,7 @@ namespace MultiplayerARPG
             SetReloadActionStates(animActionType, reloadingAmmoAmount);
 
             // Prepare requires data and get damages data
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null;
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
@@ -234,7 +234,7 @@ namespace MultiplayerARPG
                     if (weaponItem != null &&
                         (AnimActionType == AnimActionType.ReloadRightHand ||
                         AnimActionType == AnimActionType.ReloadLeftHand))
-                        AudioManager.PlaySfxClipAtPoint(weaponItem.ReloadClip, CacheTransform.position);
+                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.ReloadClip, CharacterModel.GenericAudioSource);
                 }
 
                 for (int i = 0; i < triggerDurations.Length; ++i)
@@ -351,7 +351,7 @@ namespace MultiplayerARPG
             SetAttackActionStates(animActionType, animActionDataId);
 
             // Prepare requires data and get damages data
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null;
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamages(ref isLeftHand);
 
@@ -393,7 +393,7 @@ namespace MultiplayerARPG
                         if (weaponItem != null &&
                             (AnimActionType == AnimActionType.AttackRightHand ||
                             AnimActionType == AnimActionType.AttackLeftHand))
-                            AudioManager.PlaySfxClipAtPoint(weaponItem.LaunchClip, CacheTransform.position);
+                            AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, CharacterModel.GenericAudioSource);
                     }
 
                     // Get aim position by character's forward

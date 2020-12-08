@@ -21,7 +21,7 @@ namespace MultiplayerARPG
                 QueueGameMessage(GameMessage.Type.NoAmmo);
                 // Play empty sfx
                 if (weaponItem != null)
-                    AudioManager.PlaySfxClipAtPoint(weaponItem.ReloadClip, CacheTransform.position);
+                    AudioManager.PlaySfxClipAtAudioSource(weaponItem.EmptyClip, CharacterModel.GenericAudioSource);
                 return false;
             }
             return true;

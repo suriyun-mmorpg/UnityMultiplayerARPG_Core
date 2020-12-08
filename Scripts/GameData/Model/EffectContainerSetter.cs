@@ -19,8 +19,8 @@ namespace MultiplayerARPG
             bool hasChanges = false;
             bool isFound = false;
             List<EffectContainer> effectContainers = new List<EffectContainer>();
-            if (gameEntityModel.effectContainers != null)
-                effectContainers.AddRange(gameEntityModel.effectContainers);
+            if (gameEntityModel.EffectContainers != null)
+                effectContainers.AddRange(gameEntityModel.EffectContainers);
             for (int i = 0; i < effectContainers.Count; ++i)
             {
                 EffectContainer effectContainer = effectContainers[i];
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             }
             if (hasChanges)
             {
-                gameEntityModel.effectContainers = effectContainers.ToArray();
+                gameEntityModel.EffectContainers = effectContainers.ToArray();
             }
         }
     }

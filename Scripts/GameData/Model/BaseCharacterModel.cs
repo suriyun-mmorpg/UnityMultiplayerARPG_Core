@@ -17,7 +17,14 @@ namespace MultiplayerARPG
         public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
 
         [Header("Equipment Containers")]
-        public EquipmentContainer[] equipmentContainers;
+        [SerializeField]
+        protected EquipmentContainer[] equipmentContainers;
+        public EquipmentContainer[] EquipmentContainers
+        {
+            get { return equipmentContainers; }
+            set { equipmentContainers = value; }
+        }
+
 #if UNITY_EDITOR
         [InspectorButton(nameof(SetEquipmentContainersBySetters))]
         public bool setEquipmentContainersBySetters;

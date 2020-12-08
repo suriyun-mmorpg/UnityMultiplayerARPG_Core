@@ -660,7 +660,7 @@ namespace MultiplayerARPG
                 CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
                 yield return 0;
             }
-            AudioManager.PlaySfxClipAtPoint(tempActionAnimation.GetRandomAudioClip(), CacheTransform.position);
+            AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), genericAudioSource);
             if (tempActionAnimation.clip != null)
             {
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
@@ -1105,12 +1105,12 @@ namespace MultiplayerARPG
                 skillCastClip = defaultSkillCastClip,
                 skillActivateAnimation = defaultSkillActivateAnimation,
             };
-            model.hiddingObjects = hiddingObjects;
-            model.hiddingRenderers = hiddingRenderers;
-            model.fpsHiddingObjects = fpsHiddingObjects;
-            model.fpsHiddingRenderers = fpsHiddingRenderers;
-            model.effectContainers = effectContainers;
-            model.equipmentContainers = equipmentContainers;
+            model.HiddingObjects = hiddingObjects;
+            model.HiddingRenderers = hiddingRenderers;
+            model.FpsHiddingObjects = fpsHiddingObjects;
+            model.FpsHiddingRenderers = fpsHiddingRenderers;
+            model.EffectContainers = effectContainers;
+            model.EquipmentContainers = equipmentContainers;
             EditorUtility.SetDirty(model);
         }
 
@@ -1142,12 +1142,12 @@ namespace MultiplayerARPG
                 skillCastClip = defaultSkillCastClip,
                 skillActivateAnimation = defaultSkillActivateAnimation,
             };
-            model.hiddingObjects = hiddingObjects;
-            model.hiddingRenderers = hiddingRenderers;
-            model.fpsHiddingObjects = fpsHiddingObjects;
-            model.fpsHiddingRenderers = fpsHiddingRenderers;
-            model.effectContainers = effectContainers;
-            model.equipmentContainers = equipmentContainers;
+            model.HiddingObjects = hiddingObjects;
+            model.HiddingRenderers = hiddingRenderers;
+            model.FpsHiddingObjects = fpsHiddingObjects;
+            model.FpsHiddingRenderers = fpsHiddingRenderers;
+            model.EffectContainers = effectContainers;
+            model.EquipmentContainers = equipmentContainers;
             EditorUtility.SetDirty(model);
         }
 #endif
