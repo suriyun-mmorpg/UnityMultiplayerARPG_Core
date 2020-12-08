@@ -15,9 +15,13 @@ namespace MultiplayerARPG
             lastActionTime = time;
 
             CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             if (!ValidateAmmo(weapon))
             {
                 QueueGameMessage(GameMessage.Type.NoAmmo);
+                // Play empty sfx
+                if (weaponItem != null)
+                    AudioManager.PlaySfxClipAtPoint(weaponItem.ReloadClip, CacheTransform.position);
                 return false;
             }
             return true;

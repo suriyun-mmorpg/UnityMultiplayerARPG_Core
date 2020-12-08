@@ -660,9 +660,7 @@ namespace MultiplayerARPG
                 CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
                 yield return 0;
             }
-            AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
-            if (audioClip != null)
-                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            AudioManager.PlaySfxClipAtPoint(tempActionAnimation.GetRandomAudioClip(), CacheTransform.position);
             if (tempActionAnimation.clip != null)
             {
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
@@ -688,9 +686,7 @@ namespace MultiplayerARPG
                     legacyAnimation.RemoveClip(CLIP_ACTION);
                 legacyAnimation.AddClip(tempActionAnimation.clip, CLIP_ACTION);
             }
-            AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
-            if (audioClip != null)
-                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            AudioManager.PlaySfxClipAtPoint(tempActionAnimation.GetRandomAudioClip(), CacheTransform.position);
             isPlayingActionAnimation = true;
             if (tempActionAnimation.clip != null)
                 CrossFadeLegacyAnimation(CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);

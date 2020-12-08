@@ -13,6 +13,9 @@ namespace MultiplayerARPG
         short AmmoCapacity { get; }
         BaseWeaponAbility WeaponAbility { get; }
         CrosshairSetting CrosshairSetting { get; }
+        AudioClip LaunchClip { get; }
+        AudioClip ReloadClip { get; }
+        AudioClip EmptyClip { get; }
         FireType FireType { get; }
         Vector2 FireStagger { get; }
         byte FireSpread { get; }

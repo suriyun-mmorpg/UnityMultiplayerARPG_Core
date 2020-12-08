@@ -713,9 +713,7 @@ namespace MultiplayerARPG
                 legacyAnimation.AddClip(tempActionAnimation.clip, CLIP_ACTION);
                 legacyAnimation[CLIP_ACTION].speed = playSpeedMultiplier;
             }
-            AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
-            if (audioClip != null)
-                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            AudioManager.PlaySfxClipAtPoint(tempActionAnimation.GetRandomAudioClip(), CacheTransform.position);
             if (tempActionAnimation.clip != null)
                 CrossFadeLegacyAnimation(CLIP_ACTION, actionClipFadeLength, WrapMode.Once);
             // Waits by current transition + clip duration before end animation

@@ -68,6 +68,9 @@ namespace MultiplayerARPG
             minSpread = 10f,
             maxSpread = 50f
         };
+        public AudioClip launchClip;
+        public AudioClip reloadClip;
+        public AudioClip emptyClip;
 
         [Header("Equipment Bonus Stats")]
         public CharacterStatsIncremental increaseStats;
@@ -359,6 +362,21 @@ namespace MultiplayerARPG
         public CrosshairSetting CrosshairSetting
         {
             get { return crosshairSetting; }
+        }
+
+        public AudioClip LaunchClip
+        {
+            get { return launchClip; }
+        }
+
+        public AudioClip ReloadClip
+        {
+            get { return reloadClip; }
+        }
+
+        public AudioClip EmptyClip
+        {
+            get { return emptyClip; }
         }
 
         public FireType FireType

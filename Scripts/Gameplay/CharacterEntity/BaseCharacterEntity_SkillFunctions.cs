@@ -213,6 +213,7 @@ namespace MultiplayerARPG
             }
 
             // Prepare requires data and get damages data
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
 
@@ -275,10 +276,16 @@ namespace MultiplayerARPG
                     // Special effects will plays on clients only
                     if (IsClient)
                     {
+                        // Play weapon launch special effects
                         if (CharacterModel && CharacterModel.gameObject.activeSelf)
                             CharacterModel.PlayWeaponLaunchEffect(AnimActionType);
                         if (FpsModel && FpsModel.gameObject.activeSelf)
                             FpsModel.PlayWeaponLaunchEffect(AnimActionType);
+                        // Play launch sfx
+                        if (weaponItem != null &&
+                            (AnimActionType == AnimActionType.AttackRightHand ||
+                            AnimActionType == AnimActionType.AttackLeftHand))
+                            AudioManager.PlaySfxClipAtPoint(weaponItem.LaunchClip, CacheTransform.position);
                     }
 
                     // Get aim position by character's forward

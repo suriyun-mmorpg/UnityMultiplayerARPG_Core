@@ -35,7 +35,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public AudioClip[] randomSoundEffects;
+        public AudioClip[] randomSoundEffects = new AudioClip[0];
         private float destroyTime;
 
         private void Awake()
@@ -107,13 +107,8 @@ namespace MultiplayerARPG
             // Prepare destroy time
             destroyTime = isLoop ? -1 : Time.time + lifeTime;
             // Play random audio
-            float volume = AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level;
             if (randomSoundEffects.Length > 0)
-            {
-                AudioClip soundEffect = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
-                if (soundEffect != null)
-                    AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, volume);
-            }
+                AudioManager.PlaySfxClipAtPoint(randomSoundEffects[Random.Range(0, randomSoundEffects.Length)], CacheTransform.position);
             FxCollection.Play();
         }
     }

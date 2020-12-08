@@ -215,6 +215,9 @@ namespace MultiplayerARPG
             // Set doing action state at clients and server
             SetReloadActionStates(animActionType, reloadingAmmoAmount);
 
+            // Prepare requires data and get damages data
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
             try
@@ -227,6 +230,11 @@ namespace MultiplayerARPG
                         CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
                     if (FpsModel && FpsModel.gameObject.activeSelf)
                         FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                    // Play reload sfx
+                    if (weaponItem != null &&
+                        (AnimActionType == AnimActionType.ReloadRightHand ||
+                        AnimActionType == AnimActionType.ReloadLeftHand))
+                        AudioManager.PlaySfxClipAtPoint(weaponItem.ReloadClip, CacheTransform.position);
                 }
 
                 for (int i = 0; i < triggerDurations.Length; ++i)
@@ -343,6 +351,7 @@ namespace MultiplayerARPG
             SetAttackActionStates(animActionType, animActionDataId);
 
             // Prepare requires data and get damages data
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamages(ref isLeftHand);
 
@@ -380,6 +389,11 @@ namespace MultiplayerARPG
                             CharacterModel.PlayWeaponLaunchEffect(AnimActionType);
                         if (FpsModel && FpsModel.gameObject.activeSelf)
                             FpsModel.PlayWeaponLaunchEffect(AnimActionType);
+                        // Play launch sfx
+                        if (weaponItem != null &&
+                            (AnimActionType == AnimActionType.AttackRightHand ||
+                            AnimActionType == AnimActionType.AttackLeftHand))
+                            AudioManager.PlaySfxClipAtPoint(weaponItem.LaunchClip, CacheTransform.position);
                     }
 
                     // Get aim position by character's forward

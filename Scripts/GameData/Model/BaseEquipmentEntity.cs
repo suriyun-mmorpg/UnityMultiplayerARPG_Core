@@ -61,9 +61,6 @@ namespace MultiplayerARPG
             if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
                 weaponLaunchEffects[Random.Range(0, weaponLaunchEffects.Length)].Play();
 
-            if (weaponLaunchSoundEffects != null && weaponLaunchSoundEffects.Length > 0)
-                AudioSource.PlayClipAtPoint(weaponLaunchSoundEffects[Random.Range(0, weaponLaunchEffects.Length)], transform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-
             if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
                 poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
         }

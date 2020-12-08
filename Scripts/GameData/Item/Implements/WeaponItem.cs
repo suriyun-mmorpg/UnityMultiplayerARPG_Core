@@ -80,6 +80,27 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private AudioClip launchClip;
+        public AudioClip LaunchClip
+        {
+            get { return launchClip; }
+        }
+
+        [SerializeField]
+        private AudioClip reloadClip;
+        public AudioClip ReloadClip
+        {
+            get { return reloadClip; }
+        }
+
+        [SerializeField]
+        private AudioClip emptyClip;
+        public AudioClip EmptyClip
+        {
+            get { return emptyClip; }
+        }
+
+        [SerializeField]
         private FireType fireType;
         public FireType FireType
         {
