@@ -177,7 +177,7 @@ namespace MultiplayerARPG
             }
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
                 playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.StartPosition;
-            GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);
+            GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.Euler(playerCharacterData.CurrentRotation));
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
             Assets.NetworkSpawn(spawnObj, 0, connectionId);
