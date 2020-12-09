@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using LiteNetLibManager;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,6 +10,15 @@ namespace MultiplayerARPG
 {
     public class MonsterSpawnArea : GameSpawnArea<BaseMonsterCharacterEntity>
     {
+        [System.Serializable]
+        public class MonsterSpawnPrefabData : SpawnPrefabData<BaseMonsterCharacterEntity> { }
+
+        public List<MonsterSpawnPrefabData> spawningPrefabs = new List<MonsterSpawnPrefabData>();
+        public override SpawnPrefabData<BaseMonsterCharacterEntity>[] SpawningPrefabs
+        {
+            get { return spawningPrefabs.ToArray(); }
+        }
+
         [Tooltip("This is deprecated, might be removed in future version, set your asset to `Asset` instead.")]
         [ReadOnlyField]
         public BaseMonsterCharacterEntity monsterCharacterEntity;
@@ -58,7 +68,7 @@ namespace MultiplayerARPG
             }
             // Destroy the entity (because it can't find ground position)
             Destroy(entity.gameObject);
-            pending.Add(new SpawnPrefabData()
+            pending.Add(new MonsterSpawnPrefabData()
             {
                 prefab = prefab,
                 level = level,

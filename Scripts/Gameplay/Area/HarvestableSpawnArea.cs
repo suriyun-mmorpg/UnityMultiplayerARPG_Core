@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using LiteNetLibManager;
 using UnityEngine;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,6 +10,15 @@ namespace MultiplayerARPG
 {
     public class HarvestableSpawnArea : GameSpawnArea<HarvestableEntity>
     {
+        [System.Serializable]
+        public class HarvestableSpawnPrefabData : SpawnPrefabData<HarvestableEntity> { }
+
+        public List<HarvestableSpawnPrefabData> spawningPrefabs = new List<HarvestableSpawnPrefabData>();
+        public override SpawnPrefabData<HarvestableEntity>[] SpawningPrefabs
+        {
+            get { return spawningPrefabs.ToArray(); }
+        }
+
         [Tooltip("This is deprecated, might be removed in future version, set your asset to `Asset` instead.")]
         [ReadOnlyField]
         public HarvestableEntity harvestableEntity;
@@ -56,7 +66,7 @@ namespace MultiplayerARPG
                     overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                 {
                     // Don't spawn because it will hitting other entities
-                    pending.Add(new SpawnPrefabData()
+                    pending.Add(new HarvestableSpawnPrefabData()
                     {
                         prefab = prefab,
                         level = level,
@@ -77,7 +87,7 @@ namespace MultiplayerARPG
             }
             // Destroy the entity (because it can't find ground position)
             Destroy(entity.gameObject);
-            pending.Add(new SpawnPrefabData()
+            pending.Add(new HarvestableSpawnPrefabData()
             {
                 prefab = prefab,
                 level = level,

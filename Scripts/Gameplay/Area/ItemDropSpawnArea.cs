@@ -1,10 +1,20 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class ItemDropSpawnArea : GameSpawnArea<ItemDropEntity>
     {
+        [System.Serializable]
+        public class ItemDropSpawnPrefabData : SpawnPrefabData<ItemDropEntity> { }
+
+        public List<ItemDropSpawnPrefabData> spawningPrefabs = new List<ItemDropSpawnPrefabData>();
+        public override SpawnPrefabData<ItemDropEntity>[] SpawningPrefabs
+        {
+            get { return spawningPrefabs.ToArray(); }
+        }
+
         public override void RegisterPrefabs()
         {
             base.RegisterPrefabs();

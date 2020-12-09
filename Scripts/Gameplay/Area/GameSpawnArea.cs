@@ -9,10 +9,9 @@ namespace MultiplayerARPG
 {
     public abstract class GameSpawnArea<T> : GameArea where T : LiteNetLibBehaviour
     {
-        [System.Serializable]
-        public struct SpawnPrefabData
+        public class SpawnPrefabData<TPrefab>
         {
-            public T prefab;
+            public TPrefab prefab;
             [Min(1)]
             public short level;
             [Min(1)]
@@ -26,10 +25,12 @@ namespace MultiplayerARPG
         public short level = 1;
         [Min(1)]
         public short amount = 1;
-        public List<SpawnPrefabData> spawningPrefabs = new List<SpawnPrefabData>();
         public float respawnPendingEntitiesDelay = 5f;
+
+        public abstract SpawnPrefabData<T>[] SpawningPrefabs { get; }
+
         protected float respawnPendingEntitiesTimer = 0f;
-        protected readonly List<SpawnPrefabData> pending = new List<SpawnPrefabData>();
+        protected readonly List<SpawnPrefabData<T>> pending = new List<SpawnPrefabData<T>>();
 
         protected virtual void LateUpdate()
         {
@@ -39,7 +40,7 @@ namespace MultiplayerARPG
                 if (respawnPendingEntitiesTimer >= respawnPendingEntitiesDelay)
                 {
                     respawnPendingEntitiesTimer = 0f;
-                    foreach (SpawnPrefabData pendingEntry in pending)
+                    foreach (SpawnPrefabData<T> pendingEntry in pending)
                     {
                         Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab.name}, Amount: {pendingEntry.amount}.");
                         for (int i = 0; i < pendingEntry.amount; ++i)
@@ -56,7 +57,7 @@ namespace MultiplayerARPG
         {
             if (prefab != null)
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
-            foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
+            foreach (SpawnPrefabData<T> spawningPrefab in SpawningPrefabs)
             {
                 if (spawningPrefab.prefab != null)
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
@@ -66,7 +67,7 @@ namespace MultiplayerARPG
         public virtual void SpawnAll()
         {
             SpawnByAmount(prefab, level, amount);
-            foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
+            foreach (SpawnPrefabData<T> spawningPrefab in SpawningPrefabs)
             {
                 SpawnByAmount(spawningPrefab.prefab, spawningPrefab.level, spawningPrefab.amount);
             }
