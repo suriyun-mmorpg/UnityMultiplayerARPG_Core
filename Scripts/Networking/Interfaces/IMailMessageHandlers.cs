@@ -1,0 +1,30 @@
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+
+namespace MultiplayerARPG
+{
+    public interface IMailMessageHandlers
+    {
+        IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
+
+        UniTaskVoid HandleRequestMailList(
+            RequestHandlerData requestHandler, RequestMailListMessage request,
+            RequestProceedResultDelegate<ResponseMailListMessage> result);
+
+        UniTaskVoid HandleRequestReadMail(
+            RequestHandlerData requestHandler, RequestReadMailMessage request,
+            RequestProceedResultDelegate<ResponseReadMailMessage> result);
+
+        UniTaskVoid HandleRequestClaimMailItems(
+            RequestHandlerData requestHandler, RequestClaimMailItemsMessage request,
+            RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result);
+
+        UniTaskVoid HandleRequestDeleteMail(
+            RequestHandlerData requestHandler, RequestDeleteMailMessage request,
+            RequestProceedResultDelegate<ResponseDeleteMailMessage> result);
+
+        UniTaskVoid HandleRequestSendMail(
+            RequestHandlerData requestHandler, RequestSendMailMessage request,
+            RequestProceedResultDelegate<ResponseSendMailMessage> result);
+    }
+}

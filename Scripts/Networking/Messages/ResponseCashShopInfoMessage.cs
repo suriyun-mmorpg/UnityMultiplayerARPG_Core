@@ -2,13 +2,14 @@
 
 namespace MultiplayerARPG
 {
-    public class ResponseCashShopInfoMessage : INetSerializable
+    public struct ResponseCashShopInfoMessage : INetSerializable
     {
         public enum Error : byte
         {
             None,
             NotAvailable,
             UserNotFound,
+            InternalServerError,
         }
         public Error error;
         public int cash;

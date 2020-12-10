@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class ResponseCashShopBuyMessage : INetSerializable
+    public struct ResponseCashShopBuyMessage : INetSerializable
     {
         public enum Error : byte
         {
@@ -12,6 +12,7 @@ namespace MultiplayerARPG
             ItemNotFound,
             NotEnoughCash,
             CannotCarryAllRewards,
+            InternalServerError,
         }
         public Error error;
         public int dataId;

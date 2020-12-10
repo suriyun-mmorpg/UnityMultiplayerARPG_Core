@@ -1,0 +1,26 @@
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+
+namespace MultiplayerARPG
+{
+    public interface ICashShopMessageHandlers
+    {
+        IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
+
+        UniTaskVoid HandleRequestCashShopInfo(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCashShopInfoMessage> result);
+
+        UniTaskVoid HandleRequestCashPackageInfo(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result);
+
+        UniTaskVoid HandleRequestCashShopBuy(
+            RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
+            RequestProceedResultDelegate<ResponseCashShopBuyMessage> result);
+
+        UniTaskVoid HandleRequestCashPackageBuyValidation(
+            RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
+            RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result);
+    }
+}

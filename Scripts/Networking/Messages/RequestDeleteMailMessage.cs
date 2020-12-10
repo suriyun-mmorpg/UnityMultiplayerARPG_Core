@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class RequestDeleteMailMessage : INetSerializable
+    public struct RequestDeleteMailMessage : INetSerializable
     {
         public string id;
 

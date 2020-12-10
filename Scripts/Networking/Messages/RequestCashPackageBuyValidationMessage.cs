@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class RequestCashPackageBuyValidationMessage : INetSerializable
+    public struct RequestCashPackageBuyValidationMessage : INetSerializable
     {
         public int dataId;
         public RuntimePlatform platform;

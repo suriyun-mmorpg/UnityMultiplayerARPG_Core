@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class ResponseSendMailMessage : INetSerializable
+    public struct ResponseSendMailMessage : INetSerializable
     {
         public enum Error : byte
         {

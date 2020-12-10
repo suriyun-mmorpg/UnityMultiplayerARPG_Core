@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class ResponseCashPackageBuyValidationMessage : INetSerializable
+    public struct ResponseCashPackageBuyValidationMessage : INetSerializable
     {
         public enum Error : byte
         {
@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             NotAvailable,
             UserNotFound,
             PackageNotFound,
+            InternalServerError,
         }
         public Error error;
         public int dataId;

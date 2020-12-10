@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class RequestCashShopBuyMessage : INetSerializable
+    public struct RequestCashShopBuyMessage : INetSerializable
     {
         public int dataId;
 

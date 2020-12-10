@@ -2,13 +2,14 @@
 
 namespace MultiplayerARPG
 {
-    public class ResponseDeleteMailMessage : INetSerializable
+    public struct ResponseDeleteMailMessage : INetSerializable
     {
         public enum Error : byte
         {
             None,
             NotAvailable,
             NotAllowed,
+            InternalServerError,
         }
         public Error error;
 

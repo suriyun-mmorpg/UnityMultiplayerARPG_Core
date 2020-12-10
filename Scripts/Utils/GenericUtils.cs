@@ -120,6 +120,31 @@ public static class GenericUtils
         return result;
     }
 
+    public static TInterface GetOrAddComponent<TInterface, T>(this GameObject gameObject) 
+        where T : Component, TInterface
+    {
+        if (gameObject == null)
+            return default;
+        TInterface result = gameObject.GetComponent<TInterface>();
+        if (result == null)
+            result = gameObject.AddComponent<T>();
+        return result;
+    }
+
+    public static TInterface GetOrAddComponent<TInterface, T>(this GameObject gameObject, System.Action<TInterface> onAddComponent)
+        where T : Component, TInterface
+    {
+        if (gameObject == null)
+            return default;
+        TInterface result = gameObject.GetComponent<TInterface>();
+        if (result == null)
+        {
+            result = gameObject.AddComponent<T>();
+            onAddComponent.Invoke(result);
+        }
+        return result;
+    }
+
     public static void RemoveChildren(this Transform transform)
     {
         if (transform == null)

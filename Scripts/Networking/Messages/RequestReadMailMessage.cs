@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class RequestReadMailMessage : INetSerializable
+    public struct RequestReadMailMessage : INetSerializable
     {
         public string id;
 

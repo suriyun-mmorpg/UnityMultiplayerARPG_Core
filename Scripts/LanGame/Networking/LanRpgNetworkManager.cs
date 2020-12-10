@@ -45,6 +45,16 @@ namespace MultiplayerARPG
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
         }
 
+        protected override ICashShopMessageHandlers InitCashShopMessageHandlers()
+        {
+            return gameObject.GetOrAddComponent<ICashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
+        }
+
+        protected override IMailMessageHandlers InitMailMessageHandlers()
+        {
+            return gameObject.GetOrAddComponent<IMailMessageHandlers, LanRpgMailMessageHandlers>();
+        }
+
         public void StartGame()
         {
             NetworkSetting gameServiceConnection = CurrentGameInstance.NetworkSetting;
@@ -105,7 +115,7 @@ namespace MultiplayerARPG
                     SaveSystem.SaveCharacter(owningCharacter);
                     if (IsServer)
                     {
-                        SaveSystem.SaveWorld(owningCharacter, buildingEntities);
+                        SaveSystem.SaveWorld(owningCharacter, BuildingEntities);
                         SaveSystem.SaveStorage(owningCharacter, storageItems);
                     }
                 }
@@ -191,7 +201,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.UserLevel = 1;
 
             // Load data for first character (host)
-            if (playerCharacters.Count == 0)
+            if (PlayerCharacters.Count == 0)
             {
                 if (enableGmCommands == EnableGmCommandType.HostOnly)
                     playerCharacterEntity.UserLevel = 1;
@@ -224,9 +234,9 @@ namespace MultiplayerARPG
 
             SocialCharacterData[] members;
             // Set guild id
-            if (guilds.Count > 0)
+            if (Guilds.Count > 0)
             {
-                foreach (GuildData guild in guilds.Values)
+                foreach (GuildData guild in Guilds.Values)
                 {
                     members = guild.GetMembers();
                     for (int i = 0; i < members.Length; ++i)
@@ -242,9 +252,9 @@ namespace MultiplayerARPG
                 }
             }
             // Set party id
-            if (parties.Count > 0)
+            if (Parties.Count > 0)
             {
-                foreach (PartyData party in parties.Values)
+                foreach (PartyData party in Parties.Values)
                 {
                     members = party.GetMembers();
                     for (int i = 0; i < members.Length; ++i)
@@ -278,7 +288,7 @@ namespace MultiplayerARPG
             long connectionId = playerCharacterEntity.ConnectionId;
             BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
-                playerCharacters.ContainsKey(connectionId) &&
+                PlayerCharacters.ContainsKey(connectionId) &&
                 playerCharacterEntity.IsServer &&
                 playerCharacterEntity.IsOwnerClient &&
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
@@ -286,9 +296,9 @@ namespace MultiplayerARPG
             {
                 // Save data before warp
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-                SaveSystem.SaveWorld(owningCharacter, buildingEntities);
+                SaveSystem.SaveWorld(owningCharacter, BuildingEntities);
                 SaveSystem.SaveStorage(owningCharacter, storageItems);
-                buildingEntities.Clear();
+                BuildingEntities.Clear();
                 storageItems.Clear();
                 SetMapInfo(mapInfo);
                 teleportPosition = position;
@@ -314,180 +324,6 @@ namespace MultiplayerARPG
                 ServerSceneChange(mapInfo.Scene);
             }
         }
-
-        #region Implement Singleplayer / Lan - in-app purchasing
-        protected override UniTaskVoid HandleRequestCashShopInfo(
-            RequestHandlerData requestHandler, EmptyMessage request,
-            RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
-        {
-            // Set response data
-            ResponseCashShopInfoMessage.Error error = ResponseCashShopInfoMessage.Error.None;
-            int cash = 0;
-            List<int> cashShopItemIds = new List<int>();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Canot find user
-                error = ResponseCashShopInfoMessage.Error.UserNotFound;
-            }
-            else
-            {
-                // Get user cash amount
-                cash = playerCharacter.UserCash;
-                // Set cash shop item ids
-                cashShopItemIds.AddRange(GameInstance.CashShopItems.Keys);
-            }
-            // Send response message
-            result.Invoke(
-                error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                 new ResponseCashShopInfoMessage()
-                 {
-                     error = error,
-                     cash = cash,
-                     cashShopItemIds = cashShopItemIds.ToArray(),
-                 });
-            return default;
-        }
-
-        protected override UniTaskVoid HandleRequestCashShopBuy(
-            RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
-            RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
-        {
-            // Set response data
-            ResponseCashShopBuyMessage.Error error = ResponseCashShopBuyMessage.Error.None;
-            int dataId = request.dataId;
-            int cash = 0;
-            BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Canot find user
-                error = ResponseCashShopBuyMessage.Error.UserNotFound;
-            }
-            else
-            {
-                // Get user cash amount
-                cash = playerCharacter.UserCash;
-                CashShopItem cashShopItem;
-                if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
-                {
-                    // Cannot find item
-                    error = ResponseCashShopBuyMessage.Error.ItemNotFound;
-                }
-                else if (cash < cashShopItem.sellPrice)
-                {
-                    // Not enough cash
-                    error = ResponseCashShopBuyMessage.Error.NotEnoughCash;
-                }
-                else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.receiveItems))
-                {
-                    // Cannot carry all rewards
-                    error = ResponseCashShopBuyMessage.Error.CannotCarryAllRewards;
-                }
-                else
-                {
-                    // Decrease cash amount
-                    cash -= cashShopItem.sellPrice;
-                    playerCharacter.UserCash = cash;
-                    // Increase character gold
-                    playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.receiveGold);
-                    // Increase character item
-                    foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
-                    {
-                        if (receiveItem.item == null || receiveItem.amount <= 0) continue;
-                        playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
-                    }
-                    playerCharacter.FillEmptySlots();
-                }
-            }
-            // Send response message
-            result.Invoke(
-                error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashShopBuyMessage()
-                {
-                    error = error,
-                    dataId = dataId,
-                    cash = cash,
-                });
-            return default;
-        }
-
-        protected override UniTaskVoid HandleRequestCashPackageInfo(
-            RequestHandlerData requestHandler, EmptyMessage request,
-            RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
-        {
-            // Set response data
-            ResponseCashPackageInfoMessage.Error error = ResponseCashPackageInfoMessage.Error.None;
-            int cash = 0;
-            List<int> cashPackageIds = new List<int>();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Canot find user
-                error = ResponseCashPackageInfoMessage.Error.UserNotFound;
-            }
-            else
-            {
-                // Get user cash amount
-                cash = playerCharacter.UserCash;
-                // Set cash package ids
-                cashPackageIds.AddRange(GameInstance.CashPackages.Keys);
-            }
-            // Send response message
-            result.Invoke(
-                error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashPackageInfoMessage()
-                {
-                    error = error,
-                    cash = cash,
-                    cashPackageIds = cashPackageIds.ToArray(),
-                });
-            return default;
-        }
-
-        protected override UniTaskVoid HandleRequestCashPackageBuyValidation(
-            RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
-            RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
-        {
-            // TODO: Validate purchasing at server side
-            // Set response data
-            ResponseCashPackageBuyValidationMessage.Error error = ResponseCashPackageBuyValidationMessage.Error.None;
-            int dataId = request.dataId;
-            int cash = 0;
-            BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Canot find user
-                error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
-            }
-            else
-            {
-                // Get user cash amount
-                cash = playerCharacter.UserCash;
-                CashPackage cashPackage;
-                if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
-                {
-                    // Cannot find package
-                    error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
-                }
-                else
-                {
-                    // Increase cash amount
-                    cash += cashPackage.cashAmount;
-                    playerCharacter.UserCash = cash;
-                }
-            }
-            // Send response message
-            result.Invoke(
-                error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashPackageBuyValidationMessage()
-                {
-                    error = error,
-                    dataId = dataId,
-                    cash = cash,
-                });
-            return default;
-        }
-        #endregion
 
         #region Implement Abstract Functions
         public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
@@ -774,13 +610,13 @@ namespace MultiplayerARPG
         public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
-            if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (Guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
             {
                 if (playerCharacterEntity.Gold - amount >= 0)
                 {
                     playerCharacterEntity.Gold -= amount;
                     guild.gold += amount;
-                    guilds[playerCharacterEntity.GuildId] = guild;
+                    Guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
                 }
                 else
@@ -793,13 +629,13 @@ namespace MultiplayerARPG
         public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
-            if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (Guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
             {
                 if (guild.gold - amount >= 0)
                 {
                     guild.gold -= amount;
                     playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
-                    guilds[playerCharacterEntity.GuildId] = guild;
+                    Guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
                 }
                 else
@@ -812,7 +648,7 @@ namespace MultiplayerARPG
         public override void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
         {
             List<SocialCharacterData> socialCharacters = new List<SocialCharacterData>();
-            foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
+            foreach (BasePlayerCharacterEntity playerCharacter in PlayerCharacters.Values)
             {
                 if (playerCharacter.Id.Equals(playerCharacterEntity.Id) ||
                     !playerCharacter.CharacterName.Equals(characterName))
@@ -860,7 +696,7 @@ namespace MultiplayerARPG
 
         protected override async UniTask PreSpawnEntities()
         {
-            await SaveSystem.PreSpawnEntities(selectedCharacter, buildingEntities, storageItems);
+            await SaveSystem.PreSpawnEntities(selectedCharacter, BuildingEntities, storageItems);
         }
         #endregion
     }

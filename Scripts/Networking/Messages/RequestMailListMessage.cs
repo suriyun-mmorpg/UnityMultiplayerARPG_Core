@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class RequestMailListMessage : INetSerializable
+    public struct RequestMailListMessage : INetSerializable
     {
         public bool onlyNewMails;
 
