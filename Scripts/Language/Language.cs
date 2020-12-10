@@ -21,7 +21,9 @@ namespace MultiplayerARPG
         UI_ERROR_INVALID_PROTOCOL,
         UI_ERROR_HOST_UNREACHABLE,
         UI_ERROR_CONNECTION_TIMEOUT,
+        UI_ERROR_INTERNAL_SERVER_ERROR,
         UI_ERROR_USER_NOT_FOUND,
+        UI_ERROR_CHARACTER_NOT_FOUND,
         UI_ERROR_ITEM_NOT_FOUND,
         UI_ERROR_CASH_PACKAGE_NOT_FOUND,
         UI_ERROR_NOT_ENOUGH_GOLD,
@@ -988,7 +990,9 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_INVALID_PROTOCOL.ToString(), "Invalid protocol");
             Texts.Add(UITextKeys.UI_ERROR_HOST_UNREACHABLE.ToString(), "Host unreachable");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString(), "Connection timeout");
+            Texts.Add(UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR.ToString(), "Internal server error");
             Texts.Add(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString(), "User not found");
+            Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND.ToString(), "Character not found");
             Texts.Add(UITextKeys.UI_ERROR_ITEM_NOT_FOUND.ToString(), "Item not found");
             Texts.Add(UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND.ToString(), "Cash package not found");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString(), "Not enough gold");
