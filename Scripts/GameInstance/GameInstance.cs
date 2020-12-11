@@ -35,9 +35,9 @@ namespace MultiplayerARPG
 #endif
     {
         public static GameInstance Singleton { get; protected set; }
-        public static IClientCashShopHandlers ClientCashShopHandlers { get; protected set; }
-        public static IClientMailHandlers ClientMailHandlers { get; protected set; }
-        public static IClientStorageHandlers ClientStorageHandlers { get; protected set; }
+        public static IClientCashShopHandlers ClientCashShopHandlers { get; set; }
+        public static IClientMailHandlers ClientMailHandlers { get; set; }
+        public static IClientStorageHandlers ClientStorageHandlers { get; set; }
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();

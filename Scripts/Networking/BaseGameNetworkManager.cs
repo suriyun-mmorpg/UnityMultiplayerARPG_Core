@@ -249,6 +249,9 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartClient", client);
             base.OnStartClient(client);
+            GameInstance.ClientCashShopHandlers = this;
+            GameInstance.ClientMailHandlers = this;
+            GameInstance.ClientStorageHandlers = this;
         }
 
         public override void OnStopClient()
