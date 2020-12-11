@@ -12,13 +12,13 @@ namespace MultiplayerARPG
         /// Open storage
         /// </summary>
         /// <param name="playerCharacterEntity">Character who open the storage</param>
-        void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity);
+        UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacterEntity);
 
         /// <summary>
         /// Close storage
         /// </summary>
         /// <param name="playerCharacterEntity">Character who close the storage</param>
-        void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity);
+        UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacterEntity);
 
         /// <summary>
         /// Increase items to storage
