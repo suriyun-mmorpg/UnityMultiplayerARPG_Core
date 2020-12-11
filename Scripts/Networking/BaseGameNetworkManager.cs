@@ -10,7 +10,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, ICashShopRequests, IMailRequests, IStorageRequests
+    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, IClientCashShopHandlers, IClientMailHandlers, IClientStorageHandlers
     {
         public class MsgTypes
         {

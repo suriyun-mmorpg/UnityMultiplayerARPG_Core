@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
-using LiteNetLib.Utils;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -109,14 +109,14 @@ namespace MultiplayerARPG
             RefreshCashPackageInfo();
         }
 
-        private void ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseCashPackageInfoMessage castedResponse = response as ResponseCashPackageInfoMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -127,11 +127,11 @@ namespace MultiplayerARPG
                     {
                         uiTextCash.text = string.Format(
                             LanguageManager.GetText(formatKeyCash),
-                            castedResponse.cash.ToString("N0"));
+                            response.cash.ToString("N0"));
                     }
 
                     List<CashPackage> cashPackages = new List<CashPackage>();
-                    foreach (int cashPackageId in castedResponse.cashPackageIds)
+                    foreach (int cashPackageId in response.cashPackageIds)
                     {
                         CashPackage cashPackage;
                         if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))

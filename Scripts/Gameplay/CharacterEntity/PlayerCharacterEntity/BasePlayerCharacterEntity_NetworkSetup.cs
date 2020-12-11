@@ -48,7 +48,6 @@ namespace MultiplayerARPG
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
             currencies.forOwnerOnly = true;
-            storageItems.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
         }
 
         public override void OnSetup()
@@ -69,7 +68,6 @@ namespace MultiplayerARPG
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
             currencies.onOperation += OnCurrenciesOperation;
-            storageItems.onChange += OnStorageItemsChange;
         }
 
         protected override void EntityOnSetOwnerClient()
@@ -146,7 +144,6 @@ namespace MultiplayerARPG
             hotkeys.onOperation -= OnHotkeysOperation;
             quests.onOperation -= OnQuestsOperation;
             currencies.onOperation -= OnCurrenciesOperation;
-            storageItems.onChange -= OnStorageItemsChange;
 
             if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
                 Destroy(BasePlayerCharacterController.Singleton.gameObject);

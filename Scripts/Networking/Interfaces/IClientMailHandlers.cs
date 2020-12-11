@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IMailRequests
+    public interface IClientMailHandlers
     {
         bool RequestMailList(bool onlyNewMails, ResponseDelegate<ResponseMailListMessage> callback);
         bool RequestReadMail(string mailId, ResponseDelegate<ResponseReadMailMessage> callback);

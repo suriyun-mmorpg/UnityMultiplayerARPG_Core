@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
 using System.Text;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -162,7 +163,7 @@ namespace MultiplayerARPG
             TurnOnElapsed += tempDeltaTime;
 
             ConvertItem convertData;
-            List<CharacterItem> items = new List<CharacterItem>(CurrentGameManager.GetStorageEntityItems(this));
+            List<CharacterItem> items = new List<CharacterItem>(ServerStorageHandlers.GetStorageEntityItems(this));
             foreach (CharacterItem item in items)
             {
                 if (!CacheConvertItems.ContainsKey(item.dataId))
@@ -184,28 +185,25 @@ namespace MultiplayerARPG
                 if (convertRemainsDuration[item.dataId] <= 0f)
                 {
                     convertRemainsDuration[item.dataId] = convertData.convertInterval;
-                    ConvertItem(convertData);
+                    ConvertItem(convertData).Forget();
                 }
             }
         }
 
-        protected void ConvertItem(ConvertItem convertData)
+        protected async UniTaskVoid ConvertItem(ConvertItem convertData)
         {
             StorageId storageId = new StorageId(StorageType.Building, Id);
             ItemAmount tempItemAmount = convertData.item;
-            CurrentGameManager.DecreaseStorageItems(storageId, tempItemAmount.item.DataId, tempItemAmount.amount, null);
+            await ServerStorageHandlers.DecreaseStorageItems(storageId, tempItemAmount.item.DataId, tempItemAmount.amount);
             if (convertData.convertedItem.item != null)
             {
                 tempItemAmount = convertData.convertedItem;
                 CharacterItem convertedItem = CharacterItem.Create(tempItemAmount.item.DataId, 1, tempItemAmount.amount);
-                CurrentGameManager.IncreaseStorageItems(storageId, convertedItem, (success) =>
+                if (!await ServerStorageHandlers.IncreaseStorageItems(storageId, convertedItem))
                 {
-                    if (!success)
-                    {
-                        // Cannot add item to storage, so drop to ground
-                        ItemDropEntity.DropItem(this, convertedItem, new uint[0]);
-                    }
-                });
+                    // Cannot add item to storage, so drop to ground
+                    ItemDropEntity.DropItem(this, convertedItem, new uint[0]);
+                }
             }
         }
 
@@ -230,7 +228,7 @@ namespace MultiplayerARPG
                 // Not require fuel
                 return true;
             }
-            List<CharacterItem> items = CurrentGameManager.GetStorageEntityItems(this);
+            List<CharacterItem> items = ServerStorageHandlers.GetStorageEntityItems(this);
             foreach (CharacterItem item in items)
             {
                 if (CacheFuelItems.ContainsKey(item.dataId) &&

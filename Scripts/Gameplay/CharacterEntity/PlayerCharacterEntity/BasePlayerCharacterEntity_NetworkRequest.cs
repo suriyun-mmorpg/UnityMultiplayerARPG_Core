@@ -530,24 +530,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerMoveItemToStorage(short inventoryIndex, short amount, short storageItemIndex)
-        {
-            RPC(ServerMoveItemToStorage, inventoryIndex, amount, storageItemIndex);
-            return true;
-        }
-
-        public bool CallServerMoveItemFromStorage(short storageItemIndex, short amount, short inventoryIndex)
-        {
-            RPC(ServerMoveItemFromStorage, storageItemIndex, amount, inventoryIndex);
-            return true;
-        }
-
-        public bool CallServerSwapOrMergeStorageItem(short fromIndex, short toIndex)
-        {
-            RPC(ServerSwapOrMergeStorageItem, fromIndex, toIndex);
-            return true;
-        }
-
         public bool CallServerDepositGold(int amount)
         {
             RPC(ServerDepositGold, amount);

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
-using LiteNetLib.Utils;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -98,14 +98,14 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.RequestCashShopBuy(dataId, ResponseCashShopBuy);
         }
 
-        private void ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseCashShopInfoMessage castedResponse = response as ResponseCashShopInfoMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -116,11 +116,11 @@ namespace MultiplayerARPG
                     {
                         uiTextCash.text = string.Format(
                             LanguageManager.GetText(formatKeyCash),
-                            castedResponse.cash.ToString("N0"));
+                            response.cash.ToString("N0"));
                     }
 
                     List<CashShopItem> cashShopItems = new List<CashShopItem>();
-                    foreach (int cashShopItemId in castedResponse.cashShopItemIds)
+                    foreach (int cashShopItemId in response.cashShopItemIds)
                     {
                         CashShopItem cashShopItem;
                         if (GameInstance.CashShopItems.TryGetValue(cashShopItemId, out cashShopItem))
@@ -145,19 +145,19 @@ namespace MultiplayerARPG
             }
         }
 
-        private void ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseCashShopBuyMessage castedResponse = response as ResponseCashShopBuyMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedResponse.error)
+                    switch (response.error)
                     {
                         case ResponseCashShopBuyMessage.Error.UserNotFound:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());

@@ -175,5 +175,7 @@ namespace MultiplayerARPG
                     tempUiCharacterItem.OnClickSelect();
             });
         }
+
+        // TODO: Add function to 
     }
 }

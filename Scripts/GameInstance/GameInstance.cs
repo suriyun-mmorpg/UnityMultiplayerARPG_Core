@@ -34,9 +34,40 @@ namespace MultiplayerARPG
     public partial class GameInstance : MonoBehaviour
 #endif
     {
-        // Events
-        public System.Action onGameDataLoaded;
         public static GameInstance Singleton { get; protected set; }
+        public static IClientCashShopHandlers ClientCashShopHandlers { get; protected set; }
+        public static IClientMailHandlers ClientMailHandlers { get; protected set; }
+        public static IClientStorageHandlers ClientStorageHandlers { get; protected set; }
+        public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
+        public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
+        public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
+        public static readonly Dictionary<int, Harvestable> Harvestables = new Dictionary<int, Harvestable>();
+        public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
+        public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
+        public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
+        public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
+        public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
+        public static readonly Dictionary<int, BaseSkill> Skills = new Dictionary<int, BaseSkill>();
+        public static readonly Dictionary<int, BaseNpcDialog> NpcDialogs = new Dictionary<int, BaseNpcDialog>();
+        public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
+        public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
+        public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
+        public static readonly Dictionary<int, EquipmentSet> EquipmentSets = new Dictionary<int, EquipmentSet>();
+        public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
+        public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
+        public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
+        public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
+        public static readonly Dictionary<int, ItemDropEntity> ItemDropEntities = new Dictionary<int, ItemDropEntity>();
+        public static readonly Dictionary<int, HarvestableEntity> HarvestableEntities = new Dictionary<int, HarvestableEntity>();
+        public static readonly Dictionary<int, VehicleEntity> VehicleEntities = new Dictionary<int, VehicleEntity>();
+        public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
+        public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
+        public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
+        public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
+        public static readonly Dictionary<string, BaseMapInfo> MapInfos = new Dictionary<string, BaseMapInfo>();
+        public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
+        public static readonly HashSet<IPoolDescriptor> PoolingObjectPrefabs = new HashSet<IPoolDescriptor>();
+
         [Header("Game Instance Configs")]
         [SerializeField]
         private DimensionType dimensionType;
@@ -208,35 +239,8 @@ namespace MultiplayerARPG
         [Header("Playing In Editor")]
         public TestInEditorMode testInEditorMode;
 
-        public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
-        public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
-        public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
-        public static readonly Dictionary<int, Harvestable> Harvestables = new Dictionary<int, Harvestable>();
-        public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
-        public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
-        public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
-        public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
-        public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
-        public static readonly Dictionary<int, BaseSkill> Skills = new Dictionary<int, BaseSkill>();
-        public static readonly Dictionary<int, BaseNpcDialog> NpcDialogs = new Dictionary<int, BaseNpcDialog>();
-        public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
-        public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
-        public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
-        public static readonly Dictionary<int, EquipmentSet> EquipmentSets = new Dictionary<int, EquipmentSet>();
-        public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
-        public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
-        public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
-        public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
-        public static readonly Dictionary<int, ItemDropEntity> ItemDropEntities = new Dictionary<int, ItemDropEntity>();
-        public static readonly Dictionary<int, HarvestableEntity> HarvestableEntities = new Dictionary<int, HarvestableEntity>();
-        public static readonly Dictionary<int, VehicleEntity> VehicleEntities = new Dictionary<int, VehicleEntity>();
-        public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
-        public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
-        public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
-        public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
-        public static readonly Dictionary<string, BaseMapInfo> MapInfos = new Dictionary<string, BaseMapInfo>();
-        public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
-        public static readonly HashSet<IPoolDescriptor> PoolingObjectPrefabs = new HashSet<IPoolDescriptor>();
+        // Events
+        public System.Action onGameDataLoaded;
 
         #region Cache Data
         public DimensionType DimensionType

@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -49,19 +50,24 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.RequestReadMail(MailId, ReadMailCallback);
         }
 
-        private void ReadMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid ReadMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseReadMailMessage response)
         {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Unimplemented)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString()));
+                return;
+            }
             if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseReadMailMessage castedResponse = response as ResponseReadMailMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedResponse.error)
+                    switch (response.error)
                     {
                         case ResponseReadMailMessage.Error.NotAvailable:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());
@@ -73,7 +79,7 @@ namespace MultiplayerARPG
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;
                 default:
-                    UpdateData(castedResponse.mail);
+                    UpdateData(response.mail);
                     break;
             }
         }
@@ -83,19 +89,24 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.RequestClaimMailItems(MailId, ClaimMailItemsCallback);
         }
 
-        private void ClaimMailItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid ClaimMailItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimMailItemsMessage response)
         {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Unimplemented)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString()));
+                return;
+            }
             if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseClaimMailItemsMessage castedResponse = response as ResponseClaimMailItemsMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedResponse.error)
+                    switch (response.error)
                     {
                         case ResponseClaimMailItemsMessage.Error.NotAvailable:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());
@@ -126,19 +137,24 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.RequestDeleteMail(MailId, DeleteMailCallback);
         }
 
-        private void DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteMailMessage response)
         {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Unimplemented)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString()));
+                return;
+            }
             if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseDeleteMailMessage castedResponse = response as ResponseDeleteMailMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedResponse.error)
+                    switch (response.error)
                     {
                         case ResponseDeleteMailMessage.Error.NotAvailable:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());

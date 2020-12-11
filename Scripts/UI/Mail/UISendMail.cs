@@ -1,8 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -74,8 +71,9 @@ namespace MultiplayerARPG
                 MailSendCallback);
         }
 
-        private void MailSendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid MailSendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendMailMessage response)
         {
+            await UniTask.Yield();
             if (inputReceiverName != null)
                 inputReceiverName.interactable = true;
             if (inputTitle != null)
@@ -89,12 +87,11 @@ namespace MultiplayerARPG
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseSendMailMessage castedResponse = response as ResponseSendMailMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedResponse.error)
+                    switch (response.error)
                     {
                         case ResponseSendMailMessage.Error.NotAvailable:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());

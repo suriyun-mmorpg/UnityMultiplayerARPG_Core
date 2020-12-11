@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IStorageRequests
+    public interface IClientStorageHandlers
     {
         bool RequestGetStorageItems(
             string characterId,

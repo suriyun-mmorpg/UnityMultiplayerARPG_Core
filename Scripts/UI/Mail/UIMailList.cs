@@ -1,4 +1,4 @@
-﻿using LiteNetLib.Utils;
+﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -100,20 +100,20 @@ namespace MultiplayerARPG
             }
         }
 
-        private void MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseMailListMessage castedResponse = response as ResponseMailListMessage;
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             UIMailListEntry tempUi;
-            CacheList.Generate(castedResponse.mails, (index, mailListEntry, ui) =>
+            CacheList.Generate(response.mails, (index, mailListEntry, ui) =>
             {
                 tempUi = ui.GetComponent<UIMailListEntry>();
                 tempUi.Data = mailListEntry;

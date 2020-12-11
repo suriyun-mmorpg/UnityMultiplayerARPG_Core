@@ -1,5 +1,4 @@
 ﻿using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +6,8 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
+        protected IServerStorageHandlers ServerStorageHandlers { get { return CurrentGameInstance as IServerStorageHandlers; } }
+
         [ServerRpc]
         protected void ServerSwapOrMergeItem(short fromIndex, short toIndex)
         {
@@ -924,53 +925,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Storage
-        [ServerRpc]
-        protected void ServerMoveItemToStorage(short inventoryIndex, short amount, short storageItemIndex)
-        {
-#if !CLIENT_BUILD
-            if (this.IsDead())
-                return;
-            if (!CurrentGameManager.CanAccessStorage(this, CurrentStorageId))
-            {
-                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-            CurrentGameManager.MoveItemToStorage(this, CurrentStorageId, inventoryIndex, amount, storageItemIndex);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerMoveItemFromStorage(short storageItemIndex, short amount, short inventoryIndex)
-        {
-#if !CLIENT_BUILD
-            if (this.IsDead())
-                return;
-            if (!CurrentGameManager.CanAccessStorage(this, CurrentStorageId))
-            {
-                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-            CurrentGameManager.MoveItemFromStorage(this, CurrentStorageId, storageItemIndex, amount, inventoryIndex);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerSwapOrMergeStorageItem(short fromIndex, short toIndex)
-        {
-#if !CLIENT_BUILD
-            if (this.IsDead())
-                return;
-            if (!CurrentGameManager.CanAccessStorage(this, CurrentStorageId))
-            {
-                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-            CurrentGameManager.SwapOrMergeStorageItem(this, CurrentStorageId, fromIndex, toIndex);
-#endif
-        }
-        #endregion
-
         #region Banking
         [ServerRpc]
         protected void ServerDepositGold(int amount)
@@ -1038,7 +992,7 @@ namespace MultiplayerARPG
         protected void ServerCloseStorage()
         {
 #if !CLIENT_BUILD
-            CurrentGameManager.CloseStorage(this);
+            ServerStorageHandlers.CloseStorage(this);
             CurrentStorageId = StorageId.Empty;
 #endif
         }
@@ -1366,18 +1320,18 @@ namespace MultiplayerARPG
             }
 
             StorageId storageId = new StorageId(type, ownerId);
-            if (!CurrentGameManager.CanAccessStorage(this, storageId))
+            if (!ServerStorageHandlers.CanAccessStorage(storageId, this))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
 
-            Storage storage = CurrentGameManager.GetStorage(storageId);
+            Storage storage = ServerStorageHandlers.GetStorage(storageId);
             if (!CurrentStorageId.Equals(storageId))
             {
-                CurrentGameManager.CloseStorage(this);
+                ServerStorageHandlers.CloseStorage(this);
                 CurrentStorageId = storageId;
-                CurrentGameManager.OpenStorage(this);
+                ServerStorageHandlers.OpenStorage(this);
                 CallOwnerShowStorage(type, targetEntity == null ? 0 : targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
             }
         }
