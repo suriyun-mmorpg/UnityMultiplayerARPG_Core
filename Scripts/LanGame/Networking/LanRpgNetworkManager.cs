@@ -151,7 +151,7 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity playerCharacter;
             if (this.TryGetPlayerCharacter(connectionId, out playerCharacter))
-                CloseStorage(playerCharacter);
+                CloseStorage(playerCharacter).Forget();
             base.UnregisterPlayerCharacter(connectionId);
         }
 
