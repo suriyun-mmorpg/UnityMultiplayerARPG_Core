@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         private void ReadMail()
         {
             UpdateData(null);
-            BaseGameNetworkManager.Singleton.RequestReadMail(MailId, ReadMailCallback);
+            GameInstance.ClientMailHandlers.RequestReadMail(MailId, ReadMailCallback);
         }
 
         private async UniTaskVoid ReadMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseReadMailMessage response)
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
 
         public void OnClickClaimItems()
         {
-            BaseGameNetworkManager.Singleton.RequestClaimMailItems(MailId, ClaimMailItemsCallback);
+            GameInstance.ClientMailHandlers.RequestClaimMailItems(MailId, ClaimMailItemsCallback);
         }
 
         private async UniTaskVoid ClaimMailItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimMailItemsMessage response)
@@ -134,7 +134,7 @@ namespace MultiplayerARPG
 
         public void OnClickDelete()
         {
-            BaseGameNetworkManager.Singleton.RequestDeleteMail(MailId, DeleteMailCallback);
+            GameInstance.ClientMailHandlers.RequestDeleteMail(MailId, DeleteMailCallback);
         }
 
         private async UniTaskVoid DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteMailMessage response)

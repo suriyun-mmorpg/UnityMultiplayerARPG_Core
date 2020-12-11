@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -17,6 +19,11 @@ namespace MultiplayerARPG
         public Transform uiCharacterItemContainer;
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
+
+        [Header("Options")]
+        public float autoRefreshDuration = 5f;
+
+        private float refreshCountDown = 0f;
 
         private UIList cacheItemList;
         public UIList CacheItemList
@@ -46,6 +53,7 @@ namespace MultiplayerARPG
         }
 
         public StorageType StorageType { get; private set; }
+        public string StorageOwnerId { get; private set; }
         public BaseGameEntity TargetEntity { get; private set; }
         public short WeightLimit { get; private set; }
         public short SlotLimit { get; private set; }
@@ -54,15 +62,12 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelect);
+            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelect);
+            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
+            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselect);
             if (uiItemDialog != null)
-                uiItemDialog.onHide.AddListener(OnItemDialogHide);
-            UpdateData();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onStorageItemsChange += OnStorageItemsChange;
+                uiItemDialog.onHide.AddListener(OnDialogHide);
         }
 
         protected virtual void OnDisable()
@@ -72,59 +77,14 @@ namespace MultiplayerARPG
                 BasePlayerCharacterController.OwningCharacter.CallServerCloseStorage();
             // Clear data
             StorageType = StorageType.None;
+            StorageOwnerId = string.Empty;
             TargetEntity = null;
             WeightLimit = 0;
             SlotLimit = 0;
             // Hide
             if (uiItemDialog != null)
-                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+                uiItemDialog.onHide.RemoveListener(OnDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onStorageItemsChange -= OnStorageItemsChange;
-        }
-
-        private void OnStorageItemsChange(CharacterItem[] storageItems)
-        {
-            UpdateData();
-        }
-
-        public void Show(StorageType storageType, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
-        {
-            StorageType = storageType;
-            TargetEntity = targetEntity;
-            WeightLimit = weightLimit;
-            SlotLimit = slotLimit;
-            Show();
-        }
-
-        protected void OnItemDialogHide()
-        {
-            CacheItemSelectionManager.DeselectSelectedUI();
-        }
-
-        protected void OnSelectCharacterItem(UICharacterItem ui)
-        {
-            if (ui.Data.characterItem.IsEmptySlot())
-            {
-                CacheItemSelectionManager.DeselectSelectedUI();
-                return;
-            }
-            if (uiItemDialog != null)
-            {
-                uiItemDialog.selectionManager = CacheItemSelectionManager;
-                uiItemDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, ui.IndexOfData);
-                uiItemDialog.Show();
-            }
-        }
-
-        protected void OnDeselectCharacterItem(UICharacterItem ui)
-        {
-            if (uiItemDialog != null)
-            {
-                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
-                uiItemDialog.Hide();
-                uiItemDialog.onHide.AddListener(OnItemDialogHide);
-            }
         }
 
         protected virtual void Update()
@@ -144,18 +104,74 @@ namespace MultiplayerARPG
                 else
                     uiTextSlotLimit.text = string.Format(LanguageManager.GetText(formatKeySlotLimit), UsedSlots.ToString("N0"), SlotLimit.ToString("N0"));
             }
+
+            refreshCountDown -= Time.deltaTime;
+            if (refreshCountDown <= 0)
+                Refresh();
         }
 
-        public void UpdateData()
+        public void Show(StorageType storageType, string storageOwnerId, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
         {
-            if (StorageType == StorageType.None)
+            StorageType = storageType;
+            StorageOwnerId = storageOwnerId;
+            TargetEntity = targetEntity;
+            WeightLimit = weightLimit;
+            SlotLimit = slotLimit;
+            Show();
+        }
+
+        protected void OnDialogHide()
+        {
+            CacheItemSelectionManager.DeselectSelectedUI();
+        }
+
+        protected void OnSelect(UICharacterItem ui)
+        {
+            if (ui.Data.characterItem.IsEmptySlot())
+            {
+                CacheItemSelectionManager.DeselectSelectedUI();
                 return;
+            }
+            if (uiItemDialog != null)
+            {
+                uiItemDialog.selectionManager = CacheItemSelectionManager;
+                uiItemDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, ui.IndexOfData);
+                uiItemDialog.Show();
+            }
+        }
+
+        protected void OnDeselect(UICharacterItem ui)
+        {
+            if (uiItemDialog != null)
+            {
+                uiItemDialog.onHide.RemoveListener(OnDialogHide);
+                uiItemDialog.Hide();
+                uiItemDialog.onHide.AddListener(OnDialogHide);
+            }
+        }
+
+        public void Refresh()
+        {
+            refreshCountDown = autoRefreshDuration;
+            if (BasePlayerCharacterController.OwningCharacter)
+                GameInstance.ClientStorageHandlers.RequestGetStorageItems(BasePlayerCharacterController.OwningCharacter.Id, StorageType, StorageOwnerId, GetStorageItemsCallback);
+        }
+
+        private async UniTaskVoid GetStorageItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetStorageItemsMessage response)
+        {
+            await UniTask.Yield();
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
+            if (responseCode == AckResponseCode.Unimplemented)
+                return;
+            if (responseCode == AckResponseCode.Timeout)
+                return;
+            if (StorageType == StorageType.None)
+                return;
             TotalWeight = 0;
             UsedSlots = 0;
-            IList<CharacterItem> characterItems = BasePlayerCharacterController.OwningCharacter.StorageItems;
+            List<CharacterItem> characterItems = response.storageItems;
             UICharacterItem tempUiCharacterItem;
             CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
@@ -175,7 +191,5 @@ namespace MultiplayerARPG
                     tempUiCharacterItem.OnClickSelect();
             });
         }
-
-        // TODO: Add function to 
     }
 }

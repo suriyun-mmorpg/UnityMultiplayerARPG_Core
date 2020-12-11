@@ -425,16 +425,14 @@ namespace MultiplayerARPG
                 case StorageType.Player:
                     if (uiPlayerStorageItems != null)
                     {
-                        uiPlayerStorageItems.Show(storageType, null, weightLimit, slotLimit);
-                        uiPlayerStorageItems.UpdateData();
+                        uiPlayerStorageItems.Show(storageType, BasePlayerCharacterController.OwningCharacter.Id, null, weightLimit, slotLimit);
                         AddNpcDialog(uiPlayerStorageItems);
                     }
                     break;
                 case StorageType.Guild:
                     if (uiGuildStorageItems != null)
                     {
-                        uiGuildStorageItems.Show(storageType, null, weightLimit, slotLimit);
-                        uiGuildStorageItems.UpdateData();
+                        uiGuildStorageItems.Show(storageType, BasePlayerCharacterController.OwningCharacter.GuildId.ToString(), null, weightLimit, slotLimit);
                         AddNpcDialog(uiGuildStorageItems);
                     }
                     break;
@@ -447,8 +445,7 @@ namespace MultiplayerARPG
                     {
                         if (uiBuildingCampfireItems != null)
                         {
-                            uiBuildingCampfireItems.Show(storageType, buildingEntity, weightLimit, slotLimit);
-                            uiBuildingCampfireItems.UpdateData();
+                            uiBuildingCampfireItems.Show(storageType, buildingEntity.Id, buildingEntity, weightLimit, slotLimit);
                             AddNpcDialog(uiBuildingCampfireItems);
                         }
                     }
@@ -456,8 +453,7 @@ namespace MultiplayerARPG
                     {
                         if (uiBuildingStorageItems != null)
                         {
-                            uiBuildingStorageItems.Show(storageType, buildingEntity, weightLimit, slotLimit);
-                            uiBuildingStorageItems.UpdateData();
+                            uiBuildingStorageItems.Show(storageType, buildingEntity.Id, buildingEntity, weightLimit, slotLimit);
                             AddNpcDialog(uiBuildingStorageItems);
                         }
                     }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using UnityEngine;
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
@@ -150,7 +151,7 @@ namespace MultiplayerARPG
             if (CashPackages.TryGetValue(dataId, out package))
             {
                 // Connect to server to precess purchasing
-                BaseGameNetworkManager.Singleton.RequestCashPackageBuyValidation(dataId, args.purchasedProduct.receipt, ResponseCashPackageBuyValidation);
+                ClientCashShopHandlers.RequestCashPackageBuyValidation(dataId, args.purchasedProduct.receipt, ResponseCashPackageBuyValidation);
             }
             else
             {
@@ -163,19 +164,19 @@ namespace MultiplayerARPG
             return PurchaseProcessingResult.Pending;
         }
 
-        private void ResponseCashPackageBuyValidation(AckResponseCode responseCode, BaseAckMessage message)
+        private async UniTaskVoid ResponseCashPackageBuyValidation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageBuyValidationMessage response)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Timeout)
             {
                 PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            var castedMessage = message as ResponseCashPackageBuyValidationMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     var errorMessage = string.Empty;
-                    switch (castedMessage.error)
+                    switch (response.error)
                     {
                         case ResponseCashPackageBuyValidationMessage.Error.UserNotFound:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());
@@ -188,7 +189,7 @@ namespace MultiplayerARPG
                     break;
                 default:
                     CashPackage package;
-                    if (CashPackages.TryGetValue(castedMessage.dataId, out package))
+                    if (CashPackages.TryGetValue(response.dataId, out package))
                     {
                         StoreController.ConfirmPendingPurchase(package.ProductData);
                         PurchaseResult(true);

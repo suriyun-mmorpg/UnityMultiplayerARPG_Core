@@ -30,6 +30,8 @@ namespace MultiplayerARPG
 
         public static BasePlayerCharacterController Singleton { get; protected set; }
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
+        public static StorageType OwningCurrentStorageType { get { return Singleton == null ? StorageType.None : Singleton.CurrentStorageType; } }
+        public static string OwningCurrentStorageOwnerId { get { return Singleton == null ? string.Empty : Singleton.CurrentStorageOwnerId; } }
 
         public System.Action<BasePlayerCharacterController> onSetup;
         public System.Action<BasePlayerCharacterController> onDesetup;
@@ -48,6 +50,16 @@ namespace MultiplayerARPG
                     Setup(playerCharacterEntity);
                 }
             }
+        }
+
+        public virtual StorageType CurrentStorageType
+        {
+            get { return PlayerCharacterEntity.CurrentStorageId.storageType; }
+        }
+
+        public virtual string CurrentStorageOwnerId
+        {
+            get { return PlayerCharacterEntity.CurrentStorageId.storageOwnerId; }
         }
 
         public Transform CameraTargetTransform

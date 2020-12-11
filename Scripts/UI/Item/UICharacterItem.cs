@@ -1226,7 +1226,10 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacter.CallServerMoveItemToStorage((short)IndexOfData, 1, -1);
+                string characterId = BasePlayerCharacterController.OwningCharacter.Id;
+                StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
+                string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+                GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(characterId, storageType, storageOwnerId, (short)IndexOfData, 1, -1, UIStorageResponses.ResponseMoveItemToStorage);
             }
             else
             {
@@ -1241,7 +1244,10 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacter.CallServerMoveItemToStorage((short)IndexOfData, (short)amount, -1);
+            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
+            StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
+            string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+            GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(characterId, storageType, storageOwnerId, (short)IndexOfData, (short)amount, -1, UIStorageResponses.ResponseMoveItemToStorage);
         }
         #endregion
 
@@ -1256,7 +1262,10 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacter.CallServerMoveItemFromStorage((short)IndexOfData, 1, -1);
+                string characterId = BasePlayerCharacterController.OwningCharacter.Id;
+                StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
+                string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+                GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(characterId, storageType, storageOwnerId, (short)IndexOfData, 1, -1, UIStorageResponses.ResponseMoveItemFromStorage);
             }
             else
             {
@@ -1271,7 +1280,10 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacter.CallServerMoveItemFromStorage((short)IndexOfData, (short)amount, -1);
+            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
+            StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
+            string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+            GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(characterId, storageType, storageOwnerId, (short)IndexOfData, (short)amount, -1, UIStorageResponses.ResponseMoveItemFromStorage);
         }
         #endregion
 

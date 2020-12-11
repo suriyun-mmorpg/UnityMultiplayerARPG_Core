@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         public void RefreshCashShopInfo()
         {
             // Load cash shop item list
-            BaseGameNetworkManager.Singleton.RequestCashShopInfo(ResponseCashShopInfo);
+            GameInstance.ClientCashShopHandlers.RequestCashShopInfo(ResponseCashShopInfo);
         }
 
         protected virtual void OnEnable()
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
 
         public void Buy(int dataId)
         {
-            BaseGameNetworkManager.Singleton.RequestCashShopBuy(dataId, ResponseCashShopBuy);
+            GameInstance.ClientCashShopHandlers.RequestCashShopBuy(dataId, ResponseCashShopBuy);
         }
 
         private async UniTaskVoid ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)

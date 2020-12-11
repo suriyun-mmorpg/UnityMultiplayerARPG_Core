@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         public void RefreshCashPackageInfo()
         {
             // Load cash shop item list
-            BaseGameNetworkManager.Singleton.RequestCashPackageInfo(ResponseCashPackageInfo);
+            GameInstance.ClientCashShopHandlers.RequestCashPackageInfo(ResponseCashPackageInfo);
         }
 
         protected virtual void OnEnable()

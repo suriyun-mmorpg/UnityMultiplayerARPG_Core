@@ -61,7 +61,9 @@ namespace MultiplayerARPG
         {
             // Set UI drop state
             draggedItemUI.isDropped = true;
-
+            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
+            StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
+            string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -76,7 +78,7 @@ namespace MultiplayerARPG
                     break;
                 case InventoryType.StorageItems:
                     // Drop non equip item to storage item
-                    BasePlayerCharacterController.OwningCharacter.CallServerMoveItemToStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
+                    GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(characterId, storageType, storageOwnerId, (short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData, UIStorageResponses.ResponseMoveItemToStorage);
                     break;
             }
         }
@@ -85,16 +87,18 @@ namespace MultiplayerARPG
         {
             // Set UI drop state
             draggedItemUI.isDropped = true;
-
+            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
+            StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
+            string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
                     // Drop storage item to non equip item
-                    BasePlayerCharacterController.OwningCharacter.CallServerMoveItemFromStorage((short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData);
+                    GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(characterId, storageType, storageOwnerId, (short)draggedItemUI.uiCharacterItem.IndexOfData, draggedItemUI.uiCharacterItem.CharacterItem.amount, (short)uiCharacterItem.IndexOfData, UIStorageResponses.ResponseMoveItemFromStorage);
                     break;
                 case InventoryType.StorageItems:
                     // Drop storage item to storage item
-                    BasePlayerCharacterController.OwningCharacter.CallServerSwapOrMergeStorageItem((short)draggedItemUI.uiCharacterItem.IndexOfData, (short)uiCharacterItem.IndexOfData);
+                    GameInstance.ClientStorageHandlers.RequestSwapOrMergeStorageItem(characterId, storageType, storageOwnerId, (short)draggedItemUI.uiCharacterItem.IndexOfData, (short)uiCharacterItem.IndexOfData, UIStorageResponses.ResponseSwapOrMergeStorageItem);
                     break;
             }
         }

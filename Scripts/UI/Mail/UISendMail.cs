@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                 inputContent.interactable = false;
             if (inputGold != null)
                 inputGold.interactable = false;
-            BaseGameNetworkManager.Singleton.RequestSendMail(
+            GameInstance.ClientMailHandlers.RequestSendMail(
                 ReceiverName,
                 Title,
                 Content,

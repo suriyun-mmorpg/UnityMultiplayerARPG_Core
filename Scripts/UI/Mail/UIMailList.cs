@@ -44,12 +44,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Refresh()
-        {
-            refreshCountDown = autoRefreshDuration;
-            BaseGameNetworkManager.Singleton.RequestMailList(onlyNewMails, MailListCallback);
-        }
-
         protected virtual void OnEnable()
         {
             CacheSelectionManager.eventOnSelect.RemoveListener(OnSelect);
@@ -100,18 +94,22 @@ namespace MultiplayerARPG
             }
         }
 
+        public void Refresh()
+        {
+            refreshCountDown = autoRefreshDuration;
+            GameInstance.ClientMailHandlers.RequestMailList(onlyNewMails, MailListCallback);
+        }
+
         private async UniTaskVoid MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Timeout)
-            {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
-                return;
-            }
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
-
+            if (responseCode == AckResponseCode.Unimplemented)
+                return;
+            if (responseCode == AckResponseCode.Timeout)
+                return;
             UIMailListEntry tempUi;
             CacheList.Generate(response.mails, (index, mailListEntry, ui) =>
             {
