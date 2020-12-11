@@ -205,7 +205,6 @@ namespace MultiplayerARPG
         {
             this.character = character;
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
-            CacheItemSelectionManager.DeselectSelectedUI();
             // Clear slots data
             UICharacterItem equipSlot;
             foreach (string equipPosition in CacheEquipItemSlots.Keys)
@@ -219,7 +218,8 @@ namespace MultiplayerARPG
 
             CharacterItem tempEquipItem;
             IArmorItem tempArmorItem;
-            UICharacterItem tempSlot;
+            UICharacterItem selectedUI = null;
+            UICharacterItem tempUI;
             int i;
             for (i = 0; i < character.EquipItems.Count; ++i)
             {
@@ -228,12 +228,25 @@ namespace MultiplayerARPG
                 if (tempArmorItem == null)
                     continue;
 
-                if (CacheEquipItemSlots.TryGetValue(GetEquipPosition(tempArmorItem.EquipPosition, tempEquipItem.equipSlotIndex), out tempSlot))
+                if (CacheEquipItemSlots.TryGetValue(GetEquipPosition(tempArmorItem.EquipPosition, tempEquipItem.equipSlotIndex), out tempUI))
                 {
-                    tempSlot.Setup(new UICharacterItemData(tempEquipItem, InventoryType.EquipItems), character, i);
+                    tempUI.Setup(new UICharacterItemData(tempEquipItem, InventoryType.EquipItems), character, i);
                     if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(tempEquipItem.id))
-                        tempSlot.OnClickSelect();
+                        selectedUI = tempUI;
                 }
+            }
+            if (selectedUI == null)
+            {
+                CacheItemSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                bool defaultDontShowComparingEquipments = uiItemDialog != null ? uiItemDialog.dontShowComparingEquipments : false;
+                if (uiItemDialog != null)
+                    uiItemDialog.dontShowComparingEquipments = true;
+                selectedUI.OnClickSelect();
+                if (uiItemDialog != null)
+                    uiItemDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
             }
 
             for (i = 0; i < character.SelectableWeaponSets.Count; ++i)

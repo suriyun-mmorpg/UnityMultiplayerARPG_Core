@@ -161,35 +161,50 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
-            CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
-            if (responseCode == AckResponseCode.Unimplemented)
+            if (responseCode == AckResponseCode.Unimplemented ||
+                responseCode == AckResponseCode.Timeout ||
+                StorageType == StorageType.None)
+            {
+                if (uiItemDialog != null)
+                    uiItemDialog.Hide();
+                CacheItemList.HideAll();
                 return;
-            if (responseCode == AckResponseCode.Timeout)
-                return;
-            if (StorageType == StorageType.None)
-                return;
+            }
             TotalWeight = 0;
             UsedSlots = 0;
-            List<CharacterItem> characterItems = response.storageItems;
-            UICharacterItem tempUiCharacterItem;
-            CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
+            UICharacterItem selectedUI = null;
+            UICharacterItem tempUI;
+            CacheItemList.Generate(response.storageItems, (index, characterItem, ui) =>
             {
-                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
-                tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
-                tempUiCharacterItem.Show();
+                tempUI = ui.GetComponent<UICharacterItem>();
+                tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
+                tempUI.Show();
                 if (characterItem.NotEmptySlot())
                 {
                     TotalWeight += characterItem.GetItem().Weight * characterItem.amount;
                     UsedSlots++;
                 }
-                UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
+                UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
-                    dragHandler.SetupForStorageItems(tempUiCharacterItem);
-                CacheItemSelectionManager.Add(tempUiCharacterItem);
+                    dragHandler.SetupForStorageItems(tempUI);
+                CacheItemSelectionManager.Add(tempUI);
                 if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
-                    tempUiCharacterItem.OnClickSelect();
+                    selectedUI = tempUI;
             });
+            if (selectedUI == null)
+            {
+                CacheItemSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                bool defaultDontShowComparingEquipments = uiItemDialog != null ? uiItemDialog.dontShowComparingEquipments : false;
+                if (uiItemDialog != null)
+                    uiItemDialog.dontShowComparingEquipments = true;
+                selectedUI.OnClickSelect();
+                if (uiItemDialog != null)
+                    uiItemDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
+            }
         }
     }
 }

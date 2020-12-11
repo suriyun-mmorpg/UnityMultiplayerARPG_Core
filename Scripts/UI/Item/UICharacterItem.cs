@@ -151,6 +151,7 @@ namespace MultiplayerARPG
         public bool showAmountWhenMaxIsOne;
         public bool showLevelAsDefault;
         public bool dontAppendRefineLevelToTitle;
+        public bool dontShowComparingEquipments;
 
         private bool isSellItemDialogAppeared;
         private bool isRefineItemDialogAppeared;
@@ -775,7 +776,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiComparingEquipments != null)
+            if (uiComparingEquipments != null && !dontShowComparingEquipments)
             {
                 foreach (UICharacterItem uiComparingEquipment in uiComparingEquipments)
                 {

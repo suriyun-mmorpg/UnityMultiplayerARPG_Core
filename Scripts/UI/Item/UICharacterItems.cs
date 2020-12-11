@@ -96,21 +96,23 @@ namespace MultiplayerARPG
         {
             Character = character;
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
-            CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
             if (character == null || characterItems == null || characterItems.Count == 0)
             {
+                if (uiItemDialog != null)
+                    uiItemDialog.Hide();
                 CacheItemList.HideAll();
                 return;
             }
 
             // Filter items to show by specific item types
             BaseItem tempItem;
-            UICharacterItem tempUiCharacterItem;
+            UICharacterItem selectedUI = null;
+            UICharacterItem tempUI;
             CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
-                tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
+                tempUI = ui.GetComponent<UICharacterItem>();
                 tempItem = characterItem.GetItem();
                 if (!GameInstance.Singleton.IsLimitInventorySlot ||
                     (filterCategories != null && filterCategories.Count > 0) ||
@@ -119,7 +121,7 @@ namespace MultiplayerARPG
                     // If inventory type isn't limit inventory slot, hide empty slot
                     if (tempItem == null)
                     {
-                        tempUiCharacterItem.Hide();
+                        tempUI.Hide();
                         return;
                     }
                 }
@@ -132,25 +134,38 @@ namespace MultiplayerARPG
                     if (filterItemTypes == null || filterItemTypes.Count == 0 ||
                         filterItemTypes.Contains(tempItem.ItemType))
                     {
-                        tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), Character, index);
-                        tempUiCharacterItem.Show();
-                        UICharacterItemDragHandler dragHandler = tempUiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
+                        tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), Character, index);
+                        tempUI.Show();
+                        UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                         if (dragHandler != null)
-                            dragHandler.SetupForNonEquipItems(tempUiCharacterItem);
-                        CacheItemSelectionManager.Add(tempUiCharacterItem);
+                            dragHandler.SetupForNonEquipItems(tempUI);
+                        CacheItemSelectionManager.Add(tempUI);
                         if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
-                            tempUiCharacterItem.OnClickSelect();
+                            selectedUI = tempUI;
                     }
                     else
                     {
-                        tempUiCharacterItem.Hide();
+                        tempUI.Hide();
                     }
                 }
                 else
                 {
-                    tempUiCharacterItem.Hide();
+                    tempUI.Hide();
                 }
             });
+            if (selectedUI == null)
+            {
+                CacheItemSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                bool defaultDontShowComparingEquipments = uiItemDialog != null ? uiItemDialog.dontShowComparingEquipments : false;
+                if (uiItemDialog != null)
+                    uiItemDialog.dontShowComparingEquipments = true;
+                selectedUI.OnClickSelect();
+                if (uiItemDialog != null)
+                    uiItemDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
+            }
         }
 
         protected virtual void Update()
