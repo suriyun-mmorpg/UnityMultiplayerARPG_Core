@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<long>> usingStorageCharacters = new Dictionary<StorageId, HashSet<long>>();
 
-        public void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
+        public async UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (!CanAccessStorage(playerCharacterEntity.CurrentStorageId, playerCharacterEntity))
             {
@@ -18,12 +18,14 @@ namespace MultiplayerARPG
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<long>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ConnectionId);
+            await UniTask.Yield();
         }
 
-        public void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
+        public async UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ConnectionId);
+            await UniTask.Yield();
         }
 
         public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
