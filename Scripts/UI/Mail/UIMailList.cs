@@ -106,9 +106,8 @@ namespace MultiplayerARPG
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
-            if (responseCode == AckResponseCode.Unimplemented)
-                return;
-            if (responseCode == AckResponseCode.Timeout)
+            if (responseCode == AckResponseCode.Unimplemented ||
+                responseCode == AckResponseCode.Timeout)
                 return;
             UIMailListEntry tempUi;
             CacheList.Generate(response.mails, (index, mailListEntry, ui) =>
