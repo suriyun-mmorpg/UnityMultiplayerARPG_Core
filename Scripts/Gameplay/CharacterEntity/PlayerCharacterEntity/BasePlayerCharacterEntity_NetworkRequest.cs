@@ -566,9 +566,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallOwnerShowStorage(StorageType type, uint objectId, short weightLimit, short slotLimit)
+        public bool CallOwnerShowStorage(StorageType type, string ownerId, uint objectId, short weightLimit, short slotLimit)
         {
-            RPC(TargetShowStorage, ConnectionId, type, objectId, weightLimit, slotLimit);
+            RPC(TargetShowStorage, ConnectionId, type, ownerId, objectId, weightLimit, slotLimit);
             return true;
         }
 

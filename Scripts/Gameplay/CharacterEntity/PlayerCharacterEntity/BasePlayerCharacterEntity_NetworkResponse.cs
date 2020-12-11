@@ -232,10 +232,10 @@ namespace MultiplayerARPG
         }
 
         [TargetRpc]
-        protected void TargetShowStorage(StorageType type, uint objectId, short weightLimit, short slotLimit)
+        protected void TargetShowStorage(StorageType type, string ownerId, uint objectId, short weightLimit, short slotLimit)
         {
             if (onShowStorage != null)
-                onShowStorage.Invoke(type, objectId, weightLimit, slotLimit);
+                onShowStorage.Invoke(type, ownerId, objectId, weightLimit, slotLimit);
         }
 
         private bool VerifyDismantleItem(short index, short amount, List<CharacterItem> simulatingNonEquipItems, out int returningGold, out List<ItemAmount> returningItems)
@@ -1332,7 +1332,7 @@ namespace MultiplayerARPG
                 ServerStorageHandlers.CloseStorage(this);
                 CurrentStorageId = storageId;
                 ServerStorageHandlers.OpenStorage(this);
-                CallOwnerShowStorage(type, targetEntity == null ? 0 : targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
+                CallOwnerShowStorage(type, ownerId, targetEntity == null ? 0 : targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
             }
         }
     }

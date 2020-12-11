@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
         public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
         // Storage dialog events
-        public System.Action<StorageType, uint, short, short> onShowStorage;
+        public System.Action<StorageType, string, uint, short, short> onShowStorage;
         // Sync variables
         public System.Action<int> onDataIdChange;
         public System.Action<int> onFactionIdChange;

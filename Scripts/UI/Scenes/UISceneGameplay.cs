@@ -408,7 +408,7 @@ namespace MultiplayerARPG
             uiGuildInvitation.Show();
         }
 
-        public void OnShowStorage(StorageType storageType, uint objectId, short weightLimit, short slotLimit)
+        public void OnShowStorage(StorageType storageType, string storageOWnerId, uint objectId, short weightLimit, short slotLimit)
         {
             // Hide all of storage UIs
             if (uiPlayerStorageItems != null)
@@ -425,14 +425,14 @@ namespace MultiplayerARPG
                 case StorageType.Player:
                     if (uiPlayerStorageItems != null)
                     {
-                        uiPlayerStorageItems.Show(storageType, BasePlayerCharacterController.OwningCharacter.Id, null, weightLimit, slotLimit);
+                        uiPlayerStorageItems.Show(storageType, storageOWnerId, null, weightLimit, slotLimit);
                         AddNpcDialog(uiPlayerStorageItems);
                     }
                     break;
                 case StorageType.Guild:
                     if (uiGuildStorageItems != null)
                     {
-                        uiGuildStorageItems.Show(storageType, BasePlayerCharacterController.OwningCharacter.GuildId.ToString(), null, weightLimit, slotLimit);
+                        uiGuildStorageItems.Show(storageType, storageOWnerId, null, weightLimit, slotLimit);
                         AddNpcDialog(uiGuildStorageItems);
                     }
                     break;
@@ -445,7 +445,7 @@ namespace MultiplayerARPG
                     {
                         if (uiBuildingCampfireItems != null)
                         {
-                            uiBuildingCampfireItems.Show(storageType, buildingEntity.Id, buildingEntity, weightLimit, slotLimit);
+                            uiBuildingCampfireItems.Show(storageType, storageOWnerId, buildingEntity, weightLimit, slotLimit);
                             AddNpcDialog(uiBuildingCampfireItems);
                         }
                     }
@@ -453,7 +453,7 @@ namespace MultiplayerARPG
                     {
                         if (uiBuildingStorageItems != null)
                         {
-                            uiBuildingStorageItems.Show(storageType, buildingEntity.Id, buildingEntity, weightLimit, slotLimit);
+                            uiBuildingStorageItems.Show(storageType, storageOWnerId, buildingEntity, weightLimit, slotLimit);
                             AddNpcDialog(uiBuildingStorageItems);
                         }
                     }
