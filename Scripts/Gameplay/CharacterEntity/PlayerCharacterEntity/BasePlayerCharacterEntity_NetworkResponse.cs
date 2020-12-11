@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        protected IServerStorageHandlers ServerStorageHandlers { get { return CurrentGameInstance as IServerStorageHandlers; } }
+        protected IServerStorageHandlers ServerStorageHandlers { get { return CurrentGameManager as IServerStorageHandlers; } }
 
         [ServerRpc]
         protected void ServerSwapOrMergeItem(short fromIndex, short toIndex)

@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         private bool dirtyIsOpen;
         public override bool Activatable { get { return true; } }
         public override bool Lockable { get { return lockable; } }
-        protected IServerStorageHandlers ServerStorageHandlers { get { return CurrentGameInstance as IServerStorageHandlers; } }
+        protected IServerStorageHandlers ServerStorageHandlers { get { return CurrentGameManager as IServerStorageHandlers; } }
 
         public override void OnSetup()
         {
