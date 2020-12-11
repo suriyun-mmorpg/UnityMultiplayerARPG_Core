@@ -9,6 +9,8 @@ namespace MultiplayerARPG
             None,
             NotAvailable,
             NotAllowed,
+            CharacterNotFound,
+            InvalidItemIndex,
             InternalServerError,
         }
         public Error error;

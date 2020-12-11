@@ -413,9 +413,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool IsCreator(BasePlayerCharacterEntity playerCharacterEntity)
+        public bool IsCreator(IPlayerCharacterData playerCharacter)
         {
-            return CreatorId.Equals(playerCharacterEntity.Id);
+            return IsCreator(playerCharacter.Id);
+        }
+
+        public bool IsCreator(string playerCharacterId)
+        {
+            return CreatorId.Equals(playerCharacterId);
         }
     }
 }

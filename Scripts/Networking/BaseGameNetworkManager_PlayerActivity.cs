@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameNetworkManager
+    public partial class BaseGameNetworkManager
     {
         #region Activity validation functions
         public virtual bool CanWarpCharacter(BasePlayerCharacterEntity playerCharacterEntity)
@@ -553,7 +553,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity memberCharacterEntity;
-            if (PlayerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
+            if (this.TryGetPlayerCharacterById(characterId, out memberCharacterEntity))
             {
                 memberCharacterEntity.ClearParty();
                 SendPartyTerminateToClient(memberCharacterEntity.ConnectionId, partyId);
@@ -575,7 +575,7 @@ namespace MultiplayerARPG
                 foreach (string memberId in party.GetMemberIds())
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
-                    if (PlayerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                    if (this.TryGetPlayerCharacterById(memberId, out memberCharacterEntity))
                     {
                         memberCharacterEntity.ClearParty();
                         SendPartyTerminateToClient(memberCharacterEntity.ConnectionId, partyId);
@@ -619,7 +619,7 @@ namespace MultiplayerARPG
             guild.SetLeader(characterId);
             Guilds[guildId] = guild;
             BasePlayerCharacterEntity targetCharacterEntity;
-            if (TryGetPlayerCharacterById(characterId, out targetCharacterEntity))
+            if (this.TryGetPlayerCharacterById(characterId, out targetCharacterEntity))
                 targetCharacterEntity.GuildRole = guild.GetMemberRole(targetCharacterEntity.Id);
             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
             SendChangeGuildLeaderToClients(guild);
@@ -650,7 +650,7 @@ namespace MultiplayerARPG
             foreach (string memberId in guild.GetMemberIds())
             {
                 BasePlayerCharacterEntity memberCharacterEntity;
-                if (PlayerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                if (this.TryGetPlayerCharacterById(memberId, out memberCharacterEntity))
                     memberCharacterEntity.GuildRole = guild.GetMemberRole(memberCharacterEntity.Id);
             }
             SendSetGuildRoleToClients(guild, guildRole, roleName, canInvite, canKick, shareExpPercentage);
@@ -666,7 +666,7 @@ namespace MultiplayerARPG
             guild.SetMemberRole(characterId, guildRole);
             Guilds[guildId] = guild;
             BasePlayerCharacterEntity memberCharacterEntity;
-            if (TryGetPlayerCharacterById(characterId, out memberCharacterEntity))
+            if (this.TryGetPlayerCharacterById(characterId, out memberCharacterEntity))
                 memberCharacterEntity.GuildRole = guild.GetMemberRole(memberCharacterEntity.Id);
             SendSetGuildMemberRoleToClients(guild, characterId, guildRole);
         }
@@ -700,7 +700,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity memberCharacterEntity;
-            if (PlayerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
+            if (this.TryGetPlayerCharacterById(characterId, out memberCharacterEntity))
             {
                 memberCharacterEntity.ClearGuild();
                 SendGuildTerminateToClient(memberCharacterEntity.ConnectionId, guildId);
@@ -722,7 +722,7 @@ namespace MultiplayerARPG
                 foreach (string memberId in guild.GetMemberIds())
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
-                    if (PlayerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                    if (this.TryGetPlayerCharacterById(memberId, out memberCharacterEntity))
                     {
                         memberCharacterEntity.ClearGuild();
                         SendGuildTerminateToClient(memberCharacterEntity.ConnectionId, guildId);
@@ -810,49 +810,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public Storage GetStorage(StorageId storageId)
-        {
-            Storage storage = default(Storage);
-            switch (storageId.storageType)
-            {
-                case StorageType.Player:
-                    storage = CurrentGameInstance.playerStorage;
-                    break;
-                case StorageType.Guild:
-                    storage = CurrentGameInstance.guildStorage;
-                    break;
-                case StorageType.Building:
-                    StorageEntity buildingEntity;
-                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
-                        storage = buildingEntity.storage;
-                    break;
-            }
-            return storage;
-        }
-
-        public bool CanAccessStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId)
-        {
-            switch (storageId.storageType)
-            {
-                case StorageType.Player:
-                    if (!playerCharacterEntity.UserId.Equals(storageId.storageOwnerId))
-                        return false;
-                    break;
-                case StorageType.Guild:
-                    if (!Guilds.ContainsKey(playerCharacterEntity.GuildId) ||
-                        !playerCharacterEntity.GuildId.ToString().Equals(storageId.storageOwnerId))
-                        return false;
-                    break;
-                case StorageType.Building:
-                    StorageEntity buildingEntity;
-                    if (!TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity) ||
-                        !(buildingEntity.IsCreator(playerCharacterEntity) || buildingEntity.canUseByEveryone))
-                        return false;
-                    break;
-            }
-            return true;
-        }
-
         /// <summary>
         /// Create Party
         /// </summary>
@@ -867,78 +824,6 @@ namespace MultiplayerARPG
         /// <param name="playerCharacterEntity">Character who create the guild</param>
         /// <param name="guildName">Guild name</param>
         public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
-
-        /// <summary>
-        /// Open storage
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who open the storage</param>
-        public abstract void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity);
-
-        /// <summary>
-        /// Close storage
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who close the storage</param>
-        public abstract void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity);
-
-        /// <summary>
-        /// Move item to storage
-        /// </summary>
-        /// <param name="playerCharacter">Character who move item from inventory to storage</param>
-        /// <param name="storageId">Storage id</param>
-        /// <param name="inventoryIndex">Index of inventory</param>
-        /// <param name="amount">Amount of item</param>
-        /// <param name="storageItemIndex">Index of storage</param>
-        public abstract void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short inventoryIndex, short amount, short storageItemIndex);
-
-        /// <summary>
-        /// Move item from storage
-        /// </summary>
-        /// <param name="playerCharacter">Character who move item from storage to inventory</param>
-        /// <param name="storageId">Storage id</param>
-        /// <param name="storageItemIndex">Index of storage</param>
-        /// <param name="amount">Amount of item</param>
-        /// <param name="inventoryIndex">Index of inventory</param>
-        public abstract void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, short inventoryIndex);
-
-        /// <summary>
-        /// Increase items to storage
-        /// </summary>
-        /// <param name="playerCharacterEntity"></param>
-        /// <param name="storageId"></param>
-        /// <param name="addingItem"></param>
-        public abstract void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, System.Action<bool> callback);
-
-        /// <summary>
-        /// Decrease items from storage
-        /// </summary>
-        /// <param name="storageId"></param>
-        /// <param name="dataId"></param>
-        /// <param name="amount"></param>
-        /// <param name="decreaseItems"></param>
-        public abstract void DecreaseStorageItems(StorageId storageId, int dataId, short amount, System.Action<bool, Dictionary<int, short>> callback);
-
-        /// <summary>
-        /// Swap or merge storage item
-        /// </summary>
-        /// <param name="playerCharacter"></param>
-        /// <param name="storageId">Storage id</param>
-        /// <param name="storageItemIndex">Index of storage</param>
-        /// <param name="nonEquipIndex">Index of inventory</param>
-        public abstract void SwapOrMergeStorageItem(IPlayerCharacterData playerCharacter, StorageId storageId, short fromIndex, short toIndex);
-
-        /// <summary>
-        /// Check if storage entity is opened or not
-        /// </summary>
-        /// <param name="storageEntity">Checking storage entity</param>
-        /// <returns></returns>
-        public abstract bool IsStorageEntityOpen(StorageEntity storageEntity);
-
-        /// <summary>
-        /// Get items from storage entity
-        /// </summary>
-        /// <param name="storageEntity"></param>
-        /// <returns></returns>
-        public abstract List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity);
 
         /// <summary>
         /// Deposit gold

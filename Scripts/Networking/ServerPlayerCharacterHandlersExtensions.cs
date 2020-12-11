@@ -1,0 +1,46 @@
+﻿using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    public static class ServerPlayerCharacterHandlersExtensions
+    {
+        public static bool TryGetPlayerCharacter<T>(this IServerPlayerCharacterHandlers handlers, long connectionId, out T playerCharacter)
+            where T : Component, IPlayerCharacterData
+        {
+            playerCharacter = null;
+            IPlayerCharacterData result;
+            if (handlers.TryGetPlayerCharacter(connectionId, out result))
+            {
+                playerCharacter = result as T;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryGetPlayerCharacterById<T>(this IServerPlayerCharacterHandlers handlers, string id, out T playerCharacter)
+            where T : Component, IPlayerCharacterData
+        {
+            playerCharacter = null;
+            IPlayerCharacterData result;
+            if (handlers.TryGetPlayerCharacterById(id, out result))
+            {
+                playerCharacter = result as T;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryGetPlayerCharacterByName<T>(this IServerPlayerCharacterHandlers handlers, string name, out T playerCharacter)
+            where T : Component, IPlayerCharacterData
+        {
+            playerCharacter = null;
+            IPlayerCharacterData result;
+            if (handlers.TryGetPlayerCharacterByName(name, out result))
+            {
+                playerCharacter = result as T;
+                return true;
+            }
+            return false;
+        }
+    }
+}

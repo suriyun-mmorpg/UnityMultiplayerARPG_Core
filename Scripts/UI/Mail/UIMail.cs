@@ -106,7 +106,7 @@ namespace MultiplayerARPG
                         case ResponseClaimMailItemsMessage.Error.AlreadyClaimed:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED.ToString());
                             break;
-                        case ResponseClaimMailItemsMessage.Error.CannotCarry:
+                        case ResponseClaimMailItemsMessage.Error.CannotCarryAllItems:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_CLAIM_CANNOT_CARRY.ToString());
                             break;
                     }

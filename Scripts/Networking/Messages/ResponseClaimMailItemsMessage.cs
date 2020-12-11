@@ -10,7 +10,7 @@ namespace MultiplayerARPG
             NotAvailable,
             NotAllowed,
             AlreadyClaimed,
-            CannotCarry,
+            CannotCarryAllItems,
             InternalServerError,
         }
         public Error error;

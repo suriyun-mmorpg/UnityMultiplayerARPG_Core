@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 using LiteNetLib;
@@ -9,7 +8,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
-    public partial class LanRpgNetworkManager : BaseGameNetworkManager
+    public partial class LanRpgNetworkManager : BaseGameNetworkManager, IServerStorageHandlers
     {
         public enum GameStartType
         {
@@ -32,8 +31,6 @@ namespace MultiplayerARPG
         private int nextPartyId = 1;
         private int nextGuildId = 1;
         private Vector3? teleportPosition;
-        private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
-        private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         private readonly Dictionary<long, PlayerCharacterData> pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
 
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
@@ -43,16 +40,28 @@ namespace MultiplayerARPG
         {
             base.Awake();
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
+            CashShopRequestHandlers = InitCashShopMessageHandlers();
+            CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
+            MailRequestHandlers = InitMailMessageHandlers();
+            MailRequestHandlers.ServerPlayerCharacterHandlers = this;
+            StorageRequestHandlers = InitStorageMessageHandlers();
+            StorageRequestHandlers.ServerPlayerCharacterHandlers = this;
+            StorageRequestHandlers.ServerStorageHandlers = this;
         }
 
-        protected override ICashShopMessageHandlers InitCashShopMessageHandlers()
+        protected ICashShopMessageHandlers InitCashShopMessageHandlers()
         {
             return gameObject.GetOrAddComponent<ICashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
         }
 
-        protected override IMailMessageHandlers InitMailMessageHandlers()
+        protected IMailMessageHandlers InitMailMessageHandlers()
         {
             return gameObject.GetOrAddComponent<IMailMessageHandlers, LanRpgMailMessageHandlers>();
+        }
+
+        protected IStorageMessageHandlers InitStorageMessageHandlers()
+        {
+            return gameObject.GetOrAddComponent<IStorageMessageHandlers, LanRpgStorageMessageHandlers>();
         }
 
         public void StartGame()
@@ -138,6 +147,14 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void UnregisterPlayerCharacter(long connectionId)
+        {
+            BasePlayerCharacterEntity playerCharacter;
+            if (this.TryGetPlayerCharacter(connectionId, out playerCharacter))
+                CloseStorage(playerCharacter);
+            base.UnregisterPlayerCharacter(connectionId);
+        }
+
         protected override void Clean()
         {
             base.Clean();
@@ -201,7 +218,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.UserLevel = 1;
 
             // Load data for first character (host)
-            if (PlayerCharacters.Count == 0)
+            if (PlayerCharactersCount == 0)
             {
                 if (enableGmCommands == EnableGmCommandType.HostOnly)
                     playerCharacterEntity.UserLevel = 1;
@@ -288,7 +305,6 @@ namespace MultiplayerARPG
             long connectionId = playerCharacterEntity.ConnectionId;
             BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
-                PlayerCharacters.ContainsKey(connectionId) &&
                 playerCharacterEntity.IsServer &&
                 playerCharacterEntity.IsOwnerClient &&
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
@@ -334,255 +350,6 @@ namespace MultiplayerARPG
         public override void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
             CreateGuild(playerCharacterEntity, guildName, nextGuildId++);
-        }
-
-        public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
-            {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-            if (!storageItems.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                storageItems[playerCharacterEntity.CurrentStorageId] = new List<CharacterItem>();
-            if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
-            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
-            // Prepare storage data
-            Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
-            storageItems[playerCharacterEntity.CurrentStorageId].FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage items
-            playerCharacterEntity.StorageItems = storageItems[playerCharacterEntity.CurrentStorageId].ToArray();
-        }
-
-        public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
-            playerCharacterEntity.StorageItems = new CharacterItem[0];
-        }
-
-        public override void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short inventoryIndex, short amount, short storageItemIndex)
-        {
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
-            List<CharacterItem> storageItemList = storageItems[storageId];
-            if (inventoryIndex < 0 || inventoryIndex >= playerCharacter.NonEquipItems.Count)
-            {
-                // Don't do anything, if non equip item index is invalid
-                return;
-            }
-            // Prepare storage data
-            Storage storage = GetStorage(storageId);
-            bool isLimitWeight = storage.weightLimit > 0;
-            bool isLimitSlot = storage.slotLimit > 0;
-            short weightLimit = storage.weightLimit;
-            short slotLimit = storage.slotLimit;
-            // Prepare item data
-            CharacterItem movingItem = playerCharacter.NonEquipItems[inventoryIndex].Clone(true);
-            movingItem.amount = amount;
-            if (storageItemIndex < 0 ||
-                storageItemIndex >= storageItemList.Count ||
-                storageItemList[storageItemIndex].dataId == movingItem.dataId)
-            {
-                // Add to storage or merge
-                bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
-                    movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
-                    storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
-                if (!isOverwhelming && storageItemList.IncreaseItems(movingItem))
-                {
-                    // Decrease from inventory
-                    playerCharacter.DecreaseItemsByIndex(inventoryIndex, amount);
-                    playerCharacter.FillEmptySlots();
-                }
-            }
-            else
-            {
-                // Swapping
-                CharacterItem storageItem = storageItemList[storageItemIndex];
-                CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryIndex];
-
-                storageItemList[storageItemIndex] = nonEquipItem;
-                playerCharacter.NonEquipItems[inventoryIndex] = storageItem;
-            }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
-        }
-
-        public override void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, short inventoryIndex)
-        {
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
-            List<CharacterItem> storageItemList = storageItems[storageId];
-            if (storageItemIndex < 0 || storageItemIndex >= storageItemList.Count)
-            {
-                // Don't do anything, if storage item index is invalid
-                return;
-            }
-            // Prepare storage data
-            Storage storage = GetStorage(storageId);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
-            // Prepare item data
-            CharacterItem movingItem = storageItemList[storageItemIndex].Clone(true);
-            IArmorItem equippingArmorItem = movingItem.GetArmorItem();
-            IWeaponItem equippingWeaponItem = movingItem.GetWeaponItem();
-            IShieldItem equippingShieldItem = movingItem.GetShieldItem();
-            movingItem.amount = amount;
-            if (inventoryIndex < 0 ||
-                inventoryIndex >= playerCharacter.NonEquipItems.Count ||
-                playerCharacter.NonEquipItems[inventoryIndex].dataId == movingItem.dataId)
-            {
-                // Add to inventory or merge
-                bool isOverwhelming = playerCharacter.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
-                if (!isOverwhelming && playerCharacter.IncreaseItems(movingItem))
-                {
-                    // Decrease from storage
-                    storageItemList.DecreaseItemsByIndex(storageItemIndex, amount, isLimitSlot);
-                }
-            }
-            else
-            {
-                // Swapping
-                CharacterItem storageItem = storageItemList[storageItemIndex];
-                CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryIndex];
-
-                storageItemList[storageItemIndex] = nonEquipItem;
-                playerCharacter.NonEquipItems[inventoryIndex] = storageItem;
-            }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            playerCharacter.FillEmptySlots();
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
-        }
-
-        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, System.Action<bool> callback)
-        {
-            if (addingItem.IsEmptySlot())
-            {
-                if (callback != null)
-                    callback.Invoke(false);
-                return;
-            }
-
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
-            List<CharacterItem> storageItemList = storageItems[storageId];
-            // Prepare storage data
-            Storage storage = GetStorage(storageId);
-            bool isLimitWeight = storage.weightLimit > 0;
-            bool isLimitSlot = storage.slotLimit > 0;
-            short weightLimit = storage.weightLimit;
-            short slotLimit = storage.slotLimit;
-            // Increase item to storage
-            bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
-                addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
-                storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
-            if (callback != null)
-                callback.Invoke(!isOverwhelming && storageItemList.IncreaseItems(addingItem));
-            // Update slots
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
-        }
-
-        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, System.Action<bool, Dictionary<int, short>> callback)
-        {
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
-            List<CharacterItem> storageItemList = storageItems[storageId];
-            // Prepare storage data
-            Storage storage = GetStorage(storageId);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
-            // Increase item to storage
-            Dictionary<int, short> decreaseItems;
-            bool decreaseResult = storageItemList.DecreaseItems(dataId, amount, isLimitSlot, out decreaseItems);
-            if (callback != null)
-                callback.Invoke(decreaseResult, decreaseItems);
-            // Update slots
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
-        }
-
-        public override void SwapOrMergeStorageItem(IPlayerCharacterData playerCharacter, StorageId storageId, short fromIndex, short toIndex)
-        {
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
-            List<CharacterItem> storageItemList = storageItems[storageId];
-            if (fromIndex >= storageItemList.Count ||
-                toIndex >= storageItemList.Count)
-            {
-                // Don't do anything, if storage item index is invalid
-                return;
-            }
-            // Prepare storage data
-            Storage storage = GetStorage(storageId);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
-            // Prepare item data
-            CharacterItem fromItem = storageItemList[fromIndex];
-            CharacterItem toItem = storageItemList[toIndex];
-
-            if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
-            {
-                // Merge if same id and not full
-                short maxStack = toItem.GetMaxStack();
-                if (toItem.amount + fromItem.amount <= maxStack)
-                {
-                    toItem.amount += fromItem.amount;
-                    storageItemList[fromIndex] = CharacterItem.Empty;
-                    storageItemList[toIndex] = toItem;
-                }
-                else
-                {
-                    short remains = (short)(toItem.amount + fromItem.amount - maxStack);
-                    toItem.amount = maxStack;
-                    fromItem.amount = remains;
-                    storageItemList[fromIndex] = fromItem;
-                    storageItemList[toIndex] = toItem;
-                }
-            }
-            else
-            {
-                // Swap
-                storageItemList[fromIndex] = toItem;
-                storageItemList[toIndex] = fromItem;
-            }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
-        }
-
-        public override bool IsStorageEntityOpen(StorageEntity storageEntity)
-        {
-            if (storageEntity == null)
-                return false;
-            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
-            return usingStorageCharacters.ContainsKey(id) &&
-                usingStorageCharacters[id].Count > 0;
-        }
-
-        public override List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity)
-        {
-            if (storageEntity == null)
-                return new List<CharacterItem>();
-            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
-            if (!storageItems.ContainsKey(id))
-                storageItems[id] = new List<CharacterItem>();
-            return storageItems[id];
-        }
-
-        private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
-        {
-            BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (uint objectId in objectIds)
-            {
-                if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
-                {
-                    // Update storage items
-                    playerCharacterEntity.StorageItems = storageItems.ToArray();
-                }
-            }
         }
 
         public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
@@ -645,17 +412,13 @@ namespace MultiplayerARPG
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
 
-        public override void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
+        public override void FindCharacters(BasePlayerCharacterEntity finder, string characterName)
         {
             List<SocialCharacterData> socialCharacters = new List<SocialCharacterData>();
-            foreach (BasePlayerCharacterEntity playerCharacter in PlayerCharacters.Values)
-            {
-                if (playerCharacter.Id.Equals(playerCharacterEntity.Id) ||
-                    !playerCharacter.CharacterName.Equals(characterName))
-                    continue;
-                socialCharacters.Add(SocialCharacterData.Create(playerCharacter));
-            }
-            this.SendSocialMembers(playerCharacterEntity.ConnectionId, MsgTypes.UpdateFoundCharacters, socialCharacters.ToArray());
+            BasePlayerCharacterEntity findResult;
+            if (this.TryGetPlayerCharacterByName(characterName, out findResult))
+                socialCharacters.Add(SocialCharacterData.Create(findResult));
+            this.SendSocialMembers(finder.ConnectionId, MsgTypes.UpdateFoundCharacters, socialCharacters.ToArray());
         }
 
         public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)

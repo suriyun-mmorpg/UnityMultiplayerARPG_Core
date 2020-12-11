@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -11,7 +10,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, ICashShopRequests, IMailRequests
+    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, ICashShopRequests, IMailRequests, IStorageRequests
     {
         public class MsgTypes
         {
@@ -43,6 +42,10 @@ namespace MultiplayerARPG
             public const ushort ClaimMailItems = 106;
             public const ushort DeleteMail = 107;
             public const ushort SendMail = 108;
+            public const ushort GetStorageItems = 109;
+            public const ushort MoveItemFromStorage = 110;
+            public const ushort MoveItemToStorage = 111;
+            public const ushort SwapOrMergeStorageItem = 112;
         }
 
         public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
@@ -55,10 +58,9 @@ namespace MultiplayerARPG
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         protected ICashShopMessageHandlers CashShopRequestHandlers { get; set; }
         protected IMailMessageHandlers MailRequestHandlers { get; set; }
-        public static readonly Dictionary<long, BasePlayerCharacterEntity> PlayerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
-        public static readonly Dictionary<string, BasePlayerCharacterEntity> PlayerCharactersById = new Dictionary<string, BasePlayerCharacterEntity>();
+        protected IStorageMessageHandlers StorageRequestHandlers { get; set; }
+
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
-        public static readonly Dictionary<string, long> ConnectionIdsByCharacterName = new Dictionary<string, long>();
         public static readonly Dictionary<int, PartyData> Parties = new Dictionary<int, PartyData>();
         public static readonly Dictionary<int, GuildData> Guilds = new Dictionary<int, GuildData>();
         public static readonly Dictionary<long, PartyData> UpdatingPartyMembers = new Dictionary<long, PartyData>();
@@ -99,29 +101,7 @@ namespace MultiplayerARPG
 
         public override uint PacketVersion()
         {
-            return 4;
-        }
-
-        public Dictionary<long, BasePlayerCharacterEntity>.ValueCollection GetPlayerCharacters()
-        {
-            return PlayerCharacters.Values;
-        }
-
-        public bool TryGetPlayerCharacter(long connectionId, out BasePlayerCharacterEntity result)
-        {
-            return PlayerCharacters.TryGetValue(connectionId, out result);
-        }
-
-        public bool TryGetPlayerCharacterById(string id, out BasePlayerCharacterEntity result)
-        {
-            return PlayerCharactersById.TryGetValue(id, out result);
-        }
-
-        public bool TryGetPlayerCharacterByName(string characterName, out BasePlayerCharacterEntity result)
-        {
-            result = null;
-            long connectionId;
-            return ConnectionIdsByCharacterName.TryGetValue(characterName, out connectionId) && PlayerCharacters.TryGetValue(connectionId, out result);
+            return 5;
         }
 
         public bool TryGetParty(int id, out PartyData result)
@@ -139,16 +119,8 @@ namespace MultiplayerARPG
             Singleton = this;
             doNotEnterGameOnConnect = false;
             doNotDestroyOnSceneChanges = true;
-            CashShopRequestHandlers = InitCashShopMessageHandlers();
-            CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
-            MailRequestHandlers = InitMailMessageHandlers();
-            MailRequestHandlers.ServerPlayerCharacterHandlers = this;
             base.Awake();
         }
-
-        protected abstract ICashShopMessageHandlers InitCashShopMessageHandlers();
-
-        protected abstract IMailMessageHandlers InitMailMessageHandlers();
 
         protected override void LateUpdate()
         {
@@ -205,6 +177,10 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems);
             RegisterClientResponse<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail);
             RegisterClientResponse<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail);
+            RegisterClientResponse<RequestGetStorageItemsMessage, ResponseGetStorageItemsMessage>(ReqTypes.GetStorageItems);
+            RegisterClientResponse<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage);
+            RegisterClientResponse<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage);
+            RegisterClientResponse<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem);
         }
 
         protected override void RegisterServerMessages()
@@ -215,24 +191,35 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
             RegisterServerMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
             // Requests
-            RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, CashShopRequestHandlers.HandleRequestCashShopInfo);
-            RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, CashShopRequestHandlers.HandleRequestCashPackageInfo);
-            RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, CashShopRequestHandlers.HandleRequestCashShopBuy);
-            RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, CashShopRequestHandlers.HandleRequestCashPackageBuyValidation);
-            RegisterServerRequest<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList, MailRequestHandlers.HandleRequestMailList);
-            RegisterServerRequest<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail, MailRequestHandlers.HandleRequestReadMail);
-            RegisterServerRequest<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems, MailRequestHandlers.HandleRequestClaimMailItems);
-            RegisterServerRequest<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail, MailRequestHandlers.HandleRequestDeleteMail);
-            RegisterServerRequest<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail, MailRequestHandlers.HandleRequestSendMail);
+            if (CashShopRequestHandlers != null)
+            {
+                RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, CashShopRequestHandlers.HandleRequestCashShopInfo);
+                RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, CashShopRequestHandlers.HandleRequestCashPackageInfo);
+                RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, CashShopRequestHandlers.HandleRequestCashShopBuy);
+                RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, CashShopRequestHandlers.HandleRequestCashPackageBuyValidation);
+            }
+            if (MailRequestHandlers != null)
+            {
+                RegisterServerRequest<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList, MailRequestHandlers.HandleRequestMailList);
+                RegisterServerRequest<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail, MailRequestHandlers.HandleRequestReadMail);
+                RegisterServerRequest<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems, MailRequestHandlers.HandleRequestClaimMailItems);
+                RegisterServerRequest<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail, MailRequestHandlers.HandleRequestDeleteMail);
+                RegisterServerRequest<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail, MailRequestHandlers.HandleRequestSendMail);
+            }
+            if (StorageRequestHandlers != null)
+            {
+                RegisterServerRequest<RequestGetStorageItemsMessage, ResponseGetStorageItemsMessage>(ReqTypes.GetStorageItems, StorageRequestHandlers.HandleRequestGetStorageItems);
+                RegisterServerRequest<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage, StorageRequestHandlers.HandleRequestMoveItemFromStorage);
+                RegisterServerRequest<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage, StorageRequestHandlers.HandleRequestMoveItemToStorage);
+                RegisterServerRequest<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem, StorageRequestHandlers.HandleRequestSwapOrMergeStorageItem);
+            }
         }
 
         protected virtual void Clean()
         {
             this.InvokeInstanceDevExtMethods("Clean");
-            PlayerCharacters.Clear();
-            PlayerCharactersById.Clear();
+            ClearPlayerCharacters();
             BuildingEntities.Clear();
-            ConnectionIdsByCharacterName.Clear();
             Parties.Clear();
             Guilds.Clear();
             UpdatingPartyMembers.Clear();
@@ -343,7 +330,7 @@ namespace MultiplayerARPG
 
             PartyData tempParty;
             GuildData tempGuild;
-            foreach (BasePlayerCharacterEntity playerCharacter in PlayerCharacters.Values)
+            foreach (BasePlayerCharacterEntity playerCharacter in GetPlayerCharacters())
             {
                 UpdateOnlineCharacter(playerCharacter);
 
@@ -409,77 +396,6 @@ namespace MultiplayerARPG
             GameMessage message = new GameMessage();
             message.type = type;
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.GameMessage, message);
-        }
-
-        public virtual bool RequestCashShopInfo(ResponseDelegate<ResponseCashShopInfoMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.CashShopInfo, new EmptyMessage(), responseDelegate: callback);
-        }
-
-        public virtual bool RequestCashPackageInfo(ResponseDelegate<ResponseCashPackageInfoMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.CashPackageInfo, new EmptyMessage(), responseDelegate: callback);
-        }
-
-        public virtual bool RequestCashShopBuy(int dataId, ResponseDelegate<ResponseCashShopBuyMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.CashShopBuy, new RequestCashShopBuyMessage()
-            {
-                dataId = dataId,
-            }, responseDelegate: callback);
-        }
-
-        public virtual bool RequestCashPackageBuyValidation(int dataId, string receipt, ResponseDelegate<ResponseCashPackageBuyValidationMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.CashPackageBuyValidation, new RequestCashPackageBuyValidationMessage()
-            {
-                dataId = dataId,
-                platform = Application.platform,
-                receipt = receipt,
-            }, responseDelegate: callback);
-        }
-
-        public virtual bool RequestMailList(bool onlyNewMails, ResponseDelegate<ResponseMailListMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.MailList, new RequestMailListMessage()
-            {
-                onlyNewMails = onlyNewMails,
-            }, responseDelegate: callback);
-        }
-
-        public virtual bool RequestReadMail(string mailId, ResponseDelegate<ResponseReadMailMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.ReadMail, new RequestReadMailMessage()
-            {
-                id = mailId,
-            }, responseDelegate: callback);
-        }
-
-        public virtual bool RequestClaimMailItems(string mailId, ResponseDelegate<ResponseClaimMailItemsMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.ClaimMailItems, new RequestClaimMailItemsMessage()
-            {
-                id = mailId,
-            }, responseDelegate: callback);
-        }
-
-        public virtual bool RequestDeleteMail(string mailId, ResponseDelegate<ResponseDeleteMailMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.DeleteMail, new RequestDeleteMailMessage()
-            {
-                id = mailId,
-            }, responseDelegate: callback);
-        }
-
-        public virtual bool RequestSendMail(string receiverName, string title, string content, int gold, ResponseDelegate<ResponseSendMailMessage> callback)
-        {
-            return ClientSendRequest(ReqTypes.SendMail, new RequestSendMailMessage()
-            {
-                receiverName = receiverName,
-                title = title,
-                content = content,
-                gold = gold,
-            }, responseDelegate: callback);
         }
 
         protected virtual void HandleGameMessageAtClient(MessageHandlerData messageHandler)
@@ -666,7 +582,7 @@ namespace MultiplayerARPG
 
         protected ChatMessage FillChatChannelId(ChatMessage message)
         {
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
             {
                 if (!string.IsNullOrEmpty(message.sender) &&
@@ -688,14 +604,12 @@ namespace MultiplayerARPG
 
         protected virtual void ReadChatMessage(ChatMessage message)
         {
-            long senderConnectionId;
-            long receiverConnectionId;
             BasePlayerCharacterEntity playerCharacter;
             switch (message.channel)
             {
                 case ChatChannel.Local:
                     if (!string.IsNullOrEmpty(message.sender) &&
-                        TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                        this.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
                         string gmCommand;
                         if (CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
@@ -726,16 +640,16 @@ namespace MultiplayerARPG
                     break;
                 case ChatChannel.Whisper:
                     if (!string.IsNullOrEmpty(message.sender) &&
-                        ConnectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId))
+                        this.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
                         // If found sender send whisper message to sender
-                        ServerSendPacket(senderConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                     }
                     if (!string.IsNullOrEmpty(message.receiver) &&
-                        ConnectionIdsByCharacterName.TryGetValue(message.receiver, out receiverConnectionId))
+                        this.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
                     {
                         // If found receiver send whisper message to receiver
-                        ServerSendPacket(receiverConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                     }
                     break;
                 case ChatChannel.Party:
@@ -744,7 +658,7 @@ namespace MultiplayerARPG
                     {
                         foreach (string memberId in party.GetMemberIds())
                         {
-                            if (TryGetPlayerCharacterById(memberId, out playerCharacter) &&
+                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If party member is online, send party message to the member
@@ -759,7 +673,7 @@ namespace MultiplayerARPG
                     {
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (TryGetPlayerCharacterById(memberId, out playerCharacter) &&
+                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If guild member is online, send guild message to the member
@@ -1094,22 +1008,12 @@ namespace MultiplayerARPG
 
         public virtual void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity == null || !ConnectionIds.Contains(playerCharacterEntity.ConnectionId) || PlayerCharacters.ContainsKey(playerCharacterEntity.ConnectionId))
-                return;
-            PlayerCharacters[playerCharacterEntity.ConnectionId] = playerCharacterEntity;
-            PlayerCharactersById[playerCharacterEntity.Id] = playerCharacterEntity;
-            ConnectionIdsByCharacterName[playerCharacterEntity.CharacterName] = playerCharacterEntity.ConnectionId;
+            AddPlayerCharacter(playerCharacterEntity.ConnectionId, playerCharacterEntity);
         }
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
         {
-            BasePlayerCharacterEntity playerCharacter;
-            if (!PlayerCharacters.TryGetValue(connectionId, out playerCharacter))
-                return;
-            CloseStorage(playerCharacter);
-            ConnectionIdsByCharacterName.Remove(playerCharacter.CharacterName);
-            PlayerCharactersById.Remove(playerCharacter.Id);
-            PlayerCharacters.Remove(connectionId);
+            RemovePlayerCharacter(connectionId);
         }
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
@@ -1227,7 +1131,7 @@ namespace MultiplayerARPG
             // TODO: Don't use fixed user level
             BasePlayerCharacterEntity playerCharacter;
             return (!string.IsNullOrEmpty(sender) &&
-                    TryGetPlayerCharacterByName(sender, out playerCharacter) &&
+                    this.TryGetPlayerCharacterByName(sender, out playerCharacter) &&
                     playerCharacter.UserLevel > 0) ||
                     CHAT_SYSTEM_ANNOUNCER_SENDER.Equals(sender);
         }
@@ -1245,18 +1149,6 @@ namespace MultiplayerARPG
             };
             chatMessage.Serialize(writer);
             HandleChatAtServer(new MessageHandlerData(MsgTypes.Chat, Server, -1, new NetDataReader(writer.CopyData())));
-        }
-
-        public bool TryGetPlayerCharacter(long connectionId, out IPlayerCharacterData playerCharacter)
-        {
-            playerCharacter = null;
-            BasePlayerCharacterEntity playerCharacterEntity;
-            if (PlayerCharacters.TryGetValue(connectionId, out playerCharacterEntity))
-            {
-                playerCharacter = playerCharacterEntity;
-                return true;
-            }
-            return false;
         }
     }
 }

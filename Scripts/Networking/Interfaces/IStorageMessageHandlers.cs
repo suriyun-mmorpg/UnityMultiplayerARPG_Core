@@ -3,9 +3,17 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    /// <summary>
+    /// These properties and functions will be called at server only
+    /// </summary>
     public interface IStorageMessageHandlers
     {
         IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
+        IServerStorageHandlers ServerStorageHandlers { get; set; }
+
+        UniTaskVoid HandleRequestGetStorageItems(
+            RequestHandlerData requestHandler, RequestGetStorageItemsMessage request,
+            RequestProceedResultDelegate<ResponseGetStorageItemsMessage> result);
 
         UniTaskVoid HandleRequestMoveItemToStorage(
             RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request,

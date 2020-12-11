@@ -3,6 +3,9 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    /// <summary>
+    /// These properties and functions will be called at server only
+    /// </summary>
     public interface IMailMessageHandlers
     {
         IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
