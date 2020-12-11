@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     public partial class LanRpgNetworkManager
     {
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
-        private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
+        private readonly Dictionary<StorageId, HashSet<long>> usingStorageCharacters = new Dictionary<StorageId, HashSet<long>>();
 
         public void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
@@ -15,25 +15,15 @@ namespace MultiplayerARPG
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            if (!storageItems.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                storageItems[playerCharacterEntity.CurrentStorageId] = new List<CharacterItem>();
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
-            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
-            // Prepare storage data
-            Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
-            storageItems[playerCharacterEntity.CurrentStorageId].FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage items
-            playerCharacterEntity.StorageItems = storageItems[playerCharacterEntity.CurrentStorageId].ToArray();
+                usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<long>();
+            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ConnectionId);
         }
 
         public void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
-            playerCharacterEntity.StorageItems = new CharacterItem[0];
+                usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ConnectionId);
         }
 
         public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
@@ -56,7 +46,7 @@ namespace MultiplayerARPG
             {
                 // Update slots
                 storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-                UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
+                NotifyStorageItemsToCharacters(usingStorageCharacters[storageId]);
                 return true;
             }
             return false;
@@ -76,7 +66,7 @@ namespace MultiplayerARPG
             {
                 // Update slots
                 storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-                UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+                NotifyStorageItemsToCharacters(usingStorageCharacters[storageId]);
                 return new DecreaseStorageItemsResult()
                 {
                     IsSuccess = true,
@@ -91,6 +81,13 @@ namespace MultiplayerARPG
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
             return storageItems[storageId];
+        }
+
+        public void SetStorageItems(StorageId storageId, List<CharacterItem> items)
+        {
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
+            storageItems[storageId] = items;
         }
 
         public Storage GetStorage(StorageId storageId)
@@ -155,15 +152,13 @@ namespace MultiplayerARPG
             return storageItems[id];
         }
 
-        private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
+        private void NotifyStorageItemsToCharacters(HashSet<long> connectionIds)
         {
-            BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (uint objectId in objectIds)
+            foreach (long connectionId in connectionIds)
             {
-                if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
+                if (Players.ContainsKey(connectionId))
                 {
-                    // Update storage items
-                    playerCharacterEntity.StorageItems = storageItems.ToArray();
+
                 }
             }
         }

@@ -45,6 +45,13 @@ namespace MultiplayerARPG
         List<CharacterItem> GetStorageItems(StorageId storageId);
 
         /// <summary>
+        /// Set storage items to collection
+        /// </summary>
+        /// <param name="storageId"></param>
+        /// <param name="items"></param>
+        void SetStorageItems(StorageId storageId, List<CharacterItem> items);
+
+        /// <summary>
         /// Check if storage entity is opened or not
         /// </summary>
         /// <param name="storageEntity">Checking storage entity</param>

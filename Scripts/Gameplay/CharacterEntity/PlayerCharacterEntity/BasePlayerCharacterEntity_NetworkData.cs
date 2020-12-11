@@ -111,13 +111,6 @@ namespace MultiplayerARPG
         /// This value will be used by server only to define character using storage state
         /// </summary>
         public StorageId CurrentStorageId { get; protected set; }
-        protected SyncFieldArray<CharacterItem> storageItems = new SyncFieldArray<CharacterItem>();
-
-        public CharacterItem[] StorageItems
-        {
-            get { return storageItems; }
-            set { storageItems.Value = value; }
-        }
         #endregion
 
         #region Fields/Interface/Getter/Setter implementation
