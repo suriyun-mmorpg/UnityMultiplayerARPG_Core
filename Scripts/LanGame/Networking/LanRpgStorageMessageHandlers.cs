@@ -16,7 +16,6 @@ namespace MultiplayerARPG
             IPlayerCharacterData playerCharacter;
             if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Error: can't find player's character
                 result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
                 {
                     error = ResponseGetStorageItemsMessage.Error.CharacterNotFound,
@@ -25,7 +24,6 @@ namespace MultiplayerARPG
             }
             if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
             {
-                // Error: can't access storage
                 result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
                 {
                     error = ResponseGetStorageItemsMessage.Error.NotAllowed,
@@ -49,7 +47,6 @@ namespace MultiplayerARPG
             IPlayerCharacterData playerCharacter;
             if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Error: can't find player's character
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
                     error = ResponseMoveItemFromStorageMessage.Error.CharacterNotFound,
@@ -58,7 +55,6 @@ namespace MultiplayerARPG
             }
             if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
             {
-                // Error: can't access storage
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
                     error = ResponseMoveItemFromStorageMessage.Error.NotAllowed,
@@ -68,7 +64,6 @@ namespace MultiplayerARPG
             List<CharacterItem> storageItemList = ServerStorageHandlers.GetStorageItems(storageId);
             if (storageItemIndex < 0 || storageItemIndex >= storageItemList.Count)
             {
-                // Error: storage item index is invalid
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
                     error = ResponseMoveItemFromStorageMessage.Error.InvalidItemIndex,
@@ -130,7 +125,6 @@ namespace MultiplayerARPG
             IPlayerCharacterData playerCharacter;
             if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Error: can't find player's character
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     error = ResponseMoveItemToStorageMessage.Error.CharacterNotFound,
@@ -139,7 +133,6 @@ namespace MultiplayerARPG
             }
             if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
             {
-                // Error: can't access storage
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     error = ResponseMoveItemToStorageMessage.Error.NotAllowed,
@@ -149,7 +142,6 @@ namespace MultiplayerARPG
             List<CharacterItem> storageItemList = ServerStorageHandlers.GetStorageItems(storageId);
             if (inventoryIndex < 0 || inventoryIndex >= playerCharacter.NonEquipItems.Count)
             {
-                // Error: non equip item index is invalid
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     error = ResponseMoveItemToStorageMessage.Error.InvalidItemIndex,
@@ -211,7 +203,6 @@ namespace MultiplayerARPG
             IPlayerCharacterData playerCharacter;
             if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Error: can't find player's character
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
                     error = ResponseSwapOrMergeStorageItemMessage.Error.CharacterNotFound,
@@ -220,7 +211,6 @@ namespace MultiplayerARPG
             }
             if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
             {
-                // Error: can't access storage
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
                     error = ResponseSwapOrMergeStorageItemMessage.Error.NotAllowed,
@@ -231,7 +221,6 @@ namespace MultiplayerARPG
             if (fromIndex >= storageItemList.Count ||
                 toIndex >= storageItemList.Count)
             {
-                // Don't do anything, if storage item index is invalid
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
                     error = ResponseSwapOrMergeStorageItemMessage.Error.InvalidItemIndex,
