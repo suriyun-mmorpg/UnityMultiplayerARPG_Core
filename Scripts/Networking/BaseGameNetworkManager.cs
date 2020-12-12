@@ -64,6 +64,7 @@ namespace MultiplayerARPG
         protected IServerCashShopMessageHandlers CashShopRequestHandlers { get; set; }
         protected IServerMailMessageHandlers MailRequestHandlers { get; set; }
         protected IServerStorageMessageHandlers StorageRequestHandlers { get; set; }
+        protected IServerInventoryMessageHandlers InventoryRequestHandlers { get; set; }
 
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
         public static readonly Dictionary<int, PartyData> Parties = new Dictionary<int, PartyData>();
@@ -173,19 +174,28 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.NotifyRewardItem, HandleNotifyRewardItemAtClient);
             RegisterClientMessage(MsgTypes.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
             // Responses
+            // Cash shop
             RegisterClientResponse<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo);
             RegisterClientResponse<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo);
             RegisterClientResponse<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy);
             RegisterClientResponse<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation);
+            // Mail
             RegisterClientResponse<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList);
             RegisterClientResponse<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail);
             RegisterClientResponse<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems);
             RegisterClientResponse<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail);
             RegisterClientResponse<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail);
+            // Storage
             RegisterClientResponse<RequestGetStorageItemsMessage, ResponseGetStorageItemsMessage>(ReqTypes.GetStorageItems);
             RegisterClientResponse<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage);
             RegisterClientResponse<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage);
             RegisterClientResponse<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem);
+            // Inventory
+            RegisterClientResponse<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(ReqTypes.SwapOrMergeItem);
+            RegisterClientResponse<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(ReqTypes.EquipWeapon);
+            RegisterClientResponse<RequestEquipArmorMessage, ResponseEquipArmorMessage>(ReqTypes.EquipArmor);
+            RegisterClientResponse<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(ReqTypes.UnEquipWeapon);
+            RegisterClientResponse<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(ReqTypes.UnEquipArmor);
         }
 
         protected override void RegisterServerMessages()
@@ -196,6 +206,7 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
             RegisterServerMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
             // Requests
+            // Cash shop
             if (CashShopRequestHandlers != null)
             {
                 RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, CashShopRequestHandlers.HandleRequestCashShopInfo);
@@ -203,6 +214,7 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, CashShopRequestHandlers.HandleRequestCashShopBuy);
                 RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, CashShopRequestHandlers.HandleRequestCashPackageBuyValidation);
             }
+            // Mail
             if (MailRequestHandlers != null)
             {
                 RegisterServerRequest<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList, MailRequestHandlers.HandleRequestMailList);
@@ -211,12 +223,22 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail, MailRequestHandlers.HandleRequestDeleteMail);
                 RegisterServerRequest<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail, MailRequestHandlers.HandleRequestSendMail);
             }
+            // Storage
             if (StorageRequestHandlers != null)
             {
                 RegisterServerRequest<RequestGetStorageItemsMessage, ResponseGetStorageItemsMessage>(ReqTypes.GetStorageItems, StorageRequestHandlers.HandleRequestGetStorageItems);
                 RegisterServerRequest<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage, StorageRequestHandlers.HandleRequestMoveItemFromStorage);
                 RegisterServerRequest<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage, StorageRequestHandlers.HandleRequestMoveItemToStorage);
                 RegisterServerRequest<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem, StorageRequestHandlers.HandleRequestSwapOrMergeStorageItem);
+            }
+            // Inventory
+            if (InventoryRequestHandlers != null)
+            {
+                RegisterServerRequest<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(ReqTypes.SwapOrMergeItem, InventoryRequestHandlers.HandleRequestSwapOrMergeItem);
+                RegisterServerRequest<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(ReqTypes.EquipWeapon, InventoryRequestHandlers.HandleRequestEquipWeapon);
+                RegisterServerRequest<RequestEquipArmorMessage, ResponseEquipArmorMessage>(ReqTypes.EquipArmor, InventoryRequestHandlers.HandleRequestEquipArmor);
+                RegisterServerRequest<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(ReqTypes.UnEquipWeapon, InventoryRequestHandlers.HandleRequestUnEquipWeapon);
+                RegisterServerRequest<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(ReqTypes.UnEquipArmor, InventoryRequestHandlers.HandleRequestUnEquipArmor);
             }
         }
 
@@ -254,9 +276,6 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartClient", client);
             base.OnStartClient(client);
-            GameInstance.ClientCashShopHandlers = this;
-            GameInstance.ClientMailHandlers = this;
-            GameInstance.ClientStorageHandlers = this;
         }
 
         public override void OnStopClient()
@@ -264,6 +283,15 @@ namespace MultiplayerARPG
             if (!IsServer)
                 Clean();
             base.OnStopClient();
+        }
+
+        public override void OnClientConnected()
+        {
+            base.OnClientConnected();
+            GameInstance.ClientCashShopHandlers = this;
+            GameInstance.ClientMailHandlers = this;
+            GameInstance.ClientStorageHandlers = this;
+            GameInstance.ClientInventoryHandlers = this;
         }
 
         public override void OnPeerConnected(long connectionId)

@@ -7,23 +7,23 @@ namespace MultiplayerARPG
     {
         IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
 
-        UniTaskVoid HandleRequestSwapOrMergeItemMessage(
+        UniTaskVoid HandleRequestSwapOrMergeItem(
             RequestHandlerData requestHandler, RequestSwapOrMergeItemMessage request,
             RequestProceedResultDelegate<ResponseSwapOrMergeItemMessage> result);
 
-        UniTaskVoid HandleRequestEquipWeaponMessage(
+        UniTaskVoid HandleRequestEquipWeapon(
             RequestHandlerData requestHandler, RequestEquipWeaponMessage request,
             RequestProceedResultDelegate<ResponseEquipWeaponMessage> result);
 
-        UniTaskVoid HandleRequestEquipArmorMessage(
+        UniTaskVoid HandleRequestEquipArmor(
             RequestHandlerData requestHandler, RequestEquipArmorMessage request,
             RequestProceedResultDelegate<ResponseEquipArmorMessage> result);
 
-        UniTaskVoid HandleRequestUnEquipWeaponMessage(
+        UniTaskVoid HandleRequestUnEquipWeapon(
             RequestHandlerData requestHandler, RequestUnEquipWeaponMessage request,
             RequestProceedResultDelegate<ResponseUnEquipWeaponMessage> result);
 
-        UniTaskVoid HandleRequestUnEquipArmorMessage(
+        UniTaskVoid HandleRequestUnEquipArmor(
             RequestHandlerData requestHandler, RequestUnEquipArmorMessage request,
             RequestProceedResultDelegate<ResponseUnEquipArmorMessage> result);
 

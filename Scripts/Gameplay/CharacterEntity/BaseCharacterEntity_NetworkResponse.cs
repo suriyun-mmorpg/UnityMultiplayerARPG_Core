@@ -329,7 +329,7 @@ namespace MultiplayerARPG
 
             this.FillWeaponSetsIfNeeded(equipWeaponSet);
             EquipWeapons tempEquipWeapons = SelectableWeaponSets[equipWeaponSet];
-            CharacterItem unEquipItem = CharacterItem.Empty;
+            CharacterItem unEquipItem;
 
             if (isLeftHand)
             {
