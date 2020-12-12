@@ -309,12 +309,12 @@ namespace MultiplayerARPG
             {
                 LastCharacterOnlineTimes.Add(characterId, new NotifyOnlineCharacterTime()
                 {
-                    lastNotifyTime = Time.unscaledTime
+                    LastNotifyTime = Time.unscaledTime
                 });
             }
             else
             {
-                notifyTime.lastNotifyTime = Time.unscaledTime;
+                notifyTime.LastNotifyTime = Time.unscaledTime;
                 LastCharacterOnlineTimes[characterId] = notifyTime;
             }
         }
@@ -330,15 +330,15 @@ namespace MultiplayerARPG
             {
                 LastCharacterOnlineTimes.Add(characterId, new NotifyOnlineCharacterTime()
                 {
-                    lastRequestTime = unscaledTime
+                    LastRequestTime = unscaledTime
                 });
             }
             else
             {
-                if (unscaledTime - notifyTime.lastRequestTime < 1.5f)
+                if (unscaledTime - notifyTime.LastRequestTime < 1.5f)
                     return;
 
-                notifyTime.lastRequestTime = unscaledTime;
+                notifyTime.LastRequestTime = unscaledTime;
                 LastCharacterOnlineTimes[characterId] = notifyTime;
             }
             Singleton.ClientSendPacket(DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, (writer) =>
@@ -351,7 +351,7 @@ namespace MultiplayerARPG
         {
             NotifyOnlineCharacterTime notifyTime;
             return LastCharacterOnlineTimes.TryGetValue(characterId, out notifyTime) &&
-                Time.unscaledTime - notifyTime.lastNotifyTime <= 2f;
+                Time.unscaledTime - notifyTime.LastNotifyTime <= 2f;
         }
 
         protected virtual void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)

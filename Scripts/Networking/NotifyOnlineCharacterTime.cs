@@ -2,7 +2,7 @@
 {
     public struct NotifyOnlineCharacterTime
     {
-        public float lastNotifyTime;
-        public float lastRequestTime;
+        public float LastNotifyTime { get; set; }
+        public float LastRequestTime { get; set; }
     }
 }
