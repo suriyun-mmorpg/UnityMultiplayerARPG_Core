@@ -40,28 +40,15 @@ namespace MultiplayerARPG
         {
             base.Awake();
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
-            CashShopRequestHandlers = InitCashShopMessageHandlers();
+            CashShopRequestHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
             CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
-            MailRequestHandlers = InitMailMessageHandlers();
+            MailRequestHandlers = gameObject.GetOrAddComponent<IServerMailMessageHandlers, LanRpgMailMessageHandlers>();
             MailRequestHandlers.ServerPlayerCharacterHandlers = this;
-            StorageRequestHandlers = InitStorageMessageHandlers();
+            StorageRequestHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, LanRpgStorageMessageHandlers>();
             StorageRequestHandlers.ServerPlayerCharacterHandlers = this;
             StorageRequestHandlers.ServerStorageHandlers = this;
-        }
-
-        protected IServerCashShopMessageHandlers InitCashShopMessageHandlers()
-        {
-            return gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
-        }
-
-        protected IServerMailMessageHandlers InitMailMessageHandlers()
-        {
-            return gameObject.GetOrAddComponent<IServerMailMessageHandlers, LanRpgMailMessageHandlers>();
-        }
-
-        protected IServerStorageMessageHandlers InitStorageMessageHandlers()
-        {
-            return gameObject.GetOrAddComponent<IServerStorageMessageHandlers, LanRpgStorageMessageHandlers>();
+            InventoryRequestHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
+            InventoryRequestHandlers.ServerPlayerCharacterHandlers = this;
         }
 
         public void StartGame()
