@@ -11,6 +11,7 @@ namespace MultiplayerARPG
             NotAllowed,
             CharacterNotFound,
             InvalidItemIndex,
+            CannotCarryAllItems,
             InternalServerError,
         }
         public Error error;

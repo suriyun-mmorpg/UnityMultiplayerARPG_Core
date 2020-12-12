@@ -86,14 +86,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerSwapOrMergeItem(short fromIndex, short toIndex)
-        {
-            if (this.IsDead())
-                return false;
-            RPC(ServerSwapOrMergeItem, fromIndex, toIndex);
-            return true;
-        }
-
         public bool CallServerAddAttribute(int dataId)
         {
             if (this.IsDead())

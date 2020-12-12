@@ -1402,24 +1402,26 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem)
+        public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, int expectedIndex = -1)
         {
-            data.AddOrSetNonEquipItems(characterItem, out _);
+            data.AddOrSetNonEquipItems(characterItem, out _, expectedIndex);
         }
 
-        public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, out int index)
+        public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, out int index, int expectedIndex = -1)
         {
-            data.NonEquipItems.AddOrSetItems(characterItem, out index);
+            data.NonEquipItems.AddOrSetItems(characterItem, out index, expectedIndex);
         }
 
-        public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem)
+        public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, int expectedIndex = -1)
         {
-            itemList.AddOrSetItems(characterItem, out _);
+            itemList.AddOrSetItems(characterItem, out _, expectedIndex);
         }
 
-        public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, out int index)
+        public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, out int index, int expectedIndex = -1)
         {
-            index = IndexOfEmptyItemSlot(itemList);
+            index = expectedIndex;
+            if (index < 0 || index >= itemList.Count || itemList[index].NotEmptySlot())
+                index = IndexOfEmptyItemSlot(itemList);
             if (index >= 0)
             {
                 // Insert to empty slot

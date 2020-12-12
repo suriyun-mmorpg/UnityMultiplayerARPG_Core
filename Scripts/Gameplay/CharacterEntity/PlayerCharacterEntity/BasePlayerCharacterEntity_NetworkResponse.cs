@@ -9,48 +9,6 @@ namespace MultiplayerARPG
         protected IServerStorageHandlers ServerStorageHandlers { get { return CurrentGameManager as IServerStorageHandlers; } }
 
         [ServerRpc]
-        protected void ServerSwapOrMergeItem(short fromIndex, short toIndex)
-        {
-#if !CLIENT_BUILD
-            if (!CanDoActions() || fromIndex >= NonEquipItems.Count || toIndex >= NonEquipItems.Count)
-                return;
-
-            CharacterItem fromItem = NonEquipItems[fromIndex];
-            CharacterItem toItem = NonEquipItems[toIndex];
-
-            if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
-            {
-                // Merge if same id and not full
-                short maxStack = toItem.GetMaxStack();
-                if (toItem.amount + fromItem.amount <= maxStack)
-                {
-                    toItem.amount += fromItem.amount;
-                    if (CurrentGameInstance.IsLimitInventorySlot)
-                        NonEquipItems[fromIndex] = CharacterItem.Empty;
-                    else
-                        NonEquipItems.RemoveAt(fromIndex);
-                    NonEquipItems[toIndex] = toItem;
-                    this.FillEmptySlots();
-                }
-                else
-                {
-                    short remains = (short)(toItem.amount + fromItem.amount - maxStack);
-                    toItem.amount = maxStack;
-                    fromItem.amount = remains;
-                    NonEquipItems[fromIndex] = fromItem;
-                    NonEquipItems[toIndex] = toItem;
-                }
-            }
-            else
-            {
-                // Swap
-                NonEquipItems[fromIndex] = toItem;
-                NonEquipItems[toIndex] = fromItem;
-            }
-#endif
-        }
-
-        [ServerRpc]
         protected void ServerAddAttribute(int dataId)
         {
 #if !CLIENT_BUILD

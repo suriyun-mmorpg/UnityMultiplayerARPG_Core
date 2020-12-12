@@ -1114,7 +1114,11 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            OwningCharacter.CallServerEquipItem((short)IndexOfData);
+            GameInstance.ClientInventoryHandlers.RequestEquipItem(
+                OwningCharacter,
+                (short)IndexOfData,
+                UIInventoryResponses.ResponseEquipArmor,
+                UIInventoryResponses.ResponseEquipWeapon);
         }
 
         public void OnClickUnEquip()
@@ -1126,7 +1130,14 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            OwningCharacter.RequestUnEquipItem(InventoryType, (short)IndexOfData, CharacterItem.equipSlotIndex);
+            GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
+                OwningCharacter.Id,
+                InventoryType,
+                (short)IndexOfData,
+                CharacterItem.equipSlotIndex,
+                -1,
+                UIInventoryResponses.ResponseUnEquipArmor,
+                UIInventoryResponses.ResponseUnEquipWeapon);
         }
 
         public void OnClickUse()

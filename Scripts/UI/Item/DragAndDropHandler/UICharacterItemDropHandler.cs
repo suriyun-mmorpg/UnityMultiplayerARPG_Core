@@ -46,6 +46,7 @@ namespace MultiplayerARPG
                 switch (draggedItemUI.sourceLocation)
                 {
                     case UICharacterItemDragHandler.SourceLocation.EquipItems:
+                        OnDropEquipItem(draggedItemUI);
                         break;
                     case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
                         OnDropNonEquipItem(draggedItemUI);
@@ -54,6 +55,27 @@ namespace MultiplayerARPG
                         OnDropStorageItem(draggedItemUI);
                         break;
                 }
+            }
+        }
+
+        protected virtual void OnDropEquipItem(UICharacterItemDragHandler draggedItemUI)
+        {
+            // Set UI drop state
+            draggedItemUI.isDropped = true;
+            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
+            switch (uiCharacterItem.InventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    // Unequip item
+                    GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
+                        characterId,
+                        draggedItemUI.uiCharacterItem.InventoryType,
+                        (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                        draggedItemUI.uiCharacterItem.EquipSlotIndex,
+                        (short)uiCharacterItem.IndexOfData,
+                        UIInventoryResponses.ResponseUnEquipArmor,
+                        UIInventoryResponses.ResponseUnEquipWeapon);
+                    break;
             }
         }
 
@@ -68,7 +90,12 @@ namespace MultiplayerARPG
             {
                 case InventoryType.NonEquipItems:
                     // Drop non equip item to non equip item
-                    BasePlayerCharacterController.OwningCharacter.CallServerSwapOrMergeItem((short)draggedItemUI.uiCharacterItem.IndexOfData, (short)uiCharacterItem.IndexOfData);
+                    GameInstance.ClientInventoryHandlers.RequestSwapOrMergeItem(new RequestSwapOrMergeItemMessage()
+                    {
+                        characterId = characterId,
+                        fromIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                        toIndex = (short)uiCharacterItem.IndexOfData,
+                    }, UIInventoryResponses.ResponseSwapOrMergeItem);
                     break;
                 case InventoryType.EquipItems:
                 case InventoryType.EquipWeaponRight:
@@ -171,10 +198,13 @@ namespace MultiplayerARPG
             }
             // Can equip the item
             // so tell the server that this client want to equip the item
-            owningCharacter.CallServerEquipItem(
+            GameInstance.ClientInventoryHandlers.RequestEquipItem(
+                owningCharacter.Id,
                 (short)draggedItemUI.uiCharacterItem.IndexOfData,
                 uiCharacterItem.InventoryType,
-                uiCharacterItem.EquipSlotIndex);
+                uiCharacterItem.EquipSlotIndex,
+                UIInventoryResponses.ResponseEquipArmor,
+                UIInventoryResponses.ResponseEquipWeapon);
         }
     }
 }

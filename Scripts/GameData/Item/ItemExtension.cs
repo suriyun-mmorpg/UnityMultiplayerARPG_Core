@@ -211,7 +211,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public static bool CanEquip<T>(this T item, BaseCharacterEntity character, short level, out GameMessage.Type gameMessageType)
+        public static bool CanEquip<T>(this T item, ICharacterData character, short level, out GameMessage.Type gameMessageType)
              where T : IEquipmentItem
         {
             gameMessageType = GameMessage.Type.None;

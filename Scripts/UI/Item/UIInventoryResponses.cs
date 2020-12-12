@@ -1,0 +1,90 @@
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    public static class UIInventoryResponses
+    {
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeItemMessage> onResponseSwapOrMergeItem;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseEquipArmorMessage> onResponseEquipArmor;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseEquipWeaponMessage> onResponseEquipWeapon;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseUnEquipArmorMessage> onResponseUnEquipArmor;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseUnEquipWeaponMessage> onResponseUnEquipWeapon;
+
+        public static async UniTaskVoid ResponseSwapOrMergeItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwapOrMergeItemMessage response)
+        {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Success)
+            {
+                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
+                foreach (UIStorageItems ui in uis)
+                {
+                    ui.Refresh();
+                }
+            }
+            if (onResponseSwapOrMergeItem != null)
+                onResponseSwapOrMergeItem.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static async UniTaskVoid ResponseEquipArmor(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseEquipArmorMessage response)
+        {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Success)
+            {
+                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
+                foreach (UIStorageItems ui in uis)
+                {
+                    ui.Refresh();
+                }
+            }
+            if (onResponseEquipArmor != null)
+                onResponseEquipArmor.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static async UniTaskVoid ResponseEquipWeapon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseEquipWeaponMessage response)
+        {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Success)
+            {
+                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
+                foreach (UIStorageItems ui in uis)
+                {
+                    ui.Refresh();
+                }
+            }
+            if (onResponseEquipWeapon != null)
+                onResponseEquipWeapon.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static async UniTaskVoid ResponseUnEquipArmor(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseUnEquipArmorMessage response)
+        {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Success)
+            {
+                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
+                foreach (UIStorageItems ui in uis)
+                {
+                    ui.Refresh();
+                }
+            }
+            if (onResponseUnEquipArmor != null)
+                onResponseUnEquipArmor.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static async UniTaskVoid ResponseUnEquipWeapon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseUnEquipWeaponMessage response)
+        {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Success)
+            {
+                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
+                foreach (UIStorageItems ui in uis)
+                {
+                    ui.Refresh();
+                }
+            }
+            if (onResponseUnEquipWeapon != null)
+                onResponseUnEquipWeapon.Invoke(requestHandler, responseCode, response);
+        }
+    }
+}
