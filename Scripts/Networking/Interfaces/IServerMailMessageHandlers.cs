@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface IMailMessageHandlers
+    public interface IServerMailMessageHandlers
     {
         IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
 

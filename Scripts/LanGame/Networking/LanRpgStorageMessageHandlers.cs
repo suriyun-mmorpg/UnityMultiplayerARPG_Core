@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class LanRpgStorageMessageHandlers : MonoBehaviour, IStorageMessageHandlers
+    public class LanRpgStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
         public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
         public IServerStorageHandlers ServerStorageHandlers { get; set; }

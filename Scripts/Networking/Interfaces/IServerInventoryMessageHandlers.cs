@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public interface IInventoryMessageHandlers
+    public interface IServerInventoryMessageHandlers
     {
         IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
 

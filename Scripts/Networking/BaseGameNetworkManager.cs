@@ -10,7 +10,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, IClientCashShopHandlers, IClientMailHandlers, IClientStorageHandlers
+    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, IClientCashShopHandlers, IClientMailHandlers, IClientStorageHandlers, IClientInventoryHandlers
     {
         public class MsgTypes
         {
@@ -46,6 +46,11 @@ namespace MultiplayerARPG
             public const ushort MoveItemFromStorage = 110;
             public const ushort MoveItemToStorage = 111;
             public const ushort SwapOrMergeStorageItem = 112;
+            public const ushort SwapOrMergeItem = 113;
+            public const ushort EquipWeapon = 114;
+            public const ushort EquipArmor = 115;
+            public const ushort UnEquipWeapon = 116;
+            public const ushort UnEquipArmor = 117;
         }
 
         public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
@@ -56,9 +61,9 @@ namespace MultiplayerARPG
 
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
-        protected ICashShopMessageHandlers CashShopRequestHandlers { get; set; }
-        protected IMailMessageHandlers MailRequestHandlers { get; set; }
-        protected IStorageMessageHandlers StorageRequestHandlers { get; set; }
+        protected IServerCashShopMessageHandlers CashShopRequestHandlers { get; set; }
+        protected IServerMailMessageHandlers MailRequestHandlers { get; set; }
+        protected IServerStorageMessageHandlers StorageRequestHandlers { get; set; }
 
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
         public static readonly Dictionary<int, PartyData> Parties = new Dictionary<int, PartyData>();

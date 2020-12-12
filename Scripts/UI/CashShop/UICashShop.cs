@@ -95,7 +95,10 @@ namespace MultiplayerARPG
 
         public void Buy(int dataId)
         {
-            GameInstance.ClientCashShopHandlers.RequestCashShopBuy(dataId, ResponseCashShopBuy);
+            GameInstance.ClientCashShopHandlers.RequestCashShopBuy(new RequestCashShopBuyMessage()
+            {
+                dataId = dataId,
+            }, ResponseCashShopBuy);
         }
 
         private async UniTaskVoid ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)

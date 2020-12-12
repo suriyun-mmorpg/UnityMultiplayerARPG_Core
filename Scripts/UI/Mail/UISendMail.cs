@@ -63,12 +63,13 @@ namespace MultiplayerARPG
                 inputContent.interactable = false;
             if (inputGold != null)
                 inputGold.interactable = false;
-            GameInstance.ClientMailHandlers.RequestSendMail(
-                ReceiverName,
-                Title,
-                Content,
-                Gold,
-                MailSendCallback);
+            GameInstance.ClientMailHandlers.RequestSendMail(new RequestSendMailMessage()
+            {
+                receiverName = ReceiverName,
+                title = Title,
+                content = Content,
+                gold = Gold,
+            }, MailSendCallback);
         }
 
         private async UniTaskVoid MailSendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendMailMessage response)

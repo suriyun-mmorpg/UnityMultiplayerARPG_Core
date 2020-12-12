@@ -1230,7 +1230,15 @@ namespace MultiplayerARPG
                 string characterId = BasePlayerCharacterController.OwningCharacter.Id;
                 StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
                 string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
-                GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(characterId, storageType, storageOwnerId, (short)IndexOfData, 1, -1, UIStorageResponses.ResponseMoveItemToStorage);
+                GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
+                {
+                    characterId = characterId,
+                    storageType = storageType,
+                    storageOwnerId = storageOwnerId,
+                    inventoryIndex = (short)IndexOfData,
+                    amount = 1,
+                    storageItemIndex = -1,
+                }, UIStorageResponses.ResponseMoveItemToStorage);
             }
             else
             {
@@ -1248,7 +1256,15 @@ namespace MultiplayerARPG
             string characterId = BasePlayerCharacterController.OwningCharacter.Id;
             StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
             string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
-            GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(characterId, storageType, storageOwnerId, (short)IndexOfData, (short)amount, -1, UIStorageResponses.ResponseMoveItemToStorage);
+            GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
+            {
+                characterId = characterId,
+                storageType = storageType,
+                storageOwnerId = storageOwnerId,
+                inventoryIndex = (short)IndexOfData,
+                amount = (short)amount,
+                storageItemIndex = -1,
+            }, UIStorageResponses.ResponseMoveItemToStorage);
         }
         #endregion
 
@@ -1266,7 +1282,15 @@ namespace MultiplayerARPG
                 string characterId = BasePlayerCharacterController.OwningCharacter.Id;
                 StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
                 string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
-                GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(characterId, storageType, storageOwnerId, (short)IndexOfData, 1, -1, UIStorageResponses.ResponseMoveItemFromStorage);
+                GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
+                {
+                    characterId = characterId,
+                    storageType = storageType,
+                    storageOwnerId = storageOwnerId,
+                    storageItemIndex = (short)IndexOfData,
+                    amount = 1,
+                    inventoryIndex = -1,
+                }, UIStorageResponses.ResponseMoveItemFromStorage);
             }
             else
             {
@@ -1284,7 +1308,15 @@ namespace MultiplayerARPG
             string characterId = BasePlayerCharacterController.OwningCharacter.Id;
             StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
             string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
-            GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(characterId, storageType, storageOwnerId, (short)IndexOfData, (short)amount, -1, UIStorageResponses.ResponseMoveItemFromStorage);
+            GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
+            {
+                characterId = characterId,
+                storageType = storageType,
+                storageOwnerId = storageOwnerId,
+                storageItemIndex = (short)IndexOfData,
+                amount = (short)amount,
+                inventoryIndex = -1,
+            }, UIStorageResponses.ResponseMoveItemFromStorage);
         }
         #endregion
 

@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface ICashShopMessageHandlers
+    public interface IServerCashShopMessageHandlers
     {
         IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
 

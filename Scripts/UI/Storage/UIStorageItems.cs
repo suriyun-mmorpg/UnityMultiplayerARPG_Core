@@ -154,7 +154,14 @@ namespace MultiplayerARPG
         {
             refreshCountDown = autoRefreshDuration;
             if (BasePlayerCharacterController.OwningCharacter)
-                GameInstance.ClientStorageHandlers.RequestGetStorageItems(BasePlayerCharacterController.OwningCharacter.Id, StorageType, StorageOwnerId, GetStorageItemsCallback);
+            {
+                GameInstance.ClientStorageHandlers.RequestGetStorageItems(new RequestGetStorageItemsMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    storageType = StorageType,
+                    storageOwnerId = StorageOwnerId,
+                }, GetStorageItemsCallback);
+            }
         }
 
         private async UniTaskVoid GetStorageItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetStorageItemsMessage response)

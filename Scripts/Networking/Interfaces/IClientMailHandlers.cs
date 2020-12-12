@@ -4,10 +4,10 @@ namespace MultiplayerARPG
 {
     public interface IClientMailHandlers
     {
-        bool RequestMailList(bool onlyNewMails, ResponseDelegate<ResponseMailListMessage> callback);
-        bool RequestReadMail(string mailId, ResponseDelegate<ResponseReadMailMessage> callback);
-        bool RequestClaimMailItems(string mailId, ResponseDelegate<ResponseClaimMailItemsMessage> callback);
-        bool RequestDeleteMail(string mailId, ResponseDelegate<ResponseDeleteMailMessage> callback);
-        bool RequestSendMail(string receiverName, string title, string content, int gold, ResponseDelegate<ResponseSendMailMessage> callback);
+        bool RequestMailList(RequestMailListMessage data, ResponseDelegate<ResponseMailListMessage> callback);
+        bool RequestReadMail(RequestReadMailMessage data, ResponseDelegate<ResponseReadMailMessage> callback);
+        bool RequestClaimMailItems(RequestClaimMailItemsMessage data, ResponseDelegate<ResponseClaimMailItemsMessage> callback);
+        bool RequestDeleteMail(RequestDeleteMailMessage data, ResponseDelegate<ResponseDeleteMailMessage> callback);
+        bool RequestSendMail(RequestSendMailMessage data, ResponseDelegate<ResponseSendMailMessage> callback);
     }
 }

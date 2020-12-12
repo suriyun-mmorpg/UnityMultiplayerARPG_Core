@@ -49,19 +49,19 @@ namespace MultiplayerARPG
             StorageRequestHandlers.ServerStorageHandlers = this;
         }
 
-        protected ICashShopMessageHandlers InitCashShopMessageHandlers()
+        protected IServerCashShopMessageHandlers InitCashShopMessageHandlers()
         {
-            return gameObject.GetOrAddComponent<ICashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
+            return gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
         }
 
-        protected IMailMessageHandlers InitMailMessageHandlers()
+        protected IServerMailMessageHandlers InitMailMessageHandlers()
         {
-            return gameObject.GetOrAddComponent<IMailMessageHandlers, LanRpgMailMessageHandlers>();
+            return gameObject.GetOrAddComponent<IServerMailMessageHandlers, LanRpgMailMessageHandlers>();
         }
 
-        protected IStorageMessageHandlers InitStorageMessageHandlers()
+        protected IServerStorageMessageHandlers InitStorageMessageHandlers()
         {
-            return gameObject.GetOrAddComponent<IStorageMessageHandlers, LanRpgStorageMessageHandlers>();
+            return gameObject.GetOrAddComponent<IServerStorageMessageHandlers, LanRpgStorageMessageHandlers>();
         }
 
         public void StartGame()

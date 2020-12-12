@@ -97,7 +97,10 @@ namespace MultiplayerARPG
         public void Refresh()
         {
             refreshCountDown = autoRefreshDuration;
-            GameInstance.ClientMailHandlers.RequestMailList(onlyNewMails, MailListCallback);
+            GameInstance.ClientMailHandlers.RequestMailList(new RequestMailListMessage()
+            {
+                onlyNewMails = onlyNewMails,
+            }, MailListCallback);
         }
 
         private async UniTaskVoid MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)

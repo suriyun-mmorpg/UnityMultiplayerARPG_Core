@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class LanRpgMailMessageHandlers : MonoBehaviour, IMailMessageHandlers
+    public class LanRpgMailMessageHandlers : MonoBehaviour, IServerMailMessageHandlers
     {
         public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
 

@@ -1,18 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using LiteNetLibManager;
 
-public class IClientInventoryHandlers : MonoBehaviour
+namespace MultiplayerARPG
 {
-    // Start is called before the first frame update
-    void Start()
+    public interface IClientInventoryHandlers
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        bool RequestSwapOrMergeItem(RequestSwapOrMergeItemMessage data, ResponseDelegate<ResponseSwapOrMergeItemMessage> callback);
+        bool RequestEquipWeapon(RequestEquipWeaponMessage data, ResponseDelegate<ResponseEquipWeaponMessage> callback);
+        bool RequestEquipArmor(RequestEquipArmorMessage data, ResponseDelegate<ResponseEquipArmorMessage> callback);
+        bool RequestUnEquipWeapon(RequestUnEquipWeaponMessage data, ResponseDelegate<ResponseUnEquipWeaponMessage> callback);
+        bool RequestUnEquipArmor(RequestUnEquipArmorMessage data, ResponseDelegate<ResponseUnEquipArmorMessage> callback);
     }
 }

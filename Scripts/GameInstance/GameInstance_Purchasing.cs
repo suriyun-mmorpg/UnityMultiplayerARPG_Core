@@ -151,7 +151,12 @@ namespace MultiplayerARPG
             if (CashPackages.TryGetValue(dataId, out package))
             {
                 // Connect to server to precess purchasing
-                ClientCashShopHandlers.RequestCashPackageBuyValidation(dataId, args.purchasedProduct.receipt, ResponseCashPackageBuyValidation);
+                ClientCashShopHandlers.RequestCashPackageBuyValidation(new RequestCashPackageBuyValidationMessage()
+                    {
+                        dataId = dataId, 
+                        platform = Application.platform,
+                        receipt = args.purchasedProduct.receipt,
+                    }, ResponseCashPackageBuyValidation);
             }
             else
             {

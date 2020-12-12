@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         bool RequestCashShopInfo(ResponseDelegate<ResponseCashShopInfoMessage> callback);
         bool RequestCashPackageInfo(ResponseDelegate<ResponseCashPackageInfoMessage> callback);
-        bool RequestCashShopBuy(int dataId, ResponseDelegate<ResponseCashShopBuyMessage> callback);
-        bool RequestCashPackageBuyValidation(int dataId, string receipt, ResponseDelegate<ResponseCashPackageBuyValidationMessage> callback);
+        bool RequestCashShopBuy(RequestCashShopBuyMessage data, ResponseDelegate<ResponseCashShopBuyMessage> callback);
+        bool RequestCashPackageBuyValidation(RequestCashPackageBuyValidationMessage data, ResponseDelegate<ResponseCashPackageBuyValidationMessage> callback);
     }
 }
