@@ -4,14 +4,25 @@ namespace MultiplayerARPG
 {
     public struct ResponseUnEquipWeaponMessage : INetSerializable
     {
+        public enum Error : byte
+        {
+            None,
+            NotAvailable,
+            NotAllowed,
+            CharacterNotFound,
+            InvalidItemIndex,
+            InternalServerError,
+        }
+        public Error error;
+
         public void Deserialize(NetDataReader reader)
         {
-            throw new System.NotImplementedException();
+            error = (Error)reader.GetByte();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            throw new System.NotImplementedException();
+            writer.Put((byte)error);
         }
     }
 }
