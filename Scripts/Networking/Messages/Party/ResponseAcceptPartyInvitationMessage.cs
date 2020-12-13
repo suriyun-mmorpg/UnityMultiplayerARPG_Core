@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             NotAvailable,
             NotAllowed,
             CharacterNotFound,
+            PartyNotFound,
             InvitationNotFound,
             AlreadyJoined,
             InternalServerError,

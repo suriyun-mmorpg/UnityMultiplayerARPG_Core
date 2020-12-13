@@ -5,18 +5,21 @@ namespace MultiplayerARPG
     public struct RequestCreatePartyMessage : INetSerializable
     {
         public string characterId;
-        public string partyName;
+        public bool shareExp;
+        public bool shareItem;
 
         public void Deserialize(NetDataReader reader)
         {
             characterId = reader.GetString();
-            partyName = reader.GetString();
+            shareExp = reader.GetBool();
+            shareItem = reader.GetBool();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(characterId);
-            writer.Put(partyName);
+            writer.Put(shareExp);
+            writer.Put(shareItem);
         }
     }
 }

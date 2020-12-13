@@ -12,6 +12,7 @@ namespace MultiplayerARPG
             CharacterNotFound,
             InviteeNotFound,
             NotJoined,
+            InviteeNotAvailable,
             InternalServerError,
         }
         public Error error;

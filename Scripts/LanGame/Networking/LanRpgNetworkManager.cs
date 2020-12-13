@@ -42,8 +42,6 @@ namespace MultiplayerARPG
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
             CashShopRequestHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
             CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
-            MailRequestHandlers = gameObject.GetOrAddComponent<IServerMailMessageHandlers, LanRpgMailMessageHandlers>();
-            MailRequestHandlers.ServerPlayerCharacterHandlers = this;
             StorageRequestHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, LanRpgStorageMessageHandlers>();
             StorageRequestHandlers.ServerPlayerCharacterHandlers = this;
             StorageRequestHandlers.ServerStorageHandlers = this;

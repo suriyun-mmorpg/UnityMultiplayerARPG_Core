@@ -202,19 +202,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public void ClearParty()
-        {
-            PartyId = 0;
-        }
-
-        public void ClearGuild()
-        {
-            GuildId = 0;
-            GuildName = string.Empty;
-            GuildRole = 0;
-            SharedGuildExp = 0;
-        }
-
         #region Sync data changes callback
         protected virtual void OnDataIdChange(bool isInitial, int dataId)
         {

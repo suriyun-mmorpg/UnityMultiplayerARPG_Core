@@ -863,5 +863,17 @@ namespace MultiplayerARPG
             }
             return true;
         }
+
+        public static void ClearParty(this IPlayerCharacterData character)
+        {
+            character.PartyId = 0;
+        }
+
+        public static void ClearGuild(this IPlayerCharacterData character)
+        {
+            character.GuildId = 0;
+            character.GuildRole = 0;
+            character.SharedGuildExp = 0;
+        }
     }
 }

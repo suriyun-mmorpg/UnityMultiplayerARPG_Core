@@ -10,6 +10,8 @@ namespace MultiplayerARPG
             ServiceNotAvailable,
             RequestTimeout,
             InvalidItemData,
+            InvalidSkillData,
+            InvalidGuildSkillData,
             NotFoundCharacter,
             NotAbleToLoot,
             NotEnoughGold,
@@ -46,6 +48,9 @@ namespace MultiplayerARPG
             DealingCanceled,
             AnotherCharacterCannotCarryAnymore,
             // Party
+            NotFoundParty,
+            NotFoundPartyInvitation,
+            PartyInvitationAccepted,
             PartyInvitationDeclined,
             CannotSendPartyInvitation,
             CannotKickPartyMember,
@@ -58,6 +63,9 @@ namespace MultiplayerARPG
             CharacterNotJoinedParty,
             PartyMemberReachedLimit,
             // Guild
+            NotFoundGuild,
+            NotFoundGuildInvitation,
+            GuildInvitationAccepted,
             GuildInvitationDeclined,
             CannotSendGuildInvitation,
             CannotKickGuildMember,

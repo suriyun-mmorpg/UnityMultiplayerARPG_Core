@@ -31,14 +31,14 @@ namespace MultiplayerARPG
             AddMember(new SocialCharacterData() { id = leaderId });
         }
 
-        public SocialCharacterData CreateMemberData(BasePlayerCharacterEntity playerCharacterEntity)
+        public SocialCharacterData CreateMemberData(IPlayerCharacterData playerCharacter)
         {
-            return SocialCharacterData.Create(playerCharacterEntity);
+            return SocialCharacterData.Create(playerCharacter);
         }
 
-        public void AddMember(BasePlayerCharacterEntity playerCharacterEntity)
+        public void AddMember(IPlayerCharacterData playerCharacter)
         {
-            AddMember(CreateMemberData(playerCharacterEntity));
+            AddMember(CreateMemberData(playerCharacter));
         }
 
         public virtual void AddMember(SocialCharacterData memberData)
@@ -55,9 +55,9 @@ namespace MultiplayerARPG
             members[memberData.id] = oldMemberData;
         }
 
-        public void UpdateMember(BasePlayerCharacterEntity playerCharacterEntity)
+        public void UpdateMember(IPlayerCharacterData playerCharacter)
         {
-            UpdateMember(CreateMemberData(playerCharacterEntity));
+            UpdateMember(CreateMemberData(playerCharacter));
         }
 
         public virtual void UpdateMember(SocialCharacterData memberData)
@@ -75,9 +75,9 @@ namespace MultiplayerARPG
             members[memberData.id] = oldMemberData;
         }
 
-        public bool RemoveMember(BasePlayerCharacterEntity playerCharacterEntity)
+        public bool RemoveMember(IPlayerCharacterData playerCharacter)
         {
-            return RemoveMember(playerCharacterEntity.Id);
+            return RemoveMember(playerCharacter.Id);
         }
 
         public virtual bool RemoveMember(string characterId)
@@ -90,9 +90,9 @@ namespace MultiplayerARPG
             members.Clear();
         }
 
-        public bool IsMember(BasePlayerCharacterEntity playerCharacterEntity)
+        public bool IsMember(IPlayerCharacterData playerCharacter)
         {
-            return IsMember(playerCharacterEntity.Id);
+            return IsMember(playerCharacter.Id);
         }
 
         public bool IsMember(string characterId)
@@ -130,9 +130,9 @@ namespace MultiplayerARPG
             return members[id];
         }
 
-        public bool IsLeader(BasePlayerCharacterEntity playerCharacterEntity)
+        public bool IsLeader(IPlayerCharacterData playerCharacter)
         {
-            return IsLeader(playerCharacterEntity.Id);
+            return IsLeader(playerCharacter.Id);
         }
 
         public bool IsLeader(string characterId)
