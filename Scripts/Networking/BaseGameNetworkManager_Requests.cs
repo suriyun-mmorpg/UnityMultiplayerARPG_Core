@@ -102,5 +102,104 @@ namespace MultiplayerARPG
             return ClientSendRequest(ReqTypes.UnEquipArmor, data, responseDelegate: callback);
         }
         #endregion
+
+        #region Party
+        public bool RequestCreateParty(RequestCreatePartyMessage data, ResponseDelegate<ResponseCreatePartyMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.CreateParty, data, responseDelegate: callback);
+        }
+
+        public bool RequestChangePartyLeader(RequestChangePartyLeaderMessage data, ResponseDelegate<ResponseChangePartyLeaderMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.ChangePartyLeader, data, responseDelegate: callback);
+        }
+
+        public bool RequestChangePartySetting(RequestChangePartySettingMessage data, ResponseDelegate<ResponseChangePartySettingMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.ChangePartySetting, data, responseDelegate: callback);
+        }
+
+        public bool RequestSendPartyInvitation(RequestSendPartyInvitationMessage data, ResponseDelegate<ResponseSendPartyInvitationMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.SendPartyInvitation, data, responseDelegate: callback);
+        }
+
+        public bool RequestAcceptPartyInvitation(RequestAcceptPartyInvitationMessage data, ResponseDelegate<ResponseAcceptPartyInvitationMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.AcceptPartyInvitation, data, responseDelegate: callback);
+        }
+
+        public bool RequestDeclinePartyInvitation(RequestDeclinePartyInvitationMessage data, ResponseDelegate<ResponseDeclinePartyInvitationMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.DeclinePartyInvitation, data, responseDelegate: callback);
+        }
+
+        public bool RequestKickMemberFromParty(RequestKickMemberFromPartyMessage data, ResponseDelegate<ResponseKickMemberFromPartyMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.KickMemberFromParty, data, responseDelegate: callback);
+        }
+
+        public bool RequestLeaveParty(RequestLeavePartyMessage data, ResponseDelegate<ResponseLeavePartyMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.LeaveParty, data, responseDelegate: callback);
+        }
+        #endregion
+
+        #region Guild
+        public bool RequestCreateGuild(RequestCreateGuildMessage data, ResponseDelegate<ResponseCreateGuildMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.CreateGuild, data, responseDelegate: callback);
+        }
+
+        public bool RequestChangeGuildLeader(RequestChangeGuildLeaderMessage data, ResponseDelegate<ResponseChangeGuildLeaderMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.ChangeGuildLeader, data, responseDelegate: callback);
+        }
+
+        public bool RequestChangeGuildMessage(RequestChangeGuildMessageMessage data, ResponseDelegate<ResponseChangeGuildMessageMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.ChangeGuildMessage, data, responseDelegate: callback);
+        }
+
+        public bool RequestChangeGuildRole(RequestChangeGuildRoleMessage data, ResponseDelegate<ResponseChangeGuildRoleMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.ChangeGuildRole, data, responseDelegate: callback);
+        }
+
+        public bool RequestChangeMemberGuildRole(RequestChangeMemberGuildRoleMessage data, ResponseDelegate<ResponseChangeMemberGuildRoleMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.ChangeMemberGuildRole, data, responseDelegate: callback);
+        }
+
+        public bool RequestSendGuildInvitation(RequestSendGuildInvitationMessage data, ResponseDelegate<ResponseSendGuildInvitationMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.SendGuildInvitation, data, responseDelegate: callback);
+        }
+
+        public bool RequestAcceptGuildInvitation(RequestAcceptGuildInvitationMessage data, ResponseDelegate<ResponseAcceptGuildInvitationMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.AcceptGuildInvitation, data, responseDelegate: callback);
+        }
+
+        public bool RequestDeclineGuildInvitation(RequestDeclineGuildInvitationMessage data, ResponseDelegate<ResponseDeclineGuildInvitationMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.DeclineGuildInvitation, data, responseDelegate: callback);
+        }
+
+        public bool RequestKickMemberFromGuild(RequestKickMemberFromGuildMessage data, ResponseDelegate<ResponseKickMemberFromGuildMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.KickMemberFromGuild, data, responseDelegate: callback);
+        }
+
+        public bool RequestLeaveGuild(RequestLeaveGuildMessage data, ResponseDelegate<ResponseLeaveGuildMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.LeaveGuild, data, responseDelegate: callback);
+        }
+
+        public bool RequestIncreaseGuildSkillLevel(RequestIncreaseGuildSkillLevelMessage data, ResponseDelegate<ResponseIncreaseGuildSkillLevelMessage> callback)
+        {
+            return ClientSendRequest(ReqTypes.IncreaseGuildSkillLevel, data, responseDelegate: callback);
+        }
+        #endregion
     }
 }

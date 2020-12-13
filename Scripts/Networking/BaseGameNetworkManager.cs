@@ -10,7 +10,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, IClientCashShopHandlers, IClientMailHandlers, IClientStorageHandlers, IClientInventoryHandlers
+    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, IClientCashShopHandlers, IClientMailHandlers, IClientStorageHandlers, IClientInventoryHandlers, IClientPartyHandlers, IClientGuildHandlers
     {
         public class MsgTypes
         {
@@ -51,6 +51,25 @@ namespace MultiplayerARPG
             public const ushort EquipArmor = 115;
             public const ushort UnEquipWeapon = 116;
             public const ushort UnEquipArmor = 117;
+            public const ushort CreateParty = 118;
+            public const ushort ChangePartyLeader = 119;
+            public const ushort ChangePartySetting = 120;
+            public const ushort SendPartyInvitation = 121;
+            public const ushort AcceptPartyInvitation = 122;
+            public const ushort DeclinePartyInvitation = 123;
+            public const ushort KickMemberFromParty = 124;
+            public const ushort LeaveParty = 125;
+            public const ushort CreateGuild = 126;
+            public const ushort ChangeGuildLeader = 127;
+            public const ushort ChangeGuildMessage = 128;
+            public const ushort ChangeGuildRole = 129;
+            public const ushort ChangeMemberGuildRole = 130;
+            public const ushort SendGuildInvitation = 131;
+            public const ushort AcceptGuildInvitation = 132;
+            public const ushort DeclineGuildInvitation = 133;
+            public const ushort KickMemberFromGuild = 134;
+            public const ushort LeaveGuild = 135;
+            public const ushort IncreaseGuildSkillLevel = 136;
         }
 
         public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
@@ -65,6 +84,10 @@ namespace MultiplayerARPG
         protected IServerMailMessageHandlers MailRequestHandlers { get; set; }
         protected IServerStorageMessageHandlers StorageRequestHandlers { get; set; }
         protected IServerInventoryMessageHandlers InventoryRequestHandlers { get; set; }
+        protected IServerPartyMessageHandlers PartyRequestHandlers { get; set; }
+        protected IServerGuildMessageHandlers GuildRequestHandlers { get; set; }
+        public PartyData ClientParty { get; set; }
+        public GuildData ClientGuild { get; set; }
 
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
         public static readonly Dictionary<int, PartyData> Parties = new Dictionary<int, PartyData>();
@@ -77,11 +100,10 @@ namespace MultiplayerARPG
         /// * The manager will not validate values in `readyToInstantiateObjectsStates` after this value was `TRUE`<para />
         /// * This value will reset to `FALSE` in `OnServerOnlineSceneLoaded`<para />
         /// </summary>
-        public static PartyData ClientParty { get; protected set; }
-        public static GuildData ClientGuild { get; protected set; }
         public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(1);
         public static readonly SocialGroupData ClientFriends = new SocialGroupData(1);
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
+
         // Events
         public System.Action onClientWarp;
         public System.Action<ChatMessage> onClientReceiveChat;
@@ -196,6 +218,27 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestEquipArmorMessage, ResponseEquipArmorMessage>(ReqTypes.EquipArmor);
             RegisterClientResponse<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(ReqTypes.UnEquipWeapon);
             RegisterClientResponse<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(ReqTypes.UnEquipArmor);
+            // Party
+            RegisterClientResponse<RequestCreatePartyMessage, ResponseCreatePartyMessage>(ReqTypes.CreateParty);
+            RegisterClientResponse<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(ReqTypes.ChangePartyLeader);
+            RegisterClientResponse<RequestChangePartySettingMessage, ResponseChangePartySettingMessage>(ReqTypes.ChangePartySetting);
+            RegisterClientResponse<RequestSendPartyInvitationMessage, ResponseSendPartyInvitationMessage>(ReqTypes.SendPartyInvitation);
+            RegisterClientResponse<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(ReqTypes.AcceptPartyInvitation);
+            RegisterClientResponse<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(ReqTypes.DeclinePartyInvitation);
+            RegisterClientResponse<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(ReqTypes.KickMemberFromParty);
+            RegisterClientResponse<RequestLeavePartyMessage, ResponseLeavePartyMessage>(ReqTypes.LeaveParty);
+            // Guild
+            RegisterClientResponse<RequestCreateGuildMessage, ResponseCreateGuildMessage>(ReqTypes.CreateGuild);
+            RegisterClientResponse<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(ReqTypes.ChangeGuildLeader);
+            RegisterClientResponse<RequestChangeGuildMessageMessage, ResponseChangeGuildMessageMessage>(ReqTypes.ChangeGuildMessage);
+            RegisterClientResponse<RequestChangeGuildRoleMessage, ResponseChangeGuildRoleMessage>(ReqTypes.ChangeGuildRole);
+            RegisterClientResponse<RequestChangeMemberGuildRoleMessage, ResponseChangeMemberGuildRoleMessage>(ReqTypes.ChangeMemberGuildRole);
+            RegisterClientResponse<RequestSendGuildInvitationMessage, ResponseSendGuildInvitationMessage>(ReqTypes.SendGuildInvitation);
+            RegisterClientResponse<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(ReqTypes.AcceptGuildInvitation);
+            RegisterClientResponse<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(ReqTypes.DeclineGuildInvitation);
+            RegisterClientResponse<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild);
+            RegisterClientResponse<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild);
+            RegisterClientResponse<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel);
         }
 
         protected override void RegisterServerMessages()
@@ -239,6 +282,33 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestEquipArmorMessage, ResponseEquipArmorMessage>(ReqTypes.EquipArmor, InventoryRequestHandlers.HandleRequestEquipArmor);
                 RegisterServerRequest<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(ReqTypes.UnEquipWeapon, InventoryRequestHandlers.HandleRequestUnEquipWeapon);
                 RegisterServerRequest<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(ReqTypes.UnEquipArmor, InventoryRequestHandlers.HandleRequestUnEquipArmor);
+            }
+            // Party
+            if (PartyRequestHandlers != null)
+            {
+                RegisterServerRequest<RequestCreatePartyMessage, ResponseCreatePartyMessage>(ReqTypes.CreateParty, PartyRequestHandlers.HandleRequestCreateParty);
+                RegisterServerRequest<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(ReqTypes.ChangePartyLeader, PartyRequestHandlers.HandleRequestChangePartyLeader);
+                RegisterServerRequest<RequestChangePartySettingMessage, ResponseChangePartySettingMessage>(ReqTypes.ChangePartySetting, PartyRequestHandlers.HandleRequestChangePartySetting);
+                RegisterServerRequest<RequestSendPartyInvitationMessage, ResponseSendPartyInvitationMessage>(ReqTypes.SendPartyInvitation, PartyRequestHandlers.HandleRequestSendPartyInvitation);
+                RegisterServerRequest<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(ReqTypes.AcceptPartyInvitation, PartyRequestHandlers.HandleRequestAcceptPartyInvitation);
+                RegisterServerRequest<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(ReqTypes.DeclinePartyInvitation, PartyRequestHandlers.HandleRequestDeclinePartyInvitation);
+                RegisterServerRequest<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(ReqTypes.KickMemberFromParty, PartyRequestHandlers.HandleRequestKickMemberFromParty);
+                RegisterServerRequest<RequestLeavePartyMessage, ResponseLeavePartyMessage>(ReqTypes.LeaveParty, PartyRequestHandlers.HandleRequestLeaveParty);
+            }
+            // Guild
+            if (GuildRequestHandlers != null)
+            {
+                RegisterServerRequest<RequestCreateGuildMessage, ResponseCreateGuildMessage>(ReqTypes.CreateGuild, GuildRequestHandlers.HandleRequestCreateGuild);
+                RegisterServerRequest<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(ReqTypes.ChangeGuildLeader, GuildRequestHandlers.HandleRequestChangeGuildLeader);
+                RegisterServerRequest<RequestChangeGuildMessageMessage, ResponseChangeGuildMessageMessage>(ReqTypes.ChangeGuildMessage, GuildRequestHandlers.HandleRequestChangeGuildMessage);
+                RegisterServerRequest<RequestChangeGuildRoleMessage, ResponseChangeGuildRoleMessage>(ReqTypes.ChangeGuildRole, GuildRequestHandlers.HandleRequestChangeGuildRole);
+                RegisterServerRequest<RequestChangeMemberGuildRoleMessage, ResponseChangeMemberGuildRoleMessage>(ReqTypes.ChangeMemberGuildRole, GuildRequestHandlers.HandleRequestChangeMemberGuildRole);
+                RegisterServerRequest<RequestSendGuildInvitationMessage, ResponseSendGuildInvitationMessage>(ReqTypes.SendGuildInvitation, GuildRequestHandlers.HandleRequestSendGuildInvitation);
+                RegisterServerRequest<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(ReqTypes.AcceptGuildInvitation, GuildRequestHandlers.HandleRequestAcceptGuildInvitation);
+                RegisterServerRequest<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(ReqTypes.DeclineGuildInvitation, GuildRequestHandlers.HandleRequestDeclineGuildInvitation);
+                RegisterServerRequest<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild, GuildRequestHandlers.HandleRequestKickMemberFromGuild);
+                RegisterServerRequest<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild, GuildRequestHandlers.HandleRequestLeaveGuild);
+                RegisterServerRequest<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel, GuildRequestHandlers.HandleRequestIncreaseGuildSkillLevel);
             }
         }
 
