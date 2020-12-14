@@ -80,5 +80,10 @@ namespace MultiplayerARPG
         /// <param name="playerCharacter"></param>
         /// <returns></returns>
         bool CanAccessStorage(StorageId storageId, IPlayerCharacterData playerCharacter);
+
+        /// <summary>
+        /// This will be used to clear data relates to storage system
+        /// </summary>
+        void ClearStorage();
     }
 }

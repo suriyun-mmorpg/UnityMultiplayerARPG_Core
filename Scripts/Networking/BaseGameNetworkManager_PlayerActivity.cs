@@ -24,18 +24,6 @@ namespace MultiplayerARPG
             }
             WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition, false, Vector3.zero);
         }
-
-        public virtual void IncreaseGuildExp(BasePlayerCharacterEntity playerCharacterEntity, int exp)
-        {
-            int guildId;
-            GuildData guild;
-            if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out guild))
-                return;
-
-            guild = CurrentGameInstance.SocialSystemSetting.IncreaseGuildExp(guild, exp);
-            Guilds[guildId] = guild;
-            SendGuildLevelExpSkillPointToClients(guild);
-        }
         #endregion
 
         /// <summary>
@@ -81,21 +69,6 @@ namespace MultiplayerARPG
                     break;
             }
         }
-
-        /// <summary>
-        /// Create Party
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who create the party</param>
-        /// <param name="shareExp">The party will share exp or not</param>
-        /// <param name="shareItem">The party will share item or not</param>
-        public abstract void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem);
-
-        /// <summary>
-        /// Create Guild
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who create the guild</param>
-        /// <param name="guildName">Guild name</param>
-        public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
 
         /// <summary>
         /// Deposit gold

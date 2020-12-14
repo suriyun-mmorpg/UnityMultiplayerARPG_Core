@@ -154,6 +154,12 @@ namespace MultiplayerARPG
             return storageItems[id];
         }
 
+        public void ClearStorage()
+        {
+            storageItems.Clear();
+            usingStorageCharacters.Clear();
+        }
+
         private void NotifyStorageItemsToCharacters(HashSet<long> connectionIds)
         {
             foreach (long connectionId in connectionIds)

@@ -163,7 +163,7 @@ namespace MultiplayerARPG
             TurnOnElapsed += tempDeltaTime;
 
             ConvertItem convertData;
-            List<CharacterItem> items = new List<CharacterItem>(ServerStorageHandlers.GetStorageEntityItems(this));
+            List<CharacterItem> items = new List<CharacterItem>(GameInstance.ServerStorageHandlers.GetStorageEntityItems(this));
             foreach (CharacterItem item in items)
             {
                 if (!CacheConvertItems.ContainsKey(item.dataId))
@@ -194,12 +194,12 @@ namespace MultiplayerARPG
         {
             StorageId storageId = new StorageId(StorageType.Building, Id);
             ItemAmount tempItemAmount = convertData.item;
-            await ServerStorageHandlers.DecreaseStorageItems(storageId, tempItemAmount.item.DataId, tempItemAmount.amount);
+            await GameInstance.ServerStorageHandlers.DecreaseStorageItems(storageId, tempItemAmount.item.DataId, tempItemAmount.amount);
             if (convertData.convertedItem.item != null)
             {
                 tempItemAmount = convertData.convertedItem;
                 CharacterItem convertedItem = CharacterItem.Create(tempItemAmount.item.DataId, 1, tempItemAmount.amount);
-                if (!await ServerStorageHandlers.IncreaseStorageItems(storageId, convertedItem))
+                if (!await GameInstance.ServerStorageHandlers.IncreaseStorageItems(storageId, convertedItem))
                 {
                     // Cannot add item to storage, so drop to ground
                     ItemDropEntity.DropItem(this, convertedItem, new uint[0]);
@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                 // Not require fuel
                 return true;
             }
-            List<CharacterItem> items = ServerStorageHandlers.GetStorageEntityItems(this);
+            List<CharacterItem> items = GameInstance.ServerStorageHandlers.GetStorageEntityItems(this);
             foreach (CharacterItem item in items)
             {
                 if (CacheFuelItems.ContainsKey(item.dataId) &&

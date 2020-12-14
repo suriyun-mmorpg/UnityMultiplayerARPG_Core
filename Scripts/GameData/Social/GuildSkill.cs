@@ -83,12 +83,8 @@ namespace MultiplayerARPG
             if (character == null)
                 return false;
 
-            BaseGameNetworkManager gameManager = BaseGameNetworkManager.Singleton;
-            if (gameManager == null)
-                return false;
-
-            GuildData guildData = null;
-            if (!gameManager.TryGetGuild(character.GuildId, out guildData))
+            GuildData guildData;
+            if (!GameInstance.ServerGuildHandlers.TryGetGuild(character.GuildId, out guildData))
                 return false;
 
             return guildData.skillPoint > 0 && level < maxLevel;

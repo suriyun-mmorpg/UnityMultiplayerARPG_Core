@@ -10,7 +10,16 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager, IServerPlayerCharacterHandlers, IClientCashShopHandlers, IClientMailHandlers, IClientStorageHandlers, IClientInventoryHandlers, IClientPartyHandlers, IClientGuildHandlers
+    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager,
+        IServerPlayerCharacterHandlers,
+        IServerGuildHandlers,
+        IServerPartyHandlers,
+        IClientCashShopHandlers,
+        IClientMailHandlers,
+        IClientStorageHandlers,
+        IClientInventoryHandlers,
+        IClientPartyHandlers,
+        IClientGuildHandlers
     {
         public class MsgTypes
         {
@@ -90,10 +99,6 @@ namespace MultiplayerARPG
         public GuildData ClientGuild { get; set; }
 
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
-        public static readonly Dictionary<int, PartyData> Parties = new Dictionary<int, PartyData>();
-        public static readonly Dictionary<int, GuildData> Guilds = new Dictionary<int, GuildData>();
-        public static readonly Dictionary<long, PartyData> UpdatingPartyMembers = new Dictionary<long, PartyData>();
-        public static readonly Dictionary<long, GuildData> UpdatingGuildMembers = new Dictionary<long, GuildData>();
         public static readonly Dictionary<string, NotifyOnlineCharacterTime> LastCharacterOnlineTimes = new Dictionary<string, NotifyOnlineCharacterTime>();
         /// <summary>
         /// * This value will be `TRUE` when all values in `readyToInstantiateObjectsStates` are `TRUE`<para />
@@ -105,6 +110,8 @@ namespace MultiplayerARPG
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
         // Events
+        public System.Action onClientConnected;
+        public System.Action<DisconnectInfo> onClientDisconnected;
         public System.Action onClientWarp;
         public System.Action<ChatMessage> onClientReceiveChat;
         public System.Action<GameMessage> onClientReceiveGameMessage;
@@ -130,16 +137,6 @@ namespace MultiplayerARPG
         public override uint PacketVersion()
         {
             return 5;
-        }
-
-        public bool TryGetParty(int id, out PartyData result)
-        {
-            return Parties.TryGetValue(id, out result);
-        }
-
-        public bool TryGetGuild(int id, out GuildData result)
-        {
-            return Guilds.TryGetValue(id, out result);
         }
 
         protected override void Awake()
@@ -316,11 +313,9 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("Clean");
             ClearPlayerCharacters();
+            ClearParty();
+            ClearGuild();
             BuildingEntities.Clear();
-            Parties.Clear();
-            Guilds.Clear();
-            UpdatingPartyMembers.Clear();
-            UpdatingGuildMembers.Clear();
             LastCharacterOnlineTimes.Clear();
             ClientParty = null;
             ClientGuild = null;
@@ -333,6 +328,9 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
+            GameInstance.ServerPlayerCharacterHandlers = this;
+            GameInstance.ServerPartyHandlers = this;
+            GameInstance.ServerGuildHandlers = this;
             CurrentGameInstance.DayNightTimeUpdater.InitTimeOfDay(this);
         }
 
@@ -358,10 +356,20 @@ namespace MultiplayerARPG
         public override void OnClientConnected()
         {
             base.OnClientConnected();
+            if (onClientConnected != null)
+                onClientConnected.Invoke();
             GameInstance.ClientCashShopHandlers = this;
             GameInstance.ClientMailHandlers = this;
             GameInstance.ClientStorageHandlers = this;
             GameInstance.ClientInventoryHandlers = this;
+        }
+
+        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
+        {
+            base.OnClientDisconnected(disconnectInfo);
+            if (onClientDisconnected != null)
+                onClientDisconnected.Invoke(disconnectInfo);
+            UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
         }
 
         public override void OnPeerConnected(long connectionId)
@@ -444,14 +452,14 @@ namespace MultiplayerARPG
                 {
                     tempParty.UpdateMember(playerCharacter);
                     if (!UpdatingPartyMembers.ContainsKey(playerCharacter.ConnectionId))
-                        UpdatingPartyMembers.Add(playerCharacter.ConnectionId, tempParty);
+                        UpdatingPartyMembers.TryAdd(playerCharacter.ConnectionId, tempParty);
                 }
 
                 if (playerCharacter.GuildId > 0 && Guilds.TryGetValue(playerCharacter.GuildId, out tempGuild))
                 {
                     tempGuild.UpdateMember(playerCharacter);
                     if (!UpdatingGuildMembers.ContainsKey(playerCharacter.ConnectionId))
-                        UpdatingGuildMembers.Add(playerCharacter.ConnectionId, tempGuild);
+                        UpdatingGuildMembers.TryAdd(playerCharacter.ConnectionId, tempGuild);
                 }
             }
 
@@ -880,12 +888,6 @@ namespace MultiplayerARPG
         public void Quit()
         {
             Application.Quit();
-        }
-
-        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
-        {
-            base.OnClientDisconnected(disconnectInfo);
-            UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
         }
 
         private void RegisterEntities()

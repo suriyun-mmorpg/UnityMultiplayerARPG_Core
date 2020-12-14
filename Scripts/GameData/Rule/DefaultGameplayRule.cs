@@ -340,11 +340,11 @@ namespace MultiplayerARPG
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
-                        if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                        if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += Mathf.CeilToInt(exp * guildData.IncreaseExpGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
-                        if (playerCharacter.CurrentGameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                        if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += Mathf.CeilToInt(exp * guildData.IncreaseShareExpGainPercentage * 0.01f);
                         break;
                 }

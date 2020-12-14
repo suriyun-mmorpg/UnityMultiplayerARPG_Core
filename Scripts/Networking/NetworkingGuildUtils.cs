@@ -1,13 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public static class NetworkingGuildUtil
     {
-        public static async UniTask<ValidateGuildRequestResult> CanCreateGuild(this IPlayerCharacterData playerCharacter, string guildName)
+        public static ValidateGuildRequestResult CanCreateGuild(this IPlayerCharacterData playerCharacter, string guildName)
         {
-            await UniTask.Yield();
             GameMessage.Type gameMessageType;
             if (string.IsNullOrEmpty(guildName) || guildName.Length < GameInstance.Singleton.SocialSystemSetting.MinGuildNameLength)
             {
@@ -30,12 +26,12 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanChangeGuildLeader(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, string memberId)
+        public static ValidateGuildRequestResult CanChangeGuildLeader(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, string memberId)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
             GuildData guild;
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -54,12 +50,12 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanChangeGuildMessage(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, string guildMessage)
+        public static ValidateGuildRequestResult CanChangeGuildMessage(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, string guildMessage)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
             GuildData guild;
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -78,12 +74,12 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanChangeGuildRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, byte guildRole, string roleName)
+        public static ValidateGuildRequestResult CanChangeGuildRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, byte guildRole, string roleName)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
             GuildData guild;
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -112,12 +108,12 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanSetGuildMemberRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter)
+        public static ValidateGuildRequestResult CanSetGuildMemberRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
             GuildData guild;
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -131,12 +127,12 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanSendGuildInvitation(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData inviterCharacter, IPlayerCharacterData inviteeCharacter)
+        public static ValidateGuildRequestResult CanSendGuildInvitation(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData inviterCharacter, IPlayerCharacterData inviteeCharacter)
         {
             GameMessage.Type gameMessageType;
             int guildId = inviterCharacter.GuildId;
             GuildData guild;
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -155,11 +151,11 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanAcceptGuildInvitation(this IServerGuildHandlers serverGuildHandlers, int guildId, IPlayerCharacterData inviteeCharacter)
+        public static ValidateGuildRequestResult CanAcceptGuildInvitation(this IServerGuildHandlers serverGuildHandlers, int guildId, IPlayerCharacterData inviteeCharacter)
         {
             GameMessage.Type gameMessageType;
             GuildData guild;
-            if (!await serverGuildHandlers.HasInvitation(guildId, inviteeCharacter.Id))
+            if (!serverGuildHandlers.HasGuildInvitation(guildId, inviteeCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotFoundGuildInvitation;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -169,7 +165,7 @@ namespace MultiplayerARPG
                 gameMessageType = GameMessage.Type.JoinedAnotherGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotFoundGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -183,16 +179,16 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanDeclineGuildInvitation(this IServerGuildHandlers serverGuildHandlers, int guildId, IPlayerCharacterData inviteeCharacter)
+        public static ValidateGuildRequestResult CanDeclineGuildInvitation(this IServerGuildHandlers serverGuildHandlers, int guildId, IPlayerCharacterData inviteeCharacter)
         {
             GameMessage.Type gameMessageType;
             GuildData guild;
-            if (!await serverGuildHandlers.HasInvitation(guildId, inviteeCharacter.Id))
+            if (!serverGuildHandlers.HasGuildInvitation(guildId, inviteeCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotFoundGuildInvitation;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotFoundGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -201,12 +197,12 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanKickMemberFromGuild(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, string memberId)
+        public static ValidateGuildRequestResult CanKickMemberFromGuild(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, string memberId)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
             GuildData guild;
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -241,12 +237,12 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanLeaveGuild(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter)
+        public static ValidateGuildRequestResult CanLeaveGuild(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
             GuildData guild;
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -255,7 +251,7 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanIncreaseGuildSkillLevel(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, int dataId)
+        public static ValidateGuildRequestResult CanIncreaseGuildSkillLevel(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, int dataId)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
@@ -265,7 +261,7 @@ namespace MultiplayerARPG
                 gameMessageType = GameMessage.Type.InvalidGuildSkillData;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -289,12 +285,12 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanIncreaseGuildExp(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, int exp)
+        public static ValidateGuildRequestResult CanIncreaseGuildExp(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, int exp)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
             GuildData guild;
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -303,7 +299,7 @@ namespace MultiplayerARPG
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static async UniTask<ValidateGuildRequestResult> CanUseGuildSkill(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, int dataId)
+        public static ValidateGuildRequestResult CanUseGuildSkill(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, int dataId)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;
@@ -313,7 +309,7 @@ namespace MultiplayerARPG
                 gameMessageType = GameMessage.Type.InvalidGuildSkillData;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (guildId <= 0 || !await serverGuildHandlers.TryGetGuild(guildId, out guild))
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
             {
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);

@@ -28,8 +28,6 @@ namespace MultiplayerARPG
         public PlayerCharacterData selectedCharacter;
         public EnableGmCommandType enableGmCommands;
         private float lastSaveTime;
-        private int nextPartyId = 1;
-        private int nextGuildId = 1;
         private Vector3? teleportPosition;
         private readonly Dictionary<long, PlayerCharacterData> pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
 
@@ -42,11 +40,17 @@ namespace MultiplayerARPG
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
             CashShopRequestHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
             CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
+            InventoryRequestHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
+            InventoryRequestHandlers.ServerPlayerCharacterHandlers = this;
             StorageRequestHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, LanRpgStorageMessageHandlers>();
             StorageRequestHandlers.ServerPlayerCharacterHandlers = this;
             StorageRequestHandlers.ServerStorageHandlers = this;
-            InventoryRequestHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
-            InventoryRequestHandlers.ServerPlayerCharacterHandlers = this;
+            PartyRequestHandlers = gameObject.GetOrAddComponent<IServerPartyMessageHandlers, LanRpgPartyMessageHandlers>();
+            PartyRequestHandlers.ServerPlayerCharacterHandlers = this;
+            PartyRequestHandlers.ServerPartyHandlers = this;
+            GuildRequestHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, LanRpgGuildMessageHandlers>();
+            GuildRequestHandlers.ServerPlayerCharacterHandlers = this;
+            GuildRequestHandlers.ServerGuildHandlers = this;
         }
 
         public void StartGame()
@@ -143,8 +147,7 @@ namespace MultiplayerARPG
         protected override void Clean()
         {
             base.Clean();
-            nextPartyId = 1;
-            nextGuildId = 1;
+
             storageItems.Clear();
             usingStorageCharacters.Clear();
         }
@@ -327,16 +330,6 @@ namespace MultiplayerARPG
         }
 
         #region Implement Abstract Functions
-        public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
-        {
-            CreateParty(playerCharacterEntity, shareExp, shareItem, nextPartyId++);
-        }
-
-        public override void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
-        {
-            CreateGuild(playerCharacterEntity, guildName, nextGuildId++);
-        }
-
         public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             if (playerCharacterEntity.Gold - amount >= 0)
@@ -439,6 +432,7 @@ namespace MultiplayerARPG
         public override void OnStartServer()
         {
             base.OnStartServer();
+            GameInstance.ServerStorageHandlers = this;
             SaveSystem.OnServerStart();
         }
 

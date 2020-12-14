@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         {
             float expLostPercentage = CurrentGameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;
-            if (CurrentGameManager.TryGetGuild(GuildId, out guildData))
+            if (CurrentGameManager.GetServerGuildHandlers().TryGetGuild(GuildId, out guildData))
                 expLostPercentage -= expLostPercentage * guildData.DecreaseExpLostPercentage;
             if (expLostPercentage <= 0f)
                 expLostPercentage = 0f;

@@ -22,7 +22,6 @@ namespace MultiplayerARPG
         private bool dirtyIsOpen;
         public override bool Activatable { get { return true; } }
         public override bool Lockable { get { return lockable; } }
-        protected IServerStorageHandlers ServerStorageHandlers { get { return CurrentGameManager as IServerStorageHandlers; } }
 
         public override void OnSetup()
         {
@@ -64,7 +63,7 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            bool updatingIsOpen = ServerStorageHandlers.IsStorageEntityOpen(this);
+            bool updatingIsOpen = GameInstance.ServerStorageHandlers.IsStorageEntityOpen(this);
             if (updatingIsOpen != dirtyIsOpen)
             {
                 dirtyIsOpen = updatingIsOpen;

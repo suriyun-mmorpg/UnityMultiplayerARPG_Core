@@ -22,9 +22,6 @@ namespace MultiplayerARPG
         public System.Action<int> onUpdateAnotherDealingGold;
         public System.Action<DealingCharacterItems> onUpdateDealingItems;
         public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
-        // Invitation dialog events
-        public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
-        public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
         // Storage dialog events
         public System.Action<StorageType, string, uint, short, short> onShowStorage;
         // Sync variables

@@ -6,8 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        protected IServerStorageHandlers ServerStorageHandlers { get { return CurrentGameManager as IServerStorageHandlers; } }
-
         [ServerRpc]
         protected void ServerAddAttribute(int dataId)
         {
@@ -37,16 +35,6 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerAddGuildSkill(int dataId)
-        {
-#if !CLIENT_BUILD
-            if (this.IsDead())
-                return;
-            CurrentGameManager.AddGuildSkill(this, dataId);
-#endif
-        }
-
-        [ServerRpc]
         protected void ServerUseGuildSkill(int dataId)
         {
 #if !CLIENT_BUILD
@@ -58,7 +46,7 @@ namespace MultiplayerARPG
                 return;
 
             GuildData guild;
-            if (GuildId <= 0 || !CurrentGameManager.TryGetGuild(GuildId, out guild))
+            if (GuildId <= 0 || !Manager.GetServerGuildHandlers().TryGetGuild(GuildId, out guild))
                 return;
 
             short level = guild.GetSkillLevel(dataId);
@@ -695,194 +683,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Party
-        [ServerRpc]
-        protected void ServerCreateParty(bool shareExp, bool shareItem)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.CreateParty(this, shareExp, shareItem);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerChangePartyLeader(string characterId)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.ChangePartyLeader(this, characterId);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerPartySetting(bool shareExp, bool shareItem)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.PartySetting(this, shareExp, shareItem);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerSendPartyInvitation(uint objectId)
-        {
-#if !CLIENT_BUILD
-            BasePlayerCharacterEntity targetCharacterEntity;
-            if (!CurrentGameManager.CanSendPartyInvitation(this, objectId, out targetCharacterEntity))
-                return;
-            DealingCharacter = targetCharacterEntity;
-            targetCharacterEntity.DealingCharacter = this;
-            // Send receive party invitation request to player
-            targetCharacterEntity.CallOwnerReceivePartyInvitation(ObjectId);
-#endif
-        }
-
-        [TargetRpc]
-        protected void TargetReceivePartyInvitation(uint objectId)
-        {
-            BasePlayerCharacterEntity playerCharacterEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
-                return;
-            if (onShowPartyInvitationDialog != null)
-                onShowPartyInvitationDialog.Invoke(playerCharacterEntity);
-        }
-
-        [ServerRpc]
-        protected void ServerAcceptPartyInvitation()
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.AddPartyMember(DealingCharacter, this);
-            StopPartyInvitation();
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerDeclinePartyInvitation()
-        {
-#if !CLIENT_BUILD
-            if (DealingCharacter != null)
-                CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
-            CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.PartyInvitationDeclined);
-            StopPartyInvitation();
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerKickFromParty(string characterId)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.KickFromParty(this, characterId);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerLeaveParty()
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.LeaveParty(this);
-#endif
-        }
-        #endregion
-
-        #region Guild
-        [ServerRpc]
-        protected void ServerCreateGuild(string guildName)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.CreateGuild(this, guildName);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerChangeGuildLeader(string characterId)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.ChangeGuildLeader(this, characterId);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerSetGuildMessage(string guildMessage)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.SetGuildMessage(this, guildMessage);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.SetGuildRole(this, guildRole, name, canInvite, canKick, shareExpPercentage);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerSetGuildMemberRole(string characterId, byte guildRole)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.SetGuildMemberRole(this, characterId, guildRole);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerSendGuildInvitation(uint objectId)
-        {
-#if !CLIENT_BUILD
-            BasePlayerCharacterEntity targetCharacterEntity;
-            if (!CurrentGameManager.CanSendGuildInvitation(this, objectId, out targetCharacterEntity))
-                return;
-            DealingCharacter = targetCharacterEntity;
-            targetCharacterEntity.DealingCharacter = this;
-            // Send receive guild invitation request to player
-            targetCharacterEntity.CallOwnerReceiveGuildInvitation(ObjectId);
-#endif
-        }
-
-        [TargetRpc]
-        protected void TargetReceiveGuildInvitation(uint objectId)
-        {
-            BasePlayerCharacterEntity playerCharacterEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
-                return;
-            if (onShowGuildInvitationDialog != null)
-                onShowGuildInvitationDialog.Invoke(playerCharacterEntity);
-        }
-
-        [ServerRpc]
-        protected void ServerAcceptGuildInvitation()
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.AddGuildMember(DealingCharacter, this);
-            StopGuildInvitation();
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerDeclineGuildInvitation()
-        {
-#if !CLIENT_BUILD
-            if (DealingCharacter != null)
-                CurrentGameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
-            CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.GuildInvitationDeclined);
-            StopGuildInvitation();
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerKickFromGuild(string characterId)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.KickFromGuild(this, characterId);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerLeaveGuild()
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.LeaveGuild(this);
-#endif
-        }
-        #endregion
-
         #region Banking
         [ServerRpc]
         protected void ServerDepositGold(int amount)
@@ -950,7 +750,7 @@ namespace MultiplayerARPG
         protected void ServerCloseStorage()
         {
 #if !CLIENT_BUILD
-            ServerStorageHandlers.CloseStorage(this);
+            GameInstance.ServerStorageHandlers.CloseStorage(this);
             CurrentStorageId = StorageId.Empty;
 #endif
         }
@@ -1278,18 +1078,18 @@ namespace MultiplayerARPG
             }
 
             StorageId storageId = new StorageId(type, ownerId);
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, this))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(storageId, this))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
 
-            Storage storage = ServerStorageHandlers.GetStorage(storageId);
+            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId);
             if (!CurrentStorageId.Equals(storageId))
             {
-                ServerStorageHandlers.CloseStorage(this);
+                GameInstance.ServerStorageHandlers.CloseStorage(this);
                 CurrentStorageId = storageId;
-                ServerStorageHandlers.OpenStorage(this);
+                GameInstance.ServerStorageHandlers.OpenStorage(this);
                 CallOwnerShowStorage(type, ownerId, targetEntity == null ? 0 : targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
             }
         }
