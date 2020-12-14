@@ -20,11 +20,6 @@ namespace MultiplayerARPG
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
 
-        [Header("Options")]
-        public float autoRefreshDuration = 5f;
-
-        private float refreshCountDown = 0f;
-
         private UIList cacheItemList;
         public UIList CacheItemList
         {
@@ -104,10 +99,6 @@ namespace MultiplayerARPG
                 else
                     uiTextSlotLimit.text = string.Format(LanguageManager.GetText(formatKeySlotLimit), UsedSlots.ToString("N0"), SlotLimit.ToString("N0"));
             }
-
-            refreshCountDown -= Time.deltaTime;
-            if (refreshCountDown <= 0)
-                Refresh();
         }
 
         public void Show(StorageType storageType, string storageOwnerId, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
@@ -152,16 +143,12 @@ namespace MultiplayerARPG
 
         public void Refresh()
         {
-            refreshCountDown = autoRefreshDuration;
-            if (BasePlayerCharacterController.OwningCharacter)
+            GameInstance.ClientStorageHandlers.RequestGetStorageItems(new RequestGetStorageItemsMessage()
             {
-                GameInstance.ClientStorageHandlers.RequestGetStorageItems(new RequestGetStorageItemsMessage()
-                {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
-                    storageType = StorageType,
-                    storageOwnerId = StorageOwnerId,
-                }, GetStorageItemsCallback);
-            }
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                storageType = StorageType,
+                storageOwnerId = StorageOwnerId,
+            }, GetStorageItemsCallback);
         }
 
         private async UniTaskVoid GetStorageItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetStorageItemsMessage response)
