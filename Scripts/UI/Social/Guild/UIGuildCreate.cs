@@ -38,8 +38,11 @@ namespace MultiplayerARPG
 
         public void OnClickCreate()
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerCreateGuild(
-                inputFieldGuildName != null ? inputFieldGuildName.text : string.Empty);
+            GameInstance.ClientGuildHandlers.RequestCreateGuild(new RequestCreateGuildMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                guildName = inputFieldGuildName.text,
+            }, UIGuildResponses.ResponseCreateGuild);
             Hide();
         }
     }

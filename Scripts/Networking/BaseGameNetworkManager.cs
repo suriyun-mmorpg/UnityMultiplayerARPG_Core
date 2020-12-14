@@ -38,6 +38,9 @@ namespace MultiplayerARPG
             public const ushort NotifyRewardGold = 115;
             public const ushort NotifyRewardItem = 116;
             public const ushort UpdateTimeOfDay = 117;
+            public const ushort UpdateStorage = 118;
+            public const ushort NotifyGuildInvitation = 119;
+            public const ushort NotifyPartyInvitation = 120;
         }
 
         public class ReqTypes

@@ -43,18 +43,22 @@ namespace MultiplayerARPG
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY.ToString()));
                 return;
             }
-            if (inputFieldShareExpPercentage == null || 
+            if (inputFieldShareExpPercentage == null ||
                 !byte.TryParse(inputFieldShareExpPercentage.text, out shareExpPercentage))
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString()));
                 return;
             }
-            BasePlayerCharacterController.OwningCharacter.CallServerSetGuildRole(
-                guildRole,
-                inputFieldRoleName.text,
-                toggleCanInvite != null && toggleCanInvite.isOn,
-                toggleCanKick != null && toggleCanKick.isOn,
-                shareExpPercentage);
+
+            GameInstance.ClientGuildHandlers.RequestChangeGuildRole(new RequestChangeGuildRoleMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                guildRole = guildRole,
+                name = inputFieldRoleName.text,
+                canInvite = toggleCanInvite != null && toggleCanInvite.isOn,
+                canKick = toggleCanKick != null && toggleCanKick.isOn,
+                shareExpPercentage = shareExpPercentage,
+            }, UIGuildResponses.ResponseChangeGuildRole);
             Hide();
         }
     }

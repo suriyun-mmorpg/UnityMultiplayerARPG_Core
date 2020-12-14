@@ -18,9 +18,7 @@ namespace MultiplayerARPG
         public UISocialGroup uiSocialGroup;
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
-        // HP
         public UIGageValue uiGageHp;
-        // MP
         public UIGageValue uiGageMp;
 
         public UICharacterBuffs uiCharacterBuffs;

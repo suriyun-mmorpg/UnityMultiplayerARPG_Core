@@ -278,7 +278,11 @@ namespace MultiplayerARPG
         {
             if (GameInstance.ClientGuildHandlers.ClientGuild == null)
                 return;
-            BasePlayerCharacterController.OwningCharacter.CallServerAddGuildSkill(GuildSkill.DataId);
+            GameInstance.ClientGuildHandlers.RequestIncreaseGuildSkillLevel(new RequestIncreaseGuildSkillLevelMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                dataId = GuildSkill.DataId,
+            }, UIGuildResponses.ResponseIncreaseGuildSkillLevel);
         }
 
         public void OnClickUse()

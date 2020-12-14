@@ -95,7 +95,11 @@ namespace MultiplayerARPG
             SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_CHANGE_LEADER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerChangePartyLeader(partyMember.id);
+                GameInstance.ClientPartyHandlers.RequestChangePartyLeader(new RequestChangePartyLeaderMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    memberId = partyMember.id,
+                }, UIPartyResponses.ResponseChangePartyLeader);
             });
         }
 
@@ -119,7 +123,11 @@ namespace MultiplayerARPG
             SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerKickFromParty(partyMember.id);
+                GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    memberId = partyMember.id,
+                }, UIPartyResponses.ResponseKickMemberFromParty);
             });
         }
 
@@ -127,7 +135,10 @@ namespace MultiplayerARPG
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerLeaveParty();
+                GameInstance.ClientPartyHandlers.RequestLeaveParty(new RequestLeavePartyMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                }, UIPartyResponses.ResponseLeaveParty);
             });
         }
 

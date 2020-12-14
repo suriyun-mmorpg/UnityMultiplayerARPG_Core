@@ -1,4 +1,6 @@
-﻿using UnityEngine.UI;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -18,9 +20,12 @@ namespace MultiplayerARPG
 
         public void OnClickCreate()
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerCreateParty(
-                toggleShareExp != null && toggleShareExp.isOn,
-                toggleShareItem != null && toggleShareItem.isOn);
+            GameInstance.ClientPartyHandlers.RequestCreateParty(new RequestCreatePartyMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                shareExp = toggleShareExp != null && toggleShareExp.isOn,
+                shareItem = toggleShareItem != null && toggleShareItem.isOn,
+            }, UIPartyResponses.ResponseCreateParty);
             Hide();
         }
     }

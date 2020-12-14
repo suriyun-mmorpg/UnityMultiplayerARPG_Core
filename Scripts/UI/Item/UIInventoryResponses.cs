@@ -15,14 +15,6 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseSwapOrMergeItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwapOrMergeItemMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Success)
-            {
-                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
-                foreach (UIStorageItems ui in uis)
-                {
-                    ui.Refresh();
-                }
-            }
             if (onResponseSwapOrMergeItem != null)
                 onResponseSwapOrMergeItem.Invoke(requestHandler, responseCode, response);
         }
@@ -30,14 +22,6 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseEquipArmor(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseEquipArmorMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Success)
-            {
-                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
-                foreach (UIStorageItems ui in uis)
-                {
-                    ui.Refresh();
-                }
-            }
             if (onResponseEquipArmor != null)
                 onResponseEquipArmor.Invoke(requestHandler, responseCode, response);
         }
@@ -45,14 +29,6 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseEquipWeapon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseEquipWeaponMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Success)
-            {
-                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
-                foreach (UIStorageItems ui in uis)
-                {
-                    ui.Refresh();
-                }
-            }
             if (onResponseEquipWeapon != null)
                 onResponseEquipWeapon.Invoke(requestHandler, responseCode, response);
         }
@@ -60,14 +36,6 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseUnEquipArmor(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseUnEquipArmorMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Success)
-            {
-                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
-                foreach (UIStorageItems ui in uis)
-                {
-                    ui.Refresh();
-                }
-            }
             if (onResponseUnEquipArmor != null)
                 onResponseUnEquipArmor.Invoke(requestHandler, responseCode, response);
         }
@@ -75,14 +43,6 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseUnEquipWeapon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseUnEquipWeaponMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Success)
-            {
-                UIStorageItems[] uis = Object.FindObjectsOfType<UIStorageItems>();
-                foreach (UIStorageItems ui in uis)
-                {
-                    ui.Refresh();
-                }
-            }
             if (onResponseUnEquipWeapon != null)
                 onResponseUnEquipWeapon.Invoke(requestHandler, responseCode, response);
         }

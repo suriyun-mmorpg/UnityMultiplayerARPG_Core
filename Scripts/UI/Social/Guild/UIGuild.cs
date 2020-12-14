@@ -332,7 +332,11 @@ namespace MultiplayerARPG
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerChangeGuildLeader(guildMember.id);
+                GameInstance.ClientGuildHandlers.RequestChangeGuildLeader(new RequestChangeGuildLeaderMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    memberId = guildMember.id,
+                }, UIGuildResponses.ResponseChangeGuildLeader);
             });
         }
 
@@ -369,7 +373,13 @@ namespace MultiplayerARPG
 
             // Show setup guild dialog
             if (inputFieldMessage != null)
-                BasePlayerCharacterController.OwningCharacter.CallServerSetGuildMessage(inputFieldMessage.text);
+            {
+                GameInstance.ClientGuildHandlers.RequestChangeGuildMessage(new RequestChangeGuildMessageMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    message = inputFieldMessage.text,
+                }, UIGuildResponses.ResponseChangeGuildMessage);
+            }
         }
 
         public void OnClickKickFromGuild()
@@ -381,7 +391,11 @@ namespace MultiplayerARPG
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerKickFromGuild(guildMember.id);
+                GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    memberId = guildMember.id,
+                }, UIGuildResponses.ResponseKickMemberFromGuild);
             });
         }
 
@@ -389,7 +403,10 @@ namespace MultiplayerARPG
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerLeaveGuild();
+                GameInstance.ClientGuildHandlers.RequestLeaveGuild(new RequestLeaveGuildMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                }, UIGuildResponses.ResponseLeaveGuild);
             });
         }
 

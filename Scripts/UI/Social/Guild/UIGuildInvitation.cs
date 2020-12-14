@@ -1,39 +1,81 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
-    public partial class UIGuildInvitation : UISelectionEntry<BasePlayerCharacterEntity>
+    public partial class UIGuildInvitation : UISelectionEntry<GuildInvitationData>
     {
         [Header("String Formats")]
+        [Tooltip("Format => {0} = {Character Name}")]
+        public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Level}")]
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Guild Name}")]
         public UILocaleKeySetting formatKeyGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Guild Level}")]
+        public UILocaleKeySetting formatKeyGuildLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
 
+        // TODO: `uiAnotherCharacter` will be deprecated, still keep it for migration
+        [HideInInspector]
         public UICharacter uiAnotherCharacter;
-        public TextWrapper uiTextGuildName;
 
-        protected override void UpdateData()
+        [Header("UI Elements")]
+        public TextWrapper uiTextName;
+        public TextWrapper uiTextLevel;
+        public TextWrapper uiTextGuildName;
+        public TextWrapper uiTextGuildLevel;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            OnValidate();
+        }
+
+        private void OnValidate()
         {
             if (uiAnotherCharacter != null)
             {
-                uiAnotherCharacter.NotForOwningCharacter = true;
-                uiAnotherCharacter.Data = Data;
+                uiTextName = uiAnotherCharacter.uiTextName;
+                uiTextLevel = uiAnotherCharacter.uiTextLevel;
+                uiAnotherCharacter = null;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this);
+#endif
             }
+        }
+
+        protected override void UpdateData()
+        {
+            if (uiTextName != null)
+                uiTextName.text = string.Format(LanguageManager.GetText(formatKeyName), Data.InviterName);
+
+            if (uiTextLevel != null)
+                uiTextLevel.text = string.Format(LanguageManager.GetText(formatKeyLevel), Data.InviterLevel.ToString("N0"));
 
             if (uiTextGuildName != null)
-                uiTextGuildName.text = string.Format(LanguageManager.GetText(formatKeyGuildName), Data.TitleB);
+                uiTextGuildName.text = string.Format(LanguageManager.GetText(formatKeyGuildName), Data.GuildName);
+
+            if (uiTextGuildLevel != null)
+                uiTextGuildLevel.text = string.Format(LanguageManager.GetText(formatKeyGuildLevel), Data.GuildLevel.ToString("N0"));
         }
 
         public void OnClickAccept()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.CallServerAcceptGuildInvitation();
+            GameInstance.ClientGuildHandlers.RequestAcceptGuildInvitation(new RequestAcceptGuildInvitationMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+            }, UIGuildResponses.ResponseAcceptGuildInvitation);
             Hide();
         }
 
         public void OnClickDecline()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.CallServerDeclineGuildInvitation();
+            GameInstance.ClientGuildHandlers.RequestDeclineGuildInvitation(new RequestDeclineGuildInvitationMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+            }, UIGuildResponses.ResponseDeclineGuildInvitation);
             Hide();
         }
     }

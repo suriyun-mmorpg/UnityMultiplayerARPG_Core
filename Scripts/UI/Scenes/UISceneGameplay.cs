@@ -392,19 +392,19 @@ namespace MultiplayerARPG
             uiDealing.Show();
         }
 
-        public void OnShowPartyInvitation(BasePlayerCharacterEntity playerCharacter)
+        public void OnShowPartyInvitation(PartyInvitationData invitation)
         {
             if (uiPartyInvitation == null)
                 return;
-            uiPartyInvitation.Data = playerCharacter;
+            uiPartyInvitation.Data = invitation;
             uiPartyInvitation.Show();
         }
 
-        public void OnShowGuildInvitation(BasePlayerCharacterEntity playerCharacter)
+        public void OnShowGuildInvitation(GuildInvitationData invitation)
         {
             if (uiGuildInvitation == null)
                 return;
-            uiGuildInvitation.Data = playerCharacter;
+            uiGuildInvitation.Data = invitation;
             uiGuildInvitation.Show();
         }
 
@@ -669,8 +669,6 @@ namespace MultiplayerARPG
             characterEntity.onRespawn.AddListener(OnCharacterRespawn);
             characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
             characterEntity.onShowDealingDialog += OnShowDealing;
-            characterEntity.onShowPartyInvitationDialog += OnShowPartyInvitation;
-            characterEntity.onShowGuildInvitationDialog += OnShowGuildInvitation;
             characterEntity.onShowStorage += OnShowStorage;
             characterEntity.onIsWarpingChange += OnIsWarpingChange;
         }
@@ -685,8 +683,6 @@ namespace MultiplayerARPG
             characterEntity.onRespawn.RemoveListener(OnCharacterRespawn);
             characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;
             characterEntity.onShowDealingDialog -= OnShowDealing;
-            characterEntity.onShowPartyInvitationDialog -= OnShowPartyInvitation;
-            characterEntity.onShowGuildInvitationDialog -= OnShowGuildInvitation;
             characterEntity.onShowStorage -= OnShowStorage;
             characterEntity.onIsWarpingChange -= OnIsWarpingChange;
         }
