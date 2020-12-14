@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLib;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -367,6 +368,30 @@ namespace MultiplayerARPG
         public void SendUpdateFriendsToClient(long connectionId, SocialCharacterData[] members)
         {
             this.SendSocialMembers(connectionId, MsgTypes.UpdateFriends, members);
+        }
+
+        public void SendNotifyStorageItemsUpdatedToClient(long connectionId)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyStorageItemsUpdated);
+        }
+
+        public void SendNotifyStorageItemsUpdatedToClients(HashSet<long> connectionIds)
+        {
+            foreach (long connectionId in connectionIds)
+            {
+                if (Players.ContainsKey(connectionId))
+                    SendNotifyStorageItemsUpdatedToClient(connectionId);
+            }
+        }
+
+        public void SendNotifyPartyInvitationToClient(long connectionId, PartyInvitationData invitation)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyPartyInvitation, invitation);
+        }
+
+        public void SendNotifyGuildInvitationToClient(long connectionId, GuildInvitationData invitation)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyGuildInvitation, invitation);
         }
     }
 }

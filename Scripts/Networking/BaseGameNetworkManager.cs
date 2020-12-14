@@ -38,9 +38,9 @@ namespace MultiplayerARPG
             public const ushort NotifyRewardGold = 115;
             public const ushort NotifyRewardItem = 116;
             public const ushort UpdateTimeOfDay = 117;
-            public const ushort UpdateStorage = 118;
-            public const ushort NotifyGuildInvitation = 119;
-            public const ushort NotifyPartyInvitation = 120;
+            public const ushort NotifyStorageItemsUpdated = 118;
+            public const ushort NotifyPartyInvitation = 119;
+            public const ushort NotifyGuildInvitation = 120;
         }
 
         public class ReqTypes
@@ -125,6 +125,9 @@ namespace MultiplayerARPG
         public System.Action<int> onNotifyRewardExp;
         public System.Action<int> onNotifyRewardGold;
         public System.Action<int, short> onNotifyRewardItem;
+        public System.Action onNotifyStorageItemsUpdated;
+        public System.Action<PartyInvitationData> onNotifyPartyInvitation;
+        public System.Action<GuildInvitationData> onNotifyGuildInvitation;
         protected float updateOnlineCharactersCountDown;
         protected float updateTimeOfDayCountDown;
         protected float serverSceneLoadedTime;
@@ -195,6 +198,9 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.NotifyRewardGold, HandleNotifyRewardGoldAtClient);
             RegisterClientMessage(MsgTypes.NotifyRewardItem, HandleNotifyRewardItemAtClient);
             RegisterClientMessage(MsgTypes.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
+            RegisterClientMessage(MsgTypes.NotifyStorageItemsUpdated, HandleNotifyStorageItemsUpdatedAtClient);
+            RegisterClientMessage(MsgTypes.NotifyPartyInvitation, HandleNotifyPartyInvitationAtClient);
+            RegisterClientMessage(MsgTypes.NotifyGuildInvitation, HandleNotifyGuildInvitationAtClient);
             // Responses
             // Cash shop
             RegisterClientResponse<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo);
@@ -643,6 +649,26 @@ namespace MultiplayerARPG
                 return;
             UpdateTimeOfDayMessage message = messageHandler.ReadMessage<UpdateTimeOfDayMessage>();
             CurrentGameInstance.DayNightTimeUpdater.SetTimeOfDay(message.timeOfDay);
+        }
+
+        protected virtual void HandleNotifyStorageItemsUpdatedAtClient(MessageHandlerData messageHandler)
+        {
+            if (onNotifyStorageItemsUpdated != null)
+                onNotifyStorageItemsUpdated.Invoke();
+        }
+
+        protected virtual void HandleNotifyPartyInvitationAtClient(MessageHandlerData messageHandler)
+        {
+            PartyInvitationData invitation = messageHandler.ReadMessage<PartyInvitationData>();
+            if (onNotifyPartyInvitation != null)
+                onNotifyPartyInvitation.Invoke(invitation);
+        }
+
+        protected virtual void HandleNotifyGuildInvitationAtClient(MessageHandlerData messageHandler)
+        {
+            GuildInvitationData invitation = messageHandler.ReadMessage<GuildInvitationData>();
+            if (onNotifyGuildInvitation != null)
+                onNotifyGuildInvitation.Invoke(invitation);
         }
 
         protected virtual void HandleUpdateFoundCharactersAtClient(MessageHandlerData messageHandler)
