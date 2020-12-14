@@ -12,6 +12,7 @@ namespace MultiplayerARPG
             CharacterNotFound,
             NameTooShort,
             NameTooLong,
+            NameExisted,
             AlreadyJoined,
             InternalServerError,
         }
