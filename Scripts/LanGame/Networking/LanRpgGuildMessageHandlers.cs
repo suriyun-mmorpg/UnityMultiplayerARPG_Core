@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -147,6 +148,15 @@ namespace MultiplayerARPG
                 return;
             }
             ServerGuildHandlers.AppendGuildInvitation(playerCharacter.GuildId, request.inviteeId);
+            BaseGameNetworkManager.Singleton.SendNotifyGuildInvitationToClient(inviteeCharacter.ConnectionId, new GuildInvitationData()
+            {
+                InviterId = playerCharacter.Id,
+                InviterName = playerCharacter.CharacterName,
+                InviterLevel = playerCharacter.Level,
+                GuildId = validateResult.GuildId,
+                GuildName = validateResult.Guild.guildName,
+                GuildLevel = validateResult.Guild.level,
+            });
             result.Invoke(AckResponseCode.Success, new ResponseSendGuildInvitationMessage());
         }
 
