@@ -18,6 +18,8 @@ namespace MultiplayerARPG
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<long>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ConnectionId);
+            // Notify storage items to client
+            SendNotifyStorageItemsUpdatedToClient(playerCharacterEntity.ConnectionId);
             await UniTask.Yield();
         }
 
@@ -48,7 +50,7 @@ namespace MultiplayerARPG
             {
                 // Update slots
                 storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-                NotifyStorageItemsToCharacters(usingStorageCharacters[storageId]);
+                SendNotifyStorageItemsUpdatedToClients(usingStorageCharacters[storageId]);
                 return true;
             }
             return false;
@@ -68,7 +70,7 @@ namespace MultiplayerARPG
             {
                 // Update slots
                 storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-                NotifyStorageItemsToCharacters(usingStorageCharacters[storageId]);
+                SendNotifyStorageItemsUpdatedToClients(usingStorageCharacters[storageId]);
                 return new DecreaseStorageItemsResult()
                 {
                     IsSuccess = true,
@@ -158,17 +160,6 @@ namespace MultiplayerARPG
         {
             storageItems.Clear();
             usingStorageCharacters.Clear();
-        }
-
-        private void NotifyStorageItemsToCharacters(HashSet<long> connectionIds)
-        {
-            foreach (long connectionId in connectionIds)
-            {
-                if (Players.ContainsKey(connectionId))
-                {
-
-                }
-            }
         }
     }
 }
