@@ -10,16 +10,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager,
-        IServerPlayerCharacterHandlers,
-        IServerGuildHandlers,
-        IServerPartyHandlers,
-        IClientCashShopHandlers,
-        IClientMailHandlers,
-        IClientStorageHandlers,
-        IClientInventoryHandlers,
-        IClientPartyHandlers,
-        IClientGuildHandlers
+    public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager
     {
         public class MsgTypes
         {
@@ -38,9 +29,10 @@ namespace MultiplayerARPG
             public const ushort NotifyRewardGold = 115;
             public const ushort NotifyRewardItem = 116;
             public const ushort UpdateTimeOfDay = 117;
-            public const ushort NotifyStorageItemsUpdated = 118;
-            public const ushort NotifyPartyInvitation = 119;
-            public const ushort NotifyGuildInvitation = 120;
+            public const ushort NotifyStorageOpened = 118;
+            public const ushort NotifyStorageItemsUpdated = 119;
+            public const ushort NotifyPartyInvitation = 120;
+            public const ushort NotifyGuildInvitation = 121;
         }
 
         public class ReqTypes
@@ -92,14 +84,25 @@ namespace MultiplayerARPG
 
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
-        protected IServerCashShopMessageHandlers CashShopRequestHandlers { get; set; }
-        protected IServerMailMessageHandlers MailRequestHandlers { get; set; }
-        protected IServerStorageMessageHandlers StorageRequestHandlers { get; set; }
-        protected IServerInventoryMessageHandlers InventoryRequestHandlers { get; set; }
-        protected IServerPartyMessageHandlers PartyRequestHandlers { get; set; }
-        protected IServerGuildMessageHandlers GuildRequestHandlers { get; set; }
-        public PartyData ClientParty { get; set; }
-        public GuildData ClientGuild { get; set; }
+        // Server Handlers
+        protected IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
+        protected IServerStorageHandlers ServerStorageHandlers { get; set; }
+        protected IServerPartyHandlers ServerPartyHandlers { get; set; }
+        protected IServerGuildHandlers ServerGuildHandlers { get; set; }
+        // Server Message Handlers
+        protected IServerCashShopMessageHandlers ServerCashShopMessageHandlers { get; set; }
+        protected IServerMailMessageHandlers ServerMailMessageHandlers { get; set; }
+        protected IServerStorageMessageHandlers ServerStorageMessageHandlers { get; set; }
+        protected IServerInventoryMessageHandlers ServerInventoryMessageHandlers { get; set; }
+        protected IServerPartyMessageHandlers ServerPartyMessageHandlers { get; set; }
+        protected IServerGuildMessageHandlers ServerGuildMessageHandlers { get; set; }
+        // Client handlers
+        protected IClientCashShopHandlers ClientCashShopHandlers { get; set; }
+        protected IClientMailHandlers ClientMailHandlers { get; set; }
+        protected IClientStorageHandlers ClientStorageHandlers { get; set; }
+        protected IClientInventoryHandlers ClientInventoryHandlers { get; set; }
+        protected IClientPartyHandlers ClientPartyHandlers { get; set; }
+        protected IClientGuildHandlers ClientGuildHandlers { get; set; }
 
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
         public static readonly Dictionary<string, NotifyOnlineCharacterTime> LastCharacterOnlineTimes = new Dictionary<string, NotifyOnlineCharacterTime>();
@@ -113,21 +116,8 @@ namespace MultiplayerARPG
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
         // Events
-        public System.Action onClientConnected;
-        public System.Action<DisconnectInfo> onClientDisconnected;
-        public System.Action onClientWarp;
-        public System.Action<ChatMessage> onClientReceiveChat;
-        public System.Action<GameMessage> onClientReceiveGameMessage;
-        public System.Action<PartyData> onClientUpdateParty;
-        public System.Action<GuildData> onClientUpdateGuild;
         public System.Action<SocialGroupData> onClientUpdateFoundCharacters;
         public System.Action<SocialGroupData> onClientUpdateFriends;
-        public System.Action<int> onNotifyRewardExp;
-        public System.Action<int> onNotifyRewardGold;
-        public System.Action<int, short> onNotifyRewardItem;
-        public System.Action onNotifyStorageItemsUpdated;
-        public System.Action<PartyInvitationData> onNotifyPartyInvitation;
-        public System.Action<GuildInvitationData> onNotifyGuildInvitation;
         protected float updateOnlineCharactersCountDown;
         protected float updateTimeOfDayCountDown;
         protected float serverSceneLoadedTime;
@@ -198,6 +188,7 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.NotifyRewardGold, HandleNotifyRewardGoldAtClient);
             RegisterClientMessage(MsgTypes.NotifyRewardItem, HandleNotifyRewardItemAtClient);
             RegisterClientMessage(MsgTypes.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
+            RegisterClientMessage(MsgTypes.NotifyStorageOpened, HandleNotifyStorageOpenedAtClient);
             RegisterClientMessage(MsgTypes.NotifyStorageItemsUpdated, HandleNotifyStorageItemsUpdatedAtClient);
             RegisterClientMessage(MsgTypes.NotifyPartyInvitation, HandleNotifyPartyInvitationAtClient);
             RegisterClientMessage(MsgTypes.NotifyGuildInvitation, HandleNotifyGuildInvitationAtClient);
@@ -256,78 +247,81 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
             // Requests
             // Cash shop
-            if (CashShopRequestHandlers != null)
+            if (ServerCashShopMessageHandlers != null)
             {
-                RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, CashShopRequestHandlers.HandleRequestCashShopInfo);
-                RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, CashShopRequestHandlers.HandleRequestCashPackageInfo);
-                RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, CashShopRequestHandlers.HandleRequestCashShopBuy);
-                RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, CashShopRequestHandlers.HandleRequestCashPackageBuyValidation);
+                RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, ServerCashShopMessageHandlers.HandleRequestCashShopInfo);
+                RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, ServerCashShopMessageHandlers.HandleRequestCashPackageInfo);
+                RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, ServerCashShopMessageHandlers.HandleRequestCashShopBuy);
+                RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, ServerCashShopMessageHandlers.HandleRequestCashPackageBuyValidation);
             }
             // Mail
-            if (MailRequestHandlers != null)
+            if (ServerMailMessageHandlers != null)
             {
-                RegisterServerRequest<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList, MailRequestHandlers.HandleRequestMailList);
-                RegisterServerRequest<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail, MailRequestHandlers.HandleRequestReadMail);
-                RegisterServerRequest<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems, MailRequestHandlers.HandleRequestClaimMailItems);
-                RegisterServerRequest<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail, MailRequestHandlers.HandleRequestDeleteMail);
-                RegisterServerRequest<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail, MailRequestHandlers.HandleRequestSendMail);
+                RegisterServerRequest<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList, ServerMailMessageHandlers.HandleRequestMailList);
+                RegisterServerRequest<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail, ServerMailMessageHandlers.HandleRequestReadMail);
+                RegisterServerRequest<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems, ServerMailMessageHandlers.HandleRequestClaimMailItems);
+                RegisterServerRequest<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail, ServerMailMessageHandlers.HandleRequestDeleteMail);
+                RegisterServerRequest<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail, ServerMailMessageHandlers.HandleRequestSendMail);
             }
             // Storage
-            if (StorageRequestHandlers != null)
+            if (ServerStorageMessageHandlers != null)
             {
-                RegisterServerRequest<RequestGetStorageItemsMessage, ResponseGetStorageItemsMessage>(ReqTypes.GetStorageItems, StorageRequestHandlers.HandleRequestGetStorageItems);
-                RegisterServerRequest<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage, StorageRequestHandlers.HandleRequestMoveItemFromStorage);
-                RegisterServerRequest<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage, StorageRequestHandlers.HandleRequestMoveItemToStorage);
-                RegisterServerRequest<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem, StorageRequestHandlers.HandleRequestSwapOrMergeStorageItem);
+                RegisterServerRequest<RequestGetStorageItemsMessage, ResponseGetStorageItemsMessage>(ReqTypes.GetStorageItems, ServerStorageMessageHandlers.HandleRequestGetStorageItems);
+                RegisterServerRequest<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage, ServerStorageMessageHandlers.HandleRequestMoveItemFromStorage);
+                RegisterServerRequest<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage, ServerStorageMessageHandlers.HandleRequestMoveItemToStorage);
+                RegisterServerRequest<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem, ServerStorageMessageHandlers.HandleRequestSwapOrMergeStorageItem);
             }
             // Inventory
-            if (InventoryRequestHandlers != null)
+            if (ServerInventoryMessageHandlers != null)
             {
-                RegisterServerRequest<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(ReqTypes.SwapOrMergeItem, InventoryRequestHandlers.HandleRequestSwapOrMergeItem);
-                RegisterServerRequest<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(ReqTypes.EquipWeapon, InventoryRequestHandlers.HandleRequestEquipWeapon);
-                RegisterServerRequest<RequestEquipArmorMessage, ResponseEquipArmorMessage>(ReqTypes.EquipArmor, InventoryRequestHandlers.HandleRequestEquipArmor);
-                RegisterServerRequest<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(ReqTypes.UnEquipWeapon, InventoryRequestHandlers.HandleRequestUnEquipWeapon);
-                RegisterServerRequest<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(ReqTypes.UnEquipArmor, InventoryRequestHandlers.HandleRequestUnEquipArmor);
+                RegisterServerRequest<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(ReqTypes.SwapOrMergeItem, ServerInventoryMessageHandlers.HandleRequestSwapOrMergeItem);
+                RegisterServerRequest<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(ReqTypes.EquipWeapon, ServerInventoryMessageHandlers.HandleRequestEquipWeapon);
+                RegisterServerRequest<RequestEquipArmorMessage, ResponseEquipArmorMessage>(ReqTypes.EquipArmor, ServerInventoryMessageHandlers.HandleRequestEquipArmor);
+                RegisterServerRequest<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(ReqTypes.UnEquipWeapon, ServerInventoryMessageHandlers.HandleRequestUnEquipWeapon);
+                RegisterServerRequest<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(ReqTypes.UnEquipArmor, ServerInventoryMessageHandlers.HandleRequestUnEquipArmor);
             }
             // Party
-            if (PartyRequestHandlers != null)
+            if (ServerPartyMessageHandlers != null)
             {
-                RegisterServerRequest<RequestCreatePartyMessage, ResponseCreatePartyMessage>(ReqTypes.CreateParty, PartyRequestHandlers.HandleRequestCreateParty);
-                RegisterServerRequest<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(ReqTypes.ChangePartyLeader, PartyRequestHandlers.HandleRequestChangePartyLeader);
-                RegisterServerRequest<RequestChangePartySettingMessage, ResponseChangePartySettingMessage>(ReqTypes.ChangePartySetting, PartyRequestHandlers.HandleRequestChangePartySetting);
-                RegisterServerRequest<RequestSendPartyInvitationMessage, ResponseSendPartyInvitationMessage>(ReqTypes.SendPartyInvitation, PartyRequestHandlers.HandleRequestSendPartyInvitation);
-                RegisterServerRequest<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(ReqTypes.AcceptPartyInvitation, PartyRequestHandlers.HandleRequestAcceptPartyInvitation);
-                RegisterServerRequest<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(ReqTypes.DeclinePartyInvitation, PartyRequestHandlers.HandleRequestDeclinePartyInvitation);
-                RegisterServerRequest<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(ReqTypes.KickMemberFromParty, PartyRequestHandlers.HandleRequestKickMemberFromParty);
-                RegisterServerRequest<RequestLeavePartyMessage, ResponseLeavePartyMessage>(ReqTypes.LeaveParty, PartyRequestHandlers.HandleRequestLeaveParty);
+                RegisterServerRequest<RequestCreatePartyMessage, ResponseCreatePartyMessage>(ReqTypes.CreateParty, ServerPartyMessageHandlers.HandleRequestCreateParty);
+                RegisterServerRequest<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(ReqTypes.ChangePartyLeader, ServerPartyMessageHandlers.HandleRequestChangePartyLeader);
+                RegisterServerRequest<RequestChangePartySettingMessage, ResponseChangePartySettingMessage>(ReqTypes.ChangePartySetting, ServerPartyMessageHandlers.HandleRequestChangePartySetting);
+                RegisterServerRequest<RequestSendPartyInvitationMessage, ResponseSendPartyInvitationMessage>(ReqTypes.SendPartyInvitation, ServerPartyMessageHandlers.HandleRequestSendPartyInvitation);
+                RegisterServerRequest<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(ReqTypes.AcceptPartyInvitation, ServerPartyMessageHandlers.HandleRequestAcceptPartyInvitation);
+                RegisterServerRequest<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(ReqTypes.DeclinePartyInvitation, ServerPartyMessageHandlers.HandleRequestDeclinePartyInvitation);
+                RegisterServerRequest<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(ReqTypes.KickMemberFromParty, ServerPartyMessageHandlers.HandleRequestKickMemberFromParty);
+                RegisterServerRequest<RequestLeavePartyMessage, ResponseLeavePartyMessage>(ReqTypes.LeaveParty, ServerPartyMessageHandlers.HandleRequestLeaveParty);
             }
             // Guild
-            if (GuildRequestHandlers != null)
+            if (ServerGuildMessageHandlers != null)
             {
-                RegisterServerRequest<RequestCreateGuildMessage, ResponseCreateGuildMessage>(ReqTypes.CreateGuild, GuildRequestHandlers.HandleRequestCreateGuild);
-                RegisterServerRequest<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(ReqTypes.ChangeGuildLeader, GuildRequestHandlers.HandleRequestChangeGuildLeader);
-                RegisterServerRequest<RequestChangeGuildMessageMessage, ResponseChangeGuildMessageMessage>(ReqTypes.ChangeGuildMessage, GuildRequestHandlers.HandleRequestChangeGuildMessage);
-                RegisterServerRequest<RequestChangeGuildRoleMessage, ResponseChangeGuildRoleMessage>(ReqTypes.ChangeGuildRole, GuildRequestHandlers.HandleRequestChangeGuildRole);
-                RegisterServerRequest<RequestChangeMemberGuildRoleMessage, ResponseChangeMemberGuildRoleMessage>(ReqTypes.ChangeMemberGuildRole, GuildRequestHandlers.HandleRequestChangeMemberGuildRole);
-                RegisterServerRequest<RequestSendGuildInvitationMessage, ResponseSendGuildInvitationMessage>(ReqTypes.SendGuildInvitation, GuildRequestHandlers.HandleRequestSendGuildInvitation);
-                RegisterServerRequest<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(ReqTypes.AcceptGuildInvitation, GuildRequestHandlers.HandleRequestAcceptGuildInvitation);
-                RegisterServerRequest<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(ReqTypes.DeclineGuildInvitation, GuildRequestHandlers.HandleRequestDeclineGuildInvitation);
-                RegisterServerRequest<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild, GuildRequestHandlers.HandleRequestKickMemberFromGuild);
-                RegisterServerRequest<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild, GuildRequestHandlers.HandleRequestLeaveGuild);
-                RegisterServerRequest<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel, GuildRequestHandlers.HandleRequestIncreaseGuildSkillLevel);
+                RegisterServerRequest<RequestCreateGuildMessage, ResponseCreateGuildMessage>(ReqTypes.CreateGuild, ServerGuildMessageHandlers.HandleRequestCreateGuild);
+                RegisterServerRequest<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(ReqTypes.ChangeGuildLeader, ServerGuildMessageHandlers.HandleRequestChangeGuildLeader);
+                RegisterServerRequest<RequestChangeGuildMessageMessage, ResponseChangeGuildMessageMessage>(ReqTypes.ChangeGuildMessage, ServerGuildMessageHandlers.HandleRequestChangeGuildMessage);
+                RegisterServerRequest<RequestChangeGuildRoleMessage, ResponseChangeGuildRoleMessage>(ReqTypes.ChangeGuildRole, ServerGuildMessageHandlers.HandleRequestChangeGuildRole);
+                RegisterServerRequest<RequestChangeMemberGuildRoleMessage, ResponseChangeMemberGuildRoleMessage>(ReqTypes.ChangeMemberGuildRole, ServerGuildMessageHandlers.HandleRequestChangeMemberGuildRole);
+                RegisterServerRequest<RequestSendGuildInvitationMessage, ResponseSendGuildInvitationMessage>(ReqTypes.SendGuildInvitation, ServerGuildMessageHandlers.HandleRequestSendGuildInvitation);
+                RegisterServerRequest<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(ReqTypes.AcceptGuildInvitation, ServerGuildMessageHandlers.HandleRequestAcceptGuildInvitation);
+                RegisterServerRequest<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(ReqTypes.DeclineGuildInvitation, ServerGuildMessageHandlers.HandleRequestDeclineGuildInvitation);
+                RegisterServerRequest<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild, ServerGuildMessageHandlers.HandleRequestKickMemberFromGuild);
+                RegisterServerRequest<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild, ServerGuildMessageHandlers.HandleRequestLeaveGuild);
+                RegisterServerRequest<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel, ServerGuildMessageHandlers.HandleRequestIncreaseGuildSkillLevel);
             }
         }
 
         protected virtual void Clean()
         {
             this.InvokeInstanceDevExtMethods("Clean");
-            ClearPlayerCharacters();
-            ClearParty();
-            ClearGuild();
+            if (ServerPlayerCharacterHandlers != null)
+                ServerPlayerCharacterHandlers.ClearPlayerCharacters();
+            if (ServerStorageHandlers != null)
+                ServerStorageHandlers.ClearStorage();
+            if (ServerPartyHandlers != null)
+                ServerPartyHandlers.ClearParty();
+            if (ServerGuildHandlers != null)
+                ServerGuildHandlers.ClearGuild();
             BuildingEntities.Clear();
             LastCharacterOnlineTimes.Clear();
-            ClientParty = null;
-            ClientGuild = null;
             ClientFoundCharacters.ClearMembers();
             ClientFriends.ClearMembers();
             CurrentMapInfo = null;
@@ -337,9 +331,10 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
-            GameInstance.ServerPlayerCharacterHandlers = this;
-            GameInstance.ServerPartyHandlers = this;
-            GameInstance.ServerGuildHandlers = this;
+            GameInstance.ServerPlayerCharacterHandlers = ServerPlayerCharacterHandlers;
+            GameInstance.ServerStorageHandlers = ServerStorageHandlers;
+            GameInstance.ServerPartyHandlers = ServerPartyHandlers;
+            GameInstance.ServerGuildHandlers = ServerGuildHandlers;
             CurrentGameInstance.DayNightTimeUpdater.InitTimeOfDay(this);
         }
 
@@ -353,6 +348,12 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartClient", client);
             base.OnStartClient(client);
+            GameInstance.ClientCashShopHandlers = ClientCashShopHandlers;
+            GameInstance.ClientMailHandlers = ClientMailHandlers;
+            GameInstance.ClientInventoryHandlers = ClientInventoryHandlers;
+            GameInstance.ClientStorageHandlers = ClientStorageHandlers;
+            GameInstance.ClientPartyHandlers = ClientPartyHandlers;
+            GameInstance.ClientGuildHandlers = ClientGuildHandlers;
         }
 
         public override void OnStopClient()
@@ -365,19 +366,13 @@ namespace MultiplayerARPG
         public override void OnClientConnected()
         {
             base.OnClientConnected();
-            if (onClientConnected != null)
-                onClientConnected.Invoke();
-            GameInstance.ClientCashShopHandlers = this;
-            GameInstance.ClientMailHandlers = this;
-            GameInstance.ClientStorageHandlers = this;
-            GameInstance.ClientInventoryHandlers = this;
+            ClientGenericActions.ClientConnected();
         }
 
         public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
         {
             base.OnClientDisconnected(disconnectInfo);
-            if (onClientDisconnected != null)
-                onClientDisconnected.Invoke(disconnectInfo);
+            ClientGenericActions.ClientDisconnected(disconnectInfo);
             UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
         }
 
@@ -448,109 +443,60 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateOnlineCharacters()
         {
-            UpdatingPartyMembers.Clear();
-            UpdatingGuildMembers.Clear();
+            Dictionary<long, PartyData> updatingPartyMembers = new Dictionary<long, PartyData>();
+            Dictionary<long, GuildData> updatingGuildMembers = new Dictionary<long, GuildData>();
 
             PartyData tempParty;
             GuildData tempGuild;
-            foreach (BasePlayerCharacterEntity playerCharacter in GetPlayerCharacters())
+            foreach (BasePlayerCharacterEntity playerCharacter in ServerPlayerCharacterHandlers.GetPlayerCharacters())
             {
                 UpdateOnlineCharacter(playerCharacter);
 
-                if (playerCharacter.PartyId > 0 && Parties.TryGetValue(playerCharacter.PartyId, out tempParty))
+                if (playerCharacter.PartyId > 0 && ServerPartyHandlers.TryGetParty(playerCharacter.PartyId, out tempParty))
                 {
                     tempParty.UpdateMember(playerCharacter);
-                    if (!UpdatingPartyMembers.ContainsKey(playerCharacter.ConnectionId))
-                        UpdatingPartyMembers.TryAdd(playerCharacter.ConnectionId, tempParty);
+                    if (!updatingPartyMembers.ContainsKey(playerCharacter.ConnectionId))
+                        updatingPartyMembers.Add(playerCharacter.ConnectionId, tempParty);
                 }
 
-                if (playerCharacter.GuildId > 0 && Guilds.TryGetValue(playerCharacter.GuildId, out tempGuild))
+                if (playerCharacter.GuildId > 0 && ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out tempGuild))
                 {
                     tempGuild.UpdateMember(playerCharacter);
-                    if (!UpdatingGuildMembers.ContainsKey(playerCharacter.ConnectionId))
-                        UpdatingGuildMembers.TryAdd(playerCharacter.ConnectionId, tempGuild);
+                    if (!updatingGuildMembers.ContainsKey(playerCharacter.ConnectionId))
+                        updatingGuildMembers.Add(playerCharacter.ConnectionId, tempGuild);
                 }
             }
 
-            foreach (long connectionId in UpdatingPartyMembers.Keys)
+            foreach (long connectionId in updatingPartyMembers.Keys)
             {
-                SendUpdatePartyMembersToClient(connectionId, UpdatingPartyMembers[connectionId]);
+                SendUpdatePartyMembersToClient(connectionId, updatingPartyMembers[connectionId]);
             }
 
-            foreach (long connectionId in UpdatingGuildMembers.Keys)
+            foreach (long connectionId in updatingGuildMembers.Keys)
             {
-                SendUpdateGuildMembersToClient(connectionId, UpdatingGuildMembers[connectionId]);
+                SendUpdateGuildMembersToClient(connectionId, updatingGuildMembers[connectionId]);
             }
-        }
-
-        public virtual void SendNotifyRewardExp(long connectionId, int exp)
-        {
-            if (exp <= 0)
-                return;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardExp, (writer) =>
-            {
-                writer.Put(exp);
-            });
-        }
-
-        public virtual void SendNotifyRewardGold(long connectionId, int gold)
-        {
-            if (gold <= 0)
-                return;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardGold, (writer) =>
-            {
-                writer.Put(gold);
-            });
-        }
-
-        public virtual void SendNotifyRewardItem(long connectionId, int dataId, short amount)
-        {
-            if (amount <= 0)
-                return;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardItem, (writer) =>
-            {
-                writer.Put(dataId);
-                writer.Put(amount);
-            });
-        }
-
-        public virtual void SendServerGameMessage(long connectionId, GameMessage.Type type)
-        {
-            GameMessage message = new GameMessage();
-            message.type = type;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
         protected virtual void HandleGameMessageAtClient(MessageHandlerData messageHandler)
         {
-            GameMessage message = messageHandler.ReadMessage<GameMessage>();
-            ClientReceiveGameMessage(message);
-        }
-
-        public void ClientReceiveGameMessage(GameMessage message)
-        {
-            if (onClientReceiveGameMessage != null)
-                onClientReceiveGameMessage.Invoke(message);
+            ClientGenericActions.ClientReceiveGameMessage(messageHandler.ReadMessage<GameMessage>());
         }
 
         protected virtual void HandleWarpAtClient(MessageHandlerData messageHandler)
         {
-            if (onClientWarp != null)
-                onClientWarp.Invoke();
+            ClientGenericActions.ClientWarp();
         }
 
         protected virtual void HandleChatAtClient(MessageHandlerData messageHandler)
         {
-            ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
-            if (onClientReceiveChat != null)
-                onClientReceiveChat.Invoke(message);
+            ClientGenericActions.ClientReceiveChatMessage(messageHandler.ReadMessage<ChatMessage>());
         }
 
         protected virtual void HandleUpdatePartyMemberAtClient(MessageHandlerData messageHandler)
         {
-            UpdateSocialGroupMember(ClientParty, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
-            if (onClientUpdateParty != null)
-                onClientUpdateParty.Invoke(ClientParty);
+            UpdateSocialGroupMember(ClientPartyHandlers.ClientParty, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            ClientPartyActions.NotifyPartyUpdated(ClientPartyHandlers.ClientParty);
         }
 
         protected virtual void HandleUpdatePartyAtClient(MessageHandlerData messageHandler)
@@ -558,32 +504,30 @@ namespace MultiplayerARPG
             UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (message.type == UpdatePartyMessage.UpdateType.Create)
             {
-                ClientParty = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
+                ClientPartyHandlers.ClientParty = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
             }
-            else if (ClientParty != null && ClientParty.id == message.id)
+            else if (ClientPartyHandlers.ClientParty != null && ClientPartyHandlers.ClientParty.id == message.id)
             {
                 switch (message.type)
                 {
                     case UpdatePartyMessage.UpdateType.ChangeLeader:
-                        ClientParty.SetLeader(message.characterId);
+                        ClientPartyHandlers.ClientParty.SetLeader(message.characterId);
                         break;
                     case UpdatePartyMessage.UpdateType.Setting:
-                        ClientParty.Setting(message.shareExp, message.shareItem);
+                        ClientPartyHandlers.ClientParty.Setting(message.shareExp, message.shareItem);
                         break;
                     case UpdatePartyMessage.UpdateType.Terminate:
-                        ClientParty = null;
+                        ClientPartyHandlers.ClientParty = null;
                         break;
                 }
             }
-            if (onClientUpdateParty != null)
-                onClientUpdateParty.Invoke(ClientParty);
+            ClientPartyActions.NotifyPartyUpdated(ClientPartyHandlers.ClientParty);
         }
 
         protected virtual void HandleUpdateGuildMemberAtClient(MessageHandlerData messageHandler)
         {
-            UpdateSocialGroupMember(ClientGuild, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
-            if (onClientUpdateGuild != null)
-                onClientUpdateGuild.Invoke(ClientGuild);
+            UpdateSocialGroupMember(ClientGuildHandlers.ClientGuild, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            ClientGuildActions.NotifyGuildUpdated(ClientGuildHandlers.ClientGuild);
         }
 
         protected virtual void HandleUpdateGuildAtClient(MessageHandlerData messageHandler)
@@ -591,46 +535,45 @@ namespace MultiplayerARPG
             UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (message.type == UpdateGuildMessage.UpdateType.Create)
             {
-                ClientGuild = new GuildData(message.id, message.guildName, message.characterId);
+                ClientGuildHandlers.ClientGuild = new GuildData(message.id, message.guildName, message.characterId);
             }
-            else if (ClientGuild != null && ClientGuild.id == message.id)
+            else if (ClientGuildHandlers.ClientGuild != null && ClientGuildHandlers.ClientGuild.id == message.id)
             {
                 switch (message.type)
                 {
                     case UpdateGuildMessage.UpdateType.ChangeLeader:
-                        ClientGuild.SetLeader(message.characterId);
+                        ClientGuildHandlers.ClientGuild.SetLeader(message.characterId);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMessage:
-                        ClientGuild.guildMessage = message.guildMessage;
+                        ClientGuildHandlers.ClientGuild.guildMessage = message.guildMessage;
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
-                        ClientGuild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
+                        ClientGuildHandlers.ClientGuild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
-                        ClientGuild.SetMemberRole(message.characterId, message.guildRole);
+                        ClientGuildHandlers.ClientGuild.SetMemberRole(message.characterId, message.guildRole);
                         break;
                     case UpdateGuildMessage.UpdateType.SetSkillLevel:
-                        ClientGuild.SetSkillLevel(message.dataId, message.level);
+                        ClientGuildHandlers.ClientGuild.SetSkillLevel(message.dataId, message.level);
                         if (BasePlayerCharacterController.OwningCharacter != null)
                             BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
                         break;
                     case UpdateGuildMessage.UpdateType.SetGold:
-                        ClientGuild.gold = message.gold;
+                        ClientGuildHandlers.ClientGuild.gold = message.gold;
                         break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
-                        ClientGuild.level = message.level;
-                        ClientGuild.exp = message.exp;
-                        ClientGuild.skillPoint = message.skillPoint;
+                        ClientGuildHandlers.ClientGuild.level = message.level;
+                        ClientGuildHandlers.ClientGuild.exp = message.exp;
+                        ClientGuildHandlers.ClientGuild.skillPoint = message.skillPoint;
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
-                        ClientGuild = null;
+                        ClientGuildHandlers.ClientGuild = null;
                         if (BasePlayerCharacterController.OwningCharacter != null)
                             BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
                         break;
                 }
             }
-            if (onClientUpdateGuild != null)
-                onClientUpdateGuild.Invoke(ClientGuild);
+            ClientGuildActions.NotifyGuildUpdated(ClientGuildHandlers.ClientGuild);
         }
 
         protected virtual void HandleUpdateMapInfoAtClient(MessageHandlerData messageHandler)
@@ -649,26 +592,6 @@ namespace MultiplayerARPG
                 return;
             UpdateTimeOfDayMessage message = messageHandler.ReadMessage<UpdateTimeOfDayMessage>();
             CurrentGameInstance.DayNightTimeUpdater.SetTimeOfDay(message.timeOfDay);
-        }
-
-        protected virtual void HandleNotifyStorageItemsUpdatedAtClient(MessageHandlerData messageHandler)
-        {
-            if (onNotifyStorageItemsUpdated != null)
-                onNotifyStorageItemsUpdated.Invoke();
-        }
-
-        protected virtual void HandleNotifyPartyInvitationAtClient(MessageHandlerData messageHandler)
-        {
-            PartyInvitationData invitation = messageHandler.ReadMessage<PartyInvitationData>();
-            if (onNotifyPartyInvitation != null)
-                onNotifyPartyInvitation.Invoke(invitation);
-        }
-
-        protected virtual void HandleNotifyGuildInvitationAtClient(MessageHandlerData messageHandler)
-        {
-            GuildInvitationData invitation = messageHandler.ReadMessage<GuildInvitationData>();
-            if (onNotifyGuildInvitation != null)
-                onNotifyGuildInvitation.Invoke(invitation);
         }
 
         protected virtual void HandleUpdateFoundCharactersAtClient(MessageHandlerData messageHandler)
@@ -695,27 +618,51 @@ namespace MultiplayerARPG
                 onClientUpdateFriends.Invoke(ClientFriends);
         }
 
-        protected virtual void HandleNotifyOnlineCharacterAtClient(MessageHandlerData messageHandler)
+        protected void HandleNotifyOnlineCharacterAtClient(MessageHandlerData messageHandler)
         {
             NotifyOnlineCharacter(messageHandler.Reader.GetString());
         }
 
-        protected virtual void HandleNotifyRewardExpAtClient(MessageHandlerData messageHandler)
+        protected void HandleNotifyRewardExpAtClient(MessageHandlerData messageHandler)
         {
-            if (onNotifyRewardExp != null)
-                onNotifyRewardExp.Invoke(messageHandler.Reader.GetInt());
+            ClientGenericActions.NotifyRewardExp(messageHandler.Reader.GetPackedInt());
         }
 
-        protected virtual void HandleNotifyRewardGoldAtClient(MessageHandlerData messageHandler)
+        protected void HandleNotifyRewardGoldAtClient(MessageHandlerData messageHandler)
         {
-            if (onNotifyRewardGold != null)
-                onNotifyRewardGold.Invoke(messageHandler.Reader.GetInt());
+            ClientGenericActions.NotifyRewardGold(messageHandler.Reader.GetPackedInt());
         }
 
-        protected virtual void HandleNotifyRewardItemAtClient(MessageHandlerData messageHandler)
+        protected void HandleNotifyRewardItemAtClient(MessageHandlerData messageHandler)
         {
-            if (onNotifyRewardItem != null)
-                onNotifyRewardItem.Invoke(messageHandler.Reader.GetInt(), messageHandler.Reader.GetShort());
+            ClientGenericActions.NotifyRewardItem(
+                messageHandler.Reader.GetPackedInt(),
+                messageHandler.Reader.GetPackedShort());
+        }
+
+        protected void HandleNotifyStorageOpenedAtClient(MessageHandlerData messageHandler)
+        {
+            ClientStorageActions.NotifyStorageOpened(
+                (StorageType)messageHandler.Reader.GetByte(),
+                messageHandler.Reader.GetString(),
+                messageHandler.Reader.GetPackedUInt(),
+                messageHandler.Reader.GetPackedShort(),
+                messageHandler.Reader.GetPackedShort());
+        }
+
+        protected void HandleNotifyStorageItemsUpdatedAtClient(MessageHandlerData messageHandler)
+        {
+            ClientStorageActions.NotifyStorageItemsUpdated(messageHandler.Reader.GetList<CharacterItem>());
+        }
+
+        protected void HandleNotifyPartyInvitationAtClient(MessageHandlerData messageHandler)
+        {
+            ClientPartyActions.NotifyPartyInvitation(messageHandler.ReadMessage<PartyInvitationData>());
+        }
+
+        protected void HandleNotifyGuildInvitationAtClient(MessageHandlerData messageHandler)
+        {
+            ClientGuildActions.NotifyGuildInvitation(messageHandler.ReadMessage<GuildInvitationData>());
         }
 
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
@@ -729,7 +676,7 @@ namespace MultiplayerARPG
             if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
             {
                 if (!string.IsNullOrEmpty(message.sender) &&
-                    TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                    ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                 {
                     switch (message.channel)
                     {
@@ -752,7 +699,7 @@ namespace MultiplayerARPG
             {
                 case ChatChannel.Local:
                     if (!string.IsNullOrEmpty(message.sender) &&
-                        this.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                        ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
                         string gmCommand;
                         if (CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
@@ -783,13 +730,13 @@ namespace MultiplayerARPG
                     break;
                 case ChatChannel.Whisper:
                     if (!string.IsNullOrEmpty(message.sender) &&
-                        this.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                        ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
                         // If found sender send whisper message to sender
                         ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                     }
                     if (!string.IsNullOrEmpty(message.receiver) &&
-                        this.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
+                        ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
                     {
                         // If found receiver send whisper message to receiver
                         ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
@@ -797,11 +744,11 @@ namespace MultiplayerARPG
                     break;
                 case ChatChannel.Party:
                     PartyData party;
-                    if (Parties.TryGetValue(message.channelId, out party))
+                    if (GameInstance.ServerPartyHandlers.TryGetParty(message.channelId, out party))
                     {
                         foreach (string memberId in party.GetMemberIds())
                         {
-                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
+                            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If party member is online, send party message to the member
@@ -812,11 +759,11 @@ namespace MultiplayerARPG
                     break;
                 case ChatChannel.Guild:
                     GuildData guild;
-                    if (Guilds.TryGetValue(message.channelId, out guild))
+                    if (GameInstance.ServerGuildHandlers.TryGetGuild(message.channelId, out guild))
                     {
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
+                            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If guild member is online, send guild message to the member
@@ -1145,12 +1092,12 @@ namespace MultiplayerARPG
 
         public virtual void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            AddPlayerCharacter(playerCharacterEntity.ConnectionId, playerCharacterEntity);
+            ServerPlayerCharacterHandlers.AddPlayerCharacter(playerCharacterEntity.ConnectionId, playerCharacterEntity);
         }
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
         {
-            RemovePlayerCharacter(connectionId);
+            ServerPlayerCharacterHandlers.RemovePlayerCharacter(connectionId);
         }
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
@@ -1268,7 +1215,7 @@ namespace MultiplayerARPG
             // TODO: Don't use fixed user level
             BasePlayerCharacterEntity playerCharacter;
             return (!string.IsNullOrEmpty(sender) &&
-                    this.TryGetPlayerCharacterByName(sender, out playerCharacter) &&
+                    ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(sender, out playerCharacter) &&
                     playerCharacter.UserLevel > 0) ||
                     CHAT_SYSTEM_ANNOUNCER_SENDER.Equals(sender);
         }

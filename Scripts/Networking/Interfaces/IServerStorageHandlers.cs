@@ -9,21 +9,26 @@ namespace MultiplayerARPG
     public interface IServerStorageHandlers
     {
         /// <summary>
+        /// Get all storages and all items which cached in current server
+        /// </summary>
+        /// <returns></returns>
+        IDictionary<StorageId, List<CharacterItem>> GetAllStorageItems();
+
+        /// <summary>
         /// Open storage
         /// </summary>
-        /// <param name="playerCharacterEntity">Character who open the storage</param>
-        UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacterEntity);
+        /// <param name="playerCharacter">Character who open the storage</param>
+        UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacter);
 
         /// <summary>
         /// Close storage
         /// </summary>
-        /// <param name="playerCharacterEntity">Character who close the storage</param>
-        UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacterEntity);
+        /// <param name="playerCharacter">Character who close the storage</param>
+        UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacter);
 
         /// <summary>
         /// Increase items to storage
         /// </summary>
-        /// <param name="playerCharacterEntity"></param>
         /// <param name="storageId"></param>
         /// <param name="addingItem"></param>
         UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem);
@@ -34,7 +39,6 @@ namespace MultiplayerARPG
         /// <param name="storageId"></param>
         /// <param name="dataId"></param>
         /// <param name="amount"></param>
-        /// <param name="decreaseItems"></param>
         UniTask<DecreaseStorageItemsResult> DecreaseStorageItems(StorageId storageId, int dataId, short amount);
 
         /// <summary>
@@ -58,7 +62,6 @@ namespace MultiplayerARPG
         /// <returns></returns>
         bool IsStorageEntityOpen(StorageEntity storageEntity);
 
-
         /// <summary>
         /// Get items from storage entity
         /// </summary>
@@ -70,8 +73,9 @@ namespace MultiplayerARPG
         /// Get storage settings by storage Id
         /// </summary>
         /// <param name="storageId"></param>
+        /// <param name="objectId"></param>
         /// <returns></returns>
-        Storage GetStorage(StorageId storageId);
+        Storage GetStorage(StorageId storageId, out uint objectId);
 
         /// <summary>
         /// Can access storage or not?
@@ -79,11 +83,18 @@ namespace MultiplayerARPG
         /// <param name="storageId"></param>
         /// <param name="playerCharacter"></param>
         /// <returns></returns>
-        bool CanAccessStorage(StorageId storageId, IPlayerCharacterData playerCharacter);
+        bool CanAccessStorage(IPlayerCharacterData playerCharacter, StorageId storageId);
 
         /// <summary>
         /// This will be used to clear data relates to storage system
         /// </summary>
         void ClearStorage();
+
+        /// <summary>
+        /// Notify to clients which using storage
+        /// </summary>
+        /// <param name="storageType"></param>
+        /// <param name="storageOwnerId"></param>
+        void NotifyStorageItemsUpdated(StorageType storageType, string storageOwnerId);
     }
 }

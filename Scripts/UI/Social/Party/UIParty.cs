@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         {
             base.OnEnable();
             UpdatePartyUIs(Party);
-            BaseGameNetworkManager.Singleton.onClientUpdateParty += UpdatePartyUIs;
+            ClientPartyActions.onNotifyPartyUpdated += UpdatePartyUIs;
         }
 
         protected override void OnDisable()
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
                 uiPartyCreate.Hide();
             if (uiPartySetting != null)
                 uiPartySetting.Hide();
-            BaseGameNetworkManager.Singleton.onClientUpdateParty -= UpdatePartyUIs;
+            ClientPartyActions.onNotifyPartyUpdated -= UpdatePartyUIs;
         }
 
         private void UpdatePartyUIs(PartyData party)

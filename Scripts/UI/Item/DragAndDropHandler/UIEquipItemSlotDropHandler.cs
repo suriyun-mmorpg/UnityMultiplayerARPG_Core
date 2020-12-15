@@ -79,7 +79,7 @@ namespace MultiplayerARPG
                         !armorItem.EquipPosition.Equals(uiCharacterItem.EquipPosition))
                     {
                         // Check if it's correct equip position or not
-                        BaseGameNetworkManager.Singleton.ClientReceiveGameMessage(new GameMessage()
+                        ClientGenericActions.ClientReceiveGameMessage(new GameMessage()
                         {
                             type = GameMessage.Type.CannotEquip
                         });
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                         shieldItem == null)
                     {
                         // Check if it's correct equip position or not
-                        BaseGameNetworkManager.Singleton.ClientReceiveGameMessage(new GameMessage()
+                        ClientGenericActions.ClientReceiveGameMessage(new GameMessage()
                         {
                             type = GameMessage.Type.CannotEquip
                         });

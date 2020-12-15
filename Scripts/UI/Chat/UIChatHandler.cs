@@ -69,12 +69,12 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            BaseGameNetworkManager.Singleton.onClientReceiveChat += OnReceiveChat;
+            ClientGenericActions.onClientReceiveChatMessage += OnReceiveChat;
         }
 
         private void OnDisable()
         {
-            BaseGameNetworkManager.Singleton.onClientReceiveChat -= OnReceiveChat;
+            ClientGenericActions.onClientReceiveChatMessage -= OnReceiveChat;
         }
 
         private void Update()

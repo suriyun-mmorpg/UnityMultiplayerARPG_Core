@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseKickMemberFromPartyMessage> onResponseKickMemberFromParty;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseLeavePartyMessage> onResponseLeaveParty;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangePartySettingMessage> onResponseChangePartySetting;
+        public static System.Action<PartyInvitationData> onNotifyPartyInvitation;
+        public static System.Action<PartyData> onNotifyPartyUpdated;
 
         public static async UniTaskVoid ResponseSendPartyInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
         {
@@ -68,6 +70,18 @@ namespace MultiplayerARPG
             await UniTask.Yield();
             if (onResponseChangePartySetting != null)
                 onResponseChangePartySetting.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void NotifyPartyInvitation(PartyInvitationData invitation)
+        {
+            if (onNotifyPartyInvitation != null)
+                onNotifyPartyInvitation.Invoke(invitation);
+        }
+
+        public static void NotifyPartyUpdated(PartyData party)
+        {
+            if (onNotifyPartyUpdated != null)
+                onNotifyPartyUpdated.Invoke(party);
         }
     }
 }

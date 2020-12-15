@@ -5,8 +5,6 @@ namespace MultiplayerARPG
 {
     public interface IServerInventoryMessageHandlers
     {
-        IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-
         UniTaskVoid HandleRequestSwapOrMergeItem(
             RequestHandlerData requestHandler, RequestSwapOrMergeItemMessage request,
             RequestProceedResultDelegate<ResponseSwapOrMergeItemMessage> result);

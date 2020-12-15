@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                 {
                     receiver = sender;
                     short amount;
-                    if (manager.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
+                    if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[1], out amount) &&
                         amount > 0)
                         playerCharacter.Level = amount;
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
                 {
                     receiver = sender;
                     short amount;
-                    if (manager.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
+                    if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[1], out amount) &&
                         amount >= 0)
                         playerCharacter.StatPoint = amount;
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                 {
                     receiver = sender;
                     short amount;
-                    if (manager.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
+                    if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[1], out amount) &&
                         amount >= 0)
                         playerCharacter.SkillPoint = amount;
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                 {
                     receiver = sender;
                     short amount;
-                    if (manager.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
+                    if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[1], out amount) &&
                         amount >= 0)
                         playerCharacter.Gold = amount;
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
                     receiver = sender;
                     BaseItem item;
                     short amount;
-                    if (manager.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
+                    if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         GameInstance.Items.TryGetValue(data[1].GenerateHashId(), out item) &&
                         short.TryParse(data[2], out amount))
                     {
@@ -151,7 +151,7 @@ namespace MultiplayerARPG
                 {
                     receiver = data[1];
                     short amount;
-                    if (manager.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
+                    if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[2], out amount))
                         playerCharacter.Gold = playerCharacter.Gold.Increase(amount);
                 }
@@ -160,7 +160,7 @@ namespace MultiplayerARPG
                     receiver = data[1];
                     BaseItem item;
                     short amount;
-                    if (manager.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
+                    if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         GameInstance.Items.TryGetValue(data[2].GenerateHashId(), out item) &&
                         short.TryParse(data[3], out amount))
                     {

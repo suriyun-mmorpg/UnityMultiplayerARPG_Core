@@ -8,8 +8,6 @@ namespace MultiplayerARPG
     /// </summary>
     public interface IServerMailMessageHandlers
     {
-        IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-
         UniTaskVoid HandleRequestMailList(
             RequestHandlerData requestHandler, RequestMailListMessage request,
             RequestProceedResultDelegate<ResponseMailListMessage> result);

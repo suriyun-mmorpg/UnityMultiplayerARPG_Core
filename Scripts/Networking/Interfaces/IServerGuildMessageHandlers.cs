@@ -5,9 +5,6 @@ namespace MultiplayerARPG
 {
     public interface IServerGuildMessageHandlers
     {
-        IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-        IServerGuildHandlers ServerGuildHandlers { get; set; }
-
         UniTaskVoid HandleRequestCreateGuild(
             RequestHandlerData requestHandler, RequestCreateGuildMessage request,
             RequestProceedResultDelegate<ResponseCreateGuildMessage> result);

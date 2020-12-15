@@ -1,32 +1,37 @@
 ﻿using Cysharp.Threading.Tasks;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class LanRpgNetworkManager
+    public class LanRpgServerStorageHandlers : MonoBehaviour, IServerStorageHandlers
     {
-        private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
-        private readonly Dictionary<StorageId, HashSet<long>> usingStorageCharacters = new Dictionary<StorageId, HashSet<long>>();
+        private readonly ConcurrentDictionary<StorageId, List<CharacterItem>> storageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
+        private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageCharacters = new ConcurrentDictionary<StorageId, HashSet<long>>();
 
-        public async UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
+        public async UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacter)
         {
-            if (!CanAccessStorage(playerCharacterEntity.CurrentStorageId, playerCharacterEntity))
+            if (!CanAccessStorage(playerCharacter, playerCharacter.CurrentStorageId))
             {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<long>();
-            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ConnectionId);
+            if (!usingStorageCharacters.ContainsKey(playerCharacter.CurrentStorageId))
+                usingStorageCharacters.TryAdd(playerCharacter.CurrentStorageId, new HashSet<long>());
+            usingStorageCharacters[playerCharacter.CurrentStorageId].Add(playerCharacter.ConnectionId);
             // Notify storage items to client
-            SendNotifyStorageItemsUpdatedToClient(playerCharacterEntity.ConnectionId);
+            uint storageObjectId;
+            Storage storage = GetStorage(playerCharacter.CurrentStorageId, out storageObjectId);
+            BaseGameNetworkManager.Singleton.SendNotifyStorageOpenedToClient(playerCharacter.ConnectionId, playerCharacter.CurrentStorageId.storageType, playerCharacter.CurrentStorageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
+            BaseGameNetworkManager.Singleton.SendNotifyStorageItemsUpdatedToClient(playerCharacter.ConnectionId, GetStorageItems(playerCharacter.CurrentStorageId));
             await UniTask.Yield();
         }
 
-        public async UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
+        public async UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacter)
         {
-            if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ConnectionId);
+            if (usingStorageCharacters.ContainsKey(playerCharacter.CurrentStorageId))
+                usingStorageCharacters[playerCharacter.CurrentStorageId].Remove(playerCharacter.ConnectionId);
             await UniTask.Yield();
         }
 
@@ -37,7 +42,7 @@ namespace MultiplayerARPG
                 return false;
             List<CharacterItem> storageItems = GetStorageItems(storageId);
             // Prepare storage data
-            Storage storage = GetStorage(storageId);
+            Storage storage = GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
             short weightLimit = storage.weightLimit;
@@ -50,7 +55,8 @@ namespace MultiplayerARPG
             {
                 // Update slots
                 storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-                SendNotifyStorageItemsUpdatedToClients(usingStorageCharacters[storageId]);
+                SetStorageItems(storageId, storageItems);
+                NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
                 return true;
             }
             return false;
@@ -59,18 +65,19 @@ namespace MultiplayerARPG
         public async UniTask<DecreaseStorageItemsResult> DecreaseStorageItems(StorageId storageId, int dataId, short amount)
         {
             await UniTask.Yield();
-            List<CharacterItem> storageItemList = GetStorageItems(storageId);
+            List<CharacterItem> storageItems = GetStorageItems(storageId);
             // Prepare storage data
-            Storage storage = GetStorage(storageId);
+            Storage storage = GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
             Dictionary<int, short> decreaseItems;
-            if (storageItemList.DecreaseItems(dataId, amount, isLimitSlot, out decreaseItems))
+            if (storageItems.DecreaseItems(dataId, amount, isLimitSlot, out decreaseItems))
             {
                 // Update slots
-                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-                SendNotifyStorageItemsUpdatedToClients(usingStorageCharacters[storageId]);
+                storageItems.FillEmptySlots(isLimitSlot, slotLimit);
+                SetStorageItems(storageId, storageItems);
+                NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
                 return new DecreaseStorageItemsResult()
                 {
                     IsSuccess = true,
@@ -83,38 +90,42 @@ namespace MultiplayerARPG
         public List<CharacterItem> GetStorageItems(StorageId storageId)
         {
             if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
+                storageItems.TryAdd(storageId, new List<CharacterItem>());
             return storageItems[storageId];
         }
 
         public void SetStorageItems(StorageId storageId, List<CharacterItem> items)
         {
             if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
+                storageItems.TryAdd(storageId, new List<CharacterItem>());
             storageItems[storageId] = items;
         }
 
-        public Storage GetStorage(StorageId storageId)
+        public Storage GetStorage(StorageId storageId, out uint objectId)
         {
+            objectId = 0;
             Storage storage = default(Storage);
             switch (storageId.storageType)
             {
                 case StorageType.Player:
-                    storage = CurrentGameInstance.playerStorage;
+                    storage = GameInstance.Singleton.playerStorage;
                     break;
                 case StorageType.Guild:
-                    storage = CurrentGameInstance.guildStorage;
+                    storage = GameInstance.Singleton.guildStorage;
                     break;
                 case StorageType.Building:
                     StorageEntity buildingEntity;
-                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
+                    if (BaseGameNetworkManager.Singleton.TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
+                    {
+                        objectId = buildingEntity.ObjectId;
                         storage = buildingEntity.storage;
+                    }
                     break;
             }
             return storage;
         }
 
-        public bool CanAccessStorage(StorageId storageId, IPlayerCharacterData playerCharacter)
+        public bool CanAccessStorage(IPlayerCharacterData playerCharacter, StorageId storageId)
         {
             switch (storageId.storageType)
             {
@@ -123,13 +134,13 @@ namespace MultiplayerARPG
                         return false;
                     break;
                 case StorageType.Guild:
-                    if (!Guilds.ContainsKey(playerCharacter.GuildId) ||
+                    if (!GameInstance.ServerGuildHandlers.ContainsGuild(playerCharacter.GuildId) ||
                         !playerCharacter.GuildId.ToString().Equals(storageId.storageOwnerId))
                         return false;
                     break;
                 case StorageType.Building:
                     StorageEntity buildingEntity;
-                    if (!TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity) ||
+                    if (!BaseGameNetworkManager.Singleton.TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity) ||
                         !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.canUseByEveryone))
                         return false;
                     break;
@@ -142,24 +153,31 @@ namespace MultiplayerARPG
             if (storageEntity == null)
                 return false;
             StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
-            return usingStorageCharacters.ContainsKey(id) &&
-                usingStorageCharacters[id].Count > 0;
+            return usingStorageCharacters.ContainsKey(id) && usingStorageCharacters[id].Count > 0;
         }
 
         public List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity)
         {
             if (storageEntity == null)
                 return new List<CharacterItem>();
-            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
-            if (!storageItems.ContainsKey(id))
-                storageItems[id] = new List<CharacterItem>();
-            return storageItems[id];
+            return GetStorageItems(new StorageId(StorageType.Building, storageEntity.Id));
         }
 
         public void ClearStorage()
         {
             storageItems.Clear();
             usingStorageCharacters.Clear();
+        }
+
+        public void NotifyStorageItemsUpdated(StorageType storageType, string storageOwnerId)
+        {
+            StorageId storageId = new StorageId(storageType, storageOwnerId);
+            BaseGameNetworkManager.Singleton.SendNotifyStorageItemsUpdatedToClients(usingStorageCharacters[storageId], GetStorageItems(storageId));
+        }
+
+        public IDictionary<StorageId, List<CharacterItem>> GetAllStorageItems()
+        {
+            return storageItems;
         }
     }
 }

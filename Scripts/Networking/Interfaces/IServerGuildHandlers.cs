@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using System.Collections.Generic;
+
+namespace MultiplayerARPG
 {
     /// <summary>
     /// These properties and functions will be called at server only
@@ -6,12 +8,30 @@
     public interface IServerGuildHandlers
     {
         /// <summary>
+        /// Count guilds
+        /// </summary>
+        int GuildsCount { get; }
+
+        /// <summary>
+        /// Get all guilds
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<GuildData> GetGuilds();
+
+        /// <summary>
         /// Get guild from server's collection
         /// </summary>
         /// <param name="guildId"></param>
         /// <param name="guildData"></param>
         /// <returns></returns>
         bool TryGetGuild(int guildId, out GuildData guildData);
+
+        /// <summary>
+        /// Has guild in server's collection or not
+        /// </summary>
+        /// <param name="guildId"></param>
+        /// <returns></returns>
+        bool ContainsGuild(int guildId);
 
         /// <summary>
         /// Set guild to server's collection

@@ -6,13 +6,11 @@ namespace MultiplayerARPG
 {
     public class DefaultServerInventoryMessageHandlers : MonoBehaviour, IServerInventoryMessageHandlers
     {
-        public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-
         public async UniTaskVoid HandleRequestSwapOrMergeItem(RequestHandlerData requestHandler, RequestSwapOrMergeItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeItemMessage> result)
         {
             await UniTask.Yield();
             PlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
                 {
@@ -44,7 +42,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             PlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
                 {
@@ -79,7 +77,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             PlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
                 {
@@ -114,7 +112,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             PlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
                 {
@@ -149,7 +147,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             PlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
                 {

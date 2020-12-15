@@ -29,18 +29,18 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            BaseGameNetworkManager.Singleton.onClientReceiveGameMessage += OnReceiveGameMessage;
-            BaseGameNetworkManager.Singleton.onNotifyRewardExp += OnNotifyRewardExp;
-            BaseGameNetworkManager.Singleton.onNotifyRewardGold += OnNotifyRewardGold;
-            BaseGameNetworkManager.Singleton.onNotifyRewardItem += OnNotifyRewardItem;
+            ClientGenericActions.onClientReceiveGameMessage += OnReceiveGameMessage;
+            ClientGenericActions.onNotifyRewardExp += OnNotifyRewardExp;
+            ClientGenericActions.onNotifyRewardGold += OnNotifyRewardGold;
+            ClientGenericActions.onNotifyRewardItem += OnNotifyRewardItem;
         }
 
         private void OnDisable()
         {
-            BaseGameNetworkManager.Singleton.onClientReceiveGameMessage -= OnReceiveGameMessage;
-            BaseGameNetworkManager.Singleton.onNotifyRewardExp -= OnNotifyRewardExp;
-            BaseGameNetworkManager.Singleton.onNotifyRewardGold -= OnNotifyRewardGold;
-            BaseGameNetworkManager.Singleton.onNotifyRewardItem -= OnNotifyRewardItem;
+            ClientGenericActions.onClientReceiveGameMessage -= OnReceiveGameMessage;
+            ClientGenericActions.onNotifyRewardExp -= OnNotifyRewardExp;
+            ClientGenericActions.onNotifyRewardGold -= OnNotifyRewardGold;
+            ClientGenericActions.onNotifyRewardItem -= OnNotifyRewardItem;
         }
 
         private void OnReceiveGameMessage(GameMessage gameMessage)

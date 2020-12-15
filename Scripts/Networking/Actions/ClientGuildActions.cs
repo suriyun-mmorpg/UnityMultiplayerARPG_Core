@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildRoleMessage> onResponseChangeGuildRole;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeMemberGuildRoleMessage> onResponseChangeMemberGuildRole;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseGuildSkillLevelMessage> onResponseIncreaseGuildSkillLevel;
+        public static System.Action<GuildInvitationData> onNotifyGuildInvitation;
+        public static System.Action<GuildData> onNotifyGuildUpdated;
 
         public static async UniTaskVoid ResponseSendGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
         {
@@ -92,6 +94,18 @@ namespace MultiplayerARPG
             await UniTask.Yield();
             if (onResponseIncreaseGuildSkillLevel != null)
                 onResponseIncreaseGuildSkillLevel.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void NotifyGuildInvitation(GuildInvitationData invitation)
+        {
+            if (onNotifyGuildInvitation != null)
+                onNotifyGuildInvitation.Invoke(invitation);
+        }
+
+        public static void NotifyGuildUpdated(GuildData guild)
+        {
+            if (onNotifyGuildUpdated != null)
+                onNotifyGuildUpdated.Invoke(guild);
         }
     }
 }

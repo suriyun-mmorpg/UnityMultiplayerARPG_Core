@@ -1,18 +1,27 @@
 ﻿using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class BaseGameNetworkManager
+    public class DefaultServerGuildHandlers : MonoBehaviour, IServerGuildHandlers
     {
         public const int GuildInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, GuildData> Guilds = new ConcurrentDictionary<int, GuildData>();
         public static readonly ConcurrentDictionary<long, GuildData> UpdatingGuildMembers = new ConcurrentDictionary<long, GuildData>();
         public static readonly ConcurrentDictionary<string, int> GuildInvitations = new ConcurrentDictionary<string, int>();
 
+        public int GuildsCount { get { return Guilds.Count; } }
+
         public bool TryGetGuild(int guildId, out GuildData guildData)
         {
             return Guilds.TryGetValue(guildId, out guildData);
+        }
+
+        public bool ContainsGuild(int guildId)
+        {
+            return Guilds.ContainsKey(guildId);
         }
 
         public void SetGuild(int guildId, GuildData guildData)
@@ -59,7 +68,7 @@ namespace MultiplayerARPG
                 return;
             validateResult.Guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(validateResult.Guild, exp);
             SetGuild(validateResult.GuildId, validateResult.Guild);
-            SendGuildLevelExpSkillPointToClients(validateResult.Guild);
+            BaseGameNetworkManager.Singleton.SendGuildLevelExpSkillPointToClients(validateResult.Guild);
         }
 
         private string GetGuildInvitationId(int guildId, string characterId)
@@ -71,6 +80,11 @@ namespace MultiplayerARPG
         {
             await UniTask.Delay(GuildInvitationDuration);
             RemoveGuildInvitation(partyId, characterId);
+        }
+
+        public IEnumerable<GuildData> GetGuilds()
+        {
+            return Guilds.Values;
         }
     }
 }

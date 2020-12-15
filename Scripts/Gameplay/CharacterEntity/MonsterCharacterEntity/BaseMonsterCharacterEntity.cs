@@ -409,7 +409,7 @@ namespace MultiplayerARPG
                             makeMostDamage = true;
                         }
                         // Try find guild data from player character
-                        if (tempPlayerCharacterEntity.GuildId > 0 && CurrentGameManager.TryGetGuild(tempPlayerCharacterEntity.GuildId, out tempGuildData))
+                        if (tempPlayerCharacterEntity.GuildId > 0 && GameInstance.ServerGuildHandlers.TryGetGuild(tempPlayerCharacterEntity.GuildId, out tempGuildData))
                         {
                             // Calculation amount of Exp which will be shared to guild
                             shareGuildExpRate = (float)tempGuildData.ShareExpPercentage(tempPlayerCharacterEntity.Id) * 0.01f;
@@ -417,17 +417,17 @@ namespace MultiplayerARPG
                             if (shareGuildExpRate > 0)
                             {
                                 // Increase guild exp
-                                CurrentGameManager.IncreaseGuildExp(tempPlayerCharacterEntity, (int)(reward.exp * shareGuildExpRate * rewardRate));
+                                GameInstance.ServerGuildHandlers.IncreaseGuildExp(tempPlayerCharacterEntity, (int)(reward.exp * shareGuildExpRate * rewardRate));
                             }
                         }
                         // Try find party data from player character
-                        if (tempPlayerCharacterEntity.PartyId > 0 && CurrentGameManager.TryGetParty(tempPlayerCharacterEntity.PartyId, out tempPartyData))
+                        if (tempPlayerCharacterEntity.PartyId > 0 && GameInstance.ServerPartyHandlers.TryGetParty(tempPlayerCharacterEntity.PartyId, out tempPartyData))
                         {
                             BasePlayerCharacterEntity partyPlayerCharacterEntity;
                             // Loop party member to fill looter list / increase gold / increase exp
                             foreach (SocialCharacterData member in tempPartyData.GetMembers())
                             {
-                                if (CurrentGameManager.TryGetPlayerCharacterById(member.id, out partyPlayerCharacterEntity))
+                                if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out partyPlayerCharacterEntity))
                                 {
                                     // If share exp, every party member will receive devided exp
                                     // If not share exp, character who make damage will receive non-devided exp

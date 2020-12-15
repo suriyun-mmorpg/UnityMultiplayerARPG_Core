@@ -57,6 +57,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
+            ClientStorageActions.onNotifyStorageItemsUpdated += UpdateData;
             CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelect);
             CacheItemSelectionManager.eventOnSelected.AddListener(OnSelect);
             CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
@@ -67,6 +68,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnDisable()
         {
+            ClientStorageActions.onNotifyStorageItemsUpdated -= UpdateData;
             // Close storage
             if (StorageType != StorageType.None && BasePlayerCharacterController.OwningCharacter)
                 BasePlayerCharacterController.OwningCharacter.CallServerCloseStorage();
@@ -141,35 +143,25 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Refresh()
+        public void UpdateData(IList<CharacterItem> characterItems)
         {
-            GameInstance.ClientStorageHandlers.RequestGetStorageItems(new RequestGetStorageItemsMessage()
-            {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
-                storageType = StorageType,
-                storageOwnerId = StorageOwnerId,
-            }, GetStorageItemsCallback);
-        }
-
-        private async UniTaskVoid GetStorageItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetStorageItemsMessage response)
-        {
-            await UniTask.Yield();
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             CacheItemSelectionManager.Clear();
-            if (responseCode == AckResponseCode.Unimplemented ||
-                responseCode == AckResponseCode.Timeout ||
-                StorageType == StorageType.None)
+
+            TotalWeight = 0;
+            UsedSlots = 0;
+
+            if (characterItems == null || characterItems.Count == 0)
             {
                 if (uiItemDialog != null)
                     uiItemDialog.Hide();
                 CacheItemList.HideAll();
                 return;
             }
-            TotalWeight = 0;
-            UsedSlots = 0;
+
             UICharacterItem selectedUI = null;
             UICharacterItem tempUI;
-            CacheItemList.Generate(response.storageItems, (index, characterItem, ui) =>
+            CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterItem>();
                 tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);

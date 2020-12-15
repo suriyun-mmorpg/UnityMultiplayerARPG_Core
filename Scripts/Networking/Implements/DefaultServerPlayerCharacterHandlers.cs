@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class BaseGameNetworkManager
+    public class DefaultServerPlayerCharacterHandlers : MonoBehaviour, IServerPlayerCharacterHandlers
     {
         public static readonly ConcurrentDictionary<long, IPlayerCharacterData> PlayerCharacters = new ConcurrentDictionary<long, IPlayerCharacterData>();
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersById = new ConcurrentDictionary<string, IPlayerCharacterData>();

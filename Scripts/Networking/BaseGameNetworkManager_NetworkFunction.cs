@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
 using System.Collections.Generic;
 
 namespace MultiplayerARPG
@@ -23,7 +24,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendChangePartyLeaderToClient(playerCharacterEntity.ConnectionId, party);
             }
         }
@@ -41,7 +42,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendPartySettingToClient(playerCharacterEntity.ConnectionId, party);
             }
         }
@@ -75,7 +76,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (!member.id.Equals(characterId) && this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (!member.id.Equals(characterId) && ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendAddPartyMemberToClient(playerCharacterEntity.ConnectionId, party.id, characterId, characterName, dataId, level);
             }
         }
@@ -103,7 +104,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (!member.id.Equals(characterId) && this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (!member.id.Equals(characterId) && ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendRemovePartyMemberToClient(playerCharacterEntity.ConnectionId, party.id, characterId);
             }
         }
@@ -132,7 +133,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendChangeGuildLeaderToClient(playerCharacterEntity.ConnectionId, guild);
             }
         }
@@ -153,7 +154,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildMessageToClient(playerCharacterEntity.ConnectionId, guild);
             }
         }
@@ -171,7 +172,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildRoleToClient(playerCharacterEntity.ConnectionId, guild.id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
             }
         }
@@ -203,7 +204,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildMemberRoleToClient(playerCharacterEntity.ConnectionId, guild.id, characterId, guildRole);
             }
         }
@@ -250,7 +251,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (!member.id.Equals(characterId) && this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (!member.id.Equals(characterId) && ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendAddGuildMemberToClient(playerCharacterEntity.ConnectionId, guild.id, characterId, characterName, dataId, level);
             }
         }
@@ -281,7 +282,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (!member.id.Equals(characterId) && this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (!member.id.Equals(characterId) && ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendRemoveGuildMemberToClient(playerCharacterEntity.ConnectionId, guild.id, characterId);
             }
         }
@@ -311,7 +312,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildSkillLevelToClient(playerCharacterEntity.ConnectionId, guild.id, dataId, skillLevel);
             }
         }
@@ -337,7 +338,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildGoldToClient(playerCharacterEntity.ConnectionId, guild.id, guild.gold);
             }
         }
@@ -355,7 +356,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (this.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild);
             }
         }
@@ -370,17 +371,70 @@ namespace MultiplayerARPG
             this.SendSocialMembers(connectionId, MsgTypes.UpdateFriends, members);
         }
 
-        public void SendNotifyStorageItemsUpdatedToClient(long connectionId)
+        public void SendServerGameMessage(long connectionId, GameMessage.Type type)
         {
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyStorageItemsUpdated);
+            GameMessage message = new GameMessage();
+            message.type = type;
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
-        public void SendNotifyStorageItemsUpdatedToClients(HashSet<long> connectionIds)
+        public void SendNotifyRewardExp(long connectionId, int exp)
+        {
+            if (exp <= 0)
+                return;
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardExp, (writer) =>
+            {
+                writer.PutPackedInt(exp);
+            });
+        }
+
+        public void SendNotifyRewardGold(long connectionId, int gold)
+        {
+            if (gold <= 0)
+                return;
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardGold, (writer) =>
+            {
+                writer.PutPackedInt(gold);
+            });
+        }
+
+        public void SendNotifyRewardItem(long connectionId, int dataId, short amount)
+        {
+            if (amount <= 0)
+                return;
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyRewardItem, (writer) =>
+            {
+                writer.PutPackedInt(dataId);
+                writer.PutPackedShort(amount);
+            });
+        }
+
+        public void SendNotifyStorageOpenedToClient(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyStorageOpened, (writer) =>
+             {
+                 writer.Put((byte)storageType);
+                 writer.Put(storageOwnerId);
+                 writer.PutPackedUInt(objectId);
+                 writer.PutPackedShort(weightLimit);
+                 writer.PutPackedShort(slotLimit);
+             });
+        }
+
+        public void SendNotifyStorageItemsUpdatedToClient(long connectionId, List<CharacterItem> storageItems)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyStorageItemsUpdated, (writer) =>
+            {
+                writer.PutList(storageItems);
+            });
+        }
+
+        public void SendNotifyStorageItemsUpdatedToClients(HashSet<long> connectionIds, List<CharacterItem> storageITems)
         {
             foreach (long connectionId in connectionIds)
             {
                 if (Players.ContainsKey(connectionId))
-                    SendNotifyStorageItemsUpdatedToClient(connectionId);
+                    SendNotifyStorageItemsUpdatedToClient(connectionId, storageITems);
             }
         }
 

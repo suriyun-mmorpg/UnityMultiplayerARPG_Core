@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             isReadyToSave = false;
         }
 
-        public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities, Dictionary<StorageId, List<CharacterItem>> storageItems)
+        public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<string, BuildingEntity> buildingEntities, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
             buildingEntities.Clear();
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             return PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
         }
 
-        public override void SaveStorage(IPlayerCharacterData hostPlayerCharacterData, Dictionary<StorageId, List<CharacterItem>> storageItems)
+        public override void SaveStorage(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             if (!isReadyToSave)
                 return;
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
             storageSaveData.SavePersistentData(hostPlayerCharacterData.Id);
         }
 
-        public override void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, Dictionary<string, BuildingEntity> buildingEntities)
+        public override void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, IDictionary<string, BuildingEntity> buildingEntities)
         {
             if (!isReadyToSave)
                 return;

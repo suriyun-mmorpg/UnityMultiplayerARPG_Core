@@ -8,7 +8,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
-    public partial class LanRpgNetworkManager : BaseGameNetworkManager, IServerStorageHandlers
+    public partial class LanRpgNetworkManager : BaseGameNetworkManager
     {
         public enum GameStartType
         {
@@ -38,19 +38,24 @@ namespace MultiplayerARPG
         {
             base.Awake();
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
-            CashShopRequestHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, LanRpgCashShopMessageHandlers>();
-            CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
-            InventoryRequestHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
-            InventoryRequestHandlers.ServerPlayerCharacterHandlers = this;
-            StorageRequestHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, LanRpgStorageMessageHandlers>();
-            StorageRequestHandlers.ServerPlayerCharacterHandlers = this;
-            StorageRequestHandlers.ServerStorageHandlers = this;
-            PartyRequestHandlers = gameObject.GetOrAddComponent<IServerPartyMessageHandlers, LanRpgPartyMessageHandlers>();
-            PartyRequestHandlers.ServerPlayerCharacterHandlers = this;
-            PartyRequestHandlers.ServerPartyHandlers = this;
-            GuildRequestHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, LanRpgGuildMessageHandlers>();
-            GuildRequestHandlers.ServerPlayerCharacterHandlers = this;
-            GuildRequestHandlers.ServerGuildHandlers = this;
+            // Server Handlers
+            ServerPlayerCharacterHandlers = gameObject.GetOrAddComponent<IServerPlayerCharacterHandlers, DefaultServerPlayerCharacterHandlers>();
+            ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, LanRpgServerStorageHandlers>();
+            ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
+            ServerGuildHandlers = gameObject.GetOrAddComponent<IServerGuildHandlers, DefaultServerGuildHandlers>();
+            // Server Message Handlers
+            ServerCashShopMessageHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, LanRpgServerCashShopMessageHandlers>();
+            ServerStorageMessageHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, LanRpgServerStorageMessageHandlers>();
+            ServerInventoryMessageHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
+            ServerPartyMessageHandlers = gameObject.GetOrAddComponent<IServerPartyMessageHandlers, LanRpgServerPartyMessageHandlers>();
+            ServerGuildMessageHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, LanRpgServerGuildMessageHandlers>();
+            // Client handlers
+            ClientCashShopHandlers = gameObject.GetOrAddComponent<IClientCashShopHandlers, DefaultClientCashShopHandlers>();
+            ClientMailHandlers = gameObject.GetOrAddComponent<IClientMailHandlers, DefaultClientMailHandlers>();
+            ClientStorageHandlers = gameObject.GetOrAddComponent<IClientStorageHandlers, DefaultClientStorageHandlers>();
+            ClientInventoryHandlers = gameObject.GetOrAddComponent<IClientInventoryHandlers, DefaultClientInventoryHandlers>();
+            ClientPartyHandlers = gameObject.GetOrAddComponent<IClientPartyHandlers, DefaultClientPartyHandlers>();
+            ClientGuildHandlers = gameObject.GetOrAddComponent<IClientGuildHandlers, DefaultClientGuildHandlers>();
         }
 
         public void StartGame()
@@ -114,7 +119,7 @@ namespace MultiplayerARPG
                     if (IsServer)
                     {
                         SaveSystem.SaveWorld(owningCharacter, BuildingEntities);
-                        SaveSystem.SaveStorage(owningCharacter, storageItems);
+                        SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
                     }
                 }
                 Profiler.EndSample();
@@ -139,17 +144,9 @@ namespace MultiplayerARPG
         public override void UnregisterPlayerCharacter(long connectionId)
         {
             BasePlayerCharacterEntity playerCharacter;
-            if (this.TryGetPlayerCharacter(connectionId, out playerCharacter))
-                CloseStorage(playerCharacter).Forget();
+            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out playerCharacter))
+                ServerStorageHandlers.CloseStorage(playerCharacter).Forget();
             base.UnregisterPlayerCharacter(connectionId);
-        }
-
-        protected override void Clean()
-        {
-            base.Clean();
-
-            storageItems.Clear();
-            usingStorageCharacters.Clear();
         }
 
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
@@ -206,7 +203,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.UserLevel = 1;
 
             // Load data for first character (host)
-            if (PlayerCharactersCount == 0)
+            if (ServerPlayerCharacterHandlers.PlayerCharactersCount == 0)
             {
                 if (enableGmCommands == EnableGmCommandType.HostOnly)
                     playerCharacterEntity.UserLevel = 1;
@@ -239,9 +236,9 @@ namespace MultiplayerARPG
 
             SocialCharacterData[] members;
             // Set guild id
-            if (Guilds.Count > 0)
+            if (ServerGuildHandlers.GuildsCount > 0)
             {
-                foreach (GuildData guild in Guilds.Values)
+                foreach (GuildData guild in ServerGuildHandlers.GetGuilds())
                 {
                     members = guild.GetMembers();
                     for (int i = 0; i < members.Length; ++i)
@@ -257,9 +254,9 @@ namespace MultiplayerARPG
                 }
             }
             // Set party id
-            if (Parties.Count > 0)
+            if (ServerPartyHandlers.PartiesCount > 0)
             {
-                foreach (PartyData party in Parties.Values)
+                foreach (PartyData party in ServerPartyHandlers.GetParties())
                 {
                     members = party.GetMembers();
                     for (int i = 0; i < members.Length; ++i)
@@ -301,9 +298,9 @@ namespace MultiplayerARPG
                 // Save data before warp
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 SaveSystem.SaveWorld(owningCharacter, BuildingEntities);
-                SaveSystem.SaveStorage(owningCharacter, storageItems);
+                SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
                 BuildingEntities.Clear();
-                storageItems.Clear();
+                ServerStorageHandlers.ClearStorage();
                 SetMapInfo(mapInfo);
                 teleportPosition = position;
                 if (owningCharacter != null)
@@ -355,13 +352,13 @@ namespace MultiplayerARPG
         public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
-            if (Guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
             {
                 if (playerCharacterEntity.Gold - amount >= 0)
                 {
                     playerCharacterEntity.Gold -= amount;
                     guild.gold += amount;
-                    Guilds[playerCharacterEntity.GuildId] = guild;
+                    ServerGuildHandlers.SetGuild(playerCharacterEntity.GuildId, guild);
                     SendSetGuildGoldToClients(guild);
                 }
                 else
@@ -374,13 +371,13 @@ namespace MultiplayerARPG
         public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
-            if (Guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
             {
                 if (guild.gold - amount >= 0)
                 {
                     guild.gold -= amount;
                     playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
-                    Guilds[playerCharacterEntity.GuildId] = guild;
+                    ServerGuildHandlers.SetGuild(playerCharacterEntity.GuildId, guild);
                     SendSetGuildGoldToClients(guild);
                 }
                 else
@@ -394,7 +391,7 @@ namespace MultiplayerARPG
         {
             List<SocialCharacterData> socialCharacters = new List<SocialCharacterData>();
             BasePlayerCharacterEntity findResult;
-            if (this.TryGetPlayerCharacterByName(characterName, out findResult))
+            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(characterName, out findResult))
                 socialCharacters.Add(SocialCharacterData.Create(findResult));
             this.SendSocialMembers(finder.ConnectionId, MsgTypes.UpdateFoundCharacters, socialCharacters.ToArray());
         }
@@ -432,13 +429,12 @@ namespace MultiplayerARPG
         public override void OnStartServer()
         {
             base.OnStartServer();
-            GameInstance.ServerStorageHandlers = this;
             SaveSystem.OnServerStart();
         }
 
         protected override async UniTask PreSpawnEntities()
         {
-            await SaveSystem.PreSpawnEntities(selectedCharacter, BuildingEntities, storageItems);
+            await SaveSystem.PreSpawnEntities(selectedCharacter, BuildingEntities, ServerStorageHandlers.GetAllStorageItems());
         }
         #endregion
     }

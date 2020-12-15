@@ -5,16 +5,13 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class LanRpgStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
+    public class LanRpgServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
-        public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-        public IServerStorageHandlers ServerStorageHandlers { get; set; }
-
         public async UniTaskVoid HandleRequestGetStorageItems(RequestHandlerData requestHandler, RequestGetStorageItemsMessage request, RequestProceedResultDelegate<ResponseGetStorageItemsMessage> result)
         {
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
                 {
@@ -22,7 +19,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
                 {
@@ -30,7 +27,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            List<CharacterItem> storageItemList = ServerStorageHandlers.GetStorageItems(storageId);
+            List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             result.Invoke(AckResponseCode.Success, new ResponseGetStorageItemsMessage()
             {
                 storageItems = storageItemList,
@@ -45,7 +42,7 @@ namespace MultiplayerARPG
             short amount = request.amount;
             short inventoryIndex = request.inventoryIndex;
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
@@ -53,7 +50,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
@@ -61,7 +58,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            List<CharacterItem> storageItemList = ServerStorageHandlers.GetStorageItems(storageId);
+            List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             if (storageItemIndex < 0 || storageItemIndex >= storageItemList.Count)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
@@ -71,7 +68,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Prepare storage data
-            Storage storage = ServerStorageHandlers.GetStorage(storageId);
+            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Prepare item data
@@ -111,6 +108,8 @@ namespace MultiplayerARPG
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             playerCharacter.FillEmptySlots();
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItemList);
+            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemFromStorageMessage());
             await UniTask.Yield();
@@ -123,7 +122,7 @@ namespace MultiplayerARPG
             short amount = request.amount;
             short storageItemIndex = request.storageItemIndex;
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
@@ -131,7 +130,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
@@ -139,7 +138,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            List<CharacterItem> storageItemList = ServerStorageHandlers.GetStorageItems(storageId);
+            List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             if (inventoryIndex < 0 || inventoryIndex >= playerCharacter.NonEquipItems.Count)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
@@ -149,7 +148,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Prepare storage data
-            Storage storage = ServerStorageHandlers.GetStorage(storageId);
+            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
             short weightLimit = storage.weightLimit;
@@ -190,6 +189,8 @@ namespace MultiplayerARPG
             }
             playerCharacter.FillEmptySlots();
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItemList);
+            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemToStorageMessage());
             await UniTask.Yield();
@@ -201,7 +202,7 @@ namespace MultiplayerARPG
             short fromIndex = request.fromIndex;
             short toIndex = request.toIndex;
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
@@ -209,7 +210,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
@@ -217,7 +218,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            List<CharacterItem> storageItemList = ServerStorageHandlers.GetStorageItems(storageId);
+            List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             if (fromIndex >= storageItemList.Count ||
                 toIndex >= storageItemList.Count)
             {
@@ -228,7 +229,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Prepare storage data
-            Storage storage = ServerStorageHandlers.GetStorage(storageId);
+            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Prepare item data
@@ -261,6 +262,8 @@ namespace MultiplayerARPG
                 storageItemList[toIndex] = fromItem;
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItemList);
+            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseSwapOrMergeStorageItemMessage());
             await UniTask.Yield();

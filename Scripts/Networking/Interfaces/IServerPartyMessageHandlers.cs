@@ -5,9 +5,6 @@ namespace MultiplayerARPG
 {
     public interface IServerPartyMessageHandlers
     {
-        IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-        IServerPartyHandlers ServerPartyHandlers { get; set; }
-
         UniTaskVoid HandleRequestCreateParty(
             RequestHandlerData requestHandler, RequestCreatePartyMessage request,
             RequestProceedResultDelegate<ResponseCreatePartyMessage> result);

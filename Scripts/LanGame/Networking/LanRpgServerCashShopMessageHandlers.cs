@@ -5,10 +5,8 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class LanRpgCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
+    public class LanRpgServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
     {
-        public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-
         public UniTaskVoid HandleRequestCashShopInfo(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
@@ -18,7 +16,7 @@ namespace MultiplayerARPG
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
@@ -51,7 +49,7 @@ namespace MultiplayerARPG
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashShopBuyMessage.Error.UserNotFound;
@@ -113,7 +111,7 @@ namespace MultiplayerARPG
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
@@ -147,7 +145,7 @@ namespace MultiplayerARPG
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;

@@ -8,8 +8,6 @@ namespace MultiplayerARPG
     /// </summary>
     public interface IServerCashShopMessageHandlers
     {
-        IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-
         UniTaskVoid HandleRequestCashShopInfo(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result);

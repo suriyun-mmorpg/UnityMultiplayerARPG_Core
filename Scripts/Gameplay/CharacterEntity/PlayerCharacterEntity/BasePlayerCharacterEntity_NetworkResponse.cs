@@ -177,13 +177,6 @@ namespace MultiplayerARPG
 #endif
         }
 
-        [TargetRpc]
-        protected void TargetShowStorage(StorageType type, string ownerId, uint objectId, short weightLimit, short slotLimit)
-        {
-            if (onShowStorage != null)
-                onShowStorage.Invoke(type, ownerId, objectId, weightLimit, slotLimit);
-        }
-
         private bool VerifyDismantleItem(short index, short amount, List<CharacterItem> simulatingNonEquipItems, out int returningGold, out List<ItemAmount> returningItems)
         {
             returningGold = 0;
@@ -1060,37 +1053,38 @@ namespace MultiplayerARPG
 
         public void OpenStorage(StorageType type, BaseGameEntity targetEntity)
         {
-            string ownerId = UserId;
+            string ownerId;
             switch (type)
             {
+                case StorageType.Player:
+                    ownerId = UserId;
+                    break;
                 case StorageType.Guild:
                     if (GuildId <= 0)
                         return;
                     ownerId = GuildId.ToString();
                     break;
                 case StorageType.Building:
-                    if (!(targetEntity is BuildingEntity))
+                    if (!(targetEntity is BuildingEntity)) 
                         return;
                     ownerId = (targetEntity as BuildingEntity).Id;
                     break;
-                case StorageType.None:
+                default:
                     return;
             }
 
             StorageId storageId = new StorageId(type, ownerId);
-            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(storageId, this))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(this, storageId))
             {
                 CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
 
-            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId);
             if (!CurrentStorageId.Equals(storageId))
             {
                 GameInstance.ServerStorageHandlers.CloseStorage(this);
                 CurrentStorageId = storageId;
                 GameInstance.ServerStorageHandlers.OpenStorage(this);
-                CallOwnerShowStorage(type, ownerId, targetEntity == null ? 0 : targetEntity.ObjectId, storage.weightLimit, storage.slotLimit);
             }
         }
     }

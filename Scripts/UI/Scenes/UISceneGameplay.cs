@@ -392,7 +392,7 @@ namespace MultiplayerARPG
             uiDealing.Show();
         }
 
-        public void OnShowPartyInvitation(PartyInvitationData invitation)
+        public void OnNotifyPartyInvitation(PartyInvitationData invitation)
         {
             if (uiPartyInvitation == null)
                 return;
@@ -400,7 +400,7 @@ namespace MultiplayerARPG
             uiPartyInvitation.Show();
         }
 
-        public void OnShowGuildInvitation(GuildInvitationData invitation)
+        public void OnNotifyGuildInvitation(GuildInvitationData invitation)
         {
             if (uiGuildInvitation == null)
                 return;
@@ -408,7 +408,7 @@ namespace MultiplayerARPG
             uiGuildInvitation.Show();
         }
 
-        public void OnShowStorage(StorageType storageType, string storageOWnerId, uint objectId, short weightLimit, short slotLimit)
+        public void OnNotifyStorageOpened(StorageType storageType, string storageOWnerId, uint objectId, short weightLimit, short slotLimit)
         {
             // Hide all of storage UIs
             if (uiPlayerStorageItems != null)
@@ -669,8 +669,10 @@ namespace MultiplayerARPG
             characterEntity.onRespawn.AddListener(OnCharacterRespawn);
             characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
             characterEntity.onShowDealingDialog += OnShowDealing;
-            characterEntity.onShowStorage += OnShowStorage;
             characterEntity.onIsWarpingChange += OnIsWarpingChange;
+            ClientStorageActions.onNotifyStorageOpened += OnNotifyStorageOpened;
+            ClientPartyActions.onNotifyPartyInvitation += OnNotifyPartyInvitation;
+            ClientGuildActions.onNotifyGuildInvitation += OnNotifyGuildInvitation;
         }
 
         public override void OnControllerDesetup(BasePlayerCharacterEntity characterEntity)
@@ -683,8 +685,10 @@ namespace MultiplayerARPG
             characterEntity.onRespawn.RemoveListener(OnCharacterRespawn);
             characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;
             characterEntity.onShowDealingDialog -= OnShowDealing;
-            characterEntity.onShowStorage -= OnShowStorage;
             characterEntity.onIsWarpingChange -= OnIsWarpingChange;
+            ClientStorageActions.onNotifyStorageOpened -= OnNotifyStorageOpened;
+            ClientPartyActions.onNotifyPartyInvitation -= OnNotifyPartyInvitation;
+            ClientGuildActions.onNotifyGuildInvitation -= OnNotifyGuildInvitation;
         }
     }
 }

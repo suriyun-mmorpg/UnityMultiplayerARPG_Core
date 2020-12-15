@@ -1,18 +1,27 @@
 ﻿using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class BaseGameNetworkManager
+    public class DefaultServerPartyHandlers : MonoBehaviour, IServerPartyHandlers
     {
         public const int PartyInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, PartyData> Parties = new ConcurrentDictionary<int, PartyData>();
         public static readonly ConcurrentDictionary<long, PartyData> UpdatingPartyMembers = new ConcurrentDictionary<long, PartyData>();
         public static readonly ConcurrentDictionary<string, int> PartyInvitations = new ConcurrentDictionary<string, int>();
 
+        public int PartiesCount { get { return Parties.Count; } }
+
         public bool TryGetParty(int partyId, out PartyData partyData)
         {
             return Parties.TryGetValue(partyId, out partyData);
+        }
+
+        public bool ContainsParty(int partyId)
+        {
+            return Parties.ContainsKey(partyId);
         }
 
         public void SetParty(int partyId, PartyData partyData)
@@ -61,6 +70,11 @@ namespace MultiplayerARPG
         {
             await UniTask.Delay(PartyInvitationDuration);
             RemovePartyInvitation(partyId, characterId);
+        }
+
+        public IEnumerable<PartyData> GetParties()
+        {
+            return Parties.Values;
         }
     }
 }
