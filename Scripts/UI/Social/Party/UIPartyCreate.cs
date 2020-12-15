@@ -25,7 +25,7 @@ namespace MultiplayerARPG
                 characterId = BasePlayerCharacterController.OwningCharacter.Id,
                 shareExp = toggleShareExp != null && toggleShareExp.isOn,
                 shareItem = toggleShareItem != null && toggleShareItem.isOn,
-            }, UIPartyResponses.ResponseCreateParty);
+            }, ClientPartyActions.ResponseCreateParty);
             Hide();
         }
     }

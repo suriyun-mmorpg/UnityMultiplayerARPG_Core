@@ -113,7 +113,7 @@ namespace MultiplayerARPG
                         inventoryIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
                         amount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
                         storageItemIndex = (short)uiCharacterItem.IndexOfData
-                    }, UIStorageResponses.ResponseMoveItemToStorage);
+                    }, ClientStorageActions.ResponseMoveItemToStorage);
                     break;
             }
         }
@@ -137,7 +137,7 @@ namespace MultiplayerARPG
                         storageItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
                         amount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
                         inventoryIndex = (short)uiCharacterItem.IndexOfData
-                    }, UIStorageResponses.ResponseMoveItemFromStorage);
+                    }, ClientStorageActions.ResponseMoveItemFromStorage);
                     break;
                 case InventoryType.StorageItems:
                     // Drop storage item to storage item
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
                         storageOwnerId = storageOwnerId,
                         fromIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
                         toIndex = (short)uiCharacterItem.IndexOfData
-                    }, UIStorageResponses.ResponseSwapOrMergeStorageItem);
+                    }, ClientStorageActions.ResponseSwapOrMergeStorageItem);
                     break;
             }
         }

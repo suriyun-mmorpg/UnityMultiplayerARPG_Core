@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public static class UIPartyResponses
+    public static class ClientPartyActions
     {
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendPartyInvitationMessage> onResponseSendPartyInvitation;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptPartyInvitationMessage> onResponseAcceptPartyInvitation;

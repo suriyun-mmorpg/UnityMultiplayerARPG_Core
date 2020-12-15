@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             {
                 characterId = BasePlayerCharacterController.OwningCharacter.Id,
                 guildName = inputFieldGuildName.text,
-            }, UIGuildResponses.ResponseCreateGuild);
+            }, ClientGuildActions.ResponseCreateGuild);
             Hide();
         }
     }

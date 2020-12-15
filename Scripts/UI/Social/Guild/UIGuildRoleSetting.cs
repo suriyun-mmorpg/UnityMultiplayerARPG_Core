@@ -58,7 +58,7 @@ namespace MultiplayerARPG
                 canInvite = toggleCanInvite != null && toggleCanInvite.isOn,
                 canKick = toggleCanKick != null && toggleCanKick.isOn,
                 shareExpPercentage = shareExpPercentage,
-            }, UIGuildResponses.ResponseChangeGuildRole);
+            }, ClientGuildActions.ResponseChangeGuildRole);
             Hide();
         }
     }

@@ -336,7 +336,7 @@ namespace MultiplayerARPG
                 {
                     characterId = BasePlayerCharacterController.OwningCharacter.Id,
                     memberId = guildMember.id,
-                }, UIGuildResponses.ResponseChangeGuildLeader);
+                }, ClientGuildActions.ResponseChangeGuildLeader);
             });
         }
 
@@ -378,7 +378,7 @@ namespace MultiplayerARPG
                 {
                     characterId = BasePlayerCharacterController.OwningCharacter.Id,
                     message = inputFieldMessage.text,
-                }, UIGuildResponses.ResponseChangeGuildMessage);
+                }, ClientGuildActions.ResponseChangeGuildMessage);
             }
         }
 
@@ -395,7 +395,7 @@ namespace MultiplayerARPG
                 {
                     characterId = BasePlayerCharacterController.OwningCharacter.Id,
                     memberId = guildMember.id,
-                }, UIGuildResponses.ResponseKickMemberFromGuild);
+                }, ClientGuildActions.ResponseKickMemberFromGuild);
             });
         }
 
@@ -406,7 +406,7 @@ namespace MultiplayerARPG
                 GameInstance.ClientGuildHandlers.RequestLeaveGuild(new RequestLeaveGuildMessage()
                 {
                     characterId = BasePlayerCharacterController.OwningCharacter.Id,
-                }, UIGuildResponses.ResponseLeaveGuild);
+                }, ClientGuildActions.ResponseLeaveGuild);
             });
         }
 

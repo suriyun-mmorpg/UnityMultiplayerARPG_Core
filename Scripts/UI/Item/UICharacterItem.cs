@@ -1249,7 +1249,7 @@ namespace MultiplayerARPG
                     inventoryIndex = (short)IndexOfData,
                     amount = 1,
                     storageItemIndex = -1,
-                }, UIStorageResponses.ResponseMoveItemToStorage);
+                }, ClientStorageActions.ResponseMoveItemToStorage);
             }
             else
             {
@@ -1275,7 +1275,7 @@ namespace MultiplayerARPG
                 inventoryIndex = (short)IndexOfData,
                 amount = (short)amount,
                 storageItemIndex = -1,
-            }, UIStorageResponses.ResponseMoveItemToStorage);
+            }, ClientStorageActions.ResponseMoveItemToStorage);
         }
         #endregion
 
@@ -1301,7 +1301,7 @@ namespace MultiplayerARPG
                     storageItemIndex = (short)IndexOfData,
                     amount = 1,
                     inventoryIndex = -1,
-                }, UIStorageResponses.ResponseMoveItemFromStorage);
+                }, ClientStorageActions.ResponseMoveItemFromStorage);
             }
             else
             {
@@ -1327,7 +1327,7 @@ namespace MultiplayerARPG
                 storageItemIndex = (short)IndexOfData,
                 amount = (short)amount,
                 inventoryIndex = -1,
-            }, UIStorageResponses.ResponseMoveItemFromStorage);
+            }, ClientStorageActions.ResponseMoveItemFromStorage);
         }
         #endregion
 

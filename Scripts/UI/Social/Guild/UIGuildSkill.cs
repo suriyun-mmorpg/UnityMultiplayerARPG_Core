@@ -282,7 +282,7 @@ namespace MultiplayerARPG
             {
                 characterId = BasePlayerCharacterController.OwningCharacter.Id,
                 dataId = GuildSkill.DataId,
-            }, UIGuildResponses.ResponseIncreaseGuildSkillLevel);
+            }, ClientGuildActions.ResponseIncreaseGuildSkillLevel);
         }
 
         public void OnClickUse()

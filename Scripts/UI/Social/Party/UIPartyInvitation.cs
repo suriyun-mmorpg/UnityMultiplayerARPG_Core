@@ -54,7 +54,7 @@ namespace MultiplayerARPG
             GameInstance.ClientPartyHandlers.RequestAcceptPartyInvitation(new RequestAcceptPartyInvitationMessage()
             {
                 characterId = BasePlayerCharacterController.OwningCharacter.Id,
-            }, UIPartyResponses.ResponseAcceptPartyInvitation);
+            }, ClientPartyActions.ResponseAcceptPartyInvitation);
             Hide();
         }
 
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             GameInstance.ClientPartyHandlers.RequestDeclinePartyInvitation(new RequestDeclinePartyInvitationMessage()
             {
                 characterId = BasePlayerCharacterController.OwningCharacter.Id,
-            }, UIPartyResponses.ResponseDeclinePartyInvitation);
+            }, ClientPartyActions.ResponseDeclinePartyInvitation);
             Hide();
         }
     }

@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public static class UIGuildResponses
+    public static class ClientGuildActions
     {
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendGuildInvitationMessage> onResponseSendGuildInvitation;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptGuildInvitationMessage> onResponseAcceptGuildInvitation;

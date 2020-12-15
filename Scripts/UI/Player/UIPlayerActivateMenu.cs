@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             {
                 characterId = BasePlayerCharacterController.OwningCharacter.Id,
                 inviteeId = Data.Id,
-            }, UIPartyResponses.ResponseSendPartyInvitation);
+            }, ClientPartyActions.ResponseSendPartyInvitation);
             Hide();
         }
 
@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             {
                 characterId = BasePlayerCharacterController.OwningCharacter.Id,
                 inviteeId = Data.Id,
-            }, UIGuildResponses.ResponseSendGuildInvitation);
+            }, ClientGuildActions.ResponseSendGuildInvitation);
             Hide();
         }
     }

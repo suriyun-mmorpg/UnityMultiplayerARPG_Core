@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             {
                 characterId = BasePlayerCharacterController.OwningCharacter.Id,
                 guildRole = (byte)dropdownRoles.value,
-            }, UIGuildResponses.ResponseChangeMemberGuildRole);
+            }, ClientGuildActions.ResponseChangeMemberGuildRole);
             Hide();
         }
     }
