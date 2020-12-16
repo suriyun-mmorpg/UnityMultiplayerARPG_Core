@@ -49,6 +49,7 @@ namespace MultiplayerARPG
             ServerInventoryMessageHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
             ServerPartyMessageHandlers = gameObject.GetOrAddComponent<IServerPartyMessageHandlers, LanRpgServerPartyMessageHandlers>();
             ServerGuildMessageHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, LanRpgServerGuildMessageHandlers>();
+            ServerBankMessageHandlers = gameObject.GetOrAddComponent<IServerBankMessageHandlers, LanRpgServerBankMessageHandlers>();
             // Client handlers
             ClientCashShopHandlers = gameObject.GetOrAddComponent<IClientCashShopHandlers, DefaultClientCashShopHandlers>();
             ClientMailHandlers = gameObject.GetOrAddComponent<IClientMailHandlers, DefaultClientMailHandlers>();
@@ -57,6 +58,7 @@ namespace MultiplayerARPG
             ClientPartyHandlers = gameObject.GetOrAddComponent<IClientPartyHandlers, DefaultClientPartyHandlers>();
             ClientGuildHandlers = gameObject.GetOrAddComponent<IClientGuildHandlers, DefaultClientGuildHandlers>();
             ClientFriendHandlers = gameObject.GetOrAddComponent<IClientFriendHandlers, DefaultClientFriendHandlers>();
+            ClientBankHandlers = gameObject.GetOrAddComponent<IClientBankHandlers, DefaultClientBankHandlers>();
         }
 
         public void StartGame()
@@ -96,6 +98,17 @@ namespace MultiplayerARPG
                     CacheDiscovery.StopClient();
                     break;
             }
+        }
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            SaveSystem.OnServerStart();
+        }
+
+        protected override async UniTask PreSpawnEntities()
+        {
+            await SaveSystem.PreSpawnEntities(selectedCharacter, BuildingEntities, ServerStorageHandlers.GetAllStorageItems());
         }
 
         public override void OnStopHost()
@@ -327,67 +340,6 @@ namespace MultiplayerARPG
             }
         }
 
-        #region Implement Abstract Functions
-        public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
-        {
-            if (playerCharacterEntity.Gold - amount >= 0)
-            {
-                playerCharacterEntity.Gold -= amount;
-                playerCharacterEntity.UserGold = playerCharacterEntity.UserGold.Increase(amount);
-            }
-            else
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
-        }
-
-        public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
-        {
-            if (playerCharacterEntity.UserGold - amount >= 0)
-            {
-                playerCharacterEntity.UserGold -= amount;
-                playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
-            }
-            else
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
-        }
-
-        public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
-        {
-            GuildData guild;
-            if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
-            {
-                if (playerCharacterEntity.Gold - amount >= 0)
-                {
-                    playerCharacterEntity.Gold -= amount;
-                    guild.gold += amount;
-                    ServerGuildHandlers.SetGuild(playerCharacterEntity.GuildId, guild);
-                    SendSetGuildGoldToClients(guild);
-                }
-                else
-                    SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
-            }
-            else
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
-        }
-
-        public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
-        {
-            GuildData guild;
-            if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
-            {
-                if (guild.gold - amount >= 0)
-                {
-                    guild.gold -= amount;
-                    playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
-                    ServerGuildHandlers.SetGuild(playerCharacterEntity.GuildId, guild);
-                    SendSetGuildGoldToClients(guild);
-                }
-                else
-                    SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
-            }
-            else
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
-        }
-
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             // For now just warp follow host
@@ -399,17 +351,5 @@ namespace MultiplayerARPG
         {
             return false;
         }
-
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            SaveSystem.OnServerStart();
-        }
-
-        protected override async UniTask PreSpawnEntities()
-        {
-            await SaveSystem.PreSpawnEntities(selectedCharacter, BuildingEntities, ServerStorageHandlers.GetAllStorageItems());
-        }
-        #endregion
     }
 }

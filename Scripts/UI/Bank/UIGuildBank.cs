@@ -15,12 +15,20 @@ namespace MultiplayerARPG
 
         public override void OnDepositConfirm(int amount)
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerDepositGuildGold(amount);
+            GameInstance.ClientBankHandlers.RequestDepositGuildGold(new RequestDepositGuildGoldMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                gold = amount,
+            }, ClientBankActions.ResponseDepositGuildGold);
         }
 
         public override void OnWithdrawConfirm(int amount)
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerWithdrawGuildGold(amount);
+            GameInstance.ClientBankHandlers.RequestWithdrawGuildGold(new RequestWithdrawGuildGoldMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                gold = amount,
+            }, ClientBankActions.ResponseWithdrawGuildGold);
         }
     }
 }

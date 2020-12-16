@@ -678,38 +678,6 @@ namespace MultiplayerARPG
 
         #region Banking
         [ServerRpc]
-        protected void ServerDepositGold(int amount)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.DepositGold(this, amount);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerWithdrawGold(int amount)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.WithdrawGold(this, amount);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerDepositGuildGold(int amount)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.DepositGuildGold(this, amount);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerWithdrawGuildGold(int amount)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.WithdrawGuildGold(this, amount);
-#endif
-        }
-
-        [ServerRpc]
         protected void ServerOpenStorage(uint objectId, string password)
         {
 #if !CLIENT_BUILD

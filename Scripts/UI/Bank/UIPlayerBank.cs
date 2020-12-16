@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public class UIPlayerBank : UIBaseBank
     {
@@ -13,12 +9,20 @@ namespace MultiplayerARPG
 
         public override void OnDepositConfirm(int amount)
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerDepositGold(amount);
+            GameInstance.ClientBankHandlers.RequestDepositUserGold(new RequestDepositUserGoldMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                gold = amount,
+            }, ClientBankActions.ResponseDepositUserGold);
         }
 
         public override void OnWithdrawConfirm(int amount)
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerWithdrawGold(amount);
+            GameInstance.ClientBankHandlers.RequestWithdrawUserGold(new RequestWithdrawUserGoldMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                gold = amount,
+            }, ClientBankActions.ResponseWithdrawUserGold);
         }
     }
 }

@@ -394,30 +394,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerDepositGold(int amount)
-        {
-            RPC(ServerDepositGold, amount);
-            return true;
-        }
-
-        public bool CallServerWithdrawGold(int amount)
-        {
-            RPC(ServerWithdrawGold, amount);
-            return true;
-        }
-
-        public bool CallServerDepositGuildGold(int amount)
-        {
-            RPC(ServerDepositGuildGold, amount);
-            return true;
-        }
-
-        public bool CallServerWithdrawGuildGold(int amount)
-        {
-            RPC(ServerWithdrawGuildGold, amount);
-            return true;
-        }
-
         public bool CallServerOpenStorage(uint objectId, string password)
         {
             RPC(ServerOpenStorage, objectId, password);
