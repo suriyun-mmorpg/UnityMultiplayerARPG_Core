@@ -76,6 +76,10 @@ namespace MultiplayerARPG
             public const ushort GetFriends = 137;
             public const ushort AddFriend = 138;
             public const ushort RemoveFriend = 139;
+            public const ushort DepositUserGold = 140;
+            public const ushort WithdrawUserGold = 141;
+            public const ushort DepositGuildGold = 142;
+            public const ushort WithdrawGuildGold = 143;
         }
 
         public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
@@ -99,6 +103,7 @@ namespace MultiplayerARPG
         protected IServerPartyMessageHandlers ServerPartyMessageHandlers { get; set; }
         protected IServerGuildMessageHandlers ServerGuildMessageHandlers { get; set; }
         protected IServerFriendMessageHandlers ServerFriendMessageHandlers { get; set; }
+        protected IServerBankMessageHandlers ServerBankMessageHandlers { get; set; }
         // Client handlers
         protected IClientCashShopHandlers ClientCashShopHandlers { get; set; }
         protected IClientMailHandlers ClientMailHandlers { get; set; }
@@ -107,6 +112,7 @@ namespace MultiplayerARPG
         protected IClientPartyHandlers ClientPartyHandlers { get; set; }
         protected IClientGuildHandlers ClientGuildHandlers { get; set; }
         protected IClientFriendHandlers ClientFriendHandlers { get; set; }
+        protected IClientBankHandlers ClientBankHandlers { get; set; }
 
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
         public static readonly Dictionary<string, NotifyOnlineCharacterTime> LastCharacterOnlineTimes = new Dictionary<string, NotifyOnlineCharacterTime>();
@@ -229,6 +235,11 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild);
             RegisterClientResponse<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild);
             RegisterClientResponse<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel);
+            // Bank
+            RegisterClientResponse<RequestDepositUserGoldMessage, ResponseDepositUserGoldMessage>(ReqTypes.DepositUserGold);
+            RegisterClientResponse<RequestWithdrawUserGoldMessage, ResponseWithdrawUserGoldMessage>(ReqTypes.WithdrawUserGold);
+            RegisterClientResponse<RequestDepositGuildGoldMessage, ResponseDepositGuildGoldMessage>(ReqTypes.DepositGuildGold);
+            RegisterClientResponse<RequestWithdrawGuildGoldMessage, ResponseWithdrawGuildGoldMessage>(ReqTypes.WithdrawGuildGold);
         }
 
         protected override void RegisterServerMessages()
@@ -299,6 +310,14 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild, ServerGuildMessageHandlers.HandleRequestLeaveGuild);
                 RegisterServerRequest<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel, ServerGuildMessageHandlers.HandleRequestIncreaseGuildSkillLevel);
             }
+            // Bank
+            if (ServerBankMessageHandlers != null)
+            {
+                RegisterServerRequest<RequestDepositUserGoldMessage, ResponseDepositUserGoldMessage>(ReqTypes.DepositUserGold, ServerBankMessageHandlers.HandleRequestDepositUserGold);
+                RegisterServerRequest<RequestWithdrawUserGoldMessage, ResponseWithdrawUserGoldMessage>(ReqTypes.WithdrawUserGold, ServerBankMessageHandlers.HandleRequestWithdrawUserGold);
+                RegisterServerRequest<RequestDepositGuildGoldMessage, ResponseDepositGuildGoldMessage>(ReqTypes.DepositGuildGold, ServerBankMessageHandlers.HandleRequestDepositGuildGold);
+                RegisterServerRequest<RequestWithdrawGuildGoldMessage, ResponseWithdrawGuildGoldMessage>(ReqTypes.WithdrawGuildGold, ServerBankMessageHandlers.HandleRequestWithdrawGuildGold);
+            }
         }
 
         protected virtual void Clean()
@@ -345,6 +364,7 @@ namespace MultiplayerARPG
             GameInstance.ClientPartyHandlers = ClientPartyHandlers;
             GameInstance.ClientGuildHandlers = ClientGuildHandlers;
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
+            GameInstance.ClientBankHandlers = ClientBankHandlers;
         }
 
         public override void OnStopClient()

@@ -71,34 +71,6 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Deposit gold
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who deposit gold</param>
-        /// <param name="amount">Amount of gold</param>
-        public abstract void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
-
-        /// <summary>
-        /// Withdraw gold
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who withdraw gold</param>
-        /// <param name="amount">Amount of gold</param>
-        public abstract void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
-
-        /// <summary>
-        /// Deposit guild gold
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who deposit gold</param>
-        /// <param name="amount">Amount of gold</param>
-        public abstract void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
-
-        /// <summary>
-        /// Withdraw guild gold
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who withdraw gold</param>
-        /// <param name="amount">Amount of gold</param>
-        public abstract void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
-
-        /// <summary>
         /// Warp character to other map if `mapName` is not empty
         /// </summary>
         /// <param name="playerCharacterEntity"></param>
