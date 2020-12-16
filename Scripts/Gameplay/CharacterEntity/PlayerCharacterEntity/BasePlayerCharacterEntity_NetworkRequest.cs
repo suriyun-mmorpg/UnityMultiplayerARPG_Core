@@ -460,30 +460,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerFindCharacters(string characterName)
-        {
-            RPC(ServerFindCharacters, characterName);
-            return true;
-        }
-
-        public bool CallServerAddFriend(string friendCharacterId)
-        {
-            RPC(ServerAddFriend, friendCharacterId);
-            return true;
-        }
-
-        public bool CallServerRemoveFriend(string friendCharacterId)
-        {
-            RPC(ServerRemoveFriend, friendCharacterId);
-            return true;
-        }
-
-        public bool CallServerGetFriends()
-        {
-            RPC(ServerGetFriends);
-            return true;
-        }
-
         public bool CallServerSetBuildingPassword(uint objectId, string password)
         {
             RPC(ServerSetBuildingPassword, objectId, password);

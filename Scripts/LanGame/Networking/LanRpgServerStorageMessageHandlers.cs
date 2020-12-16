@@ -7,34 +7,6 @@ namespace MultiplayerARPG
 {
     public class LanRpgServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
-        public async UniTaskVoid HandleRequestGetStorageItems(RequestHandlerData requestHandler, RequestGetStorageItemsMessage request, RequestProceedResultDelegate<ResponseGetStorageItemsMessage> result)
-        {
-            StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
-                {
-                    error = ResponseGetStorageItemsMessage.Error.CharacterNotFound,
-                });
-                return;
-            }
-            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
-                {
-                    error = ResponseGetStorageItemsMessage.Error.NotAllowed,
-                });
-                return;
-            }
-            List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-            result.Invoke(AckResponseCode.Success, new ResponseGetStorageItemsMessage()
-            {
-                storageItems = storageItemList,
-            });
-            await UniTask.Yield();
-        }
-
         public async UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);

@@ -17,22 +17,21 @@ namespace MultiplayerARPG
             public const ushort GameMessage = 100;
             public const ushort Warp = 101;
             public const ushort Chat = 102;
-            public const ushort UpdatePartyMember = 106;
-            public const ushort UpdateParty = 107;
-            public const ushort UpdateGuildMember = 108;
-            public const ushort UpdateGuild = 109;
-            public const ushort UpdateMapInfo = 110;
-            public const ushort UpdateFoundCharacters = 111;
-            public const ushort UpdateFriends = 112;
-            public const ushort NotifyOnlineCharacter = 113;
-            public const ushort NotifyRewardExp = 114;
-            public const ushort NotifyRewardGold = 115;
-            public const ushort NotifyRewardItem = 116;
-            public const ushort UpdateTimeOfDay = 117;
-            public const ushort NotifyStorageOpened = 118;
-            public const ushort NotifyStorageItemsUpdated = 119;
-            public const ushort NotifyPartyInvitation = 120;
-            public const ushort NotifyGuildInvitation = 121;
+            public const ushort UpdatePartyMember = 103;
+            public const ushort UpdateParty = 104;
+            public const ushort UpdateGuildMember = 105;
+            public const ushort UpdateGuild = 106;
+            public const ushort UpdateFriends = 107;
+            public const ushort UpdateMapInfo = 108;
+            public const ushort NotifyOnlineCharacter = 109;
+            public const ushort NotifyRewardExp = 110;
+            public const ushort NotifyRewardGold = 111;
+            public const ushort NotifyRewardItem = 112;
+            public const ushort UpdateTimeOfDay = 113;
+            public const ushort NotifyStorageOpened = 114;
+            public const ushort NotifyStorageItemsUpdated = 115;
+            public const ushort NotifyPartyInvitation = 116;
+            public const ushort NotifyGuildInvitation = 117;
         }
 
         public class ReqTypes
@@ -46,34 +45,37 @@ namespace MultiplayerARPG
             public const ushort ClaimMailItems = 106;
             public const ushort DeleteMail = 107;
             public const ushort SendMail = 108;
-            public const ushort GetStorageItems = 109;
-            public const ushort MoveItemFromStorage = 110;
-            public const ushort MoveItemToStorage = 111;
-            public const ushort SwapOrMergeStorageItem = 112;
-            public const ushort SwapOrMergeItem = 113;
-            public const ushort EquipWeapon = 114;
-            public const ushort EquipArmor = 115;
-            public const ushort UnEquipWeapon = 116;
-            public const ushort UnEquipArmor = 117;
-            public const ushort CreateParty = 118;
-            public const ushort ChangePartyLeader = 119;
-            public const ushort ChangePartySetting = 120;
-            public const ushort SendPartyInvitation = 121;
-            public const ushort AcceptPartyInvitation = 122;
-            public const ushort DeclinePartyInvitation = 123;
-            public const ushort KickMemberFromParty = 124;
-            public const ushort LeaveParty = 125;
-            public const ushort CreateGuild = 126;
-            public const ushort ChangeGuildLeader = 127;
-            public const ushort ChangeGuildMessage = 128;
-            public const ushort ChangeGuildRole = 129;
-            public const ushort ChangeMemberGuildRole = 130;
-            public const ushort SendGuildInvitation = 131;
-            public const ushort AcceptGuildInvitation = 132;
-            public const ushort DeclineGuildInvitation = 133;
-            public const ushort KickMemberFromGuild = 134;
-            public const ushort LeaveGuild = 135;
-            public const ushort IncreaseGuildSkillLevel = 136;
+            public const ushort MoveItemFromStorage = 109;
+            public const ushort MoveItemToStorage = 110;
+            public const ushort SwapOrMergeStorageItem = 111;
+            public const ushort SwapOrMergeItem = 112;
+            public const ushort EquipWeapon = 113;
+            public const ushort EquipArmor = 114;
+            public const ushort UnEquipWeapon = 115;
+            public const ushort UnEquipArmor = 116;
+            public const ushort CreateParty = 117;
+            public const ushort ChangePartyLeader = 118;
+            public const ushort ChangePartySetting = 119;
+            public const ushort SendPartyInvitation = 120;
+            public const ushort AcceptPartyInvitation = 121;
+            public const ushort DeclinePartyInvitation = 122;
+            public const ushort KickMemberFromParty = 123;
+            public const ushort LeaveParty = 124;
+            public const ushort CreateGuild = 125;
+            public const ushort ChangeGuildLeader = 126;
+            public const ushort ChangeGuildMessage = 127;
+            public const ushort ChangeGuildRole = 128;
+            public const ushort ChangeMemberGuildRole = 129;
+            public const ushort SendGuildInvitation = 130;
+            public const ushort AcceptGuildInvitation = 131;
+            public const ushort DeclineGuildInvitation = 132;
+            public const ushort KickMemberFromGuild = 133;
+            public const ushort LeaveGuild = 134;
+            public const ushort IncreaseGuildSkillLevel = 135;
+            public const ushort FindCharacters = 136;
+            public const ushort GetFriends = 137;
+            public const ushort AddFriend = 138;
+            public const ushort RemoveFriend = 139;
         }
 
         public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
@@ -96,6 +98,7 @@ namespace MultiplayerARPG
         protected IServerInventoryMessageHandlers ServerInventoryMessageHandlers { get; set; }
         protected IServerPartyMessageHandlers ServerPartyMessageHandlers { get; set; }
         protected IServerGuildMessageHandlers ServerGuildMessageHandlers { get; set; }
+        protected IServerFriendMessageHandlers ServerFriendMessageHandlers { get; set; }
         // Client handlers
         protected IClientCashShopHandlers ClientCashShopHandlers { get; set; }
         protected IClientMailHandlers ClientMailHandlers { get; set; }
@@ -103,21 +106,13 @@ namespace MultiplayerARPG
         protected IClientInventoryHandlers ClientInventoryHandlers { get; set; }
         protected IClientPartyHandlers ClientPartyHandlers { get; set; }
         protected IClientGuildHandlers ClientGuildHandlers { get; set; }
+        protected IClientFriendHandlers ClientFriendHandlers { get; set; }
 
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
         public static readonly Dictionary<string, NotifyOnlineCharacterTime> LastCharacterOnlineTimes = new Dictionary<string, NotifyOnlineCharacterTime>();
-        /// <summary>
-        /// * This value will be `TRUE` when all values in `readyToInstantiateObjectsStates` are `TRUE`<para />
-        /// * The manager will not validate values in `readyToInstantiateObjectsStates` after this value was `TRUE`<para />
-        /// * This value will reset to `FALSE` in `OnServerOnlineSceneLoaded`<para />
-        /// </summary>
-        public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(1);
-        public static readonly SocialGroupData ClientFriends = new SocialGroupData(1);
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
         // Events
-        public System.Action<SocialGroupData> onClientUpdateFoundCharacters;
-        public System.Action<SocialGroupData> onClientUpdateFriends;
         protected float updateOnlineCharactersCountDown;
         protected float updateTimeOfDayCountDown;
         protected float serverSceneLoadedTime;
@@ -180,9 +175,8 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.UpdateParty, HandleUpdatePartyAtClient);
             RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
             RegisterClientMessage(MsgTypes.UpdateGuild, HandleUpdateGuildAtClient);
-            RegisterClientMessage(MsgTypes.UpdateMapInfo, HandleUpdateMapInfoAtClient);
-            RegisterClientMessage(MsgTypes.UpdateFoundCharacters, HandleUpdateFoundCharactersAtClient);
             RegisterClientMessage(MsgTypes.UpdateFriends, HandleUpdateFriendsAtClient);
+            RegisterClientMessage(MsgTypes.UpdateMapInfo, HandleUpdateMapInfoAtClient);
             RegisterClientMessage(MsgTypes.NotifyOnlineCharacter, HandleNotifyOnlineCharacterAtClient);
             RegisterClientMessage(MsgTypes.NotifyRewardExp, HandleNotifyRewardExpAtClient);
             RegisterClientMessage(MsgTypes.NotifyRewardGold, HandleNotifyRewardGoldAtClient);
@@ -205,7 +199,6 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail);
             RegisterClientResponse<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail);
             // Storage
-            RegisterClientResponse<RequestGetStorageItemsMessage, ResponseGetStorageItemsMessage>(ReqTypes.GetStorageItems);
             RegisterClientResponse<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage);
             RegisterClientResponse<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage);
             RegisterClientResponse<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem);
@@ -266,7 +259,6 @@ namespace MultiplayerARPG
             // Storage
             if (ServerStorageMessageHandlers != null)
             {
-                RegisterServerRequest<RequestGetStorageItemsMessage, ResponseGetStorageItemsMessage>(ReqTypes.GetStorageItems, ServerStorageMessageHandlers.HandleRequestGetStorageItems);
                 RegisterServerRequest<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage, ServerStorageMessageHandlers.HandleRequestMoveItemFromStorage);
                 RegisterServerRequest<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage, ServerStorageMessageHandlers.HandleRequestMoveItemToStorage);
                 RegisterServerRequest<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem, ServerStorageMessageHandlers.HandleRequestSwapOrMergeStorageItem);
@@ -322,8 +314,6 @@ namespace MultiplayerARPG
                 ServerGuildHandlers.ClearGuild();
             BuildingEntities.Clear();
             LastCharacterOnlineTimes.Clear();
-            ClientFoundCharacters.ClearMembers();
-            ClientFriends.ClearMembers();
             CurrentMapInfo = null;
         }
 
@@ -354,6 +344,7 @@ namespace MultiplayerARPG
             GameInstance.ClientStorageHandlers = ClientStorageHandlers;
             GameInstance.ClientPartyHandlers = ClientPartyHandlers;
             GameInstance.ClientGuildHandlers = ClientGuildHandlers;
+            GameInstance.ClientFriendHandlers = ClientFriendHandlers;
         }
 
         public override void OnStopClient()
@@ -493,13 +484,13 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveChatMessage(messageHandler.ReadMessage<ChatMessage>());
         }
 
-        protected virtual void HandleUpdatePartyMemberAtClient(MessageHandlerData messageHandler)
+        protected void HandleUpdatePartyMemberAtClient(MessageHandlerData messageHandler)
         {
             UpdateSocialGroupMember(ClientPartyHandlers.ClientParty, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
             ClientPartyActions.NotifyPartyUpdated(ClientPartyHandlers.ClientParty);
         }
 
-        protected virtual void HandleUpdatePartyAtClient(MessageHandlerData messageHandler)
+        protected void HandleUpdatePartyAtClient(MessageHandlerData messageHandler)
         {
             UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (message.type == UpdatePartyMessage.UpdateType.Create)
@@ -524,13 +515,13 @@ namespace MultiplayerARPG
             ClientPartyActions.NotifyPartyUpdated(ClientPartyHandlers.ClientParty);
         }
 
-        protected virtual void HandleUpdateGuildMemberAtClient(MessageHandlerData messageHandler)
+        protected void HandleUpdateGuildMemberAtClient(MessageHandlerData messageHandler)
         {
             UpdateSocialGroupMember(ClientGuildHandlers.ClientGuild, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
             ClientGuildActions.NotifyGuildUpdated(ClientGuildHandlers.ClientGuild);
         }
 
-        protected virtual void HandleUpdateGuildAtClient(MessageHandlerData messageHandler)
+        protected void HandleUpdateGuildAtClient(MessageHandlerData messageHandler)
         {
             UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (message.type == UpdateGuildMessage.UpdateType.Create)
@@ -576,7 +567,12 @@ namespace MultiplayerARPG
             ClientGuildActions.NotifyGuildUpdated(ClientGuildHandlers.ClientGuild);
         }
 
-        protected virtual void HandleUpdateMapInfoAtClient(MessageHandlerData messageHandler)
+        protected void HandleUpdateFriendsAtClient(MessageHandlerData messageHandler)
+        {
+            ClientFriendActions.NotifyFriendsUpdated(messageHandler.Reader.GetList<SocialCharacterData>());
+        }
+
+        protected void HandleUpdateMapInfoAtClient(MessageHandlerData messageHandler)
         {
             // Don't set map info again at server
             if (IsServer)
@@ -585,37 +581,13 @@ namespace MultiplayerARPG
             SetMapInfo(message.mapId);
         }
 
-        protected virtual void HandleUpdateDayNightTimeAtClient(MessageHandlerData messageHandler)
+        protected void HandleUpdateDayNightTimeAtClient(MessageHandlerData messageHandler)
         {
             // Don't set time of day again at server
             if (IsServer)
                 return;
             UpdateTimeOfDayMessage message = messageHandler.ReadMessage<UpdateTimeOfDayMessage>();
             CurrentGameInstance.DayNightTimeUpdater.SetTimeOfDay(message.timeOfDay);
-        }
-
-        protected virtual void HandleUpdateFoundCharactersAtClient(MessageHandlerData messageHandler)
-        {
-            UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
-            ClientFoundCharacters.ClearMembers();
-            foreach (SocialCharacterData member in msg.members)
-            {
-                ClientFoundCharacters.AddMember(member);
-            }
-            if (onClientUpdateFoundCharacters != null)
-                onClientUpdateFoundCharacters.Invoke(ClientFoundCharacters);
-        }
-
-        protected virtual void HandleUpdateFriendsAtClient(MessageHandlerData messageHandler)
-        {
-            UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
-            ClientFriends.ClearMembers();
-            foreach (SocialCharacterData member in msg.members)
-            {
-                ClientFriends.AddMember(member);
-            }
-            if (onClientUpdateFriends != null)
-                onClientUpdateFriends.Invoke(ClientFriends);
         }
 
         protected void HandleNotifyOnlineCharacterAtClient(MessageHandlerData messageHandler)

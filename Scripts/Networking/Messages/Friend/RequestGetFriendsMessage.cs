@@ -2,24 +2,18 @@
 
 namespace MultiplayerARPG
 {
-    public struct RequestGetStorageItemsMessage : INetSerializable
+    public struct RequestGetFriendsMessage : INetSerializable
     {
         public string characterId;
-        public StorageType storageType;
-        public string storageOwnerId;
 
         public void Deserialize(NetDataReader reader)
         {
             characterId = reader.GetString();
-            storageType = (StorageType)reader.GetByte();
-            storageOwnerId = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(characterId);
-            writer.Put((byte)storageType);
-            writer.Put(storageOwnerId);
         }
     }
 }

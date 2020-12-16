@@ -6,11 +6,6 @@ namespace MultiplayerARPG
 {
     public class DefaultClientStorageHandlers : MonoBehaviour, IClientStorageHandlers
     {
-        public bool RequestGetStorageItems(RequestGetStorageItemsMessage data, ResponseDelegate<ResponseGetStorageItemsMessage> callback)
-        {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(ReqTypes.GetStorageItems, data, responseDelegate: callback);
-        }
-
         public bool RequestMoveItemFromStorage(RequestMoveItemFromStorageMessage data, ResponseDelegate<ResponseMoveItemFromStorageMessage> callback)
         {
             return BaseGameNetworkManager.Singleton.ClientSendRequest(ReqTypes.MoveItemFromStorage, data, responseDelegate: callback);

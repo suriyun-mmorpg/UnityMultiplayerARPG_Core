@@ -1,4 +1,8 @@
-﻿namespace MultiplayerARPG
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using System.Collections.Generic;
+
+namespace MultiplayerARPG
 {
     public class UIFindCharacters : UISocialGroup<UISocialCharacter>
     {
@@ -7,29 +11,22 @@
         protected override void OnEnable()
         {
             base.OnEnable();
-            BaseGameNetworkManager.Singleton.onClientUpdateFoundCharacters += UpdateFoundCharactersUIs;
+            if (inputCharacterName)
+                inputCharacterName.text = string.Empty;
+            MemberSelectionManager.DeselectSelectedUI();
+            MemberSelectionManager.Clear();
         }
 
-        protected override void OnDisable()
+        private void UpdateFoundCharactersUIs(List<SocialCharacterData> foundCharacters)
         {
-            base.OnDisable();
-            BaseGameNetworkManager.Singleton.onClientUpdateFoundCharacters -= UpdateFoundCharactersUIs;
-        }
-
-        private void UpdateFoundCharactersUIs(SocialGroupData group)
-        {
-            if (group == null)
-                return;
-
-            memberAmount = group.CountMember();
+            memberAmount = foundCharacters.Count;
             UpdateUIs();
 
             int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
-            SocialCharacterData[] members = group.GetMembers();
-            MemberList.Generate(members, (index, foundCharacter, ui) =>
+            MemberList.Generate(foundCharacters, (index, foundCharacter, ui) =>
             {
                 UISocialCharacterData foundCharacterEntity = new UISocialCharacterData();
                 foundCharacterEntity.socialCharacter = foundCharacter;
@@ -51,7 +48,6 @@
 
         public override int GetMaxMemberAmount()
         {
-            // TODO: Implement this
             return 0;
         }
 
@@ -80,7 +76,17 @@
             string characterName = string.Empty;
             if (inputCharacterName != null)
                 characterName = inputCharacterName.text;
-            BasePlayerCharacterController.OwningCharacter.CallServerFindCharacters(characterName);
+            GameInstance.ClientFriendHandlers.RequestFindCharacters(new RequestFindCharactersMessage()
+            {
+                characterName = characterName,
+            }, FindCharactersCallback);
+        }
+
+        private async UniTaskVoid FindCharactersCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseFindCharactersMessage response)
+        {
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Success)
+                UpdateFoundCharactersUIs(new List<SocialCharacterData>(response.characters));
         }
 
         public void OnClickAddFriend()
@@ -89,10 +95,13 @@
                 return;
 
             SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog(
-                LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerAddFriend(friend.id);
+                GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    friendId = friend.id,
+                }, ClientFriendActions.ResponseAddFriend);
             });
         }
     }

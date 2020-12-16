@@ -56,6 +56,7 @@ namespace MultiplayerARPG
             ClientInventoryHandlers = gameObject.GetOrAddComponent<IClientInventoryHandlers, DefaultClientInventoryHandlers>();
             ClientPartyHandlers = gameObject.GetOrAddComponent<IClientPartyHandlers, DefaultClientPartyHandlers>();
             ClientGuildHandlers = gameObject.GetOrAddComponent<IClientGuildHandlers, DefaultClientGuildHandlers>();
+            ClientFriendHandlers = gameObject.GetOrAddComponent<IClientFriendHandlers, DefaultClientFriendHandlers>();
         }
 
         public void StartGame()
@@ -385,33 +386,6 @@ namespace MultiplayerARPG
             }
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
-        }
-
-        public override void FindCharacters(BasePlayerCharacterEntity finder, string characterName)
-        {
-            List<SocialCharacterData> socialCharacters = new List<SocialCharacterData>();
-            BasePlayerCharacterEntity findResult;
-            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(characterName, out findResult))
-                socialCharacters.Add(SocialCharacterData.Create(findResult));
-            this.SendSocialMembers(finder.ConnectionId, MsgTypes.UpdateFoundCharacters, socialCharacters.ToArray());
-        }
-
-        public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
-        {
-            // Service not available for Lan mode
-            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
-        }
-
-        public override void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
-        {
-            // Service not available for Lan mode
-            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
-        }
-
-        public override void GetFriends(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            // Service not available for Lan mode
-            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
         }
 
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)

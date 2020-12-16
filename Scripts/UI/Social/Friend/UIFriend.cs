@@ -1,34 +1,47 @@
-﻿namespace MultiplayerARPG
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using System.Collections.Generic;
+
+namespace MultiplayerARPG
 {
     public class UIFriend : UISocialGroup<UISocialCharacter>
     {
         protected override void OnEnable()
         {
             base.OnEnable();
-            BaseGameNetworkManager.Singleton.onClientUpdateFriends += UpdateFriendsUIs;
-            BasePlayerCharacterController.OwningCharacter.CallServerGetFriends();
+            GameInstance.ClientFriendHandlers.RequestGetFriends(new RequestGetFriendsMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+            }, GetFriendsCallback);
+            ClientFriendActions.onNotifyFriendsUpdated += UpdateFriendsUIs;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            BaseGameNetworkManager.Singleton.onClientUpdateFriends -= UpdateFriendsUIs;
+            ClientFriendActions.onNotifyFriendsUpdated -= UpdateFriendsUIs;
         }
 
-        private void UpdateFriendsUIs(SocialGroupData group)
+        private async UniTaskVoid GetFriendsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetFriendsMessage response)
         {
-            if (group == null)
+            await UniTask.Yield();
+            if (responseCode == AckResponseCode.Success)
+                UpdateFriendsUIs(new List<SocialCharacterData>(response.friends));
+        }
+
+        private void UpdateFriendsUIs(List<SocialCharacterData> friends)
+        {
+            if (friends == null)
                 return;
 
-            memberAmount = group.CountMember();
+            memberAmount = friends.Count;
             UpdateUIs();
 
             int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
-            SocialCharacterData[] members = group.GetMembers();
-            MemberList.Generate(members, (index, friend, ui) =>
+            MemberList.Generate(friends, (index, friend, ui) =>
             {
                 UISocialCharacterData friendEntity = new UISocialCharacterData();
                 friendEntity.socialCharacter = friend;
@@ -50,7 +63,6 @@
 
         public override int GetMaxMemberAmount()
         {
-            // TODO: Implement this
             return 0;
         }
 
@@ -82,7 +94,11 @@
             SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerRemoveFriend(friend.id);
+                GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
+                {
+                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    friendId = friend.id,
+                }, ClientFriendActions.ResponseRemoveFriend);
             });
         }
     }

@@ -877,40 +877,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Social
-        [ServerRpc]
-        protected void ServerFindCharacters(string characterName)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.FindCharacters(this, characterName);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerAddFriend(string friendCharacterId)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.AddFriend(this, friendCharacterId);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerRemoveFriend(string friendCharacterId)
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.RemoveFriend(this, friendCharacterId);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerGetFriends()
-        {
-#if !CLIENT_BUILD
-            CurrentGameManager.GetFriends(this);
-#endif
-        }
-        #endregion
-
         #region Building Locking
         [ServerRpc]
         protected void ServerSetBuildingPassword(uint objectId, string password)

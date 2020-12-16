@@ -361,14 +361,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SendUpdateFoundCharactersToClient(long connectionId, SocialCharacterData[] members)
+        public void SendUpdateFriendsToClient(long connectionId, List<SocialCharacterData> friends)
         {
-            this.SendSocialMembers(connectionId, MsgTypes.UpdateFoundCharacters, members);
-        }
-
-        public void SendUpdateFriendsToClient(long connectionId, SocialCharacterData[] members)
-        {
-            this.SendSocialMembers(connectionId, MsgTypes.UpdateFriends, members);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.UpdateFriends, (writer) =>
+            {
+                writer.PutList(friends);
+            });
         }
 
         public void SendServerGameMessage(long connectionId, GameMessage.Type type)

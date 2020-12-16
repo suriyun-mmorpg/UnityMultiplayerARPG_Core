@@ -99,33 +99,6 @@ namespace MultiplayerARPG
         public abstract void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
 
         /// <summary>
-        /// Find characters by name
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who find other characters</param>
-        /// <param name="characterName">Character name</param>
-        public abstract void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName);
-
-        /// <summary>
-        /// Add friend
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who adding friend</param>
-        /// <param name="friendCharacterId">Id of character whom will be added</param>
-        public abstract void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId);
-
-        /// <summary>
-        /// Remove friend
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who removing friend</param>
-        /// <param name="friendCharacterId">Id of character whom will be removed</param>
-        public abstract void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId);
-
-        /// <summary>
-        /// Get friends
-        /// </summary>
-        /// <param name="playerCharacterEntity">Character who request friend list</param>
-        public abstract void GetFriends(BasePlayerCharacterEntity playerCharacterEntity);
-
-        /// <summary>
         /// Warp character to other map if `mapName` is not empty
         /// </summary>
         /// <param name="playerCharacterEntity"></param>

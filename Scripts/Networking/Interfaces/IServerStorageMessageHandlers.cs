@@ -8,10 +8,6 @@ namespace MultiplayerARPG
     /// </summary>
     public interface IServerStorageMessageHandlers
     {
-        UniTaskVoid HandleRequestGetStorageItems(
-            RequestHandlerData requestHandler, RequestGetStorageItemsMessage request,
-            RequestProceedResultDelegate<ResponseGetStorageItemsMessage> result);
-
         UniTaskVoid HandleRequestMoveItemToStorage(
             RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request,
             RequestProceedResultDelegate<ResponseMoveItemToStorageMessage> result);

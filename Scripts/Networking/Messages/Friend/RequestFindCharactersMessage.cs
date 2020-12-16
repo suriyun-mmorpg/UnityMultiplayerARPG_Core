@@ -2,18 +2,18 @@
 
 namespace MultiplayerARPG
 {
-    public struct RequestGetSocialGroupMembersMessage : INetSerializable
+    public struct RequestFindCharactersMessage : INetSerializable
     {
-        public string characterId;
+        public string characterName;
 
         public void Deserialize(NetDataReader reader)
         {
-            characterId = reader.GetString();
+            characterName = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(characterId);
+            writer.Put(characterName);
         }
     }
 }
