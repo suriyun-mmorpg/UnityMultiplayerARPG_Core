@@ -747,6 +747,9 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.ServiceNotAvailable.ToString(), "Service not available");
             Texts.Add(GameMessage.Type.RequestTimeout.ToString(), "Request timeout");
             Texts.Add(GameMessage.Type.InvalidItemData.ToString(), "Invalid item data");
+            Texts.Add(GameMessage.Type.InvalidAttributeData.ToString(), "Invalid attribute data");
+            Texts.Add(GameMessage.Type.InvalidSkillData.ToString(), "Invalid skill data");
+            Texts.Add(GameMessage.Type.InvalidGuildSkillData.ToString(), "Invalid guild skill data");
             Texts.Add(GameMessage.Type.NotFoundCharacter.ToString(), "Character not found");
             Texts.Add(GameMessage.Type.NotAbleToLoot.ToString(), "Cannot get this item");
             Texts.Add(GameMessage.Type.NotEnoughGold.ToString(), "Have not enough gold");
@@ -775,6 +778,9 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.DealingCanceled.ToString(), "Dealing canceled");
             Texts.Add(GameMessage.Type.AnotherCharacterCannotCarryAnymore.ToString(), "Another character cannot carry anymore items");
             // Party
+            Texts.Add(GameMessage.Type.NotFoundParty.ToString(), "Party not found");
+            Texts.Add(GameMessage.Type.NotFoundPartyInvitation.ToString(), "Party invitation not found");
+            Texts.Add(GameMessage.Type.PartyInvitationAccepted.ToString(), "Party invitation accepted");
             Texts.Add(GameMessage.Type.PartyInvitationDeclined.ToString(), "Party invitation declined");
             Texts.Add(GameMessage.Type.CannotSendPartyInvitation.ToString(), "Cannot send party invitation");
             Texts.Add(GameMessage.Type.CannotKickPartyMember.ToString(), "Cannot kick party member");
@@ -787,6 +793,9 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.CharacterNotJoinedParty.ToString(), "Character not joined the party");
             Texts.Add(GameMessage.Type.PartyMemberReachedLimit.ToString(), "Party member reached limit");
             // Guild
+            Texts.Add(GameMessage.Type.NotFoundGuild.ToString(), "Guild not found");
+            Texts.Add(GameMessage.Type.NotFoundGuildInvitation.ToString(), "Guild invitation not found");
+            Texts.Add(GameMessage.Type.GuildInvitationAccepted.ToString(), "Guild invitation accepted");
             Texts.Add(GameMessage.Type.GuildInvitationDeclined.ToString(), "Guild invitation declined");
             Texts.Add(GameMessage.Type.CannotSendGuildInvitation.ToString(), "Cannot send guild invitation");
             Texts.Add(GameMessage.Type.CannotKickGuildMember.ToString(), "Cannot kick guild member");

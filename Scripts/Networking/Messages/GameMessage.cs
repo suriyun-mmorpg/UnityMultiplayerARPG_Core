@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             ServiceNotAvailable,
             RequestTimeout,
             InvalidItemData,
+            InvalidAttributeData,
             InvalidSkillData,
             InvalidGuildSkillData,
             NotFoundCharacter,
