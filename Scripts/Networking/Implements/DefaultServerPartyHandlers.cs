@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public const int PartyInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, PartyData> Parties = new ConcurrentDictionary<int, PartyData>();
         public static readonly ConcurrentDictionary<long, PartyData> UpdatingPartyMembers = new ConcurrentDictionary<long, PartyData>();
-        public static readonly ConcurrentDictionary<string, int> PartyInvitations = new ConcurrentDictionary<string, int>();
+        public static readonly HashSet<string> PartyInvitations = new HashSet<string>();
 
         public int PartiesCount { get { return Parties.Count; } }
 
@@ -39,19 +39,19 @@ namespace MultiplayerARPG
 
         public bool HasPartyInvitation(int partyId, string characterId)
         {
-            return PartyInvitations.ContainsKey(GetPartyInvitationId(partyId, characterId));
+            return PartyInvitations.Contains(GetPartyInvitationId(partyId, characterId));
         }
 
         public void AppendPartyInvitation(int partyId, string characterId)
         {
             RemovePartyInvitation(partyId, characterId);
-            PartyInvitations.TryAdd(GetPartyInvitationId(partyId, characterId), partyId);
+            PartyInvitations.Add(GetPartyInvitationId(partyId, characterId));
             DelayRemovePartyInvitation(partyId, characterId).Forget();
         }
 
         public void RemovePartyInvitation(int partyId, string characterId)
         {
-            PartyInvitations.TryRemove(GetPartyInvitationId(partyId, characterId), out _);
+            PartyInvitations.Remove(GetPartyInvitationId(partyId, characterId));
         }
 
         public void ClearParty()

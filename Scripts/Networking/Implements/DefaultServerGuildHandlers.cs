@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public const int GuildInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, GuildData> Guilds = new ConcurrentDictionary<int, GuildData>();
         public static readonly ConcurrentDictionary<long, GuildData> UpdatingGuildMembers = new ConcurrentDictionary<long, GuildData>();
-        public static readonly ConcurrentDictionary<string, int> GuildInvitations = new ConcurrentDictionary<string, int>();
+        public static readonly HashSet<string> GuildInvitations = new HashSet<string>();
 
         public int GuildsCount { get { return Guilds.Count; } }
 
@@ -39,19 +39,19 @@ namespace MultiplayerARPG
 
         public bool HasGuildInvitation(int guildId, string characterId)
         {
-            return GuildInvitations.ContainsKey(GetGuildInvitationId(guildId, characterId));
+            return GuildInvitations.Contains(GetGuildInvitationId(guildId, characterId));
         }
 
         public void AppendGuildInvitation(int guildId, string characterId)
         {
             RemoveGuildInvitation(guildId, characterId);
-            GuildInvitations.TryAdd(GetGuildInvitationId(guildId, characterId), guildId);
+            GuildInvitations.Add(GetGuildInvitationId(guildId, characterId));
             DelayRemoveGuildInvitation(guildId, characterId).Forget();
         }
 
         public void RemoveGuildInvitation(int guildId, string characterId)
         {
-            GuildInvitations.TryRemove(GetGuildInvitationId(guildId, characterId), out _);
+            GuildInvitations.Remove(GetGuildInvitationId(guildId, characterId));
         }
 
         public void ClearGuild()
