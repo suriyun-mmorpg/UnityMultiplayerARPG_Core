@@ -24,16 +24,16 @@ namespace MultiplayerARPG
             id = reader.GetString();
             userId = reader.GetString();
             characterName = reader.GetString();
-            dataId = reader.GetInt();
-            level = reader.GetShort();
-            factionId = reader.GetInt();
-            partyId = reader.GetInt();
-            guildId = reader.GetInt();
+            dataId = reader.GetPackedInt();
+            level = reader.GetPackedShort();
+            factionId = reader.GetPackedInt();
+            partyId = reader.GetPackedInt();
+            guildId = reader.GetPackedInt();
             guildRole = reader.GetByte();
-            currentHp = reader.GetInt();
-            maxHp = reader.GetInt();
-            currentMp = reader.GetInt();
-            maxMp = reader.GetInt();
+            currentHp = reader.GetPackedInt();
+            maxHp = reader.GetPackedInt();
+            currentMp = reader.GetPackedInt();
+            maxMp = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -41,32 +41,51 @@ namespace MultiplayerARPG
             writer.Put(id);
             writer.Put(userId);
             writer.Put(characterName);
-            writer.Put(dataId);
-            writer.Put(level);
-            writer.Put(factionId);
-            writer.Put(partyId);
-            writer.Put(guildId);
+            writer.PutPackedInt(dataId);
+            writer.PutPackedShort(level);
+            writer.PutPackedInt(factionId);
+            writer.PutPackedInt(partyId);
+            writer.PutPackedInt(guildId);
             writer.Put(guildRole);
-            writer.Put(currentHp);
-            writer.Put(maxHp);
-            writer.Put(currentMp);
-            writer.Put(maxMp);
+            writer.PutPackedInt(currentHp);
+            writer.PutPackedInt(maxHp);
+            writer.PutPackedInt(currentMp);
+            writer.PutPackedInt(maxMp);
         }
 
-        public static SocialCharacterData Create(IPlayerCharacterData characterEntity)
+        public static SocialCharacterData Create(IPlayerCharacterData character)
         {
             return new SocialCharacterData()
             {
-                id = characterEntity.Id,
-                characterName = characterEntity.CharacterName,
-                dataId = characterEntity.DataId,
-                level = characterEntity.Level,
-                factionId = characterEntity.FactionId,
-                partyId = characterEntity.PartyId,
-                guildId = characterEntity.GuildId,
-                guildRole = characterEntity.GuildRole,
-                currentHp = characterEntity.CurrentHp,
-                currentMp = characterEntity.CurrentMp,
+                id = character.Id,
+                characterName = character.CharacterName,
+                dataId = character.DataId,
+                level = character.Level,
+                factionId = character.FactionId,
+                partyId = character.PartyId,
+                guildId = character.GuildId,
+                guildRole = character.GuildRole,
+                currentHp = character.CurrentHp,
+                currentMp = character.CurrentMp,
+            };
+        }
+
+        public static SocialCharacterData Create(BasePlayerCharacterEntity character)
+        {
+            return new SocialCharacterData()
+            {
+                id = character.Id,
+                characterName = character.CharacterName,
+                dataId = character.DataId,
+                level = character.Level,
+                factionId = character.FactionId,
+                partyId = character.PartyId,
+                guildId = character.GuildId,
+                guildRole = character.GuildRole,
+                currentHp = character.CurrentHp,
+                maxHp = character.MaxHp,
+                currentMp = character.CurrentMp,
+                maxMp = character.MaxMp,
             };
         }
     }

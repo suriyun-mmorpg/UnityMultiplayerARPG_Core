@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();
-            id = reader.GetInt();
+            id = reader.GetPackedInt();
             if (type != UpdateType.Clear)
             {
                 // Get social member data
@@ -29,16 +29,16 @@ namespace MultiplayerARPG
                     case UpdateType.Add:
                     case UpdateType.Update:
                         data.characterName = reader.GetString();
-                        data.dataId = reader.GetInt();
-                        data.level = reader.GetShort();
+                        data.dataId = reader.GetPackedInt();
+                        data.level = reader.GetPackedShort();
                         isOnline = reader.GetBool();
                         // Read extra data
                         if (isOnline)
                         {
-                            data.currentHp = reader.GetInt();
-                            data.maxHp = reader.GetInt();
-                            data.currentMp = reader.GetInt();
-                            data.maxMp = reader.GetInt();
+                            data.currentHp = reader.GetPackedInt();
+                            data.maxHp = reader.GetPackedInt();
+                            data.currentMp = reader.GetPackedInt();
+                            data.maxMp = reader.GetPackedInt();
                         }
                         break;
                 }
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)type);
-            writer.Put(id);
+            writer.PutPackedInt(id);
             if (type != UpdateType.Clear)
             {
                 // Put social member data
@@ -58,16 +58,16 @@ namespace MultiplayerARPG
                     case UpdateType.Add:
                     case UpdateType.Update:
                         writer.Put(data.characterName);
-                        writer.Put(data.dataId);
-                        writer.Put(data.level);
+                        writer.PutPackedInt(data.dataId);
+                        writer.PutPackedShort(data.level);
                         writer.Put(isOnline);
                         // Put extra data
                         if (isOnline)
                         {
-                            writer.Put(data.currentHp);
-                            writer.Put(data.maxHp);
-                            writer.Put(data.currentMp);
-                            writer.Put(data.maxMp);
+                            writer.PutPackedInt(data.currentHp);
+                            writer.PutPackedInt(data.maxHp);
+                            writer.PutPackedInt(data.currentMp);
+                            writer.PutPackedInt(data.maxMp);
                         }
                         break;
                 }
