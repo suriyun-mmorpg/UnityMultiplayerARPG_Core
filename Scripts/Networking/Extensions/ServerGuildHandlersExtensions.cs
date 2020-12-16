@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public static class NetworkingGuildUtil
+    public static class ServerGuildHandlersExtensions
     {
         public static ValidateGuildRequestResult CanCreateGuild(this IPlayerCharacterData playerCharacter, string guildName)
         {
