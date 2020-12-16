@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter && GuildSkill && Level < GuildSkill.maxLevel &&
                 GameInstance.ClientGuildHandlers.ClientGuild != null &&
-                GameInstance.ClientGuildHandlers.ClientGuild.IsLeader(owningCharacter) &&
+                GameInstance.ClientGuildHandlers.ClientGuild.IsLeader(owningCharacter.Id) &&
                 GameInstance.ClientGuildHandlers.ClientGuild.skillPoint > 0)
             {
                 onAbleToLevelUp.Invoke();

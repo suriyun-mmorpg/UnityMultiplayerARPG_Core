@@ -24,7 +24,7 @@
                 gameMessageType = GameMessage.Type.NotJoinedParty;
                 return new ValidatePartyRequestResult(false, gameMessageType);
             }
-            if (!party.IsLeader(playerCharacter))
+            if (!party.IsLeader(playerCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotPartyLeader;
                 return new ValidatePartyRequestResult(false, gameMessageType);
@@ -48,7 +48,7 @@
                 gameMessageType = GameMessage.Type.NotJoinedParty;
                 return new ValidatePartyRequestResult(false, gameMessageType);
             }
-            if (!party.IsLeader(playerCharacter))
+            if (!party.IsLeader(playerCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotPartyLeader;
                 return new ValidatePartyRequestResult(false, gameMessageType);

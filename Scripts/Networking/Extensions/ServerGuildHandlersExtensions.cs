@@ -36,7 +36,7 @@
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (!guild.IsLeader(playerCharacter))
+            if (!guild.IsLeader(playerCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotGuildLeader;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -60,7 +60,7 @@
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (!guild.IsLeader(playerCharacter))
+            if (!guild.IsLeader(playerCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotGuildLeader;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -84,7 +84,7 @@
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (!guild.IsLeader(playerCharacter))
+            if (!guild.IsLeader(playerCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotGuildLeader;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -118,7 +118,7 @@
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (!guild.IsLeader(playerCharacter))
+            if (!guild.IsLeader(playerCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotGuildLeader;
                 return new ValidateGuildRequestResult(false, gameMessageType);
@@ -266,7 +266,7 @@
                 gameMessageType = GameMessage.Type.NotJoinedGuild;
                 return new ValidateGuildRequestResult(false, gameMessageType);
             }
-            if (!guild.IsLeader(playerCharacter))
+            if (!guild.IsLeader(playerCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotGuildLeader;
                 return new ValidateGuildRequestResult(false, gameMessageType);

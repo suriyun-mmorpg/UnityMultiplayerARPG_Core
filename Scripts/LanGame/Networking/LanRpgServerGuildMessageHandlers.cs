@@ -330,7 +330,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (validateResult.Guild.IsLeader(playerCharacter))
+            if (validateResult.Guild.IsLeader(playerCharacter.Id))
             {
                 BasePlayerCharacterEntity memberEntity;
                 foreach (string memberId in validateResult.Guild.GetMemberIds())
