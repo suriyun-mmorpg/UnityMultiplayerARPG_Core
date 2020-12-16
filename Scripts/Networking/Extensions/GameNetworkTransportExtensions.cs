@@ -1,10 +1,9 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public static partial class GameNetworkTransportExtensions
+    public static class GameNetworkTransportExtensions
     {
         private static void Send(LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, INetSerializable message)
         {
