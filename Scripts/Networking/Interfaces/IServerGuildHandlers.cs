@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -78,6 +79,6 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="playerCharacter"></param>
         /// <param name="exp"></param>
-        void IncreaseGuildExp(IPlayerCharacterData playerCharacter, int exp);
+        UniTaskVoid IncreaseGuildExp(IPlayerCharacterData playerCharacter, int exp);
     }
 }

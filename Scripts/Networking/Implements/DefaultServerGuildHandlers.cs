@@ -61,8 +61,9 @@ namespace MultiplayerARPG
             GuildInvitations.Clear();
         }
 
-        public void IncreaseGuildExp(IPlayerCharacterData playerCharacter, int exp)
+        public async UniTaskVoid IncreaseGuildExp(IPlayerCharacterData playerCharacter, int exp)
         {
+            await UniTask.Yield();
             ValidateGuildRequestResult validateResult = this.CanIncreaseGuildExp(playerCharacter, exp);
             if (!validateResult.IsSuccess)
                 return;
