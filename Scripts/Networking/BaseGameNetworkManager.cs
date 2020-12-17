@@ -235,6 +235,11 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild);
             RegisterClientResponse<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild);
             RegisterClientResponse<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel);
+            // Friend
+            RegisterClientResponse<RequestFindCharactersMessage, ResponseFindCharactersMessage>(ReqTypes.FindCharacters);
+            RegisterClientResponse<RequestGetFriendsMessage, ResponseGetFriendsMessage>(ReqTypes.GetFriends);
+            RegisterClientResponse<RequestAddFriendMessage, ResponseAddFriendMessage>(ReqTypes.AddFriend);
+            RegisterClientResponse<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(ReqTypes.RemoveFriend);
             // Bank
             RegisterClientResponse<RequestDepositUserGoldMessage, ResponseDepositUserGoldMessage>(ReqTypes.DepositUserGold);
             RegisterClientResponse<RequestWithdrawUserGoldMessage, ResponseWithdrawUserGoldMessage>(ReqTypes.WithdrawUserGold);
@@ -309,6 +314,14 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild, ServerGuildMessageHandlers.HandleRequestKickMemberFromGuild);
                 RegisterServerRequest<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild, ServerGuildMessageHandlers.HandleRequestLeaveGuild);
                 RegisterServerRequest<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel, ServerGuildMessageHandlers.HandleRequestIncreaseGuildSkillLevel);
+            }
+            // Friend
+            if (ServerFriendMessageHandlers != null)
+            {
+                RegisterServerRequest<RequestFindCharactersMessage, ResponseFindCharactersMessage>(ReqTypes.FindCharacters, ServerFriendMessageHandlers.HandleRequestFindCharacters);
+                RegisterServerRequest<RequestGetFriendsMessage, ResponseGetFriendsMessage>(ReqTypes.GetFriends, ServerFriendMessageHandlers.HandleRequestGetFriends);
+                RegisterServerRequest<RequestAddFriendMessage, ResponseAddFriendMessage>(ReqTypes.AddFriend, ServerFriendMessageHandlers.HandleRequestAddFriend);
+                RegisterServerRequest<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(ReqTypes.RemoveFriend, ServerFriendMessageHandlers.HandleRequestRemoveFriend);
             }
             // Bank
             if (ServerBankMessageHandlers != null)
