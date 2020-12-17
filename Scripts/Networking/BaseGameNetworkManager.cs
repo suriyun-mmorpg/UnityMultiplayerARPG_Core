@@ -602,7 +602,7 @@ namespace MultiplayerARPG
 
         protected void HandleUpdateFriendsAtClient(MessageHandlerData messageHandler)
         {
-            ClientFriendActions.NotifyFriendsUpdated(messageHandler.Reader.GetList<SocialCharacterData>());
+            ClientFriendActions.NotifyFriendsUpdated(messageHandler.Reader.GetArray<SocialCharacterData>());
         }
 
         protected void HandleUpdateMapInfoAtClient(MessageHandlerData messageHandler)

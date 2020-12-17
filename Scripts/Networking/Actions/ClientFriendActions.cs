@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendsMessage> onResponseGetFriends;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAddFriendMessage> onResponseAddFriend;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRemoveFriendMessage> onResponseRemoveFriend;
-        public static System.Action<List<SocialCharacterData>> onNotifyFriendsUpdated;
+        public static System.Action<SocialCharacterData[]> onNotifyFriendsUpdated;
 
         public static async UniTaskVoid ResponseFindCharacters(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindCharactersMessage response)
         {
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
                 onResponseRemoveFriend.Invoke(requestHandler, responseCode, response);
         }
 
-        public static void NotifyFriendsUpdated(List<SocialCharacterData> friends)
+        public static void NotifyFriendsUpdated(SocialCharacterData[] friends)
         {
             if (onNotifyFriendsUpdated != null)
                 onNotifyFriendsUpdated.Invoke(friends);

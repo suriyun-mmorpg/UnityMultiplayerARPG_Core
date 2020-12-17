@@ -361,11 +361,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SendUpdateFriendsToClient(long connectionId, List<SocialCharacterData> friends)
+        public void SendUpdateFriendsToClient(long connectionId, SocialCharacterData[] friends)
         {
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.UpdateFriends, (writer) =>
             {
-                writer.PutList(friends);
+                writer.PutArray(friends);
             });
         }
 

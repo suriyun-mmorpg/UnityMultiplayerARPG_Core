@@ -9,10 +9,6 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
-            GameInstance.ClientFriendHandlers.RequestGetFriends(new RequestGetFriendsMessage()
-            {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
-            }, GetFriendsCallback);
             ClientFriendActions.onNotifyFriendsUpdated += UpdateFriendsUIs;
         }
 
@@ -22,19 +18,27 @@ namespace MultiplayerARPG
             ClientFriendActions.onNotifyFriendsUpdated -= UpdateFriendsUIs;
         }
 
+        public void Refresh()
+        {
+            GameInstance.ClientFriendHandlers.RequestGetFriends(new RequestGetFriendsMessage()
+            {
+                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+            }, GetFriendsCallback);
+        }
+
         private async UniTaskVoid GetFriendsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetFriendsMessage response)
         {
             await UniTask.Yield();
             if (responseCode == AckResponseCode.Success)
-                UpdateFriendsUIs(new List<SocialCharacterData>(response.friends));
+                UpdateFriendsUIs(response.friends);
         }
 
-        private void UpdateFriendsUIs(List<SocialCharacterData> friends)
+        private void UpdateFriendsUIs(SocialCharacterData[] friends)
         {
             if (friends == null)
                 return;
 
-            memberAmount = friends.Count;
+            memberAmount = friends.Length;
             UpdateUIs();
 
             int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;

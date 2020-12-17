@@ -15,11 +15,15 @@ namespace MultiplayerARPG
                 inputCharacterName.text = string.Empty;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
+            MemberList.HideAll();
         }
 
-        private void UpdateFoundCharactersUIs(List<SocialCharacterData> foundCharacters)
+        private void UpdateFoundCharactersUIs(SocialCharacterData[] foundCharacters)
         {
-            memberAmount = foundCharacters.Count;
+            if (foundCharacters == null)
+                return;
+
+            memberAmount = foundCharacters.Length;
             UpdateUIs();
 
             int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
@@ -86,7 +90,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             if (responseCode == AckResponseCode.Success)
-                UpdateFoundCharactersUIs(new List<SocialCharacterData>(response.characters));
+                UpdateFoundCharactersUIs(response.characters);
         }
 
         public void OnClickAddFriend()
