@@ -46,7 +46,7 @@ namespace MultiplayerARPG
                 return;
 
             GuildData guild;
-            if (GuildId <= 0 || !Manager.GetServerGuildHandlers().TryGetGuild(GuildId, out guild))
+            if (GuildId <= 0 || !GameInstance.ServerGuildHandlers.TryGetGuild(GuildId, out guild))
                 return;
 
             short level = guild.GetSkillLevel(dataId);
