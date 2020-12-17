@@ -216,7 +216,7 @@ namespace MultiplayerARPG
             SetReloadActionStates(animActionType, reloadingAmmoAmount);
 
             // Prepare requires data and get damages data
-            IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null;
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
@@ -231,9 +231,8 @@ namespace MultiplayerARPG
                     if (FpsModel && FpsModel.gameObject.activeSelf)
                         FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
                     // Play reload sfx
-                    if (weaponItem != null &&
-                        (AnimActionType == AnimActionType.ReloadRightHand ||
-                        AnimActionType == AnimActionType.ReloadLeftHand))
+                    if (AnimActionType == AnimActionType.ReloadRightHand ||
+                        AnimActionType == AnimActionType.ReloadLeftHand)
                         AudioManager.PlaySfxClipAtAudioSource(weaponItem.ReloadClip, CharacterModel.GenericAudioSource);
                 }
 
@@ -246,7 +245,7 @@ namespace MultiplayerARPG
                     short triggerReloadAmmoAmount = (short)(ReloadingAmmoAmount / triggerDurations.Length);
                     EquipWeapons equipWeapons = EquipWeapons;
                     Dictionary<CharacterItem, short> decreaseItems;
-                    if (IsServer && this.DecreaseAmmos(weapon.GetWeaponItem().WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out decreaseItems))
+                    if (IsServer && this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out decreaseItems))
                     {
                         this.FillEmptySlots();
                         weapon.ammo += triggerReloadAmmoAmount;
@@ -351,7 +350,7 @@ namespace MultiplayerARPG
             SetAttackActionStates(animActionType, animActionDataId);
 
             // Prepare requires data and get damages data
-            IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null;
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamages(ref isLeftHand);
 
@@ -390,9 +389,8 @@ namespace MultiplayerARPG
                         if (FpsModel && FpsModel.gameObject.activeSelf)
                             FpsModel.PlayWeaponLaunchEffect(AnimActionType);
                         // Play launch sfx
-                        if (weaponItem != null &&
-                            (AnimActionType == AnimActionType.AttackRightHand ||
-                            AnimActionType == AnimActionType.AttackLeftHand))
+                        if (AnimActionType == AnimActionType.AttackRightHand ||
+                            AnimActionType == AnimActionType.AttackLeftHand)
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, CharacterModel.GenericAudioSource);
                     }
 

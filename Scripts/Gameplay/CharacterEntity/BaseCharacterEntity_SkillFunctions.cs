@@ -31,14 +31,13 @@ namespace MultiplayerARPG
                 return;
             // Prepare weapon data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            WeaponType weaponType = weaponItem.WeaponType;
             // Get activate animation type which defined at character model
             SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
             // Prepare animation
             if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack())
             {
                 // Assign data id
-                animationDataId = weaponType.DataId;
+                animationDataId = weaponItem.WeaponType.DataId;
                 // Assign animation action type
                 animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
             }
@@ -175,6 +174,7 @@ namespace MultiplayerARPG
             // Skill animation still playing, skip it
             if (skillCancellationTokenSource != null)
                 return;
+
             // Prepare cancellation
             skillCancellationTokenSource = new CancellationTokenSource();
 
@@ -213,7 +213,7 @@ namespace MultiplayerARPG
             }
 
             // Prepare requires data and get damages data
-            IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null; 
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
 
