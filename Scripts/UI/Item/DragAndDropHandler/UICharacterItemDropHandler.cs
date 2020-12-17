@@ -62,7 +62,7 @@ namespace MultiplayerARPG
         {
             // Set UI drop state
             draggedItemUI.isDropped = true;
-            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
+            string characterId = GameInstance.ClientUserHandlers.CharacterId;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -83,9 +83,9 @@ namespace MultiplayerARPG
         {
             // Set UI drop state
             draggedItemUI.isDropped = true;
-            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
-            StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
-            string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+            string characterId = GameInstance.ClientUserHandlers.CharacterId;
+            StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
+            string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -122,9 +122,9 @@ namespace MultiplayerARPG
         {
             // Set UI drop state
             draggedItemUI.isDropped = true;
-            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
-            StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
-            string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+            string characterId = GameInstance.ClientUserHandlers.CharacterId;
+            StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
+            string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:

@@ -18,12 +18,12 @@ namespace MultiplayerARPG
             foreach (GameObject obj in partyInviteObjects)
             {
                 if (obj != null)
-                    obj.SetActive(GameInstance.ClientPartyHandlers.ClientParty != null && GameInstance.ClientPartyHandlers.ClientParty.CanInvite(BasePlayerCharacterController.OwningCharacter.Id));
+                    obj.SetActive(GameInstance.ClientPartyHandlers.ClientParty != null && GameInstance.ClientPartyHandlers.ClientParty.CanInvite(GameInstance.ClientUserHandlers.CharacterId));
             }
             foreach (GameObject obj in guildInviteObjects)
             {
                 if (obj != null)
-                    obj.SetActive(GameInstance.ClientGuildHandlers.ClientGuild != null && GameInstance.ClientGuildHandlers.ClientGuild.CanInvite(BasePlayerCharacterController.OwningCharacter.Id));
+                    obj.SetActive(GameInstance.ClientGuildHandlers.ClientGuild != null && GameInstance.ClientGuildHandlers.ClientGuild.CanInvite(GameInstance.ClientUserHandlers.CharacterId));
             }
         }
 
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientPartyHandlers.RequestSendPartyInvitation(new RequestSendPartyInvitationMessage()
             {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 inviteeId = Data.Id,
             }, ClientPartyActions.ResponseSendPartyInvitation);
             Hide();
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientGuildHandlers.RequestSendGuildInvitation(new RequestSendGuildInvitationMessage()
             {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 inviteeId = Data.Id,
             }, ClientGuildActions.ResponseSendGuildInvitation);
             Hide();

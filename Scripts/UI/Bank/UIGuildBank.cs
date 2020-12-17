@@ -13,7 +13,7 @@
         {
             GameInstance.ClientBankHandlers.RequestDepositGuildGold(new RequestDepositGuildGoldMessage()
             {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 gold = amount,
             }, ClientBankActions.ResponseDepositGuildGold);
         }
@@ -22,7 +22,7 @@
         {
             GameInstance.ClientBankHandlers.RequestWithdrawGuildGold(new RequestWithdrawGuildGoldMessage()
             {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 gold = amount,
             }, ClientBankActions.ResponseWithdrawGuildGold);
         }

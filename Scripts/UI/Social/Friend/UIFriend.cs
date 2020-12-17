@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientFriendHandlers.RequestGetFriends(new RequestGetFriendsMessage()
             {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                characterId = GameInstance.ClientUserHandlers.CharacterId,
             }, GetFriendsCallback);
         }
 
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     friendId = friend.id,
                 }, ClientFriendActions.ResponseRemoveFriend);
             });

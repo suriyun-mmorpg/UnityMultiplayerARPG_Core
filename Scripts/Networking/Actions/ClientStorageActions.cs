@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMoveItemToStorageMessage> onResponseMoveItemToStorage;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeStorageItemMessage> onResponseSwapOrMergeStorageItem;
         public static System.Action<StorageType, string, uint, short, short> onNotifyStorageOpened;
+        public static System.Action onNotifyStorageClosed;
         public static System.Action<List<CharacterItem>> onNotifyStorageItemsUpdated;
 
         public static async UniTaskVoid ResponseMoveItemFromStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMoveItemFromStorageMessage response)
@@ -33,10 +34,20 @@ namespace MultiplayerARPG
                 onResponseSwapOrMergeStorageItem.Invoke(requestHandler, responseCode, response);
         }
 
-        public static void NotifyStorageOpened(StorageType storageType, string storageOWnerId, uint objectId, short weightLimit, short slotLimit)
+        public static void NotifyStorageOpened(StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
         {
+            GameInstance.ClientStorageHandlers.StorageType = storageType;
+            GameInstance.ClientStorageHandlers.StorageOwnerId = storageOwnerId;
             if (onNotifyStorageOpened != null)
-                onNotifyStorageOpened.Invoke(storageType, storageOWnerId, objectId, weightLimit, slotLimit);
+                onNotifyStorageOpened.Invoke(storageType, storageOwnerId, objectId, weightLimit, slotLimit);
+        }
+
+        public static void NotifyStorageClosed()
+        {
+            GameInstance.ClientStorageHandlers.StorageType = StorageType.None;
+            GameInstance.ClientStorageHandlers.StorageOwnerId = string.Empty;
+            if (onNotifyStorageClosed != null)
+                onNotifyStorageClosed.Invoke();
         }
 
         public static void NotifyStorageItemsUpdated(List<CharacterItem> storageItems)

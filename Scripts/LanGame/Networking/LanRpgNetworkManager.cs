@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             base.Awake();
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
             // Server Handlers
-            ServerPlayerCharacterHandlers = gameObject.GetOrAddComponent<IServerPlayerCharacterHandlers, DefaultServerPlayerCharacterHandlers>();
+            ServerPlayerCharacterHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
             ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, LanRpgServerStorageHandlers>();
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
             ServerGuildHandlers = gameObject.GetOrAddComponent<IServerGuildHandlers, DefaultServerGuildHandlers>();
@@ -59,6 +59,7 @@ namespace MultiplayerARPG
             ClientGuildHandlers = gameObject.GetOrAddComponent<IClientGuildHandlers, DefaultClientGuildHandlers>();
             ClientFriendHandlers = gameObject.GetOrAddComponent<IClientFriendHandlers, DefaultClientFriendHandlers>();
             ClientBankHandlers = gameObject.GetOrAddComponent<IClientBankHandlers, DefaultClientBankHandlers>();
+            ClientUserHandlers = gameObject.GetOrAddComponent<IClientUserHandlers, DefaultClientUserHandlers>();
         }
 
         public void StartGame()
@@ -301,7 +302,6 @@ namespace MultiplayerARPG
                 return;
             }
 
-            long connectionId = playerCharacterEntity.ConnectionId;
             BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 playerCharacterEntity.IsServer &&

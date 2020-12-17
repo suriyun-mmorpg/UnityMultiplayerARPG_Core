@@ -1238,9 +1238,9 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                string characterId = BasePlayerCharacterController.OwningCharacter.Id;
-                StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
-                string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+                string characterId = GameInstance.ClientUserHandlers.CharacterId;
+                StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
+                string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
                 GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
                 {
                     characterId = characterId,
@@ -1264,9 +1264,9 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
-            StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
-            string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+            string characterId = GameInstance.ClientUserHandlers.CharacterId;
+            StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
+            string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
             {
                 characterId = characterId,
@@ -1290,9 +1290,9 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                string characterId = BasePlayerCharacterController.OwningCharacter.Id;
-                StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
-                string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+                string characterId = GameInstance.ClientUserHandlers.CharacterId;
+                StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
+                string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
                 GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
                 {
                     characterId = characterId,
@@ -1316,9 +1316,9 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            string characterId = BasePlayerCharacterController.OwningCharacter.Id;
-            StorageType storageType = BasePlayerCharacterController.OwningCurrentStorageType;
-            string storageOwnerId = BasePlayerCharacterController.OwningCurrentStorageOwnerId;
+            string characterId = GameInstance.ClientUserHandlers.CharacterId;
+            StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
+            string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
             {
                 characterId = characterId,

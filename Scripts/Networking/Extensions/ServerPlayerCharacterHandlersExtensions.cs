@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public static class ServerPlayerCharacterHandlersExtensions
     {
-        public static bool TryGetPlayerCharacter<T>(this IServerPlayerCharacterHandlers handlers, long connectionId, out T playerCharacter)
+        public static bool TryGetPlayerCharacter<T>(this IServerUserHandlers handlers, long connectionId, out T playerCharacter)
             where T : Component, IPlayerCharacterData
         {
             playerCharacter = null;
@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool TryGetPlayerCharacterById<T>(this IServerPlayerCharacterHandlers handlers, string id, out T playerCharacter)
+        public static bool TryGetPlayerCharacterById<T>(this IServerUserHandlers handlers, string id, out T playerCharacter)
             where T : Component, IPlayerCharacterData
         {
             playerCharacter = null;
@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool TryGetPlayerCharacterByName<T>(this IServerPlayerCharacterHandlers handlers, string name, out T playerCharacter)
+        public static bool TryGetPlayerCharacterByName<T>(this IServerUserHandlers handlers, string name, out T playerCharacter)
             where T : Component, IPlayerCharacterData
         {
             playerCharacter = null;

@@ -2,9 +2,9 @@
 {
     public static class GameNetworkManagerEntensions
     {
-        public static IServerPlayerCharacterHandlers GetServerPlayerCharacterHandlers(this LiteNetLibManager.LiteNetLibManager manager)
+        public static IServerUserHandlers GetServerPlayerCharacterHandlers(this LiteNetLibManager.LiteNetLibManager manager)
         {
-            return manager as IServerPlayerCharacterHandlers;
+            return manager as IServerUserHandlers;
         }
 
         public static IServerPartyHandlers GetServerPartyHandlers(this LiteNetLibManager.LiteNetLibManager manager)

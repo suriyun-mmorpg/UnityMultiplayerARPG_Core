@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultServerPlayerCharacterHandlers : MonoBehaviour, IServerPlayerCharacterHandlers
+    public class DefaultServerUserHandlers : MonoBehaviour, IServerUserHandlers
     {
         public static readonly ConcurrentDictionary<long, IPlayerCharacterData> PlayerCharacters = new ConcurrentDictionary<long, IPlayerCharacterData>();
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersById = new ConcurrentDictionary<string, IPlayerCharacterData>();

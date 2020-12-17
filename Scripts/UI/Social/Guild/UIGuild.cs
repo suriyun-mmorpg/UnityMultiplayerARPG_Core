@@ -334,7 +334,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientGuildHandlers.RequestChangeGuildLeader(new RequestChangeGuildLeaderMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     memberId = guildMember.id,
                 }, ClientGuildActions.ResponseChangeGuildLeader);
             });
@@ -376,7 +376,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientGuildHandlers.RequestChangeGuildMessage(new RequestChangeGuildMessageMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     message = inputFieldMessage.text,
                 }, ClientGuildActions.ResponseChangeGuildMessage);
             }
@@ -393,7 +393,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     memberId = guildMember.id,
                 }, ClientGuildActions.ResponseKickMemberFromGuild);
             });
@@ -405,7 +405,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientGuildHandlers.RequestLeaveGuild(new RequestLeaveGuildMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                 }, ClientGuildActions.ResponseLeaveGuild);
             });
         }
@@ -434,12 +434,12 @@ namespace MultiplayerARPG
 
         public override bool OwningCharacterIsLeader()
         {
-            return IsLeader(BasePlayerCharacterController.OwningCharacter.Id);
+            return IsLeader(GameInstance.ClientUserHandlers.CharacterId);
         }
 
         public override bool OwningCharacterCanKick()
         {
-            return CanKick(BasePlayerCharacterController.OwningCharacter.Id);
+            return CanKick(GameInstance.ClientUserHandlers.CharacterId);
         }
     }
 }

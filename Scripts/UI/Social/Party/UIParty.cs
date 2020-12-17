@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientPartyHandlers.RequestChangePartyLeader(new RequestChangePartyLeaderMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     memberId = partyMember.id,
                 }, ClientPartyActions.ResponseChangePartyLeader);
             });
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     memberId = partyMember.id,
                 }, ClientPartyActions.ResponseKickMemberFromParty);
             });
@@ -137,7 +137,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientPartyHandlers.RequestLeaveParty(new RequestLeavePartyMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                 }, ClientPartyActions.ResponseLeaveParty);
             });
         }
@@ -166,12 +166,12 @@ namespace MultiplayerARPG
 
         public override bool OwningCharacterIsLeader()
         {
-            return IsLeader(BasePlayerCharacterController.OwningCharacter.Id);
+            return IsLeader(GameInstance.ClientUserHandlers.CharacterId);
         }
 
         public override bool OwningCharacterCanKick()
         {
-            return CanKick(BasePlayerCharacterController.OwningCharacter.Id);
+            return CanKick(GameInstance.ClientUserHandlers.CharacterId);
         }
     }
 }

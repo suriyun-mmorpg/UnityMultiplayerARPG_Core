@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
                 {
-                    characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     friendId = friend.id,
                 }, ClientFriendActions.ResponseAddFriend);
             });

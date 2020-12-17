@@ -29,9 +29,10 @@ namespace MultiplayerARPG
             public const ushort NotifyRewardItem = 112;
             public const ushort UpdateTimeOfDay = 113;
             public const ushort NotifyStorageOpened = 114;
-            public const ushort NotifyStorageItemsUpdated = 115;
-            public const ushort NotifyPartyInvitation = 116;
-            public const ushort NotifyGuildInvitation = 117;
+            public const ushort NotifyStorageClosed = 115;
+            public const ushort NotifyStorageItemsUpdated = 116;
+            public const ushort NotifyPartyInvitation = 117;
+            public const ushort NotifyGuildInvitation = 118;
         }
 
         public class ReqTypes
@@ -91,7 +92,7 @@ namespace MultiplayerARPG
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         // Server Handlers
-        protected IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
+        protected IServerUserHandlers ServerPlayerCharacterHandlers { get; set; }
         protected IServerStorageHandlers ServerStorageHandlers { get; set; }
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
         protected IServerGuildHandlers ServerGuildHandlers { get; set; }
@@ -113,6 +114,7 @@ namespace MultiplayerARPG
         protected IClientGuildHandlers ClientGuildHandlers { get; set; }
         protected IClientFriendHandlers ClientFriendHandlers { get; set; }
         protected IClientBankHandlers ClientBankHandlers { get; set; }
+        protected IClientUserHandlers ClientUserHandlers { get; set; }
 
         public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
         public static readonly Dictionary<string, NotifyOnlineCharacterTime> LastCharacterOnlineTimes = new Dictionary<string, NotifyOnlineCharacterTime>();
@@ -189,6 +191,7 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.NotifyRewardItem, HandleNotifyRewardItemAtClient);
             RegisterClientMessage(MsgTypes.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
             RegisterClientMessage(MsgTypes.NotifyStorageOpened, HandleNotifyStorageOpenedAtClient);
+            RegisterClientMessage(MsgTypes.NotifyStorageClosed, HandleNotifyStorageClosedAtClient);
             RegisterClientMessage(MsgTypes.NotifyStorageItemsUpdated, HandleNotifyStorageItemsUpdatedAtClient);
             RegisterClientMessage(MsgTypes.NotifyPartyInvitation, HandleNotifyPartyInvitationAtClient);
             RegisterClientMessage(MsgTypes.NotifyGuildInvitation, HandleNotifyGuildInvitationAtClient);
@@ -378,6 +381,7 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers = ClientGuildHandlers;
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
             GameInstance.ClientBankHandlers = ClientBankHandlers;
+            GameInstance.ClientUserHandlers = ClientUserHandlers;
         }
 
         public override void OnStopClient()
@@ -653,6 +657,11 @@ namespace MultiplayerARPG
                 messageHandler.Reader.GetPackedUInt(),
                 messageHandler.Reader.GetPackedShort(),
                 messageHandler.Reader.GetPackedShort());
+        }
+
+        protected void HandleNotifyStorageClosedAtClient(MessageHandlerData messageHandler)
+        {
+            ClientStorageActions.NotifyStorageClosed();
         }
 
         protected void HandleNotifyStorageItemsUpdatedAtClient(MessageHandlerData messageHandler)

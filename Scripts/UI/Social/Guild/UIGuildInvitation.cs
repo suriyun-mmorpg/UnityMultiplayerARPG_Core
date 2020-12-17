@@ -65,7 +65,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientGuildHandlers.RequestAcceptGuildInvitation(new RequestAcceptGuildInvitationMessage()
             {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 guildId = Data.GuildId,
             }, ClientGuildActions.ResponseAcceptGuildInvitation);
             Hide();
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientGuildHandlers.RequestDeclineGuildInvitation(new RequestDeclineGuildInvitationMessage()
             {
-                characterId = BasePlayerCharacterController.OwningCharacter.Id,
+                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 guildId = Data.GuildId,
             }, ClientGuildActions.ResponseDeclineGuildInvitation);
             Hide();

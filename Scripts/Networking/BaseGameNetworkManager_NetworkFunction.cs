@@ -410,13 +410,18 @@ namespace MultiplayerARPG
         public void SendNotifyStorageOpenedToClient(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
         {
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyStorageOpened, (writer) =>
-             {
-                 writer.Put((byte)storageType);
-                 writer.Put(storageOwnerId);
-                 writer.PutPackedUInt(objectId);
-                 writer.PutPackedShort(weightLimit);
-                 writer.PutPackedShort(slotLimit);
-             });
+            {
+                writer.Put((byte)storageType);
+                writer.Put(storageOwnerId);
+                writer.PutPackedUInt(objectId);
+                writer.PutPackedShort(weightLimit);
+                writer.PutPackedShort(slotLimit);
+            });
+        }
+
+        public void SendNotifyStorageClosedToClient(long connectionId)
+        {
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyStorageClosed);
         }
 
         public void SendNotifyStorageItemsUpdatedToClient(long connectionId, List<CharacterItem> storageItems)
