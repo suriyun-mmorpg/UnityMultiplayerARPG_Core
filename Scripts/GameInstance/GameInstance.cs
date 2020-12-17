@@ -341,6 +341,8 @@ namespace MultiplayerARPG
             get { return defaultWeaponItem as IWeaponItem; }
         }
 
+        public IWeaponItem MonsterWeaponItem { get; private set; }
+
         public DamageElement DefaultDamageElement
         {
             get { return defaultDamageElement; }
@@ -394,6 +396,15 @@ namespace MultiplayerARPG
             if (defaultWeaponItem == null || !defaultWeaponItem.IsWeapon())
             {
                 defaultWeaponItem = ScriptableObject.CreateInstance<Item>()
+                    .GenerateDefaultItem(DefaultWeaponType);
+                // Use the same item with default weapon item (if default weapon not set by user)
+                MonsterWeaponItem = defaultWeaponItem as IWeaponItem;
+            }
+
+            // Setup monster weapon item if not existed
+            if (MonsterWeaponItem == null)
+            {
+                MonsterWeaponItem = ScriptableObject.CreateInstance<Item>()
                     .GenerateDefaultItem(DefaultWeaponType);
             }
 
@@ -477,7 +488,10 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("LoadedGameData");
 
             // Add required default game data
-            AddItems(DefaultWeaponItem as BaseItem);
+            AddItems(new BaseItem[] {
+                DefaultWeaponItem as BaseItem,
+                MonsterWeaponItem as BaseItem
+            });
             AddWeaponTypes(DefaultWeaponType);
             AddPoolingObjects(levelUpEffect);
             AddPoolingObjects(DefaultDamageHitEffects);

@@ -283,7 +283,7 @@ namespace MultiplayerARPG
             // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
             animationDataId = 0;
             // Monster will not have weapon data
-            weapon = CharacterItem.Create(CurrentGameInstance.DefaultWeaponItem.DataId);
+            weapon = CharacterItem.Create(CurrentGameInstance.MonsterWeaponItem.DataId);
         }
 
         public override void GetUsingSkillData(
@@ -300,7 +300,7 @@ namespace MultiplayerARPG
             // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
             animationDataId = 0;
             // Monster will not have weapon data
-            weapon = CharacterItem.Create(CurrentGameInstance.DefaultWeaponItem.DataId);
+            weapon = CharacterItem.Create(CurrentGameInstance.MonsterWeaponItem.DataId);
             // Prepare skill data
             if (skill == null)
                 return;
