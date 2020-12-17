@@ -108,7 +108,7 @@
             return new ValidateGuildRequestResult(true, gameMessageType, guildId, guild);
         }
 
-        public static ValidateGuildRequestResult CanSetGuildMemberRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter)
+        public static ValidateGuildRequestResult CanChangeGuildMemberRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter)
         {
             GameMessage.Type gameMessageType;
             int guildId = playerCharacter.GuildId;

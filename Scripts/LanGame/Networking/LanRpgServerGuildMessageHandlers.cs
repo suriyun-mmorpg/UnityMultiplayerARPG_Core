@@ -455,7 +455,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSetGuildMemberRole(playerCharacter);
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -499,7 +499,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSetGuildMemberRole(playerCharacter);
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanIncreaseGuildSkillLevel(playerCharacter, request.dataId);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
