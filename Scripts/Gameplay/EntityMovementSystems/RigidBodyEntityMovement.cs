@@ -1,7 +1,6 @@
 ﻿using LiteNetLib;
 using LiteNetLibManager;
 using StandardAssets.Characters.Physics;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
