@@ -352,6 +352,13 @@ namespace MultiplayerARPG
             CurrentMapInfo = null;
         }
 
+        public override bool StartServer()
+        {
+            Clean();
+            InitPrefabs();
+            return base.StartServer();
+        }
+
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
@@ -363,10 +370,12 @@ namespace MultiplayerARPG
             CurrentGameInstance.DayNightTimeUpdater.InitTimeOfDay(this);
         }
 
-        public override void OnStopServer()
+        public override bool StartClient(string networkAddress, int networkPort)
         {
-            Clean();
-            base.OnStopServer();
+            if (!IsServer)
+                Clean();
+            InitPrefabs();
+            return base.StartClient(networkAddress, networkPort);
         }
 
         public override void OnStartClient(LiteNetLibClient client)
@@ -382,13 +391,6 @@ namespace MultiplayerARPG
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
             GameInstance.ClientBankHandlers = ClientBankHandlers;
             GameInstance.ClientUserHandlers = ClientUserHandlers;
-        }
-
-        public override void OnStopClient()
-        {
-            if (!IsServer)
-                Clean();
-            base.OnStopClient();
         }
 
         public override void OnClientConnected()
@@ -807,18 +809,6 @@ namespace MultiplayerARPG
                     writer.Put(characterId);
                 });
             }
-        }
-
-        public override bool StartServer()
-        {
-            InitPrefabs();
-            return base.StartServer();
-        }
-
-        public override bool StartClient(string networkAddress, int networkPort)
-        {
-            InitPrefabs();
-            return base.StartClient(networkAddress, networkPort);
         }
 
         public virtual void InitPrefabs()
