@@ -1,13 +1,9 @@
-﻿using LiteNetLib.Utils;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public static class NetworkReponseUtils
+    public static class GameNetworkingReponseUtils
     {
         public static bool ShowUnhandledResponseMessageDialog(this AckResponseCode responseCode, Action errorHandler)
         {

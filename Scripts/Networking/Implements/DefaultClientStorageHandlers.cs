@@ -1,6 +1,5 @@
 ﻿using LiteNetLibManager;
 using UnityEngine;
-using ReqTypes = MultiplayerARPG.BaseGameNetworkManager.ReqTypes;
 
 namespace MultiplayerARPG
 {
@@ -11,17 +10,17 @@ namespace MultiplayerARPG
 
         public bool RequestMoveItemFromStorage(RequestMoveItemFromStorageMessage data, ResponseDelegate<ResponseMoveItemFromStorageMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(ReqTypes.MoveItemFromStorage, data, responseDelegate: callback);
+            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.MoveItemFromStorage, data, responseDelegate: callback);
         }
 
         public bool RequestMoveItemToStorage(RequestMoveItemToStorageMessage data, ResponseDelegate<ResponseMoveItemToStorageMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(ReqTypes.MoveItemToStorage, data, responseDelegate: callback);
+            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.MoveItemToStorage, data, responseDelegate: callback);
         }
 
         public bool RequestSwapOrMergeStorageItem(RequestSwapOrMergeStorageItemMessage data, ResponseDelegate<ResponseSwapOrMergeStorageItemMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(ReqTypes.SwapOrMergeStorageItem, data, responseDelegate: callback);
+            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.SwapOrMergeStorageItem, data, responseDelegate: callback);
         }
     }
 }

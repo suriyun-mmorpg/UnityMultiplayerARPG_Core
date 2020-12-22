@@ -12,77 +12,6 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseGameNetworkManager : LiteNetLibGameManager
     {
-        public class MsgTypes
-        {
-            public const ushort GameMessage = 100;
-            public const ushort Warp = 101;
-            public const ushort Chat = 102;
-            public const ushort UpdatePartyMember = 103;
-            public const ushort UpdateParty = 104;
-            public const ushort UpdateGuildMember = 105;
-            public const ushort UpdateGuild = 106;
-            public const ushort UpdateFriends = 107;
-            public const ushort UpdateMapInfo = 108;
-            public const ushort NotifyOnlineCharacter = 109;
-            public const ushort NotifyRewardExp = 110;
-            public const ushort NotifyRewardGold = 111;
-            public const ushort NotifyRewardItem = 112;
-            public const ushort UpdateTimeOfDay = 113;
-            public const ushort NotifyStorageOpened = 114;
-            public const ushort NotifyStorageClosed = 115;
-            public const ushort NotifyStorageItemsUpdated = 116;
-            public const ushort NotifyPartyInvitation = 117;
-            public const ushort NotifyGuildInvitation = 118;
-        }
-
-        public class ReqTypes
-        {
-            public const ushort CashShopInfo = 100;
-            public const ushort CashShopBuy = 101;
-            public const ushort CashPackageInfo = 102;
-            public const ushort CashPackageBuyValidation = 103;
-            public const ushort MailList = 104;
-            public const ushort ReadMail = 105;
-            public const ushort ClaimMailItems = 106;
-            public const ushort DeleteMail = 107;
-            public const ushort SendMail = 108;
-            public const ushort MoveItemFromStorage = 109;
-            public const ushort MoveItemToStorage = 110;
-            public const ushort SwapOrMergeStorageItem = 111;
-            public const ushort SwapOrMergeItem = 112;
-            public const ushort EquipWeapon = 113;
-            public const ushort EquipArmor = 114;
-            public const ushort UnEquipWeapon = 115;
-            public const ushort UnEquipArmor = 116;
-            public const ushort CreateParty = 117;
-            public const ushort ChangePartyLeader = 118;
-            public const ushort ChangePartySetting = 119;
-            public const ushort SendPartyInvitation = 120;
-            public const ushort AcceptPartyInvitation = 121;
-            public const ushort DeclinePartyInvitation = 122;
-            public const ushort KickMemberFromParty = 123;
-            public const ushort LeaveParty = 124;
-            public const ushort CreateGuild = 125;
-            public const ushort ChangeGuildLeader = 126;
-            public const ushort ChangeGuildMessage = 127;
-            public const ushort ChangeGuildRole = 128;
-            public const ushort ChangeMemberGuildRole = 129;
-            public const ushort SendGuildInvitation = 130;
-            public const ushort AcceptGuildInvitation = 131;
-            public const ushort DeclineGuildInvitation = 132;
-            public const ushort KickMemberFromGuild = 133;
-            public const ushort LeaveGuild = 134;
-            public const ushort IncreaseGuildSkillLevel = 135;
-            public const ushort FindCharacters = 136;
-            public const ushort GetFriends = 137;
-            public const ushort AddFriend = 138;
-            public const ushort RemoveFriend = 139;
-            public const ushort DepositUserGold = 140;
-            public const ushort WithdrawUserGold = 141;
-            public const ushort DepositGuildGold = 142;
-            public const ushort WithdrawGuildGold = 143;
-        }
-
         public const string CHAT_SYSTEM_ANNOUNCER_SENDER = "SYSTEM_ANNOUNCER";
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
         public const float UPDATE_TIME_OF_DAY_DURATION = 5f;
@@ -176,78 +105,78 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             base.RegisterClientMessages();
-            RegisterClientMessage(MsgTypes.GameMessage, HandleGameMessageAtClient);
-            RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
-            RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
-            RegisterClientMessage(MsgTypes.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
-            RegisterClientMessage(MsgTypes.UpdateParty, HandleUpdatePartyAtClient);
-            RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
-            RegisterClientMessage(MsgTypes.UpdateGuild, HandleUpdateGuildAtClient);
-            RegisterClientMessage(MsgTypes.UpdateFriends, HandleUpdateFriendsAtClient);
-            RegisterClientMessage(MsgTypes.UpdateMapInfo, HandleUpdateMapInfoAtClient);
-            RegisterClientMessage(MsgTypes.NotifyOnlineCharacter, HandleNotifyOnlineCharacterAtClient);
-            RegisterClientMessage(MsgTypes.NotifyRewardExp, HandleNotifyRewardExpAtClient);
-            RegisterClientMessage(MsgTypes.NotifyRewardGold, HandleNotifyRewardGoldAtClient);
-            RegisterClientMessage(MsgTypes.NotifyRewardItem, HandleNotifyRewardItemAtClient);
-            RegisterClientMessage(MsgTypes.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
-            RegisterClientMessage(MsgTypes.NotifyStorageOpened, HandleNotifyStorageOpenedAtClient);
-            RegisterClientMessage(MsgTypes.NotifyStorageClosed, HandleNotifyStorageClosedAtClient);
-            RegisterClientMessage(MsgTypes.NotifyStorageItemsUpdated, HandleNotifyStorageItemsUpdatedAtClient);
-            RegisterClientMessage(MsgTypes.NotifyPartyInvitation, HandleNotifyPartyInvitationAtClient);
-            RegisterClientMessage(MsgTypes.NotifyGuildInvitation, HandleNotifyGuildInvitationAtClient);
+            RegisterClientMessage(GameNetworkingConsts.GameMessage, HandleGameMessageAtClient);
+            RegisterClientMessage(GameNetworkingConsts.Warp, HandleWarpAtClient);
+            RegisterClientMessage(GameNetworkingConsts.Chat, HandleChatAtClient);
+            RegisterClientMessage(GameNetworkingConsts.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
+            RegisterClientMessage(GameNetworkingConsts.UpdateParty, HandleUpdatePartyAtClient);
+            RegisterClientMessage(GameNetworkingConsts.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
+            RegisterClientMessage(GameNetworkingConsts.UpdateGuild, HandleUpdateGuildAtClient);
+            RegisterClientMessage(GameNetworkingConsts.UpdateFriends, HandleUpdateFriendsAtClient);
+            RegisterClientMessage(GameNetworkingConsts.UpdateMapInfo, HandleUpdateMapInfoAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyOnlineCharacter, HandleNotifyOnlineCharacterAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyRewardExp, HandleNotifyRewardExpAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyRewardGold, HandleNotifyRewardGoldAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyRewardItem, HandleNotifyRewardItemAtClient);
+            RegisterClientMessage(GameNetworkingConsts.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyStorageOpened, HandleNotifyStorageOpenedAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyStorageClosed, HandleNotifyStorageClosedAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyStorageItemsUpdated, HandleNotifyStorageItemsUpdatedAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyPartyInvitation, HandleNotifyPartyInvitationAtClient);
+            RegisterClientMessage(GameNetworkingConsts.NotifyGuildInvitation, HandleNotifyGuildInvitationAtClient);
             // Responses
             // Cash shop
-            RegisterClientResponse<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo);
-            RegisterClientResponse<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo);
-            RegisterClientResponse<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy);
-            RegisterClientResponse<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation);
+            RegisterClientResponse<EmptyMessage, ResponseCashShopInfoMessage>(GameNetworkingConsts.CashShopInfo);
+            RegisterClientResponse<EmptyMessage, ResponseCashPackageInfoMessage>(GameNetworkingConsts.CashPackageInfo);
+            RegisterClientResponse<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(GameNetworkingConsts.CashShopBuy);
+            RegisterClientResponse<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(GameNetworkingConsts.CashPackageBuyValidation);
             // Mail
-            RegisterClientResponse<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList);
-            RegisterClientResponse<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail);
-            RegisterClientResponse<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems);
-            RegisterClientResponse<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail);
-            RegisterClientResponse<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail);
+            RegisterClientResponse<RequestMailListMessage, ResponseMailListMessage>(GameNetworkingConsts.MailList);
+            RegisterClientResponse<RequestReadMailMessage, ResponseReadMailMessage>(GameNetworkingConsts.ReadMail);
+            RegisterClientResponse<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(GameNetworkingConsts.ClaimMailItems);
+            RegisterClientResponse<RequestDeleteMailMessage, ResponseDeleteMailMessage>(GameNetworkingConsts.DeleteMail);
+            RegisterClientResponse<RequestSendMailMessage, ResponseSendMailMessage>(GameNetworkingConsts.SendMail);
             // Storage
-            RegisterClientResponse<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage);
-            RegisterClientResponse<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage);
-            RegisterClientResponse<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem);
+            RegisterClientResponse<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(GameNetworkingConsts.MoveItemFromStorage);
+            RegisterClientResponse<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(GameNetworkingConsts.MoveItemToStorage);
+            RegisterClientResponse<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(GameNetworkingConsts.SwapOrMergeStorageItem);
             // Inventory
-            RegisterClientResponse<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(ReqTypes.SwapOrMergeItem);
-            RegisterClientResponse<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(ReqTypes.EquipWeapon);
-            RegisterClientResponse<RequestEquipArmorMessage, ResponseEquipArmorMessage>(ReqTypes.EquipArmor);
-            RegisterClientResponse<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(ReqTypes.UnEquipWeapon);
-            RegisterClientResponse<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(ReqTypes.UnEquipArmor);
+            RegisterClientResponse<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(GameNetworkingConsts.SwapOrMergeItem);
+            RegisterClientResponse<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(GameNetworkingConsts.EquipWeapon);
+            RegisterClientResponse<RequestEquipArmorMessage, ResponseEquipArmorMessage>(GameNetworkingConsts.EquipArmor);
+            RegisterClientResponse<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(GameNetworkingConsts.UnEquipWeapon);
+            RegisterClientResponse<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(GameNetworkingConsts.UnEquipArmor);
             // Party
-            RegisterClientResponse<RequestCreatePartyMessage, ResponseCreatePartyMessage>(ReqTypes.CreateParty);
-            RegisterClientResponse<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(ReqTypes.ChangePartyLeader);
-            RegisterClientResponse<RequestChangePartySettingMessage, ResponseChangePartySettingMessage>(ReqTypes.ChangePartySetting);
-            RegisterClientResponse<RequestSendPartyInvitationMessage, ResponseSendPartyInvitationMessage>(ReqTypes.SendPartyInvitation);
-            RegisterClientResponse<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(ReqTypes.AcceptPartyInvitation);
-            RegisterClientResponse<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(ReqTypes.DeclinePartyInvitation);
-            RegisterClientResponse<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(ReqTypes.KickMemberFromParty);
-            RegisterClientResponse<RequestLeavePartyMessage, ResponseLeavePartyMessage>(ReqTypes.LeaveParty);
+            RegisterClientResponse<RequestCreatePartyMessage, ResponseCreatePartyMessage>(GameNetworkingConsts.CreateParty);
+            RegisterClientResponse<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(GameNetworkingConsts.ChangePartyLeader);
+            RegisterClientResponse<RequestChangePartySettingMessage, ResponseChangePartySettingMessage>(GameNetworkingConsts.ChangePartySetting);
+            RegisterClientResponse<RequestSendPartyInvitationMessage, ResponseSendPartyInvitationMessage>(GameNetworkingConsts.SendPartyInvitation);
+            RegisterClientResponse<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(GameNetworkingConsts.AcceptPartyInvitation);
+            RegisterClientResponse<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(GameNetworkingConsts.DeclinePartyInvitation);
+            RegisterClientResponse<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(GameNetworkingConsts.KickMemberFromParty);
+            RegisterClientResponse<RequestLeavePartyMessage, ResponseLeavePartyMessage>(GameNetworkingConsts.LeaveParty);
             // Guild
-            RegisterClientResponse<RequestCreateGuildMessage, ResponseCreateGuildMessage>(ReqTypes.CreateGuild);
-            RegisterClientResponse<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(ReqTypes.ChangeGuildLeader);
-            RegisterClientResponse<RequestChangeGuildMessageMessage, ResponseChangeGuildMessageMessage>(ReqTypes.ChangeGuildMessage);
-            RegisterClientResponse<RequestChangeGuildRoleMessage, ResponseChangeGuildRoleMessage>(ReqTypes.ChangeGuildRole);
-            RegisterClientResponse<RequestChangeMemberGuildRoleMessage, ResponseChangeMemberGuildRoleMessage>(ReqTypes.ChangeMemberGuildRole);
-            RegisterClientResponse<RequestSendGuildInvitationMessage, ResponseSendGuildInvitationMessage>(ReqTypes.SendGuildInvitation);
-            RegisterClientResponse<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(ReqTypes.AcceptGuildInvitation);
-            RegisterClientResponse<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(ReqTypes.DeclineGuildInvitation);
-            RegisterClientResponse<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild);
-            RegisterClientResponse<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild);
-            RegisterClientResponse<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel);
+            RegisterClientResponse<RequestCreateGuildMessage, ResponseCreateGuildMessage>(GameNetworkingConsts.CreateGuild);
+            RegisterClientResponse<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(GameNetworkingConsts.ChangeGuildLeader);
+            RegisterClientResponse<RequestChangeGuildMessageMessage, ResponseChangeGuildMessageMessage>(GameNetworkingConsts.ChangeGuildMessage);
+            RegisterClientResponse<RequestChangeGuildRoleMessage, ResponseChangeGuildRoleMessage>(GameNetworkingConsts.ChangeGuildRole);
+            RegisterClientResponse<RequestChangeMemberGuildRoleMessage, ResponseChangeMemberGuildRoleMessage>(GameNetworkingConsts.ChangeMemberGuildRole);
+            RegisterClientResponse<RequestSendGuildInvitationMessage, ResponseSendGuildInvitationMessage>(GameNetworkingConsts.SendGuildInvitation);
+            RegisterClientResponse<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(GameNetworkingConsts.AcceptGuildInvitation);
+            RegisterClientResponse<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(GameNetworkingConsts.DeclineGuildInvitation);
+            RegisterClientResponse<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(GameNetworkingConsts.KickMemberFromGuild);
+            RegisterClientResponse<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(GameNetworkingConsts.LeaveGuild);
+            RegisterClientResponse<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(GameNetworkingConsts.IncreaseGuildSkillLevel);
             // Friend
-            RegisterClientResponse<RequestFindCharactersMessage, ResponseFindCharactersMessage>(ReqTypes.FindCharacters);
-            RegisterClientResponse<RequestGetFriendsMessage, ResponseGetFriendsMessage>(ReqTypes.GetFriends);
-            RegisterClientResponse<RequestAddFriendMessage, ResponseAddFriendMessage>(ReqTypes.AddFriend);
-            RegisterClientResponse<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(ReqTypes.RemoveFriend);
+            RegisterClientResponse<RequestFindCharactersMessage, ResponseFindCharactersMessage>(GameNetworkingConsts.FindCharacters);
+            RegisterClientResponse<RequestGetFriendsMessage, ResponseGetFriendsMessage>(GameNetworkingConsts.GetFriends);
+            RegisterClientResponse<RequestAddFriendMessage, ResponseAddFriendMessage>(GameNetworkingConsts.AddFriend);
+            RegisterClientResponse<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(GameNetworkingConsts.RemoveFriend);
             // Bank
-            RegisterClientResponse<RequestDepositUserGoldMessage, ResponseDepositUserGoldMessage>(ReqTypes.DepositUserGold);
-            RegisterClientResponse<RequestWithdrawUserGoldMessage, ResponseWithdrawUserGoldMessage>(ReqTypes.WithdrawUserGold);
-            RegisterClientResponse<RequestDepositGuildGoldMessage, ResponseDepositGuildGoldMessage>(ReqTypes.DepositGuildGold);
-            RegisterClientResponse<RequestWithdrawGuildGoldMessage, ResponseWithdrawGuildGoldMessage>(ReqTypes.WithdrawGuildGold);
+            RegisterClientResponse<RequestDepositUserGoldMessage, ResponseDepositUserGoldMessage>(GameNetworkingConsts.DepositUserGold);
+            RegisterClientResponse<RequestWithdrawUserGoldMessage, ResponseWithdrawUserGoldMessage>(GameNetworkingConsts.WithdrawUserGold);
+            RegisterClientResponse<RequestDepositGuildGoldMessage, ResponseDepositGuildGoldMessage>(GameNetworkingConsts.DepositGuildGold);
+            RegisterClientResponse<RequestWithdrawGuildGoldMessage, ResponseWithdrawGuildGoldMessage>(GameNetworkingConsts.WithdrawGuildGold);
         }
 
         protected override void RegisterServerMessages()
@@ -255,84 +184,84 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             base.RegisterServerMessages();
             // Networking messages
-            RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
-            RegisterServerMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
+            RegisterServerMessage(GameNetworkingConsts.Chat, HandleChatAtServer);
+            RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
             // Requests
             // Cash shop
             if (ServerCashShopMessageHandlers != null)
             {
-                RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(ReqTypes.CashShopInfo, ServerCashShopMessageHandlers.HandleRequestCashShopInfo);
-                RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(ReqTypes.CashPackageInfo, ServerCashShopMessageHandlers.HandleRequestCashPackageInfo);
-                RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(ReqTypes.CashShopBuy, ServerCashShopMessageHandlers.HandleRequestCashShopBuy);
-                RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(ReqTypes.CashPackageBuyValidation, ServerCashShopMessageHandlers.HandleRequestCashPackageBuyValidation);
+                RegisterServerRequest<EmptyMessage, ResponseCashShopInfoMessage>(GameNetworkingConsts.CashShopInfo, ServerCashShopMessageHandlers.HandleRequestCashShopInfo);
+                RegisterServerRequest<EmptyMessage, ResponseCashPackageInfoMessage>(GameNetworkingConsts.CashPackageInfo, ServerCashShopMessageHandlers.HandleRequestCashPackageInfo);
+                RegisterServerRequest<RequestCashShopBuyMessage, ResponseCashShopBuyMessage>(GameNetworkingConsts.CashShopBuy, ServerCashShopMessageHandlers.HandleRequestCashShopBuy);
+                RegisterServerRequest<RequestCashPackageBuyValidationMessage, ResponseCashPackageBuyValidationMessage>(GameNetworkingConsts.CashPackageBuyValidation, ServerCashShopMessageHandlers.HandleRequestCashPackageBuyValidation);
             }
             // Mail
             if (ServerMailMessageHandlers != null)
             {
-                RegisterServerRequest<RequestMailListMessage, ResponseMailListMessage>(ReqTypes.MailList, ServerMailMessageHandlers.HandleRequestMailList);
-                RegisterServerRequest<RequestReadMailMessage, ResponseReadMailMessage>(ReqTypes.ReadMail, ServerMailMessageHandlers.HandleRequestReadMail);
-                RegisterServerRequest<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(ReqTypes.ClaimMailItems, ServerMailMessageHandlers.HandleRequestClaimMailItems);
-                RegisterServerRequest<RequestDeleteMailMessage, ResponseDeleteMailMessage>(ReqTypes.DeleteMail, ServerMailMessageHandlers.HandleRequestDeleteMail);
-                RegisterServerRequest<RequestSendMailMessage, ResponseSendMailMessage>(ReqTypes.SendMail, ServerMailMessageHandlers.HandleRequestSendMail);
+                RegisterServerRequest<RequestMailListMessage, ResponseMailListMessage>(GameNetworkingConsts.MailList, ServerMailMessageHandlers.HandleRequestMailList);
+                RegisterServerRequest<RequestReadMailMessage, ResponseReadMailMessage>(GameNetworkingConsts.ReadMail, ServerMailMessageHandlers.HandleRequestReadMail);
+                RegisterServerRequest<RequestClaimMailItemsMessage, ResponseClaimMailItemsMessage>(GameNetworkingConsts.ClaimMailItems, ServerMailMessageHandlers.HandleRequestClaimMailItems);
+                RegisterServerRequest<RequestDeleteMailMessage, ResponseDeleteMailMessage>(GameNetworkingConsts.DeleteMail, ServerMailMessageHandlers.HandleRequestDeleteMail);
+                RegisterServerRequest<RequestSendMailMessage, ResponseSendMailMessage>(GameNetworkingConsts.SendMail, ServerMailMessageHandlers.HandleRequestSendMail);
             }
             // Storage
             if (ServerStorageMessageHandlers != null)
             {
-                RegisterServerRequest<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(ReqTypes.MoveItemFromStorage, ServerStorageMessageHandlers.HandleRequestMoveItemFromStorage);
-                RegisterServerRequest<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(ReqTypes.MoveItemToStorage, ServerStorageMessageHandlers.HandleRequestMoveItemToStorage);
-                RegisterServerRequest<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(ReqTypes.SwapOrMergeStorageItem, ServerStorageMessageHandlers.HandleRequestSwapOrMergeStorageItem);
+                RegisterServerRequest<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(GameNetworkingConsts.MoveItemFromStorage, ServerStorageMessageHandlers.HandleRequestMoveItemFromStorage);
+                RegisterServerRequest<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(GameNetworkingConsts.MoveItemToStorage, ServerStorageMessageHandlers.HandleRequestMoveItemToStorage);
+                RegisterServerRequest<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(GameNetworkingConsts.SwapOrMergeStorageItem, ServerStorageMessageHandlers.HandleRequestSwapOrMergeStorageItem);
             }
             // Inventory
             if (ServerInventoryMessageHandlers != null)
             {
-                RegisterServerRequest<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(ReqTypes.SwapOrMergeItem, ServerInventoryMessageHandlers.HandleRequestSwapOrMergeItem);
-                RegisterServerRequest<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(ReqTypes.EquipWeapon, ServerInventoryMessageHandlers.HandleRequestEquipWeapon);
-                RegisterServerRequest<RequestEquipArmorMessage, ResponseEquipArmorMessage>(ReqTypes.EquipArmor, ServerInventoryMessageHandlers.HandleRequestEquipArmor);
-                RegisterServerRequest<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(ReqTypes.UnEquipWeapon, ServerInventoryMessageHandlers.HandleRequestUnEquipWeapon);
-                RegisterServerRequest<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(ReqTypes.UnEquipArmor, ServerInventoryMessageHandlers.HandleRequestUnEquipArmor);
+                RegisterServerRequest<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(GameNetworkingConsts.SwapOrMergeItem, ServerInventoryMessageHandlers.HandleRequestSwapOrMergeItem);
+                RegisterServerRequest<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(GameNetworkingConsts.EquipWeapon, ServerInventoryMessageHandlers.HandleRequestEquipWeapon);
+                RegisterServerRequest<RequestEquipArmorMessage, ResponseEquipArmorMessage>(GameNetworkingConsts.EquipArmor, ServerInventoryMessageHandlers.HandleRequestEquipArmor);
+                RegisterServerRequest<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(GameNetworkingConsts.UnEquipWeapon, ServerInventoryMessageHandlers.HandleRequestUnEquipWeapon);
+                RegisterServerRequest<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(GameNetworkingConsts.UnEquipArmor, ServerInventoryMessageHandlers.HandleRequestUnEquipArmor);
             }
             // Party
             if (ServerPartyMessageHandlers != null)
             {
-                RegisterServerRequest<RequestCreatePartyMessage, ResponseCreatePartyMessage>(ReqTypes.CreateParty, ServerPartyMessageHandlers.HandleRequestCreateParty);
-                RegisterServerRequest<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(ReqTypes.ChangePartyLeader, ServerPartyMessageHandlers.HandleRequestChangePartyLeader);
-                RegisterServerRequest<RequestChangePartySettingMessage, ResponseChangePartySettingMessage>(ReqTypes.ChangePartySetting, ServerPartyMessageHandlers.HandleRequestChangePartySetting);
-                RegisterServerRequest<RequestSendPartyInvitationMessage, ResponseSendPartyInvitationMessage>(ReqTypes.SendPartyInvitation, ServerPartyMessageHandlers.HandleRequestSendPartyInvitation);
-                RegisterServerRequest<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(ReqTypes.AcceptPartyInvitation, ServerPartyMessageHandlers.HandleRequestAcceptPartyInvitation);
-                RegisterServerRequest<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(ReqTypes.DeclinePartyInvitation, ServerPartyMessageHandlers.HandleRequestDeclinePartyInvitation);
-                RegisterServerRequest<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(ReqTypes.KickMemberFromParty, ServerPartyMessageHandlers.HandleRequestKickMemberFromParty);
-                RegisterServerRequest<RequestLeavePartyMessage, ResponseLeavePartyMessage>(ReqTypes.LeaveParty, ServerPartyMessageHandlers.HandleRequestLeaveParty);
+                RegisterServerRequest<RequestCreatePartyMessage, ResponseCreatePartyMessage>(GameNetworkingConsts.CreateParty, ServerPartyMessageHandlers.HandleRequestCreateParty);
+                RegisterServerRequest<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(GameNetworkingConsts.ChangePartyLeader, ServerPartyMessageHandlers.HandleRequestChangePartyLeader);
+                RegisterServerRequest<RequestChangePartySettingMessage, ResponseChangePartySettingMessage>(GameNetworkingConsts.ChangePartySetting, ServerPartyMessageHandlers.HandleRequestChangePartySetting);
+                RegisterServerRequest<RequestSendPartyInvitationMessage, ResponseSendPartyInvitationMessage>(GameNetworkingConsts.SendPartyInvitation, ServerPartyMessageHandlers.HandleRequestSendPartyInvitation);
+                RegisterServerRequest<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(GameNetworkingConsts.AcceptPartyInvitation, ServerPartyMessageHandlers.HandleRequestAcceptPartyInvitation);
+                RegisterServerRequest<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(GameNetworkingConsts.DeclinePartyInvitation, ServerPartyMessageHandlers.HandleRequestDeclinePartyInvitation);
+                RegisterServerRequest<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(GameNetworkingConsts.KickMemberFromParty, ServerPartyMessageHandlers.HandleRequestKickMemberFromParty);
+                RegisterServerRequest<RequestLeavePartyMessage, ResponseLeavePartyMessage>(GameNetworkingConsts.LeaveParty, ServerPartyMessageHandlers.HandleRequestLeaveParty);
             }
             // Guild
             if (ServerGuildMessageHandlers != null)
             {
-                RegisterServerRequest<RequestCreateGuildMessage, ResponseCreateGuildMessage>(ReqTypes.CreateGuild, ServerGuildMessageHandlers.HandleRequestCreateGuild);
-                RegisterServerRequest<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(ReqTypes.ChangeGuildLeader, ServerGuildMessageHandlers.HandleRequestChangeGuildLeader);
-                RegisterServerRequest<RequestChangeGuildMessageMessage, ResponseChangeGuildMessageMessage>(ReqTypes.ChangeGuildMessage, ServerGuildMessageHandlers.HandleRequestChangeGuildMessage);
-                RegisterServerRequest<RequestChangeGuildRoleMessage, ResponseChangeGuildRoleMessage>(ReqTypes.ChangeGuildRole, ServerGuildMessageHandlers.HandleRequestChangeGuildRole);
-                RegisterServerRequest<RequestChangeMemberGuildRoleMessage, ResponseChangeMemberGuildRoleMessage>(ReqTypes.ChangeMemberGuildRole, ServerGuildMessageHandlers.HandleRequestChangeMemberGuildRole);
-                RegisterServerRequest<RequestSendGuildInvitationMessage, ResponseSendGuildInvitationMessage>(ReqTypes.SendGuildInvitation, ServerGuildMessageHandlers.HandleRequestSendGuildInvitation);
-                RegisterServerRequest<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(ReqTypes.AcceptGuildInvitation, ServerGuildMessageHandlers.HandleRequestAcceptGuildInvitation);
-                RegisterServerRequest<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(ReqTypes.DeclineGuildInvitation, ServerGuildMessageHandlers.HandleRequestDeclineGuildInvitation);
-                RegisterServerRequest<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(ReqTypes.KickMemberFromGuild, ServerGuildMessageHandlers.HandleRequestKickMemberFromGuild);
-                RegisterServerRequest<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(ReqTypes.LeaveGuild, ServerGuildMessageHandlers.HandleRequestLeaveGuild);
-                RegisterServerRequest<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(ReqTypes.IncreaseGuildSkillLevel, ServerGuildMessageHandlers.HandleRequestIncreaseGuildSkillLevel);
+                RegisterServerRequest<RequestCreateGuildMessage, ResponseCreateGuildMessage>(GameNetworkingConsts.CreateGuild, ServerGuildMessageHandlers.HandleRequestCreateGuild);
+                RegisterServerRequest<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(GameNetworkingConsts.ChangeGuildLeader, ServerGuildMessageHandlers.HandleRequestChangeGuildLeader);
+                RegisterServerRequest<RequestChangeGuildMessageMessage, ResponseChangeGuildMessageMessage>(GameNetworkingConsts.ChangeGuildMessage, ServerGuildMessageHandlers.HandleRequestChangeGuildMessage);
+                RegisterServerRequest<RequestChangeGuildRoleMessage, ResponseChangeGuildRoleMessage>(GameNetworkingConsts.ChangeGuildRole, ServerGuildMessageHandlers.HandleRequestChangeGuildRole);
+                RegisterServerRequest<RequestChangeMemberGuildRoleMessage, ResponseChangeMemberGuildRoleMessage>(GameNetworkingConsts.ChangeMemberGuildRole, ServerGuildMessageHandlers.HandleRequestChangeMemberGuildRole);
+                RegisterServerRequest<RequestSendGuildInvitationMessage, ResponseSendGuildInvitationMessage>(GameNetworkingConsts.SendGuildInvitation, ServerGuildMessageHandlers.HandleRequestSendGuildInvitation);
+                RegisterServerRequest<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(GameNetworkingConsts.AcceptGuildInvitation, ServerGuildMessageHandlers.HandleRequestAcceptGuildInvitation);
+                RegisterServerRequest<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(GameNetworkingConsts.DeclineGuildInvitation, ServerGuildMessageHandlers.HandleRequestDeclineGuildInvitation);
+                RegisterServerRequest<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(GameNetworkingConsts.KickMemberFromGuild, ServerGuildMessageHandlers.HandleRequestKickMemberFromGuild);
+                RegisterServerRequest<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(GameNetworkingConsts.LeaveGuild, ServerGuildMessageHandlers.HandleRequestLeaveGuild);
+                RegisterServerRequest<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(GameNetworkingConsts.IncreaseGuildSkillLevel, ServerGuildMessageHandlers.HandleRequestIncreaseGuildSkillLevel);
             }
             // Friend
             if (ServerFriendMessageHandlers != null)
             {
-                RegisterServerRequest<RequestFindCharactersMessage, ResponseFindCharactersMessage>(ReqTypes.FindCharacters, ServerFriendMessageHandlers.HandleRequestFindCharacters);
-                RegisterServerRequest<RequestGetFriendsMessage, ResponseGetFriendsMessage>(ReqTypes.GetFriends, ServerFriendMessageHandlers.HandleRequestGetFriends);
-                RegisterServerRequest<RequestAddFriendMessage, ResponseAddFriendMessage>(ReqTypes.AddFriend, ServerFriendMessageHandlers.HandleRequestAddFriend);
-                RegisterServerRequest<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(ReqTypes.RemoveFriend, ServerFriendMessageHandlers.HandleRequestRemoveFriend);
+                RegisterServerRequest<RequestFindCharactersMessage, ResponseFindCharactersMessage>(GameNetworkingConsts.FindCharacters, ServerFriendMessageHandlers.HandleRequestFindCharacters);
+                RegisterServerRequest<RequestGetFriendsMessage, ResponseGetFriendsMessage>(GameNetworkingConsts.GetFriends, ServerFriendMessageHandlers.HandleRequestGetFriends);
+                RegisterServerRequest<RequestAddFriendMessage, ResponseAddFriendMessage>(GameNetworkingConsts.AddFriend, ServerFriendMessageHandlers.HandleRequestAddFriend);
+                RegisterServerRequest<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(GameNetworkingConsts.RemoveFriend, ServerFriendMessageHandlers.HandleRequestRemoveFriend);
             }
             // Bank
             if (ServerBankMessageHandlers != null)
             {
-                RegisterServerRequest<RequestDepositUserGoldMessage, ResponseDepositUserGoldMessage>(ReqTypes.DepositUserGold, ServerBankMessageHandlers.HandleRequestDepositUserGold);
-                RegisterServerRequest<RequestWithdrawUserGoldMessage, ResponseWithdrawUserGoldMessage>(ReqTypes.WithdrawUserGold, ServerBankMessageHandlers.HandleRequestWithdrawUserGold);
-                RegisterServerRequest<RequestDepositGuildGoldMessage, ResponseDepositGuildGoldMessage>(ReqTypes.DepositGuildGold, ServerBankMessageHandlers.HandleRequestDepositGuildGold);
-                RegisterServerRequest<RequestWithdrawGuildGoldMessage, ResponseWithdrawGuildGoldMessage>(ReqTypes.WithdrawGuildGold, ServerBankMessageHandlers.HandleRequestWithdrawGuildGold);
+                RegisterServerRequest<RequestDepositUserGoldMessage, ResponseDepositUserGoldMessage>(GameNetworkingConsts.DepositUserGold, ServerBankMessageHandlers.HandleRequestDepositUserGold);
+                RegisterServerRequest<RequestWithdrawUserGoldMessage, ResponseWithdrawUserGoldMessage>(GameNetworkingConsts.WithdrawUserGold, ServerBankMessageHandlers.HandleRequestWithdrawUserGold);
+                RegisterServerRequest<RequestDepositGuildGoldMessage, ResponseDepositGuildGoldMessage>(GameNetworkingConsts.DepositGuildGold, ServerBankMessageHandlers.HandleRequestDepositGuildGold);
+                RegisterServerRequest<RequestWithdrawGuildGoldMessage, ResponseWithdrawGuildGoldMessage>(GameNetworkingConsts.WithdrawGuildGold, ServerBankMessageHandlers.HandleRequestWithdrawGuildGold);
             }
         }
 
@@ -453,7 +382,7 @@ namespace MultiplayerARPG
                 notifyTime.LastRequestTime = unscaledTime;
                 LastCharacterOnlineTimes[characterId] = notifyTime;
             }
-            Singleton.ClientSendPacket(DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, (writer) =>
+            Singleton.ClientSendPacket(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
             {
                 writer.Put(characterId);
             });
@@ -730,10 +659,10 @@ namespace MultiplayerARPG
                             List<BasePlayerCharacterEntity> receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(CurrentGameInstance.localChatDistance, false, true, true, true);
                             foreach (BasePlayerCharacterEntity receiver in receivers)
                             {
-                                ServerSendPacket(receiver.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                                ServerSendPacket(receiver.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
                             // Send messages to sender
-                            ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                            ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                         }
                     }
                     break;
@@ -741,7 +670,7 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(message.sender))
                     {
                         // Send message to all clients
-                        ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
                 case ChatChannel.Whisper:
@@ -749,13 +678,13 @@ namespace MultiplayerARPG
                         ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
                         // If found sender send whisper message to sender
-                        ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     if (!string.IsNullOrEmpty(message.receiver) &&
                         ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
                     {
                         // If found receiver send whisper message to receiver
-                        ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
                 case ChatChannel.Party:
@@ -768,7 +697,7 @@ namespace MultiplayerARPG
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If party member is online, send party message to the member
-                                ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                                ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
@@ -783,7 +712,7 @@ namespace MultiplayerARPG
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If guild member is online, send guild message to the member
-                                ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                                ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
@@ -792,7 +721,7 @@ namespace MultiplayerARPG
                     if (CanSendSystemAnnounce(message.sender))
                     {
                         // Send message to all clients
-                        ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
             }
@@ -804,7 +733,7 @@ namespace MultiplayerARPG
             if (IsCharacterOnline(characterId))
             {
                 // Notify back online character
-                ServerSendPacket(messageHandler.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, (writer) =>
+                ServerSendPacket(messageHandler.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
                 {
                     writer.Put(characterId);
                 });
@@ -862,7 +791,7 @@ namespace MultiplayerARPG
             chatMessage.message = message;
             chatMessage.sender = senderName;
             chatMessage.receiver = receiverName;
-            ClientSendPacket(DeliveryMethod.ReliableOrdered, MsgTypes.Chat, chatMessage);
+            ClientSendPacket(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, chatMessage);
         }
 
         public void Quit()
@@ -1176,7 +1105,7 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = new UpdateMapInfoMessage();
             message.mapId = CurrentMapInfo.Id;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.UpdateMapInfo, message);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, message);
         }
 
         public void SendTimeOfDay()
@@ -1195,7 +1124,7 @@ namespace MultiplayerARPG
                 return;
             UpdateTimeOfDayMessage message = new UpdateTimeOfDayMessage();
             message.timeOfDay = CurrentGameInstance.DayNightTimeUpdater.TimeOfDay;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.UpdateTimeOfDay, message);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateTimeOfDay, message);
         }
 
         public bool IsReadyToInstantiateObjects()
@@ -1236,7 +1165,7 @@ namespace MultiplayerARPG
                 message = message,
             };
             chatMessage.Serialize(writer);
-            HandleChatAtServer(new MessageHandlerData(MsgTypes.Chat, Server, -1, new NetDataReader(writer.CopyData())));
+            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
         }
     }
 }
