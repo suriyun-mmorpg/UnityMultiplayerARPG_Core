@@ -112,56 +112,43 @@ namespace MultiplayerARPG
         private async UniTaskVoid ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Unimplemented)
+            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString()));
-                return;
-            }
-            if (responseCode == AckResponseCode.Timeout)
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
+            })) return;
+
+            if (uiTextCash != null)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
-                return;
+                uiTextCash.text = string.Format(
+                    LanguageManager.GetText(formatKeyCash),
+                    response.cash.ToString("N0"));
             }
-            switch (responseCode)
+
+            List<CashPackage> cashPackages = new List<CashPackage>();
+            foreach (int cashPackageId in response.cashPackageIds)
             {
-                case AckResponseCode.Error:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
-                    break;
-                default:
-                    if (uiTextCash != null)
-                    {
-                        uiTextCash.text = string.Format(
-                            LanguageManager.GetText(formatKeyCash),
-                            response.cash.ToString("N0"));
-                    }
-
-                    List<CashPackage> cashPackages = new List<CashPackage>();
-                    foreach (int cashPackageId in response.cashPackageIds)
-                    {
-                        CashPackage cashPackage;
-                        if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))
-                        {
-                            cashPackages.Add(cashPackage);
-                        }
-                    }
-
-                    int selectedIdx = CacheCashPackageSelectionManager.SelectedUI != null ? CacheCashPackageSelectionManager.IndexOf(CacheCashPackageSelectionManager.SelectedUI) : -1;
-                    CacheCashPackageSelectionManager.DeselectSelectedUI();
-                    CacheCashPackageSelectionManager.Clear();
-
-                    UICashPackage tempUiCashPackage;
-                    CacheCashPackageList.Generate(cashPackages, (index, cashShopItem, ui) =>
-                    {
-                        tempUiCashPackage = ui.GetComponent<UICashPackage>();
-                        tempUiCashPackage.uiCashPackages = this;
-                        tempUiCashPackage.Data = cashShopItem;
-                        tempUiCashPackage.Show();
-                        CacheCashPackageSelectionManager.Add(tempUiCashPackage);
-                        if (selectedIdx == index)
-                            tempUiCashPackage.OnClickSelect();
-                    });
-                    break;
+                CashPackage cashPackage;
+                if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))
+                {
+                    cashPackages.Add(cashPackage);
+                }
             }
+
+            int selectedIdx = CacheCashPackageSelectionManager.SelectedUI != null ? CacheCashPackageSelectionManager.IndexOf(CacheCashPackageSelectionManager.SelectedUI) : -1;
+            CacheCashPackageSelectionManager.DeselectSelectedUI();
+            CacheCashPackageSelectionManager.Clear();
+
+            UICashPackage tempUiCashPackage;
+            CacheCashPackageList.Generate(cashPackages, (index, cashShopItem, ui) =>
+            {
+                tempUiCashPackage = ui.GetComponent<UICashPackage>();
+                tempUiCashPackage.uiCashPackages = this;
+                tempUiCashPackage.Data = cashShopItem;
+                tempUiCashPackage.Show();
+                CacheCashPackageSelectionManager.Add(tempUiCashPackage);
+                if (selectedIdx == index)
+                    tempUiCashPackage.OnClickSelect();
+            });
         }
     }
 }

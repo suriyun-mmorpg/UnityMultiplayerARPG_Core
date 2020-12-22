@@ -83,37 +83,30 @@ namespace MultiplayerARPG
                 inputContent.interactable = true;
             if (inputGold != null)
                 inputGold.interactable = true;
-            if (responseCode == AckResponseCode.Timeout)
+
+            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
-                return;
-            }
-            switch (responseCode)
-            {
-                case AckResponseCode.Error:
-                    string errorMessage = string.Empty;
-                    switch (response.error)
-                    {
-                        case ResponseSendMailMessage.Error.NotAvailable:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());
-                            break;
-                        case ResponseSendMailMessage.Error.NotAllowed:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_SEND_NOT_ALLOWED.ToString());
-                            break;
-                        case ResponseSendMailMessage.Error.NoReceiver:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER.ToString());
-                            break;
-                        case ResponseSendMailMessage.Error.NotEnoughGold:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString());
-                            break;
-                    }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-                    break;
-                default:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_SEND_SUCCESS.ToString()));
-                    Hide();
-                    break;
-            }
+                string errorMessage = string.Empty;
+                switch (response.error)
+                {
+                    case ResponseSendMailMessage.Error.NotAvailable:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());
+                        break;
+                    case ResponseSendMailMessage.Error.NotAllowed:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_SEND_NOT_ALLOWED.ToString());
+                        break;
+                    case ResponseSendMailMessage.Error.NoReceiver:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER.ToString());
+                        break;
+                    case ResponseSendMailMessage.Error.NotEnoughGold:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString());
+                        break;
+                }
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+            })) return;
+            // Success, hide this dialog
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_SEND_SUCCESS.ToString()));
+            Hide();
         }
     }
 }

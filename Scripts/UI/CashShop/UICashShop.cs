@@ -104,94 +104,67 @@ namespace MultiplayerARPG
         private async UniTaskVoid ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Unimplemented)
+            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString()));
-                return;
-            }
-            if (responseCode == AckResponseCode.Timeout)
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString()));
+            })) return;
+
+            if (uiTextCash != null)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
-                return;
+                uiTextCash.text = string.Format(
+                    LanguageManager.GetText(formatKeyCash),
+                    response.cash.ToString("N0"));
             }
-            switch (responseCode)
+
+            List<CashShopItem> cashShopItems = new List<CashShopItem>();
+            foreach (int cashShopItemId in response.cashShopItemIds)
             {
-                case AckResponseCode.Error:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString()));
-                    break;
-                default:
-                    if (uiTextCash != null)
-                    {
-                        uiTextCash.text = string.Format(
-                            LanguageManager.GetText(formatKeyCash),
-                            response.cash.ToString("N0"));
-                    }
-
-                    List<CashShopItem> cashShopItems = new List<CashShopItem>();
-                    foreach (int cashShopItemId in response.cashShopItemIds)
-                    {
-                        CashShopItem cashShopItem;
-                        if (GameInstance.CashShopItems.TryGetValue(cashShopItemId, out cashShopItem))
-                            cashShopItems.Add(cashShopItem);
-                    }
-
-                    int selectedIdx = CacheCashShopSelectionManager.SelectedUI != null ? CacheCashShopSelectionManager.IndexOf(CacheCashShopSelectionManager.SelectedUI) : -1;
-                    CacheCashShopSelectionManager.DeselectSelectedUI();
-                    CacheCashShopSelectionManager.Clear();
-
-                    CacheCashShopList.Generate(cashShopItems, (index, cashShopItem, ui) =>
-                    {
-                        UICashShopItem uiCashShopItem = ui.GetComponent<UICashShopItem>();
-                        uiCashShopItem.uiCashShop = this;
-                        uiCashShopItem.Data = cashShopItem;
-                        uiCashShopItem.Show();
-                        CacheCashShopSelectionManager.Add(uiCashShopItem);
-                        if (selectedIdx == index)
-                            uiCashShopItem.OnClickSelect();
-                    });
-                    break;
+                CashShopItem cashShopItem;
+                if (GameInstance.CashShopItems.TryGetValue(cashShopItemId, out cashShopItem))
+                    cashShopItems.Add(cashShopItem);
             }
+
+            int selectedIdx = CacheCashShopSelectionManager.SelectedUI != null ? CacheCashShopSelectionManager.IndexOf(CacheCashShopSelectionManager.SelectedUI) : -1;
+            CacheCashShopSelectionManager.DeselectSelectedUI();
+            CacheCashShopSelectionManager.Clear();
+
+            CacheCashShopList.Generate(cashShopItems, (index, cashShopItem, ui) =>
+            {
+                UICashShopItem uiCashShopItem = ui.GetComponent<UICashShopItem>();
+                uiCashShopItem.uiCashShop = this;
+                uiCashShopItem.Data = cashShopItem;
+                uiCashShopItem.Show();
+                CacheCashShopSelectionManager.Add(uiCashShopItem);
+                if (selectedIdx == index)
+                    uiCashShopItem.OnClickSelect();
+            });
         }
 
         private async UniTaskVoid ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)
         {
             await UniTask.Yield();
-            if (responseCode == AckResponseCode.Unimplemented)
+            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString()));
-                return;
-            }
-            if (responseCode == AckResponseCode.Timeout)
-            {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
-                return;
-            }
-            switch (responseCode)
-            {
-                case AckResponseCode.Error:
-                    string errorMessage = string.Empty;
-                    switch (response.error)
-                    {
-                        case ResponseCashShopBuyMessage.Error.UserNotFound:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());
-                            break;
-                        case ResponseCashShopBuyMessage.Error.ItemNotFound:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_ITEM_NOT_FOUND.ToString());
-                            break;
-                        case ResponseCashShopBuyMessage.Error.NotEnoughCash:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString());
-                            break;
-                        case ResponseCashShopBuyMessage.Error.CannotCarryAllRewards:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_CARRY_ALL_REWARDS.ToString());
-                            break;
-                    }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-                    break;
-                default:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_SUCCESS_CASH_SHOP_BUY.ToString()));
-                    RefreshCashShopInfo();
-                    break;
-            }
+                string errorMessage = string.Empty;
+                switch (response.error)
+                {
+                    case ResponseCashShopBuyMessage.Error.UserNotFound:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());
+                        break;
+                    case ResponseCashShopBuyMessage.Error.ItemNotFound:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_ITEM_NOT_FOUND.ToString());
+                        break;
+                    case ResponseCashShopBuyMessage.Error.NotEnoughCash:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString());
+                        break;
+                    case ResponseCashShopBuyMessage.Error.CannotCarryAllRewards:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_CARRY_ALL_REWARDS.ToString());
+                        break;
+                }
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+            })) return;
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_SUCCESS_CASH_SHOP_BUY.ToString()));
+            RefreshCashShopInfo();
         }
     }
 }
