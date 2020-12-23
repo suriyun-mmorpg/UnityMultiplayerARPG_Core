@@ -16,6 +16,11 @@ namespace MultiplayerARPG
             get { return PlayerCharacters.Count; }
         }
 
+        public int UserIdsCount
+        {
+            get { return UserIds.Count; }
+        }
+
         public IEnumerable<IPlayerCharacterData> GetPlayerCharacters()
         {
             return PlayerCharacters.Values;
@@ -67,6 +72,11 @@ namespace MultiplayerARPG
             PlayerCharactersById.Clear();
             PlayerCharactersByName.Clear();
             UserIds.Clear();
+        }
+
+        public IEnumerable<string> GetUserIds()
+        {
+            return UserIds.Values;
         }
 
         public bool TryGetUserId(long connectionId, out string userId)
