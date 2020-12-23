@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         // Server Handlers
-        protected IServerUserHandlers ServerPlayerCharacterHandlers { get; set; }
+        protected IServerUserHandlers ServerUserHandlers { get; set; }
         protected IServerStorageHandlers ServerStorageHandlers { get; set; }
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
         protected IServerGuildHandlers ServerGuildHandlers { get; set; }
@@ -268,8 +268,8 @@ namespace MultiplayerARPG
         protected virtual void Clean()
         {
             this.InvokeInstanceDevExtMethods("Clean");
-            if (ServerPlayerCharacterHandlers != null)
-                ServerPlayerCharacterHandlers.ClearPlayerCharacters();
+            if (ServerUserHandlers != null)
+                ServerUserHandlers.ClearUsersAndPlayerCharacters();
             if (ServerStorageHandlers != null)
                 ServerStorageHandlers.ClearStorage();
             if (ServerPartyHandlers != null)
@@ -292,7 +292,7 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
-            GameInstance.ServerPlayerCharacterHandlers = ServerPlayerCharacterHandlers;
+            GameInstance.ServerUserHandlers = ServerUserHandlers;
             GameInstance.ServerStorageHandlers = ServerStorageHandlers;
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;
@@ -407,7 +407,7 @@ namespace MultiplayerARPG
 
             PartyData tempParty;
             GuildData tempGuild;
-            foreach (BasePlayerCharacterEntity playerCharacter in ServerPlayerCharacterHandlers.GetPlayerCharacters())
+            foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
             {
                 UpdateOnlineCharacter(playerCharacter);
 
@@ -621,7 +621,7 @@ namespace MultiplayerARPG
             if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
             {
                 if (!string.IsNullOrEmpty(message.sender) &&
-                    ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                    ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                 {
                     switch (message.channel)
                     {
@@ -644,7 +644,7 @@ namespace MultiplayerARPG
             {
                 case ChatChannel.Local:
                     if (!string.IsNullOrEmpty(message.sender) &&
-                        ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                        ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
                         string gmCommand;
                         if (CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
@@ -675,13 +675,13 @@ namespace MultiplayerARPG
                     break;
                 case ChatChannel.Whisper:
                     if (!string.IsNullOrEmpty(message.sender) &&
-                        ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                        ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
                         // If found sender send whisper message to sender
                         ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     if (!string.IsNullOrEmpty(message.receiver) &&
-                        ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
+                        ServerUserHandlers.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
                     {
                         // If found receiver send whisper message to receiver
                         ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
@@ -693,7 +693,7 @@ namespace MultiplayerARPG
                     {
                         foreach (string memberId in party.GetMemberIds())
                         {
-                            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
+                            if (ServerUserHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If party member is online, send party message to the member
@@ -708,7 +708,7 @@ namespace MultiplayerARPG
                     {
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
+                            if (ServerUserHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If guild member is online, send guild message to the member
@@ -1023,14 +1023,24 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
-        public virtual void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)
+        public virtual void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacter)
         {
-            ServerPlayerCharacterHandlers.AddPlayerCharacter(playerCharacterEntity.ConnectionId, playerCharacterEntity);
+            ServerUserHandlers.AddPlayerCharacter(connectionId, playerCharacter);
         }
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
         {
-            ServerPlayerCharacterHandlers.RemovePlayerCharacter(connectionId);
+            ServerUserHandlers.RemovePlayerCharacter(connectionId);
+        }
+
+        public virtual void RegisterUserId(long connectionId, string userId)
+        {
+            ServerUserHandlers.AddUserId(connectionId, userId);
+        }
+
+        public virtual void UnregisterUserId(long connectionId)
+        {
+            ServerUserHandlers.RemoveUserId(connectionId);
         }
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
@@ -1148,7 +1158,7 @@ namespace MultiplayerARPG
             // TODO: Don't use fixed user level
             BasePlayerCharacterEntity playerCharacter;
             return (!string.IsNullOrEmpty(sender) &&
-                    ServerPlayerCharacterHandlers.TryGetPlayerCharacterByName(sender, out playerCharacter) &&
+                    ServerUserHandlers.TryGetPlayerCharacterByName(sender, out playerCharacter) &&
                     playerCharacter.UserLevel > 0) ||
                     CHAT_SYSTEM_ANNOUNCER_SENDER.Equals(sender);
         }

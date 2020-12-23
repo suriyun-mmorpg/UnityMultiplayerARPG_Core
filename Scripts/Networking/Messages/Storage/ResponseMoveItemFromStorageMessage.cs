@@ -9,6 +9,7 @@ namespace MultiplayerARPG
             None,
             NotAvailable,
             NotAllowed,
+            NotLoggedIn,
             CharacterNotFound,
             InvalidItemIndex,
             CannotCarryAllItems,

@@ -60,6 +60,40 @@ namespace MultiplayerARPG
         /// <summary>
         /// Clear server's collection (and other relates variables)
         /// </summary>
-        void ClearPlayerCharacters();
+        void ClearUsersAndPlayerCharacters();
+
+        /// <summary>
+        /// Count online user IDs
+        /// </summary>
+        int UserIdsCount { get; }
+
+        /// <summary>
+        /// Get all online user IDs
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetUserIds();
+
+        /// <summary>
+        /// Get user id by connection id
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        bool TryGetUserId(long connectionId, out string userId);
+
+        /// <summary>
+        /// Add user id to server's collection
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        bool AddUserId(long connectionId, string userId);
+
+        /// <summary>
+        /// Remove user id from server's collection
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <returns></returns>
+        bool RemoveUserId(long connectionId);
     }
 }

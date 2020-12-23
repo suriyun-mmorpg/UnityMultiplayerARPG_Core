@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendChangePartyLeaderToClient(playerCharacterEntity.ConnectionId, party);
             }
         }
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendPartySettingToClient(playerCharacterEntity.ConnectionId, party);
             }
         }
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (!member.id.Equals(characterId) && ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (!member.id.Equals(characterId) && ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendAddPartyMemberToClient(playerCharacterEntity.ConnectionId, party.id, characterId, characterName, dataId, level);
             }
         }
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (!member.id.Equals(characterId) && ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (!member.id.Equals(characterId) && ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendRemovePartyMemberToClient(playerCharacterEntity.ConnectionId, party.id, characterId);
             }
         }
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendChangeGuildLeaderToClient(playerCharacterEntity.ConnectionId, guild);
             }
         }
@@ -154,7 +154,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildMessageToClient(playerCharacterEntity.ConnectionId, guild);
             }
         }
@@ -172,7 +172,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildRoleToClient(playerCharacterEntity.ConnectionId, guild.id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
             }
         }
@@ -204,7 +204,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildMemberRoleToClient(playerCharacterEntity.ConnectionId, guild.id, characterId, guildRole);
             }
         }
@@ -251,7 +251,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (!member.id.Equals(characterId) && ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (!member.id.Equals(characterId) && ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendAddGuildMemberToClient(playerCharacterEntity.ConnectionId, guild.id, characterId, characterName, dataId, level);
             }
         }
@@ -282,7 +282,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (!member.id.Equals(characterId) && ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (!member.id.Equals(characterId) && ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendRemoveGuildMemberToClient(playerCharacterEntity.ConnectionId, guild.id, characterId);
             }
         }
@@ -312,7 +312,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildSkillLevelToClient(playerCharacterEntity.ConnectionId, guild.id, dataId, skillLevel);
             }
         }
@@ -338,7 +338,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildGoldToClient(playerCharacterEntity.ConnectionId, guild.id, guild.gold);
             }
         }
@@ -356,7 +356,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                if (ServerUserHandlers.TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild);
             }
         }

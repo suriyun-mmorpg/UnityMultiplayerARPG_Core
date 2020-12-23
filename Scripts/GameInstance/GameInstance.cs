@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         public static IClientFriendHandlers ClientFriendHandlers { get; set; }
         public static IClientBankHandlers ClientBankHandlers { get; set; }
         public static IClientUserHandlers ClientUserHandlers { get; set; }
-        public static IServerUserHandlers ServerPlayerCharacterHandlers { get; set; }
+        public static IServerUserHandlers ServerUserHandlers { get; set; }
         public static IServerStorageHandlers ServerStorageHandlers { get; set; }
         public static IServerPartyHandlers ServerPartyHandlers { get; set; }
         public static IServerGuildHandlers ServerGuildHandlers { get; set; }
@@ -372,8 +372,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Not running headless, set target framerate higher
-                Application.targetFrameRate = 60;
+                // Not running headless
+                Application.targetFrameRate = -1;
             }
             Application.runInBackground = true;
             if (Singleton != null)

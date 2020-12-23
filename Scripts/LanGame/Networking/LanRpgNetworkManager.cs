@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             base.Awake();
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
             // Server Handlers
-            ServerPlayerCharacterHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
+            ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
             ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, LanRpgServerStorageHandlers>();
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
             ServerGuildHandlers = gameObject.GetOrAddComponent<IServerGuildHandlers, DefaultServerGuildHandlers>();
@@ -159,7 +159,7 @@ namespace MultiplayerARPG
         public override void UnregisterPlayerCharacter(long connectionId)
         {
             BasePlayerCharacterEntity playerCharacter;
-            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out playerCharacter))
+            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacter))
                 ServerStorageHandlers.CloseStorage(playerCharacter).Forget();
             base.UnregisterPlayerCharacter(connectionId);
         }
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.UserLevel = 1;
 
             // Load data for first character (host)
-            if (ServerPlayerCharacterHandlers.PlayerCharactersCount == 0)
+            if (ServerUserHandlers.PlayerCharactersCount == 0)
             {
                 if (enableGmCommands == EnableGmCommandType.HostOnly)
                     playerCharacterEntity.UserLevel = 1;
@@ -250,7 +250,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.CallAllOnDead();
 
             // Register player, will use registered player to send chat / player messages
-            RegisterPlayerCharacter(playerCharacterEntity);
+            RegisterPlayerCharacter(connectionId, playerCharacterEntity);
 
             SocialCharacterData[] members;
             // Set guild id

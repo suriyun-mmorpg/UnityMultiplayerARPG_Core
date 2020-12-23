@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public static readonly ConcurrentDictionary<long, IPlayerCharacterData> PlayerCharacters = new ConcurrentDictionary<long, IPlayerCharacterData>();
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersById = new ConcurrentDictionary<string, IPlayerCharacterData>();
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersByName = new ConcurrentDictionary<string, IPlayerCharacterData>();
+        public static readonly ConcurrentDictionary<long, string> UserIds = new ConcurrentDictionary<long, string>();
 
         public int PlayerCharactersCount
         {
@@ -60,11 +61,27 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ClearPlayerCharacters()
+        public void ClearUsersAndPlayerCharacters()
         {
             PlayerCharacters.Clear();
             PlayerCharactersById.Clear();
             PlayerCharactersByName.Clear();
+            UserIds.Clear();
+        }
+
+        public bool TryGetUserId(long connectionId, out string userId)
+        {
+            return UserIds.TryGetValue(connectionId, out userId);
+        }
+
+        public bool AddUserId(long connectionId, string userId)
+        {
+            return UserIds.TryAdd(connectionId, userId);
+        }
+
+        public bool RemoveUserId(long connectionId)
+        {
+            return UserIds.TryRemove(connectionId, out _);
         }
     }
 }

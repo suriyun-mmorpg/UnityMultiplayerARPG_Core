@@ -16,7 +16,7 @@ namespace MultiplayerARPG
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashShopBuyMessage.Error.UserNotFound;
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
@@ -145,7 +145,7 @@ namespace MultiplayerARPG
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class ServerPlayerCharacterHandlersExtensions
+    public static class ServerUserHandlersExtensions
     {
         public static bool TryGetPlayerCharacter<T>(this IServerUserHandlers handlers, long connectionId, out T playerCharacter)
             where T : Component, IPlayerCharacterData

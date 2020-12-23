@@ -427,7 +427,7 @@ namespace MultiplayerARPG
                             // Loop party member to fill looter list / increase gold / increase exp
                             foreach (SocialCharacterData member in tempPartyData.GetMembers())
                             {
-                                if (GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(member.id, out partyPlayerCharacterEntity))
+                                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(member.id, out partyPlayerCharacterEntity))
                                 {
                                     // If share exp, every party member will receive devided exp
                                     // If not share exp, character who make damage will receive non-devided exp

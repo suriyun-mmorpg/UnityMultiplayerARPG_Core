@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             short amount = request.amount;
             short inventoryIndex = request.inventoryIndex;
             IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             short amount = request.amount;
             short storageItemIndex = request.storageItemIndex;
             IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
             short fromIndex = request.fromIndex;
             short toIndex = request.toIndex;
             IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
