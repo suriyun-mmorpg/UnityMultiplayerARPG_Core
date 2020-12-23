@@ -7,14 +7,14 @@ namespace MultiplayerARPG
         public enum Error : byte
         {
             None,
+            InternalServerError,
             NotAvailable,
             NotAllowed,
-            CharacterNotFound,
+            NotLoggedIn,
             NameTooShort,
             NameTooLong,
             NameExisted,
             AlreadyJoined,
-            InternalServerError,
         }
         public Error error;
 

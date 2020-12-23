@@ -7,11 +7,11 @@ namespace MultiplayerARPG
         public enum Error : byte
         {
             None,
+            InternalServerError,
             NotAvailable,
             NotAllowed,
             AlreadyClaimed,
             CannotCarryAllItems,
-            InternalServerError,
         }
         public Error error;
         public Mail mail;

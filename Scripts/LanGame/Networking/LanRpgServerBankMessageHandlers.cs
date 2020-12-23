@@ -15,7 +15,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
-                    error = ResponseDepositGuildGoldMessage.Error.CharacterNotFound,
+                    error = ResponseDepositGuildGoldMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
                 {
-                    error = ResponseDepositUserGoldMessage.Error.CharacterNotFound,
+                    error = ResponseDepositUserGoldMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
-                    error = ResponseWithdrawGuildGoldMessage.Error.CharacterNotFound,
+                    error = ResponseWithdrawGuildGoldMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
                 {
-                    error = ResponseWithdrawUserGoldMessage.Error.CharacterNotFound,
+                    error = ResponseWithdrawUserGoldMessage.Error.NotLoggedIn,
                 });
                 return;
             }

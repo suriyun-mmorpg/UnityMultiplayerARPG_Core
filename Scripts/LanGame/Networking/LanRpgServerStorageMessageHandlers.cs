@@ -18,7 +18,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
-                    error = ResponseMoveItemFromStorageMessage.Error.CharacterNotFound,
+                    error = ResponseMoveItemFromStorageMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
-                    error = ResponseMoveItemToStorageMessage.Error.CharacterNotFound,
+                    error = ResponseMoveItemToStorageMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -184,7 +184,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = ResponseSwapOrMergeStorageItemMessage.Error.CharacterNotFound,
+                    error = ResponseSwapOrMergeStorageItemMessage.Error.NotLoggedIn,
                 });
                 return;
             }

@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
-                error = ResponseCashShopInfoMessage.Error.UserNotFound;
+                error = ResponseCashShopInfoMessage.Error.NotLoggedIn;
             }
             else
             {
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
-                error = ResponseCashShopBuyMessage.Error.UserNotFound;
+                error = ResponseCashShopBuyMessage.Error.NotLoggedIn;
             }
             else
             {
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
-                error = ResponseCashPackageInfoMessage.Error.UserNotFound;
+                error = ResponseCashPackageInfoMessage.Error.NotLoggedIn;
             }
             else
             {
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
-                error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
+                error = ResponseCashPackageBuyValidationMessage.Error.NotLoggedIn;
             }
             else
             {

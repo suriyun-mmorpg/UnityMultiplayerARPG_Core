@@ -148,7 +148,7 @@ namespace MultiplayerARPG
                 string errorMessage = string.Empty;
                 switch (response.error)
                 {
-                    case ResponseCashShopBuyMessage.Error.UserNotFound:
+                    case ResponseCashShopBuyMessage.Error.NotLoggedIn:
                         errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());
                         break;
                     case ResponseCashShopBuyMessage.Error.ItemNotFound:

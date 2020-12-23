@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
                 {
-                    error = ResponseSwapOrMergeItemMessage.Error.CharacterNotFound,
+                    error = ResponseSwapOrMergeItemMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
                 {
-                    error = ResponseEquipArmorMessage.Error.CharacterNotFound,
+                    error = ResponseEquipArmorMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
                 {
-                    error = ResponseEquipWeaponMessage.Error.CharacterNotFound,
+                    error = ResponseEquipWeaponMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
                 {
-                    error = ResponseUnEquipArmorMessage.Error.CharacterNotFound,
+                    error = ResponseUnEquipArmorMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -151,7 +151,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
                 {
-                    error = ResponseUnEquipWeaponMessage.Error.CharacterNotFound,
+                    error = ResponseUnEquipWeaponMessage.Error.NotLoggedIn,
                 });
                 return;
             }

@@ -17,7 +17,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
                 {
-                    error = ResponseAcceptGuildInvitationMessage.Error.CharacterNotFound,
+                    error = ResponseAcceptGuildInvitationMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
                 {
-                    error = ResponseDeclineGuildInvitationMessage.Error.CharacterNotFound,
+                    error = ResponseDeclineGuildInvitationMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -108,7 +108,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
-                    error = ResponseSendGuildInvitationMessage.Error.CharacterNotFound,
+                    error = ResponseSendGuildInvitationMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
                 {
-                    error = ResponseCreateGuildMessage.Error.CharacterNotFound,
+                    error = ResponseCreateGuildMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -210,7 +210,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
                 {
-                    error = ResponseChangeGuildLeaderMessage.Error.CharacterNotFound,
+                    error = ResponseChangeGuildLeaderMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -254,7 +254,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
                 {
-                    error = ResponseKickMemberFromGuildMessage.Error.CharacterNotFound,
+                    error = ResponseKickMemberFromGuildMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -306,7 +306,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
                 {
-                    error = ResponseLeaveGuildMessage.Error.CharacterNotFound,
+                    error = ResponseLeaveGuildMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -362,7 +362,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
                 {
-                    error = ResponseChangeGuildMessageMessage.Error.CharacterNotFound,
+                    error = ResponseChangeGuildMessageMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -403,7 +403,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
                 {
-                    error = ResponseChangeGuildRoleMessage.Error.CharacterNotFound,
+                    error = ResponseChangeGuildRoleMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -451,7 +451,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
                 {
-                    error = ResponseChangeMemberGuildRoleMessage.Error.CharacterNotFound,
+                    error = ResponseChangeMemberGuildRoleMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -495,7 +495,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
                 {
-                    error = ResponseIncreaseGuildSkillLevelMessage.Error.CharacterNotFound,
+                    error = ResponseIncreaseGuildSkillLevelMessage.Error.NotLoggedIn,
                 });
                 return;
             }
