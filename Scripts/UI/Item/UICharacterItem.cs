@@ -1246,8 +1246,8 @@ namespace MultiplayerARPG
                     characterId = characterId,
                     storageType = storageType,
                     storageOwnerId = storageOwnerId,
-                    inventoryIndex = (short)IndexOfData,
-                    amount = 1,
+                    inventoryItemIndex = (short)IndexOfData,
+                    inventoryItemAmount = 1,
                     storageItemIndex = -1,
                 }, ClientStorageActions.ResponseMoveItemToStorage);
             }
@@ -1272,8 +1272,8 @@ namespace MultiplayerARPG
                 characterId = characterId,
                 storageType = storageType,
                 storageOwnerId = storageOwnerId,
-                inventoryIndex = (short)IndexOfData,
-                amount = (short)amount,
+                inventoryItemIndex = (short)IndexOfData,
+                inventoryItemAmount = (short)amount,
                 storageItemIndex = -1,
             }, ClientStorageActions.ResponseMoveItemToStorage);
         }
@@ -1299,8 +1299,8 @@ namespace MultiplayerARPG
                     storageType = storageType,
                     storageOwnerId = storageOwnerId,
                     storageItemIndex = (short)IndexOfData,
-                    amount = 1,
-                    inventoryIndex = -1,
+                    storageItemAmount = 1,
+                    inventoryItemIndex = -1,
                 }, ClientStorageActions.ResponseMoveItemFromStorage);
             }
             else
@@ -1325,8 +1325,8 @@ namespace MultiplayerARPG
                 storageType = storageType,
                 storageOwnerId = storageOwnerId,
                 storageItemIndex = (short)IndexOfData,
-                amount = (short)amount,
-                inventoryIndex = -1,
+                storageItemAmount = (short)amount,
+                inventoryItemIndex = -1,
             }, ClientStorageActions.ResponseMoveItemFromStorage);
         }
         #endregion

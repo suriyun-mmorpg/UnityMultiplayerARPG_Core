@@ -11,8 +11,8 @@ namespace MultiplayerARPG
         {
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             short storageItemIndex = request.storageItemIndex;
-            short amount = request.amount;
-            short inventoryIndex = request.inventoryIndex;
+            short amount = request.storageItemAmount;
+            short inventoryIndex = request.inventoryItemIndex;
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -93,8 +93,8 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestMoveItemToStorage(RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemToStorageMessage> result)
         {
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
-            short inventoryIndex = request.inventoryIndex;
-            short amount = request.amount;
+            short inventoryIndex = request.inventoryItemIndex;
+            short amount = request.inventoryItemAmount;
             short storageItemIndex = request.storageItemIndex;
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))

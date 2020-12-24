@@ -110,8 +110,8 @@ namespace MultiplayerARPG
                         characterId = characterId,
                         storageType = storageType,
                         storageOwnerId = storageOwnerId,
-                        inventoryIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
-                        amount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
+                        inventoryItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                        inventoryItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
                         storageItemIndex = (short)uiCharacterItem.IndexOfData
                     }, ClientStorageActions.ResponseMoveItemToStorage);
                     break;
@@ -135,8 +135,8 @@ namespace MultiplayerARPG
                         storageType = storageType,
                         storageOwnerId = storageOwnerId,
                         storageItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
-                        amount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
-                        inventoryIndex = (short)uiCharacterItem.IndexOfData
+                        storageItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
+                        inventoryItemIndex = (short)uiCharacterItem.IndexOfData
                     }, ClientStorageActions.ResponseMoveItemFromStorage);
                     break;
                 case InventoryType.StorageItems:

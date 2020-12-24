@@ -8,8 +8,8 @@ namespace MultiplayerARPG
         public StorageType storageType;
         public string storageOwnerId;
         public short storageItemIndex;
-        public short amount;
-        public short inventoryIndex;
+        public short storageItemAmount;
+        public short inventoryItemIndex;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -17,8 +17,8 @@ namespace MultiplayerARPG
             storageType = (StorageType)reader.GetByte();
             storageOwnerId = reader.GetString();
             storageItemIndex = reader.GetPackedShort();
-            amount = reader.GetPackedShort();
-            inventoryIndex = reader.GetPackedShort();
+            storageItemAmount = reader.GetPackedShort();
+            inventoryItemIndex = reader.GetPackedShort();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -27,8 +27,8 @@ namespace MultiplayerARPG
             writer.Put((byte)storageType);
             writer.Put(storageOwnerId);
             writer.PutPackedShort(storageItemIndex);
-            writer.PutPackedShort(amount);
-            writer.PutPackedShort(inventoryIndex);
+            writer.PutPackedShort(storageItemAmount);
+            writer.PutPackedShort(inventoryItemIndex);
         }
     }
 }
