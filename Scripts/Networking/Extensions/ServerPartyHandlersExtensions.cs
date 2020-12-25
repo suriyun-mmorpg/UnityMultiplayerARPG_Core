@@ -85,7 +85,18 @@
         {
             GameMessage.Type gameMessageType;
             PartyData party;
-            if (!serverPartyHandlers.HasPartyInvitation(partyId, inviteeCharacter.Id))
+            if (partyId <= 0 || !serverPartyHandlers.TryGetParty(partyId, out party))
+            {
+                gameMessageType = GameMessage.Type.NotFoundParty;
+                return new ValidatePartyRequestResult(false, gameMessageType);
+            }
+            return serverPartyHandlers.CanAcceptPartyInvitation(party, inviteeCharacter);
+        }
+
+        public static ValidatePartyRequestResult CanAcceptPartyInvitation(this IServerPartyHandlers serverPartyHandlers, PartyData party, IPlayerCharacterData inviteeCharacter)
+        {
+            GameMessage.Type gameMessageType;
+            if (!serverPartyHandlers.HasPartyInvitation(party.id, inviteeCharacter.Id))
             {
                 gameMessageType = GameMessage.Type.NotFoundPartyInvitation;
                 return new ValidatePartyRequestResult(false, gameMessageType);
@@ -95,36 +106,37 @@
                 gameMessageType = GameMessage.Type.JoinedAnotherParty;
                 return new ValidatePartyRequestResult(false, gameMessageType);
             }
-            if (partyId <= 0 || !serverPartyHandlers.TryGetParty(partyId, out party))
-            {
-                gameMessageType = GameMessage.Type.NotFoundParty;
-                return new ValidatePartyRequestResult(false, gameMessageType);
-            }
             if (party.CountMember() >= party.MaxMember())
             {
                 gameMessageType = GameMessage.Type.PartyMemberReachedLimit;
                 return new ValidatePartyRequestResult(false, gameMessageType);
             }
             gameMessageType = GameMessage.Type.None;
-            return new ValidatePartyRequestResult(true, gameMessageType, partyId, party);
+            return new ValidatePartyRequestResult(true, gameMessageType, party.id, party);
         }
 
         public static ValidatePartyRequestResult CanDeclinePartyInvitation(this IServerPartyHandlers serverPartyHandlers, int partyId, IPlayerCharacterData inviteeCharacter)
         {
             GameMessage.Type gameMessageType;
             PartyData party;
-            if (!serverPartyHandlers.HasPartyInvitation(partyId, inviteeCharacter.Id))
-            {
-                gameMessageType = GameMessage.Type.NotFoundPartyInvitation;
-                return new ValidatePartyRequestResult(false, gameMessageType);
-            }
             if (partyId <= 0 || !serverPartyHandlers.TryGetParty(partyId, out party))
             {
                 gameMessageType = GameMessage.Type.NotFoundParty;
                 return new ValidatePartyRequestResult(false, gameMessageType);
             }
+            return serverPartyHandlers.CanDeclinePartyInvitation(party, inviteeCharacter);
+        }
+
+        public static ValidatePartyRequestResult CanDeclinePartyInvitation(this IServerPartyHandlers serverPartyHandlers, PartyData party, IPlayerCharacterData inviteeCharacter)
+        {
+            GameMessage.Type gameMessageType;
+            if (!serverPartyHandlers.HasPartyInvitation(party.id, inviteeCharacter.Id))
+            {
+                gameMessageType = GameMessage.Type.NotFoundPartyInvitation;
+                return new ValidatePartyRequestResult(false, gameMessageType);
+            }
             gameMessageType = GameMessage.Type.None;
-            return new ValidatePartyRequestResult(true, gameMessageType, partyId, party);
+            return new ValidatePartyRequestResult(true, gameMessageType, party.id, party);
         }
 
         public static ValidatePartyRequestResult CanKickMemberFromParty(this IServerPartyHandlers serverPartyHandlers, IPlayerCharacterData playerCharacter, string memberId)
