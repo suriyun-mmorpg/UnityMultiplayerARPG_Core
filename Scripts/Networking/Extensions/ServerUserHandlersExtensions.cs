@@ -12,7 +12,7 @@ namespace MultiplayerARPG
             if (handlers.TryGetPlayerCharacter(connectionId, out result))
             {
                 playerCharacter = result as T;
-                return true;
+                return playerCharacter != null;
             }
             return false;
         }
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             if (handlers.TryGetPlayerCharacterById(id, out result))
             {
                 playerCharacter = result as T;
-                return true;
+                return playerCharacter != null;
             }
             return false;
         }
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
             if (handlers.TryGetPlayerCharacterByName(name, out result))
             {
                 playerCharacter = result as T;
-                return true;
+                return playerCharacter != null;
             }
             return false;
         }
