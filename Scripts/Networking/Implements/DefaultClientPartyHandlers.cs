@@ -42,9 +42,9 @@ namespace MultiplayerARPG
             return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.KickMemberFromParty, data, responseDelegate: callback);
         }
 
-        public bool RequestLeaveParty(RequestLeavePartyMessage data, ResponseDelegate<ResponseLeavePartyMessage> callback)
+        public bool RequestLeaveParty(ResponseDelegate<ResponseLeavePartyMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.LeaveParty, data, responseDelegate: callback);
+            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.LeaveParty, new EmptyMessage(), responseDelegate: callback);
         }
     }
 }

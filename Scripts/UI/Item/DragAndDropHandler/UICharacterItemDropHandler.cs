@@ -92,7 +92,6 @@ namespace MultiplayerARPG
                     // Drop non equip item to non equip item
                     GameInstance.ClientInventoryHandlers.RequestSwapOrMergeItem(new RequestSwapOrMergeItemMessage()
                     {
-                        characterId = characterId,
                         fromIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
                         toIndex = (short)uiCharacterItem.IndexOfData,
                     }, UIInventoryResponses.ResponseSwapOrMergeItem);
@@ -107,7 +106,6 @@ namespace MultiplayerARPG
                     // Drop non equip item to storage item
                     GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
                     {
-                        characterId = characterId,
                         storageType = storageType,
                         storageOwnerId = storageOwnerId,
                         inventoryItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
@@ -131,7 +129,6 @@ namespace MultiplayerARPG
                     // Drop storage item to non equip item
                     GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
                     {
-                        characterId = characterId,
                         storageType = storageType,
                         storageOwnerId = storageOwnerId,
                         storageItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
@@ -143,7 +140,6 @@ namespace MultiplayerARPG
                     // Drop storage item to storage item
                     GameInstance.ClientStorageHandlers.RequestSwapOrMergeStorageItem(new RequestSwapOrMergeStorageItemMessage()
                     {
-                        characterId = characterId,
                         storageType = storageType,
                         storageOwnerId = storageOwnerId,
                         fromIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,

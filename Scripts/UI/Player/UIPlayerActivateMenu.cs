@@ -46,7 +46,6 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientPartyHandlers.RequestSendPartyInvitation(new RequestSendPartyInvitationMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 inviteeId = Data.Id,
             }, ClientPartyActions.ResponseSendPartyInvitation);
             Hide();
@@ -56,7 +55,6 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientGuildHandlers.RequestSendGuildInvitation(new RequestSendGuildInvitationMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 inviteeId = Data.Id,
             }, ClientGuildActions.ResponseSendGuildInvitation);
             Hide();

@@ -154,7 +154,7 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(GameNetworkingConsts.AcceptPartyInvitation);
             RegisterClientResponse<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(GameNetworkingConsts.DeclinePartyInvitation);
             RegisterClientResponse<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(GameNetworkingConsts.KickMemberFromParty);
-            RegisterClientResponse<RequestLeavePartyMessage, ResponseLeavePartyMessage>(GameNetworkingConsts.LeaveParty);
+            RegisterClientResponse<EmptyMessage, ResponseLeavePartyMessage>(GameNetworkingConsts.LeaveParty);
             // Guild
             RegisterClientResponse<RequestCreateGuildMessage, ResponseCreateGuildMessage>(GameNetworkingConsts.CreateGuild);
             RegisterClientResponse<RequestChangeGuildLeaderMessage, ResponseChangeGuildLeaderMessage>(GameNetworkingConsts.ChangeGuildLeader);
@@ -165,11 +165,11 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(GameNetworkingConsts.AcceptGuildInvitation);
             RegisterClientResponse<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(GameNetworkingConsts.DeclineGuildInvitation);
             RegisterClientResponse<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(GameNetworkingConsts.KickMemberFromGuild);
-            RegisterClientResponse<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(GameNetworkingConsts.LeaveGuild);
+            RegisterClientResponse<EmptyMessage, ResponseLeaveGuildMessage>(GameNetworkingConsts.LeaveGuild);
             RegisterClientResponse<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(GameNetworkingConsts.IncreaseGuildSkillLevel);
             // Friend
             RegisterClientResponse<RequestFindCharactersMessage, ResponseFindCharactersMessage>(GameNetworkingConsts.FindCharacters);
-            RegisterClientResponse<RequestGetFriendsMessage, ResponseGetFriendsMessage>(GameNetworkingConsts.GetFriends);
+            RegisterClientResponse<EmptyMessage, ResponseGetFriendsMessage>(GameNetworkingConsts.GetFriends);
             RegisterClientResponse<RequestAddFriendMessage, ResponseAddFriendMessage>(GameNetworkingConsts.AddFriend);
             RegisterClientResponse<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(GameNetworkingConsts.RemoveFriend);
             // Bank
@@ -230,7 +230,7 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestAcceptPartyInvitationMessage, ResponseAcceptPartyInvitationMessage>(GameNetworkingConsts.AcceptPartyInvitation, ServerPartyMessageHandlers.HandleRequestAcceptPartyInvitation);
                 RegisterServerRequest<RequestDeclinePartyInvitationMessage, ResponseDeclinePartyInvitationMessage>(GameNetworkingConsts.DeclinePartyInvitation, ServerPartyMessageHandlers.HandleRequestDeclinePartyInvitation);
                 RegisterServerRequest<RequestKickMemberFromPartyMessage, ResponseKickMemberFromPartyMessage>(GameNetworkingConsts.KickMemberFromParty, ServerPartyMessageHandlers.HandleRequestKickMemberFromParty);
-                RegisterServerRequest<RequestLeavePartyMessage, ResponseLeavePartyMessage>(GameNetworkingConsts.LeaveParty, ServerPartyMessageHandlers.HandleRequestLeaveParty);
+                RegisterServerRequest<EmptyMessage, ResponseLeavePartyMessage>(GameNetworkingConsts.LeaveParty, ServerPartyMessageHandlers.HandleRequestLeaveParty);
             }
             // Guild
             if (ServerGuildMessageHandlers != null)
@@ -244,14 +244,14 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestAcceptGuildInvitationMessage, ResponseAcceptGuildInvitationMessage>(GameNetworkingConsts.AcceptGuildInvitation, ServerGuildMessageHandlers.HandleRequestAcceptGuildInvitation);
                 RegisterServerRequest<RequestDeclineGuildInvitationMessage, ResponseDeclineGuildInvitationMessage>(GameNetworkingConsts.DeclineGuildInvitation, ServerGuildMessageHandlers.HandleRequestDeclineGuildInvitation);
                 RegisterServerRequest<RequestKickMemberFromGuildMessage, ResponseKickMemberFromGuildMessage>(GameNetworkingConsts.KickMemberFromGuild, ServerGuildMessageHandlers.HandleRequestKickMemberFromGuild);
-                RegisterServerRequest<RequestLeaveGuildMessage, ResponseLeaveGuildMessage>(GameNetworkingConsts.LeaveGuild, ServerGuildMessageHandlers.HandleRequestLeaveGuild);
+                RegisterServerRequest<EmptyMessage, ResponseLeaveGuildMessage>(GameNetworkingConsts.LeaveGuild, ServerGuildMessageHandlers.HandleRequestLeaveGuild);
                 RegisterServerRequest<RequestIncreaseGuildSkillLevelMessage, ResponseIncreaseGuildSkillLevelMessage>(GameNetworkingConsts.IncreaseGuildSkillLevel, ServerGuildMessageHandlers.HandleRequestIncreaseGuildSkillLevel);
             }
             // Friend
             if (ServerFriendMessageHandlers != null)
             {
                 RegisterServerRequest<RequestFindCharactersMessage, ResponseFindCharactersMessage>(GameNetworkingConsts.FindCharacters, ServerFriendMessageHandlers.HandleRequestFindCharacters);
-                RegisterServerRequest<RequestGetFriendsMessage, ResponseGetFriendsMessage>(GameNetworkingConsts.GetFriends, ServerFriendMessageHandlers.HandleRequestGetFriends);
+                RegisterServerRequest<EmptyMessage, ResponseGetFriendsMessage>(GameNetworkingConsts.GetFriends, ServerFriendMessageHandlers.HandleRequestGetFriends);
                 RegisterServerRequest<RequestAddFriendMessage, ResponseAddFriendMessage>(GameNetworkingConsts.AddFriend, ServerFriendMessageHandlers.HandleRequestAddFriend);
                 RegisterServerRequest<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(GameNetworkingConsts.RemoveFriend, ServerFriendMessageHandlers.HandleRequestRemoveFriend);
             }
@@ -283,7 +283,6 @@ namespace MultiplayerARPG
 
         public override bool StartServer()
         {
-            Clean();
             InitPrefabs();
             return base.StartServer();
         }
@@ -299,10 +298,14 @@ namespace MultiplayerARPG
             CurrentGameInstance.DayNightTimeUpdater.InitTimeOfDay(this);
         }
 
+        public override void OnStopServer()
+        {
+            Clean();
+            base.OnStopServer();
+        }
+
         public override bool StartClient(string networkAddress, int networkPort)
         {
-            if (!IsServer)
-                Clean();
             InitPrefabs();
             return base.StartClient(networkAddress, networkPort);
         }
@@ -320,6 +323,13 @@ namespace MultiplayerARPG
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
             GameInstance.ClientBankHandlers = ClientBankHandlers;
             GameInstance.ClientUserHandlers = ClientUserHandlers;
+        }
+
+        public override void OnStopClient()
+        {
+            if (!IsServer)
+                Clean();
+            base.OnStopClient();
         }
 
         public override void OnClientConnected()

@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             InternalServerError,
             NotAvailable,
             NotAllowed,
+            NotLoggedIn,
         }
         public Error error;
 

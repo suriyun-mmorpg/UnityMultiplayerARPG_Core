@@ -52,7 +52,6 @@ namespace MultiplayerARPG
 
             GameInstance.ClientGuildHandlers.RequestChangeGuildRole(new RequestChangeGuildRoleMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 guildRole = guildRole,
                 name = inputFieldRoleName.text,
                 canInvite = toggleCanInvite != null && toggleCanInvite.isOn,

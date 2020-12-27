@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseKickMemberFromPartyMessage> result);
 
         UniTaskVoid HandleRequestLeaveParty(
-            RequestHandlerData requestHandler, RequestLeavePartyMessage request,
+            RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseLeavePartyMessage> result);
     }
 }

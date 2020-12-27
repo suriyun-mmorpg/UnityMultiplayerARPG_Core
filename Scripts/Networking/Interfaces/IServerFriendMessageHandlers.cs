@@ -13,7 +13,7 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseFindCharactersMessage> result);
 
         UniTaskVoid HandleRequestGetFriends(
-            RequestHandlerData requestHandler, RequestGetFriendsMessage request,
+            RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseGetFriendsMessage> result);
 
         UniTaskVoid HandleRequestAddFriend(

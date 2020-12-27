@@ -1243,7 +1243,6 @@ namespace MultiplayerARPG
                 string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
                 GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
                 {
-                    characterId = characterId,
                     storageType = storageType,
                     storageOwnerId = storageOwnerId,
                     inventoryItemIndex = (short)IndexOfData,
@@ -1269,7 +1268,6 @@ namespace MultiplayerARPG
             string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
             {
-                characterId = characterId,
                 storageType = storageType,
                 storageOwnerId = storageOwnerId,
                 inventoryItemIndex = (short)IndexOfData,
@@ -1295,7 +1293,6 @@ namespace MultiplayerARPG
                 string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
                 GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
                 {
-                    characterId = characterId,
                     storageType = storageType,
                     storageOwnerId = storageOwnerId,
                     storageItemIndex = (short)IndexOfData,
@@ -1321,7 +1318,6 @@ namespace MultiplayerARPG
             string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
             {
-                characterId = characterId,
                 storageType = storageType,
                 storageOwnerId = storageOwnerId,
                 storageItemIndex = (short)IndexOfData,

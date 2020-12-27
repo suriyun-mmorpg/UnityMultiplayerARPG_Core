@@ -4,7 +4,6 @@ namespace MultiplayerARPG
 {
     public struct RequestChangeGuildRoleMessage : INetSerializable
     {
-        public string characterId;
         public byte guildRole;
         public string name;
         public bool canInvite;
@@ -13,7 +12,6 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            characterId = reader.GetString();
             guildRole = reader.GetByte();
             name = reader.GetString();
             canInvite = reader.GetBool();
@@ -23,7 +21,6 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(characterId);
             writer.Put(guildRole);
             writer.Put(name);
             writer.Put(canInvite);

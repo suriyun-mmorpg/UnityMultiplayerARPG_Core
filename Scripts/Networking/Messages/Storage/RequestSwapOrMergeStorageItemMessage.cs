@@ -4,7 +4,6 @@ namespace MultiplayerARPG
 {
     public struct RequestSwapOrMergeStorageItemMessage : INetSerializable
     {
-        public string characterId;
         public StorageType storageType;
         public string storageOwnerId;
         public short fromIndex;
@@ -12,7 +11,6 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            characterId = reader.GetString();
             storageType = (StorageType)reader.GetByte();
             storageOwnerId = reader.GetString();
             fromIndex = reader.GetPackedShort();
@@ -21,7 +19,6 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(characterId);
             writer.Put((byte)storageType);
             writer.Put(storageOwnerId);
             writer.PutPackedShort(fromIndex);

@@ -40,7 +40,6 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientGuildHandlers.RequestCreateGuild(new RequestCreateGuildMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 guildName = inputFieldGuildName.text,
             }, ClientGuildActions.ResponseCreateGuild);
             Hide();

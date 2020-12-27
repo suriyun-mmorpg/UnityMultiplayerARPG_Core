@@ -52,9 +52,9 @@ namespace MultiplayerARPG
             return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.KickMemberFromGuild, data, responseDelegate: callback);
         }
 
-        public bool RequestLeaveGuild(RequestLeaveGuildMessage data, ResponseDelegate<ResponseLeaveGuildMessage> callback)
+        public bool RequestLeaveGuild(ResponseDelegate<ResponseLeaveGuildMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.LeaveGuild, data, responseDelegate: callback);
+            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.LeaveGuild, new EmptyMessage(), responseDelegate: callback);
         }
 
         public bool RequestIncreaseGuildSkillLevel(RequestIncreaseGuildSkillLevelMessage data, ResponseDelegate<ResponseIncreaseGuildSkillLevelMessage> callback)

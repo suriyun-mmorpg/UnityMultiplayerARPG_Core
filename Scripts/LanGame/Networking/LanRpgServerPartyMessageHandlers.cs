@@ -294,7 +294,7 @@ namespace MultiplayerARPG
             result.Invoke(AckResponseCode.Success, new ResponseKickMemberFromPartyMessage());
         }
 
-        public async UniTaskVoid HandleRequestLeaveParty(RequestHandlerData requestHandler, RequestLeavePartyMessage request, RequestProceedResultDelegate<ResponseLeavePartyMessage> result)
+        public async UniTaskVoid HandleRequestLeaveParty(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseLeavePartyMessage> result)
         {
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;

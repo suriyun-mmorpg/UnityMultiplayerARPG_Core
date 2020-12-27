@@ -97,7 +97,6 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientPartyHandlers.RequestChangePartyLeader(new RequestChangePartyLeaderMessage()
                 {
-                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     memberId = partyMember.id,
                 }, ClientPartyActions.ResponseChangePartyLeader);
             });
@@ -125,7 +124,6 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()
                 {
-                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     memberId = partyMember.id,
                 }, ClientPartyActions.ResponseKickMemberFromParty);
             });
@@ -135,10 +133,7 @@ namespace MultiplayerARPG
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
-                GameInstance.ClientPartyHandlers.RequestLeaveParty(new RequestLeavePartyMessage()
-                {
-                    characterId = GameInstance.ClientUserHandlers.CharacterId,
-                }, ClientPartyActions.ResponseLeaveParty);
+                GameInstance.ClientPartyHandlers.RequestLeaveParty(ClientPartyActions.ResponseLeaveParty);
             });
         }
 

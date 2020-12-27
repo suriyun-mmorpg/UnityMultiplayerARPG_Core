@@ -5,9 +5,9 @@ namespace MultiplayerARPG
 {
     public class DefaultClientFriendHandlers : MonoBehaviour, IClientFriendHandlers
     {
-        public bool RequestGetFriends(RequestGetFriendsMessage data, ResponseDelegate<ResponseGetFriendsMessage> callback)
+        public bool RequestGetFriends(ResponseDelegate<ResponseGetFriendsMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.GetFriends, data, responseDelegate: callback);
+            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.GetFriends, new EmptyMessage(), responseDelegate: callback);
         }
 
         public bool RequestFindCharacters(RequestFindCharactersMessage data, ResponseDelegate<ResponseFindCharactersMessage> callback)

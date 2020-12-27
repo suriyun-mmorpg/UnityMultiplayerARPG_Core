@@ -11,7 +11,6 @@
         {
             GameInstance.ClientBankHandlers.RequestDepositUserGold(new RequestDepositUserGoldMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 gold = amount,
             }, ClientBankActions.ResponseDepositUserGold);
         }
@@ -20,7 +19,6 @@
         {
             GameInstance.ClientBankHandlers.RequestWithdrawUserGold(new RequestWithdrawUserGoldMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 gold = amount,
             }, ClientBankActions.ResponseWithdrawUserGold);
         }

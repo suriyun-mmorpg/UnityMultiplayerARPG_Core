@@ -22,7 +22,6 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientPartyHandlers.RequestCreateParty(new RequestCreatePartyMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 shareExp = toggleShareExp != null && toggleShareExp.isOn,
                 shareItem = toggleShareItem != null && toggleShareItem.isOn,
             }, ClientPartyActions.ResponseCreateParty);

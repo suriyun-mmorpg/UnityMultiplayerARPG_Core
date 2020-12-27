@@ -23,7 +23,6 @@ namespace MultiplayerARPG
                     if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
                         handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                         {
-                            characterId = playerCharacter.Id,
                             nonEquipIndex = nonEquipIndex,
                             equipWeaponSet = playerCharacter.EquipWeaponSet,
                             isLeftHand = true,
@@ -31,7 +30,6 @@ namespace MultiplayerARPG
                     else
                         handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                         {
-                            characterId = playerCharacter.Id,
                             nonEquipIndex = nonEquipIndex,
                             equipWeaponSet = playerCharacter.EquipWeaponSet,
                             isLeftHand = false,
@@ -41,7 +39,6 @@ namespace MultiplayerARPG
                 {
                     handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                     {
-                        characterId = playerCharacter.Id,
                         nonEquipIndex = nonEquipIndex,
                         equipWeaponSet = playerCharacter.EquipWeaponSet,
                         isLeftHand = false,
@@ -53,7 +50,6 @@ namespace MultiplayerARPG
                 // Shield can equip at left-hand only
                 handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                 {
-                    characterId = playerCharacter.Id,
                     nonEquipIndex = nonEquipIndex,
                     equipWeaponSet = playerCharacter.EquipWeaponSet,
                     isLeftHand = true,
@@ -87,7 +83,6 @@ namespace MultiplayerARPG
                 }
                 handlers.RequestEquipArmor(new RequestEquipArmorMessage()
                 {
-                    characterId = playerCharacter.Id,
                     nonEquipIndex = nonEquipIndex,
                     equipSlotIndex = equippingSlotIndex,
                 }, responseEquipArmor);
@@ -101,7 +96,6 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     handlers.RequestEquipArmor(new RequestEquipArmorMessage()
                     {
-                        characterId = characterId,
                         nonEquipIndex = nonEquipIndex,
                         equipSlotIndex = equipSlotIndex,
                     }, responseEquipArmor);
@@ -109,7 +103,6 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponRight:
                     handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                     {
-                        characterId = characterId,
                         nonEquipIndex = nonEquipIndex,
                         equipWeaponSet = equipSlotIndex,
                         isLeftHand = false,
@@ -118,7 +111,6 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponLeft:
                     handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                     {
-                        characterId = characterId,
                         nonEquipIndex = nonEquipIndex,
                         equipWeaponSet = equipSlotIndex,
                         isLeftHand = true,
@@ -134,7 +126,6 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     handlers.RequestUnEquipArmor(new RequestUnEquipArmorMessage()
                     {
-                        characterId = characterId,
                         equipIndex = equipItemIndex,
                         nonEquipIndex = nonEquipIndex,
                     }, responseUnEquipArmor);
@@ -142,7 +133,6 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponRight:
                     handlers.RequestUnEquipWeapon(new RequestUnEquipWeaponMessage()
                     {
-                        characterId = characterId,
                         equipWeaponSet = equipWeaponSet,
                         isLeftHand = false,
                         nonEquipIndex = nonEquipIndex,
@@ -151,7 +141,6 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponLeft:
                     handlers.RequestUnEquipWeapon(new RequestUnEquipWeaponMessage()
                     {
-                        characterId = characterId,
                         equipWeaponSet = equipWeaponSet,
                         isLeftHand = true,
                         nonEquipIndex = nonEquipIndex,

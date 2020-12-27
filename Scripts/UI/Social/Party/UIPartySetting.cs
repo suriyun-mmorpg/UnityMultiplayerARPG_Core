@@ -22,7 +22,6 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientPartyHandlers.RequestChangePartySetting(new RequestChangePartySettingMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 shareExp = toggleShareExp != null && toggleShareExp.isOn,
                 shareItem = toggleShareItem != null && toggleShareItem.isOn,
             }, ClientPartyActions.ResponseChangePartySetting);

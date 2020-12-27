@@ -280,7 +280,6 @@ namespace MultiplayerARPG
                 return;
             GameInstance.ClientGuildHandlers.RequestIncreaseGuildSkillLevel(new RequestIncreaseGuildSkillLevelMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 dataId = GuildSkill.DataId,
             }, ClientGuildActions.ResponseIncreaseGuildSkillLevel);
         }

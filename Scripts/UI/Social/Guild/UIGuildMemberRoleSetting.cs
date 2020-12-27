@@ -61,7 +61,6 @@ namespace MultiplayerARPG
             }
             GameInstance.ClientGuildHandlers.RequestChangeMemberGuildRole(new RequestChangeMemberGuildRoleMessage()
             {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
                 guildRole = (byte)dropdownRoles.value,
             }, ClientGuildActions.ResponseChangeMemberGuildRole);
             Hide();

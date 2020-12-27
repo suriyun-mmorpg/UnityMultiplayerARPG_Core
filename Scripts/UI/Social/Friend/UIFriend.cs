@@ -20,10 +20,7 @@ namespace MultiplayerARPG
 
         public void Refresh()
         {
-            GameInstance.ClientFriendHandlers.RequestGetFriends(new RequestGetFriendsMessage()
-            {
-                characterId = GameInstance.ClientUserHandlers.CharacterId,
-            }, GetFriendsCallback);
+            GameInstance.ClientFriendHandlers.RequestGetFriends(GetFriendsCallback);
         }
 
         private async UniTaskVoid GetFriendsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetFriendsMessage response)
@@ -100,7 +97,6 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
                 {
-                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     friendId = friend.id,
                 }, ClientFriendActions.ResponseRemoveFriend);
             });

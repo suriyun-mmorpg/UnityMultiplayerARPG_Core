@@ -334,7 +334,6 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientGuildHandlers.RequestChangeGuildLeader(new RequestChangeGuildLeaderMessage()
                 {
-                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     memberId = guildMember.id,
                 }, ClientGuildActions.ResponseChangeGuildLeader);
             });
@@ -376,7 +375,6 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientGuildHandlers.RequestChangeGuildMessage(new RequestChangeGuildMessageMessage()
                 {
-                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     message = inputFieldMessage.text,
                 }, ClientGuildActions.ResponseChangeGuildMessage);
             }
@@ -393,7 +391,6 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
                 {
-                    characterId = GameInstance.ClientUserHandlers.CharacterId,
                     memberId = guildMember.id,
                 }, ClientGuildActions.ResponseKickMemberFromGuild);
             });
@@ -403,10 +400,7 @@ namespace MultiplayerARPG
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
-                GameInstance.ClientGuildHandlers.RequestLeaveGuild(new RequestLeaveGuildMessage()
-                {
-                    characterId = GameInstance.ClientUserHandlers.CharacterId,
-                }, ClientGuildActions.ResponseLeaveGuild);
+                GameInstance.ClientGuildHandlers.RequestLeaveGuild(ClientGuildActions.ResponseLeaveGuild);
             });
         }
 

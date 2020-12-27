@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseKickMemberFromGuildMessage> result);
 
         UniTaskVoid HandleRequestLeaveGuild(
-            RequestHandlerData requestHandler, RequestLeaveGuildMessage request,
+            RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseLeaveGuildMessage> result);
 
         UniTaskVoid HandleRequestIncreaseGuildSkillLevel(
