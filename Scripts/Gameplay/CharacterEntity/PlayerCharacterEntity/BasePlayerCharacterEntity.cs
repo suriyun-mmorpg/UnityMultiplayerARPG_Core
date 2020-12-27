@@ -143,7 +143,7 @@ namespace MultiplayerARPG
                     {
                         if (DealingCharacter.IncreaseItems(dealingItem.characterItem))
                         {
-                            CurrentGameManager.SendNotifyRewardItem(DealingCharacter.ConnectionId, dealingItem.characterItem.dataId, dealingItem.characterItem.amount);
+                            GameInstance.ServerGameMessageHandlers.SendNotifyRewardItem(DealingCharacter.ConnectionId, dealingItem.characterItem.dataId, dealingItem.characterItem.amount);
                             // Reduce item amount when able to increase item to co character
                             nonEquipItem.amount -= dealingItem.characterItem.amount;
                             if (nonEquipItem.amount == 0)
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
             DealingCharacter.FillEmptySlots();
             Gold -= DealingGold;
             DealingCharacter.Gold = DealingCharacter.Gold.Increase(gold);
-            CurrentGameManager.SendNotifyRewardGold(DealingCharacter.ConnectionId, DealingGold);
+            GameInstance.ServerGameMessageHandlers.SendNotifyRewardGold(DealingCharacter.ConnectionId, DealingGold);
         }
 
         public void ClearDealingData()

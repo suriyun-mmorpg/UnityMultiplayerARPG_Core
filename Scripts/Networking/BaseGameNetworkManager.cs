@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         // Server Handlers
         protected IServerUserHandlers ServerUserHandlers { get; set; }
+        protected IServerGameMessageHandlers ServerGameMessageHandlers { get; set; }
         protected IServerStorageHandlers ServerStorageHandlers { get; set; }
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
         protected IServerGuildHandlers ServerGuildHandlers { get; set; }
@@ -292,6 +293,7 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
             GameInstance.ServerUserHandlers = ServerUserHandlers;
+            GameInstance.ServerGameMessageHandlers = ServerGameMessageHandlers;
             GameInstance.ServerStorageHandlers = ServerStorageHandlers;
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;

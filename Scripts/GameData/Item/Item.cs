@@ -546,7 +546,7 @@ namespace MultiplayerARPG
 
             GameMessage.Type gameMessageType;
             if (!character.AddAttribute(out gameMessageType, attributeAmount.attribute.DataId, (short)attributeAmount.amount, itemIndex))
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(character.ConnectionId, gameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(character.ConnectionId, gameMessageType);
         }
 
         protected void UseItemAttributeReset(BasePlayerCharacterEntity character, short itemIndex)
@@ -564,7 +564,7 @@ namespace MultiplayerARPG
 
             GameMessage.Type gameMessageType;
             if (!character.AddSkill(out gameMessageType, UsingSkill.DataId, UsingSkillLevel, itemIndex))
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(character.ConnectionId, gameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(character.ConnectionId, gameMessageType);
         }
 
         protected void UseItemSkillReset(BasePlayerCharacterEntity character, short itemIndex)

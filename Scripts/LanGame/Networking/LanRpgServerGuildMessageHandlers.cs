@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
                 {
                     error = ResponseAcceptGuildInvitationMessage.Error.NotLoggedIn,
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanAcceptGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseAcceptGuildInvitationMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             validateResult.Guild.AddMember(playerCharacter);
             GameInstance.ServerGuildHandlers.SetGuild(request.guildId, validateResult.Guild);
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
-            BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.GuildInvitationAccepted);
+            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.GuildInvitationAccepted);
             BaseGameNetworkManager.Singleton.SendCreateGuildToClient(requestHandler.ConnectionId, validateResult.Guild);
             BaseGameNetworkManager.Singleton.SendAddGuildMembersToClient(requestHandler.ConnectionId, validateResult.Guild);
             BaseGameNetworkManager.Singleton.SendAddGuildMemberToClients(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
                 {
                     error = ResponseDeclineGuildInvitationMessage.Error.NotLoggedIn,
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanDeclineGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseDeclineGuildInvitationMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
                 return;
             }
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
-            BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
+            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
             result.Invoke(AckResponseCode.Success, new ResponseDeclineGuildInvitationMessage());
         }
 
@@ -105,7 +105,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
                     error = ResponseSendGuildInvitationMessage.Error.NotLoggedIn,
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSendGuildInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseSendGuildInvitationMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -163,7 +163,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
                 {
                     error = ResponseCreateGuildMessage.Error.NotLoggedIn,
@@ -173,7 +173,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = playerCharacter.CanCreateGuild(request.guildName);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseCreateGuildMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseChangeGuildLeaderMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -261,7 +261,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanKickMemberFromGuild(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseKickMemberFromGuildMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -313,7 +313,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanLeaveGuild(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseLeaveGuildMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -369,7 +369,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMessage(playerCharacter, request.message);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseChangeGuildMessageMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -410,7 +410,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseChangeGuildRoleMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -458,7 +458,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseChangeMemberGuildRoleMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {
@@ -502,7 +502,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanIncreaseGuildSkillLevel(playerCharacter, request.dataId);
             if (!validateResult.IsSuccess)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
                 ResponseIncreaseGuildSkillLevelMessage.Error error;
                 switch (validateResult.GameMessageType)
                 {

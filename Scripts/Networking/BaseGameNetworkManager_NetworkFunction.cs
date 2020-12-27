@@ -369,44 +369,6 @@ namespace MultiplayerARPG
             });
         }
 
-        public void SendServerGameMessage(long connectionId, GameMessage.Type type)
-        {
-            GameMessage message = new GameMessage();
-            message.type = type;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.GameMessage, message);
-        }
-
-        public void SendNotifyRewardExp(long connectionId, int exp)
-        {
-            if (exp <= 0)
-                return;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardExp, (writer) =>
-            {
-                writer.PutPackedInt(exp);
-            });
-        }
-
-        public void SendNotifyRewardGold(long connectionId, int gold)
-        {
-            if (gold <= 0)
-                return;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardGold, (writer) =>
-            {
-                writer.PutPackedInt(gold);
-            });
-        }
-
-        public void SendNotifyRewardItem(long connectionId, int dataId, short amount)
-        {
-            if (amount <= 0)
-                return;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardItem, (writer) =>
-            {
-                writer.PutPackedInt(dataId);
-                writer.PutPackedShort(amount);
-            });
-        }
-
         public void SendNotifyStorageOpenedToClient(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
         {
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageOpened, (writer) =>
@@ -432,12 +394,12 @@ namespace MultiplayerARPG
             });
         }
 
-        public void SendNotifyStorageItemsUpdatedToClients(HashSet<long> connectionIds, List<CharacterItem> storageITems)
+        public void SendNotifyStorageItemsUpdatedToClients(HashSet<long> connectionIds, List<CharacterItem> storageItems)
         {
             foreach (long connectionId in connectionIds)
             {
                 if (Players.ContainsKey(connectionId))
-                    SendNotifyStorageItemsUpdatedToClient(connectionId, storageITems);
+                    SendNotifyStorageItemsUpdatedToClient(connectionId, storageItems);
             }
         }
 

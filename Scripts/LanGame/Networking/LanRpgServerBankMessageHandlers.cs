@@ -12,7 +12,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
                     error = ResponseDepositGuildGoldMessage.Error.NotLoggedIn,
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
                     error = ResponseDepositGuildGoldMessage.Error.GuildNotFound,
@@ -31,7 +31,7 @@ namespace MultiplayerARPG
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
                     error = ResponseDepositGuildGoldMessage.Error.GoldNotEnough,
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
                 {
                     error = ResponseDepositUserGoldMessage.Error.NotLoggedIn,
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
                 {
                     error = ResponseDepositUserGoldMessage.Error.GoldNotEnough,
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
                     error = ResponseWithdrawGuildGoldMessage.Error.NotLoggedIn,
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
                     error = ResponseWithdrawGuildGoldMessage.Error.GuildNotFound,
@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             }
             if (guild.gold - request.gold < 0)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
                     error = ResponseWithdrawGuildGoldMessage.Error.GoldNotEnough,
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
                 {
                     error = ResponseWithdrawUserGoldMessage.Error.NotLoggedIn,
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
             }
             if (playerCharacter.UserGold - request.gold < 0)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
                 {
                     error = ResponseWithdrawUserGoldMessage.Error.GoldNotEnough,

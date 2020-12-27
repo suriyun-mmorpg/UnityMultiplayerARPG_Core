@@ -22,7 +22,7 @@ namespace MultiplayerARPG
             if (!playerCharacter.SwapOrMergeItem(request.fromIndex, request.toIndex, out gameMessage))
             {
                 ResponseSwapOrMergeItemMessage.Error error = ResponseSwapOrMergeItemMessage.Error.NotAllowed;
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, gameMessage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 switch(gameMessage)
                 {
                     case GameMessage.Type.InvalidItemData:
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
             if (!playerCharacter.EquipArmor(request.nonEquipIndex, request.equipSlotIndex, out gameMessage))
             {
                 ResponseEquipArmorMessage.Error error = ResponseEquipArmorMessage.Error.NotAllowed;
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, gameMessage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 switch (gameMessage)
                 {
                     case GameMessage.Type.InvalidItemData:
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             if (!playerCharacter.EquipWeapon(request.nonEquipIndex, request.equipWeaponSet, request.isLeftHand, out gameMessage))
             {
                 ResponseEquipWeaponMessage.Error error = ResponseEquipWeaponMessage.Error.NotAllowed;
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, gameMessage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 switch (gameMessage)
                 {
                     case GameMessage.Type.InvalidItemData:
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             if (!playerCharacter.UnEquipArmor(request.equipIndex, false, out gameMessage, out _, request.nonEquipIndex))
             {
                 ResponseUnEquipArmorMessage.Error error = ResponseUnEquipArmorMessage.Error.NotAllowed;
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, gameMessage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 switch (gameMessage)
                 {
                     case GameMessage.Type.InvalidItemData:
@@ -159,7 +159,7 @@ namespace MultiplayerARPG
             if (!playerCharacter.UnEquipWeapon(request.equipWeaponSet, request.isLeftHand, false, out gameMessage, out _, request.nonEquipIndex))
             {
                 ResponseUnEquipWeaponMessage.Error error = ResponseUnEquipWeaponMessage.Error.NotAllowed;
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, gameMessage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 switch (gameMessage)
                 {
                     case GameMessage.Type.InvalidItemData:

@@ -46,7 +46,7 @@ namespace MultiplayerARPG
             if (this.IncreasingItemsWillOverwhelming(quest.rewardItems))
             {
                 // Overwhelming
-                CurrentGameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
             // Decrease task items
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
                     if (rewardItem.item != null && rewardItem.amount > 0)
                     {
                         this.IncreaseItems(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount));
-                        CurrentGameManager.SendNotifyRewardItem(ConnectionId, rewardItem.item.DataId, rewardItem.amount);
+                        GameInstance.ServerGameMessageHandlers.SendNotifyRewardItem(ConnectionId, rewardItem.item.DataId, rewardItem.amount);
                     }
                 }
             }
