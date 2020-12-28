@@ -112,6 +112,10 @@ namespace MultiplayerARPG
             RegisterClientMessage(GameNetworkingConsts.Chat, HandleChatAtClient);
             RegisterClientMessage(GameNetworkingConsts.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
             RegisterClientMessage(GameNetworkingConsts.UpdateMapInfo, HandleUpdateMapInfoAtClient);
+            if (ClientOnlineCharacterHandlers != null)
+            {
+                RegisterClientMessage(GameNetworkingConsts.NotifyOnlineCharacter, ClientOnlineCharacterHandlers.HandleNotifyOnlineCharacter);
+            }
             if (ClientGameMessageHandlers != null)
             {
                 RegisterClientMessage(GameNetworkingConsts.GameMessage, ClientGameMessageHandlers.HandleGameMessage);
@@ -128,10 +132,6 @@ namespace MultiplayerARPG
                 RegisterClientMessage(GameNetworkingConsts.NotifyStorageItemsUpdated, ClientGameMessageHandlers.HandleNotifyStorageItems);
                 RegisterClientMessage(GameNetworkingConsts.NotifyPartyInvitation, ClientGameMessageHandlers.HandleNotifyPartyInvitation);
                 RegisterClientMessage(GameNetworkingConsts.NotifyGuildInvitation, ClientGameMessageHandlers.HandleNotifyGuildInvitation);
-            }
-            if (ClientOnlineCharacterHandlers != null)
-            {
-                RegisterClientMessage(GameNetworkingConsts.NotifyOnlineCharacter, ClientOnlineCharacterHandlers.HandleNotifyOnlineCharacter);
             }
             // Responses
             // Cash shop
