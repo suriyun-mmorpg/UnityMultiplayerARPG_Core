@@ -16,7 +16,7 @@
                     break;
                 case StorageType.Building:
                     StorageEntity buildingEntity;
-                    if (BaseGameNetworkManager.Singleton.TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
+                    if (GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity))
                     {
                         objectId = buildingEntity.ObjectId;
                         storage = buildingEntity.storage;
@@ -41,7 +41,7 @@
                     break;
                 case StorageType.Building:
                     StorageEntity buildingEntity;
-                    if (!BaseGameNetworkManager.Singleton.TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity) ||
+                    if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity) ||
                         !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.canUseByEveryone))
                         return false;
                     break;

@@ -8,8 +8,8 @@ namespace MultiplayerARPG
     public abstract class BaseGameSaveSystem : ScriptableObject
     {
         public abstract void OnServerStart();
-        public abstract UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<string, BuildingEntity> buildingEntities, IDictionary<StorageId, List<CharacterItem>> storageItems);
-        public abstract void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, IDictionary<string, BuildingEntity> buildingEntities);
+        public abstract UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems);
+        public abstract void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, IEnumerable<IBuildingSaveData> buildings);
         public abstract void SaveStorage(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems);
         public abstract void SaveCharacter(IPlayerCharacterData playerCharacterData);
         public abstract List<PlayerCharacterData> LoadCharacters();

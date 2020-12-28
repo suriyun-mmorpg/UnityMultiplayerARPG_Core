@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         // Server Handlers
         protected IServerUserHandlers ServerUserHandlers { get; set; }
+        protected IServerBuildingHandlers ServerBuildingHandlers { get; set; }
         protected IServerGameMessageHandlers ServerGameMessageHandlers { get; set; }
         protected IServerStorageHandlers ServerStorageHandlers { get; set; }
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
@@ -46,7 +47,6 @@ namespace MultiplayerARPG
         protected IClientBankHandlers ClientBankHandlers { get; set; }
         protected IClientUserHandlers ClientUserHandlers { get; set; }
 
-        public static readonly Dictionary<string, BuildingEntity> BuildingEntities = new Dictionary<string, BuildingEntity>();
         public static readonly Dictionary<string, NotifyOnlineCharacterTime> LastCharacterOnlineTimes = new Dictionary<string, NotifyOnlineCharacterTime>();
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
@@ -271,13 +271,14 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("Clean");
             if (ServerUserHandlers != null)
                 ServerUserHandlers.ClearUsersAndPlayerCharacters();
+            if (ServerBuildingHandlers != null)
+                ServerBuildingHandlers.ClearBuildings();
             if (ServerStorageHandlers != null)
                 ServerStorageHandlers.ClearStorage();
             if (ServerPartyHandlers != null)
                 ServerPartyHandlers.ClearParty();
             if (ServerGuildHandlers != null)
                 ServerGuildHandlers.ClearGuild();
-            BuildingEntities.Clear();
             LastCharacterOnlineTimes.Clear();
             CurrentMapInfo = null;
         }
@@ -293,6 +294,7 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
             GameInstance.ServerUserHandlers = ServerUserHandlers;
+            GameInstance.ServerBuildingHandlers = ServerBuildingHandlers;
             GameInstance.ServerGameMessageHandlers = ServerGameMessageHandlers;
             GameInstance.ServerStorageHandlers = ServerStorageHandlers;
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
@@ -1070,7 +1072,7 @@ namespace MultiplayerARPG
                 buildingEntity.CreatorId = saveData.CreatorId;
                 buildingEntity.CreatorName = saveData.CreatorName;
                 Assets.NetworkSpawn(spawnObj);
-                BuildingEntities[buildingEntity.Id] = buildingEntity;
+                ServerBuildingHandlers.AddBuilding(buildingEntity.Id, buildingEntity);
                 buildingEntity.CallAllOnBuildingConstruct();
                 return buildingEntity;
             }
@@ -1079,22 +1081,12 @@ namespace MultiplayerARPG
 
         public virtual void DestroyBuildingEntity(string id)
         {
-            if (BuildingEntities.ContainsKey(id))
+            BuildingEntity buildingEntity;
+            if (ServerBuildingHandlers.TryGetBuilding(id, out buildingEntity))
             {
-                BuildingEntities[id].Destroy();
-                BuildingEntities.Remove(id);
+                buildingEntity.Destroy();
+                ServerBuildingHandlers.RemoveBuilding(id);
             }
-        }
-
-        public bool TryGetBuildingEntity<T>(string id, out T entity) where T : BuildingEntity
-        {
-            entity = null;
-            if (BuildingEntities.ContainsKey(id))
-            {
-                entity = BuildingEntities[id] as T;
-                return entity;
-            }
-            return false;
         }
 
         public void SetMapInfo(string mapId)

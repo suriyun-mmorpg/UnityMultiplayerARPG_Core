@@ -205,7 +205,7 @@ namespace MultiplayerARPG
             if (IsServer && !parentFound)
             {
                 BuildingEntity parent;
-                if (CurrentGameManager.TryGetBuildingEntity(ParentId, out parent))
+                if (GameInstance.ServerBuildingHandlers.TryGetBuilding(ParentId, out parent))
                 {
                     parentFound = true;
                     parent.AddChildren(this);

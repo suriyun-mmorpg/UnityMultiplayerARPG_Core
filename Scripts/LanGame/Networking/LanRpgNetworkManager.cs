@@ -40,6 +40,7 @@ namespace MultiplayerARPG
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
             // Server Handlers
             ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
+            ServerBuildingHandlers = gameObject.GetOrAddComponent<IServerBuildingHandlers, DefaultServerBuildingHandlers>();
             ServerGameMessageHandlers = gameObject.GetOrAddComponent<IServerGameMessageHandlers, DefaultServerGameMessageHandlers>();
             ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, LanRpgServerStorageHandlers>();
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
@@ -110,7 +111,7 @@ namespace MultiplayerARPG
 
         protected override async UniTask PreSpawnEntities()
         {
-            await SaveSystem.PreSpawnEntities(selectedCharacter, BuildingEntities, ServerStorageHandlers.GetAllStorageItems());
+            await SaveSystem.PreSpawnEntities(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
         }
 
         public override void OnStopHost()
@@ -134,7 +135,7 @@ namespace MultiplayerARPG
                     SaveSystem.SaveCharacter(owningCharacter);
                     if (IsServer)
                     {
-                        SaveSystem.SaveWorld(owningCharacter, BuildingEntities);
+                        SaveSystem.SaveWorld(owningCharacter, ServerBuildingHandlers.GetBuildings());
                         SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
                     }
                 }
@@ -315,9 +316,9 @@ namespace MultiplayerARPG
             {
                 // Save data before warp
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-                SaveSystem.SaveWorld(owningCharacter, BuildingEntities);
+                SaveSystem.SaveWorld(owningCharacter, ServerBuildingHandlers.GetBuildings());
                 SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
-                BuildingEntities.Clear();
+                ServerBuildingHandlers.ClearBuildings();
                 ServerStorageHandlers.ClearStorage();
                 SetMapInfo(mapInfo);
                 teleportPosition = position;

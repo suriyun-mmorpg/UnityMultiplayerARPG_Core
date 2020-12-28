@@ -17,10 +17,9 @@ namespace MultiplayerARPG
             isReadyToSave = false;
         }
 
-        public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<string, BuildingEntity> buildingEntities, IDictionary<StorageId, List<CharacterItem>> storageItems)
+        public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
-            buildingEntities.Clear();
             storageItems.Clear();
             if (hostPlayerCharacterData != null && !string.IsNullOrEmpty(hostPlayerCharacterData.Id))
             {
@@ -77,14 +76,14 @@ namespace MultiplayerARPG
             storageSaveData.SavePersistentData(hostPlayerCharacterData.Id);
         }
 
-        public override void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, IDictionary<string, BuildingEntity> buildingEntities)
+        public override void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, IEnumerable<IBuildingSaveData> buildings)
         {
             if (!isReadyToSave)
                 return;
 
             // Save building entities / Tree / Rocks
             worldSaveData.buildings.Clear();
-            foreach (BuildingEntity buildingEntity in buildingEntities.Values)
+            foreach (IBuildingSaveData buildingEntity in buildings)
             {
                 if (buildingEntity == null) continue;
                 worldSaveData.buildings.Add(new BuildingSaveData()
