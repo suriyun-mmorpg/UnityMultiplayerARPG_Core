@@ -69,7 +69,7 @@ namespace MultiplayerARPG
                 return;
             validateResult.Guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(validateResult.Guild, exp);
             SetGuild(validateResult.GuildId, validateResult.Guild);
-            BaseGameNetworkManager.Singleton.SendGuildLevelExpSkillPointToClients(validateResult.Guild);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(validateResult.Guild);
         }
 
         private string GetGuildInvitationId(int guildId, string characterId)

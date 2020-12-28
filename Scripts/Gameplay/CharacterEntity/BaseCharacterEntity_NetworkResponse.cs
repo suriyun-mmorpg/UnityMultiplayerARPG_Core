@@ -82,7 +82,7 @@ namespace MultiplayerARPG
 
             this.IncreaseItems(itemDropEntity.DropItems, (dataId, level, amount) =>
             {
-                GameInstance.ServerGameMessageHandlers.SendNotifyRewardItem(ConnectionId, dataId, amount);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
             });
             this.FillEmptySlots();
             itemDropEntity.PickedUp();

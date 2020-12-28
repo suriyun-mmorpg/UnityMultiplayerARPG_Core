@@ -440,12 +440,12 @@ namespace MultiplayerARPG
 
             foreach (long connectionId in updatingPartyMembers.Keys)
             {
-                SendUpdatePartyMembersToClient(connectionId, updatingPartyMembers[connectionId]);
+                ServerGameMessageHandlers.SendUpdatePartyMembersToOne(connectionId, updatingPartyMembers[connectionId]);
             }
 
             foreach (long connectionId in updatingGuildMembers.Keys)
             {
-                SendUpdateGuildMembersToClient(connectionId, updatingGuildMembers[connectionId]);
+                ServerGameMessageHandlers.SendUpdateGuildMembersToOne(connectionId, updatingGuildMembers[connectionId]);
             }
         }
 
