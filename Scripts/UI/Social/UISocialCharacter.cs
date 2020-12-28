@@ -37,16 +37,16 @@ namespace MultiplayerARPG
             foreach (GameObject obj in memberIsOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(BaseGameNetworkManager.IsCharacterOnline(Data.socialCharacter.id));
+                    obj.SetActive(GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.socialCharacter.id));
             }
 
             foreach (GameObject obj in memberIsNotOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!BaseGameNetworkManager.IsCharacterOnline(Data.socialCharacter.id));
+                    obj.SetActive(!GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.socialCharacter.id));
             }
 
-            BaseGameNetworkManager.RequestOnlineCharacter(Data.socialCharacter.id);
+            GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.socialCharacter.id);
         }
 
         protected override void UpdateData()

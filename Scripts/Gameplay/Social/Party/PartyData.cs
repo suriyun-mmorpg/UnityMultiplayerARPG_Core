@@ -58,7 +58,7 @@ namespace MultiplayerARPG
                 if (memberId.Equals(leaderId))
                     continue;
                 tempMember = members[memberId];
-                if (!BaseGameNetworkManager.IsCharacterOnline(memberId))
+                if (!GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(memberId))
                 {
                     offlineMembers.Add(tempMember);
                     continue;

@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         // Server Handlers
         protected IServerUserHandlers ServerUserHandlers { get; set; }
         protected IServerBuildingHandlers ServerBuildingHandlers { get; set; }
+        protected IServerOnlineCharacterHandlers ServerOnlineCharacterHandlers { get; set; }
         protected IServerGameMessageHandlers ServerGameMessageHandlers { get; set; }
         protected IServerStorageHandlers ServerStorageHandlers { get; set; }
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
@@ -46,9 +47,9 @@ namespace MultiplayerARPG
         protected IClientFriendHandlers ClientFriendHandlers { get; set; }
         protected IClientBankHandlers ClientBankHandlers { get; set; }
         protected IClientUserHandlers ClientUserHandlers { get; set; }
+        protected IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
         protected IClientGameMessageHandlers ClientGameMessageHandlers { get; set; }
 
-        public static readonly Dictionary<string, NotifyOnlineCharacterTime> LastCharacterOnlineTimes = new Dictionary<string, NotifyOnlineCharacterTime>();
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
         // Events
@@ -111,7 +112,27 @@ namespace MultiplayerARPG
             RegisterClientMessage(GameNetworkingConsts.Chat, HandleChatAtClient);
             RegisterClientMessage(GameNetworkingConsts.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
             RegisterClientMessage(GameNetworkingConsts.UpdateMapInfo, HandleUpdateMapInfoAtClient);
-            RegisterClientMessage(GameNetworkingConsts.NotifyOnlineCharacter, HandleNotifyOnlineCharacterAtClient);
+            if (ClientGameMessageHandlers != null)
+            {
+                RegisterClientMessage(GameNetworkingConsts.GameMessage, ClientGameMessageHandlers.HandleGameMessage);
+                RegisterClientMessage(GameNetworkingConsts.UpdatePartyMember, ClientGameMessageHandlers.HandleUpdatePartyMember);
+                RegisterClientMessage(GameNetworkingConsts.UpdateParty, ClientGameMessageHandlers.HandleUpdateParty);
+                RegisterClientMessage(GameNetworkingConsts.UpdateGuildMember, ClientGameMessageHandlers.HandleUpdateGuildMember);
+                RegisterClientMessage(GameNetworkingConsts.UpdateGuild, ClientGameMessageHandlers.HandleUpdateGuild);
+                RegisterClientMessage(GameNetworkingConsts.UpdateFriends, ClientGameMessageHandlers.HandleUpdateFriends);
+                RegisterClientMessage(GameNetworkingConsts.NotifyRewardExp, ClientGameMessageHandlers.HandleNotifyRewardExp);
+                RegisterClientMessage(GameNetworkingConsts.NotifyRewardGold, ClientGameMessageHandlers.HandleNotifyRewardGold);
+                RegisterClientMessage(GameNetworkingConsts.NotifyRewardItem, ClientGameMessageHandlers.HandleNotifyRewardItem);
+                RegisterClientMessage(GameNetworkingConsts.NotifyStorageOpened, ClientGameMessageHandlers.HandleNotifyStorageOpened);
+                RegisterClientMessage(GameNetworkingConsts.NotifyStorageClosed, ClientGameMessageHandlers.HandleNotifyStorageClosed);
+                RegisterClientMessage(GameNetworkingConsts.NotifyStorageItemsUpdated, ClientGameMessageHandlers.HandleNotifyStorageItems);
+                RegisterClientMessage(GameNetworkingConsts.NotifyPartyInvitation, ClientGameMessageHandlers.HandleNotifyPartyInvitation);
+                RegisterClientMessage(GameNetworkingConsts.NotifyGuildInvitation, ClientGameMessageHandlers.HandleNotifyGuildInvitation);
+            }
+            if (ClientOnlineCharacterHandlers != null)
+            {
+                RegisterClientMessage(GameNetworkingConsts.NotifyOnlineCharacter, ClientOnlineCharacterHandlers.HandleNotifyOnlineCharacter);
+            }
             // Responses
             // Cash shop
             RegisterClientResponse<EmptyMessage, ResponseCashShopInfoMessage>(GameNetworkingConsts.CashShopInfo);
@@ -173,7 +194,10 @@ namespace MultiplayerARPG
             base.RegisterServerMessages();
             // Networking messages
             RegisterServerMessage(GameNetworkingConsts.Chat, HandleChatAtServer);
-            RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
+            if (ServerOnlineCharacterHandlers != null)
+            {
+                RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerOnlineCharacterHandlers.HandleRequestOnlineCharacter);
+            }
             // Requests
             // Cash shop
             if (ServerCashShopMessageHandlers != null)
@@ -256,17 +280,22 @@ namespace MultiplayerARPG
         protected virtual void Clean()
         {
             this.InvokeInstanceDevExtMethods("Clean");
+            // Server components
             if (ServerUserHandlers != null)
                 ServerUserHandlers.ClearUsersAndPlayerCharacters();
             if (ServerBuildingHandlers != null)
                 ServerBuildingHandlers.ClearBuildings();
+            if (ServerOnlineCharacterHandlers != null)
+                ServerOnlineCharacterHandlers.ClearOnlineCharacters();
             if (ServerStorageHandlers != null)
                 ServerStorageHandlers.ClearStorage();
             if (ServerPartyHandlers != null)
                 ServerPartyHandlers.ClearParty();
             if (ServerGuildHandlers != null)
                 ServerGuildHandlers.ClearGuild();
-            LastCharacterOnlineTimes.Clear();
+            // Client components
+            if (ClientOnlineCharacterHandlers != null)
+                ClientOnlineCharacterHandlers.ClearOnlineCharacters();
             CurrentMapInfo = null;
         }
 
@@ -283,6 +312,7 @@ namespace MultiplayerARPG
             GameInstance.ServerUserHandlers = ServerUserHandlers;
             GameInstance.ServerBuildingHandlers = ServerBuildingHandlers;
             GameInstance.ServerGameMessageHandlers = ServerGameMessageHandlers;
+            GameInstance.ServerOnlineCharacterHandlers = ServerOnlineCharacterHandlers;
             GameInstance.ServerStorageHandlers = ServerStorageHandlers;
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;
@@ -314,6 +344,7 @@ namespace MultiplayerARPG
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
             GameInstance.ClientBankHandlers = ClientBankHandlers;
             GameInstance.ClientUserHandlers = ClientUserHandlers;
+            GameInstance.ClientOnlineCharacterHandlers = ClientOnlineCharacterHandlers;
         }
 
         public override void OnStopClient()
@@ -344,61 +375,9 @@ namespace MultiplayerARPG
             SendTimeOfDay(connectionId);
         }
 
-        public static void NotifyOnlineCharacter(string characterId)
-        {
-            NotifyOnlineCharacterTime notifyTime;
-            if (!LastCharacterOnlineTimes.TryGetValue(characterId, out notifyTime))
-            {
-                LastCharacterOnlineTimes.Add(characterId, new NotifyOnlineCharacterTime()
-                {
-                    LastNotifyTime = Time.unscaledTime
-                });
-            }
-            else
-            {
-                notifyTime.LastNotifyTime = Time.unscaledTime;
-                LastCharacterOnlineTimes[characterId] = notifyTime;
-            }
-        }
-
-        public static void RequestOnlineCharacter(string characterId)
-        {
-            if (Singleton == null || Singleton.IsServer || !Singleton.IsClientConnected)
-                return;
-
-            float unscaledTime = Time.unscaledTime;
-            NotifyOnlineCharacterTime notifyTime;
-            if (!LastCharacterOnlineTimes.TryGetValue(characterId, out notifyTime))
-            {
-                LastCharacterOnlineTimes.Add(characterId, new NotifyOnlineCharacterTime()
-                {
-                    LastRequestTime = unscaledTime
-                });
-            }
-            else
-            {
-                if (unscaledTime - notifyTime.LastRequestTime < 1.5f)
-                    return;
-
-                notifyTime.LastRequestTime = unscaledTime;
-                LastCharacterOnlineTimes[characterId] = notifyTime;
-            }
-            Singleton.ClientSendPacket(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
-            {
-                writer.Put(characterId);
-            });
-        }
-
-        public static bool IsCharacterOnline(string characterId)
-        {
-            NotifyOnlineCharacterTime notifyTime;
-            return LastCharacterOnlineTimes.TryGetValue(characterId, out notifyTime) &&
-                Time.unscaledTime - notifyTime.LastNotifyTime <= 2f;
-        }
-
         protected virtual void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            NotifyOnlineCharacter(playerCharacterEntity.Id);
+            ServerOnlineCharacterHandlers.MarkOnlineCharacter(playerCharacterEntity.Id);
         }
 
         protected virtual void UpdateOnlineCharacters()
@@ -464,11 +443,6 @@ namespace MultiplayerARPG
                 return;
             UpdateTimeOfDayMessage message = messageHandler.ReadMessage<UpdateTimeOfDayMessage>();
             CurrentGameInstance.DayNightTimeUpdater.SetTimeOfDay(message.timeOfDay);
-        }
-
-        protected void HandleNotifyOnlineCharacterAtClient(MessageHandlerData messageHandler)
-        {
-            NotifyOnlineCharacter(messageHandler.Reader.GetString());
         }
 
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
@@ -585,19 +559,6 @@ namespace MultiplayerARPG
                         ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
-            }
-        }
-
-        protected virtual void HandleRequestOnlineCharacter(MessageHandlerData messageHandler)
-        {
-            string characterId = messageHandler.Reader.GetString();
-            if (IsCharacterOnline(characterId))
-            {
-                // Notify back online character
-                ServerSendPacket(messageHandler.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
-                {
-                    writer.Put(characterId);
-                });
             }
         }
 
