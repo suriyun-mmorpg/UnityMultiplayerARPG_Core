@@ -1,54 +1,34 @@
 ﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class DefaultClientGameMessageHandlers : MonoBehaviour, IClientGameMessageHandlers
     {
-        public void RegisterGameMessageHandlers(LiteNetLibManager.LiteNetLibManager manager)
-        {
-            manager.RegisterClientMessage(GameNetworkingConsts.GameMessage, HandleGameMessageAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.UpdateParty, HandleUpdatePartyAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.UpdateGuild, HandleUpdateGuildAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.UpdateFriends, HandleUpdateFriendsAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.NotifyRewardExp, HandleNotifyRewardExpAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.NotifyRewardGold, HandleNotifyRewardGoldAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.NotifyRewardItem, HandleNotifyRewardItemAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.NotifyStorageOpened, HandleNotifyStorageOpenedAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.NotifyStorageClosed, HandleNotifyStorageClosedAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.NotifyStorageItemsUpdated, HandleNotifyStorageItemsUpdatedAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.NotifyPartyInvitation, HandleNotifyPartyInvitationAtClient);
-            manager.RegisterClientMessage(GameNetworkingConsts.NotifyGuildInvitation, HandleNotifyGuildInvitationAtClient);
-        }
-
-        protected void HandleGameMessageAtClient(MessageHandlerData messageHandler)
+        public void HandleGameMessage(MessageHandlerData messageHandler)
         {
             ClientGenericActions.ClientReceiveGameMessage(messageHandler.ReadMessage<GameMessage>());
         }
 
-        protected void HandleNotifyRewardExpAtClient(MessageHandlerData messageHandler)
+        public void HandleNotifyRewardExp(MessageHandlerData messageHandler)
         {
             ClientGenericActions.NotifyRewardExp(messageHandler.Reader.GetPackedInt());
         }
 
-        protected void HandleNotifyRewardGoldAtClient(MessageHandlerData messageHandler)
+        public void HandleNotifyRewardGold(MessageHandlerData messageHandler)
         {
             ClientGenericActions.NotifyRewardGold(messageHandler.Reader.GetPackedInt());
         }
 
-        protected void HandleNotifyRewardItemAtClient(MessageHandlerData messageHandler)
+        public void HandleNotifyRewardItem(MessageHandlerData messageHandler)
         {
             ClientGenericActions.NotifyRewardItem(
                 messageHandler.Reader.GetPackedInt(),
                 messageHandler.Reader.GetPackedShort());
         }
 
-        protected void HandleNotifyStorageOpenedAtClient(MessageHandlerData messageHandler)
+        public void HandleNotifyStorageOpened(MessageHandlerData messageHandler)
         {
             ClientStorageActions.NotifyStorageOpened(
                 (StorageType)messageHandler.Reader.GetByte(),
@@ -58,34 +38,34 @@ namespace MultiplayerARPG
                 messageHandler.Reader.GetPackedShort());
         }
 
-        protected void HandleNotifyStorageClosedAtClient(MessageHandlerData messageHandler)
+        public void HandleNotifyStorageClosed(MessageHandlerData messageHandler)
         {
             ClientStorageActions.NotifyStorageClosed();
         }
 
-        protected void HandleNotifyStorageItemsUpdatedAtClient(MessageHandlerData messageHandler)
+        public void HandleNotifyStorageItems(MessageHandlerData messageHandler)
         {
             ClientStorageActions.NotifyStorageItemsUpdated(messageHandler.Reader.GetList<CharacterItem>());
         }
 
-        protected void HandleNotifyPartyInvitationAtClient(MessageHandlerData messageHandler)
+        public void HandleNotifyPartyInvitation(MessageHandlerData messageHandler)
         {
             ClientPartyActions.NotifyPartyInvitation(messageHandler.ReadMessage<PartyInvitationData>());
         }
 
-        protected void HandleNotifyGuildInvitationAtClient(MessageHandlerData messageHandler)
+        public void HandleNotifyGuildInvitation(MessageHandlerData messageHandler)
         {
             ClientGuildActions.NotifyGuildInvitation(messageHandler.ReadMessage<GuildInvitationData>());
         }
 
-        protected void HandleUpdatePartyMemberAtClient(MessageHandlerData messageHandler)
+        public void HandleUpdatePartyMember(MessageHandlerData messageHandler)
         {
             if (GameInstance.ClientPartyHandlers.ClientParty != null)
                 GameInstance.ClientPartyHandlers.ClientParty.UpdateSocialGroupMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
             ClientPartyActions.NotifyPartyUpdated(GameInstance.ClientPartyHandlers.ClientParty);
         }
 
-        protected void HandleUpdatePartyAtClient(MessageHandlerData messageHandler)
+        public void HandleUpdateParty(MessageHandlerData messageHandler)
         {
             UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (message.type == UpdatePartyMessage.UpdateType.Create)
@@ -110,14 +90,14 @@ namespace MultiplayerARPG
             ClientPartyActions.NotifyPartyUpdated(GameInstance.ClientPartyHandlers.ClientParty);
         }
 
-        protected void HandleUpdateGuildMemberAtClient(MessageHandlerData messageHandler)
+        public void HandleUpdateGuildMember(MessageHandlerData messageHandler)
         {
             if (GameInstance.ClientGuildHandlers.ClientGuild != null)
                 GameInstance.ClientGuildHandlers.ClientGuild.UpdateSocialGroupMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
             ClientGuildActions.NotifyGuildUpdated(GameInstance.ClientGuildHandlers.ClientGuild);
         }
 
-        protected void HandleUpdateGuildAtClient(MessageHandlerData messageHandler)
+        public void HandleUpdateGuild(MessageHandlerData messageHandler)
         {
             UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (message.type == UpdateGuildMessage.UpdateType.Create)
@@ -163,7 +143,7 @@ namespace MultiplayerARPG
             ClientGuildActions.NotifyGuildUpdated(GameInstance.ClientGuildHandlers.ClientGuild);
         }
 
-        protected void HandleUpdateFriendsAtClient(MessageHandlerData messageHandler)
+        public void HandleUpdateFriends(MessageHandlerData messageHandler)
         {
             ClientFriendActions.NotifyFriendsUpdated(messageHandler.Reader.GetArray<SocialCharacterData>());
         }

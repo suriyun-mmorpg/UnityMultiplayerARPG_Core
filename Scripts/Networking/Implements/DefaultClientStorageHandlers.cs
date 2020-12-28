@@ -7,20 +7,26 @@ namespace MultiplayerARPG
     {
         public StorageType StorageType { get; set; }
         public string StorageOwnerId { get; set; }
+        public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
+
+        private void Awake()
+        {
+            Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
+        }
 
         public bool RequestMoveItemFromStorage(RequestMoveItemFromStorageMessage data, ResponseDelegate<ResponseMoveItemFromStorageMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.MoveItemFromStorage, data, responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.MoveItemFromStorage, data, responseDelegate: callback);
         }
 
         public bool RequestMoveItemToStorage(RequestMoveItemToStorageMessage data, ResponseDelegate<ResponseMoveItemToStorageMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.MoveItemToStorage, data, responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.MoveItemToStorage, data, responseDelegate: callback);
         }
 
         public bool RequestSwapOrMergeStorageItem(RequestSwapOrMergeStorageItemMessage data, ResponseDelegate<ResponseSwapOrMergeStorageItemMessage> callback)
         {
-            return BaseGameNetworkManager.Singleton.ClientSendRequest(GameNetworkingConsts.SwapOrMergeStorageItem, data, responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.SwapOrMergeStorageItem, data, responseDelegate: callback);
         }
     }
 }
