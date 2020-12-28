@@ -149,5 +149,28 @@ namespace MultiplayerARPG
             leaderId = reader.GetString();
             members = reader.GetDictionary<string, SocialCharacterData>();
         }
+
+        public bool UpdateSocialGroupMember(UpdateSocialMemberMessage message)
+        {
+            if (id != message.id)
+                return false;
+
+            switch (message.type)
+            {
+                case UpdateSocialMemberMessage.UpdateType.Add:
+                    AddMember(message.data);
+                    break;
+                case UpdateSocialMemberMessage.UpdateType.Update:
+                    UpdateMember(message.data);
+                    break;
+                case UpdateSocialMemberMessage.UpdateType.Remove:
+                    RemoveMember(message.data.id);
+                    break;
+                case UpdateSocialMemberMessage.UpdateType.Clear:
+                    ClearMembers();
+                    break;
+            }
+            return true;
+        }
     }
 }
