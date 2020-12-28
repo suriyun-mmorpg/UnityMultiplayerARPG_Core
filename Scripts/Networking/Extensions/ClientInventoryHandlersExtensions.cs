@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void RequestEquipItem(this IClientInventoryHandlers handlers, string characterId, short nonEquipIndex, InventoryType inventoryType, byte equipSlotIndex, ResponseDelegate<ResponseEquipArmorMessage> responseEquipArmor, ResponseDelegate<ResponseEquipWeaponMessage> responseEquipWeapon)
+        public static void RequestEquipItem(this IClientInventoryHandlers handlers, short nonEquipIndex, InventoryType inventoryType, byte equipSlotIndex, ResponseDelegate<ResponseEquipArmorMessage> responseEquipArmor, ResponseDelegate<ResponseEquipWeaponMessage> responseEquipWeapon)
         {
             switch (inventoryType)
             {
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void RequestUnEquipItem(this IClientInventoryHandlers handlers, string characterId, InventoryType inventoryType, short equipItemIndex, byte equipWeaponSet, short nonEquipIndex, ResponseDelegate<ResponseUnEquipArmorMessage> responseUnEquipArmor, ResponseDelegate<ResponseUnEquipWeaponMessage> responseUnEquipWeapon)
+        public static void RequestUnEquipItem(this IClientInventoryHandlers handlers, InventoryType inventoryType, short equipItemIndex, byte equipWeaponSet, short nonEquipIndex, ResponseDelegate<ResponseUnEquipArmorMessage> responseUnEquipArmor, ResponseDelegate<ResponseUnEquipWeaponMessage> responseUnEquipWeapon)
         {
             switch (inventoryType)
             {

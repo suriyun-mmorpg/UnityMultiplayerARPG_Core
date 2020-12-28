@@ -62,13 +62,11 @@ namespace MultiplayerARPG
         {
             // Set UI drop state
             draggedItemUI.isDropped = true;
-            string characterId = GameInstance.ClientUserHandlers.CharacterId;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
                     // Unequip item
                     GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
-                        characterId,
                         draggedItemUI.uiCharacterItem.InventoryType,
                         (short)draggedItemUI.uiCharacterItem.IndexOfData,
                         draggedItemUI.uiCharacterItem.EquipSlotIndex,
@@ -155,11 +153,6 @@ namespace MultiplayerARPG
             if (!uiCharacterItem.IsSetupAsEquipSlot)
                 return;
 
-            // Get owing character
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null)
-                return;
-
             // Detect type of equipping slot and validate
             IArmorItem armorItem = draggedItemUI.uiCharacterItem.CharacterItem.GetArmorItem();
             IWeaponItem weaponItem = draggedItemUI.uiCharacterItem.CharacterItem.GetWeaponItem();
@@ -195,7 +188,6 @@ namespace MultiplayerARPG
             // Can equip the item
             // so tell the server that this client want to equip the item
             GameInstance.ClientInventoryHandlers.RequestEquipItem(
-                owningCharacter.Id,
                 (short)draggedItemUI.uiCharacterItem.IndexOfData,
                 uiCharacterItem.InventoryType,
                 uiCharacterItem.EquipSlotIndex,

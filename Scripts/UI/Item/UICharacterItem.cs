@@ -1131,7 +1131,6 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
 
             GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
-                OwningCharacter.Id,
                 InventoryType,
                 (short)IndexOfData,
                 CharacterItem.equipSlotIndex,

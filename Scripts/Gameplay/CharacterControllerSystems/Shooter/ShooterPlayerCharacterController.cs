@@ -1245,7 +1245,6 @@ namespace MultiplayerARPG
                     out characterItem))
                 {
                     GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
-                        PlayerCharacterEntity.Id,
                         inventoryType,
                         (short)itemIndex,
                         equipWeaponSet,
