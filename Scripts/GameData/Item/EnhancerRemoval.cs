@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public bool CanRemove(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.None;
-            if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRemoveEnhancer(character, this))
+            if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRemoveEnhancer(character))
             {
                 gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;

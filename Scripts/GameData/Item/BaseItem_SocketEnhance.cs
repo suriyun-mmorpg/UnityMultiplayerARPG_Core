@@ -185,6 +185,8 @@ namespace MultiplayerARPG
             }
             enhancedItem.Sockets[socketIndex] = 0;
             onRemoveEnhancer.Invoke(enhancedItem);
+            // Decrease required gold
+            GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRemoveEnhancer(character);
         }
     }
 }
