@@ -20,6 +20,10 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {List Of Weapon Type}")]
         public UILocaleKeySetting formatKeyAvailableWeapons = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS);
+        [Tooltip("Format => {0} = {List Of Armor Type}")]
+        public UILocaleKeySetting formatKeyAvailableArmors = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS);
+        [Tooltip("Format => {0} = {List Of Vehicle Type}")]
+        public UILocaleKeySetting formatKeyAvailableVehicles = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS);
         [Tooltip("Format => {0} = {Consume Hp Amount}")]
         public UILocaleKeySetting formatKeyConsumeHp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CONSUME_HP);
         [Tooltip("Format => {0} = {Consume Mp Amount}")]
@@ -44,6 +48,8 @@ namespace MultiplayerARPG
         public Image imageIcon;
         public TextWrapper uiTextSkillType;
         public TextWrapper uiTextAvailableWeapons;
+        public TextWrapper uiTextAvailableArmors;
+        public TextWrapper uiTextAvailableVehicles;
         public TextWrapper uiTextConsumeHp;
         public TextWrapper uiTextConsumeMp;
         public TextWrapper uiTextConsumeStamina;
@@ -215,6 +221,36 @@ namespace MultiplayerARPG
                     uiTextAvailableWeapons.text = string.Format(
                         LanguageManager.GetText(formatKeyAvailableWeapons),
                         Skill.AvailableWeaponsText);
+                }
+            }
+
+            if (uiTextAvailableArmors != null)
+            {
+                if (string.IsNullOrEmpty(Skill.AvailableArmorsText))
+                {
+                    uiTextAvailableArmors.SetGameObjectActive(false);
+                }
+                else
+                {
+                    uiTextAvailableArmors.SetGameObjectActive(true);
+                    uiTextAvailableArmors.text = string.Format(
+                        LanguageManager.GetText(formatKeyAvailableArmors),
+                        Skill.AvailableArmorsText);
+                }
+            }
+
+            if (uiTextAvailableVehicles != null)
+            {
+                if (string.IsNullOrEmpty(Skill.AvailableVehiclesText))
+                {
+                    uiTextAvailableVehicles.SetGameObjectActive(false);
+                }
+                else
+                {
+                    uiTextAvailableVehicles.SetGameObjectActive(true);
+                    uiTextAvailableVehicles.text = string.Format(
+                        LanguageManager.GetText(formatKeyAvailableVehicles),
+                        Skill.AvailableVehiclesText);
                 }
             }
 

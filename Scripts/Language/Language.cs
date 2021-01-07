@@ -736,6 +736,15 @@ namespace MultiplayerARPG
         /// Format => {0} = {Sent Date}
         /// </summary>
         UI_FORMAT_MAIL_SENT_DATE,
+        // 1.62 New Formats
+        /// <summary>
+        /// Format => {0} = {List Of Armor Type}
+        /// </summary>
+        UI_FORMAT_AVAILABLE_ARMORS,
+        /// <summary>
+        /// Format => {0} = {List Of Vehicle Type}
+        /// </summary>
+        UI_FORMAT_AVAILABLE_VEHICLES,
     }
 
     public static class DefaultLocale
@@ -887,7 +896,9 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_SELL_PRICE.ToString(), "Sell Price: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL.ToString(), "Require Level: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_CLASS.ToString(), "Require Class: {0}");
-            Texts.Add(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS.ToString(), "Available Weapons: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS.ToString(), "Have to equip: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_AVAILABLE_ARMORS.ToString(), "Have to equip: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_AVAILABLE_VEHICLES.ToString(), "Have to drive: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_CONSUME_HP.ToString(), "Consume Hp: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_CONSUME_MP.ToString(), "Consume Mp: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_CONSUME_STAMINA.ToString(), "Consume Stamina: {0}");

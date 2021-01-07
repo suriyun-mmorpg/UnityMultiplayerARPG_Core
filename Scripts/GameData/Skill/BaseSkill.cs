@@ -22,8 +22,16 @@ namespace MultiplayerARPG
         public GameEffect[] damageHitEffects;
 
         [Header("Available Weapons")]
-        [Tooltip("An available weapons, if it not set every weapons is available")]
+        [Tooltip("Characters will be able to use skill if this list is empty or equipping one in this list")]
         public WeaponType[] availableWeapons;
+
+        [Header("Required One Of Armors")]
+        [Tooltip("Characters will be able to use skill if this list is empty or equipping one in this list")]
+        public ArmorType[] availableArmors;
+
+        [Header("Required One Of Driving Vehicles")]
+        [Tooltip("Characters will be able to use skill if this list is empty or driving one in this list")]
+        public VehicleType[] availableVehicles;
 
         [Header("Consume Hp")]
         public IncrementalInt consumeHp;
@@ -83,6 +91,69 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
+        private HashSet<WeaponType> cacheAvailableWeapons;
+        public HashSet<WeaponType> CacheAvailableWeapons
+        {
+            get
+            {
+                if (cacheAvailableWeapons == null)
+                {
+                    cacheAvailableWeapons = new HashSet<WeaponType>();
+                    if (availableWeapons == null || availableWeapons.Length == 0)
+                        return cacheAvailableWeapons;
+                    foreach (WeaponType availableWeapon in availableWeapons)
+                    {
+                        if (availableWeapon == null) continue;
+                        cacheAvailableWeapons.Add(availableWeapon);
+                    }
+                }
+                return cacheAvailableWeapons;
+            }
+        }
+
+        [System.NonSerialized]
+        private HashSet<ArmorType> cacheAvailableArmors;
+        public HashSet<ArmorType> CacheAvailableArmors
+        {
+            get
+            {
+                if (cacheAvailableArmors == null)
+                {
+                    cacheAvailableArmors = new HashSet<ArmorType>();
+                    if (availableArmors == null || availableArmors.Length == 0)
+                        return cacheAvailableArmors;
+                    foreach (ArmorType requireArmor in availableArmors)
+                    {
+                        if (requireArmor == null) continue;
+                        cacheAvailableArmors.Add(requireArmor);
+                    }
+                }
+                return cacheAvailableArmors;
+            }
+        }
+
+        [System.NonSerialized]
+        private HashSet<VehicleType> cacheAvailableVehicles;
+        public HashSet<VehicleType> CacheAvailableVehicles
+        {
+            get
+            {
+                if (cacheAvailableVehicles == null)
+                {
+                    cacheAvailableVehicles = new HashSet<VehicleType>();
+                    if (availableVehicles == null || availableVehicles.Length == 0)
+                        return cacheAvailableVehicles;
+                    foreach (VehicleType requireVehicle in availableVehicles)
+                    {
+                        if (requireVehicle == null) continue;
+                        cacheAvailableVehicles.Add(requireVehicle);
+                    }
+                }
+                return cacheAvailableVehicles;
+            }
+        }
+
+        [System.NonSerialized]
         private bool alreadySetAvailableWeaponsText;
         [System.NonSerialized]
         private string availableWeaponsText;
@@ -93,7 +164,7 @@ namespace MultiplayerARPG
                 if (!alreadySetAvailableWeaponsText)
                 {
                     string str = string.Empty;
-                    foreach (WeaponType availableWeapon in availableWeapons)
+                    foreach (WeaponType availableWeapon in CacheAvailableWeapons)
                     {
                         if (!string.IsNullOrEmpty(str))
                             str += "/";
@@ -106,10 +177,57 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
+        private bool alreadySetAvailableArmorsText;
+        [System.NonSerialized]
+        private string availableArmorsText;
+        public string AvailableArmorsText
+        {
+            get
+            {
+                if (!alreadySetAvailableArmorsText)
+                {
+                    string str = string.Empty;
+                    foreach (ArmorType requireArmor in availableArmors)
+                    {
+                        if (!string.IsNullOrEmpty(str))
+                            str += "/";
+                        str += requireArmor.Title;
+                    }
+                    availableArmorsText = str;
+                    alreadySetAvailableArmorsText = true;
+                }
+                return availableArmorsText;
+            }
+        }
+
+        [System.NonSerialized]
+        private bool alreadySetAvailableVehiclesText;
+        [System.NonSerialized]
+        private string availableVehiclesText;
+        public string AvailableVehiclesText
+        {
+            get
+            {
+                if (!alreadySetAvailableVehiclesText)
+                {
+                    string str = string.Empty;
+                    foreach (VehicleType requireVehicle in availableVehicles)
+                    {
+                        if (!string.IsNullOrEmpty(str))
+                            str += "/";
+                        str += requireVehicle.Title;
+                    }
+                    availableVehiclesText = str;
+                    alreadySetAvailableVehiclesText = true;
+                }
+                return availableVehiclesText;
+            }
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddWeaponTypes(availableWeapons);
             GameInstance.AddPoolingObjects(skillCastEffects);
             GameInstance.AddPoolingObjects(damageHitEffects);
             GameInstance.AddPoolingObjects(GetBuff().effects);
@@ -371,28 +489,48 @@ namespace MultiplayerARPG
                 switch (SkillType)
                 {
                     case SkillType.Active:
-                        available = availableWeapons == null || availableWeapons.Length == 0;
-                        if (!available)
+                        available = true;
+                        if (CacheAvailableWeapons.Count > 0)
                         {
+                            available = false;
                             IWeaponItem rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
                             IWeaponItem leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
-                            foreach (WeaponType availableWeapon in availableWeapons)
+                            if (rightWeaponItem != null && CacheAvailableWeapons.Contains(rightWeaponItem.WeaponType))
                             {
-                                if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
+                                available = true;
+                            }
+                            else if (leftWeaponItem != null && CacheAvailableWeapons.Contains(leftWeaponItem.WeaponType))
+                            {
+                                available = true;
+                            }
+                            else if (rightWeaponItem == null && leftWeaponItem == null && 
+                                CacheAvailableWeapons.Contains(GameInstance.Singleton.DefaultWeaponItem.WeaponType))
+                            {
+                                available = true;
+                            }
+                        }
+                        if (available && CacheAvailableArmors.Count > 0)
+                        {
+                            available = false;
+                            IArmorItem armorItem;
+                            foreach (CharacterItem characterItem in character.EquipItems)
+                            {
+                                armorItem = characterItem.GetArmorItem();
+                                if (armorItem != null && CacheAvailableArmors.Contains(armorItem.ArmorType))
                                 {
                                     available = true;
                                     break;
                                 }
-                                else if (leftWeaponItem != null && leftWeaponItem.WeaponType == availableWeapon)
-                                {
-                                    available = true;
-                                    break;
-                                }
-                                else if (rightWeaponItem == null && leftWeaponItem == null && GameInstance.Singleton.DefaultWeaponItem.WeaponType == availableWeapon)
-                                {
-                                    available = true;
-                                    break;
-                                }
+                            }
+                        }
+                        if (available && CacheAvailableVehicles.Count > 0)
+                        {
+                            available = false;
+                            if (character.PassengingVehicleType != null &&
+                                CacheAvailableVehicles.Contains(character.PassengingVehicleType) &&
+                                character.PassengingVehicleEntity.IsDriver(character.PassengingVehicle.seatIndex))
+                            {
+                                available = true;
                             }
                         }
                         break;
