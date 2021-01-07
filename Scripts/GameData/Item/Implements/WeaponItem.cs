@@ -124,7 +124,6 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddWeaponTypes(WeaponType);
             GameInstance.AddDamageElements(DamageAmount);
             GameInstance.AddPoolingWeaponLaunchEffects(OffHandEquipmentModels);
         }

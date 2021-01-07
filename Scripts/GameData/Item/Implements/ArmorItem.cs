@@ -31,11 +31,5 @@ namespace MultiplayerARPG
         {
             get { return equipPosition; }
         }
-
-        public override void PrepareRelatesData()
-        {
-            base.PrepareRelatesData();
-            GameInstance.AddArmorTypes(ArmorType);
-        }
     }
 }

@@ -56,8 +56,6 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, Harvestable> Harvestables = new Dictionary<int, Harvestable>();
-        public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
-        public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
         public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
@@ -460,7 +458,6 @@ namespace MultiplayerARPG
             Attributes.Clear();
             Currencies.Clear();
             Items.Clear();
-            WeaponTypes.Clear();
             Characters.Clear();
             PlayerCharacters.Clear();
             MonsterCharacters.Clear();
@@ -496,7 +493,6 @@ namespace MultiplayerARPG
                 DefaultWeaponItem as BaseItem,
                 MonsterWeaponItem as BaseItem
             });
-            AddWeaponTypes(DefaultWeaponType);
             AddPoolingObjects(levelUpEffect);
             AddPoolingObjects(DefaultDamageHitEffects);
 
@@ -837,26 +833,6 @@ namespace MultiplayerARPG
                         AddGameData(MonsterCharacters, character as MonsterCharacter);
                 }
             }
-        }
-
-        public static void AddArmorTypes(params ArmorType[] armorTypes)
-        {
-            AddArmorTypes((IEnumerable<ArmorType>)armorTypes);
-        }
-
-        public static void AddArmorTypes(IEnumerable<ArmorType> armorTypes)
-        {
-            AddManyGameData(ArmorTypes, armorTypes);
-        }
-
-        public static void AddWeaponTypes(params WeaponType[] weaponTypes)
-        {
-            AddWeaponTypes((IEnumerable<WeaponType>)weaponTypes);
-        }
-
-        public static void AddWeaponTypes(IEnumerable<WeaponType> weaponTypes)
-        {
-            AddManyGameData(WeaponTypes, weaponTypes);
         }
 
         public static void AddMapWarpPortals(params WarpPortals[] mapWarpPortals)

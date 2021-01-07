@@ -437,8 +437,6 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddArmorTypes(armorType);
-            GameInstance.AddWeaponTypes(weaponType);
             GameInstance.AddBuildingEntities(buildingEntity);
             GameInstance.AddCharacterEntities(petEntity);
             GameInstance.AddVehicleEntities(mountEntity);
