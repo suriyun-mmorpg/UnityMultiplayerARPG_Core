@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public interface IUISelectionEntry
+﻿public interface IUISelectionEntry
 {
     bool IsSelected { get; }
     void ForceUpdate();
