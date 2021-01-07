@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -10,6 +8,15 @@ namespace MultiplayerARPG
         public void OnClick()
         {
             LanguageManager.ChangeLanguage(languageKey);
+            UIBase[] uis = FindObjectsOfType<UIBase>();
+            for (int i = 0; i < uis.Length; ++i)
+            {
+                if (!uis[i].IsVisible())
+                    continue;
+                if (uis[i] is IUISelectionEntry)
+                    (uis[i] as IUISelectionEntry).ForceUpdate();
+
+            }
         }
     }
 }
