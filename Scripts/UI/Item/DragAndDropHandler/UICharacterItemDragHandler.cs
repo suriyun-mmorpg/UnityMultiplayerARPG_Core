@@ -4,12 +4,13 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterItemDragHandler : UIDragHandler
     {
-        public enum SourceLocation
+        public enum SourceLocation : byte
         {
             NonEquipItems,
             EquipItems,
             StorageItems,
             Hotkey,
+            Unknow = 254,
         }
 
         public SourceLocation sourceLocation { get; protected set; }
@@ -74,6 +75,12 @@ namespace MultiplayerARPG
         {
             sourceLocation = SourceLocation.Hotkey;
             this.uiCharacterHotkey = uiCharacterHotkey;
+        }
+
+        public void SetupForUnknow(UICharacterItem uiCharacterItem)
+        {
+            sourceLocation = SourceLocation.Unknow;
+            this.uiCharacterItem = uiCharacterItem;
         }
 
         public override void OnEndDrag(PointerEventData eventData)

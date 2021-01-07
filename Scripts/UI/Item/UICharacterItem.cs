@@ -118,27 +118,28 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSkill;
 
         [Header("Events")]
-        public UnityEvent onSetLevelZeroData;
-        public UnityEvent onSetNonLevelZeroData;
-        public UnityEvent onSetEquippedData;
-        public UnityEvent onSetUnEquippedData;
-        public UnityEvent onSetUnEquippableData;
-        public UnityEvent onSetUsableData;
-        public UnityEvent onSetStorageItemData;
-        public UnityEvent onNpcSellItemDialogAppear;
-        public UnityEvent onNpcSellItemDialogDisappear;
-        public UnityEvent onRefineItemDialogAppear;
-        public UnityEvent onRefineItemDialogDisappear;
-        public UnityEvent onDismantleItemDialogAppear;
-        public UnityEvent onDismantleItemDialogDisappear;
-        public UnityEvent onRepairItemDialogAppear;
-        public UnityEvent onRepairItemDialogDisappear;
-        public UnityEvent onEnhanceSocketItemDialogAppear;
-        public UnityEvent onEnhanceSocketItemDialogDisappear;
-        public UnityEvent onStorageDialogAppear;
-        public UnityEvent onStorageDialogDisappear;
-        public UnityEvent onEnterDealingState;
-        public UnityEvent onExitDealingState;
+        public UnityEvent onSetLevelZeroData = new UnityEvent();
+        public UnityEvent onSetNonLevelZeroData = new UnityEvent();
+        public UnityEvent onSetEquippedData = new UnityEvent();
+        public UnityEvent onSetUnEquippedData = new UnityEvent();
+        public UnityEvent onSetUnEquippableData = new UnityEvent();
+        public UnityEvent onSetUnknowSourceData = new UnityEvent();
+        public UnityEvent onSetUsableData = new UnityEvent();
+        public UnityEvent onSetStorageItemData = new UnityEvent();
+        public UnityEvent onNpcSellItemDialogAppear = new UnityEvent();
+        public UnityEvent onNpcSellItemDialogDisappear = new UnityEvent();
+        public UnityEvent onRefineItemDialogAppear = new UnityEvent();
+        public UnityEvent onRefineItemDialogDisappear = new UnityEvent();
+        public UnityEvent onDismantleItemDialogAppear = new UnityEvent();
+        public UnityEvent onDismantleItemDialogDisappear = new UnityEvent();
+        public UnityEvent onRepairItemDialogAppear = new UnityEvent();
+        public UnityEvent onRepairItemDialogDisappear = new UnityEvent();
+        public UnityEvent onEnhanceSocketItemDialogAppear = new UnityEvent();
+        public UnityEvent onEnhanceSocketItemDialogDisappear = new UnityEvent();
+        public UnityEvent onStorageDialogAppear = new UnityEvent();
+        public UnityEvent onStorageDialogDisappear = new UnityEvent();
+        public UnityEvent onEnterDealingState = new UnityEvent();
+        public UnityEvent onExitDealingState = new UnityEvent();
 
         [Header("Options")]
         [Tooltip("UIs in this list will use cloned item data from this UI")]
@@ -230,7 +231,11 @@ namespace MultiplayerARPG
 
             if (InventoryType != InventoryType.StorageItems)
             {
-                if (EquipmentItem != null)
+                if (InventoryType == InventoryType.Unknow)
+                {
+                    onSetUnknowSourceData.Invoke();
+                }
+                else if (EquipmentItem != null)
                 {
                     if (InventoryType != InventoryType.NonEquipItems)
                         onSetEquippedData.Invoke();
@@ -245,7 +250,9 @@ namespace MultiplayerARPG
                 }
             }
             else
+            {
                 onSetStorageItemData.Invoke();
+            }
 
             if (uiTextTitle != null)
             {

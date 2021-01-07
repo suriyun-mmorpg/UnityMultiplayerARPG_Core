@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public UICharacterItem uiPrefab;
         [FormerlySerializedAs("uiCharacterItemContainer")]
         public Transform uiContainer;
+        public bool isUnknowSource;
 
         public virtual ICharacterData Character { get; set; }
 
@@ -76,6 +77,7 @@ namespace MultiplayerARPG
             }
             if (uiItemDialog != null && CacheItemSelectionManager.selectionMode == UISelectionMode.SelectSingle)
             {
+                Debug.LogError(ui.Data.inventoryType);
                 uiItemDialog.selectionManager = CacheItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, Character, ui.IndexOfData);
                 uiItemDialog.Show();
@@ -134,11 +136,16 @@ namespace MultiplayerARPG
                     if (filterItemTypes == null || filterItemTypes.Count == 0 ||
                         filterItemTypes.Contains(tempItem.ItemType))
                     {
-                        tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), Character, index);
+                        tempUI.Setup(new UICharacterItemData(characterItem, isUnknowSource ? InventoryType.Unknow : InventoryType.NonEquipItems), Character, index);
                         tempUI.Show();
                         UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                         if (dragHandler != null)
-                            dragHandler.SetupForNonEquipItems(tempUI);
+                        {
+                            if (isUnknowSource)
+                                dragHandler.SetupForUnknow(tempUI);
+                            else
+                                dragHandler.SetupForNonEquipItems(tempUI);
+                        }
                         CacheItemSelectionManager.Add(tempUI);
                         if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
                             selectedUI = tempUI;

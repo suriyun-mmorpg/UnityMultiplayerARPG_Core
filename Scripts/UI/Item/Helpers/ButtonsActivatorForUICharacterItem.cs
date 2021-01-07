@@ -24,6 +24,7 @@ namespace MultiplayerARPG
             ui.onSetEquippedData.AddListener(OnSetEquippedData);
             ui.onSetUnEquippedData.AddListener(OnSetUnEquippedData);
             ui.onSetUnEquippableData.AddListener(OnSetUnEquippableData);
+            ui.onSetUnknowSourceData.AddListener(OnSetUnknowSourceData);
             ui.onSetUsableData.AddListener(OnSetUsableData);
             ui.onSetStorageItemData.AddListener(OnSetStorageItemData);
             ui.onRefineItemDialogAppear.AddListener(OnRefineItemDialogAppear);
@@ -107,6 +108,11 @@ namespace MultiplayerARPG
                 buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
             if (buttonDrop)
                 buttonDrop.gameObject.SetActive(true);
+        }
+
+        public void OnSetUnknowSourceData()
+        {
+            DeactivateAllButtons();
         }
 
         public void OnSetUsableData()
