@@ -21,8 +21,11 @@ namespace MultiplayerARPG
         [Header("Spawning Data")]
         [FormerlySerializedAs("asset")]
         public T prefab;
+        [FormerlySerializedAs("level")]
         [Min(1)]
-        public short level = 1;
+        public short minLevel = 1;
+        [Min(1)]
+        public short maxLevel = 1;
         [Min(1)]
         public short amount = 1;
         public float respawnPendingEntitiesDelay = 5f;
@@ -66,7 +69,7 @@ namespace MultiplayerARPG
 
         public virtual void SpawnAll()
         {
-            SpawnByAmount(prefab, level, amount);
+            SpawnByAmount(prefab, (short)Random.Range(minLevel, maxLevel), amount);
             foreach (SpawnPrefabData<T> spawningPrefab in SpawningPrefabs)
             {
                 SpawnByAmount(spawningPrefab.prefab, spawningPrefab.level, spawningPrefab.amount);
