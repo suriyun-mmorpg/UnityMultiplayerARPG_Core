@@ -231,25 +231,24 @@ namespace MultiplayerARPG
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
             try
             {
+                // Play special effect
+                if (IsClient)
+                {
+                    if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                        CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
+                    if (FpsModel && FpsModel.gameObject.activeSelf)
+                        FpsModel.InstantiateEffect(skill.GetSkillCastEffect());
+                }
+
                 if (CastingSkillDuration > 0f)
                 {
-                    // Tell clients that character is casting
+                    // Play special effect
                     if (IsClient)
                     {
                         if (CharacterModel && CharacterModel.gameObject.activeSelf)
-                        {
-                            // Play special effect
-                            CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
-                            // Play casting animation
                             CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
-                        }
                         if (FpsModel && FpsModel.gameObject.activeSelf)
-                        {
-                            // Play special effect
-                            FpsModel.InstantiateEffect(skill.GetSkillCastEffect());
-                            // Play casting animation
                             FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
-                        }
                     }
                     // Wait until end of cast duration
                     await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
