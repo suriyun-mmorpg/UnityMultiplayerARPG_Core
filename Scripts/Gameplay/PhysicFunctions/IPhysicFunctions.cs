@@ -6,6 +6,8 @@ namespace MultiplayerARPG
 {
     public interface IPhysicFunctions
     {
+        int Raycast(Vector3 start, Vector3 end, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal);
+
         int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal);
 
         int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 raycastPosition, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal);
@@ -26,7 +28,7 @@ namespace MultiplayerARPG
 
         GameObject GetRaycastObject(int index);
 
-        GameObject GetRaycastColliderGameObject(int index);
+        GameObject GetRaycastColliderObject(int index);
 
         int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal);
 
