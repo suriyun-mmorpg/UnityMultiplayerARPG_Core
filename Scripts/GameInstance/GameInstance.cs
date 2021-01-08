@@ -248,6 +248,11 @@ namespace MultiplayerARPG
         [Tooltip("Max characters that player can create, set it to 0 to unlimit")]
         public byte maxCharacterSaves = 5;
 
+        [Header("Platforms Configs")]
+        public int serverTargetFrameRate = 30;
+        public int standaloneTargetFrameRate = 60;
+        public int mobileTargetFrameRate = 30;
+
         [Header("Playing In Editor")]
         public TestInEditorMode testInEditorMode;
 
@@ -370,12 +375,15 @@ namespace MultiplayerARPG
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             {
                 // Set target framerate when running headless to reduce CPU usage
-                Application.targetFrameRate = 30;
+                Application.targetFrameRate = serverTargetFrameRate;
             }
             else
             {
                 // Not running headless
-                Application.targetFrameRate = -1;
+                if (Application.isMobilePlatform)
+                    Application.targetFrameRate = mobileTargetFrameRate;
+                else
+                    Application.targetFrameRate = standaloneTargetFrameRate;
             }
             Application.runInBackground = true;
             if (Singleton != null)
