@@ -15,6 +15,11 @@ namespace MultiplayerARPG
             overlapColliders2D = new Collider2D[allocSize];
         }
 
+        public int Raycast(Vector3 start, Vector3 end, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            return PhysicUtils.SortedRaycastNonAlloc2D(start, (end - start).normalized, raycasts2D, Vector3.Distance(start, end), layerMask);
+        }
+
         public int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
             return PhysicUtils.SortedRaycastNonAlloc2D(origin, direction, raycasts2D, distance, layerMask);
@@ -67,7 +72,7 @@ namespace MultiplayerARPG
             return raycasts2D[index].transform.gameObject;
         }
 
-        public GameObject GetRaycastColliderGameObject(int index)
+        public GameObject GetRaycastColliderObject(int index)
         {
             return raycasts2D[index].collider.gameObject;
         }

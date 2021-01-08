@@ -362,7 +362,7 @@ namespace MultiplayerARPG
                             point = attacker.AttackPhysicFunctions.GetRaycastPoint(tempLoopCounter);
                             normal = attacker.AttackPhysicFunctions.GetRaycastNormal(tempLoopCounter);
                             distance = attacker.AttackPhysicFunctions.GetRaycastDistance(tempLoopCounter);
-                            tempGameObject = attacker.AttackPhysicFunctions.GetRaycastColliderGameObject(tempLoopCounter);
+                            tempGameObject = attacker.AttackPhysicFunctions.GetRaycastColliderObject(tempLoopCounter);
 
                             if (tempGameObject.layer == PhysicLayers.TransparentFX ||
                                 tempGameObject.layer == PhysicLayers.IgnoreRaycast ||
