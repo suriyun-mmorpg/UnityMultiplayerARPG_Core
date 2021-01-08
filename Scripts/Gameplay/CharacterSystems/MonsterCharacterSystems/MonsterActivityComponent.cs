@@ -252,7 +252,7 @@ namespace MultiplayerARPG
                 randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             // Random position around summoner
             if (CacheEntity.Summoner != null)
-                randomPosition = CacheEntity.Summoner.GetSummonPosition();
+                randomPosition = GameInstance.Singleton.GameplayRule.GetSummonPosition(CacheEntity.Summoner);
 
             CacheEntity.SetTargetEntity(null);
             SetWanderDestination(randomPosition);
@@ -269,7 +269,7 @@ namespace MultiplayerARPG
                 randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             // Random position around summoner
             if (CacheEntity.Summoner != null)
-                randomPosition = CacheEntity.Summoner.GetSummonPosition();
+                randomPosition = GameInstance.Singleton.GameplayRule.GetSummonPosition(CacheEntity.Summoner);
 
             CacheEntity.SetTargetEntity(null);
             SetDestination(randomPosition, 0f);

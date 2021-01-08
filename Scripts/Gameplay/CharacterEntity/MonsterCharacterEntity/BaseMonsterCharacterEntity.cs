@@ -129,7 +129,7 @@ namespace MultiplayerARPG
                     if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > CurrentGameInstance.maxFollowSummonerDistance)
                     {
                         // Teleport to summoner if too far from summoner
-                        Teleport(Summoner.GetSummonPosition());
+                        Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner));
                     }
                 }
             }

@@ -1041,20 +1041,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual Vector3 GetSummonPosition()
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return CacheTransform.position + new Vector3(Random.Range(CurrentGameInstance.minSummonDistance, CurrentGameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), Random.Range(CurrentGameInstance.minSummonDistance, CurrentGameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f);
-            return CacheTransform.position + new Vector3(Random.Range(CurrentGameInstance.minSummonDistance, CurrentGameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(CurrentGameInstance.minSummonDistance, CurrentGameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive());
-        }
-
-        public virtual Quaternion GetSummonRotation()
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return Quaternion.identity;
-            return CacheTransform.rotation;
-        }
-
         public bool IsNeutral(BaseCharacterEntity characterEntity)
         {
             return !IsAlly(characterEntity) && !IsEnemy(characterEntity);

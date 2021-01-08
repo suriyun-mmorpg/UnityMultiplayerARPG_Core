@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -715,6 +716,46 @@ namespace MultiplayerARPG
                 // Dead by itself, so causer is itself
                 character.ValidateRecovery(character);
             }
+        }
+
+        public override bool CanInteractEntity(BaseCharacterEntity character, uint objectId)
+        {
+            LiteNetLibIdentity identity;
+            if (!character.Manager.Assets.TryGetSpawnedObject(objectId, out identity))
+                return false;
+            // This function will sort: near to far, so loop from 0
+            int count = character.FindPhysicFunctions.Raycast(character.MeleeDamageTransform.position, identity.transform.position, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
+            IGameEntity gameEntity;
+            for (int i = 0; i < count; ++i)
+            {
+                gameEntity = character.FindPhysicFunctions.GetRaycastObject(i).GetComponent<IGameEntity>();
+                if (gameEntity == null) continue;
+                if (gameEntity.GetObjectId() == objectId)
+                {
+                    // It's target entity, so interact it
+                    return true;
+                }
+                if (gameEntity.Entity is BuildingEntity)
+                {
+                    // Cannot interact object behind the wall
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public override Vector3 GetSummonPosition(BaseCharacterEntity character)
+        {
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
+                return character.MovementTransform.position + new Vector3(Random.Range(GameInstance.Singleton.minSummonDistance, GameInstance.Singleton.maxSummonDistance) * GenericUtils.GetNegativePositive(), Random.Range(GameInstance.Singleton.minSummonDistance, GameInstance.Singleton.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f);
+            return character.MovementTransform.position + new Vector3(Random.Range(GameInstance.Singleton.minSummonDistance, GameInstance.Singleton.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(GameInstance.Singleton.minSummonDistance, GameInstance.Singleton.maxSummonDistance) * GenericUtils.GetNegativePositive());
+        }
+
+        public override Quaternion GetSummonRotation(BaseCharacterEntity character)
+        {
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
+                return Quaternion.identity;
+            return character.MovementTransform.rotation;
         }
     }
 }

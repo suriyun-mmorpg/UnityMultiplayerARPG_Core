@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
             }
             // Spawn area entity
-            PoolSystem.GetInstance(areaDamageEntity, aimPosition, skillUser.GetSummonRotation())
+            PoolSystem.GetInstance(areaDamageEntity, aimPosition, GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser))
                 .Setup(skillUser, weapon, damageAmounts, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
 
