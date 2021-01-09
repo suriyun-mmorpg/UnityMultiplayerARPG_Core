@@ -510,7 +510,7 @@ namespace MultiplayerARPG
             characterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
             characterData.MountDataId = reader.GetPackedInt();
             characterData.LastUpdate = reader.GetPackedInt();
-            int count = 0;
+            int count;
             count = reader.GetByte();
             for (int i = 0; i < count; ++i)
             {
