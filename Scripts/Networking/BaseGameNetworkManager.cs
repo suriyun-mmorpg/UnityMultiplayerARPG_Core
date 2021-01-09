@@ -112,6 +112,7 @@ namespace MultiplayerARPG
             RegisterClientMessage(GameNetworkingConsts.Chat, HandleChatAtClient);
             RegisterClientMessage(GameNetworkingConsts.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
             RegisterClientMessage(GameNetworkingConsts.UpdateMapInfo, HandleUpdateMapInfoAtClient);
+            // Shared messages
             if (ClientOnlineCharacterHandlers != null)
             {
                 RegisterClientMessage(GameNetworkingConsts.NotifyOnlineCharacter, ClientOnlineCharacterHandlers.HandleNotifyOnlineCharacter);
@@ -194,6 +195,7 @@ namespace MultiplayerARPG
             base.RegisterServerMessages();
             // Networking messages
             RegisterServerMessage(GameNetworkingConsts.Chat, HandleChatAtServer);
+            // Shared messages
             if (ServerOnlineCharacterHandlers != null)
             {
                 RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerOnlineCharacterHandlers.HandleRequestOnlineCharacter);
