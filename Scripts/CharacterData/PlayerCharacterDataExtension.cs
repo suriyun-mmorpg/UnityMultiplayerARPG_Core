@@ -371,7 +371,7 @@ namespace MultiplayerARPG
             DeletePersistentCharacterData(characterData.Id);
         }
 
-        public static void SerializeCharacterData<T>(this T characterData, NetDataWriter writer) where T : IPlayerCharacterData
+        public static void SerializeCharacterData<T>(this T characterData, NetDataWriter writer, bool forListEntry = false) where T : IPlayerCharacterData
         {
             writer.Put(characterData.Id);
             writer.PutPackedInt(characterData.DataId);
@@ -396,63 +396,97 @@ namespace MultiplayerARPG
             writer.Put(characterData.GuildRole);
             writer.PutPackedInt(characterData.SharedGuildExp);
             writer.Put(characterData.CurrentMapName);
-            writer.Put(characterData.CurrentPosition.x);
-            writer.Put(characterData.CurrentPosition.y);
-            writer.Put(characterData.CurrentPosition.z);
-            writer.Put(characterData.CurrentRotation.x);
-            writer.Put(characterData.CurrentRotation.y);
-            writer.Put(characterData.CurrentRotation.z);
+            if (!forListEntry)
+            {
+                writer.Put(characterData.CurrentPosition.x);
+                writer.Put(characterData.CurrentPosition.y);
+                writer.Put(characterData.CurrentPosition.z);
+                writer.Put(characterData.CurrentRotation.x);
+                writer.Put(characterData.CurrentRotation.y);
+                writer.Put(characterData.CurrentRotation.z);
+            }
             writer.Put(characterData.RespawnMapName);
-            writer.Put(characterData.RespawnPosition.x);
-            writer.Put(characterData.RespawnPosition.y);
-            writer.Put(characterData.RespawnPosition.z);
+            if (!forListEntry)
+            {
+                writer.Put(characterData.RespawnPosition.x);
+                writer.Put(characterData.RespawnPosition.y);
+                writer.Put(characterData.RespawnPosition.z);
+            }
             writer.PutPackedInt(characterData.MountDataId);
             writer.PutPackedInt(characterData.LastUpdate);
+            // Attributes
             writer.Put((byte)characterData.Attributes.Count);
             foreach (CharacterAttribute entry in characterData.Attributes)
             {
                 entry.Serialize(writer);
             }
-            writer.Put((byte)characterData.Buffs.Count);
-            foreach (CharacterBuff entry in characterData.Buffs)
+            // Buffs
+            if (!forListEntry)
             {
-                entry.Serialize(writer);
+                writer.Put((byte)characterData.Buffs.Count);
+                foreach (CharacterBuff entry in characterData.Buffs)
+                {
+                    entry.Serialize(writer);
+                }
             }
+            // Skills
             writer.Put((short)characterData.Skills.Count);
             foreach (CharacterSkill entry in characterData.Skills)
             {
                 entry.Serialize(writer);
             }
-            writer.Put((byte)characterData.SkillUsages.Count);
-            foreach (CharacterSkillUsage entry in characterData.SkillUsages)
+            // Skill Usages
+            if (!forListEntry)
             {
-                entry.Serialize(writer);
+                writer.Put((byte)characterData.SkillUsages.Count);
+                foreach (CharacterSkillUsage entry in characterData.SkillUsages)
+                {
+                    entry.Serialize(writer);
+                }
             }
-            writer.Put((byte)characterData.Summons.Count);
-            foreach (CharacterSummon entry in characterData.Summons)
+            // Summons
+            if (!forListEntry)
             {
-                entry.Serialize(writer);
+                writer.Put((byte)characterData.Summons.Count);
+                foreach (CharacterSummon entry in characterData.Summons)
+                {
+                    entry.Serialize(writer);
+                }
             }
+            // Equip Items
             writer.Put((byte)characterData.EquipItems.Count);
             foreach (CharacterItem entry in characterData.EquipItems)
             {
                 entry.Serialize(writer, true); // Force serialize for owner client to send all data
             }
-            writer.Put((short)characterData.NonEquipItems.Count);
-            foreach (CharacterItem entry in characterData.NonEquipItems)
+            // Non Equip Items
+            if (!forListEntry)
             {
-                entry.Serialize(writer, true); // Force serialize for owner client to send all data
+                writer.Put((short)characterData.NonEquipItems.Count);
+                foreach (CharacterItem entry in characterData.NonEquipItems)
+                {
+                    entry.Serialize(writer, true); // Force serialize for owner client to send all data
+                }
             }
-            writer.Put((byte)characterData.Hotkeys.Count);
-            foreach (CharacterHotkey entry in characterData.Hotkeys)
+            // Hotkeys
+            if (!forListEntry)
             {
-                entry.Serialize(writer);
+                writer.Put((byte)characterData.Hotkeys.Count);
+                foreach (CharacterHotkey entry in characterData.Hotkeys)
+                {
+                    entry.Serialize(writer);
+                }
             }
-            writer.Put((short)characterData.Quests.Count);
-            foreach (CharacterQuest entry in characterData.Quests)
+            // Quests
+            if (!forListEntry)
             {
-                entry.Serialize(writer);
+                writer.Put((short)characterData.Quests.Count);
+                foreach (CharacterQuest entry in characterData.Quests)
+                {
+                    entry.Serialize(writer);
+                }
             }
+            // Currencies
             writer.Put((byte)characterData.Currencies.Count);
             foreach (CharacterCurrency entry in characterData.Currencies)
             {
@@ -479,7 +513,7 @@ namespace MultiplayerARPG
             characterData = reader.DeserializeCharacterData();
         }
 
-        public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
+        public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader, bool forListEntry = false) where T : IPlayerCharacterData
         {
             characterData.Id = reader.GetString();
             characterData.DataId = reader.GetPackedInt();
@@ -504,13 +538,20 @@ namespace MultiplayerARPG
             characterData.GuildRole = reader.GetByte();
             characterData.SharedGuildExp = reader.GetPackedInt();
             characterData.CurrentMapName = reader.GetString();
-            characterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
-            characterData.CurrentRotation = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+            if (!forListEntry)
+            {
+                characterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+                characterData.CurrentRotation = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+            }
             characterData.RespawnMapName = reader.GetString();
-            characterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+            if (!forListEntry)
+            {
+                characterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+            }
             characterData.MountDataId = reader.GetPackedInt();
             characterData.LastUpdate = reader.GetPackedInt();
             int count;
+            // Attributes
             count = reader.GetByte();
             for (int i = 0; i < count; ++i)
             {
@@ -518,13 +559,18 @@ namespace MultiplayerARPG
                 entry.Deserialize(reader);
                 characterData.Attributes.Add(entry);
             }
-            count = reader.GetByte();
-            for (int i = 0; i < count; ++i)
+            // Buffs
+            if (!forListEntry)
             {
-                CharacterBuff entry = new CharacterBuff();
-                entry.Deserialize(reader);
-                characterData.Buffs.Add(entry);
+                count = reader.GetByte();
+                for (int i = 0; i < count; ++i)
+                {
+                    CharacterBuff entry = new CharacterBuff();
+                    entry.Deserialize(reader);
+                    characterData.Buffs.Add(entry);
+                }
             }
+            // Skills
             count = reader.GetShort();
             for (int i = 0; i < count; ++i)
             {
@@ -532,20 +578,29 @@ namespace MultiplayerARPG
                 entry.Deserialize(reader);
                 characterData.Skills.Add(entry);
             }
-            count = reader.GetByte();
-            for (int i = 0; i < count; ++i)
+            // Skill Usages
+            if (!forListEntry)
             {
-                CharacterSkillUsage entry = new CharacterSkillUsage();
-                entry.Deserialize(reader);
-                characterData.SkillUsages.Add(entry);
+                count = reader.GetByte();
+                for (int i = 0; i < count; ++i)
+                {
+                    CharacterSkillUsage entry = new CharacterSkillUsage();
+                    entry.Deserialize(reader);
+                    characterData.SkillUsages.Add(entry);
+                }
             }
-            count = reader.GetByte();
-            for (int i = 0; i < count; ++i)
+            // Summons
+            if (!forListEntry)
             {
-                CharacterSummon entry = new CharacterSummon();
-                entry.Deserialize(reader);
-                characterData.Summons.Add(entry);
+                count = reader.GetByte();
+                for (int i = 0; i < count; ++i)
+                {
+                    CharacterSummon entry = new CharacterSummon();
+                    entry.Deserialize(reader);
+                    characterData.Summons.Add(entry);
+                }
             }
+            // Equip Items
             count = reader.GetByte();
             for (int i = 0; i < count; ++i)
             {
@@ -553,27 +608,40 @@ namespace MultiplayerARPG
                 entry.Deserialize(reader);
                 characterData.EquipItems.Add(entry);
             }
-            count = reader.GetShort();
-            for (int i = 0; i < count; ++i)
+            // Non Equip Items
+            if (!forListEntry)
             {
-                CharacterItem entry = new CharacterItem();
-                entry.Deserialize(reader);
-                characterData.NonEquipItems.Add(entry);
+                count = reader.GetShort();
+                for (int i = 0; i < count; ++i)
+                {
+                    CharacterItem entry = new CharacterItem();
+                    entry.Deserialize(reader);
+                    characterData.NonEquipItems.Add(entry);
+                }
             }
-            count = reader.GetByte();
-            for (int i = 0; i < count; ++i)
+            // Hotkeys
+            if (!forListEntry)
             {
-                CharacterHotkey entry = new CharacterHotkey();
-                entry.Deserialize(reader);
-                characterData.Hotkeys.Add(entry);
+                count = reader.GetByte();
+                for (int i = 0; i < count; ++i)
+                {
+                    CharacterHotkey entry = new CharacterHotkey();
+                    entry.Deserialize(reader);
+                    characterData.Hotkeys.Add(entry);
+                }
             }
-            count = reader.GetShort();
-            for (int i = 0; i < count; ++i)
+            // Quests
+            if (!forListEntry)
             {
-                CharacterQuest entry = new CharacterQuest();
-                entry.Deserialize(reader);
-                characterData.Quests.Add(entry);
+                count = reader.GetShort();
+                for (int i = 0; i < count; ++i)
+                {
+                    CharacterQuest entry = new CharacterQuest();
+                    entry.Deserialize(reader);
+                    characterData.Quests.Add(entry);
+                }
             }
+            // Currencies
             count = reader.GetByte();
             for (int i = 0; i < count; ++i)
             {
