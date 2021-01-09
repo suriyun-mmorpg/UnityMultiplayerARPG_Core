@@ -42,6 +42,11 @@ namespace MultiplayerARPG
         UI_ERROR_USERNAME_TOO_LONG,
         UI_ERROR_PASSWORD_TOO_SHORT,
         UI_ERROR_USERNAME_EXISTED,
+        // Error - UI Lobby
+        UI_ERROR_ALREADY_CONNECTED_TO_LOBBY,
+        UI_ERROR_ALREADY_CONNECTED_TO_GAME,
+        UI_ERROR_NO_SELECTED_REALM,
+        UI_ERROR_NO_AVAILABLE_LOBBY,
         // Error - UI Character List
         UI_ERROR_NO_CHOSEN_CHARACTER_TO_START,
         UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE,
@@ -1030,6 +1035,11 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_TOO_LONG.ToString(), "Username is too long");
             Texts.Add(UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT.ToString(), "Password is too short");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_EXISTED.ToString(), "Username is already existed");
+            // Error - UI Lobby
+            Texts.Add(UITextKeys.UI_ERROR_ALREADY_CONNECTED_TO_LOBBY.ToString(), "Already connected to lobby server");
+            Texts.Add(UITextKeys.UI_ERROR_ALREADY_CONNECTED_TO_GAME.ToString(), "Already connected to game server");
+            Texts.Add(UITextKeys.UI_ERROR_NO_SELECTED_REALM.ToString(), "Please select realm");
+            Texts.Add(UITextKeys.UI_ERROR_NO_AVAILABLE_LOBBY.ToString(), "No available lobby");
             // Error - UI Character List
             Texts.Add(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_START.ToString(), "Please choose character to start game");
             Texts.Add(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE.ToString(), "Please choose character to delete");
