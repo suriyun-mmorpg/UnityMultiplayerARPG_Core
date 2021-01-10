@@ -70,9 +70,9 @@ namespace MultiplayerARPG
             Storage storage = GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
-            // Increase item to storage
-            Dictionary<int, short> decreaseItems;
-            if (storageItems.DecreaseItems(dataId, amount, isLimitSlot, out decreaseItems))
+            // Decrease item from storage
+            Dictionary<int, short> decreasedItems;
+            if (storageItems.DecreaseItems(dataId, amount, isLimitSlot, out decreasedItems))
             {
                 // Update slots
                 storageItems.FillEmptySlots(isLimitSlot, slotLimit);
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
                 return new DecreaseStorageItemsResult()
                 {
                     IsSuccess = true,
-                    DecreasedItems = decreaseItems,
+                    DecreasedItems = decreasedItems,
                 };
             }
             return new DecreaseStorageItemsResult();
