@@ -27,6 +27,14 @@ namespace MultiplayerARPG
         bool TryGetPlayerCharacter(long connectionId, out IPlayerCharacterData playerCharacter);
 
         /// <summary>
+        /// Get connection ID by character's ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="connectionId"></param>
+        /// <returns></returns>
+        bool TryGetConnectionId(string id, out long connectionId);
+
+        /// <summary>
         /// Get character from server's collection
         /// </summary>
         /// <param name="id"></param>

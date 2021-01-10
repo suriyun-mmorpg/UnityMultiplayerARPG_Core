@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public static readonly ConcurrentDictionary<long, IPlayerCharacterData> PlayerCharacters = new ConcurrentDictionary<long, IPlayerCharacterData>();
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersById = new ConcurrentDictionary<string, IPlayerCharacterData>();
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersByName = new ConcurrentDictionary<string, IPlayerCharacterData>();
+        public static readonly ConcurrentDictionary<string, long> PlayerCharacterConnectionIds = new ConcurrentDictionary<string, long>();
         public static readonly ConcurrentDictionary<long, string> UserIds = new ConcurrentDictionary<long, string>();
 
         public int PlayerCharactersCount
@@ -31,6 +32,11 @@ namespace MultiplayerARPG
             return PlayerCharacters.TryGetValue(connectionId, out playerCharacter);
         }
 
+        public bool TryGetConnectionId(string id, out long connectionId)
+        {
+            return PlayerCharacterConnectionIds.TryGetValue(id, out connectionId);
+        }
+
         public bool TryGetPlayerCharacterById(string id, out IPlayerCharacterData playerCharacter)
         {
             return PlayerCharactersById.TryGetValue(id, out playerCharacter);
@@ -49,6 +55,7 @@ namespace MultiplayerARPG
             {
                 PlayerCharactersById.TryAdd(playerCharacter.Id, playerCharacter);
                 PlayerCharactersByName.TryAdd(playerCharacter.CharacterName, playerCharacter);
+                PlayerCharacterConnectionIds.TryAdd(playerCharacter.Id, connectionId);
                 return true;
             }
             return false;
@@ -61,6 +68,7 @@ namespace MultiplayerARPG
             {
                 PlayerCharactersById.TryRemove(playerCharacter.Id, out _);
                 PlayerCharactersByName.TryRemove(playerCharacter.CharacterName, out _);
+                PlayerCharacterConnectionIds.TryRemove(playerCharacter.Id, out _);
                 return true;
             }
             return false;
@@ -71,6 +79,7 @@ namespace MultiplayerARPG
             PlayerCharacters.Clear();
             PlayerCharactersById.Clear();
             PlayerCharactersByName.Clear();
+            PlayerCharacterConnectionIds.Clear();
             UserIds.Clear();
         }
 
