@@ -710,10 +710,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCloseStorage()
         {
-#if !CLIENT_BUILD
-            GameInstance.ServerStorageHandlers.CloseStorage(this);
-            CurrentStorageId = StorageId.Empty;
-#endif
+            CloseStorage();
         }
         #endregion
 
@@ -999,7 +996,7 @@ namespace MultiplayerARPG
                     ownerId = GuildId.ToString();
                     break;
                 case StorageType.Building:
-                    if (!(targetEntity is BuildingEntity)) 
+                    if (!(targetEntity is BuildingEntity))
                         return;
                     ownerId = (targetEntity as BuildingEntity).Id;
                     break;
@@ -1020,6 +1017,14 @@ namespace MultiplayerARPG
                 CurrentStorageId = storageId;
                 GameInstance.ServerStorageHandlers.OpenStorage(this);
             }
+        }
+
+        public void CloseStorage()
+        {
+#if !CLIENT_BUILD
+            GameInstance.ServerStorageHandlers.CloseStorage(this);
+            CurrentStorageId = StorageId.Empty;
+#endif
         }
     }
 }
