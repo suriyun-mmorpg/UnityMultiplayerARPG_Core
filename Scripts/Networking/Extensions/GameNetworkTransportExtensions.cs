@@ -180,7 +180,7 @@ namespace MultiplayerARPG
             Send(manager, connectionId, msgType, netMessage);
         }
 
-        public static void SendGuildLevelExpSkillPoint(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, short level, int exp, short skillPoint)
+        public static void SendSetGuildLevelExpSkillPoint(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, short level, int exp, short skillPoint)
         {
             UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.LevelExpSkillPoint;

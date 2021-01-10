@@ -177,7 +177,7 @@ namespace MultiplayerARPG
 
         public void SendSetGuildLevelExpSkillPoint(long connectionId, int id, short level, int exp, short skillPoint)
         {
-            Manager.SendGuildLevelExpSkillPoint(connectionId, GameNetworkingConsts.UpdateGuild, id, level, exp, skillPoint);
+            Manager.SendSetGuildLevelExpSkillPoint(connectionId, GameNetworkingConsts.UpdateGuild, id, level, exp, skillPoint);
         }
 
         public void SendNotifyGuildInvitation(long connectionId, GuildInvitationData invitation)
