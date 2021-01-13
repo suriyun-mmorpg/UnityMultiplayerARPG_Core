@@ -1244,7 +1244,6 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                string characterId = GameInstance.ClientUserHandlers.CharacterId;
                 StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
                 string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
                 GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
@@ -1269,7 +1268,6 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            string characterId = GameInstance.ClientUserHandlers.CharacterId;
             StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
             string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
@@ -1294,7 +1292,6 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                string characterId = GameInstance.ClientUserHandlers.CharacterId;
                 StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
                 string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
                 GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
@@ -1319,7 +1316,6 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            string characterId = GameInstance.ClientUserHandlers.CharacterId;
             StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
             string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
