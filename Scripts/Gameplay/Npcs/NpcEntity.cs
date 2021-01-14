@@ -255,5 +255,26 @@ namespace MultiplayerARPG
             }
             return false;
         }
+
+        public bool HaveTasksDoneQuests(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (playerCharacterEntity == null)
+                return false;
+            Quest quest;
+            List<int> tasksDoneQuests = new List<int>();
+            foreach (CharacterQuest characterQuest in playerCharacterEntity.Quests)
+            {
+                quest = characterQuest.GetQuest();
+                if (quest == null || characterQuest.isComplete || !characterQuest.IsAllTasksDone(playerCharacterEntity))
+                    continue;
+                tasksDoneQuests.Add(quest.DataId);
+            }
+            foreach (int questId in questIds)
+            {
+                if (tasksDoneQuests.Contains(questId))
+                    return true;
+            }
+            return false;
+        }
     }
 }

@@ -1,22 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     public class NpcQuestIndicator : MonoBehaviour
     {
+        [Tooltip("This will activate when has a quest which done all tasks")]
+        public GameObject haveTasksDoneQuestsIndicator;
         [Tooltip("This will activate when there are in progress quests")]
-        public GameObject haveInProgressQuestIndicator;
+        [FormerlySerializedAs("haveInProgressQuestIndicator")]
+        public GameObject haveInProgressQuestsIndicator;
         [Tooltip("This will activate when there are new quests")]
-        public GameObject haveNewQuestIndicator;
+        [FormerlySerializedAs("haveNewQuestIndicator")]
+        public GameObject haveNewQuestsIndicator;
         public float updateWithinRange = 30f;
         public float updateRepeatRate = 0.5f;
         [HideInInspector, System.NonSerialized]
         public NpcEntity npcEntity;
         private float lastUpdateTime;
-
-        private bool tempVisibleResult;
 
         private void Awake()
         {
@@ -30,28 +33,35 @@ namespace MultiplayerARPG
                 BasePlayerCharacterController.OwningCharacter == null ||
                 Vector3.Distance(npcEntity.CacheTransform.position, BasePlayerCharacterController.OwningCharacter.CacheTransform.position) > updateWithinRange)
             {
-                if (haveInProgressQuestIndicator != null && haveInProgressQuestIndicator.activeSelf)
-                    haveInProgressQuestIndicator.SetActive(false);
-                if (haveNewQuestIndicator != null && haveNewQuestIndicator.activeSelf)
-                    haveNewQuestIndicator.SetActive(false);
+                if (haveTasksDoneQuestsIndicator != null && haveTasksDoneQuestsIndicator.activeSelf)
+                    haveTasksDoneQuestsIndicator.SetActive(false);
+                if (haveInProgressQuestsIndicator != null && haveInProgressQuestsIndicator.activeSelf)
+                    haveInProgressQuestsIndicator.SetActive(false);
+                if (haveNewQuestsIndicator != null && haveNewQuestsIndicator.activeSelf)
+                    haveNewQuestsIndicator.SetActive(false);
                 return;
             }
 
             if (Time.unscaledTime - lastUpdateTime >= updateRepeatRate)
             {
                 lastUpdateTime = Time.unscaledTime;
-                // Indicator priority haveInProgress > haveNewQuest
-                tempVisibleResult = npcEntity.HaveInProgressQuests(BasePlayerCharacterController.OwningCharacter);
-                if (haveInProgressQuestIndicator != null && haveInProgressQuestIndicator.activeSelf != tempVisibleResult)
-                    haveInProgressQuestIndicator.SetActive(tempVisibleResult);
+                // Indicator priority haveTasksDoneQuests > haveInProgressQuests > haveNewQuests
+                bool isIndicatorShown = false;
+                bool tempVisibleState;
+                tempVisibleState = !isIndicatorShown && npcEntity.HaveTasksDoneQuests(BasePlayerCharacterController.OwningCharacter);
+                isIndicatorShown = isIndicatorShown || tempVisibleState;
+                if (haveTasksDoneQuestsIndicator != null && haveTasksDoneQuestsIndicator.activeSelf != tempVisibleState)
+                    haveTasksDoneQuestsIndicator.SetActive(tempVisibleState);
 
-                if (!tempVisibleResult)
-                    tempVisibleResult = npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter);
-                else
-                    tempVisibleResult = false;
+                tempVisibleState = !isIndicatorShown && npcEntity.HaveInProgressQuests(BasePlayerCharacterController.OwningCharacter);
+                isIndicatorShown = isIndicatorShown || tempVisibleState;
+                if (haveInProgressQuestsIndicator != null && haveInProgressQuestsIndicator.activeSelf != tempVisibleState)
+                    haveInProgressQuestsIndicator.SetActive(tempVisibleState);
 
-                if (haveNewQuestIndicator != null && haveNewQuestIndicator.activeSelf != tempVisibleResult)
-                    haveNewQuestIndicator.SetActive(tempVisibleResult);
+                tempVisibleState = !isIndicatorShown && npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter);
+                isIndicatorShown = isIndicatorShown || tempVisibleState;
+                if (haveNewQuestsIndicator != null && haveNewQuestsIndicator.activeSelf != tempVisibleState)
+                    haveNewQuestsIndicator.SetActive(tempVisibleState);
             }
         }
     }
