@@ -17,10 +17,6 @@ namespace MultiplayerARPG
         public Transform miniMapElementContainer;
         public Transform questIndicatorContainer;
 
-        [Header("Sync Lists")]
-        [SerializeField]
-        private SyncListInt questIds = new SyncListInt();
-
         private UINpcEntity uiNpcEntity;
         private NpcQuestIndicator questIndicator;
 
@@ -103,19 +99,11 @@ namespace MultiplayerARPG
                 GameInstance.AddNpcDialogs(startDialog);
             if (graph != null)
                 GameInstance.AddNpcDialogs(graph.GetDialogs());
-            SetupQuestIds();
-        }
-
-        protected override void SetupNetElements()
-        {
-            base.SetupNetElements();
-            questIds.forOwnerOnly = false;
         }
 
         public override void OnSetup()
         {
             base.OnSetup();
-            SetupQuestIds();
 
             // Setup relates elements
             if (CurrentGameInstance.npcMiniMapObjects != null && CurrentGameInstance.npcMiniMapObjects.Length > 0)
@@ -155,16 +143,7 @@ namespace MultiplayerARPG
             questIndicator.npcEntity = this;
         }
 
-        private void SetupQuestIds()
-        {
-            if (!IsServer)
-                return;
-
-            questIds.Clear();
-            FindQuestFromDialog(StartDialog);
-        }
-
-        private void FindQuestFromDialog(BaseNpcDialog baseDialog, List<BaseNpcDialog> foundDialogs = null)
+        private void FindQuestFromDialog(IPlayerCharacterData playerCharacter, HashSet<int> questIds, BaseNpcDialog baseDialog, List<BaseNpcDialog> foundDialogs = null)
         {
             if (foundDialogs == null)
                 foundDialogs = new List<BaseNpcDialog>();
@@ -183,40 +162,42 @@ namespace MultiplayerARPG
                 case NpcDialogType.Normal:
                     foreach (NpcDialogMenu menu in dialog.menus)
                     {
-                        if (menu.isCloseMenu) continue;
-                        FindQuestFromDialog(menu.dialog, foundDialogs);
+                        if (menu.isCloseMenu && !menu.IsPassConditions(playerCharacter)) continue;
+                        FindQuestFromDialog(playerCharacter, questIds, menu.dialog, foundDialogs);
                     }
                     break;
                 case NpcDialogType.Quest:
                     if (dialog.quest != null)
                         questIds.Add(dialog.quest.DataId);
-                    FindQuestFromDialog(dialog.questAcceptedDialog, foundDialogs);
-                    FindQuestFromDialog(dialog.questDeclinedDialog, foundDialogs);
-                    FindQuestFromDialog(dialog.questAbandonedDialog, foundDialogs);
-                    FindQuestFromDialog(dialog.questCompletedDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.questAcceptedDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.questDeclinedDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.questAbandonedDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.questCompletedDialog, foundDialogs);
                     break;
                 case NpcDialogType.CraftItem:
-                    FindQuestFromDialog(dialog.craftNotMeetRequirementsDialog, foundDialogs);
-                    FindQuestFromDialog(dialog.craftDoneDialog, foundDialogs);
-                    FindQuestFromDialog(dialog.craftCancelDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.craftNotMeetRequirementsDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.craftDoneDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.craftCancelDialog, foundDialogs);
                     break;
                 case NpcDialogType.SaveRespawnPoint:
-                    FindQuestFromDialog(dialog.saveRespawnConfirmDialog, foundDialogs);
-                    FindQuestFromDialog(dialog.saveRespawnCancelDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnConfirmDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnCancelDialog, foundDialogs);
                     break;
                 case NpcDialogType.Warp:
-                    FindQuestFromDialog(dialog.warpCancelDialog, foundDialogs);
+                    FindQuestFromDialog(playerCharacter, questIds, dialog.warpCancelDialog, foundDialogs);
                     break;
             }
         }
 
-        public bool HaveNewQuests(BasePlayerCharacterEntity playerCharacterEntity)
+        public bool HaveNewQuests(IPlayerCharacterData playerCharacter)
         {
-            if (playerCharacterEntity == null)
+            if (playerCharacter == null)
                 return false;
+            HashSet<int> questIds = new HashSet<int>();
+            FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> clearedQuests = new List<int>();
-            foreach (CharacterQuest characterQuest in playerCharacterEntity.Quests)
+            foreach (CharacterQuest characterQuest in playerCharacter.Quests)
             {
                 quest = characterQuest.GetQuest();
                 if (quest == null || characterQuest.isComplete)
@@ -227,24 +208,26 @@ namespace MultiplayerARPG
             {
                 if (!clearedQuests.Contains(questId) &&
                     GameInstance.Quests.ContainsKey(questId) &&
-                    GameInstance.Quests[questId].CanReceiveQuest(playerCharacterEntity))
+                    GameInstance.Quests[questId].CanReceiveQuest(playerCharacter))
                     return true;
             }
             return false;
         }
 
-        public bool HaveInProgressQuests(BasePlayerCharacterEntity playerCharacterEntity)
+        public bool HaveInProgressQuests(IPlayerCharacterData playerCharacter)
         {
-            if (playerCharacterEntity == null)
+            if (playerCharacter == null)
                 return false;
+            HashSet<int> questIds = new HashSet<int>();
+            FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> inProgressQuests = new List<int>();
-            foreach (CharacterQuest characterQuest in playerCharacterEntity.Quests)
+            foreach (CharacterQuest characterQuest in playerCharacter.Quests)
             {
                 quest = characterQuest.GetQuest();
                 if (quest == null || characterQuest.isComplete)
                     continue;
-                if (quest.HaveToTalkToNpc(playerCharacterEntity, this, out _, out _, out _))
+                if (quest.HaveToTalkToNpc(playerCharacter, this, out _, out _, out _))
                     return true;
                 inProgressQuests.Add(quest.DataId);
             }
@@ -256,16 +239,18 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool HaveTasksDoneQuests(BasePlayerCharacterEntity playerCharacterEntity)
+        public bool HaveTasksDoneQuests(IPlayerCharacterData playerCharacter)
         {
-            if (playerCharacterEntity == null)
+            if (playerCharacter == null)
                 return false;
+            HashSet<int> questIds = new HashSet<int>();
+            FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> tasksDoneQuests = new List<int>();
-            foreach (CharacterQuest characterQuest in playerCharacterEntity.Quests)
+            foreach (CharacterQuest characterQuest in playerCharacter.Quests)
             {
                 quest = characterQuest.GetQuest();
-                if (quest == null || characterQuest.isComplete || !characterQuest.IsAllTasksDone(playerCharacterEntity))
+                if (quest == null || characterQuest.isComplete || !characterQuest.IsAllTasksDone(playerCharacter))
                     continue;
                 tasksDoneQuests.Add(quest.DataId);
             }
