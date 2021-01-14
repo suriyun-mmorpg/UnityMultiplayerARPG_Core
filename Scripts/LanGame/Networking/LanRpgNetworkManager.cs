@@ -54,6 +54,7 @@ namespace MultiplayerARPG
             ServerGuildMessageHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, LanRpgServerGuildMessageHandlers>();
             ServerBankMessageHandlers = gameObject.GetOrAddComponent<IServerBankMessageHandlers, LanRpgServerBankMessageHandlers>();
             // Client handlers
+            ClientUserHandlers = gameObject.GetOrAddComponent<IClientUserHandlers, DefaultClientUserHandlers>();
             ClientCashShopHandlers = gameObject.GetOrAddComponent<IClientCashShopHandlers, DefaultClientCashShopHandlers>();
             ClientMailHandlers = gameObject.GetOrAddComponent<IClientMailHandlers, DefaultClientMailHandlers>();
             ClientStorageHandlers = gameObject.GetOrAddComponent<IClientStorageHandlers, DefaultClientStorageHandlers>();
@@ -176,6 +177,7 @@ namespace MultiplayerARPG
 
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
+            ClientUserHandlers.CharacterId = selectedCharacter.Id;
             selectedCharacter.SerializeCharacterData(writer);
         }
 
