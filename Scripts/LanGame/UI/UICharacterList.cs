@@ -14,10 +14,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public Button buttonStart;
         public Button buttonDelete;
+        [Tooltip("These objects will be activated while character selected")]
+        public List<GameObject> selectedCharacterObjects = new List<GameObject>();
         [Header("Event")]
-        public UnityEvent eventOnNoCharacter;
-        public UnityEvent eventOnAbleToCreateCharacter;
-        public UnityEvent eventOnNotAbleToCreateCharacter;
+        public UnityEvent eventOnNoCharacter = new UnityEvent();
+        public UnityEvent eventOnAbleToCreateCharacter = new UnityEvent();
+        public UnityEvent eventOnNotAbleToCreateCharacter = new UnityEvent();
 
         private UIList cacheCharacterList;
         public UIList CacheCharacterList
@@ -57,11 +59,16 @@ namespace MultiplayerARPG
         {
             CacheCharacterSelectionManager.Clear();
             CacheCharacterList.HideAll();
-            // Unenabled buttons
+            // Unenable buttons
             if (buttonStart)
                 buttonStart.gameObject.SetActive(false);
             if (buttonDelete)
                 buttonDelete.gameObject.SetActive(false);
+            // Deactivate selected character objects
+            foreach (GameObject obj in selectedCharacterObjects)
+            {
+                obj.SetActive(false);
+            }
             // Remove all models
             characterModelContainer.RemoveChildren();
             CharacterModelById.Clear();
@@ -134,6 +141,10 @@ namespace MultiplayerARPG
                 buttonDelete.onClick.AddListener(OnClickDelete);
                 buttonDelete.gameObject.SetActive(false);
             }
+            foreach (GameObject obj in selectedCharacterObjects)
+            {
+                obj.SetActive(false);
+            }
             // Clear selection
             CacheCharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             CacheCharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
@@ -151,10 +162,16 @@ namespace MultiplayerARPG
         protected void OnSelectCharacter(UICharacter uiCharacter)
         {
             selectedPlayerCharacterData = uiCharacter.Data as PlayerCharacterData;
+            // Enable buttons because character was selected
             if (buttonStart)
                 buttonStart.gameObject.SetActive(true);
             if (buttonDelete)
                 buttonDelete.gameObject.SetActive(true);
+            // Activate selected character objects because character was selected
+            foreach (GameObject obj in selectedCharacterObjects)
+            {
+                obj.SetActive(true);
+            }
             characterModelContainer.SetChildrenActive(false);
             // Show selected character model
             CharacterModelById.TryGetValue(selectedPlayerCharacterData.Id, out selectedModel);
