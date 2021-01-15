@@ -35,6 +35,9 @@ namespace MultiplayerARPG
             System.Action onClickNo = null,
             System.Action onClickCancel = null)
         {
+#if DEBUG_UI
+            Debug.Log($"Showing message dialog {title} {description}");
+#endif
             uiMessageDialog.Show(title,
                 description,
                 showButtonOkay,
@@ -54,6 +57,9 @@ namespace MultiplayerARPG
             InputField.ContentType contentType = InputField.ContentType.Standard,
             int characterLimit = 0)
         {
+#if DEBUG_UI
+            Debug.Log($"Showing input dialog (string) {title} {description}");
+#endif
             uiInputDialog.Show(title,
                 description,
                 onConfirmText,
@@ -69,6 +75,9 @@ namespace MultiplayerARPG
             int? maxAmount = null,
             int defaultAmount = 0)
         {
+#if DEBUG_UI
+            Debug.Log($"Showing input dialog (integer) {title} {description}");
+#endif
             uiInputDialog.Show(title,
                 description,
                 onConfirmInteger,
@@ -84,6 +93,9 @@ namespace MultiplayerARPG
             float? maxAmount = null,
             float defaultAmount = 0f)
         {
+#if DEBUG_UI
+            Debug.Log($"Showing input dialog (float) {title} {description}");
+#endif
             uiInputDialog.Show(title,
                 description,
                 onConfirmDecimal,
