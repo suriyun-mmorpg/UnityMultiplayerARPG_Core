@@ -1007,6 +1007,7 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_CONTENT.ToString(), "{0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_SENT_DATE.ToString(), "Date: {0}");
             // Error - Generic Error
+            Texts.Add(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString(), "Service is not available");
             Texts.Add(UITextKeys.UI_ERROR_KICKED_FROM_SERVER.ToString(), "You have been kicked from server");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_FAILED.ToString(), "Cannot connect to the server");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_REJECTED.ToString(), "Connection rejected by server");
@@ -1021,6 +1022,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND.ToString(), "Cash package not found");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString(), "Not enough gold");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString(), "Not enough cash");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString(), "Not logged in");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_DATA.ToString(), "Invalid data");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString(), "Invalid character data");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString(), "Username is empty");
