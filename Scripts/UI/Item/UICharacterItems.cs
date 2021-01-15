@@ -77,7 +77,6 @@ namespace MultiplayerARPG
             }
             if (uiItemDialog != null && CacheItemSelectionManager.selectionMode == UISelectionMode.SelectSingle)
             {
-                Debug.LogError(ui.Data.inventoryType);
                 uiItemDialog.selectionManager = CacheItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, Character, ui.IndexOfData);
                 uiItemDialog.Show();
