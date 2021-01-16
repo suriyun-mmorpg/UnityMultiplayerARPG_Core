@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            IPlayerCharacterData owningCharacter = GameInstance.ClientUserHandlers.Character;
+            IPlayerCharacterData owningCharacter = GameInstance.Character;
             SocialSystemSetting systemSetting = GameInstance.Singleton.SocialSystemSetting;
             if (textRequireGold != null)
             {

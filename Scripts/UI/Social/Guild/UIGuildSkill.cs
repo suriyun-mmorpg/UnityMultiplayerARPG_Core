@@ -119,9 +119,9 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter && GuildSkill && Level < GuildSkill.maxLevel &&
-                GameInstance.ClientGuildHandlers.ClientGuild != null &&
-                GameInstance.ClientGuildHandlers.ClientGuild.IsLeader(owningCharacter.Id) &&
-                GameInstance.ClientGuildHandlers.ClientGuild.skillPoint > 0)
+                GameInstance.ClientGuild != null &&
+                GameInstance.ClientGuild.IsLeader(owningCharacter.Id) &&
+                GameInstance.ClientGuild.skillPoint > 0)
             {
                 onAbleToLevelUp.Invoke();
             }
@@ -276,7 +276,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            if (GameInstance.ClientGuildHandlers.ClientGuild == null)
+            if (GameInstance.ClientGuild == null)
                 return;
             GameInstance.ClientGuildHandlers.RequestIncreaseGuildSkillLevel(new RequestIncreaseGuildSkillLevelMessage()
             {
@@ -286,7 +286,7 @@ namespace MultiplayerARPG
 
         public void OnClickUse()
         {
-            if (GameInstance.ClientGuildHandlers.ClientGuild == null)
+            if (GameInstance.ClientGuild == null)
                 return;
             BasePlayerCharacterController.OwningCharacter.CallServerUseGuildSkill(GuildSkill.DataId);
         }

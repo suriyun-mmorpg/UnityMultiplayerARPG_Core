@@ -18,12 +18,12 @@ namespace MultiplayerARPG
             foreach (GameObject obj in partyInviteObjects)
             {
                 if (obj != null)
-                    obj.SetActive(GameInstance.ClientPartyHandlers.ClientParty != null && GameInstance.ClientPartyHandlers.ClientParty.CanInvite(GameInstance.ClientUserHandlers.CharacterId));
+                    obj.SetActive(GameInstance.ClientParty != null && GameInstance.ClientParty.CanInvite(GameInstance.Character.Id));
             }
             foreach (GameObject obj in guildInviteObjects)
             {
                 if (obj != null)
-                    obj.SetActive(GameInstance.ClientGuildHandlers.ClientGuild != null && GameInstance.ClientGuildHandlers.ClientGuild.CanInvite(GameInstance.ClientUserHandlers.CharacterId));
+                    obj.SetActive(GameInstance.ClientGuild != null && GameInstance.ClientGuild.CanInvite(GameInstance.Character.Id));
             }
         }
 

@@ -46,7 +46,6 @@ namespace MultiplayerARPG
         protected IClientGuildHandlers ClientGuildHandlers { get; set; }
         protected IClientFriendHandlers ClientFriendHandlers { get; set; }
         protected IClientBankHandlers ClientBankHandlers { get; set; }
-        protected IClientUserHandlers ClientUserHandlers { get; set; }
         protected IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
         protected IClientGameMessageHandlers ClientGameMessageHandlers { get; set; }
 
@@ -345,7 +344,6 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers = ClientGuildHandlers;
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
             GameInstance.ClientBankHandlers = ClientBankHandlers;
-            GameInstance.ClientUserHandlers = ClientUserHandlers;
             GameInstance.ClientOnlineCharacterHandlers = ClientOnlineCharacterHandlers;
         }
 

@@ -4,7 +4,6 @@ namespace MultiplayerARPG
 {
     public interface IClientGuildHandlers
     {
-        GuildData ClientGuild { get; set; }
         bool RequestCreateGuild(RequestCreateGuildMessage data, ResponseDelegate<ResponseCreateGuildMessage> callback);
         bool RequestChangeGuildLeader(RequestChangeGuildLeaderMessage data, ResponseDelegate<ResponseChangeGuildLeaderMessage> callback);
         bool RequestChangeGuildMessage(RequestChangeGuildMessageMessage data, ResponseDelegate<ResponseChangeGuildMessageMessage> callback);

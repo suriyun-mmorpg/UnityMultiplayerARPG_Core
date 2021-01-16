@@ -36,18 +36,18 @@ namespace MultiplayerARPG
         private void Start()
         {
             updatingActivatingGameObjects = false;
-            dirtyEquipWeaponSet = GameInstance.ClientUserHandlers.Character.EquipWeaponSet;
+            dirtyEquipWeaponSet = GameInstance.Character.EquipWeaponSet;
             UpdateActivatingGameObjects();
         }
 
         private void LateUpdate()
         {
-            if (GameInstance.ClientUserHandlers.Character == null)
+            if (GameInstance.Character == null)
                 return;
 
-            if (dirtyEquipWeaponSet != GameInstance.ClientUserHandlers.Character.EquipWeaponSet)
+            if (dirtyEquipWeaponSet != GameInstance.Character.EquipWeaponSet)
             {
-                dirtyEquipWeaponSet = GameInstance.ClientUserHandlers.Character.EquipWeaponSet;
+                dirtyEquipWeaponSet = GameInstance.Character.EquipWeaponSet;
                 UpdateActivatingGameObjects();
             }
         }
@@ -58,11 +58,11 @@ namespace MultiplayerARPG
             for (int i = 0; i < activatingGameObjects.Length; ++i)
             {
                 if (activatingGameObjects[i].toggle != null)
-                    activatingGameObjects[i].toggle.isOn = activatingGameObjects[i].equipWeaponSet == GameInstance.ClientUserHandlers.Character.EquipWeaponSet;
+                    activatingGameObjects[i].toggle.isOn = activatingGameObjects[i].equipWeaponSet == GameInstance.Character.EquipWeaponSet;
 
                 for (int j = 0; j < activatingGameObjects[i].gameObjects.Length; ++j)
                 {
-                    activatingGameObjects[i].gameObjects[j].SetActive(activatingGameObjects[i].equipWeaponSet == GameInstance.ClientUserHandlers.Character.EquipWeaponSet);
+                    activatingGameObjects[i].gameObjects[j].SetActive(activatingGameObjects[i].equipWeaponSet == GameInstance.Character.EquipWeaponSet);
                 }
             }
             updatingActivatingGameObjects = false;

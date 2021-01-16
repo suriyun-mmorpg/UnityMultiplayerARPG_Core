@@ -1244,8 +1244,8 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
-                string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
+                StorageType storageType = GameInstance.StorageType;
+                string storageOwnerId = GameInstance.StorageOwnerId;
                 GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
                 {
                     storageType = storageType,
@@ -1268,8 +1268,8 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
-            string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
+            StorageType storageType = GameInstance.StorageType;
+            string storageOwnerId = GameInstance.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
             {
                 storageType = storageType,
@@ -1292,8 +1292,8 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
-                string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
+                StorageType storageType = GameInstance.StorageType;
+                string storageOwnerId = GameInstance.StorageOwnerId;
                 GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
                 {
                     storageType = storageType,
@@ -1316,8 +1316,8 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            StorageType storageType = GameInstance.ClientStorageHandlers.StorageType;
-            string storageOwnerId = GameInstance.ClientStorageHandlers.StorageOwnerId;
+            StorageType storageType = GameInstance.StorageType;
+            string storageOwnerId = GameInstance.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
             {
                 storageType = storageType,

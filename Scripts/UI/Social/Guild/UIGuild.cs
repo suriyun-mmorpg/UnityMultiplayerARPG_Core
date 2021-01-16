@@ -39,7 +39,7 @@ namespace MultiplayerARPG
         public UIGuildRoleSetting uiGuildRoleSetting;
         public UIGuildMemberRoleSetting uiGuildMemberRoleSetting;
 
-        public GuildData Guild { get { return GameInstance.ClientGuildHandlers.ClientGuild; } }
+        public GuildData Guild { get { return GameInstance.ClientGuild; } }
 
         private string guildMessage;
 
@@ -406,7 +406,7 @@ namespace MultiplayerARPG
 
         public override int GetSocialId()
         {
-            return GameInstance.ClientUserHandlers.Character.GuildId;
+            return GameInstance.Character.GuildId;
         }
 
         public override int GetMaxMemberAmount()
@@ -428,12 +428,12 @@ namespace MultiplayerARPG
 
         public override bool OwningCharacterIsLeader()
         {
-            return IsLeader(GameInstance.ClientUserHandlers.CharacterId);
+            return IsLeader(GameInstance.Character.Id);
         }
 
         public override bool OwningCharacterCanKick()
         {
-            return CanKick(GameInstance.ClientUserHandlers.CharacterId);
+            return CanKick(GameInstance.Character.Id);
         }
     }
 }

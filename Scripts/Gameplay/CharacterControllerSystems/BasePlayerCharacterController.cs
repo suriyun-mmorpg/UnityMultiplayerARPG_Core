@@ -34,18 +34,16 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterController> onDesetup;
         public System.Action<BuildingEntity> onActivateBuilding;
 
-        private BasePlayerCharacterEntity playerCharacterEntity;
         public BasePlayerCharacterEntity PlayerCharacterEntity
         {
-            get { return playerCharacterEntity; }
+            get { return GameInstance.Character as BasePlayerCharacterEntity; }
             set
             {
                 if (value.IsOwnerClient)
                 {
-                    Desetup(playerCharacterEntity);
-                    playerCharacterEntity = value;
-                    GameInstance.ClientUserHandlers.Character = value;
-                    Setup(playerCharacterEntity);
+                    Desetup(GameInstance.Character as BasePlayerCharacterEntity);
+                    GameInstance.Character = value;
+                    Setup(GameInstance.Character as BasePlayerCharacterEntity);
                 }
             }
         }

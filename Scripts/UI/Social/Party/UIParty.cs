@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         public UIPartyCreate uiPartyCreate;
         public UIPartySetting uiPartySetting;
 
-        public PartyData Party { get { return GameInstance.ClientPartyHandlers.ClientParty; } }
+        public PartyData Party { get { return GameInstance.ClientParty; } }
 
         protected override void UpdateUIs()
         {
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
 
         public override int GetSocialId()
         {
-            return GameInstance.ClientUserHandlers.Character.PartyId;
+            return GameInstance.Character.PartyId;
         }
 
         public override int GetMaxMemberAmount()
@@ -161,12 +161,12 @@ namespace MultiplayerARPG
 
         public override bool OwningCharacterIsLeader()
         {
-            return IsLeader(GameInstance.ClientUserHandlers.CharacterId);
+            return IsLeader(GameInstance.Character.Id);
         }
 
         public override bool OwningCharacterCanKick()
         {
-            return CanKick(GameInstance.ClientUserHandlers.CharacterId);
+            return CanKick(GameInstance.Character.Id);
         }
     }
 }

@@ -60,9 +60,9 @@ namespace MultiplayerARPG
 
         public void HandleUpdatePartyMember(MessageHandlerData messageHandler)
         {
-            if (GameInstance.ClientPartyHandlers.ClientParty != null)
-                GameInstance.ClientPartyHandlers.ClientParty.UpdateSocialGroupMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
-            ClientPartyActions.NotifyPartyUpdated(GameInstance.ClientPartyHandlers.ClientParty);
+            if (GameInstance.ClientParty != null)
+                GameInstance.ClientParty.UpdateSocialGroupMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            ClientPartyActions.NotifyPartyUpdated(GameInstance.ClientParty);
         }
 
         public void HandleUpdateParty(MessageHandlerData messageHandler)
@@ -70,31 +70,31 @@ namespace MultiplayerARPG
             UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (message.type == UpdatePartyMessage.UpdateType.Create)
             {
-                GameInstance.ClientPartyHandlers.ClientParty = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
+                GameInstance.ClientParty = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
             }
-            else if (GameInstance.ClientPartyHandlers.ClientParty != null && GameInstance.ClientPartyHandlers.ClientParty.id == message.id)
+            else if (GameInstance.ClientParty != null && GameInstance.ClientParty.id == message.id)
             {
                 switch (message.type)
                 {
                     case UpdatePartyMessage.UpdateType.ChangeLeader:
-                        GameInstance.ClientPartyHandlers.ClientParty.SetLeader(message.characterId);
+                        GameInstance.ClientParty.SetLeader(message.characterId);
                         break;
                     case UpdatePartyMessage.UpdateType.Setting:
-                        GameInstance.ClientPartyHandlers.ClientParty.Setting(message.shareExp, message.shareItem);
+                        GameInstance.ClientParty.Setting(message.shareExp, message.shareItem);
                         break;
                     case UpdatePartyMessage.UpdateType.Terminate:
-                        GameInstance.ClientPartyHandlers.ClientParty = null;
+                        GameInstance.ClientParty = null;
                         break;
                 }
             }
-            ClientPartyActions.NotifyPartyUpdated(GameInstance.ClientPartyHandlers.ClientParty);
+            ClientPartyActions.NotifyPartyUpdated(GameInstance.ClientParty);
         }
 
         public void HandleUpdateGuildMember(MessageHandlerData messageHandler)
         {
-            if (GameInstance.ClientGuildHandlers.ClientGuild != null)
-                GameInstance.ClientGuildHandlers.ClientGuild.UpdateSocialGroupMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
-            ClientGuildActions.NotifyGuildUpdated(GameInstance.ClientGuildHandlers.ClientGuild);
+            if (GameInstance.ClientGuild != null)
+                GameInstance.ClientGuild.UpdateSocialGroupMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            ClientGuildActions.NotifyGuildUpdated(GameInstance.ClientGuild);
         }
 
         public void HandleUpdateGuild(MessageHandlerData messageHandler)
@@ -102,45 +102,45 @@ namespace MultiplayerARPG
             UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (message.type == UpdateGuildMessage.UpdateType.Create)
             {
-                GameInstance.ClientGuildHandlers.ClientGuild = new GuildData(message.id, message.guildName, message.characterId);
+                GameInstance.ClientGuild = new GuildData(message.id, message.guildName, message.characterId);
             }
-            else if (GameInstance.ClientGuildHandlers.ClientGuild != null && GameInstance.ClientGuildHandlers.ClientGuild.id == message.id)
+            else if (GameInstance.ClientGuild != null && GameInstance.ClientGuild.id == message.id)
             {
                 switch (message.type)
                 {
                     case UpdateGuildMessage.UpdateType.ChangeLeader:
-                        GameInstance.ClientGuildHandlers.ClientGuild.SetLeader(message.characterId);
+                        GameInstance.ClientGuild.SetLeader(message.characterId);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMessage:
-                        GameInstance.ClientGuildHandlers.ClientGuild.guildMessage = message.guildMessage;
+                        GameInstance.ClientGuild.guildMessage = message.guildMessage;
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
-                        GameInstance.ClientGuildHandlers.ClientGuild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
+                        GameInstance.ClientGuild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
-                        GameInstance.ClientGuildHandlers.ClientGuild.SetMemberRole(message.characterId, message.guildRole);
+                        GameInstance.ClientGuild.SetMemberRole(message.characterId, message.guildRole);
                         break;
                     case UpdateGuildMessage.UpdateType.SetSkillLevel:
-                        GameInstance.ClientGuildHandlers.ClientGuild.SetSkillLevel(message.dataId, message.level);
+                        GameInstance.ClientGuild.SetSkillLevel(message.dataId, message.level);
                         if (BasePlayerCharacterController.OwningCharacter != null)
                             BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
                         break;
                     case UpdateGuildMessage.UpdateType.SetGold:
-                        GameInstance.ClientGuildHandlers.ClientGuild.gold = message.gold;
+                        GameInstance.ClientGuild.gold = message.gold;
                         break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
-                        GameInstance.ClientGuildHandlers.ClientGuild.level = message.level;
-                        GameInstance.ClientGuildHandlers.ClientGuild.exp = message.exp;
-                        GameInstance.ClientGuildHandlers.ClientGuild.skillPoint = message.skillPoint;
+                        GameInstance.ClientGuild.level = message.level;
+                        GameInstance.ClientGuild.exp = message.exp;
+                        GameInstance.ClientGuild.skillPoint = message.skillPoint;
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
-                        GameInstance.ClientGuildHandlers.ClientGuild = null;
+                        GameInstance.ClientGuild = null;
                         if (BasePlayerCharacterController.OwningCharacter != null)
                             BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
                         break;
                 }
             }
-            ClientGuildActions.NotifyGuildUpdated(GameInstance.ClientGuildHandlers.ClientGuild);
+            ClientGuildActions.NotifyGuildUpdated(GameInstance.ClientGuild);
         }
 
         public void HandleUpdateFriends(MessageHandlerData messageHandler)
