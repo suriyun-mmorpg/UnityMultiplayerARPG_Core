@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         public UIPartyCreate uiPartyCreate;
         public UIPartySetting uiPartySetting;
 
-        public PartyData Party { get { return GameInstance.ClientParty; } }
+        public PartyData Party { get { return GameInstance.JoinedParty; } }
 
         protected override void UpdateUIs()
         {

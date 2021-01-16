@@ -55,8 +55,8 @@ namespace MultiplayerARPG
         public static string UserToken { get; set; }
         public static string SelectedCharacterId { get; set; }
         public static IPlayerCharacterData PlayingCharacter { get; set; }
-        public static PartyData ClientParty { get; set; }
-        public static GuildData ClientGuild { get; set; }
+        public static PartyData JoinedParty { get; set; }
+        public static GuildData JoinedGuild { get; set; }
         public static StorageType OpenedStorageType { get; set; }
         public static string OpenedStorageOwnerId { get; set; }
 

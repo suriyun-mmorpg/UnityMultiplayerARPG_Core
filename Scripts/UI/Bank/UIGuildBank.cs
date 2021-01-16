@@ -4,9 +4,9 @@
     {
         public override int GetAmount()
         {
-            if (GameInstance.ClientGuild == null)
+            if (GameInstance.JoinedGuild == null)
                 return 0;
-            return GameInstance.ClientGuild.gold;
+            return GameInstance.JoinedGuild.gold;
         }
 
         public override void OnDepositConfirm(int amount)
