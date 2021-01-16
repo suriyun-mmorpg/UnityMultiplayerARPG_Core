@@ -21,20 +21,20 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             UpdateOwningCharacterData();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
-            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
         private void OnDisable()
         {
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
-            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         }
 
         protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
-            UpdateData(BasePlayerCharacterController.OwningCharacter);
+            UpdateData(GameInstance.PlayingCharacter);
         }
 
         public void UpdateData(ICharacterData character)

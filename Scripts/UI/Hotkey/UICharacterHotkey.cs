@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     {
         public int indexOfData { get; protected set; }
         public string hotkeyId { get { return Data.hotkeyId; } }
-        public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
+        public BasePlayerCharacterEntity OwningCharacter { get { return GameInstance.PlayingCharacterEntity; } }
         public UICharacterHotkeys UICharacterHotkeys { get; private set; }
 
         [FormerlySerializedAs("uiAssigner")]
@@ -29,15 +29,15 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         }
 
         private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)

@@ -108,24 +108,24 @@ namespace MultiplayerARPG
         protected virtual void OnEnable()
         {
             UpdateOwningCharacterData();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
-            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
-            BasePlayerCharacterController.OwningCharacter.onSkillsOperation += OnSkillsOperation;
-            BasePlayerCharacterController.OwningCharacter.onHotkeysOperation += OnHotkeysOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onSkillsOperation += OnSkillsOperation;
+            GameInstance.PlayingCharacterEntity.onHotkeysOperation += OnHotkeysOperation;
         }
 
         protected virtual void OnDisable()
         {
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
-            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            BasePlayerCharacterController.OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-            BasePlayerCharacterController.OwningCharacter.onSkillsOperation -= OnSkillsOperation;
-            BasePlayerCharacterController.OwningCharacter.onHotkeysOperation -= OnHotkeysOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onSkillsOperation -= OnSkillsOperation;
+            GameInstance.PlayingCharacterEntity.onHotkeysOperation -= OnHotkeysOperation;
         }
 
         private void OnEquipWeaponSetChange(byte equipWeaponSet)
@@ -160,8 +160,8 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (!GameInstance.PlayingCharacterEntity) return;
+            UpdateData(GameInstance.PlayingCharacterEntity);
         }
 
         private void Update()

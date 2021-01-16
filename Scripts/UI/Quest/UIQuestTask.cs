@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                     break;
                 case QuestTaskType.Custom:
                     if (uiTextTaskDescription)
-                        uiTextTaskDescription.text = QuestTask.customQuestTask.GetTaskDescription(BasePlayerCharacterController.OwningCharacter, Progress);
+                        uiTextTaskDescription.text = QuestTask.customQuestTask.GetTaskDescription(GameInstance.PlayingCharacter, Progress);
                     break;
             }
         }

@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             if (isDropped || !CanDrag)
                 return;
             if (sourceLocation == SourceLocation.Hotkey)
-                BasePlayerCharacterController.OwningCharacter.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
+                GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
         }
     }
 }

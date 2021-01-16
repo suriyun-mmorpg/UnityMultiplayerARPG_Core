@@ -29,9 +29,9 @@ namespace MultiplayerARPG
         private void Update()
         {
             if (characterEntity == null || !characterEntity.IsClient ||
-                BasePlayerCharacterController.OwningCharacter == null ||
+                GameInstance.PlayingCharacterEntity == null ||
                 (characterEntity.IsServer && characterEntity.Identity.CountSubscribers() == 0) ||
-                Vector3.Distance(characterEntity.CacheTransform.position, BasePlayerCharacterController.OwningCharacter.CacheTransform.position) > updateWithinRange)
+                Vector3.Distance(characterEntity.CacheTransform.position, GameInstance.PlayingCharacterEntity.CacheTransform.position) > updateWithinRange)
             {
                 if (owningIndicator != null && owningIndicator.activeSelf)
                     owningIndicator.SetActive(false);
@@ -48,28 +48,28 @@ namespace MultiplayerARPG
             {
                 lastUpdateTime = Time.unscaledTime;
 
-                tempVisibleResult = BasePlayerCharacterController.OwningCharacter == characterEntity;
+                tempVisibleResult = GameInstance.PlayingCharacterEntity == characterEntity;
                 if (owningIndicator != null && owningIndicator.activeSelf != tempVisibleResult)
                     owningIndicator.SetActive(tempVisibleResult);
 
                 if (tempVisibleResult)
                     return;
 
-                tempVisibleResult = characterEntity.IsAlly(BasePlayerCharacterController.OwningCharacter);
+                tempVisibleResult = characterEntity.IsAlly(GameInstance.PlayingCharacterEntity);
                 if (allyIndicator != null && allyIndicator.activeSelf != tempVisibleResult)
                     allyIndicator.SetActive(tempVisibleResult);
 
                 if (tempVisibleResult)
                     return;
 
-                tempVisibleResult = characterEntity.IsEnemy(BasePlayerCharacterController.OwningCharacter);
+                tempVisibleResult = characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity);
                 if (enemyIndicator != null && enemyIndicator.activeSelf != tempVisibleResult)
                     enemyIndicator.SetActive(tempVisibleResult);
 
                 if (tempVisibleResult)
                     return;
 
-                tempVisibleResult = characterEntity.IsNeutral(BasePlayerCharacterController.OwningCharacter);
+                tempVisibleResult = characterEntity.IsNeutral(GameInstance.PlayingCharacterEntity);
                 if (neutralIndicator != null && neutralIndicator.activeSelf != tempVisibleResult)
                     neutralIndicator.SetActive(tempVisibleResult);
             }

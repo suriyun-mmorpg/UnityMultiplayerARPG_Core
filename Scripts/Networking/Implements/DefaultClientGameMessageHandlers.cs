@@ -122,8 +122,8 @@ namespace MultiplayerARPG
                         break;
                     case UpdateGuildMessage.UpdateType.SetSkillLevel:
                         GameInstance.JoinedGuild.SetSkillLevel(message.dataId, message.level);
-                        if (BasePlayerCharacterController.OwningCharacter != null)
-                            BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
+                        if (GameInstance.PlayingCharacterEntity != null)
+                            GameInstance.PlayingCharacterEntity.ForceMakeCaches();
                         break;
                     case UpdateGuildMessage.UpdateType.SetGold:
                         GameInstance.JoinedGuild.gold = message.gold;
@@ -135,8 +135,8 @@ namespace MultiplayerARPG
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
                         GameInstance.JoinedGuild = null;
-                        if (BasePlayerCharacterController.OwningCharacter != null)
-                            BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
+                        if (GameInstance.PlayingCharacterEntity != null)
+                            GameInstance.PlayingCharacterEntity.ForceMakeCaches();
                         break;
                 }
             }

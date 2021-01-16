@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public class UIRepairEquipItems : UIBase
     {
-        public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
+        public BasePlayerCharacterEntity OwningCharacter { get { return GameInstance.PlayingCharacterEntity; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         {
             int requireGold = 0;
             ItemRepairPrice tempRepairPrice;
-            EquipWeapons equipWeapons = BasePlayerCharacterController.OwningCharacter.EquipWeapons;
+            EquipWeapons equipWeapons = GameInstance.PlayingCharacterEntity.EquipWeapons;
             if (!equipWeapons.IsEmptyRightHandSlot())
             {
                 tempRepairPrice = equipWeapons.rightHand.GetItem().GetRepairPrice(equipWeapons.rightHand.durability);
@@ -31,7 +31,7 @@ namespace MultiplayerARPG
                 tempRepairPrice = equipWeapons.leftHand.GetItem().GetRepairPrice(equipWeapons.leftHand.durability);
                 requireGold += tempRepairPrice.RequireGold;
             }
-            foreach (CharacterItem equipItem in BasePlayerCharacterController.OwningCharacter.EquipItems)
+            foreach (CharacterItem equipItem in GameInstance.PlayingCharacterEntity.EquipItems)
             {
                 if (equipItem.IsEmptySlot())
                     continue;
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
 
         public void OnClickRepairEquipItems()
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerRepairEquipItems();
+            GameInstance.PlayingCharacterEntity.CallServerRepairEquipItems();
         }
     }
 }

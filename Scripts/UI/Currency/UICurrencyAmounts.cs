@@ -52,7 +52,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             // Reset number
             foreach (UICurrencyTextPair entry in CacheTextAmounts.Values)
             {
@@ -84,11 +83,11 @@ namespace MultiplayerARPG
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
                     // Get currency amount from character
-                    if (owningCharacter != null)
+                    if (GameInstance.PlayingCharacter != null)
                     {
-                        int indexOfCurrency = owningCharacter.IndexOfCurrency(tempCurrency.DataId);
+                        int indexOfCurrency = GameInstance.PlayingCharacter.IndexOfCurrency(tempCurrency.DataId);
                         if (indexOfCurrency >= 0)
-                            tempCurrentAmount = owningCharacter.Currencies[indexOfCurrency].amount;
+                            tempCurrentAmount = GameInstance.PlayingCharacter.Currencies[indexOfCurrency].amount;
                     }
                     // Use difference format by option 
                     switch (displayType)

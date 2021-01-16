@@ -65,15 +65,14 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (coolDownRemainsDuration <= 0f)
             {
-                if (owningCharacter != null && GuildSkill != null)
+                if (GameInstance.PlayingCharacter != null && GuildSkill != null)
                 {
-                    int indexOfSkillUsage = owningCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
+                    int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
                     if (indexOfSkillUsage >= 0)
                     {
-                        coolDownRemainsDuration = owningCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                        coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
                         if (coolDownRemainsDuration <= 1f)
                             coolDownRemainsDuration = 0f;
                     }
@@ -117,7 +116,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
             if (owningCharacter && GuildSkill && Level < GuildSkill.maxLevel &&
                 GameInstance.JoinedGuild != null &&
                 GameInstance.JoinedGuild.IsLeader(owningCharacter.Id) &&
@@ -288,7 +287,7 @@ namespace MultiplayerARPG
         {
             if (GameInstance.JoinedGuild == null)
                 return;
-            BasePlayerCharacterController.OwningCharacter.CallServerUseGuildSkill(GuildSkill.DataId);
+            GameInstance.PlayingCharacterEntity.CallServerUseGuildSkill(GuildSkill.DataId);
         }
     }
 }

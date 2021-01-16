@@ -28,11 +28,11 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (image == null || BasePlayerCharacterController.OwningCharacter == null)
+            if (image == null || GameInstance.PlayingCharacter == null)
                 return;
             bool isLeftHand = false;
-            Sprite usingSprite = null;
-            WeaponType currentWeaponType = BasePlayerCharacterController.OwningCharacter.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType;
+            Sprite usingSprite;
+            WeaponType currentWeaponType = GameInstance.PlayingCharacter.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType;
             if (currentWeaponType == null || !variesSpritesDict.TryGetValue(currentWeaponType, out usingSprite))
                 usingSprite = defaultSprite;
             image.sprite = usingSprite;

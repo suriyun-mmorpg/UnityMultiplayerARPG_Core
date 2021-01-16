@@ -36,14 +36,14 @@ namespace MultiplayerARPG
 
         public BasePlayerCharacterEntity PlayerCharacterEntity
         {
-            get { return GameInstance.PlayingCharacter as BasePlayerCharacterEntity; }
+            get { return GameInstance.PlayingCharacterEntity; }
             set
             {
                 if (value.IsOwnerClient)
                 {
-                    Desetup(GameInstance.PlayingCharacter as BasePlayerCharacterEntity);
+                    Desetup(GameInstance.PlayingCharacterEntity);
                     GameInstance.PlayingCharacter = value;
-                    Setup(GameInstance.PlayingCharacter as BasePlayerCharacterEntity);
+                    Setup(GameInstance.PlayingCharacterEntity);
                 }
             }
         }

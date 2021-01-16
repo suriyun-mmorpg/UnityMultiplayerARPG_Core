@@ -16,12 +16,12 @@
             string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             if (string.IsNullOrEmpty(selectedId))
                 return;
-            BasePlayerCharacterController.OwningCharacter.CallServerPickupItem(uint.Parse(selectedId));
+            GameInstance.PlayingCharacterEntity.CallServerPickupItem(uint.Parse(selectedId));
         }
 
         public void OnClickPickupNearbyItems()
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerPickupNearbyItems();
+            GameInstance.PlayingCharacterEntity.CallServerPickupNearbyItems();
         }
     }
 }

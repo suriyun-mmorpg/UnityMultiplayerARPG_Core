@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public partial class UICraftItem : UISelectionEntry<ItemCraft>
     {
-        public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
+        public BasePlayerCharacterEntity OwningCharacter { get { return GameInstance.PlayingCharacterEntity; } }
         public ItemCraft ItemCraft { get { return Data; } }
         public BaseItem CraftingItem { get { return ItemCraft.CraftingItem; } }
         public short Amount { get { return ItemCraft.Amount; } }

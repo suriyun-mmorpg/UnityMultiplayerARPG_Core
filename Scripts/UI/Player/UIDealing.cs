@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -92,13 +91,13 @@ namespace MultiplayerARPG
             if (uiItemDialog != null)
                 uiItemDialog.onHide.AddListener(OnItemDialogHide);
             UpdateData();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onUpdateDealingState += UpdateDealingState;
-            BasePlayerCharacterController.OwningCharacter.onUpdateDealingGold += UpdateDealingGold;
-            BasePlayerCharacterController.OwningCharacter.onUpdateDealingItems += UpdateDealingItems;
-            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingState += UpdateAnotherDealingState;
-            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingGold += UpdateAnotherDealingGold;
-            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingItems += UpdateAnotherDealingItems;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onUpdateDealingState += UpdateDealingState;
+            GameInstance.PlayingCharacterEntity.onUpdateDealingGold += UpdateDealingGold;
+            GameInstance.PlayingCharacterEntity.onUpdateDealingItems += UpdateDealingItems;
+            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingState += UpdateAnotherDealingState;
+            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingGold += UpdateAnotherDealingGold;
+            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingItems += UpdateAnotherDealingItems;
         }
 
         protected override void OnDisable()
@@ -107,13 +106,13 @@ namespace MultiplayerARPG
             if (uiItemDialog != null)
                 uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onUpdateDealingState -= UpdateDealingState;
-            BasePlayerCharacterController.OwningCharacter.onUpdateDealingGold -= UpdateDealingGold;
-            BasePlayerCharacterController.OwningCharacter.onUpdateDealingItems -= UpdateDealingItems;
-            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingState -= UpdateAnotherDealingState;
-            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingGold -= UpdateAnotherDealingGold;
-            BasePlayerCharacterController.OwningCharacter.onUpdateAnotherDealingItems -= UpdateAnotherDealingItems;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onUpdateDealingState -= UpdateDealingState;
+            GameInstance.PlayingCharacterEntity.onUpdateDealingGold -= UpdateDealingGold;
+            GameInstance.PlayingCharacterEntity.onUpdateDealingItems -= UpdateDealingItems;
+            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingState -= UpdateAnotherDealingState;
+            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingGold -= UpdateAnotherDealingGold;
+            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingItems -= UpdateAnotherDealingItems;
         }
 
         protected void OnItemDialogHide()
@@ -131,7 +130,7 @@ namespace MultiplayerARPG
             if (uiItemDialog != null)
             {
                 uiItemDialog.selectionManager = CacheItemSelectionManager;
-                uiItemDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, -1);
+                uiItemDialog.Setup(ui.Data, GameInstance.PlayingCharacterEntity, -1);
                 uiItemDialog.Show();
             }
         }
@@ -280,7 +279,7 @@ namespace MultiplayerARPG
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
                 if (dealingItem.characterItem.NotEmptySlot())
                 {
-                    tempUiCharacterItem.Setup(new UICharacterItemData(dealingItem.characterItem, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, -1);
+                    tempUiCharacterItem.Setup(new UICharacterItemData(dealingItem.characterItem, InventoryType.NonEquipItems), GameInstance.PlayingCharacterEntity, -1);
                     tempUiCharacterItem.Show();
                     uiList.Add(tempUiCharacterItem);
                 }
@@ -308,28 +307,28 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_OFFER_GOLD_DESCRIPTION.ToString()), 
                 OnDealingGoldConfirmed, 
                 0, // Min amount is 0
-                BasePlayerCharacterController.OwningCharacter.Gold, // Max amount is number of gold
-                BasePlayerCharacterController.OwningCharacter.DealingGold);
+                GameInstance.PlayingCharacterEntity.Gold, // Max amount is number of gold
+                GameInstance.PlayingCharacterEntity.DealingGold);
         }
 
         private void OnDealingGoldConfirmed(int amount)
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerSetDealingGold(amount);
+            GameInstance.PlayingCharacterEntity.CallServerSetDealingGold(amount);
         }
 
         public void OnClickLock()
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerLockDealing();
+            GameInstance.PlayingCharacterEntity.CallServerLockDealing();
         }
 
         public void OnClickConfirm()
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerConfirmDealing();
+            GameInstance.PlayingCharacterEntity.CallServerConfirmDealing();
         }
 
         public void OnClickCancel()
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerCancelDealing();
+            GameInstance.PlayingCharacterEntity.CallServerCancelDealing();
         }
     }
 }

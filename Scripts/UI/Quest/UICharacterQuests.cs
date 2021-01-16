@@ -66,8 +66,8 @@ namespace MultiplayerARPG
             else if (uiQuestDialog != null)
                 uiQuestDialog.Hide();
             UpdateOwningCharacterData();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onQuestsOperation += OnQuestsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onQuestsOperation += OnQuestsOperation;
         }
 
         protected virtual void OnDisable()
@@ -75,8 +75,8 @@ namespace MultiplayerARPG
             if (uiQuestDialog != null)
                 uiQuestDialog.onHide.RemoveListener(OnQuestDialogHide);
             CacheQuestSelectionManager.DeselectSelectedUI();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onQuestsOperation -= OnQuestsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onQuestsOperation -= OnQuestsOperation;
         }
 
         private void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
@@ -86,8 +86,8 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (GameInstance.PlayingCharacter == null) return;
+            UpdateData(GameInstance.PlayingCharacter);
         }
 
         protected void OnQuestDialogHide()

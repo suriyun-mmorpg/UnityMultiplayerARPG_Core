@@ -79,22 +79,22 @@ namespace MultiplayerARPG
         public void RegisterOwningCharacterEvents()
         {
             UnregisterOwningCharacterEvents();
-            if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onDataIdChange += OnDataIdChange;
-            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
-            BasePlayerCharacterController.OwningCharacter.onSkillsOperation += OnSkillsOperation;
+            if (notForOwningCharacter || !GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onDataIdChange += OnDataIdChange;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onSkillsOperation += OnSkillsOperation;
         }
 
         public void UnregisterOwningCharacterEvents()
         {
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onDataIdChange -= OnDataIdChange;
-            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
-            BasePlayerCharacterController.OwningCharacter.onSkillsOperation -= OnSkillsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onDataIdChange -= OnDataIdChange;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onSkillsOperation -= OnSkillsOperation;
         }
 
         private void OnDataIdChange(int dataId)
@@ -124,8 +124,8 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
-            if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
-            UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (notForOwningCharacter || GameInstance.PlayingCharacter == null) return;
+            UpdateData(GameInstance.PlayingCharacter);
         }
 
         protected void OnSkillDialogHide()

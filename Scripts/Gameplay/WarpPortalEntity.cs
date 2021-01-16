@@ -67,7 +67,7 @@ namespace MultiplayerARPG
 
             if (!warpImmediatelyWhenEnter)
             {
-                if (playerCharacterEntity == BasePlayerCharacterController.OwningCharacter)
+                if (playerCharacterEntity == GameInstance.PlayingCharacterEntity)
                 {
                     foreach (GameObject warpSignal in warpSignals)
                     {
@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             if (playerCharacterEntity == null)
                 return;
 
-            if (playerCharacterEntity == BasePlayerCharacterController.OwningCharacter)
+            if (playerCharacterEntity == GameInstance.PlayingCharacterEntity)
             {
                 foreach (GameObject warpSignal in warpSignals)
                 {

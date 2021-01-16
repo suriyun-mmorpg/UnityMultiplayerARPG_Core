@@ -74,7 +74,7 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            if (BasePlayerCharacterController.OwningCharacter == null)
+            if (GameInstance.PlayingCharacterEntity == null)
             {
                 CacheSkillList.HideAll();
                 CacheItemList.HideAll();
@@ -98,16 +98,16 @@ namespace MultiplayerARPG
             CharacterSkill tempCharacterSkill;
             BaseSkill tempSkill;
             int tempIndexOfSkill;
-            CacheSkillList.Generate(BasePlayerCharacterController.OwningCharacter.GetCaches().Skills, (index, skillLevel, ui) =>
+            CacheSkillList.Generate(GameInstance.PlayingCharacterEntity.GetCaches().Skills, (index, skillLevel, ui) =>
             {
                 tempUiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                 tempSkill = skillLevel.Key;
-                tempIndexOfSkill = BasePlayerCharacterController.OwningCharacter.IndexOfSkill(tempSkill.DataId);
+                tempIndexOfSkill = GameInstance.PlayingCharacterEntity.IndexOfSkill(tempSkill.DataId);
                 // Set character skill data
                 tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
                 if (uiCharacterHotkey.CanAssignCharacterSkill(tempCharacterSkill))
                 {
-                    tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill), BasePlayerCharacterController.OwningCharacter, tempIndexOfSkill);
+                    tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill), GameInstance.PlayingCharacterEntity, tempIndexOfSkill);
                     tempUiCharacterSkill.Show();
                     CacheSkillSelectionManager.Add(tempUiCharacterSkill);
                 }
@@ -119,12 +119,12 @@ namespace MultiplayerARPG
 
             // Setup item list
             UICharacterItem tempUiCharacterItem;
-            CacheItemList.Generate(BasePlayerCharacterController.OwningCharacter.NonEquipItems, (index, characterItem, ui) =>
+            CacheItemList.Generate(GameInstance.PlayingCharacterEntity.NonEquipItems, (index, characterItem, ui) =>
             {
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
                 if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
                 {
-                    tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, index);
+                    tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), GameInstance.PlayingCharacterEntity, index);
                     tempUiCharacterItem.Show();
                     CacheItemSelectionManager.Add(tempUiCharacterItem);
                 }
@@ -143,19 +143,19 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterSkill(UICharacterSkill ui)
         {
-            BasePlayerCharacterController.OwningCharacter.AssignSkillHotkey(uiCharacterHotkey.hotkeyId, ui.Skill);
+            GameInstance.PlayingCharacterEntity.AssignSkillHotkey(uiCharacterHotkey.hotkeyId, ui.Skill);
             Hide();
         }
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            BasePlayerCharacterController.OwningCharacter.AssignItemHotkey(uiCharacterHotkey.hotkeyId, ui.Data.characterItem);
+            GameInstance.PlayingCharacterEntity.AssignItemHotkey(uiCharacterHotkey.hotkeyId, ui.Data.characterItem);
             Hide();
         }
 
         public void OnClickUnAssign()
         {
-            BasePlayerCharacterController.OwningCharacter.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
+            GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
             Hide();
         }
     }

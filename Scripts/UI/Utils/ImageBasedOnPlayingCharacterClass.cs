@@ -28,10 +28,10 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (image == null || BasePlayerCharacterController.OwningCharacter == null)
+            if (image == null || GameInstance.PlayingCharacter == null)
                 return;
-            Sprite usingSprite = null;
-            PlayerCharacter currentClass = BasePlayerCharacterController.OwningCharacter.GetDatabase() as PlayerCharacter;
+            Sprite usingSprite;
+            PlayerCharacter currentClass = GameInstance.PlayingCharacter.GetDatabase() as PlayerCharacter;
             if (currentClass == null || !variesSpritesDict.TryGetValue(currentClass, out usingSprite))
                 usingSprite = defaultSprite;
             image.sprite = usingSprite;

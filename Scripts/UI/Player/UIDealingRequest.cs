@@ -17,15 +17,13 @@
 
         public void OnClickAccept()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.CallServerAcceptDealingRequest();
+            GameInstance.PlayingCharacterEntity.CallServerAcceptDealingRequest();
             Hide();
         }
 
         public void OnClickDecline()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.CallServerDeclineDealingRequest();
+            GameInstance.PlayingCharacterEntity.CallServerDeclineDealingRequest();
             Hide();
         }
     }

@@ -34,7 +34,7 @@ namespace MultiplayerARPG
                     uiCharacterItem.Hide();
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(Data.item), InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(Data.item), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
                     uiCharacterItem.Show();
                 }
             }
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
 
             if (item.MaxStack == 1)
             {
-                BasePlayerCharacterController.OwningCharacter.CallServerBuyNpcItem((short)indexOfData, 1);
+                GameInstance.PlayingCharacterEntity.CallServerBuyNpcItem((short)indexOfData, 1);
             }
             else
             {
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
 
         private void OnBuyAmountConfirmed(int amount)
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerBuyNpcItem((short)indexOfData, (short)amount);
+            GameInstance.PlayingCharacterEntity.CallServerBuyNpcItem((short)indexOfData, (short)amount);
         }
     }
 }

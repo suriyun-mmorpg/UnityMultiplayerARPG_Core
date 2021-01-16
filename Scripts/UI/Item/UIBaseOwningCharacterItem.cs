@@ -7,7 +7,7 @@ namespace MultiplayerARPG
 {
 	public abstract class UIBaseOwningCharacterItem : UISelectionEntry<UIOwningCharacterItemData>
 	{
-        public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
+        public BasePlayerCharacterEntity OwningCharacter { get { return GameInstance.PlayingCharacterEntity; } }
 		public InventoryType InventoryType { get { return Data.inventoryType; } }
 		public int IndexOfData { get { return Data.indexOfData; } }
 		public CharacterItem CharacterItem

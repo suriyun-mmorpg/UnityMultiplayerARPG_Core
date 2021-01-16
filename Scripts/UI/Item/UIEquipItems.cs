@@ -109,18 +109,18 @@ namespace MultiplayerARPG
         public void RegisterOwningCharacterEvents()
         {
             UnregisterOwningCharacterEvents();
-            if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
+            if (notForOwningCharacter || !GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
         }
 
         public void UnregisterOwningCharacterEvents()
         {
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            BasePlayerCharacterController.OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            BasePlayerCharacterController.OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
         }
 
         private void OnEquipWeaponSetChange(byte equipWeaponSet)
@@ -140,8 +140,8 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
-            if (notForOwningCharacter || !BasePlayerCharacterController.OwningCharacter) return;
-            UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (notForOwningCharacter || GameInstance.PlayingCharacter == null) return;
+            UpdateData(GameInstance.PlayingCharacter);
         }
 
         private void OnValidate()

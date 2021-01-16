@@ -134,7 +134,7 @@ namespace MultiplayerARPG
 
         public void SendChatMessage()
         {
-            if (BasePlayerCharacterController.OwningCharacter == null)
+            if (GameInstance.PlayingCharacter == null)
                 return;
 
             string trimText = EnterChatMessage.Trim();
@@ -144,7 +144,7 @@ namespace MultiplayerARPG
             EnterChatMessage = string.Empty;
             ChatChannel channel = ChatChannel.Local;
             string message = trimText;
-            string sender = BasePlayerCharacterController.OwningCharacter.CharacterName;
+            string sender = GameInstance.PlayingCharacter.CharacterName;
             string receiver = string.Empty;
             string[] splitedText = trimText.Split(' ');
             if (splitedText.Length > 0)

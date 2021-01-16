@@ -45,7 +45,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             // Reset number
             foreach (UIItemTextPair entry in CacheTextLevels.Values)
             {
@@ -75,8 +74,8 @@ namespace MultiplayerARPG
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
                     // Get item amount from character
-                    if (owningCharacter != null)
-                        tempCurrentAmount = owningCharacter.CountNonEquipItems(tempItem.DataId);
+                    if (GameInstance.PlayingCharacter != null)
+                        tempCurrentAmount = GameInstance.PlayingCharacter.CountNonEquipItems(tempItem.DataId);
                     // Use difference format by option 
                     if (showAsRequirement)
                     {

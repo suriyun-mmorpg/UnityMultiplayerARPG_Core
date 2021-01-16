@@ -76,7 +76,7 @@ namespace MultiplayerARPG
 
         protected virtual bool ValidateToUpdateUI()
         {
-            return Data != null && BasePlayerCharacterController.OwningCharacter != null;
+            return Data != null && GameInstance.PlayingCharacterEntity != null;
         }
 
         protected override void UpdateUI()
@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             }
 
             Profiler.BeginSample("UIBaseGameEntity - Update UI");
-            tempOwningCharacter = BasePlayerCharacterController.OwningCharacter;
+            tempOwningCharacter = GameInstance.PlayingCharacterEntity;
             if (tempOwningCharacter == Data)
             {
                 // Always show the UI when character is owning character

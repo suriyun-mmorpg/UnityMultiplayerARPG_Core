@@ -183,7 +183,7 @@ namespace MultiplayerARPG
                 }
                 if (increasingCurrencies.Count > 0)
                 {
-                    uiCurrencies.UpdateData(BasePlayerCharacterController.OwningCharacter, increasingCurrencies);
+                    uiCurrencies.UpdateData(GameInstance.PlayingCharacter, increasingCurrencies);
                     uiCurrencies.Show();
                 }
                 else
@@ -204,7 +204,7 @@ namespace MultiplayerARPG
                 }
                 if (increasingItems.Count > 0)
                 {
-                    uiItems.UpdateData(BasePlayerCharacterController.OwningCharacter, increasingItems);
+                    uiItems.UpdateData(GameInstance.PlayingCharacter, increasingItems);
                     uiItems.Show();
                 }
                 else

@@ -106,7 +106,7 @@ namespace MultiplayerARPG
 
         public override void RenderUI(UINpcDialog uiNpcDialog)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
             BaseItem craftingItem = null;
 
             if (uiNpcDialog.uiSellItemRoot != null)

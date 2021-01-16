@@ -52,7 +52,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             // Reset number
             foreach (UISkillTextPair entry in CacheTextLevels.Values)
             {
@@ -84,8 +83,8 @@ namespace MultiplayerARPG
                     string tempCurrentValue;
                     string tempTargetValue;
                     // Get skill level from character
-                    if (owningCharacter != null)
-                        owningCharacter.GetCaches().Skills.TryGetValue(tempSkill, out tempCurrentLevel);
+                    if (GameInstance.PlayingCharacter != null)
+                        GameInstance.PlayingCharacter.GetCaches().Skills.TryGetValue(tempSkill, out tempCurrentLevel);
                     // Use difference format by option 
                     switch (displayType)
                     {

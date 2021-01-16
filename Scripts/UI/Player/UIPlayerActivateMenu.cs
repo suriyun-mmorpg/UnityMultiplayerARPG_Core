@@ -38,7 +38,7 @@ namespace MultiplayerARPG
 
         public void OnClickSendDealingRequest()
         {
-            BasePlayerCharacterController.OwningCharacter.CallServerSendDealingRequest(Data.ObjectId);
+            GameInstance.PlayingCharacterEntity.CallServerSendDealingRequest(Data.ObjectId);
             Hide();
         }
 

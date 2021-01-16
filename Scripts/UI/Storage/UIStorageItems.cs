@@ -70,8 +70,8 @@ namespace MultiplayerARPG
         {
             ClientStorageActions.onNotifyStorageItemsUpdated -= UpdateData;
             // Close storage
-            if (StorageType != StorageType.None && BasePlayerCharacterController.OwningCharacter)
-                BasePlayerCharacterController.OwningCharacter.CallServerCloseStorage();
+            if (StorageType != StorageType.None && GameInstance.PlayingCharacterEntity)
+                GameInstance.PlayingCharacterEntity.CallServerCloseStorage();
             // Clear data
             StorageType = StorageType.None;
             StorageOwnerId = string.Empty;
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
             if (uiItemDialog != null)
             {
                 uiItemDialog.selectionManager = CacheItemSelectionManager;
-                uiItemDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, ui.IndexOfData);
+                uiItemDialog.Setup(ui.Data, GameInstance.PlayingCharacter, ui.IndexOfData);
                 uiItemDialog.Show();
             }
         }
@@ -164,7 +164,7 @@ namespace MultiplayerARPG
             CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterItem>();
-                tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
+                tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), GameInstance.PlayingCharacter, index);
                 tempUI.Show();
                 if (characterItem.NotEmptySlot())
                 {

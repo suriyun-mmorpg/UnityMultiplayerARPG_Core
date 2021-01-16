@@ -47,8 +47,8 @@ namespace MultiplayerARPG
             if (uiSummonDialog != null)
                 uiSummonDialog.onHide.AddListener(OnSummonDialogHide);
             UpdateOwningCharacterData();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onSummonsOperation += OnSummonsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onSummonsOperation += OnSummonsOperation;
         }
 
         protected virtual void OnDisable()
@@ -56,8 +56,8 @@ namespace MultiplayerARPG
             if (uiSummonDialog != null)
                 uiSummonDialog.onHide.RemoveListener(OnSummonDialogHide);
             CacheSummonSelectionManager.DeselectSelectedUI();
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            BasePlayerCharacterController.OwningCharacter.onSummonsOperation -= OnSummonsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onSummonsOperation -= OnSummonsOperation;
         }
 
         private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
@@ -67,8 +67,8 @@ namespace MultiplayerARPG
 
         private void UpdateOwningCharacterData()
         {
-            if (!BasePlayerCharacterController.OwningCharacter) return;
-            UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (GameInstance.PlayingCharacter == null) return;
+            UpdateData(GameInstance.PlayingCharacter);
         }
 
         protected void OnSummonDialogHide()

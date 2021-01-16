@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             if (sourceLocation == SourceLocation.StorageItems)
                 uiCharacterItem.OnClickMoveFromStorage();
             if (sourceLocation == SourceLocation.Hotkey)
-                BasePlayerCharacterController.OwningCharacter.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
+                GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
         }
     }
 }

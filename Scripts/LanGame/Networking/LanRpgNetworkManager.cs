@@ -131,7 +131,7 @@ namespace MultiplayerARPG
             if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
             {
                 Profiler.BeginSample("LanRpgNetworkManager - Save Data");
-                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
                 if (owningCharacter != null && IsClientConnected)
                 {
                     SaveSystem.SaveCharacter(owningCharacter);
@@ -319,7 +319,7 @@ namespace MultiplayerARPG
                 mapInfo.IsSceneSet())
             {
                 // Save data before warp
-                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
                 SaveSystem.SaveWorld(owningCharacter, ServerBuildingHandlers.GetBuildings());
                 SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
                 ServerBuildingHandlers.ClearBuildings();

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -12,8 +10,8 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            canReload = IsReloadable(BasePlayerCharacterController.OwningCharacter.EquipWeapons.rightHand) ||
-                IsReloadable(BasePlayerCharacterController.OwningCharacter.EquipWeapons.leftHand);
+            canReload = IsReloadable(GameInstance.PlayingCharacter.EquipWeapons.rightHand) ||
+                IsReloadable(GameInstance.PlayingCharacter.EquipWeapons.leftHand);
 
             foreach (GameObject obj in activateObjects)
             {

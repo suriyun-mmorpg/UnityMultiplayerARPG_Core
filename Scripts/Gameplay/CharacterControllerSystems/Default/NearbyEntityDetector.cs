@@ -68,7 +68,7 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (BasePlayerCharacterController.OwningCharacter == null)
+            if (GameInstance.PlayingCharacterEntity == null)
                 return;
 
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             else
                 cacheCollider2D.radius = detectingRadius;
 
-            CacheTransform.position = BasePlayerCharacterController.OwningCharacter.CacheTransform.position;
+            CacheTransform.position = GameInstance.PlayingCharacterEntity.CacheTransform.position;
             // Find nearby entities
             SortNearestEntity(characters);
             SortNearestEntity(players);
@@ -236,13 +236,13 @@ namespace MultiplayerARPG
             if (findPlayer)
             {
                 player = other.GetComponent<BasePlayerCharacterEntity>();
-                if (player == BasePlayerCharacterController.OwningCharacter)
+                if (player == GameInstance.PlayingCharacterEntity)
                     player = null;
                 if (findWithAdvanceOptions)
                 {
                     if (findOnlyAlivePlayers && player != null && player.IsDead())
                         player = null;
-                    if (findPlayerToAttack && player != null && !player.CanReceiveDamageFrom(BasePlayerCharacterController.OwningCharacter))
+                    if (findPlayerToAttack && player != null && !player.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity))
                         player = null;
                 }
             }
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
                 {
                     if (findOnlyAliveMonsters && monster != null && monster.IsDead())
                         monster = null;
-                    if (findMonsterToAttack && monster != null && !monster.CanReceiveDamageFrom(BasePlayerCharacterController.OwningCharacter))
+                    if (findMonsterToAttack && monster != null && !monster.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity))
                         monster = null;
                 }
             }

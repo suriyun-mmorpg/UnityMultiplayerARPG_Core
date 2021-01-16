@@ -12,8 +12,8 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            canExitVehicle = BasePlayerCharacterController.OwningCharacter != null &&
-                BasePlayerCharacterController.OwningCharacter.PassengingVehicleEntity != null;
+            canExitVehicle = GameInstance.PlayingCharacterEntity != null &&
+                GameInstance.PlayingCharacterEntity.PassengingVehicleEntity != null;
 
             foreach (GameObject obj in activateObjects)
             {

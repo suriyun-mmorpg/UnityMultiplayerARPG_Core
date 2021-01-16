@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             switch (crafterType)
             {
                 case CrafterType.Character:
-                    BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                    BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
                     List<ItemCraft> itemCrafts = new List<ItemCraft>();
                     foreach (CharacterSkill characterSkill in owningCharacter.Skills)
                     {
