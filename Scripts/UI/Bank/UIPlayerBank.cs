@@ -4,7 +4,7 @@
     {
         public override int GetAmount()
         {
-            return BasePlayerCharacterController.OwningCharacter.UserGold;
+            return GameInstance.ClientUserHandlers.Character.Gold;
         }
 
         public override void OnDepositConfirm(int amount)

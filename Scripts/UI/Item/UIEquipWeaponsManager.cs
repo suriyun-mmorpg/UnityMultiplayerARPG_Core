@@ -36,18 +36,18 @@ namespace MultiplayerARPG
         private void Start()
         {
             updatingActivatingGameObjects = false;
-            dirtyEquipWeaponSet = BasePlayerCharacterController.OwningCharacter.EquipWeaponSet;
+            dirtyEquipWeaponSet = GameInstance.ClientUserHandlers.Character.EquipWeaponSet;
             UpdateActivatingGameObjects();
         }
 
         private void LateUpdate()
         {
-            if (BasePlayerCharacterController.OwningCharacter == null)
+            if (GameInstance.ClientUserHandlers.Character == null)
                 return;
 
-            if (dirtyEquipWeaponSet != BasePlayerCharacterController.OwningCharacter.EquipWeaponSet)
+            if (dirtyEquipWeaponSet != GameInstance.ClientUserHandlers.Character.EquipWeaponSet)
             {
-                dirtyEquipWeaponSet = BasePlayerCharacterController.OwningCharacter.EquipWeaponSet;
+                dirtyEquipWeaponSet = GameInstance.ClientUserHandlers.Character.EquipWeaponSet;
                 UpdateActivatingGameObjects();
             }
         }
@@ -58,11 +58,11 @@ namespace MultiplayerARPG
             for (int i = 0; i < activatingGameObjects.Length; ++i)
             {
                 if (activatingGameObjects[i].toggle != null)
-                    activatingGameObjects[i].toggle.isOn = activatingGameObjects[i].equipWeaponSet == BasePlayerCharacterController.OwningCharacter.EquipWeaponSet;
+                    activatingGameObjects[i].toggle.isOn = activatingGameObjects[i].equipWeaponSet == GameInstance.ClientUserHandlers.Character.EquipWeaponSet;
 
                 for (int j = 0; j < activatingGameObjects[i].gameObjects.Length; ++j)
                 {
-                    activatingGameObjects[i].gameObjects[j].SetActive(activatingGameObjects[i].equipWeaponSet == BasePlayerCharacterController.OwningCharacter.EquipWeaponSet);
+                    activatingGameObjects[i].gameObjects[j].SetActive(activatingGameObjects[i].equipWeaponSet == GameInstance.ClientUserHandlers.Character.EquipWeaponSet);
                 }
             }
             updatingActivatingGameObjects = false;

@@ -9,5 +9,6 @@ namespace MultiplayerARPG
         public string UserId { get; set; }
         public string UserToken { get; set; }
         public string CharacterId { get; set; }
+        public IPlayerCharacterData Character { get; set; }
     }
 }

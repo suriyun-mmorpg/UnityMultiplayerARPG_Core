@@ -139,7 +139,7 @@ namespace MultiplayerARPG
 
         public override int GetSocialId()
         {
-            return BasePlayerCharacterController.OwningCharacter.PartyId;
+            return GameInstance.ClientUserHandlers.Character.PartyId;
         }
 
         public override int GetMaxMemberAmount()

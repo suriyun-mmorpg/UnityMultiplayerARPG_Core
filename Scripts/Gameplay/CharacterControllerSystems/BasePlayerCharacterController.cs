@@ -44,6 +44,7 @@ namespace MultiplayerARPG
                 {
                     Desetup(playerCharacterEntity);
                     playerCharacterEntity = value;
+                    GameInstance.ClientUserHandlers.Character = value;
                     Setup(playerCharacterEntity);
                 }
             }
