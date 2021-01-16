@@ -29,6 +29,9 @@ namespace MultiplayerARPG
         }
 
         public static BasePlayerCharacterController Singleton { get; protected set; }
+        /// <summary>
+        /// Controlled character, can use `GameInstance.PlayingCharacter` or `GameInstance.PlayingCharacterEntity` instead.
+        /// </summary>
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
         public System.Action<BasePlayerCharacterController> onSetup;
         public System.Action<BasePlayerCharacterController> onDesetup;
