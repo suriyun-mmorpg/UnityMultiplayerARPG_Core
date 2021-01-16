@@ -1,10 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public static class UIInventoryResponses
+    public static class ClientInventoryActions
     {
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeItemMessage> onResponseSwapOrMergeItem;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseEquipArmorMessage> onResponseEquipArmor;
