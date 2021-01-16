@@ -53,12 +53,12 @@ namespace MultiplayerARPG
         public static IServerGuildHandlers ServerGuildHandlers { get; set; }
         public static string UserId { get; set; }
         public static string UserToken { get; set; }
-        public static string CharacterId { get; set; }
-        public static IPlayerCharacterData Character { get; set; }
+        public static string SelectedCharacterId { get; set; }
+        public static IPlayerCharacterData PlayingCharacter { get; set; }
         public static PartyData ClientParty { get; set; }
         public static GuildData ClientGuild { get; set; }
-        public static StorageType StorageType { get; set; }
-        public static string StorageOwnerId { get; set; }
+        public static StorageType OpenedStorageType { get; set; }
+        public static string OpenedStorageOwnerId { get; set; }
 
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();

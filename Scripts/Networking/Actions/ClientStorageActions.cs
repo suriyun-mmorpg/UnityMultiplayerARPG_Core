@@ -36,16 +36,16 @@ namespace MultiplayerARPG
 
         public static void NotifyStorageOpened(StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
         {
-            GameInstance.StorageType = storageType;
-            GameInstance.StorageOwnerId = storageOwnerId;
+            GameInstance.OpenedStorageType = storageType;
+            GameInstance.OpenedStorageOwnerId = storageOwnerId;
             if (onNotifyStorageOpened != null)
                 onNotifyStorageOpened.Invoke(storageType, storageOwnerId, objectId, weightLimit, slotLimit);
         }
 
         public static void NotifyStorageClosed()
         {
-            GameInstance.StorageType = StorageType.None;
-            GameInstance.StorageOwnerId = string.Empty;
+            GameInstance.OpenedStorageType = StorageType.None;
+            GameInstance.OpenedStorageOwnerId = string.Empty;
             if (onNotifyStorageClosed != null)
                 onNotifyStorageClosed.Invoke();
         }

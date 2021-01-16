@@ -176,8 +176,8 @@ namespace MultiplayerARPG
 
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
-            GameInstance.CharacterId = selectedCharacter.Id;
-            GameInstance.Character = selectedCharacter;
+            GameInstance.SelectedCharacterId = selectedCharacter.Id;
+            GameInstance.PlayingCharacter = selectedCharacter;
             selectedCharacter.SerializeCharacterData(writer);
         }
 

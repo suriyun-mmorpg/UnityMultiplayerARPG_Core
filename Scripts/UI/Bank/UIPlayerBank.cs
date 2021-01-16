@@ -4,9 +4,9 @@
     {
         public override int GetAmount()
         {
-            if (GameInstance.Character == null)
+            if (GameInstance.PlayingCharacter == null)
                 return 0;
-            return GameInstance.Character.Gold;
+            return GameInstance.PlayingCharacter.Gold;
         }
 
         public override void OnDepositConfirm(int amount)

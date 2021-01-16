@@ -139,7 +139,7 @@ namespace MultiplayerARPG
 
         public override int GetSocialId()
         {
-            return GameInstance.Character.PartyId;
+            return GameInstance.PlayingCharacter.PartyId;
         }
 
         public override int GetMaxMemberAmount()
@@ -161,12 +161,12 @@ namespace MultiplayerARPG
 
         public override bool OwningCharacterIsLeader()
         {
-            return IsLeader(GameInstance.Character.Id);
+            return IsLeader(GameInstance.PlayingCharacter.Id);
         }
 
         public override bool OwningCharacterCanKick()
         {
-            return CanKick(GameInstance.Character.Id);
+            return CanKick(GameInstance.PlayingCharacter.Id);
         }
     }
 }
