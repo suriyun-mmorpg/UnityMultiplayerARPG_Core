@@ -158,7 +158,7 @@ namespace MultiplayerARPG
             UpdateOwningCharacterData();
         }
 
-        private void UpdateOwningCharacterData()
+        public void UpdateOwningCharacterData()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
             UpdateData(GameInstance.PlayingCharacterEntity);
