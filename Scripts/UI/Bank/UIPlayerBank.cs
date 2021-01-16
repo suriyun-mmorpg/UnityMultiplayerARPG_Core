@@ -6,7 +6,7 @@
         {
             if (GameInstance.PlayingCharacter == null)
                 return 0;
-            return GameInstance.PlayingCharacter.Gold;
+            return GameInstance.PlayingCharacter.UserGold;
         }
 
         public override void OnDepositConfirm(int amount)
