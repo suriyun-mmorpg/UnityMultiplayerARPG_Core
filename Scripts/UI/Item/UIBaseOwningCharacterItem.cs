@@ -7,7 +7,6 @@ namespace MultiplayerARPG
 {
 	public abstract class UIBaseOwningCharacterItem : UISelectionEntry<UIOwningCharacterItemData>
 	{
-        public BasePlayerCharacterEntity OwningCharacter { get { return GameInstance.PlayingCharacterEntity; } }
 		public InventoryType InventoryType { get { return Data.inventoryType; } }
 		public int IndexOfData { get { return Data.indexOfData; } }
 		public CharacterItem CharacterItem
@@ -17,17 +16,17 @@ namespace MultiplayerARPG
 				switch (InventoryType)
 				{
 					case InventoryType.NonEquipItems:
-						if (IndexOfData >= 0 && IndexOfData < OwningCharacter.NonEquipItems.Count)
-							return OwningCharacter.NonEquipItems[IndexOfData];
+						if (IndexOfData >= 0 && IndexOfData < GameInstance.PlayingCharacter.NonEquipItems.Count)
+							return GameInstance.PlayingCharacter.NonEquipItems[IndexOfData];
 						break;
 					case InventoryType.EquipItems:
-						if (IndexOfData >= 0 && IndexOfData < OwningCharacter.EquipItems.Count)
-							return OwningCharacter.EquipItems[IndexOfData];
+						if (IndexOfData >= 0 && IndexOfData < GameInstance.PlayingCharacter.EquipItems.Count)
+							return GameInstance.PlayingCharacter.EquipItems[IndexOfData];
 						break;
 					case InventoryType.EquipWeaponRight:
-						return OwningCharacter.EquipWeapons.rightHand;
+						return GameInstance.PlayingCharacter.EquipWeapons.rightHand;
 					case InventoryType.EquipWeaponLeft:
-						return OwningCharacter.EquipWeapons.leftHand;
+						return GameInstance.PlayingCharacter.EquipWeapons.leftHand;
 				}
 				return null;
 			}
@@ -42,21 +41,21 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
-            if (!OwningCharacter) return;
-            OwningCharacter.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            OwningCharacter.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            OwningCharacter.onEquipItemsOperation += OnEquipItemsOperation;
-            OwningCharacter.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            if (!OwningCharacter) return;
-            OwningCharacter.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            OwningCharacter.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            OwningCharacter.onEquipItemsOperation -= OnEquipItemsOperation;
-            OwningCharacter.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         }
 
         protected void OnEquipWeaponSetChange(byte equipWeaponSet)
@@ -103,7 +102,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem, InventoryType), GameInstance.PlayingCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }

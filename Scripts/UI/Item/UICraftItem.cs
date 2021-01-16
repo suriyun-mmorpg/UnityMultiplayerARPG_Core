@@ -4,7 +4,6 @@ namespace MultiplayerARPG
 {
     public partial class UICraftItem : UISelectionEntry<ItemCraft>
     {
-        public BasePlayerCharacterEntity OwningCharacter { get { return GameInstance.PlayingCharacterEntity; } }
         public ItemCraft ItemCraft { get { return Data; } }
         public BaseItem CraftingItem { get { return ItemCraft.CraftingItem; } }
         public short Amount { get { return ItemCraft.Amount; } }
@@ -61,10 +60,10 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireGold.text = string.Format(
-                        OwningCharacter.Gold >= ItemCraft.RequireGold ?
+                        GameInstance.PlayingCharacter.Gold >= ItemCraft.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
-                        OwningCharacter.Gold.ToString("N0"),
+                        GameInstance.PlayingCharacter.Gold.ToString("N0"),
                         ItemCraft.RequireGold.ToString("N0"));
                 }
             }
@@ -89,10 +88,10 @@ namespace MultiplayerARPG
 
         public void OnClickCraft()
         {
-            if (OwningCharacter != null && CraftingItem != null)
+            if (GameInstance.PlayingCharacterEntity != null && CraftingItem != null)
             {
                 if (CrafterType == CrafterType.Workbench && TargetEntity)
-                    OwningCharacter.CallServerCraftItemByWorkbench(TargetEntity.ObjectId, CraftingItem.DataId);
+                    GameInstance.PlayingCharacterEntity.CallServerCraftItemByWorkbench(TargetEntity.ObjectId, CraftingItem.DataId);
             }
         }
     }

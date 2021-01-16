@@ -2,8 +2,6 @@
 {
     public abstract class UIDataForCharacter<T> : UISelectionEntry<T>
     {
-        public IPlayerCharacterData OwningCharacter { get { return GameInstance.PlayingCharacter; } }
-        public BasePlayerCharacterEntity OwningCharacterEntity { get { return GameInstance.PlayingCharacterEntity; } }
         public ICharacterData Character { get; protected set; }
         public int IndexOfData { get; protected set; }
 
@@ -16,7 +14,7 @@
 
         public bool IsOwningCharacter()
         {
-            return Character == OwningCharacter;
+            return Character == GameInstance.PlayingCharacter;
         }
     }
 }

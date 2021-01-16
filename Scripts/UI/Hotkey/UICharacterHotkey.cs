@@ -10,7 +10,6 @@ namespace MultiplayerARPG
     {
         public int indexOfData { get; protected set; }
         public string hotkeyId { get { return Data.hotkeyId; } }
-        public BasePlayerCharacterEntity OwningCharacter { get { return GameInstance.PlayingCharacterEntity; } }
         public UICharacterHotkeys UICharacterHotkeys { get; private set; }
 
         [FormerlySerializedAs("uiAssigner")]
@@ -46,11 +45,11 @@ namespace MultiplayerARPG
                 return;
             if (!GetAssignedSkill(out _, out _) && !GetAssignedItem(out _, out _, out _))
             {
-                foreach (CharacterItem nonEquipItem in OwningCharacter.NonEquipItems)
+                foreach (CharacterItem nonEquipItem in GameInstance.PlayingCharacter.NonEquipItems)
                 {
                     if (!CanAssignCharacterItem(nonEquipItem))
                         continue;
-                    OwningCharacter.AssignItemHotkey(hotkeyId, nonEquipItem);
+                    GameInstance.PlayingCharacterEntity.AssignItemHotkey(hotkeyId, nonEquipItem);
                     break;
                 }
             }
@@ -93,7 +92,7 @@ namespace MultiplayerARPG
             if (Data.type == HotkeyType.Skill)
             {
                 // Get all skills included equipment skills
-                Dictionary<BaseSkill, short> skills = OwningCharacter.GetCaches().Skills;
+                Dictionary<BaseSkill, short> skills = GameInstance.PlayingCharacter.GetCaches().Skills;
                 int dataId = BaseGameData.MakeDataId(Data.relateId);
                 return GameInstance.Skills.TryGetValue(dataId, out skill) &&
                     skill != null && skills.TryGetValue(skill, out skillLevel);
@@ -113,16 +112,16 @@ namespace MultiplayerARPG
                 {
                     // Find usable items
                     inventoryType = InventoryType.NonEquipItems;
-                    itemIndex = OwningCharacter.IndexOfNonEquipItem(dataId);
+                    itemIndex = GameInstance.PlayingCharacter.IndexOfNonEquipItem(dataId);
                     if (itemIndex >= 0)
                     {
-                        characterItem = OwningCharacter.NonEquipItems[itemIndex];
+                        characterItem = GameInstance.PlayingCharacter.NonEquipItems[itemIndex];
                         return true;
                     }
                 }
                 else
                 {
-                    return OwningCharacter.FindItemById(
+                    return GameInstance.PlayingCharacter.FindItemById(
                         Data.relateId,
                         out inventoryType,
                         out itemIndex,
@@ -162,7 +161,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Found skill, so create new skill entry if it's not existed in learn skill list
-                    uiCharacterSkill.Setup(new UICharacterSkillData(usingSkill, usingSkillLevel), OwningCharacter, OwningCharacter.IndexOfSkill(usingSkill.DataId));
+                    uiCharacterSkill.Setup(new UICharacterSkillData(usingSkill, usingSkillLevel), GameInstance.PlayingCharacter, GameInstance.PlayingCharacter.IndexOfSkill(usingSkill.DataId));
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)
@@ -198,7 +197,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Show only existed items
-                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, inventoryType), OwningCharacter, itemIndex);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, inventoryType), GameInstance.PlayingCharacter, itemIndex);
                     uiCharacterItem.Show();
                     UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                     if (dragHandler != null)
@@ -304,7 +303,7 @@ namespace MultiplayerARPG
         {
             if (characterSkill.IsEmpty())
                 return false;
-            if (!characterSkill.GetSkill().IsAvailable(OwningCharacter))
+            if (!characterSkill.GetSkill().IsAvailable(GameInstance.PlayingCharacter))
                 return false;
             if (UICharacterHotkeys.filterCategories.Count > 0 &&
                 !UICharacterHotkeys.filterCategories.Contains(characterSkill.GetSkill().category))

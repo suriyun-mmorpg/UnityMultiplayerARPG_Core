@@ -73,7 +73,7 @@ namespace MultiplayerARPG
             if (!characterItem.IsEmptySlot())
             {
                 GameMessage.Type gameMessageType = GameMessage.Type.CannotRefine;
-                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(OwningCharacter, Level, out gameMessageType);
+                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, out gameMessageType);
                 if (CanRefine)
                 {
                     refineLevel = EquipmentItem.ItemRefine.levels[Level - 1];
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType), GameInstance.PlayingCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }
@@ -133,10 +133,10 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireGold.text = string.Format(
-                        OwningCharacter.Gold >= refineLevel.Value.RequireGold ?
+                        GameInstance.PlayingCharacter.Gold >= refineLevel.Value.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
-                        OwningCharacter.Gold.ToString("N0"),
+                        GameInstance.PlayingCharacter.Gold.ToString("N0"),
                         refineLevel.Value.RequireGold.ToString("N0"));
                 }
             }
@@ -193,7 +193,7 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            OwningCharacter.CallServerRefineItem(InventoryType, (short)IndexOfData);
+            GameInstance.PlayingCharacterEntity.CallServerRefineItem(InventoryType, (short)IndexOfData);
         }
     }
 }

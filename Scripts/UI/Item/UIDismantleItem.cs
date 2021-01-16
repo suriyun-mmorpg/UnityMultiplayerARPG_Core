@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType), base.OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType), GameInstance.PlayingCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            OwningCharacter.CallServerDismantleItem((short)IndexOfData, DismantleAmount);
+            GameInstance.PlayingCharacterEntity.CallServerDismantleItem((short)IndexOfData, DismantleAmount);
         }
 
         public void OnClickSetDismantleAmount()

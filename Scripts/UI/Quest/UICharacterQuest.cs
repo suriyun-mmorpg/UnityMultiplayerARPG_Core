@@ -84,7 +84,7 @@ namespace MultiplayerARPG
                 {
                     tempUiQuestTask = ui.GetComponent<UIQuestTask>();
                     bool isComplete = false;
-                    int progress = Data.GetProgress(OwningCharacter, index, out isComplete);
+                    int progress = Data.GetProgress(GameInstance.PlayingCharacter, index, out isComplete);
                     tempUiQuestTask.Data = new UIQuestTaskData(task, progress);
                     tempUiQuestTask.Show();
                 });
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             bool isComplete = CharacterQuest.isComplete;
-            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(OwningCharacter);
+            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(GameInstance.PlayingCharacter);
 
             string titleFormat = isComplete ?
                 LanguageManager.GetText(formatKeyTitleComplete) :
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
                 CacheRewardItemList.Generate(Quest.rewardItems, (index, rewardItem, ui) =>
                 {
                     UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount), InventoryType.NonEquipItems), OwningCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
                     uiCharacterItem.Show();
                 });
             }

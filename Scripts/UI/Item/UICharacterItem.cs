@@ -794,42 +794,42 @@ namespace MultiplayerARPG
                     int comparingEquipmentIndex = 0;
                     if (WeaponItem != null)
                     {
-                        if (!OwningCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
-                            !OwningCharacter.EquipWeapons.rightHand.id.Equals(CharacterItem.id) &&
-                            OwningCharacter.EquipWeapons.rightHand.GetWeaponItem() != null)
+                        if (!GameInstance.PlayingCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
+                            !GameInstance.PlayingCharacter.EquipWeapons.rightHand.id.Equals(CharacterItem.id) &&
+                            GameInstance.PlayingCharacter.EquipWeapons.rightHand.GetWeaponItem() != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
-                                OwningCharacter.EquipWeapons.rightHand,
+                                GameInstance.PlayingCharacter.EquipWeapons.rightHand,
                                 InventoryType.EquipWeaponRight, 0);
                             comparingEquipmentIndex++;
                         }
-                        if (!OwningCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
-                            !OwningCharacter.EquipWeapons.leftHand.id.Equals(CharacterItem.id) &&
-                            OwningCharacter.EquipWeapons.leftHand.GetWeaponItem() != null)
+                        if (!GameInstance.PlayingCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
+                            !GameInstance.PlayingCharacter.EquipWeapons.leftHand.id.Equals(CharacterItem.id) &&
+                            GameInstance.PlayingCharacter.EquipWeapons.leftHand.GetWeaponItem() != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
-                                OwningCharacter.EquipWeapons.leftHand,
+                                GameInstance.PlayingCharacter.EquipWeapons.leftHand,
                                 InventoryType.EquipWeaponLeft, 0);
                             comparingEquipmentIndex++;
                         }
                     }
                     if (ShieldItem != null)
                     {
-                        if (!OwningCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
-                            !OwningCharacter.EquipWeapons.rightHand.id.Equals(CharacterItem.id) &&
-                            OwningCharacter.EquipWeapons.rightHand.GetShieldItem() != null)
+                        if (!GameInstance.PlayingCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
+                            !GameInstance.PlayingCharacter.EquipWeapons.rightHand.id.Equals(CharacterItem.id) &&
+                            GameInstance.PlayingCharacter.EquipWeapons.rightHand.GetShieldItem() != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
-                                OwningCharacter.EquipWeapons.rightHand,
+                                GameInstance.PlayingCharacter.EquipWeapons.rightHand,
                                 InventoryType.EquipWeaponRight, 0);
                             comparingEquipmentIndex++;
                         }
-                        if (!OwningCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
-                            !OwningCharacter.EquipWeapons.leftHand.id.Equals(CharacterItem.id) &&
-                            OwningCharacter.EquipWeapons.leftHand.GetShieldItem() != null)
+                        if (!GameInstance.PlayingCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
+                            !GameInstance.PlayingCharacter.EquipWeapons.leftHand.id.Equals(CharacterItem.id) &&
+                            GameInstance.PlayingCharacter.EquipWeapons.leftHand.GetShieldItem() != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
-                                OwningCharacter.EquipWeapons.leftHand,
+                                GameInstance.PlayingCharacter.EquipWeapons.leftHand,
                                 InventoryType.EquipWeaponLeft, 0);
                             comparingEquipmentIndex++;
                         }
@@ -837,9 +837,9 @@ namespace MultiplayerARPG
                     if (ArmorItem != null)
                     {
                         CharacterItem equipItem;
-                        for (int equipItemIndex = 0; equipItemIndex < OwningCharacter.EquipItems.Count; ++equipItemIndex)
+                        for (int equipItemIndex = 0; equipItemIndex < GameInstance.PlayingCharacter.EquipItems.Count; ++equipItemIndex)
                         {
-                            equipItem = OwningCharacter.EquipItems[equipItemIndex];
+                            equipItem = GameInstance.PlayingCharacter.EquipItems[equipItemIndex];
                             if (!equipItem.IsEmptySlot() &&
                                 !equipItem.id.Equals(CharacterItem.id) &&
                                 equipItem.GetArmorItem() != null &&
@@ -866,7 +866,7 @@ namespace MultiplayerARPG
         {
             if (uiComparingEquipments == null || index >= uiComparingEquipments.Length)
                 return;
-            uiComparingEquipments[index].Setup(new UICharacterItemData(characterItem, inventoryType), OwningCharacter, indexOfData);
+            uiComparingEquipments[index].Setup(new UICharacterItemData(characterItem, inventoryType), GameInstance.PlayingCharacter, indexOfData);
             uiComparingEquipments[index].Show();
         }
 
@@ -1122,7 +1122,7 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
 
             GameInstance.ClientInventoryHandlers.RequestEquipItem(
-                OwningCharacter,
+                GameInstance.PlayingCharacter,
                 (short)IndexOfData,
                 ClientInventoryActions.ResponseEquipArmor,
                 ClientInventoryActions.ResponseEquipWeapon);
@@ -1169,7 +1169,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacterEntity.CallServerDropItem((short)IndexOfData, 1);
+                GameInstance.PlayingCharacterEntity.CallServerDropItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DROP_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString()), OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1179,7 +1179,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacterEntity.CallServerDropItem((short)IndexOfData, (short)amount);
+            GameInstance.PlayingCharacterEntity.CallServerDropItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1194,7 +1194,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacterEntity.CallServerSellItem((short)IndexOfData, 1);
+                GameInstance.PlayingCharacterEntity.CallServerSellItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_SELL_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_SELL_ITEM_DESCRIPTION.ToString()), OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1204,7 +1204,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacterEntity.CallServerSellItem((short)IndexOfData, (short)amount);
+            GameInstance.PlayingCharacterEntity.CallServerSellItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1219,7 +1219,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacterEntity.CallServerSetDealingItem((short)IndexOfData, 1);
+                GameInstance.PlayingCharacterEntity.CallServerSetDealingItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_OFFER_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_OFFER_ITEM_DESCRIPTION.ToString()), OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1229,7 +1229,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacterEntity.CallServerSetDealingItem((short)IndexOfData, (short)amount);
+            GameInstance.PlayingCharacterEntity.CallServerSetDealingItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1361,7 +1361,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                OwningCharacterEntity.CallServerRefineItem(InventoryType, (short)IndexOfData);
+                GameInstance.PlayingCharacterEntity.CallServerRefineItem(InventoryType, (short)IndexOfData);
             }
         }
         #endregion
@@ -1403,7 +1403,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacterEntity.CallServerDismantleItem((short)IndexOfData, 1);
+                GameInstance.PlayingCharacterEntity.CallServerDismantleItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM_DESCRIPTION.ToString()), OnDismantleItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1413,7 +1413,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacterEntity.CallServerDismantleItem((short)IndexOfData, (short)amount);
+            GameInstance.PlayingCharacterEntity.CallServerDismantleItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1449,7 +1449,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                OwningCharacterEntity.CallServerRepairItem(InventoryType, (short)IndexOfData);
+                GameInstance.PlayingCharacterEntity.CallServerRepairItem(InventoryType, (short)IndexOfData);
             }
         }
         #endregion

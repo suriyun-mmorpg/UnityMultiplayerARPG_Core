@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             GameMessage.Type gameMessageType;
-            if (IsOwningCharacter() && Attribute.CanIncreaseAmount(OwningCharacter, CharacterAttribute.amount, out gameMessageType))
+            if (IsOwningCharacter() && Attribute.CanIncreaseAmount(GameInstance.PlayingCharacter, CharacterAttribute.amount, out gameMessageType))
                 onAbleToIncrease.Invoke();
             else
                 onUnableToIncrease.Invoke();
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            OwningCharacterEntity.CallServerAddAttribute(Attribute.DataId);
+            GameInstance.PlayingCharacterEntity.CallServerAddAttribute(Attribute.DataId);
         }
     }
 }

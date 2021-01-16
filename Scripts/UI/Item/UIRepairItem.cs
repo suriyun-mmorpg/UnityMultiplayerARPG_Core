@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             float maxDurability = 0f;
             ItemRepairPrice itemRepairPrice = default(ItemRepairPrice);
             if (!characterItem.IsEmptySlot())
-                CanRepair = EquipmentItem != null && characterItem.GetItem().CanRepair(OwningCharacter, characterItem.durability, out maxDurability, out itemRepairPrice);
+                CanRepair = EquipmentItem != null && characterItem.GetItem().CanRepair(GameInstance.PlayingCharacter, characterItem.durability, out maxDurability, out itemRepairPrice);
 
             if (uiCharacterItem != null)
             {
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType), GameInstance.PlayingCharacter, IndexOfData);
                     uiCharacterItem.Show();
                 }
             }
@@ -72,10 +72,10 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireGold.text = string.Format(
-                        OwningCharacter.Gold >= itemRepairPrice.RequireGold ?
+                        GameInstance.PlayingCharacter.Gold >= itemRepairPrice.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
-                        OwningCharacter.Gold.ToString("N0"),
+                        GameInstance.PlayingCharacter.Gold.ToString("N0"),
                         itemRepairPrice.RequireGold.ToString("N0"));
                 }
             }
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            OwningCharacter.CallServerRepairItem(InventoryType, (short)IndexOfData);
+            GameInstance.PlayingCharacterEntity.CallServerRepairItem(InventoryType, (short)IndexOfData);
         }
     }
 }
