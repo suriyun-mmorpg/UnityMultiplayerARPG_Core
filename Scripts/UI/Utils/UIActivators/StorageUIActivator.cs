@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         {
             foreach (GameObject obj in activateObjects)
             {
-                obj.SetActive(BaseUISceneGameplay.Singleton.IsStorageDialogVisible());
+                obj.SetActive(BaseUISceneGameplay.Singleton != null && BaseUISceneGameplay.Singleton.IsStorageDialogVisible());
             }
         }
     }
