@@ -1124,8 +1124,8 @@ namespace MultiplayerARPG
             GameInstance.ClientInventoryHandlers.RequestEquipItem(
                 OwningCharacter,
                 (short)IndexOfData,
-                UIInventoryResponses.ResponseEquipArmor,
-                UIInventoryResponses.ResponseEquipWeapon);
+                ClientInventoryActions.ResponseEquipArmor,
+                ClientInventoryActions.ResponseEquipWeapon);
         }
 
         public void OnClickUnEquip()
@@ -1142,8 +1142,8 @@ namespace MultiplayerARPG
                 (short)IndexOfData,
                 CharacterItem.equipSlotIndex,
                 -1,
-                UIInventoryResponses.ResponseUnEquipArmor,
-                UIInventoryResponses.ResponseUnEquipWeapon);
+                ClientInventoryActions.ResponseUnEquipArmor,
+                ClientInventoryActions.ResponseUnEquipWeapon);
         }
 
         public void OnClickUse()

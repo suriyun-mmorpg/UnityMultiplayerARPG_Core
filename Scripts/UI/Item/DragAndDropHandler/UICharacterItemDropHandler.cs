@@ -71,8 +71,8 @@ namespace MultiplayerARPG
                         (short)draggedItemUI.uiCharacterItem.IndexOfData,
                         draggedItemUI.uiCharacterItem.EquipSlotIndex,
                         (short)uiCharacterItem.IndexOfData,
-                        UIInventoryResponses.ResponseUnEquipArmor,
-                        UIInventoryResponses.ResponseUnEquipWeapon);
+                        ClientInventoryActions.ResponseUnEquipArmor,
+                        ClientInventoryActions.ResponseUnEquipWeapon);
                     break;
             }
         }
@@ -91,7 +91,7 @@ namespace MultiplayerARPG
                     {
                         fromIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
                         toIndex = (short)uiCharacterItem.IndexOfData,
-                    }, UIInventoryResponses.ResponseSwapOrMergeItem);
+                    }, ClientInventoryActions.ResponseSwapOrMergeItem);
                     break;
                 case InventoryType.EquipItems:
                 case InventoryType.EquipWeaponRight:
@@ -189,8 +189,8 @@ namespace MultiplayerARPG
                 (short)draggedItemUI.uiCharacterItem.IndexOfData,
                 uiCharacterItem.InventoryType,
                 uiCharacterItem.EquipSlotIndex,
-                UIInventoryResponses.ResponseEquipArmor,
-                UIInventoryResponses.ResponseEquipWeapon);
+                ClientInventoryActions.ResponseEquipArmor,
+                ClientInventoryActions.ResponseEquipWeapon);
         }
     }
 }

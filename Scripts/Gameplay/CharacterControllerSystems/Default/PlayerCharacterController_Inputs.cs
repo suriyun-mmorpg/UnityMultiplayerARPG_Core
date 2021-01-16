@@ -891,8 +891,8 @@ namespace MultiplayerARPG
                         (short)itemIndex,
                         equipWeaponSet,
                         -1,
-                        UIInventoryResponses.ResponseUnEquipArmor,
-                        UIInventoryResponses.ResponseUnEquipWeapon);
+                        ClientInventoryActions.ResponseUnEquipArmor,
+                        ClientInventoryActions.ResponseUnEquipWeapon);
                     return;
                 }
                 item = characterItem.GetItem();
@@ -909,8 +909,8 @@ namespace MultiplayerARPG
                 GameInstance.ClientInventoryHandlers.RequestEquipItem(
                         PlayerCharacterEntity,
                         (short)itemIndex,
-                        UIInventoryResponses.ResponseEquipArmor,
-                        UIInventoryResponses.ResponseEquipWeapon);
+                        ClientInventoryActions.ResponseEquipArmor,
+                        ClientInventoryActions.ResponseEquipWeapon);
             }
             else if (item.IsSkill())
             {

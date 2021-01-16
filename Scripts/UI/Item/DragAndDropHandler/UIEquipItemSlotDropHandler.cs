@@ -101,8 +101,8 @@ namespace MultiplayerARPG
                 (short)draggedItemUI.uiCharacterItem.IndexOfData,
                 uiCharacterItem.InventoryType,
                 uiCharacterItem.EquipSlotIndex,
-                UIInventoryResponses.ResponseEquipArmor,
-                UIInventoryResponses.ResponseEquipWeapon);
+                ClientInventoryActions.ResponseEquipArmor,
+                ClientInventoryActions.ResponseEquipWeapon);
         }
     }
 }
