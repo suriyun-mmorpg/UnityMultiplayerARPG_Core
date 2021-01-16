@@ -46,6 +46,8 @@ namespace MultiplayerARPG
                 {
                     Desetup(GameInstance.PlayingCharacterEntity);
                     GameInstance.PlayingCharacter = value;
+                    GameInstance.OpenedStorageType = StorageType.None;
+                    GameInstance.OpenedStorageOwnerId = string.Empty;
                     Setup(GameInstance.PlayingCharacterEntity);
                 }
             }
