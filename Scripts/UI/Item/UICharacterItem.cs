@@ -1169,7 +1169,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacter.CallServerDropItem((short)IndexOfData, 1);
+                OwningCharacterEntity.CallServerDropItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DROP_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString()), OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1179,7 +1179,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacter.CallServerDropItem((short)IndexOfData, (short)amount);
+            OwningCharacterEntity.CallServerDropItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1194,7 +1194,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacter.CallServerSellItem((short)IndexOfData, 1);
+                OwningCharacterEntity.CallServerSellItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_SELL_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_SELL_ITEM_DESCRIPTION.ToString()), OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1204,7 +1204,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacter.CallServerSellItem((short)IndexOfData, (short)amount);
+            OwningCharacterEntity.CallServerSellItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1219,7 +1219,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacter.CallServerSetDealingItem((short)IndexOfData, 1);
+                OwningCharacterEntity.CallServerSetDealingItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_OFFER_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_OFFER_ITEM_DESCRIPTION.ToString()), OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1229,7 +1229,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacter.CallServerSetDealingItem((short)IndexOfData, (short)amount);
+            OwningCharacterEntity.CallServerSetDealingItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1361,7 +1361,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                OwningCharacter.CallServerRefineItem(InventoryType, (short)IndexOfData);
+                OwningCharacterEntity.CallServerRefineItem(InventoryType, (short)IndexOfData);
             }
         }
         #endregion
@@ -1403,7 +1403,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                OwningCharacter.CallServerDismantleItem((short)IndexOfData, 1);
+                OwningCharacterEntity.CallServerDismantleItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM_DESCRIPTION.ToString()), OnDismantleItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1413,7 +1413,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            OwningCharacter.CallServerDismantleItem((short)IndexOfData, (short)amount);
+            OwningCharacterEntity.CallServerDismantleItem((short)IndexOfData, (short)amount);
         }
         #endregion
 
@@ -1449,7 +1449,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                OwningCharacter.CallServerRepairItem(InventoryType, (short)IndexOfData);
+                OwningCharacterEntity.CallServerRepairItem(InventoryType, (short)IndexOfData);
             }
         }
         #endregion

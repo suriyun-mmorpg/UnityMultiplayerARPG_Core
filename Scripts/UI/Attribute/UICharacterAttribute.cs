@@ -70,7 +70,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            OwningCharacter.CallServerAddAttribute(Attribute.DataId);
+            OwningCharacterEntity.CallServerAddAttribute(Attribute.DataId);
         }
     }
 }
