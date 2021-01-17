@@ -5,18 +5,15 @@ namespace MultiplayerARPG
     public struct RequestOpenStorageMessage : INetSerializable
     {
         public StorageType storageType;
-        public string storageOwnerId;
 
         public void Deserialize(NetDataReader reader)
         {
             storageType = (StorageType)reader.GetByte();
-            storageOwnerId = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)storageType);
-            writer.Put(storageOwnerId);
         }
     }
 }

@@ -70,8 +70,7 @@ namespace MultiplayerARPG
         {
             ClientStorageActions.onNotifyStorageItemsUpdated -= UpdateData;
             // Close storage
-            if (GameInstance.PlayingCharacterEntity)
-                GameInstance.PlayingCharacterEntity.CallServerCloseStorage();
+            GameInstance.ClientStorageHandlers.RequestCloseStorage(ClientStorageActions.ResponseCloseStorage);
             // Clear data
             StorageType = StorageType.None;
             StorageOwnerId = string.Empty;

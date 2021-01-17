@@ -7,6 +7,54 @@ namespace MultiplayerARPG
 {
     public class LanRpgServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
+        public async UniTaskVoid HandleRequestOpenStorage(RequestHandlerData requestHandler, RequestOpenStorageMessage request, RequestProceedResultDelegate<ResponseOpenStorageMessage> result)
+        {
+            if (request.storageType != StorageType.Player &&
+                request.storageType != StorageType.Guild)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
+                {
+                    error = ResponseOpenStorageMessage.Error.NotAllowed,
+                });
+                return;
+            }
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
+                {
+                    error = ResponseOpenStorageMessage.Error.NotLoggedIn,
+                });
+                return;
+            }
+            StorageId storageId;
+            if (!playerCharacter.GetStorageId(request.storageType, 0, out storageId))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
+                {
+                    error = ResponseOpenStorageMessage.Error.NotAvailable,
+                });
+                return;
+            }
+            GameInstance.ServerStorageHandlers.OpenStorage(requestHandler.ConnectionId, playerCharacter, storageId);
+            await UniTask.Yield();
+        }
+
+        public async UniTaskVoid HandleRequestCloseStorage(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseCloseStorageMessage> result)
+        {
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseCloseStorageMessage()
+                {
+                    error = ResponseCloseStorageMessage.Error.NotLoggedIn,
+                });
+                return;
+            }
+            GameInstance.ServerStorageHandlers.CloseStorage(requestHandler.ConnectionId);
+            await UniTask.Yield();
+        }
+
         public async UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);

@@ -403,12 +403,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerCloseStorage()
-        {
-            RPC(ServerCloseStorage);
-            return true;
-        }
-
         public bool CallServerOpenDoor(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
