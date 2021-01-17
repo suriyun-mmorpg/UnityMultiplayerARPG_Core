@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class NetworkBehaviourExtensions
+    public static partial class NetworkBehaviourExtensions
     {
         public static bool TryGetEntityByObjectId<T>(this LiteNetLibGameManager manager, uint objectId, out T result) where T : class
         {
