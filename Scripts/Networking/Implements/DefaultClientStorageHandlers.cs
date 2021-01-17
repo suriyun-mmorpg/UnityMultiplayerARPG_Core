@@ -14,6 +14,16 @@ namespace MultiplayerARPG
             Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
         }
 
+        public bool RequestOpenStorage(RequestOpenStorageMessage data, ResponseDelegate<ResponseOpenStorageMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.OpenStorage, data, responseDelegate: callback);
+        }
+
+        public bool RequestCloseStorage(ResponseDelegate<ResponseCloseStorageMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.CloseStorage, EmptyMessage.Value, responseDelegate: callback);
+        }
+
         public bool RequestMoveItemFromStorage(RequestMoveItemFromStorageMessage data, ResponseDelegate<ResponseMoveItemFromStorageMessage> callback)
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.MoveItemFromStorage, data, responseDelegate: callback);
