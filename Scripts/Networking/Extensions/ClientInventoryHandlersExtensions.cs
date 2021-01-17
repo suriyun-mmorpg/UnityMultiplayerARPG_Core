@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class ClientInventoryHandlersExtensions
+    public static partial class ClientInventoryHandlersExtensions
     {
 
         public static void RequestEquipItem(this IClientInventoryHandlers handlers, IPlayerCharacterData playerCharacter, short nonEquipIndex, ResponseDelegate<ResponseEquipArmorMessage> responseEquipArmor, ResponseDelegate<ResponseEquipWeaponMessage> responseEquipWeapon)
