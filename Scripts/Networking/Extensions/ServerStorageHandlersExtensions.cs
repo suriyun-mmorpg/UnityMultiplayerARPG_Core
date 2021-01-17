@@ -2,6 +2,29 @@
 {
     public static partial class ServerStorageHandlersExtensions
     {
+        public static bool GetStorageId(this IPlayerCharacterData playerCharacter, StorageType storageType, uint objectId, out StorageId storageId)
+        {
+            storageId = StorageId.Empty;
+            switch (storageType)
+            {
+                case StorageType.Player:
+                    storageId = new StorageId(storageType, playerCharacter.UserId);
+                    return true;
+                case StorageType.Guild:
+                    if (playerCharacter.GuildId <= 0)
+                        return false;
+                    storageId = new StorageId(storageType, playerCharacter.GuildId.ToString());
+                    return true;
+                case StorageType.Building:
+                    StorageEntity buildingEntity;
+                    if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out buildingEntity))
+                        return false;
+                    storageId = new StorageId(storageType, buildingEntity.Id);
+                    return true;
+            }
+            return false;
+        }
+
         public static Storage GetStorage(this StorageId storageId, out uint objectId)
         {
             objectId = 0;
