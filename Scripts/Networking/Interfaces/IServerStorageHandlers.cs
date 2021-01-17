@@ -17,14 +17,16 @@ namespace MultiplayerARPG
         /// <summary>
         /// Open storage
         /// </summary>
-        /// <param name="playerCharacter">Character who open the storage</param>
-        UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacter);
+        /// <param name="connectionId">Client who open the storage</param>
+        /// <param name="playerCharacter">Character which open the storage</param>
+        /// <param name="storageId">Opening storage ID</param>
+        UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId);
 
         /// <summary>
         /// Close storage
         /// </summary>
-        /// <param name="playerCharacter">Character who close the storage</param>
-        UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacter);
+        /// <param name="connectionId">Client who close the storage</param>
+        UniTaskVoid CloseStorage(long connectionId);
 
         /// <summary>
         /// Increase items to storage

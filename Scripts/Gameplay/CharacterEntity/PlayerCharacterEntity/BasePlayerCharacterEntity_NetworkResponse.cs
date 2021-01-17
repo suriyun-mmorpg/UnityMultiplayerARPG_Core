@@ -703,14 +703,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            OpenStorage(StorageType.Building, storageEntity);
-#endif
-        }
+            StorageId storageId;
+            if (!this.GetStorageId(StorageType.Building, objectId, out storageId))
+            {
+                // Wrong storage type or relative data
+                return;
+            }
 
-        [ServerRpc]
-        protected void ServerCloseStorage()
-        {
-            CloseStorage();
+            GameInstance.ServerStorageHandlers.OpenStorage(ConnectionId, this, storageId);
+#endif
         }
         #endregion
 
@@ -966,65 +967,6 @@ namespace MultiplayerARPG
             // Set dealing state/data for player character entity
             ClearDealingData();
             DealingCharacter = null;
-        }
-
-        public void StopPartyInvitation()
-        {
-            if (DealingCharacter != null)
-                DealingCharacter.DealingCharacter = null;
-            DealingCharacter = null;
-        }
-
-        public void StopGuildInvitation()
-        {
-            if (DealingCharacter != null)
-                DealingCharacter.DealingCharacter = null;
-            DealingCharacter = null;
-        }
-
-        public void OpenStorage(StorageType type, BaseGameEntity targetEntity)
-        {
-            string ownerId;
-            switch (type)
-            {
-                case StorageType.Player:
-                    ownerId = UserId;
-                    break;
-                case StorageType.Guild:
-                    if (GuildId <= 0)
-                        return;
-                    ownerId = GuildId.ToString();
-                    break;
-                case StorageType.Building:
-                    if (!(targetEntity is BuildingEntity))
-                        return;
-                    ownerId = (targetEntity as BuildingEntity).Id;
-                    break;
-                default:
-                    return;
-            }
-
-            StorageId storageId = new StorageId(type, ownerId);
-            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(this, storageId))
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-
-            if (!CurrentStorageId.Equals(storageId))
-            {
-                GameInstance.ServerStorageHandlers.CloseStorage(this);
-                CurrentStorageId = storageId;
-                GameInstance.ServerStorageHandlers.OpenStorage(this);
-            }
-        }
-
-        public void CloseStorage()
-        {
-#if !CLIENT_BUILD
-            GameInstance.ServerStorageHandlers.CloseStorage(this);
-            CurrentStorageId = StorageId.Empty;
-#endif
         }
     }
 }

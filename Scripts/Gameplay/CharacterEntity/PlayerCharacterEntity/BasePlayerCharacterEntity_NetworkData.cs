@@ -106,13 +106,6 @@ namespace MultiplayerARPG
         public float dealingCharacterTime { get; private set; }
         #endregion
 
-        #region Storage System
-        /// <summary>
-        /// This value will be used by server only to define character using storage state
-        /// </summary>
-        public StorageId CurrentStorageId { get; protected set; }
-        #endregion
-
         #region Fields/Interface/Getter/Setter implementation
         public override int DataId { get { return dataId.Value; } set { dataId.Value = value; } }
         public int FactionId { get { return factionId.Value; } set { factionId.Value = value; } }
