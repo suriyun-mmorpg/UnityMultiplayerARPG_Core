@@ -60,7 +60,7 @@ namespace MultiplayerARPG
 
         public bool RequestLeaveGuild(ResponseDelegate<ResponseLeaveGuildMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.LeaveGuild, new EmptyMessage(), responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.LeaveGuild, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestIncreaseGuildSkillLevel(RequestIncreaseGuildSkillLevelMessage data, ResponseDelegate<ResponseIncreaseGuildSkillLevelMessage> callback)

@@ -14,7 +14,7 @@ namespace MultiplayerARPG
 
         public bool RequestGetFriends(ResponseDelegate<ResponseGetFriendsMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.GetFriends, new EmptyMessage(), responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.GetFriends, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestFindCharacters(RequestFindCharactersMessage data, ResponseDelegate<ResponseFindCharactersMessage> callback)

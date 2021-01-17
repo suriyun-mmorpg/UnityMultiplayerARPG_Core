@@ -50,7 +50,7 @@ namespace MultiplayerARPG
 
         public bool RequestLeaveParty(ResponseDelegate<ResponseLeavePartyMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.LeaveParty, new EmptyMessage(), responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.LeaveParty, EmptyMessage.Value, responseDelegate: callback);
         }
     }
 }

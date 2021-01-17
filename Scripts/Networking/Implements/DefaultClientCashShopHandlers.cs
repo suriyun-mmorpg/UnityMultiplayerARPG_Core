@@ -14,12 +14,12 @@ namespace MultiplayerARPG
 
         public bool RequestCashShopInfo(ResponseDelegate<ResponseCashShopInfoMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.CashShopInfo, new EmptyMessage(), responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.CashShopInfo, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestCashPackageInfo(ResponseDelegate<ResponseCashPackageInfoMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.CashPackageInfo, new EmptyMessage(), responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.CashPackageInfo, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestCashShopBuy(RequestCashShopBuyMessage data, ResponseDelegate<ResponseCashShopBuyMessage> callback)
