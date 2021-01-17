@@ -1,15 +1,18 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using System.Collections.Generic;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
     public class UIFriend : UISocialGroup<UISocialCharacter>
     {
+        public UnityEvent onFriendRemoved;
+
         protected override void OnEnable()
         {
             base.OnEnable();
             ClientFriendActions.onNotifyFriendsUpdated += UpdateFriendsUIs;
+            Refresh();
         }
 
         protected override void OnDisable()
@@ -98,8 +101,16 @@ namespace MultiplayerARPG
                 GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
                 {
                     friendId = friend.id,
-                }, ClientFriendActions.ResponseRemoveFriend);
+                }, RemoveFriendCallback);
             });
+        }
+
+        public async UniTaskVoid RemoveFriendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseRemoveFriendMessage response)
+        {
+            ClientFriendActions.ResponseRemoveFriend(requestHandler, responseCode, response).Forget();
+            if (responseCode == AckResponseCode.Success)
+                onFriendRemoved.Invoke();
+            await UniTask.Yield();
         }
     }
 }

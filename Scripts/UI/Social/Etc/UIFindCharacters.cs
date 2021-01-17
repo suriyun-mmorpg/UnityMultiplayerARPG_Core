@@ -1,12 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using System.Collections.Generic;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
     public class UIFindCharacters : UISocialGroup<UISocialCharacter>
     {
         public InputFieldWrapper inputCharacterName;
+        public UnityEvent onFriendAdded;
 
         protected override void OnEnable()
         {
@@ -104,8 +105,16 @@ namespace MultiplayerARPG
                 GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
                 {
                     friendId = friend.id,
-                }, ClientFriendActions.ResponseAddFriend);
+                }, AddFriendCallback);
             });
+        }
+
+        public async UniTaskVoid AddFriendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
+        {
+            ClientFriendActions.ResponseAddFriend(requestHandler, responseCode, response).Forget();
+            if (responseCode == AckResponseCode.Success)
+                onFriendAdded.Invoke();
+            await UniTask.Yield();
         }
     }
 }
