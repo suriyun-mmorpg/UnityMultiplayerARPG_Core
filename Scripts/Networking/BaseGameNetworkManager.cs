@@ -829,6 +829,7 @@ namespace MultiplayerARPG
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
         {
+            ServerStorageHandlers.CloseStorage(connectionId).Forget();
             ServerUserHandlers.RemovePlayerCharacter(connectionId);
         }
 

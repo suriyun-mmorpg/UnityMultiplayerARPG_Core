@@ -160,14 +160,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UnregisterPlayerCharacter(long connectionId)
-        {
-            BasePlayerCharacterEntity playerCharacter;
-            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacter))
-                ServerStorageHandlers.CloseStorage(playerCharacter).Forget();
-            base.UnregisterPlayerCharacter(connectionId);
-        }
-
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
             UnregisterPlayerCharacter(connectionId);
