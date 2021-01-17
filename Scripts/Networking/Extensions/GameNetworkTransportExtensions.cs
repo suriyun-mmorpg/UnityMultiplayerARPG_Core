@@ -3,7 +3,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public static class GameNetworkTransportExtensions
+    public static partial class GameNetworkTransportExtensions
     {
         private static void Send(LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, INetSerializable message)
         {
