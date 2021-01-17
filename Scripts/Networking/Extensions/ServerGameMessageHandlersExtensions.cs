@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class ServerGameMessageHandlersExtensions
+    public static partial class ServerGameMessageHandlersExtensions
     {
         public static void SendSetPartyData(this IServerGameMessageHandlers handlers, long connectionId, PartyData party)
         {

@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public static class ServerPartyHandlersExtensions
+    public static partial class ServerPartyHandlersExtensions
     {
         public static ValidatePartyRequestResult CanCreateParty(this IPlayerCharacterData playerCharacter)
         {

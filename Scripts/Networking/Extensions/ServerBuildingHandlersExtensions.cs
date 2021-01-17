@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class ServerBuildingHandlersExtensions
+    public static partial class ServerBuildingHandlersExtensions
     {
         public static bool TryGetBuilding<T>(this IServerBuildingHandlers handlers, string id, out T building)
             where T : Component, IBuildingSaveData

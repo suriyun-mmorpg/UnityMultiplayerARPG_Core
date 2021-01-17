@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public static class ServerStorageHandlersExtensions
+    public static partial class ServerStorageHandlersExtensions
     {
         public static Storage GetStorage(this StorageId storageId, out uint objectId)
         {
