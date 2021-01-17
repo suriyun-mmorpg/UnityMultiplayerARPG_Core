@@ -160,7 +160,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestCreateParty(RequestHandlerData requestHandler, RequestCreatePartyMessage request, RequestProceedResultDelegate<ResponseCreatePartyMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
@@ -190,7 +190,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            PartyData party = new PartyData(++Id, request.shareExp, request.shareItem, playerCharacter);
+            PartyData party = new PartyData(++Id, request.shareExp, request.shareItem, SocialCharacterData.Create(playerCharacter));
             GameInstance.ServerPartyHandlers.SetParty(party.id, party);
             playerCharacter.PartyId = party.id;
             GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, party);
@@ -201,7 +201,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestChangePartyLeader(RequestHandlerData requestHandler, RequestChangePartyLeaderMessage request, RequestProceedResultDelegate<ResponseChangePartyLeaderMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangePartyLeaderMessage()
@@ -245,7 +245,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestKickMemberFromParty(RequestHandlerData requestHandler, RequestKickMemberFromPartyMessage request, RequestProceedResultDelegate<ResponseKickMemberFromPartyMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromPartyMessage()
@@ -282,11 +282,13 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            BasePlayerCharacterEntity memberEntity;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberEntity))
+            IPlayerCharacterData memberCharacter;
+            long memberConnectionId;
+            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberCharacter) &&
+                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out memberConnectionId))
             {
-                memberEntity.ClearParty();
-                GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberEntity.ConnectionId, validateResult.PartyId);
+                memberCharacter.ClearParty();
+                GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
             }
             validateResult.Party.RemoveMember(request.memberId);
             GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
@@ -297,7 +299,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestLeaveParty(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseLeavePartyMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseLeavePartyMessage()
@@ -328,13 +330,15 @@ namespace MultiplayerARPG
             }
             if (validateResult.Party.IsLeader(playerCharacter.Id))
             {
-                BasePlayerCharacterEntity memberEntity;
+                IPlayerCharacterData memberCharacter;
+                long memberConnectionId;
                 foreach (string memberId in validateResult.Party.GetMemberIds())
                 {
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberEntity))
+                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
+                        GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
                     {
-                        memberEntity.ClearParty();
-                        GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberEntity.ConnectionId, validateResult.PartyId);
+                        memberCharacter.ClearParty();
+                        GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
                     }
                 }
                 GameInstance.ServerPartyHandlers.RemoveParty(validateResult.PartyId);
@@ -342,10 +346,10 @@ namespace MultiplayerARPG
             else
             {
                 playerCharacter.ClearParty();
-                GameInstance.ServerGameMessageHandlers.SendClearPartyData(playerCharacter.ConnectionId, validateResult.PartyId);
                 validateResult.Party.RemoveMember(playerCharacter.Id);
                 GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
                 GameInstance.ServerGameMessageHandlers.SendRemovePartyMemberToMembers(validateResult.Party, playerCharacter.Id);
+                GameInstance.ServerGameMessageHandlers.SendClearPartyData(requestHandler.ConnectionId, validateResult.PartyId);
             }
             result.Invoke(AckResponseCode.Success, new ResponseLeavePartyMessage());
         }
@@ -353,7 +357,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestChangePartySetting(RequestHandlerData requestHandler, RequestChangePartySettingMessage request, RequestProceedResultDelegate<ResponseChangePartySettingMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()

@@ -126,8 +126,8 @@ namespace MultiplayerARPG
 
         }
 
-        public GuildData(int id, string guildName, BasePlayerCharacterEntity leaderCharacterEntity)
-            : this(id, guildName, leaderCharacterEntity.Id)
+        public GuildData(int id, string guildName, SocialCharacterData leaderCharacterEntity)
+            : this(id, guildName, leaderCharacterEntity.id)
         {
             AddMember(leaderCharacterEntity);
         }

@@ -34,8 +34,8 @@ namespace MultiplayerARPG
             this.shareItem = shareItem;
         }
 
-        public PartyData(int id, bool shareExp, bool shareItem, BasePlayerCharacterEntity leaderCharacter)
-            : this(id, shareExp, shareItem, leaderCharacter.Id)
+        public PartyData(int id, bool shareExp, bool shareItem, SocialCharacterData leaderCharacter)
+            : this(id, shareExp, shareItem, leaderCharacter.id)
         {
             AddMember(leaderCharacter);
         }
