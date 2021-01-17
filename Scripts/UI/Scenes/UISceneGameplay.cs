@@ -342,6 +342,16 @@ namespace MultiplayerARPG
             AddNpcDialog(uiNpcDialog);
         }
 
+        public override void HideNpcDialog()
+        {
+            for (int i = npcDialogs.Count - 1; i >= 0; --i)
+            {
+                if (npcDialogs[i].IsVisible())
+                    npcDialogs[i].Hide();
+                npcDialogs.RemoveAt(i);
+            }
+        }
+
         public void OnShowNpcRefineItem()
         {
             if (uiRefineItem == null)
@@ -402,59 +412,6 @@ namespace MultiplayerARPG
                 return;
             uiGuildInvitation.Data = invitation;
             uiGuildInvitation.Show();
-        }
-
-        public void OnNotifyStorageOpened(StorageType storageType, string storageOWnerId, uint objectId, short weightLimit, short slotLimit)
-        {
-            // Hide all of storage UIs
-            if (uiPlayerStorageItems != null)
-                uiPlayerStorageItems.Hide();
-            if (uiGuildStorageItems != null)
-                uiGuildStorageItems.Hide();
-            if (uiBuildingStorageItems != null)
-                uiBuildingStorageItems.Hide();
-            if (uiBuildingCampfireItems != null)
-                uiBuildingCampfireItems.Hide();
-            // Show only selected storage type
-            switch (storageType)
-            {
-                case StorageType.Player:
-                    if (uiPlayerStorageItems != null)
-                    {
-                        uiPlayerStorageItems.Show(storageType, storageOWnerId, null, weightLimit, slotLimit);
-                        AddNpcDialog(uiPlayerStorageItems);
-                    }
-                    break;
-                case StorageType.Guild:
-                    if (uiGuildStorageItems != null)
-                    {
-                        uiGuildStorageItems.Show(storageType, storageOWnerId, null, weightLimit, slotLimit);
-                        AddNpcDialog(uiGuildStorageItems);
-                    }
-                    break;
-                case StorageType.Building:
-                    BuildingEntity buildingEntity;
-                    if (!BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out buildingEntity))
-                        return;
-
-                    if (buildingEntity is CampFireEntity)
-                    {
-                        if (uiBuildingCampfireItems != null)
-                        {
-                            uiBuildingCampfireItems.Show(storageType, storageOWnerId, buildingEntity, weightLimit, slotLimit);
-                            AddNpcDialog(uiBuildingCampfireItems);
-                        }
-                    }
-                    else if (buildingEntity is StorageEntity)
-                    {
-                        if (uiBuildingStorageItems != null)
-                        {
-                            uiBuildingStorageItems.Show(storageType, storageOWnerId, buildingEntity, weightLimit, slotLimit);
-                            AddNpcDialog(uiBuildingStorageItems);
-                        }
-                    }
-                    break;
-            }
         }
 
         public void OnIsWarpingChange(bool isWarping)
@@ -553,16 +510,6 @@ namespace MultiplayerARPG
                 onHideCurrentBuildingDialog.Invoke();
         }
 
-        public override void HideNpcDialog()
-        {
-            for (int i = npcDialogs.Count - 1; i >= 0; --i)
-            {
-                if (npcDialogs[i].IsVisible())
-                    npcDialogs[i].Hide();
-                npcDialogs.RemoveAt(i);
-            }
-        }
-
         public override bool IsShopDialogVisible()
         {
             return uiNpcDialog != null &&
@@ -641,6 +588,59 @@ namespace MultiplayerARPG
             uiEnhanceSocketItem.Show();
         }
 
+        public override void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
+        {
+            // Hide all of storage UIs
+            if (uiPlayerStorageItems != null)
+                uiPlayerStorageItems.Hide();
+            if (uiGuildStorageItems != null)
+                uiGuildStorageItems.Hide();
+            if (uiBuildingStorageItems != null)
+                uiBuildingStorageItems.Hide();
+            if (uiBuildingCampfireItems != null)
+                uiBuildingCampfireItems.Hide();
+            // Show only selected storage type
+            switch (storageType)
+            {
+                case StorageType.Player:
+                    if (uiPlayerStorageItems != null)
+                    {
+                        uiPlayerStorageItems.Show(storageType, storageOwnerId, null, weightLimit, slotLimit);
+                        AddNpcDialog(uiPlayerStorageItems);
+                    }
+                    break;
+                case StorageType.Guild:
+                    if (uiGuildStorageItems != null)
+                    {
+                        uiGuildStorageItems.Show(storageType, storageOwnerId, null, weightLimit, slotLimit);
+                        AddNpcDialog(uiGuildStorageItems);
+                    }
+                    break;
+                case StorageType.Building:
+                    BuildingEntity buildingEntity;
+                    if (!BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out buildingEntity))
+                        return;
+
+                    if (buildingEntity is CampFireEntity)
+                    {
+                        if (uiBuildingCampfireItems != null)
+                        {
+                            uiBuildingCampfireItems.Show(storageType, storageOwnerId, buildingEntity, weightLimit, slotLimit);
+                            AddNpcDialog(uiBuildingCampfireItems);
+                        }
+                    }
+                    else if (buildingEntity is StorageEntity)
+                    {
+                        if (uiBuildingStorageItems != null)
+                        {
+                            uiBuildingStorageItems.Show(storageType, storageOwnerId, buildingEntity, weightLimit, slotLimit);
+                            AddNpcDialog(uiBuildingStorageItems);
+                        }
+                    }
+                    break;
+            }
+        }
+
         public override void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity)
         {
             if (uiBuildingCraftItems == null)
@@ -666,7 +666,6 @@ namespace MultiplayerARPG
             characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
             characterEntity.onShowDealingDialog += OnShowDealing;
             characterEntity.onIsWarpingChange += OnIsWarpingChange;
-            ClientStorageActions.onNotifyStorageOpened += OnNotifyStorageOpened;
             ClientPartyActions.onNotifyPartyInvitation += OnNotifyPartyInvitation;
             ClientGuildActions.onNotifyGuildInvitation += OnNotifyGuildInvitation;
         }
@@ -682,7 +681,6 @@ namespace MultiplayerARPG
             characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;
             characterEntity.onShowDealingDialog -= OnShowDealing;
             characterEntity.onIsWarpingChange -= OnIsWarpingChange;
-            ClientStorageActions.onNotifyStorageOpened -= OnNotifyStorageOpened;
             ClientPartyActions.onNotifyPartyInvitation -= OnNotifyPartyInvitation;
             ClientGuildActions.onNotifyGuildInvitation -= OnNotifyGuildInvitation;
         }

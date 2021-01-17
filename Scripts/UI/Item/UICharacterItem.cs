@@ -883,7 +883,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            if (BaseUISceneGameplay.Singleton.IsShopDialogVisible() &&
+            if (GameInstance.ItemUIVisibilityManager.IsShopDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isSellItemDialogAppeared)
@@ -917,7 +917,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            if (BaseUISceneGameplay.Singleton.IsRefineItemDialogVisible() &&
+            if (GameInstance.ItemUIVisibilityManager.IsRefineItemDialogVisible() &&
                 EquipmentItem != null &&
                 InventoryType != InventoryType.StorageItems)
             {
@@ -952,7 +952,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            if (BaseUISceneGameplay.Singleton.IsDismantleItemDialogVisible() &&
+            if (GameInstance.ItemUIVisibilityManager.IsDismantleItemDialogVisible() &&
                 GameInstance.Singleton.dismantleFilter.Filter(CharacterItem) &&
                 InventoryType == InventoryType.NonEquipItems)
             {
@@ -987,7 +987,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            if (BaseUISceneGameplay.Singleton.IsRepairItemDialogVisible() &&
+            if (GameInstance.ItemUIVisibilityManager.IsRepairItemDialogVisible() &&
                 EquipmentItem != null &&
                 InventoryType != InventoryType.StorageItems)
             {
@@ -1022,7 +1022,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            if (BaseUISceneGameplay.Singleton.IsEnhanceSocketItemDialogVisible() &&
+            if (GameInstance.ItemUIVisibilityManager.IsEnhanceSocketItemDialogVisible() &&
                 EquipmentItem != null &&
                 InventoryType != InventoryType.StorageItems)
             {
@@ -1057,7 +1057,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            if (BaseUISceneGameplay.Singleton.IsStorageDialogVisible() &&
+            if (GameInstance.ItemUIVisibilityManager.IsStorageDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isStorageDialogAppeared)
@@ -1091,7 +1091,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible dealing dialog
-            if (BaseUISceneGameplay.Singleton.IsDealingDialogVisibleWithDealingState() &&
+            if (GameInstance.ItemUIVisibilityManager.IsDealingDialogVisibleWithDealingState() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isDealingStateEntered)
@@ -1341,7 +1341,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                BaseUISceneGameplay.Singleton.ShowRefineItemDialog(InventoryType, IndexOfData);
+                GameInstance.ItemUIVisibilityManager.ShowRefineItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
@@ -1379,7 +1379,7 @@ namespace MultiplayerARPG
             if (!GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
                 return;
 
-            BaseUISceneGameplay.Singleton.ShowDismantleItemDialog(InventoryType, IndexOfData);
+            GameInstance.ItemUIVisibilityManager.ShowDismantleItemDialog(InventoryType, IndexOfData);
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
         }
@@ -1429,7 +1429,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                BaseUISceneGameplay.Singleton.ShowRepairItemDialog(InventoryType, IndexOfData);
+                GameInstance.ItemUIVisibilityManager.ShowRepairItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
@@ -1466,7 +1466,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                BaseUISceneGameplay.Singleton.ShowEnhanceSocketItemDialog(InventoryType, IndexOfData);
+                GameInstance.ItemUIVisibilityManager.ShowEnhanceSocketItemDialog(InventoryType, IndexOfData);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }

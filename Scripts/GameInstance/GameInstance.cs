@@ -51,6 +51,7 @@ namespace MultiplayerARPG
         public static IServerStorageHandlers ServerStorageHandlers { get; set; }
         public static IServerPartyHandlers ServerPartyHandlers { get; set; }
         public static IServerGuildHandlers ServerGuildHandlers { get; set; }
+        public static IItemUIVisibilityManager ItemUIVisibilityManager { get; set; }
         public static string UserId { get; set; }
         public static string UserToken { get; set; }
         public static string SelectedCharacterId { get; set; }

@@ -38,6 +38,7 @@ namespace MultiplayerARPG
         {
             GameInstance.OpenedStorageType = storageType;
             GameInstance.OpenedStorageOwnerId = storageOwnerId;
+            GameInstance.ItemUIVisibilityManager.ShowStorageDialog(storageType, storageOwnerId, objectId, weightLimit, slotLimit);
             if (onNotifyStorageOpened != null)
                 onNotifyStorageOpened.Invoke(storageType, storageOwnerId, objectId, weightLimit, slotLimit);
         }

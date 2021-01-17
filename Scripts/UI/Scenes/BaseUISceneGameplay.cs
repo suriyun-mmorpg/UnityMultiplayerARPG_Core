@@ -19,7 +19,7 @@ namespace MultiplayerARPG
     }
 
     [DisallowMultipleComponent]
-    public abstract class BaseUISceneGameplay : MonoBehaviour
+    public abstract class BaseUISceneGameplay : MonoBehaviour, IItemUIVisibilityManager
     {
         public static BaseUISceneGameplay Singleton { get; private set; }
 
@@ -41,6 +41,16 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             Singleton = this;
+        }
+
+        protected virtual void OnEnable()
+        {
+            GameInstance.ItemUIVisibilityManager = this;
+        }
+
+        protected virtual void OnDisable()
+        {
+            GameInstance.ItemUIVisibilityManager = null;
         }
 
         protected virtual void Update()
@@ -140,11 +150,11 @@ namespace MultiplayerARPG
         public abstract void SetTargetEntity(BaseGameEntity entity);
         public abstract void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter);
         public abstract void ShowNpcDialog(int npcDialogDataId);
+        public abstract void HideNpcDialog();
         public abstract void ShowConstructBuildingDialog(BuildingEntity buildingEntity);
         public abstract void HideConstructBuildingDialog();
         public abstract void ShowCurrentBuildingDialog(BuildingEntity buildingEntity);
         public abstract void HideCurrentBuildingDialog();
-        public abstract void HideNpcDialog();
         public abstract bool IsShopDialogVisible();
         public abstract bool IsRefineItemDialogVisible();
         public abstract bool IsDismantleItemDialogVisible();
@@ -156,6 +166,7 @@ namespace MultiplayerARPG
         public abstract void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData);
+        public abstract void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit);
         public abstract void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity);
         public abstract void OnControllerSetup(BasePlayerCharacterEntity characterEntity);
         public abstract void OnControllerDesetup(BasePlayerCharacterEntity characterEntity);

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -12,7 +10,7 @@ namespace MultiplayerARPG
         {
             foreach (GameObject obj in activateObjects)
             {
-                obj.SetActive(BaseUISceneGameplay.Singleton != null && BaseUISceneGameplay.Singleton.IsDismantleItemDialogVisible());
+                obj.SetActive(GameInstance.ItemUIVisibilityManager.IsDismantleItemDialogVisible());
             }
         }
     }
