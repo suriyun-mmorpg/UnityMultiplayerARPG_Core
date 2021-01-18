@@ -164,7 +164,7 @@ namespace MultiplayerARPG
                         // Check if it's correct equip position or not
                         ClientGenericActions.ClientReceiveGameMessage(new GameMessage()
                         {
-                            type = GameMessage.Type.CannotEquip
+                            message = UITextKeys.UI_ERROR_CANNOT_EQUIP,
                         });
                         return;
                     }
@@ -177,7 +177,7 @@ namespace MultiplayerARPG
                         // Check if it's correct equip position or not
                         ClientGenericActions.ClientReceiveGameMessage(new GameMessage()
                         {
-                            type = GameMessage.Type.CannotEquip
+                            message = UITextKeys.UI_ERROR_CANNOT_EQUIP,
                         });
                         return;
                     }

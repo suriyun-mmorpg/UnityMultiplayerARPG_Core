@@ -4,25 +4,18 @@ namespace MultiplayerARPG
 {
     public struct ResponseGetFriendsMessage : INetSerializable
     {
-        public enum Error : byte
-        {
-            None,
-            InternalServerError,
-            NotAvailable,
-            NotLoggedIn,
-        }
-        public Error error;
+        public UITextKeys error;
         public SocialCharacterData[] friends;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (Error)reader.GetByte();
+            error = (UITextKeys)reader.GetPackedUShort();
             friends = reader.GetArray<SocialCharacterData>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)error);
+            writer.PutPackedUShort((ushort)error);
             writer.PutArray(friends);
         }
     }

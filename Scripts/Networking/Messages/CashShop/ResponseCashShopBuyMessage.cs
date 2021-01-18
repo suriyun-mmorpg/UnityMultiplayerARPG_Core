@@ -4,24 +4,14 @@ namespace MultiplayerARPG
 {
     public struct ResponseCashShopBuyMessage : INetSerializable
     {
-        public enum Error : byte
-        {
-            None,
-            InternalServerError,
-            NotAvailable,
-            NotLoggedIn,
-            ItemNotFound,
-            NotEnoughCash,
-            CannotCarryAllRewards,
-        }
-        public Error error;
+        public UITextKeys error;
         public int dataId;
         public int cash;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (Error)reader.GetByte();
-            if (error == Error.None)
+            error = (UITextKeys)reader.GetPackedUShort();
+            if (error == UITextKeys.NONE)
             {
                 dataId = reader.GetInt();
                 cash = reader.GetInt();
@@ -30,8 +20,8 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)error);
-            if (error == Error.None)
+            writer.PutPackedUShort((ushort)error);
+            if (error == UITextKeys.NONE)
             {
                 writer.Put(dataId);
                 writer.Put(cash);

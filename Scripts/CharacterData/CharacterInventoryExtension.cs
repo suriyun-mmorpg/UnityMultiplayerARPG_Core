@@ -2,18 +2,18 @@
 {
     public static class CharacterInventoryExtension
     {
-        public static bool CanEquipWeapon(this ICharacterData character, CharacterItem equippingItem, byte equipWeaponSet, bool isLeftHand, out GameMessage.Type gameMessageType, out bool shouldUnequipRightHand, out bool shouldUnequipLeftHand)
+        public static bool CanEquipWeapon(this ICharacterData character, CharacterItem equippingItem, byte equipWeaponSet, bool isLeftHand, out UITextKeys gameMessage, out bool shouldUnequipRightHand, out bool shouldUnequipLeftHand)
         {
             shouldUnequipRightHand = false;
             shouldUnequipLeftHand = false;
 
             if (equippingItem.GetWeaponItem() == null && equippingItem.GetShieldItem() == null)
             {
-                gameMessageType = GameMessage.Type.CannotEquip;
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_EQUIP;
                 return false;
             }
 
-            if (!equippingItem.GetEquipmentItem().CanEquip(character, equippingItem.level, out gameMessageType))
+            if (!equippingItem.GetEquipmentItem().CanEquip(character, equippingItem.level, out gameMessage))
                 return false;
 
             character.FillWeaponSetsIfNeeded(equipWeaponSet);
@@ -37,7 +37,7 @@
                         // If weapon is one hand its equip position must be right hand
                         if (isLeftHand)
                         {
-                            gameMessageType = GameMessage.Type.InvalidEquipPositionRightHand;
+                            gameMessage = UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_RIGHT_HAND;
                             return false;
                         }
                         // One hand can equip with shield only 
@@ -70,7 +70,7 @@
                         // If weapon is one hand its equip position must be right hand
                         if (isLeftHand)
                         {
-                            gameMessageType = GameMessage.Type.InvalidEquipPositionRightHand;
+                            gameMessage = UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_RIGHT_HAND;
                             return false;
                         }
                         // Unequip both left and right hand
@@ -90,7 +90,7 @@
                 // If it is shield, its equip position must be left hand
                 if (!isLeftHand)
                 {
-                    gameMessageType = GameMessage.Type.InvalidEquipPositionLeftHand;
+                    gameMessage = UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_LEFT_HAND;
                     return false;
                 }
                 if (hasRightHandItem && rightHandEquipType == WeaponItemEquipType.TwoHand)
@@ -99,21 +99,21 @@
                     shouldUnequipLeftHand = true;
                 return true;
             }
-            gameMessageType = GameMessage.Type.CannotEquip;
+            gameMessage = UITextKeys.UI_ERROR_CANNOT_EQUIP;
             return false;
         }
 
-        public static bool CanEquipItem(this ICharacterData character, CharacterItem equippingItem, byte equipSlotIndex, out GameMessage.Type gameMessageType, out int unEquippingIndex)
+        public static bool CanEquipItem(this ICharacterData character, CharacterItem equippingItem, byte equipSlotIndex, out UITextKeys gameMessage, out int unEquippingIndex)
         {
             unEquippingIndex = -1;
 
             if (equippingItem.GetArmorItem() == null)
             {
-                gameMessageType = GameMessage.Type.CannotEquip;
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_EQUIP;
                 return false;
             }
 
-            if (!equippingItem.GetEquipmentItem().CanEquip(character, equippingItem.level, out gameMessageType))
+            if (!equippingItem.GetEquipmentItem().CanEquip(character, equippingItem.level, out gameMessage))
                 return false;
 
             // Equipping item is armor
@@ -123,22 +123,22 @@
                 unEquippingIndex = character.IndexOfEquipItemByEquipPosition(equippingArmorItem.EquipPosition, equipSlotIndex);
                 return true;
             }
-            gameMessageType = GameMessage.Type.CannotEquip;
+            gameMessage = UITextKeys.UI_ERROR_CANNOT_EQUIP;
             return false;
         }
 
-        public static bool EquipWeapon(this ICharacterData character, int nonEquipIndex, byte equipWeaponSet, bool isLeftHand, out GameMessage.Type gameMessageType)
+        public static bool EquipWeapon(this ICharacterData character, int nonEquipIndex, byte equipWeaponSet, bool isLeftHand, out UITextKeys gameMessage)
         {
             if (character == null || nonEquipIndex < 0 ||nonEquipIndex >= character.NonEquipItems.Count)
             {
-                gameMessageType = GameMessage.Type.InvalidItemData;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
                 return false;
             }
 
             CharacterItem equippingItem = character.NonEquipItems[nonEquipIndex];
             bool shouldUnequipRightHand;
             bool shouldUnequipLeftHand;
-            if (!character.CanEquipWeapon(equippingItem, equipWeaponSet, isLeftHand, out gameMessageType, out shouldUnequipRightHand, out shouldUnequipLeftHand))
+            if (!character.CanEquipWeapon(equippingItem, equipWeaponSet, isLeftHand, out gameMessage, out shouldUnequipRightHand, out shouldUnequipLeftHand))
                 return false;
 
             int unEquipCount = -1;
@@ -149,20 +149,20 @@
 
             if (character.UnEquipItemWillOverwhelming(unEquipCount))
             {
-                gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 return false;
             }
 
             int unEquippedIndexRightHand = -1;
             if (shouldUnequipRightHand)
             {
-                if (!character.UnEquipWeapon(equipWeaponSet, false, true, out gameMessageType, out unEquippedIndexRightHand))
+                if (!character.UnEquipWeapon(equipWeaponSet, false, true, out gameMessage, out unEquippedIndexRightHand))
                     return false;
             }
             int unEquippedIndexLeftHand = -1;
             if (shouldUnequipLeftHand)
             {
-                if (!character.UnEquipWeapon(equipWeaponSet, true, true, out gameMessageType, out unEquippedIndexLeftHand))
+                if (!character.UnEquipWeapon(equipWeaponSet, true, true, out gameMessage, out unEquippedIndexLeftHand))
                     return false;
             }
 
@@ -224,11 +224,11 @@
                     character.NonEquipItems.RemoveAt(nonEquipIndex);
             }
             character.FillEmptySlots(true);
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             return true;
         }
 
-        public static bool UnEquipWeapon(this ICharacterData character, byte equipWeaponSet, bool isLeftHand, bool doNotValidate, out GameMessage.Type gameMessageType, out int unEquippedIndex, int expectedUnequippedIndex = -1)
+        public static bool UnEquipWeapon(this ICharacterData character, byte equipWeaponSet, bool isLeftHand, bool doNotValidate, out UITextKeys gameMessage, out int unEquippedIndex, int expectedUnequippedIndex = -1)
         {
             unEquippedIndex = -1;
             character.FillWeaponSetsIfNeeded(equipWeaponSet);
@@ -242,7 +242,7 @@
                 if (!doNotValidate && unEquipItem.NotEmptySlot() &&
                     character.UnEquipItemWillOverwhelming())
                 {
-                    gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                    gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                     return false;
                 }
                 tempEquipWeapons.leftHand = CharacterItem.Empty;
@@ -255,7 +255,7 @@
                 if (!doNotValidate && unEquipItem.NotEmptySlot() &&
                     character.UnEquipItemWillOverwhelming())
                 {
-                    gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                    gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                     return false;
                 }
                 tempEquipWeapons.rightHand = CharacterItem.Empty;
@@ -267,26 +267,26 @@
                 character.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex, expectedUnequippedIndex);
                 character.FillEmptySlots(true);
             }
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             return true;
         }
 
 
-        public static bool EquipArmor(this ICharacterData character, int nonEquipIndex, byte equipSlotIndex, out GameMessage.Type gameMessageType)
+        public static bool EquipArmor(this ICharacterData character, int nonEquipIndex, byte equipSlotIndex, out UITextKeys gameMessage)
         {
             if (character == null || nonEquipIndex < 0 || nonEquipIndex >= character.NonEquipItems.Count)
             {
-                gameMessageType = GameMessage.Type.InvalidItemData;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
                 return false;
             }
 
             CharacterItem equippingItem = character.NonEquipItems[nonEquipIndex];
             int unEquippingIndex;
-            if (!character.CanEquipItem(equippingItem, equipSlotIndex, out gameMessageType, out unEquippingIndex))
+            if (!character.CanEquipItem(equippingItem, equipSlotIndex, out gameMessage, out unEquippingIndex))
                 return false;
 
             int unEquippedIndex = -1;
-            if (unEquippingIndex >= 0 && !character.UnEquipArmor(unEquippingIndex, true, out gameMessageType, out unEquippedIndex))
+            if (unEquippingIndex >= 0 && !character.UnEquipArmor(unEquippingIndex, true, out gameMessage, out unEquippedIndex))
                 return false;
 
             // Can equip the item when there is no equipped item or able to unequip the equipped item
@@ -311,23 +311,23 @@
                     character.NonEquipItems.RemoveAt(nonEquipIndex);
             }
             character.FillEmptySlots(true);
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             return true;
         }
 
-        public static bool UnEquipArmor(this ICharacterData character, int index, bool doNotValidate, out GameMessage.Type gameMessageType, out int unEquippedIndex, int expectedUnequippedIndex = -1)
+        public static bool UnEquipArmor(this ICharacterData character, int index, bool doNotValidate, out UITextKeys gameMessage, out int unEquippedIndex, int expectedUnequippedIndex = -1)
         {
             unEquippedIndex = -1;
             if (character == null || index < 0 || index >= character.EquipItems.Count)
             {
-                gameMessageType = GameMessage.Type.InvalidItemData;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
                 return false;
             }
             CharacterItem unEquipItem = character.EquipItems[index];
             if (!doNotValidate && unEquipItem.NotEmptySlot() &&
                 character.UnEquipItemWillOverwhelming())
             {
-                gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 return false;
             }
             character.EquipItems.RemoveAt(index);
@@ -337,17 +337,17 @@
                 character.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex, expectedUnequippedIndex);
                 character.FillEmptySlots(true);
             }
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             return true;
         }
 
-        public static bool SwapOrMergeItem(this ICharacterData character, short fromIndex, short toIndex, out GameMessage.Type gameMessageType)
+        public static bool SwapOrMergeItem(this ICharacterData character, short fromIndex, short toIndex, out UITextKeys gameMessage)
         {
             if (fromIndex < 0 || fromIndex >= character.NonEquipItems.Count ||
                 toIndex < 0 || toIndex >= character.NonEquipItems.Count ||
                 fromIndex == toIndex)
             {
-                gameMessageType = GameMessage.Type.InvalidItemData;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
                 return false;
             }
 
@@ -382,7 +382,7 @@
                 character.NonEquipItems[fromIndex] = toItem;
                 character.NonEquipItems[toIndex] = fromItem;
             }
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             return true;
         }
     }

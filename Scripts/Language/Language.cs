@@ -5,14 +5,16 @@ namespace MultiplayerARPG
 {
     public enum UITextKeys : ushort
     {
-        UI_CUSTOM,
+        NONE,
         // UI Generic Title
         UI_LABEL_DISCONNECTED,
         UI_LABEL_SUCCESS,
         UI_LABEL_ERROR,
         UI_LABEL_NONE,
         // Error - Generic Error
+        UI_ERROR_UNKNOW,
         UI_ERROR_SERVICE_NOT_AVAILABLE,
+        UI_ERROR_REQUEST_TIMEOUT,
         UI_ERROR_KICKED_FROM_SERVER,
         UI_ERROR_CONNECTION_FAILED,
         UI_ERROR_CONNECTION_REJECTED,
@@ -21,20 +23,32 @@ namespace MultiplayerARPG
         UI_ERROR_HOST_UNREACHABLE,
         UI_ERROR_CONNECTION_TIMEOUT,
         UI_ERROR_INTERNAL_SERVER_ERROR,
+        UI_ERROR_SERVER_NOT_FOUND,
         UI_ERROR_USER_NOT_FOUND,
         UI_ERROR_CHARACTER_NOT_FOUND,
         UI_ERROR_ITEM_NOT_FOUND,
         UI_ERROR_CASH_PACKAGE_NOT_FOUND,
         UI_ERROR_NOT_ENOUGH_GOLD,
         UI_ERROR_NOT_ENOUGH_CASH,
+        UI_ERROR_NOT_ENOUGH_ITEMS,
+        UI_ERROR_NOT_ENOUGH_STAT_POINT,
+        UI_ERROR_NOT_ENOUGH_SKILL_POINT,
         UI_ERROR_NOT_LOGGED_IN,
-        UI_ERROR_INVALID_DATA,
-        UI_ERROR_INVALID_CHARACTER_DATA,
         UI_ERROR_USERNAME_IS_EMPTY,
         UI_ERROR_PASSWORD_IS_EMPTY,
-        UI_ERROR_CANNOT_CARRY_ALL_REWARDS,
+        UI_ERROR_WILL_OVERWHELMING,
+        UI_ERROR_NOT_ABLE_TO_LOOT,
+        // Error - Game Data
+        UI_ERROR_INVALID_DATA,
+        UI_ERROR_INVALID_CHARACTER_DATA,
+        UI_ERROR_INVALID_ITEM_DATA,
+        UI_ERROR_INVALID_ITEM_INDEX,
+        UI_ERROR_INVALID_ATTRIBUTE_DATA,
+        UI_ERROR_INVALID_SKILL_DATA,
+        UI_ERROR_INVALID_GUILD_SKILL_DATA,
         // Error - UI Login
         UI_ERROR_INVALID_USERNAME_OR_PASSWORD,
+        UI_ERROR_INVALID_USER_TOKEN,
         UI_ERROR_ALREADY_LOGGED_IN,
         // Error - UI Register
         UI_ERROR_INVALID_CONFIRM_PASSWORD,
@@ -60,11 +74,107 @@ namespace MultiplayerARPG
         UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO,
         // Error - UI Cash Shop
         UI_ERROR_CANNOT_GET_CASH_SHOP_INFO,
+        // Error - UI Guild Name
+        UI_ERROR_GUILD_NAME_TOO_SHORT,
+        UI_ERROR_GUILD_NAME_TOO_LONG,
+        UI_ERROR_GUILD_NAME_EXISTED,
         // Error - UI Guild Role Setting
-        UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY,
+        UI_ERROR_GUILD_ROLE_NAME_TOO_SHORT,
+        UI_ERROR_GUILD_ROLE_NAME_TOO_LONG,
         UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER,
         // Error - UI Guild Member Role Setting
         UI_ERROR_INVALID_GUILD_ROLE,
+        // Error - UI Guild Message Setting
+        UI_ERROR_GUILD_MESSAGE_TOO_LONG,
+        // Error - Equip
+        UI_ERROR_CANNOT_EQUIP,
+        UI_ERROR_INVALID_EQUIP_POSITION_RIGHT_HAND,
+        UI_ERROR_INVALID_EQUIP_POSITION_LEFT_HAND,
+        UI_ERROR_INVALID_EQUIP_POSITION_RIGHT_HAND_OR_LEFT_HAND,
+        UI_ERROR_INVALID_EQUIP_POSITION_ARMOR,
+        // Error - Refine
+        UI_ERROR_CANNOT_REFINE,
+        UI_ERROR_REFINE_ITEM_REACHED_MAX_LEVEL,
+        UI_REFINE_SUCCESS,
+        UI_REFINE_FAIL,
+        // Enhance
+        UI_ERROR_CANNOT_ENHANCE_SOCKET,
+        UI_ERROR_NOT_ENOUGH_SOCKET_ENCHANER,
+        UI_ERROR_NO_EMPTY_SOCKET,
+        UI_ERROR_SOCKET_NOT_EMPTY,
+        UI_ERROR_CANNOT_REMOVE_ENHANCER,
+        UI_ERROR_NO_ENHANCER,
+        // Repair
+        UI_ERROR_CANNOT_REPAIR,
+        UI_REPAIR_SUCCESS,
+        // Dealing
+        UI_ERROR_CHARACTER_IS_DEALING,
+        UI_ERROR_CHARACTER_IS_TOO_FAR,
+        UI_ERROR_CANNOT_ACCEPT_DEALING_REQUEST,
+        UI_ERROR_DEALING_REQUEST_DECLINED,
+        UI_ERROR_INVALID_DEALING_STATE,
+        UI_ERROR_DEALING_CANCELED,
+        UI_ERROR_ANOTHER_CHARACTER_WILL_OVERWHELMING,
+        // Party
+        UI_ERROR_PARTY_NOT_FOUND,
+        UI_ERROR_PARTY_INVITATION_NOT_FOUND,
+        UI_PARTY_INVITATION_ACCEPTED,
+        UI_PARTY_INVITATION_DECLINED,
+        UI_ERROR_CANNOT_SEND_PARTY_INVITATION,
+        UI_ERROR_CANNOT_KICK_PARTY_MEMBER,
+        UI_ERROR_CANNOT_KICK_YOURSELF_FROM_PARTY,
+        UI_ERROR_CANNOT_KICK_PARTY_LEADER,
+        UI_ERROR_JOINED_ANOTHER_PARTY,
+        UI_ERROR_NOT_JOINED_PARTY,
+        UI_ERROR_NOT_PARTY_LEADER,
+        UI_ERROR_CHARACTER_JOINED_ANOTHER_PARTY,
+        UI_ERROR_CHARACTER_NOT_JOINED_PARTY,
+        UI_ERROR_PARTY_MEMBER_REACHED_LIMIT,
+        // Guild
+        UI_ERROR_GUILD_NOT_FOUND,
+        UI_ERROR_GUILD_INVITATION_NOT_FOUND,
+        UI_GUILD_INVITATION_ACCEPTED,
+        UI_GUILD_INVITATION_DECLINED,
+        UI_ERROR_CANNOT_SEND_GUILD_INVITATION,
+        UI_ERROR_CANNOT_KICK_GUILD_MEMBER,
+        UI_ERROR_CANNOT_KICK_YOURSELF_FROM_GUILD,
+        UI_ERROR_CANNOT_KICK_GUILD_LEADER,
+        UI_ERROR_CANNOT_KICK_HIGHER_GUILD_MEMBER,
+        UI_ERROR_JOINED_ANOTHER_GUILD,
+        UI_ERROR_NOT_JOINED_GUILD,
+        UI_ERROR_NOT_GUILD_LEADER,
+        UI_ERROR_CHARACTER_JOINED_ANOTHER_GUILD,
+        UI_ERROR_CHARACTER_NOT_JOINED_GUILD,
+        UI_ERROR_GUILD_MEMBER_REACHED_LIMIT,
+        UI_ERROR_GUILD_ROLE_NOT_AVAILABLE,
+        UI_ERROR_GUILD_SKILL_REACHED_MAX_LEVEL,
+        UI_ERROR_NOT_ENOUGH_GUILD_SKILL_POINT,
+        // Game Data
+        UI_UNKNOW_GAME_DATA_TITLE,
+        UI_UNKNOW_GAME_DATA_DESCRIPTION,
+        // Bank
+        UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
+        UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
+        UI_ERROR_CANNOT_ACCESS_STORAGE,
+        UI_ERROR_STORAGE_NOT_FOUND,
+        // Combatant
+        UI_ERROR_NO_AMMO,
+        UI_ERROR_NOT_ENOUGH_HP,
+        UI_ERROR_NOT_ENOUGH_MP,
+        UI_ERROR_NOT_ENOUGH_STAMINA,
+        // Skills
+        UI_ERROR_SKILL_LEVEL_IS_ZERO,
+        UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON,
+        UI_ERROR_SKILL_IS_COOLING_DOWN,
+        UI_ERROR_SKILL_IS_NOT_LEARNED,
+        UI_ERROR_NO_SKILL_TARGET,
+        // Requirement
+        UI_ERROR_NOT_ENOUGH_LEVEL,
+        UI_ERROR_NOT_MATCH_CHARACTER_CLASS,
+        UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS,
+        UI_ERROR_NOT_ENOUGH_SKILL_LEVELS,
+        UI_ERROR_ATTRIBUTE_REACHED_MAX_AMOUNT,
+        UI_ERROR_SKILL_REACHED_MAX_LEVEL,
         // Success - UI Cash Shop
         UI_SUCCESS_CASH_SHOP_BUY,
         // UI Character Item
@@ -80,6 +190,7 @@ namespace MultiplayerARPG
         UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION,
         UI_MOVE_ITEM_FROM_STORAGE,
         UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION,
+        UI_ERROR_STORAGE_WILL_OVERWHELMING,
         // UI Bank
         UI_BANK_DEPOSIT,
         UI_BANK_DEPOSIT_DESCRIPTION,
@@ -141,10 +252,18 @@ namespace MultiplayerARPG
         UI_ERROR_MAIL_READ_NOT_ALLOWED,
         UI_ERROR_MAIL_CLAIM_NOT_ALLOWED,
         UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED,
-        UI_ERROR_MAIL_CLAIM_CANNOT_CARRY,
+        UI_ERROR_MAIL_CLAIM_WILL_OVERWHELMING,
         UI_MAIL_CLAIM_SUCCESS,
         UI_ERROR_MAIL_DELETE_NOT_ALLOWED,
         UI_MAIL_DELETE_SUCCESS,
+        // Error - App Server
+        UI_ERROR_APP_NOT_READY,
+        UI_ERROR_MAP_EXISTED,
+        UI_ERROR_EVENT_EXISTED,
+        UI_ERROR_INVALID_SERVER_HASH,
+        // Error - Map Spawn Server
+        UI_ERROR_EMPTY_SCENE_NAME,
+        UI_ERROR_CANNOT_EXCUTE_MAP_SERVER,
     }
 
     public enum UIItemTypeKeys : byte
@@ -757,107 +876,6 @@ namespace MultiplayerARPG
         public static readonly Dictionary<string, string> Texts = new Dictionary<string, string>();
         static DefaultLocale()
         {
-            Texts.Add(GameMessage.Type.ServiceNotAvailable.ToString(), "Service not available");
-            Texts.Add(GameMessage.Type.RequestTimeout.ToString(), "Request timeout");
-            Texts.Add(GameMessage.Type.InvalidItemData.ToString(), "Invalid item data");
-            Texts.Add(GameMessage.Type.InvalidAttributeData.ToString(), "Invalid attribute data");
-            Texts.Add(GameMessage.Type.InvalidSkillData.ToString(), "Invalid skill data");
-            Texts.Add(GameMessage.Type.InvalidGuildSkillData.ToString(), "Invalid guild skill data");
-            Texts.Add(GameMessage.Type.NotFoundCharacter.ToString(), "Character not found");
-            Texts.Add(GameMessage.Type.NotAbleToLoot.ToString(), "Cannot get this item");
-            Texts.Add(GameMessage.Type.NotEnoughGold.ToString(), "Have not enough gold");
-            Texts.Add(GameMessage.Type.NotEnoughItems.ToString(), "Have not enough items");
-            Texts.Add(GameMessage.Type.CannotCarryAnymore.ToString(), "Cannot carry anymore items");
-            // Refine
-            Texts.Add(GameMessage.Type.RefineItemReachedMaxLevel.ToString(), "Item reached max level");
-            Texts.Add(GameMessage.Type.RefineSuccess.ToString(), "Refine success");
-            Texts.Add(GameMessage.Type.RefineFail.ToString(), "Refine fail");
-            // Enhance
-            Texts.Add(GameMessage.Type.CannotEnhanceSocket.ToString(), "Cannot enhance the item");
-            Texts.Add(GameMessage.Type.NotEnoughSocketEnchaner.ToString(), "Have not enough items");
-            Texts.Add(GameMessage.Type.NoEmptySocket.ToString(), "No empty socket");
-            Texts.Add(GameMessage.Type.SocketNotEmpty.ToString(), "Socket is not empty");
-            Texts.Add(GameMessage.Type.CannotRemoveEnhancer.ToString(), "Cannot remove enhancer item from socket");
-            Texts.Add(GameMessage.Type.NoEnhancer.ToString(), "Socket is empty");
-            // Repair
-            Texts.Add(GameMessage.Type.CannotRepair.ToString(), "Cannot repair the item");
-            Texts.Add(GameMessage.Type.RepairSuccess.ToString(), "Repair success");
-            // Dealing
-            Texts.Add(GameMessage.Type.CharacterIsInAnotherDeal.ToString(), "Character is in another deal");
-            Texts.Add(GameMessage.Type.CharacterIsTooFar.ToString(), "Character is too far");
-            Texts.Add(GameMessage.Type.CannotAcceptDealingRequest.ToString(), "Cannot accept dealing request");
-            Texts.Add(GameMessage.Type.DealingRequestDeclined.ToString(), "Dealing request declined");
-            Texts.Add(GameMessage.Type.InvalidDealingState.ToString(), "Invalid dealing state");
-            Texts.Add(GameMessage.Type.DealingCanceled.ToString(), "Dealing canceled");
-            Texts.Add(GameMessage.Type.AnotherCharacterCannotCarryAnymore.ToString(), "Another character cannot carry anymore items");
-            // Party
-            Texts.Add(GameMessage.Type.NotFoundParty.ToString(), "Party not found");
-            Texts.Add(GameMessage.Type.NotFoundPartyInvitation.ToString(), "Party invitation not found");
-            Texts.Add(GameMessage.Type.PartyInvitationAccepted.ToString(), "Party invitation accepted");
-            Texts.Add(GameMessage.Type.PartyInvitationDeclined.ToString(), "Party invitation declined");
-            Texts.Add(GameMessage.Type.CannotSendPartyInvitation.ToString(), "Cannot send party invitation");
-            Texts.Add(GameMessage.Type.CannotKickPartyMember.ToString(), "Cannot kick party member");
-            Texts.Add(GameMessage.Type.CannotKickYourSelfFromParty.ToString(), "Cannot kick yourself from party");
-            Texts.Add(GameMessage.Type.CannotKickPartyLeader.ToString(), "Cannot kick party leader");
-            Texts.Add(GameMessage.Type.JoinedAnotherParty.ToString(), "Already joined another party");
-            Texts.Add(GameMessage.Type.NotJoinedParty.ToString(), "Not joined the party");
-            Texts.Add(GameMessage.Type.NotPartyLeader.ToString(), "Not a party member");
-            Texts.Add(GameMessage.Type.CharacterJoinedAnotherParty.ToString(), "Character already joined another party");
-            Texts.Add(GameMessage.Type.CharacterNotJoinedParty.ToString(), "Character not joined the party");
-            Texts.Add(GameMessage.Type.PartyMemberReachedLimit.ToString(), "Party member reached limit");
-            // Guild
-            Texts.Add(GameMessage.Type.NotFoundGuild.ToString(), "Guild not found");
-            Texts.Add(GameMessage.Type.NotFoundGuildInvitation.ToString(), "Guild invitation not found");
-            Texts.Add(GameMessage.Type.GuildInvitationAccepted.ToString(), "Guild invitation accepted");
-            Texts.Add(GameMessage.Type.GuildInvitationDeclined.ToString(), "Guild invitation declined");
-            Texts.Add(GameMessage.Type.CannotSendGuildInvitation.ToString(), "Cannot send guild invitation");
-            Texts.Add(GameMessage.Type.CannotKickGuildMember.ToString(), "Cannot kick guild member");
-            Texts.Add(GameMessage.Type.CannotKickYourSelfFromGuild.ToString(), "Cannot kick yourself from guild");
-            Texts.Add(GameMessage.Type.CannotKickGuildLeader.ToString(), "Cannot kick guild leader");
-            Texts.Add(GameMessage.Type.CannotKickHigherGuildMember.ToString(), "Cannot kick higher guild member");
-            Texts.Add(GameMessage.Type.JoinedAnotherGuild.ToString(), "Already joined another guild");
-            Texts.Add(GameMessage.Type.NotJoinedGuild.ToString(), "Not joined the guild");
-            Texts.Add(GameMessage.Type.NotGuildLeader.ToString(), "Not a guild member");
-            Texts.Add(GameMessage.Type.CharacterJoinedAnotherGuild.ToString(), "Character already joined another guild");
-            Texts.Add(GameMessage.Type.CharacterNotJoinedGuild.ToString(), "Character not joined the guild");
-            Texts.Add(GameMessage.Type.GuildMemberReachedLimit.ToString(), "Guild member reached limit");
-            Texts.Add(GameMessage.Type.GuildRoleNotAvailable.ToString(), "Guild role is not available");
-            Texts.Add(GameMessage.Type.GuildSkillReachedMaxLevel.ToString(), "Guild skill is reached max level");
-            Texts.Add(GameMessage.Type.NoGuildSkillPoint.ToString(), "No guild skill point");
-            Texts.Add(GameMessage.Type.UnknowGameDataTitle.ToString(), "Unknow");
-            Texts.Add(GameMessage.Type.UnknowGameDataDescription.ToString(), "N/A");
-            Texts.Add(GameMessage.Type.NotEnoughGoldToDeposit.ToString(), "Not enough gold to deposit");
-            Texts.Add(GameMessage.Type.NotEnoughGoldToWithdraw.ToString(), "Not enough gold to withdraw");
-            Texts.Add(GameMessage.Type.CannotAccessStorage.ToString(), "Cannot access storage");
-            // Combatant
-            Texts.Add(GameMessage.Type.NoAmmo.ToString(), "No Ammo");
-            Texts.Add(GameMessage.Type.NotEnoughHp.ToString(), "Have not enough Hp");
-            Texts.Add(GameMessage.Type.NotEnoughMp.ToString(), "Have not enough Mp");
-            Texts.Add(GameMessage.Type.NotEnoughStamina.ToString(), "Have not enough Stamina");
-            // Guild Name
-            Texts.Add(GameMessage.Type.TooShortGuildName.ToString(), "Guild name is too short");
-            Texts.Add(GameMessage.Type.TooLongGuildName.ToString(), "Guild name is too long");
-            Texts.Add(GameMessage.Type.ExistedGuildName.ToString(), "Guild name is already existed");
-            // Guild Role Name
-            Texts.Add(GameMessage.Type.TooShortGuildRoleName.ToString(), "Guild role name is too short");
-            Texts.Add(GameMessage.Type.TooLongGuildRoleName.ToString(), "Guild role name is too long");
-            // Guild Message
-            Texts.Add(GameMessage.Type.TooLongGuildMessage.ToString(), "Guild message is too long");
-            // Skill
-            Texts.Add(GameMessage.Type.SkillLevelIsZero.ToString(), "Skill not trained yet");
-            Texts.Add(GameMessage.Type.CannotUseSkillByCurrentWeapon.ToString(), "Cannot use skill by current weapon");
-            Texts.Add(GameMessage.Type.SkillIsCoolingDown.ToString(), "Skill is cooling down");
-            Texts.Add(GameMessage.Type.SkillIsNotLearned.ToString(), "Skill is not learned");
-            Texts.Add(GameMessage.Type.NoSkillTarget.ToString(), "No target");
-            Texts.Add(GameMessage.Type.NotEnoughLevel.ToString(), "Not enough level");
-            Texts.Add(GameMessage.Type.NotMatchCharacterClass.ToString(), "Not match character class");
-            Texts.Add(GameMessage.Type.NotEnoughAttributeAmounts.ToString(), "Not enough attribute amounts");
-            Texts.Add(GameMessage.Type.NotEnoughSkillLevels.ToString(), "Not enough skill levels");
-            Texts.Add(GameMessage.Type.NotEnoughStatPoint.ToString(), "Not enough stat point");
-            Texts.Add(GameMessage.Type.NotEnoughSkillPoint.ToString(), "Not enough skill point");
-            Texts.Add(GameMessage.Type.AttributeReachedMaxAmount.ToString(), "Attribute reached max amount");
-            Texts.Add(GameMessage.Type.SkillReachedMaxLevel.ToString(), "Skill reached max level");
-
             // UI Generic Title
             Texts.Add(UITextKeys.UI_LABEL_DISCONNECTED.ToString(), "Disconnected");
             Texts.Add(UITextKeys.UI_LABEL_SUCCESS.ToString(), "Success");
@@ -1008,6 +1026,7 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_SENT_DATE.ToString(), "Date: {0}");
             // Error - Generic Error
             Texts.Add(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString(), "Service is not available");
+            Texts.Add(UITextKeys.UI_ERROR_REQUEST_TIMEOUT.ToString(), "Request timeout");
             Texts.Add(UITextKeys.UI_ERROR_KICKED_FROM_SERVER.ToString(), "You have been kicked from server");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_FAILED.ToString(), "Cannot connect to the server");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_REJECTED.ToString(), "Connection rejected by server");
@@ -1016,20 +1035,32 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_HOST_UNREACHABLE.ToString(), "Host unreachable");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString(), "Connection timeout");
             Texts.Add(UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR.ToString(), "Internal server error");
+            Texts.Add(UITextKeys.UI_ERROR_SERVER_NOT_FOUND.ToString(), "Server not found");
             Texts.Add(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString(), "User not found");
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND.ToString(), "Character not found");
             Texts.Add(UITextKeys.UI_ERROR_ITEM_NOT_FOUND.ToString(), "Item not found");
             Texts.Add(UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND.ToString(), "Cash package not found");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString(), "Not enough gold");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString(), "Not enough cash");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS.ToString(), "Not enough items");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_STAT_POINT.ToString(), "Not enough stat points");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_POINT.ToString(), "Not enough skill points");
             Texts.Add(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString(), "Not logged in");
-            Texts.Add(UITextKeys.UI_ERROR_INVALID_DATA.ToString(), "Invalid data");
-            Texts.Add(UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString(), "Invalid character data");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString(), "Username is empty");
             Texts.Add(UITextKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString(), "Password is empty");
-            Texts.Add(UITextKeys.UI_ERROR_CANNOT_CARRY_ALL_REWARDS.ToString(), "Cannot carry all rewards");
+            Texts.Add(UITextKeys.UI_ERROR_WILL_OVERWHELMING.ToString(), "Cannot carry all items");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT.ToString(), "Not allowed to loot");
+            // Error - Game Data
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_DATA.ToString(), "Invalid data");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString(), "Invalid character data");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_ITEM_DATA.ToString(), "Invalid item data");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_ITEM_INDEX.ToString(), "Invalid item index");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_ATTRIBUTE_DATA.ToString(), "Invalid attribute data");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_SKILL_DATA.ToString(), "Invalid skill data");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_GUILD_SKILL_DATA.ToString(), "Invalid guild skill data");
             // Error - UI Login
             Texts.Add(UITextKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD.ToString(), "Invalid username or password");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_USER_TOKEN.ToString(), "Invalid user token");
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString(), "User already logged in");
             // Error - UI Register
             Texts.Add(UITextKeys.UI_ERROR_INVALID_CONFIRM_PASSWORD.ToString(), "Invalid confirm password");
@@ -1055,11 +1086,107 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString(), "Cannot retrieve cash package info");
             // Error - UI Cash Shop
             Texts.Add(UITextKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString(), "Cannot retrieve cash shop info");
+            // Error - UI Guild Name
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_NAME_TOO_SHORT.ToString(), "Guild name is too short");
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_NAME_TOO_LONG.ToString(), "Guild name is too long");
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_NAME_EXISTED.ToString(), "Guild name is already existed");
             // Error - UI Guild Role Setting
-            Texts.Add(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY.ToString(), "Role name must not empty");
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_TOO_SHORT.ToString(), "Guild role name is too short");
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_TOO_LONG.ToString(), "Guild role name is too long");
             Texts.Add(UITextKeys.UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString(), "Share exp percentage must be number");
             // Error - UI Guild Member Role Setting
             Texts.Add(UITextKeys.UI_ERROR_INVALID_GUILD_ROLE.ToString(), "Invalid role");
+            // Error - UI Guild Message Setting
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_MESSAGE_TOO_LONG.ToString(), "Guild message is too long");
+            // Error - Equip
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_EQUIP.ToString(), "Cannot equip the item");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_RIGHT_HAND.ToString(), "Invalid equip position for right hand equipment");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_LEFT_HAND.ToString(), "Invalid equip position for left hand equipment");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_RIGHT_HAND_OR_LEFT_HAND.ToString(), "Invalid equip position for right hand or left hand equipment");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_ARMOR.ToString(), "Invalid equip position for armor equipment");
+            // Error - Refine
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_REFINE.ToString(), "Cannot refine the item");
+            Texts.Add(UITextKeys.UI_ERROR_REFINE_ITEM_REACHED_MAX_LEVEL.ToString(), "Item reached max level");
+            Texts.Add(UITextKeys.UI_REFINE_SUCCESS.ToString(), "Refine success");
+            Texts.Add(UITextKeys.UI_REFINE_FAIL.ToString(), "Refine fail");
+            // Error - Enhance
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_ENHANCE_SOCKET.ToString(), "Cannot enhance the item");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_SOCKET_ENCHANER.ToString(), "Have not enough items");
+            Texts.Add(UITextKeys.UI_ERROR_NO_EMPTY_SOCKET.ToString(), "No empty socket");
+            Texts.Add(UITextKeys.UI_ERROR_SOCKET_NOT_EMPTY.ToString(), "Socket is not empty");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_REMOVE_ENHANCER.ToString(), "Cannot remove enhancer item from socket");
+            Texts.Add(UITextKeys.UI_ERROR_NO_ENHANCER.ToString(), "No enhancer item");
+            // Error - Repair
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_REPAIR.ToString(), "Cannot repair the item");
+            Texts.Add(UITextKeys.UI_REPAIR_SUCCESS.ToString(), "Repair success");
+            // Error - Dealing
+            Texts.Add(UITextKeys.UI_ERROR_CHARACTER_IS_DEALING.ToString(), "Character is in another deal");
+            Texts.Add(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR.ToString(), "Character is too far");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_ACCEPT_DEALING_REQUEST.ToString(), "Cannot accept dealing request");
+            Texts.Add(UITextKeys.UI_ERROR_DEALING_REQUEST_DECLINED.ToString(), "Dealing request declined");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_DEALING_STATE.ToString(), "Invalid dealing state");
+            Texts.Add(UITextKeys.UI_ERROR_DEALING_CANCELED.ToString(), "Dealing canceled");
+            Texts.Add(UITextKeys.UI_ERROR_ANOTHER_CHARACTER_WILL_OVERWHELMING.ToString(), "Another character cannot carry all items");
+            // Error - Party
+            Texts.Add(UITextKeys.UI_ERROR_PARTY_NOT_FOUND.ToString(), "Party not found");
+            Texts.Add(UITextKeys.UI_ERROR_PARTY_INVITATION_NOT_FOUND.ToString(), "Party invitation not found");
+            Texts.Add(UITextKeys.UI_PARTY_INVITATION_ACCEPTED.ToString(), "Party invitation accepted");
+            Texts.Add(UITextKeys.UI_PARTY_INVITATION_DECLINED.ToString(), "Party invitation declined");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_SEND_PARTY_INVITATION.ToString(), "Cannot send party invitation");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_PARTY_MEMBER.ToString(), "Cannot kick party member");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_YOURSELF_FROM_PARTY.ToString(), "Cannot kick yourself from party");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_PARTY_LEADER.ToString(), "Cannot kick party leader");
+            Texts.Add(UITextKeys.UI_ERROR_JOINED_ANOTHER_PARTY.ToString(), "Already joined another party");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_JOINED_PARTY.ToString(), "Not joined the party");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_PARTY_LEADER.ToString(), "Not a party member");
+            Texts.Add(UITextKeys.UI_ERROR_CHARACTER_JOINED_ANOTHER_PARTY.ToString(), "Character already joined another party");
+            Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_PARTY.ToString(), "Character not joined the party");
+            Texts.Add(UITextKeys.UI_ERROR_PARTY_MEMBER_REACHED_LIMIT.ToString(), "Party member reached limit");
+            // Error - Guild
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_NOT_FOUND.ToString(), "Guild not found");
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_INVITATION_NOT_FOUND.ToString(), "Guild invitation not found");
+            Texts.Add(UITextKeys.UI_GUILD_INVITATION_ACCEPTED.ToString(), "Guild invitation accepted");
+            Texts.Add(UITextKeys.UI_GUILD_INVITATION_DECLINED.ToString(), "Guild invitation declined");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_SEND_GUILD_INVITATION.ToString(), "Cannot send guild invitation");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_GUILD_MEMBER.ToString(), "Cannot kick guild member");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_YOURSELF_FROM_GUILD.ToString(), "Cannot kick yourself from guild");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_GUILD_LEADER.ToString(), "Cannot kick guild leader");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_HIGHER_GUILD_MEMBER.ToString(), "Cannot kick higher guild member");
+            Texts.Add(UITextKeys.UI_ERROR_JOINED_ANOTHER_GUILD.ToString(), "Already joined another guild");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_JOINED_GUILD.ToString(), "Not joined the guild");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_GUILD_LEADER.ToString(), "Not a guild member");
+            Texts.Add(UITextKeys.UI_ERROR_CHARACTER_JOINED_ANOTHER_GUILD.ToString(), "Character already joined another guild");
+            Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_GUILD.ToString(), "Character not joined the guild");
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_MEMBER_REACHED_LIMIT.ToString(), "Guild member reached limit");
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_ROLE_NOT_AVAILABLE.ToString(), "Guild role is not available");
+            Texts.Add(UITextKeys.UI_ERROR_GUILD_SKILL_REACHED_MAX_LEVEL.ToString(), "Guild skill is reached max level");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_GUILD_SKILL_POINT.ToString(), "Not enough guild skill point");
+            // Error - Game Data
+            Texts.Add(UITextKeys.UI_UNKNOW_GAME_DATA_TITLE.ToString(), "Unknow");
+            Texts.Add(UITextKeys.UI_UNKNOW_GAME_DATA_DESCRIPTION.ToString(), "N/A");
+            // Error - Bank
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT.ToString(), "Not enough gold to deposit");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW.ToString(), "Not enough gold to withdraw");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE.ToString(), "Cannot access storage");
+            Texts.Add(UITextKeys.UI_ERROR_STORAGE_NOT_FOUND.ToString(), "Storage not found");
+            // Error - Combatant
+            Texts.Add(UITextKeys.UI_ERROR_NO_AMMO.ToString(), "No Ammo");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_HP.ToString(), "Not enough Hp");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_MP.ToString(), "Not enough Mp");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_STAMINA.ToString(), "Not enough Stamina");
+            // Error - Skill
+            Texts.Add(UITextKeys.UI_ERROR_SKILL_LEVEL_IS_ZERO.ToString(), "Skill not trained yet");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON.ToString(), "Cannot use skill by current weapon");
+            Texts.Add(UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN.ToString(), "Skill is cooling down");
+            Texts.Add(UITextKeys.UI_ERROR_SKILL_IS_NOT_LEARNED.ToString(), "Skill is not learned");
+            Texts.Add(UITextKeys.UI_ERROR_NO_SKILL_TARGET.ToString(), "No target");
+            // Error - Requirement
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL.ToString(), "Not enough level");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS.ToString(), "Not match character class");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS.ToString(), "Not enough attribute amounts");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS.ToString(), "Not enough skill levels");
+            Texts.Add(UITextKeys.UI_ERROR_ATTRIBUTE_REACHED_MAX_AMOUNT.ToString(), "Attribute reached max amount");
+            Texts.Add(UITextKeys.UI_ERROR_SKILL_REACHED_MAX_LEVEL.ToString(), "Skill reached max level");
             // Success - UI Cash Shop
             Texts.Add(UITextKeys.UI_SUCCESS_CASH_SHOP_BUY.ToString(), "Success, let's check your inventory");
             // UI Character Item
@@ -1075,6 +1202,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString(), "Enter amount of item");
             Texts.Add(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString(), "Move From Storage");
             Texts.Add(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString(), "Enter amount of item");
+            Texts.Add(UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING.ToString(), "Storage will overwhelming");
             // UI Bank
             Texts.Add(UITextKeys.UI_BANK_DEPOSIT.ToString(), "Deposit");
             Texts.Add(UITextKeys.UI_BANK_DEPOSIT_DESCRIPTION.ToString(), "Enter amount of gold");
@@ -1122,7 +1250,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED.ToString(), "You're not allowed to read the mail");
             Texts.Add(UITextKeys.UI_ERROR_MAIL_CLAIM_NOT_ALLOWED.ToString(), "You're not allowed to claim attached items");
             Texts.Add(UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED.ToString(), "Cannot claim items, it was already claimed");
-            Texts.Add(UITextKeys.UI_ERROR_MAIL_CLAIM_CANNOT_CARRY.ToString(), "Cannot carry all items");
+            Texts.Add(UITextKeys.UI_ERROR_MAIL_CLAIM_WILL_OVERWHELMING.ToString(), "Cannot carry all items");
             Texts.Add(UITextKeys.UI_MAIL_CLAIM_SUCCESS.ToString(), "Claimed an items");
             Texts.Add(UITextKeys.UI_ERROR_MAIL_DELETE_NOT_ALLOWED.ToString(), "You're not allowed to delete the mail");
             Texts.Add(UITextKeys.UI_MAIL_DELETE_SUCCESS.ToString(), "Mail deleted");

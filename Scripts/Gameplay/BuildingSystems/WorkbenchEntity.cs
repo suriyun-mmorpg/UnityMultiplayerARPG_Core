@@ -35,9 +35,9 @@ namespace MultiplayerARPG
             if (!CacheItemCrafts.TryGetValue(dataId, out itemCraft))
                 return;
 
-            GameMessage.Type gameMessageType;
-            if (!itemCraft.CanCraft(playerCharacterEntity, out gameMessageType))
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacterEntity.ConnectionId, gameMessageType);
+            UITextKeys gameMessage;
+            if (!itemCraft.CanCraft(playerCharacterEntity, out gameMessage))
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacterEntity.ConnectionId, gameMessage);
             else
                 itemCraft.CraftItem(playerCharacterEntity);
         }

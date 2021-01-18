@@ -12,21 +12,21 @@ namespace MultiplayerARPG
         [Tooltip("If this value more than 0 it will limit max amount of this attribute by this value")]
         public short maxAmount;
 
-        public bool CanIncreaseAmount(IPlayerCharacterData character, short amount, out GameMessage.Type gameMessageType, bool checkStatPoint = true)
+        public bool CanIncreaseAmount(IPlayerCharacterData character, short amount, out UITextKeys gameMessage, bool checkStatPoint = true)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (character == null)
                 return false;
 
             if (maxAmount > 0 && amount >= maxAmount)
             {
-                gameMessageType = GameMessage.Type.AttributeReachedMaxAmount;
+                gameMessage = UITextKeys.UI_ERROR_ATTRIBUTE_REACHED_MAX_AMOUNT;
                 return false;
             }
 
             if (checkStatPoint && character.StatPoint <= 0)
             {
-                gameMessageType = GameMessage.Type.NotEnoughStatPoint;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_STAT_POINT;
                 return false;
             }
 

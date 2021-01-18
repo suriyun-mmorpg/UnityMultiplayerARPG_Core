@@ -18,7 +18,7 @@ namespace MultiplayerARPG
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             if (!ValidateAmmo(weapon))
             {
-                QueueGameMessage(GameMessage.Type.NoAmmo);
+                QueueGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
                 // Play empty sfx
                 if (weaponItem != null)
                     AudioManager.PlaySfxClipAtAudioSource(weaponItem.EmptyClip, CharacterModel.GenericAudioSource);
@@ -51,10 +51,10 @@ namespace MultiplayerARPG
                 !this.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return false;
 
-            GameMessage.Type gameMessageType;
-            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessageType))
+            UITextKeys gameMessage;
+            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessage))
             {
-                QueueGameMessage(gameMessageType);
+                QueueGameMessage(gameMessage);
                 return false;
             }
             return true;

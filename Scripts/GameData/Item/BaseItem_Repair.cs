@@ -10,20 +10,20 @@ namespace MultiplayerARPG
             return CanRepair(character, durability, out maxDurability, out repairPrice, out _);
         }
 
-        public bool CanRepair(IPlayerCharacterData character, float durability, out float maxDurability, out ItemRepairPrice repairPrice, out GameMessage.Type gameMessageType)
+        public bool CanRepair(IPlayerCharacterData character, float durability, out float maxDurability, out ItemRepairPrice repairPrice, out UITextKeys gameMessageType)
         {
             maxDurability = 0f;
             repairPrice = default(ItemRepairPrice);
             if (!this.IsEquipment())
             {
                 // Cannot repair because it's not equipment item
-                gameMessageType = GameMessage.Type.CannotRepair;
+                gameMessageType = UITextKeys.UI_ERROR_CANNOT_REPAIR;
                 return false;
             }
             if (itemRefine == null)
             {
                 // Cannot repair because there is no item refine info
-                gameMessageType = GameMessage.Type.CannotRepair;
+                gameMessageType = UITextKeys.UI_ERROR_CANNOT_REPAIR;
                 return false;
             }
             repairPrice = GetRepairPrice(durability, out maxDurability);
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
             return repairPrice;
         }
 
-        public static void RepairRightHandItem(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
+        public static void RepairRightHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
         {
             RepairItem(character, character.EquipWeapons.rightHand, (repairedItem) =>
             {
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        public static void RepairLeftHandItem(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
+        public static void RepairLeftHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
         {
             RepairItem(character, character.EquipWeapons.leftHand, (repairedItem) =>
             {
@@ -73,17 +73,17 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        public static void RepairEquipItem(IPlayerCharacterData character, int index, out GameMessage.Type gameMessageType)
+        public static void RepairEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
         {
             RepairItemByList(character, character.EquipItems, index, out gameMessageType);
         }
 
-        public static void RepairNonEquipItem(IPlayerCharacterData character, int index, out GameMessage.Type gameMessageType)
+        public static void RepairNonEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
         {
             RepairItemByList(character, character.NonEquipItems, index, out gameMessageType);
         }
 
-        private static void RepairItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, out GameMessage.Type gameMessageType)
+        private static void RepairItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, out UITextKeys gameMessageType)
         {
             RepairItem(character, list[index], (repairedItem) =>
             {
@@ -91,9 +91,9 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        private static void RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out GameMessage.Type gameMessageType)
+        private static void RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out UITextKeys gameMessageType)
         {
-            gameMessageType = GameMessage.Type.CannotRepair;
+            gameMessageType = UITextKeys.UI_ERROR_CANNOT_REPAIR;
             if (repairingItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
             ItemRepairPrice repairPrice;
             if (equipmentItem.CanRepair(character, repairingItem.durability, out maxDurability, out repairPrice, out gameMessageType))
             {
-                gameMessageType = GameMessage.Type.RepairSuccess;
+                gameMessageType = UITextKeys.UI_REPAIR_SUCCESS;
                 // Repair item
                 repairingItem.durability = maxDurability;
                 onRepaired.Invoke(repairingItem);

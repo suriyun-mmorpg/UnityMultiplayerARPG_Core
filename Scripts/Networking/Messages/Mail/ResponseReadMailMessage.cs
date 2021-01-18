@@ -4,28 +4,20 @@ namespace MultiplayerARPG
 {
     public struct ResponseReadMailMessage : INetSerializable
     {
-        public enum Error : byte
-        {
-            None,
-            InternalServerError,
-            NotAvailable,
-            NotAllowed,
-            NotLoggedIn,
-        }
-        public Error error;
+        public UITextKeys error;
         public Mail mail;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (Error)reader.GetByte();
-            if (error == Error.None)
+            error = (UITextKeys)reader.GetPackedUShort();
+            if (error == UITextKeys.NONE)
                 mail = reader.GetValue<Mail>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)error);
-            if (error == Error.None)
+            writer.PutPackedUShort((ushort)error);
+            if (error == UITextKeys.NONE)
                 writer.PutValue(mail);
         }
     }

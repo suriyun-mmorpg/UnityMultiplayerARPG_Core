@@ -46,7 +46,7 @@ namespace MultiplayerARPG
             if (this.IncreasingItemsWillOverwhelming(quest.rewardItems))
             {
                 // Overwhelming
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return;
             }
             // Decrease task items

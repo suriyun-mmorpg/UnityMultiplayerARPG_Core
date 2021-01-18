@@ -112,10 +112,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
-            })) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
 
             if (uiTextCash != null)
             {

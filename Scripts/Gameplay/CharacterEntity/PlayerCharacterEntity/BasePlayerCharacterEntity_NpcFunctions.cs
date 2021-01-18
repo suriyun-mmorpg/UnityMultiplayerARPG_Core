@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(npcEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
             NpcSellItem sellItem = sellItems[index];
             if (!CurrentGameplayRule.CurrenciesEnoughToBuyItem(this, sellItem, amount))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
                 return;
             }
 
@@ -208,7 +208,7 @@ namespace MultiplayerARPG
             int dataId = sellItem.item.DataId;
             if (this.IncreasingItemsWillOverwhelming(dataId, amount))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return;
             }
 

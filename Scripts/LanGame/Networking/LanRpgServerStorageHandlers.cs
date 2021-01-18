@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         {
             if (!CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, GameMessage.Type.CannotAccessStorage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 return;
             }
             // Store storage usage states

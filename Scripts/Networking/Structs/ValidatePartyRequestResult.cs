@@ -3,22 +3,22 @@
     public struct ValidatePartyRequestResult
     {
         public bool IsSuccess { get; set; }
-        public GameMessage.Type GameMessageType { get; set; }
+        public UITextKeys GameMessage { get; set; }
         public int PartyId { get; set; }
         public PartyData Party { get; set; }
 
-        public ValidatePartyRequestResult(bool isSuccess, GameMessage.Type gameMessageType)
+        public ValidatePartyRequestResult(bool isSuccess, UITextKeys gameMessageType)
         {
             IsSuccess = isSuccess;
-            GameMessageType = gameMessageType;
+            GameMessage = gameMessageType;
             PartyId = 0;
             Party = null;
         }
 
-        public ValidatePartyRequestResult(bool isSuccess, GameMessage.Type gameMessageType, int partyId, PartyData party)
+        public ValidatePartyRequestResult(bool isSuccess, UITextKeys gameMessageType, int partyId, PartyData party)
         {
             IsSuccess = isSuccess;
-            GameMessageType = gameMessageType;
+            GameMessage = gameMessageType;
             PartyId = partyId;
             Party = party;
         }

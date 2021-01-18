@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                 return;
 
             TextWrapper newMessage = Instantiate(messagePrefab);
-            newMessage.text = LanguageManager.GetText(gameMessage.type.ToString());
+            newMessage.text = LanguageManager.GetText(gameMessage.message.ToString());
             newMessage.transform.SetParent(messageContainer);
             newMessage.transform.localScale = Vector3.one;
             newMessage.transform.localRotation = Quaternion.identity;

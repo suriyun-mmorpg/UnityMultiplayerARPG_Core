@@ -88,7 +88,7 @@ namespace MultiplayerARPG
         protected float lastMountTime;
         protected float lastActionTime;
         protected float pushGameMessageCountDown;
-        protected readonly Queue<GameMessage.Type> pushingGameMessages = new Queue<GameMessage.Type>();
+        protected readonly Queue<UITextKeys> pushingGameMessages = new Queue<UITextKeys>();
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -332,7 +332,7 @@ namespace MultiplayerARPG
                 if (pushGameMessageCountDown <= 0 && pushingGameMessages.Count > 0)
                 {
                     pushGameMessageCountDown = COMBATANT_MESSAGE_DELAY;
-                    ClientGenericActions.ClientReceiveGameMessage(new GameMessage() { type = pushingGameMessages.Dequeue() });
+                    ClientGenericActions.ClientReceiveGameMessage(new GameMessage() { message = pushingGameMessages.Dequeue() });
                 }
             }
         }
@@ -1068,7 +1068,7 @@ namespace MultiplayerARPG
             return CurrentMapInfo.IsEnemy(this, targetCharacter);
         }
 
-        public void QueueGameMessage(GameMessage.Type error)
+        public void QueueGameMessage(UITextKeys error)
         {
             if (!IsOwnerClient)
                 return;

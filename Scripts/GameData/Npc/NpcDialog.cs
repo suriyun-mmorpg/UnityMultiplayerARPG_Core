@@ -419,8 +419,8 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            GameMessage.Type gameMessageType;
-                            if (itemCraft.CanCraft(characterEntity, out gameMessageType))
+                            UITextKeys gameMessage;
+                            if (itemCraft.CanCraft(characterEntity, out gameMessage))
                             {
                                 itemCraft.CraftItem(characterEntity);
                                 nextDialog = craftDoneDialog;
@@ -428,9 +428,9 @@ namespace MultiplayerARPG
                             else
                             {
                                 // Cannot craft item
-                                switch (gameMessageType)
+                                switch (gameMessage)
                                 {
-                                    case GameMessage.Type.CannotCarryAnymore:
+                                    case UITextKeys.UI_ERROR_WILL_OVERWHELMING:
                                         nextDialog = craftItemWillOverwhelmingDialog;
                                         break;
                                     default:

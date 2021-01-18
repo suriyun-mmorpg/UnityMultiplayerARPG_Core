@@ -7,34 +7,6 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         [ServerRpc]
-        protected void ServerAddAttribute(int dataId)
-        {
-#if !CLIENT_BUILD
-            if (this.IsDead())
-                return;
-            GameMessage.Type gameMessageType;
-            if (this.AddAttribute(out gameMessageType, dataId))
-                StatPoint -= 1;
-            else
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, gameMessageType);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerAddSkill(int dataId)
-        {
-#if !CLIENT_BUILD
-            if (this.IsDead())
-                return;
-            GameMessage.Type gameMessageType;
-            if (this.AddSkill(out gameMessageType, dataId))
-                SkillPoint -= 1;
-            else
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, gameMessageType);
-#endif
-        }
-
-        [ServerRpc]
         protected void ServerUseGuildSkill(int dataId)
         {
 #if !CLIENT_BUILD
@@ -104,7 +76,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(warpPortalEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -163,7 +135,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -186,7 +158,7 @@ namespace MultiplayerARPG
             CharacterItem nonEquipItem = nonEquipItems[index];
             if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS);
                 return false;
             }
 
@@ -198,7 +170,7 @@ namespace MultiplayerARPG
             // Simulate data before applies
             if (!simulatingNonEquipItems.DecreaseItemsByIndex(index, amount, CurrentGameInstance.IsLimitInventorySlot))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.NotEnoughItems);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS);
                 return false;
             }
 
@@ -213,7 +185,7 @@ namespace MultiplayerARPG
                 this.GetCaches().LimitItemSlot))
             {
                 returningItems.Clear();
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return false;
             }
 
@@ -296,7 +268,7 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return;
 
-            GameMessage.Type gameMessageType;
+            UITextKeys gameMessageType;
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -326,7 +298,7 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return;
 
-            GameMessage.Type gameMessageType;
+            UITextKeys gameMessageType;
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -356,7 +328,7 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return;
 
-            GameMessage.Type gameMessageType;
+            UITextKeys gameMessageType;
             if (!CurrentGameInstance.enhancerRemoval.CanRemove(this, out gameMessageType))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, gameMessageType);
@@ -392,7 +364,7 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return;
 
-            GameMessage.Type gameMessageType;
+            UITextKeys gameMessageType;
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -423,21 +395,21 @@ namespace MultiplayerARPG
                 return;
 
             bool success = false;
-            GameMessage.Type gameMessageType;
+            UITextKeys gameMessageType;
             BaseItem.RepairRightHandItem(this, out gameMessageType);
-            success = success || gameMessageType == GameMessage.Type.RepairSuccess;
+            success = success || gameMessageType == UITextKeys.UI_REPAIR_SUCCESS;
             BaseItem.RepairLeftHandItem(this, out gameMessageType);
-            success = success || gameMessageType == GameMessage.Type.RepairSuccess;
+            success = success || gameMessageType == UITextKeys.UI_REPAIR_SUCCESS;
             for (int i = 0; i < EquipItems.Count; ++i)
             {
                 BaseItem.RepairEquipItem(this, i, out gameMessageType);
-                success = success || gameMessageType == GameMessage.Type.RepairSuccess;
+                success = success || gameMessageType == UITextKeys.UI_REPAIR_SUCCESS;
             }
             // Will send messages to inform that it can repair an items when any item can be repaired
             if (success)
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.RepairSuccess);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_REPAIR_SUCCESS);
             else
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotRepair);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CANNOT_REPAIR);
 #endif
         }
 
@@ -449,17 +421,17 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity targetCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 return;
             }
             if (targetCharacterEntity.DealingCharacter != null)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_DEALING);
                 return;
             }
             if (!IsGameEntityInDistance(targetCharacterEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
             DealingCharacter = targetCharacterEntity;
@@ -485,13 +457,13 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             if (DealingCharacter == null)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotAcceptDealingRequest);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCEPT_DEALING_REQUEST);
                 StopDealing();
                 return;
             }
             if (!IsGameEntityInDistance(DealingCharacter, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 StopDealing();
                 return;
             }
@@ -511,8 +483,8 @@ namespace MultiplayerARPG
         {
 #if !CLIENT_BUILD
             if (DealingCharacter != null)
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.DealingRequestDeclined);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.DealingRequestDeclined);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_DEALING_REQUEST_DECLINED);
+            GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_DEALING_REQUEST_DECLINED);
             StopDealing();
 #endif
         }
@@ -533,7 +505,7 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             if (DealingState != DealingState.Dealing)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
                 return;
             }
 
@@ -566,7 +538,7 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             if (DealingState != DealingState.Dealing)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
                 return;
             }
             if (gold > Gold)
@@ -583,7 +555,7 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             if (DealingState != DealingState.Dealing)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
                 return;
             }
             DealingState = DealingState.LockDealing;
@@ -596,7 +568,7 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             if (DealingState != DealingState.LockDealing || !(DealingCharacter.DealingState == DealingState.LockDealing || DealingCharacter.DealingState == DealingState.ConfirmDealing))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
                 return;
             }
             DealingState = DealingState.ConfirmDealing;
@@ -604,13 +576,13 @@ namespace MultiplayerARPG
             {
                 if (ExchangingDealingItemsWillOverwhelming())
                 {
-                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.AnotherCharacterCannotCarryAnymore);
-                    GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ANOTHER_CHARACTER_WILL_OVERWHELMING);
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 }
                 else if (DealingCharacter.ExchangingDealingItemsWillOverwhelming())
                 {
-                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
-                    GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.AnotherCharacterCannotCarryAnymore);
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_ANOTHER_CHARACTER_WILL_OVERWHELMING);
                 }
                 else
                 {
@@ -627,8 +599,8 @@ namespace MultiplayerARPG
         {
 #if !CLIENT_BUILD
             if (DealingCharacter != null)
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.DealingCanceled);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.DealingCanceled);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);
+            GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);
             StopDealing();
 #endif
         }
@@ -693,7 +665,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(storageEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -732,7 +704,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(doorEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -762,7 +734,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(doorEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -786,7 +758,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(campfireEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -810,7 +782,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(campfireEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -834,7 +806,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(workbenchEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -860,7 +832,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -897,7 +869,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -933,7 +905,7 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 

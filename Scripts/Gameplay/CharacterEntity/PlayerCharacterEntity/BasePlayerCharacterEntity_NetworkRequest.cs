@@ -61,10 +61,10 @@ namespace MultiplayerARPG
             if (skill == null)
                 return false;
 
-            GameMessage.Type gameMessageType;
-            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessageType, true))
+            UITextKeys gameMessage;
+            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessage, true))
             {
-                QueueGameMessage(gameMessageType);
+                QueueGameMessage(gameMessage);
                 return false;
             }
 
@@ -84,22 +84,6 @@ namespace MultiplayerARPG
             if (!ValidateRequestUseSkillItem(index, isLeftHand))
                 return false;
             RPC(ServerUseSkillItemWithAimPosition, index, isLeftHand, aimPosition);
-            return true;
-        }
-
-        public bool CallServerAddAttribute(int dataId)
-        {
-            if (this.IsDead())
-                return false;
-            RPC(ServerAddAttribute, dataId);
-            return true;
-        }
-
-        public bool CallServerAddSkill(int dataId)
-        {
-            if (this.IsDead())
-                return false;
-            RPC(ServerAddSkill, dataId);
             return true;
         }
 

@@ -144,8 +144,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            GameMessage.Type gameMessageType;
-            if (IsOwningCharacter() && Skill.CanLevelUp(GameInstance.PlayingCharacter, CharacterSkill.level, out gameMessageType))
+            if (IsOwningCharacter() && Skill.CanLevelUp(GameInstance.PlayingCharacter, CharacterSkill.level, out _))
             {
                 onAbleToLevelUp.Invoke();
             }
@@ -436,7 +435,10 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            GameInstance.PlayingCharacterEntity.CallServerAddSkill(Skill.DataId);
+            GameInstance.ClientCharacterSkillHandlers.RequestIncreaseCharacterSkillLevel(new RequestIncreaseCharacterSkillLevelMessage()
+            {
+                dataId = Skill.DataId
+            }, ClientCharacterSkillActions.ResponseIncreaseCharacterSkillLevel);
         }
     }
 }

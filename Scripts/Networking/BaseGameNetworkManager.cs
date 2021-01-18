@@ -32,6 +32,8 @@ namespace MultiplayerARPG
         protected IServerCashShopMessageHandlers ServerCashShopMessageHandlers { get; set; }
         protected IServerMailMessageHandlers ServerMailMessageHandlers { get; set; }
         protected IServerStorageMessageHandlers ServerStorageMessageHandlers { get; set; }
+        protected IServerCharacterAttributeMessageHandlers ServerCharacterAttributeMessageHandlers { get; set; }
+        protected IServerCharacterSkillMessageHandlers ServerCharacterSkillMessageHandlers { get; set; }
         protected IServerInventoryMessageHandlers ServerInventoryMessageHandlers { get; set; }
         protected IServerPartyMessageHandlers ServerPartyMessageHandlers { get; set; }
         protected IServerGuildMessageHandlers ServerGuildMessageHandlers { get; set; }
@@ -41,6 +43,8 @@ namespace MultiplayerARPG
         protected IClientCashShopHandlers ClientCashShopHandlers { get; set; }
         protected IClientMailHandlers ClientMailHandlers { get; set; }
         protected IClientStorageHandlers ClientStorageHandlers { get; set; }
+        protected IClientCharacterAttributeHandlers ClientCharacterAttributeHandlers { get; set; }
+        protected IClientCharacterSkillHandlers ClientCharacterSkillHandlers { get; set; }
         protected IClientInventoryHandlers ClientInventoryHandlers { get; set; }
         protected IClientPartyHandlers ClientPartyHandlers { get; set; }
         protected IClientGuildHandlers ClientGuildHandlers { get; set; }
@@ -151,6 +155,10 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(GameNetworkingConsts.MoveItemFromStorage);
             RegisterClientResponse<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(GameNetworkingConsts.MoveItemToStorage);
             RegisterClientResponse<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(GameNetworkingConsts.SwapOrMergeStorageItem);
+            // Character Attribute
+            RegisterClientResponse<RequestIncreaseCharacterAttributeAmountMessage, ResponseIncreaseCharacterAttributeAmountMessage>(GameNetworkingConsts.IncreaseCharacterAttributeAmount);
+            // Character Skill
+            RegisterClientResponse<RequestIncreaseCharacterSkillLevelMessage, ResponseIncreaseCharacterSkillLevelMessage>(GameNetworkingConsts.IncreaseCharacterSkillLevel);
             // Inventory
             RegisterClientResponse<RequestSwapOrMergeItemMessage, ResponseSwapOrMergeItemMessage>(GameNetworkingConsts.SwapOrMergeItem);
             RegisterClientResponse<RequestEquipWeaponMessage, ResponseEquipWeaponMessage>(GameNetworkingConsts.EquipWeapon);
@@ -228,6 +236,16 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestMoveItemFromStorageMessage, ResponseMoveItemFromStorageMessage>(GameNetworkingConsts.MoveItemFromStorage, ServerStorageMessageHandlers.HandleRequestMoveItemFromStorage);
                 RegisterServerRequest<RequestMoveItemToStorageMessage, ResponseMoveItemToStorageMessage>(GameNetworkingConsts.MoveItemToStorage, ServerStorageMessageHandlers.HandleRequestMoveItemToStorage);
                 RegisterServerRequest<RequestSwapOrMergeStorageItemMessage, ResponseSwapOrMergeStorageItemMessage>(GameNetworkingConsts.SwapOrMergeStorageItem, ServerStorageMessageHandlers.HandleRequestSwapOrMergeStorageItem);
+            }
+            // Character Attribute
+            if (ServerCharacterAttributeMessageHandlers != null)
+            {
+                RegisterServerRequest<RequestIncreaseCharacterAttributeAmountMessage, ResponseIncreaseCharacterAttributeAmountMessage>(GameNetworkingConsts.IncreaseCharacterAttributeAmount, ServerCharacterAttributeMessageHandlers.HandleRequestIncreaseCharacterAttributeAmount);
+            }
+            // Character Skill
+            if (ServerCharacterSkillMessageHandlers != null)
+            {
+                RegisterServerRequest<RequestIncreaseCharacterSkillLevelMessage, ResponseIncreaseCharacterSkillLevelMessage>(GameNetworkingConsts.IncreaseCharacterSkillLevel, ServerCharacterSkillMessageHandlers.HandleRequestIncreaseCharacterSkillLevel);
             }
             // Inventory
             if (ServerInventoryMessageHandlers != null)
@@ -344,8 +362,10 @@ namespace MultiplayerARPG
             base.OnStartClient(client);
             GameInstance.ClientCashShopHandlers = ClientCashShopHandlers;
             GameInstance.ClientMailHandlers = ClientMailHandlers;
-            GameInstance.ClientInventoryHandlers = ClientInventoryHandlers;
             GameInstance.ClientStorageHandlers = ClientStorageHandlers;
+            GameInstance.ClientCharacterAttributeHandlers = ClientCharacterAttributeHandlers;
+            GameInstance.ClientCharacterSkillHandlers = ClientCharacterSkillHandlers;
+            GameInstance.ClientInventoryHandlers = ClientInventoryHandlers;
             GameInstance.ClientPartyHandlers = ClientPartyHandlers;
             GameInstance.ClientGuildHandlers = ClientGuildHandlers;
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;

@@ -14,36 +14,19 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
                 {
-                    error = ResponseAcceptGuildInvitationMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanAcceptGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseAcceptGuildInvitationMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotFoundGuild:
-                        error = ResponseAcceptGuildInvitationMessage.Error.GuildNotFound;
-                        break;
-                    case GameMessage.Type.NotFoundGuildInvitation:
-                        error = ResponseAcceptGuildInvitationMessage.Error.InvitationNotFound;
-                        break;
-                    case GameMessage.Type.JoinedAnotherGuild:
-                        error = ResponseAcceptGuildInvitationMessage.Error.AlreadyJoined;
-                        break;
-                    default:
-                        error = ResponseAcceptGuildInvitationMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -51,7 +34,7 @@ namespace MultiplayerARPG
             validateResult.Guild.AddMember(playerCharacter);
             GameInstance.ServerGuildHandlers.SetGuild(request.guildId, validateResult.Guild);
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.GuildInvitationAccepted);
+            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_GUILD_INVITATION_ACCEPTED);
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToMembers(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
@@ -64,38 +47,24 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
                 {
-                    error = ResponseDeclineGuildInvitationMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanDeclineGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseDeclineGuildInvitationMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotFoundGuild:
-                        error = ResponseDeclineGuildInvitationMessage.Error.GuildNotFound;
-                        break;
-                    case GameMessage.Type.NotFoundGuildInvitation:
-                        error = ResponseDeclineGuildInvitationMessage.Error.InvitationNotFound;
-                        break;
-                    default:
-                        error = ResponseDeclineGuildInvitationMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
+            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_GUILD_INVITATION_DECLINED);
             result.Invoke(AckResponseCode.Success, new ResponseDeclineGuildInvitationMessage());
         }
 
@@ -105,42 +74,29 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
-                    error = ResponseSendGuildInvitationMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             BasePlayerCharacterEntity inviteeCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out inviteeCharacter))
             {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
-                    error = ResponseSendGuildInvitationMessage.Error.InviteeNotFound,
+                    error = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSendGuildInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseSendGuildInvitationMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.CannotSendGuildInvitation:
-                        error = ResponseSendGuildInvitationMessage.Error.NotAllowed;
-                        break;
-                    case GameMessage.Type.CharacterJoinedAnotherGuild:
-                        error = ResponseSendGuildInvitationMessage.Error.InviteeNotAvailable;
-                        break;
-                    default:
-                        error = ResponseSendGuildInvitationMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -163,30 +119,19 @@ namespace MultiplayerARPG
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
                 {
-                    error = ResponseCreateGuildMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = playerCharacter.CanCreateGuild(request.guildName);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseCreateGuildMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.JoinedAnotherGuild:
-                        error = ResponseCreateGuildMessage.Error.AlreadyJoined;
-                        break;
-                    default:
-                        error = ResponseCreateGuildMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -214,33 +159,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
                 {
-                    error = ResponseChangeGuildLeaderMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseChangeGuildLeaderMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotJoinedGuild:
-                        error = ResponseChangeGuildLeaderMessage.Error.NotJoined;
-                        break;
-                    case GameMessage.Type.NotGuildLeader:
-                        error = ResponseChangeGuildLeaderMessage.Error.NotAllowed;
-                        break;
-                    case GameMessage.Type.CharacterNotJoinedGuild:
-                        error = ResponseChangeGuildLeaderMessage.Error.MemberNotFound;
-                        break;
-                    default:
-                        error = ResponseChangeGuildLeaderMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -259,35 +188,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
                 {
-                    error = ResponseKickMemberFromGuildMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanKickMemberFromGuild(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseKickMemberFromGuildMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotJoinedGuild:
-                        error = ResponseKickMemberFromGuildMessage.Error.NotJoined;
-                        break;
-                    case GameMessage.Type.CannotKickGuildLeader:
-                    case GameMessage.Type.CannotKickYourSelfFromGuild:
-                    case GameMessage.Type.NotGuildLeader:
-                        error = ResponseKickMemberFromGuildMessage.Error.NotAllowed;
-                        break;
-                    case GameMessage.Type.CharacterNotJoinedGuild:
-                        error = ResponseKickMemberFromGuildMessage.Error.MemberNotFound;
-                        break;
-                    default:
-                        error = ResponseKickMemberFromGuildMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -313,27 +224,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
                 {
-                    error = ResponseLeaveGuildMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanLeaveGuild(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseLeaveGuildMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotJoinedGuild:
-                        error = ResponseLeaveGuildMessage.Error.NotJoined;
-                        break;
-                    default:
-                        error = ResponseLeaveGuildMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -371,30 +272,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
                 {
-                    error = ResponseChangeGuildMessageMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMessage(playerCharacter, request.message);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseChangeGuildMessageMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotJoinedGuild:
-                        error = ResponseChangeGuildMessageMessage.Error.NotJoined;
-                        break;
-                    case GameMessage.Type.NotGuildLeader:
-                        error = ResponseChangeGuildMessageMessage.Error.NotAllowed;
-                        break;
-                    default:
-                        error = ResponseChangeGuildMessageMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -412,30 +300,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
                 {
-                    error = ResponseChangeGuildRoleMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseChangeGuildRoleMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotJoinedGuild:
-                        error = ResponseChangeGuildRoleMessage.Error.NotJoined;
-                        break;
-                    case GameMessage.Type.NotGuildLeader:
-                        error = ResponseChangeGuildRoleMessage.Error.NotAllowed;
-                        break;
-                    default:
-                        error = ResponseChangeGuildRoleMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -460,30 +335,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
                 {
-                    error = ResponseChangeMemberGuildRoleMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseChangeMemberGuildRoleMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotJoinedGuild:
-                        error = ResponseChangeMemberGuildRoleMessage.Error.NotJoined;
-                        break;
-                    case GameMessage.Type.NotGuildLeader:
-                        error = ResponseChangeMemberGuildRoleMessage.Error.NotAllowed;
-                        break;
-                    default:
-                        error = ResponseChangeMemberGuildRoleMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }
@@ -504,30 +366,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
                 {
-                    error = ResponseIncreaseGuildSkillLevelMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanIncreaseGuildSkillLevel(playerCharacter, request.dataId);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseIncreaseGuildSkillLevelMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotJoinedGuild:
-                        error = ResponseIncreaseGuildSkillLevelMessage.Error.NotJoined;
-                        break;
-                    case GameMessage.Type.NotGuildLeader:
-                        error = ResponseIncreaseGuildSkillLevelMessage.Error.NotAllowed;
-                        break;
-                    default:
-                        error = ResponseIncreaseGuildSkillLevelMessage.Error.NotAvailable;
-                        break;
-                }
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
                 {
-                    error = error,
+                    error = validateResult.GameMessage,
                 });
                 return;
             }

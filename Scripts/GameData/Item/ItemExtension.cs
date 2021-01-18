@@ -211,10 +211,10 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public static bool CanEquip<T>(this T item, ICharacterData character, short level, out GameMessage.Type gameMessageType)
+        public static bool CanEquip<T>(this T item, ICharacterData character, short level, out UITextKeys gameMessage)
              where T : IEquipmentItem
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (!item.IsEquipment() || character == null)
                 return false;
 
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
                 if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
                     attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
                 {
-                    gameMessageType = GameMessage.Type.NotEnoughAttributeAmounts;
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
                     return false;
                 }
             }
@@ -234,13 +234,13 @@ namespace MultiplayerARPG
             // Check another requirements
             if (item.Requirement.character != null && item.Requirement.character != character.GetDatabase())
             {
-                gameMessageType = GameMessage.Type.NotMatchCharacterClass;
+                gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
                 return false;
             }
 
             if (character.Level < item.Requirement.level)
             {
-                gameMessageType = GameMessage.Type.NotEnoughLevel;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
                 return false;
             }
 

@@ -84,26 +84,7 @@ namespace MultiplayerARPG
             if (inputGold != null)
                 inputGold.interactable = true;
 
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseSendMailMessage.Error.NotAvailable:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());
-                        break;
-                    case ResponseSendMailMessage.Error.NotAllowed:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_SEND_NOT_ALLOWED.ToString());
-                        break;
-                    case ResponseSendMailMessage.Error.NoReceiver:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER.ToString());
-                        break;
-                    case ResponseSendMailMessage.Error.NotEnoughGold:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            })) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
             // Success, hide this dialog
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_SEND_SUCCESS.ToString()));
             Hide();

@@ -95,9 +95,9 @@ namespace MultiplayerARPG
             return buff;
         }
 
-        public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out GameMessage.Type gameMessageType, bool isItem = false)
+        public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out UITextKeys gameMessage, bool isItem = false)
         {
-            if (!base.CanUse(character, level, isLeftHand, out gameMessageType, isItem))
+            if (!base.CanUse(character, level, isLeftHand, out gameMessage, isItem))
                 return false;
             
             BasePlayerCharacterEntity targetEntity;

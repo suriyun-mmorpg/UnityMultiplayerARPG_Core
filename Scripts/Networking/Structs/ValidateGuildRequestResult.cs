@@ -3,22 +3,22 @@
     public struct ValidateGuildRequestResult
     {
         public bool IsSuccess { get; set; }
-        public GameMessage.Type GameMessageType { get; set; }
+        public UITextKeys GameMessage { get; set; }
         public int GuildId { get; set; }
         public GuildData Guild { get; set; }
 
-        public ValidateGuildRequestResult(bool isSuccess, GameMessage.Type gameMessageType)
+        public ValidateGuildRequestResult(bool isSuccess, UITextKeys gameMessageType)
         {
             IsSuccess = isSuccess;
-            GameMessageType = gameMessageType;
+            GameMessage = gameMessageType;
             GuildId = 0;
             Guild = null;
         }
 
-        public ValidateGuildRequestResult(bool isSuccess, GameMessage.Type gameMessageType, int partyId, GuildData party)
+        public ValidateGuildRequestResult(bool isSuccess, UITextKeys gameMessageType, int partyId, GuildData party)
         {
             IsSuccess = isSuccess;
-            GameMessageType = gameMessageType;
+            GameMessage = gameMessageType;
             GuildId = partyId;
             Guild = party;
         }

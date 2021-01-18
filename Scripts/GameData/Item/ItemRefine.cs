@@ -55,12 +55,12 @@ namespace MultiplayerARPG
             return CanRefine(character, out _);
         }
 
-        public bool CanRefine(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
+        public bool CanRefine(IPlayerCharacterData character, out UITextKeys gameMessage)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRefineItem(character, this))
             {
-                gameMessageType = GameMessage.Type.NotEnoughGold;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
             if (requireItems == null || requireItems.Length == 0)
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
                 {
-                    gameMessageType = GameMessage.Type.NotEnoughItems;
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
                     return false;
                 }
             }
@@ -95,12 +95,12 @@ namespace MultiplayerARPG
             return CanRepair(character, out _);
         }
 
-        public bool CanRepair(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
+        public bool CanRepair(IPlayerCharacterData character, out UITextKeys gameMessage)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRepairItem(character, this))
             {
-                gameMessageType = GameMessage.Type.NotEnoughGold;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
             return true;

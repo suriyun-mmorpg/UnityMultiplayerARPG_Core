@@ -37,6 +37,8 @@ namespace MultiplayerARPG
         public static GameInstance Singleton { get; protected set; }
         public static IClientCashShopHandlers ClientCashShopHandlers { get; set; }
         public static IClientMailHandlers ClientMailHandlers { get; set; }
+        public static IClientCharacterAttributeHandlers ClientCharacterAttributeHandlers { get; set; }
+        public static IClientCharacterSkillHandlers ClientCharacterSkillHandlers { get; set; }
         public static IClientInventoryHandlers ClientInventoryHandlers { get; set; }
         public static IClientStorageHandlers ClientStorageHandlers { get; set; }
         public static IClientPartyHandlers ClientPartyHandlers { get; set; }

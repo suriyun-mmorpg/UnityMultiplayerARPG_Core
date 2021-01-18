@@ -14,24 +14,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
                 {
-                    error = ResponseSwapOrMergeItemMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            GameMessage.Type gameMessage;
+            UITextKeys gameMessage;
             if (!playerCharacter.SwapOrMergeItem(request.fromIndex, request.toIndex, out gameMessage))
             {
-                ResponseSwapOrMergeItemMessage.Error error = ResponseSwapOrMergeItemMessage.Error.NotAllowed;
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
-                switch(gameMessage)
-                {
-                    case GameMessage.Type.InvalidItemData:
-                        error = ResponseSwapOrMergeItemMessage.Error.InvalidItemIndex;
-                        break;
-                }
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
                 {
-                    error = error,
+                    error = gameMessage,
                 });
                 return;
             }
@@ -46,27 +39,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
                 {
-                    error = ResponseEquipArmorMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            GameMessage.Type gameMessage;
+            UITextKeys gameMessage;
             if (!playerCharacter.EquipArmor(request.nonEquipIndex, request.equipSlotIndex, out gameMessage))
             {
-                ResponseEquipArmorMessage.Error error = ResponseEquipArmorMessage.Error.NotAllowed;
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
-                switch (gameMessage)
-                {
-                    case GameMessage.Type.InvalidItemData:
-                        error = ResponseEquipArmorMessage.Error.InvalidItemIndex;
-                        break;
-                    case GameMessage.Type.CannotCarryAnymore:
-                        error = ResponseEquipArmorMessage.Error.CannotCarryAllItems;
-                        break;
-                }
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
                 {
-                    error = error,
+                    error = gameMessage,
                 });
                 return;
             }
@@ -81,27 +64,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
                 {
-                    error = ResponseEquipWeaponMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            GameMessage.Type gameMessage;
+            UITextKeys gameMessage;
             if (!playerCharacter.EquipWeapon(request.nonEquipIndex, request.equipWeaponSet, request.isLeftHand, out gameMessage))
             {
-                ResponseEquipWeaponMessage.Error error = ResponseEquipWeaponMessage.Error.NotAllowed;
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
-                switch (gameMessage)
-                {
-                    case GameMessage.Type.InvalidItemData:
-                        error = ResponseEquipWeaponMessage.Error.InvalidItemIndex;
-                        break;
-                    case GameMessage.Type.CannotCarryAnymore:
-                        error = ResponseEquipWeaponMessage.Error.CannotCarryAllItems;
-                        break;
-                }
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
                 {
-                    error = error,
+                    error = gameMessage,
                 });
                 return;
             }
@@ -116,27 +89,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
                 {
-                    error = ResponseUnEquipArmorMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            GameMessage.Type gameMessage;
+            UITextKeys gameMessage;
             if (!playerCharacter.UnEquipArmor(request.equipIndex, false, out gameMessage, out _, request.nonEquipIndex))
             {
-                ResponseUnEquipArmorMessage.Error error = ResponseUnEquipArmorMessage.Error.NotAllowed;
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
-                switch (gameMessage)
-                {
-                    case GameMessage.Type.InvalidItemData:
-                        error = ResponseUnEquipArmorMessage.Error.InvalidItemIndex;
-                        break;
-                    case GameMessage.Type.CannotCarryAnymore:
-                        error = ResponseUnEquipArmorMessage.Error.CannotCarryAllItems;
-                        break;
-                }
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
                 {
-                    error = error,
+                    error = gameMessage,
                 });
                 return;
             }
@@ -151,27 +114,17 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
                 {
-                    error = ResponseUnEquipWeaponMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            GameMessage.Type gameMessage;
+            UITextKeys gameMessage;
             if (!playerCharacter.UnEquipWeapon(request.equipWeaponSet, request.isLeftHand, false, out gameMessage, out _, request.nonEquipIndex))
             {
-                ResponseUnEquipWeaponMessage.Error error = ResponseUnEquipWeaponMessage.Error.NotAllowed;
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
-                switch (gameMessage)
-                {
-                    case GameMessage.Type.InvalidItemData:
-                        error = ResponseUnEquipWeaponMessage.Error.InvalidItemIndex;
-                        break;
-                    case GameMessage.Type.CannotCarryAnymore:
-                        error = ResponseUnEquipWeaponMessage.Error.CannotCarryAllItems;
-                        break;
-                }
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
                 {
-                    error = error,
+                    error = gameMessage,
                 });
                 return;
             }
@@ -186,7 +139,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage()
                 {
-                    error = ResponseSwitchEquipWeaponSetMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }

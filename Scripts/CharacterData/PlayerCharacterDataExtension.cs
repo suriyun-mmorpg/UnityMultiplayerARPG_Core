@@ -770,9 +770,9 @@ namespace MultiplayerARPG
             return index;
         }
 
-        public static bool AddAttribute(this IPlayerCharacterData characterData, out GameMessage.Type gameMessageType, int dataId, short amount = 1, short itemIndex = -1)
+        public static bool AddAttribute(this IPlayerCharacterData characterData, out UITextKeys gameMessage, int dataId, short amount = 1, short itemIndex = -1)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             Attribute attribute;
             if (!GameInstance.Attributes.TryGetValue(dataId, out attribute))
                 return false;
@@ -782,7 +782,7 @@ namespace MultiplayerARPG
             if (index < 0)
             {
                 characterAtttribute = CharacterAttribute.Create(attribute, 0);
-                if (!attribute.CanIncreaseAmount(characterData, (short)(characterAtttribute.amount + amount - 1), out gameMessageType, itemIndex < 0))
+                if (!attribute.CanIncreaseAmount(characterData, (short)(characterAtttribute.amount + amount - 1), out gameMessage, itemIndex < 0))
                     return false;
                 if (itemIndex >= 0)
                 {
@@ -797,7 +797,7 @@ namespace MultiplayerARPG
             else
             {
                 characterAtttribute = characterData.Attributes[index];
-                if (!attribute.CanIncreaseAmount(characterData, (short)(characterAtttribute.amount + amount - 1), out gameMessageType, itemIndex < 0))
+                if (!attribute.CanIncreaseAmount(characterData, (short)(characterAtttribute.amount + amount - 1), out gameMessage, itemIndex < 0))
                     return false;
                 if (itemIndex >= 0)
                 {
@@ -834,9 +834,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool AddSkill(this IPlayerCharacterData characterData, out GameMessage.Type gameMessageType, int dataId, short level = 1, short itemIndex = -1)
+        public static bool AddSkill(this IPlayerCharacterData characterData, out UITextKeys gameMessageType, int dataId, short level = 1, short itemIndex = -1)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessageType = UITextKeys.NONE;
             BaseSkill skill;
             if (!GameInstance.Skills.TryGetValue(dataId, out skill))
                 return false;

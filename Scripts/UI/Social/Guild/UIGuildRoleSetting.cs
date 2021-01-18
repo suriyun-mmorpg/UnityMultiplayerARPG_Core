@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             if (inputFieldRoleName == null ||
                 string.IsNullOrEmpty(inputFieldRoleName.text))
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_TOO_SHORT.ToString()));
                 return;
             }
             if (inputFieldShareExpPercentage == null ||

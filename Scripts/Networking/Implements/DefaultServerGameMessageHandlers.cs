@@ -14,10 +14,10 @@ namespace MultiplayerARPG
             Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
         }
 
-        public void SendGameMessage(long connectionId, GameMessage.Type type)
+        public void SendGameMessage(long connectionId, UITextKeys type)
         {
             GameMessage message = new GameMessage();
-            message.type = type;
+            message.message = type;
             Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.GameMessage, message);
         }
 

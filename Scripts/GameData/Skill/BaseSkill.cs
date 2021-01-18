@@ -405,9 +405,9 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanLevelUp(IPlayerCharacterData character, short level, out GameMessage.Type gameMessageType, bool checkSkillPoint = true)
+        public virtual bool CanLevelUp(IPlayerCharacterData character, short level, out UITextKeys gameMessage, bool checkSkillPoint = true)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(this))
                 return false;
 
@@ -419,7 +419,7 @@ namespace MultiplayerARPG
                 if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
                     attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
                 {
-                    gameMessageType = GameMessage.Type.NotEnoughAttributeAmounts;
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
                     return false;
                 }
             }
@@ -436,41 +436,41 @@ namespace MultiplayerARPG
                 if (!skillLevelsDict.ContainsKey(requireSkill) ||
                     skillLevelsDict[requireSkill] < CacheRequireSkillLevels[requireSkill])
                 {
-                    gameMessageType = GameMessage.Type.NotEnoughSkillLevels;
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS;
                     return false;
                 }
             }
 
             if (character.Level < GetRequireCharacterLevel(level))
             {
-                gameMessageType = GameMessage.Type.NotEnoughLevel;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
                 return false;
             }
 
             if (maxLevel > 0 && level >= maxLevel)
             {
-                gameMessageType = GameMessage.Type.SkillReachedMaxLevel;
+                gameMessage = UITextKeys.UI_ERROR_SKILL_REACHED_MAX_LEVEL;
                 return false;
             }
 
             if (checkSkillPoint && character.SkillPoint <= 0)
             {
-                gameMessageType = GameMessage.Type.NotEnoughSkillPoint;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_POINT;
                 return false;
             }
 
             return true;
         }
 
-        public virtual bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out GameMessage.Type gameMessageType, bool isItem = false)
+        public virtual bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out UITextKeys gameMessage, bool isItem = false)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (character == null)
                 return false;
 
             if (level <= 0)
             {
-                gameMessageType = GameMessage.Type.SkillLevelIsZero;
+                gameMessage = UITextKeys.UI_ERROR_SKILL_LEVEL_IS_ZERO;
                 return false;
             }
 
@@ -481,7 +481,7 @@ namespace MultiplayerARPG
                 // Only player character will check is skill is learned
                 if (!isItem && !IsAvailable(character))
                 {
-                    gameMessageType = GameMessage.Type.SkillIsNotLearned;
+                    gameMessage = UITextKeys.UI_ERROR_SKILL_IS_NOT_LEARNED;
                     return false;
                 }
 
@@ -535,7 +535,7 @@ namespace MultiplayerARPG
                         }
                         break;
                     case SkillType.CraftItem:
-                        if (playerCharacter == null || !GetItemCraft().CanCraft(playerCharacter, out gameMessageType))
+                        if (playerCharacter == null || !GetItemCraft().CanCraft(playerCharacter, out gameMessage))
                             return false;
                         break;
                     default:
@@ -545,32 +545,32 @@ namespace MultiplayerARPG
 
             if (!available)
             {
-                gameMessageType = GameMessage.Type.CannotUseSkillByCurrentWeapon;
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON;
                 return false;
             }
 
             if (character.CurrentHp < GetConsumeHp(level))
             {
-                gameMessageType = GameMessage.Type.NotEnoughHp;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_HP;
                 return false;
             }
 
             if (character.CurrentMp < GetConsumeMp(level))
             {
-                gameMessageType = GameMessage.Type.NotEnoughMp;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_MP;
                 return false;
             }
 
             if (character.CurrentStamina < GetConsumeStamina(level))
             {
-                gameMessageType = GameMessage.Type.NotEnoughStamina;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_STAMINA;
                 return false;
             }
 
             int skillUsageIndex = character.IndexOfSkillUsage(DataId, SkillUsageType.Skill);
             if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
             {
-                gameMessageType = GameMessage.Type.SkillIsCoolingDown;
+                gameMessage = UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN;
                 return false;
             }
 
@@ -579,12 +579,12 @@ namespace MultiplayerARPG
                 BaseCharacterEntity targetEntity;
                 if (!character.TryGetTargetEntity(out targetEntity))
                 {
-                    gameMessageType = GameMessage.Type.NoSkillTarget;
+                    gameMessage = UITextKeys.UI_ERROR_NO_SKILL_TARGET;
                     return false;
                 }
                 else if (!character.IsGameEntityInDistance(targetEntity, GetCastDistance(character, level, isLeftHand)))
                 {
-                    gameMessageType = GameMessage.Type.CharacterIsTooFar;
+                    gameMessage = UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR;
                     return false;
                 }
             }
@@ -592,7 +592,7 @@ namespace MultiplayerARPG
             CharacterItem weapon = character.GetAvailableWeapon(ref isLeftHand);
             if (IsAttack() && GetUseAmmoAmount() > 0 && !character.ValidateAmmo(weapon, GetUseAmmoAmount()))
             {
-                gameMessageType = GameMessage.Type.NoAmmo;
+                gameMessage = UITextKeys.UI_ERROR_NO_AMMO;
                 return false;
             }
 

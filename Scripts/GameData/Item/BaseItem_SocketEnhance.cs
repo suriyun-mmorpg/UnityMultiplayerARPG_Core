@@ -5,65 +5,65 @@ namespace MultiplayerARPG
 {
     public partial class BaseItem
     {
-        public static void EnhanceSocketRightHandItem(IPlayerCharacterData character, int enhancerId, int socketIndex, out GameMessage.Type gameMessageType)
+        public static void EnhanceSocketRightHandItem(IPlayerCharacterData character, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
             EnhanceSocketItem(character, character.EquipWeapons.rightHand, enhancerId, socketIndex, (enhancedSocketItem) =>
             {
                 EquipWeapons equipWeapon = character.EquipWeapons;
                 equipWeapon.rightHand = enhancedSocketItem;
                 character.EquipWeapons = equipWeapon;
-            }, out gameMessageType);
+            }, out gameMessage);
         }
 
-        public static void EnhanceSocketLeftHandItem(IPlayerCharacterData character, int enhancerId, int socketIndex, out GameMessage.Type gameMessageType)
+        public static void EnhanceSocketLeftHandItem(IPlayerCharacterData character, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
             EnhanceSocketItem(character, character.EquipWeapons.leftHand, enhancerId, socketIndex, (enhancedSocketItem) =>
             {
                 EquipWeapons equipWeapon = character.EquipWeapons;
                 equipWeapon.leftHand = enhancedSocketItem;
                 character.EquipWeapons = equipWeapon;
-            }, out gameMessageType);
+            }, out gameMessage);
         }
 
-        public static void EnhanceSocketEquipItem(IPlayerCharacterData character, int index, int enhancerId, int socketIndex, out GameMessage.Type gameMessageType)
+        public static void EnhanceSocketEquipItem(IPlayerCharacterData character, int index, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
-            EnhanceSocketItemByList(character, character.EquipItems, index, enhancerId, socketIndex, out gameMessageType);
+            EnhanceSocketItemByList(character, character.EquipItems, index, enhancerId, socketIndex, out gameMessage);
         }
 
-        public static void EnhanceSocketNonEquipItem(IPlayerCharacterData character, int index, int enhancerId, int socketIndex, out GameMessage.Type gameMessageType)
+        public static void EnhanceSocketNonEquipItem(IPlayerCharacterData character, int index, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
-            EnhanceSocketItemByList(character, character.NonEquipItems, index, enhancerId, socketIndex, out gameMessageType);
+            EnhanceSocketItemByList(character, character.NonEquipItems, index, enhancerId, socketIndex, out gameMessage);
         }
 
-        private static void EnhanceSocketItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, int enhancerId, int socketIndex, out GameMessage.Type gameMessageType)
+        private static void EnhanceSocketItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
             EnhanceSocketItem(character, list[index], enhancerId, socketIndex, (enhancedSocketItem) =>
             {
                 list[index] = enhancedSocketItem;
-            }, out gameMessageType);
+            }, out gameMessage);
         }
 
-        private static void EnhanceSocketItem(IPlayerCharacterData character, CharacterItem enhancingItem, int enhancerId, int socketIndex, System.Action<CharacterItem> onEnhanceSocket, out GameMessage.Type gameMessageType)
+        private static void EnhanceSocketItem(IPlayerCharacterData character, CharacterItem enhancingItem, int enhancerId, int socketIndex, System.Action<CharacterItem> onEnhanceSocket, out UITextKeys gameMessage)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (enhancingItem.IsEmptySlot())
             {
                 // Cannot enhance socket because character item is empty
-                gameMessageType = GameMessage.Type.CannotEnhanceSocket;
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_ENHANCE_SOCKET;
                 return;
             }
             IEquipmentItem equipmentItem = enhancingItem.GetEquipmentItem();
             if (equipmentItem == null)
             {
                 // Cannot enhance socket because it's not equipment item
-                gameMessageType = GameMessage.Type.CannotEnhanceSocket;
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_ENHANCE_SOCKET;
                 return;
             }
             byte maxSocket = GameInstance.Singleton.GameplayRule.GetItemMaxSocket(character, enhancingItem);
             if (maxSocket <= 0)
             {
                 // Cannot enhance socket because equipment has no socket(s)
-                gameMessageType = GameMessage.Type.NoEmptySocket;
+                gameMessage = UITextKeys.UI_ERROR_NO_EMPTY_SOCKET;
                 return;
             }
             while (enhancingItem.Sockets.Count < maxSocket)
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                 // Put enhancer to target socket
                 if (socketIndex >= enhancingItem.Sockets.Count || enhancingItem.Sockets[socketIndex] != 0)
                 {
-                    gameMessageType = GameMessage.Type.SocketNotEmpty;
+                    gameMessage = UITextKeys.UI_ERROR_SOCKET_NOT_EMPTY;
                     return;
                 }
             }
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                     }
                     if (index == enhancingItem.Sockets.Count - 1)
                     {
-                        gameMessageType = GameMessage.Type.NoEmptySocket;
+                        gameMessage = UITextKeys.UI_ERROR_NO_EMPTY_SOCKET;
                         return;
                     }
                 }
@@ -101,13 +101,13 @@ namespace MultiplayerARPG
             if (!GameInstance.Items.TryGetValue(enhancerId, out enhancerItem) || !enhancerItem.IsSocketEnhancer())
             {
                 // Cannot enhance socket because enhancer id is invalid
-                gameMessageType = GameMessage.Type.CannotEnhanceSocket;
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_ENHANCE_SOCKET;
                 return;
             }
             if (!character.HasOneInNonEquipItems(enhancerId))
             {
                 // Cannot enhance socket because there is no item
-                gameMessageType = GameMessage.Type.NotEnoughSocketEnchaner;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SOCKET_ENCHANER;
                 return;
             }
             character.DecreaseItems(enhancerId, 1, GameInstance.Singleton.IsLimitInventorySlot);
@@ -116,60 +116,60 @@ namespace MultiplayerARPG
             onEnhanceSocket.Invoke(enhancingItem);
         }
 
-        public static void RemoveEnhancerFromRightHandItem(IPlayerCharacterData character, int socketIndex, bool returnEnhancer, out GameMessage.Type gameMessageType)
+        public static void RemoveEnhancerFromRightHandItem(IPlayerCharacterData character, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
         {
             RemoveEnhancerFromItem(character, character.EquipWeapons.rightHand, socketIndex, returnEnhancer, (enhancedSocketItem) =>
             {
                 EquipWeapons equipWeapon = character.EquipWeapons;
                 equipWeapon.rightHand = enhancedSocketItem;
                 character.EquipWeapons = equipWeapon;
-            }, out gameMessageType);
+            }, out gameMessage);
         }
 
-        public static void RemoveEnhancerFromLeftHandItem(IPlayerCharacterData character, int socketIndex, bool returnEnhancer, out GameMessage.Type gameMessageType)
+        public static void RemoveEnhancerFromLeftHandItem(IPlayerCharacterData character, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
         {
             RemoveEnhancerFromItem(character, character.EquipWeapons.leftHand, socketIndex, returnEnhancer, (enhancedSocketItem) =>
             {
                 EquipWeapons equipWeapon = character.EquipWeapons;
                 equipWeapon.leftHand = enhancedSocketItem;
                 character.EquipWeapons = equipWeapon;
-            }, out gameMessageType);
+            }, out gameMessage);
         }
 
-        public static void RemoveEnhancerFromEquipItem(IPlayerCharacterData character, int index, int socketIndex, bool returnEnhancer, out GameMessage.Type gameMessageType)
+        public static void RemoveEnhancerFromEquipItem(IPlayerCharacterData character, int index, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
         {
-            RemoveEnhancerFromItemByList(character, character.EquipItems, index, socketIndex, returnEnhancer, out gameMessageType);
+            RemoveEnhancerFromItemByList(character, character.EquipItems, index, socketIndex, returnEnhancer, out gameMessage);
         }
 
-        public static void RemoveEnhancerFromNonEquipItem(IPlayerCharacterData character, int index, int socketIndex, bool returnEnhancer, out GameMessage.Type gameMessageType)
+        public static void RemoveEnhancerFromNonEquipItem(IPlayerCharacterData character, int index, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
         {
-            RemoveEnhancerFromItemByList(character, character.NonEquipItems, index, socketIndex, returnEnhancer, out gameMessageType);
+            RemoveEnhancerFromItemByList(character, character.NonEquipItems, index, socketIndex, returnEnhancer, out gameMessage);
         }
 
-        private static void RemoveEnhancerFromItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, int socketIndex, bool returnEnhancer, out GameMessage.Type gameMessageType)
+        private static void RemoveEnhancerFromItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
         {
             RemoveEnhancerFromItem(character, list[index], socketIndex, returnEnhancer, (enhancedSocketItem) =>
             {
                 list[index] = enhancedSocketItem;
-            }, out gameMessageType);
+            }, out gameMessage);
         }
 
-        private static void RemoveEnhancerFromItem(IPlayerCharacterData character, CharacterItem enhancedItem, int socketIndex, bool returnEnhancer, System.Action<CharacterItem> onRemoveEnhancer, out GameMessage.Type gameMessageType)
+        private static void RemoveEnhancerFromItem(IPlayerCharacterData character, CharacterItem enhancedItem, int socketIndex, bool returnEnhancer, System.Action<CharacterItem> onRemoveEnhancer, out UITextKeys gameMessage)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (enhancedItem.IsEmptySlot())
             {
-                gameMessageType = GameMessage.Type.CannotRemoveEnhancer;
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_REMOVE_ENHANCER;
                 return;
             }
             if (enhancedItem.Sockets.Count == 0 || socketIndex >= enhancedItem.Sockets.Count)
             {
-                gameMessageType = GameMessage.Type.CannotRemoveEnhancer;
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_REMOVE_ENHANCER;
                 return;
             }
             if (enhancedItem.Sockets[socketIndex] == 0)
             {
-                gameMessageType = GameMessage.Type.NoEnhancer;
+                gameMessage = UITextKeys.UI_ERROR_NO_ENHANCER;
                 return;
             }
             int enhancerId = enhancedItem.Sockets[socketIndex];
@@ -177,7 +177,7 @@ namespace MultiplayerARPG
             {
                 if (character.IncreasingItemsWillOverwhelming(enhancerId, 1))
                 {
-                    gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                    gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                     return;
                 }
                 character.IncreaseItems(CharacterItem.Create(enhancerId));

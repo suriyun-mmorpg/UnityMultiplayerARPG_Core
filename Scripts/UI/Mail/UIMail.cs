@@ -56,20 +56,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid ReadMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseReadMailMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseReadMailMessage.Error.NotAvailable:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());
-                        break;
-                    case ResponseReadMailMessage.Error.NotAllowed:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            })) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
             UpdateData(response.mail);
         }
 
@@ -84,26 +71,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid ClaimMailItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimMailItemsMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseClaimMailItemsMessage.Error.NotAvailable:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());
-                        break;
-                    case ResponseClaimMailItemsMessage.Error.NotAllowed:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_CLAIM_NOT_ALLOWED.ToString());
-                        break;
-                    case ResponseClaimMailItemsMessage.Error.AlreadyClaimed:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED.ToString());
-                        break;
-                    case ResponseClaimMailItemsMessage.Error.CannotCarryAllItems:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_CLAIM_CANNOT_CARRY.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            })) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_CLAIM_SUCCESS.ToString()));
             Hide();
             if (uiMailList)
@@ -121,20 +89,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteMailMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseDeleteMailMessage.Error.NotAvailable:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString());
-                        break;
-                    case ResponseDeleteMailMessage.Error.NotAllowed:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAIL_DELETE_NOT_ALLOWED.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            })) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_DELETE_SUCCESS.ToString()));
             Hide();
             if (uiMailList)

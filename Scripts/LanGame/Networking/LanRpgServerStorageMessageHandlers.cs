@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = ResponseOpenStorageMessage.Error.NotAllowed,
+                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = ResponseOpenStorageMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = ResponseOpenStorageMessage.Error.NotAvailable,
+                    error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND,
                 });
                 return;
             }
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseCloseStorageMessage()
                 {
-                    error = ResponseCloseStorageMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -66,29 +66,20 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
-                    error = ResponseMoveItemFromStorageMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotAccessStorage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
-                    error = ResponseMoveItemFromStorageMessage.Error.NotAllowed,
+                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
             List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-            if (storageItemIndex < 0 || storageItemIndex >= storageItemList.Count)
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.InvalidItemData);
-                result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
-                {
-                    error = ResponseMoveItemFromStorageMessage.Error.InvalidItemIndex,
-                });
-                return;
-            }
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
@@ -107,11 +98,10 @@ namespace MultiplayerARPG
                 bool isOverwhelming = playerCharacter.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
                 if (isOverwhelming)
                 {
-                    // Error: cannot carry all items
-                    GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                     result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                     {
-                        error = ResponseMoveItemFromStorageMessage.Error.CannotCarryAllItems,
+                        error = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
                     });
                     return;
                 }
@@ -149,29 +139,20 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
-                    error = ResponseMoveItemToStorageMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotAccessStorage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
-                    error = ResponseMoveItemToStorageMessage.Error.NotAllowed,
+                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
             List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-            if (inventoryIndex < 0 || inventoryIndex >= playerCharacter.NonEquipItems.Count)
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.InvalidItemData);
-                result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
-                {
-                    error = ResponseMoveItemToStorageMessage.Error.InvalidItemIndex,
-                });
-                return;
-            }
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
@@ -191,11 +172,10 @@ namespace MultiplayerARPG
                     storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
                 if (isOverwhelming)
                 {
-                    // Error: cannot store all items
-                    GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                     result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                     {
-                        error = ResponseMoveItemToStorageMessage.Error.CannotCarryAllItems,
+                        error = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
                     });
                     return;
                 }
@@ -232,16 +212,16 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = ResponseSwapOrMergeStorageItemMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotAccessStorage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = ResponseSwapOrMergeStorageItemMessage.Error.NotAllowed,
+                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -249,10 +229,10 @@ namespace MultiplayerARPG
             if (fromIndex >= storageItemList.Count ||
                 toIndex >= storageItemList.Count)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.InvalidItemData);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = ResponseSwapOrMergeStorageItemMessage.Error.InvalidItemIndex,
+                    error = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX,
                 });
                 return;
             }

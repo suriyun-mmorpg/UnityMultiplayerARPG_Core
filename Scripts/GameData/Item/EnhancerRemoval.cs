@@ -18,12 +18,12 @@ namespace MultiplayerARPG
             return CanRemove(character, out _);
         }
 
-        public bool CanRemove(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
+        public bool CanRemove(IPlayerCharacterData character, out UITextKeys gameMessage)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRemoveEnhancer(character))
             {
-                gameMessageType = GameMessage.Type.NotEnoughGold;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
             return true;

@@ -64,19 +64,19 @@ namespace MultiplayerARPG
 
             if (!IsGameEntityInDistance(itemDropEntity, CurrentGameInstance.pickUpItemDistance))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
             if (!itemDropEntity.IsAbleToLoot(this))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.NotAbleToLoot);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT);
                 return;
             }
 
             if (this.IncreasingItemsWillOverwhelming(itemDropEntity.DropItems))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return;
             }
 

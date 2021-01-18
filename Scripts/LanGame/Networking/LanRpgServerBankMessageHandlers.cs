@@ -9,32 +9,31 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestDepositGuildGold(RequestHandlerData requestHandler, RequestDepositGuildGoldMessage request, RequestProceedResultDelegate<ResponseDepositGuildGoldMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
-                    error = ResponseDepositGuildGoldMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_JOINED_GUILD);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
-                    error = ResponseDepositGuildGoldMessage.Error.GuildNotFound,
+                    error = UITextKeys.UI_ERROR_NOT_JOINED_GUILD,
                 });
                 return;
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
-                    error = ResponseDepositGuildGoldMessage.Error.GoldNotEnough,
+                    error = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
                 });
                 return;
             }
@@ -48,22 +47,21 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestDepositUserGold(RequestHandlerData requestHandler, RequestDepositUserGoldMessage request, RequestProceedResultDelegate<ResponseDepositUserGoldMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
                 {
-                    error = ResponseDepositUserGoldMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
                 {
-                    error = ResponseDepositUserGoldMessage.Error.GoldNotEnough,
+                    error = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
                 });
                 return;
             }
@@ -74,32 +72,31 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestWithdrawGuildGold(RequestHandlerData requestHandler, RequestWithdrawGuildGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawGuildGoldMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
-                    error = ResponseWithdrawGuildGoldMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_JOINED_GUILD);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
-                    error = ResponseWithdrawGuildGoldMessage.Error.GuildNotFound,
+                    error = UITextKeys.UI_ERROR_NOT_JOINED_GUILD,
                 });
                 return;
             }
             if (guild.gold - request.gold < 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
-                    error = ResponseWithdrawGuildGoldMessage.Error.GoldNotEnough,
+                    error = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
                 });
                 return;
             }
@@ -113,22 +110,21 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestWithdrawUserGold(RequestHandlerData requestHandler, RequestWithdrawUserGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawUserGoldMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
                 {
-                    error = ResponseWithdrawUserGoldMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             if (playerCharacter.UserGold - request.gold < 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
                 {
-                    error = ResponseWithdrawUserGoldMessage.Error.GoldNotEnough,
+                    error = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
                 });
                 return;
             }

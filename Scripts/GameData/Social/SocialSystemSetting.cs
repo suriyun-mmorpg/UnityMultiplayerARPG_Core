@@ -102,16 +102,15 @@ namespace MultiplayerARPG
 
         public bool CanCreateGuild(IPlayerCharacterData character)
         {
-            GameMessage.Type gameMessageType;
-            return CanCreateGuild(character, out gameMessageType);
+            return CanCreateGuild(character, out _);
         }
 
-        public bool CanCreateGuild(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
+        public bool CanCreateGuild(IPlayerCharacterData character, out UITextKeys gameMessage)
         {
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToCreateGuild(character, this))
             {
-                gameMessageType = GameMessage.Type.NotEnoughGold;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
             if (createGuildRequireItems == null || createGuildRequireItems.Length == 0)
@@ -123,7 +122,7 @@ namespace MultiplayerARPG
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
                 {
-                    gameMessageType = GameMessage.Type.NotEnoughItems;
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
                     return false;
                 }
             }

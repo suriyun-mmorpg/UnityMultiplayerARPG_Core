@@ -38,25 +38,25 @@ namespace MultiplayerARPG
             return CanCraft(character, out _);
         }
 
-        public bool CanCraft(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
+        public bool CanCraft(IPlayerCharacterData character, out UITextKeys gameMessage)
         {
             // Mininmum amount is 1
             if (amount <= 0)
                 amount = 1;
-            gameMessageType = GameMessage.Type.None;
+            gameMessage = UITextKeys.NONE;
             if (craftingItem == null)
             {
-                gameMessageType = GameMessage.Type.InvalidItemData;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
                 return false;
             }
             if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToCraftItem(character, this))
             {
-                gameMessageType = GameMessage.Type.NotEnoughGold;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
             if (character.IncreasingItemsWillOverwhelming(craftingItem.DataId, amount))
             {
-                gameMessageType = GameMessage.Type.CannotCarryAnymore;
+                gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 return false;
             }
             if (craftRequirements == null || craftRequirements.Length == 0)
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             {
                 if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.DataId) < craftRequirement.amount)
                 {
-                    gameMessageType = GameMessage.Type.NotEnoughItems;
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
                     return false;
                 }
             }

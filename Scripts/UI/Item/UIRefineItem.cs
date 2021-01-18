@@ -72,21 +72,21 @@ namespace MultiplayerARPG
             ItemRefineLevel? refineLevel = null;
             if (!characterItem.IsEmptySlot())
             {
-                GameMessage.Type gameMessageType = GameMessage.Type.CannotRefine;
-                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, out gameMessageType);
+                UITextKeys gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
+                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, out gameMessage);
                 if (CanRefine)
                 {
                     refineLevel = EquipmentItem.ItemRefine.levels[Level - 1];
                 }
                 else
                 {
-                    switch (gameMessageType)
+                    switch (gameMessage)
                     {
-                        case GameMessage.Type.RefineItemReachedMaxLevel:
+                        case UITextKeys.UI_ERROR_REFINE_ITEM_REACHED_MAX_LEVEL:
                             ReachedMaxLevel = true;
                             break;
-                        case GameMessage.Type.NotEnoughGold:
-                        case GameMessage.Type.NotEnoughItems:
+                        case UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD:
+                        case UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS:
                             refineLevel = EquipmentItem.ItemRefine.levels[Level - 1];
                             break;
                     }
