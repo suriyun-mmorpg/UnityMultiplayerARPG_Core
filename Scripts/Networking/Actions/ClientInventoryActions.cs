@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseEquipWeaponMessage> onResponseEquipWeapon;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseUnEquipArmorMessage> onResponseUnEquipArmor;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseUnEquipWeaponMessage> onResponseUnEquipWeapon;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSwitchEquipWeaponSetMessage> onResponseSwitchEquipWeaponSet;
 
         public static async UniTaskVoid ResponseSwapOrMergeItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwapOrMergeItemMessage response)
         {
@@ -44,6 +45,13 @@ namespace MultiplayerARPG
             await UniTask.Yield();
             if (onResponseUnEquipWeapon != null)
                 onResponseUnEquipWeapon.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static async UniTaskVoid ResponseSwitchEquipWeaponSet(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwitchEquipWeaponSetMessage response)
+        {
+            await UniTask.Yield();
+            if (onResponseSwitchEquipWeaponSet != null)
+                onResponseSwitchEquipWeaponSet.Invoke(requestHandler, responseCode, response);
         }
     }
 }

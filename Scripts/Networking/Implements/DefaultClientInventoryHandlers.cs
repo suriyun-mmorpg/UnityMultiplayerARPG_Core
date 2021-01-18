@@ -36,5 +36,10 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.UnEquipArmor, data, responseDelegate: callback);
         }
+
+        public bool RequestSwitchEquipWeaponSet(RequestSwitchEquipWeaponSetMessage data, ResponseDelegate<ResponseSwitchEquipWeaponSetMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.SwitchEquipWeaponSet, data, responseDelegate: callback);
+        }
     }
 }

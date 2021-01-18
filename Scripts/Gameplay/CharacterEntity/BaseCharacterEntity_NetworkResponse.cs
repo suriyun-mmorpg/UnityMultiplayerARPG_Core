@@ -181,20 +181,5 @@ namespace MultiplayerARPG
             summon.UnSummon(this);
 #endif
         }
-
-        [ServerRpc]
-        protected void ServerSwitchEquipWeaponSet(byte equipWeaponSet)
-        {
-#if !CLIENT_BUILD
-            if (!CanDoActions())
-                return;
-
-            if (equipWeaponSet >= CurrentGameInstance.maxEquipWeaponSet)
-                equipWeaponSet = (byte)(CurrentGameInstance.maxEquipWeaponSet - 1);
-
-            this.FillWeaponSetsIfNeeded(equipWeaponSet);
-            EquipWeaponSet = equipWeaponSet;
-#endif
-        }
     }
 }

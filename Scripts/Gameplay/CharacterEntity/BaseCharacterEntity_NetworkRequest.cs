@@ -186,15 +186,5 @@ namespace MultiplayerARPG
             RPC(ServerReload, isLeftHand);
             return true;
         }
-
-        public bool CallServerSwitchEquipWeaponSet(byte equipWeaponSet)
-        {
-            if (!CanDoActions() || EquipWeaponSet == equipWeaponSet)
-                return false;
-            if (equipWeaponSet >= CurrentGameInstance.maxEquipWeaponSet)
-                equipWeaponSet = 0;
-            RPC(ServerSwitchEquipWeaponSet, equipWeaponSet);
-            return true;
-        }
     }
 }

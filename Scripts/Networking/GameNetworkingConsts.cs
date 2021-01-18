@@ -69,5 +69,6 @@
         public const ushort WithdrawGuildGold = 143;
         public const ushort OpenStorage = 144;
         public const ushort CloseStorage = 145;
+        public const ushort SwitchEquipWeaponSet = 146;
     }
 }

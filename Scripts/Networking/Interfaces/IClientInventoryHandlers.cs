@@ -9,5 +9,6 @@ namespace MultiplayerARPG
         bool RequestEquipArmor(RequestEquipArmorMessage data, ResponseDelegate<ResponseEquipArmorMessage> callback);
         bool RequestUnEquipWeapon(RequestUnEquipWeaponMessage data, ResponseDelegate<ResponseUnEquipWeaponMessage> callback);
         bool RequestUnEquipArmor(RequestUnEquipArmorMessage data, ResponseDelegate<ResponseUnEquipArmorMessage> callback);
+        bool RequestSwitchEquipWeaponSet(RequestSwitchEquipWeaponSetMessage data, ResponseDelegate<ResponseSwitchEquipWeaponSetMessage> callback);
     }
 }

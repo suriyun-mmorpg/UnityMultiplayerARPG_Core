@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestSwapOrMergeItem(RequestHandlerData requestHandler, RequestSwapOrMergeItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeItemMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestEquipArmor(RequestHandlerData requestHandler, RequestEquipArmorMessage request, RequestProceedResultDelegate<ResponseEquipArmorMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestEquipWeapon(RequestHandlerData requestHandler, RequestEquipWeaponMessage request, RequestProceedResultDelegate<ResponseEquipWeaponMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestUnEquipArmor(RequestHandlerData requestHandler, RequestUnEquipArmorMessage request, RequestProceedResultDelegate<ResponseUnEquipArmorMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
@@ -146,7 +146,7 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestUnEquipWeapon(RequestHandlerData requestHandler, RequestUnEquipWeaponMessage request, RequestProceedResultDelegate<ResponseUnEquipWeaponMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
@@ -176,6 +176,26 @@ namespace MultiplayerARPG
                 return;
             }
             result.Invoke(AckResponseCode.Success, new ResponseUnEquipWeaponMessage());
+        }
+
+        public async UniTaskVoid HandleRequestSwitchEquipWeaponSet(RequestHandlerData requestHandler, RequestSwitchEquipWeaponSetMessage request, RequestProceedResultDelegate<ResponseSwitchEquipWeaponSetMessage> result)
+        {
+            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage()
+                {
+                    error = ResponseSwitchEquipWeaponSetMessage.Error.NotLoggedIn,
+                });
+                return;
+            }
+            byte equipWeaponSet = request.equipWeaponSet;
+            if (equipWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
+                equipWeaponSet = (byte)(GameInstance.Singleton.maxEquipWeaponSet - 1);
+            playerCharacter.FillWeaponSetsIfNeeded(equipWeaponSet);
+            playerCharacter.EquipWeaponSet = equipWeaponSet;
+            result.Invoke(AckResponseCode.Success, new ResponseSwitchEquipWeaponSetMessage());
         }
     }
 }

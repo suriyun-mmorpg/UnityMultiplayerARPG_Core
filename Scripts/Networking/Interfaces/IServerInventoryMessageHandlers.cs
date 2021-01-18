@@ -25,5 +25,9 @@ namespace MultiplayerARPG
             RequestHandlerData requestHandler, RequestUnEquipArmorMessage request,
             RequestProceedResultDelegate<ResponseUnEquipArmorMessage> result);
 
+        UniTaskVoid HandleRequestSwitchEquipWeaponSet(
+            RequestHandlerData requestHandler, RequestSwitchEquipWeaponSetMessage request,
+            RequestProceedResultDelegate<ResponseSwitchEquipWeaponSetMessage> result);
+
     }
 }
