@@ -646,10 +646,17 @@ namespace MultiplayerARPG
                 // If it is not limit slots, don't fill it, and also remove empty slots
                 for (i = itemList.Count - 1; i >= 0; --i)
                 {
-                    if (itemList[i].IsEmptySlot())
+                    if (itemList[i].IsEmpty() || itemList[i].IsEmptySlot())
                         itemList.RemoveAt(i);
                 }
                 return;
+            }
+
+            // Place empty slots
+            for (i = 0; i < itemList.Count; ++i)
+            {
+                if (itemList[i].IsEmpty())
+                    itemList[i] = CharacterItem.CreateEmptySlot();
             }
 
             // Fill empty slots
