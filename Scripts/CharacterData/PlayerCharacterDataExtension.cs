@@ -246,6 +246,7 @@ namespace MultiplayerARPG
                     amount -= addAmount;
                 }
             }
+            character.FillEmptySlots();
             // Set start stats
             CharacterStats stats = character.GetCaches().Stats;
             character.CurrentHp = (int)stats.hp;
