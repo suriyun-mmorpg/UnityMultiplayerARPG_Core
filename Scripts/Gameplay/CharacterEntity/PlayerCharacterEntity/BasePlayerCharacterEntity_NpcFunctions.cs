@@ -1,7 +1,5 @@
 ﻿using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -120,68 +118,6 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected bool AccessingNpcShopDialog(out NpcDialog dialog)
-        {
-            dialog = null;
-
-            if (this.IsDead())
-                return false;
-
-            if (CurrentNpcDialog == null)
-                return false;
-
-            // Dialog must be built-in shop dialog
-            dialog = CurrentNpcDialog as NpcDialog;
-            if (dialog == null || dialog.type != NpcDialogType.Shop)
-                return false;
-
-            return true;
-        }
-
-        [ServerRpc]
-        protected void ServerSellItem(short index, short amount)
-        {
-#if !CLIENT_BUILD
-            if (!AccessingNpcShopDialog(out _))
-                return;
-
-            if (index >= nonEquipItems.Count)
-                return;
-
-            // Found selling item or not?
-            CharacterItem nonEquipItem = nonEquipItems[index];
-            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
-                return;
-
-            // Remove item from inventory
-            this.DecreaseItemsByIndex(index, amount);
-            this.FillEmptySlots();
-
-            // Increase currencies
-            BaseItem item = nonEquipItem.GetItem();
-            CurrentGameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerSellItems(short[] selectedIndexes)
-        {
-#if !CLIENT_BUILD
-            if (!AccessingNpcShopDialog(out _))
-                return;
-            List<short> indexes = new List<short>(selectedIndexes);
-            indexes.Sort();
-            short tempIndex;
-            for (int i = indexes.Count - 1; i >= 0; --i)
-            {
-                tempIndex = indexes[i];
-                if (tempIndex >= nonEquipItems.Count)
-                    continue;
-                ServerSellItem(tempIndex, nonEquipItems[tempIndex].amount);
-            }
-#endif
-        }
-
         [ServerRpc]
         protected void ServerBuyNpcItem(short index, short amount)
         {
@@ -220,6 +156,24 @@ namespace MultiplayerARPG
             this.FillEmptySlots();
             GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
 #endif
+        }
+
+        public bool AccessingNpcShopDialog(out NpcDialog dialog)
+        {
+            dialog = null;
+
+            if (this.IsDead())
+                return false;
+
+            if (CurrentNpcDialog == null)
+                return false;
+
+            // Dialog must be built-in shop dialog
+            dialog = CurrentNpcDialog as NpcDialog;
+            if (dialog == null || dialog.type != NpcDialogType.Shop)
+                return false;
+
+            return true;
         }
     }
 }

@@ -10,5 +10,14 @@ namespace MultiplayerARPG
         bool RequestUnEquipWeapon(RequestUnEquipWeaponMessage data, ResponseDelegate<ResponseUnEquipWeaponMessage> callback);
         bool RequestUnEquipArmor(RequestUnEquipArmorMessage data, ResponseDelegate<ResponseUnEquipArmorMessage> callback);
         bool RequestSwitchEquipWeaponSet(RequestSwitchEquipWeaponSetMessage data, ResponseDelegate<ResponseSwitchEquipWeaponSetMessage> callback);
+        bool RequestDismantleItem(RequestDismantleItemMessage data, ResponseDelegate<ResponseDismantleItemMessage> callback);
+        bool RequestDismantleItems(RequestDismantleItemsMessage data, ResponseDelegate<ResponseDismantleItemsMessage> callback);
+        bool RequestEnhanceSocketItem(RequestEnhanceSocketItemMessage data, ResponseDelegate<ResponseEnhanceSocketItemMessage> callback);
+        bool RequestRefineItem(RequestRefineItemMessage data, ResponseDelegate<ResponseRefineItemMessage> callback);
+        bool RequestRemoveEnhancerFromItem(RequestRemoveEnhancerFromItemMessage data, ResponseDelegate<ResponseRemoveEnhancerFromItemMessage> callback);
+        bool RequestRepairItem(RequestRepairItemMessage data, ResponseDelegate<ResponseRepairItemMessage> callback);
+        bool RequestRepairEquipItems(ResponseDelegate<ResponseRepairEquipItemsMessage> callback);
+        bool RequestSellItem(RequestSellItemMessage data, ResponseDelegate<ResponseSellItemMessage> callback);
+        bool RequestSellItems(RequestSellItemsMessage data, ResponseDelegate<ResponseSellItemsMessage> callback);
     }
 }

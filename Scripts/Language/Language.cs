@@ -43,6 +43,8 @@ namespace MultiplayerARPG
         UI_ERROR_INVALID_CHARACTER_DATA,
         UI_ERROR_INVALID_ITEM_DATA,
         UI_ERROR_INVALID_ITEM_INDEX,
+        UI_ERROR_INVALID_ENHANCER_ITEM_INDEX,
+        UI_ERROR_ITEM_NOT_EQUIPMENT,
         UI_ERROR_INVALID_ATTRIBUTE_DATA,
         UI_ERROR_INVALID_SKILL_DATA,
         UI_ERROR_INVALID_GUILD_SKILL_DATA,
@@ -1055,6 +1057,8 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString(), "Invalid character data");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_ITEM_DATA.ToString(), "Invalid item data");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_ITEM_INDEX.ToString(), "Invalid item index");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_ENHANCER_ITEM_INDEX.ToString(), "Invalid enhancer item index");
+            Texts.Add(UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT.ToString(), "Item is not a equipment item");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_ATTRIBUTE_DATA.ToString(), "Invalid attribute data");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_SKILL_DATA.ToString(), "Invalid skill data");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_GUILD_SKILL_DATA.ToString(), "Invalid guild skill data");

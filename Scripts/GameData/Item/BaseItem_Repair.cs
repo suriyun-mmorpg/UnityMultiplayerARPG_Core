@@ -53,9 +53,9 @@ namespace MultiplayerARPG
             return repairPrice;
         }
 
-        public static void RepairRightHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
+        public static bool RepairRightHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
         {
-            RepairItem(character, character.EquipWeapons.rightHand, (repairedItem) =>
+            return RepairItem(character, character.EquipWeapons.rightHand, (repairedItem) =>
             {
                 EquipWeapons equipWeapon = character.EquipWeapons;
                 equipWeapon.rightHand = repairedItem;
@@ -63,9 +63,9 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        public static void RepairLeftHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
+        public static bool RepairLeftHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
         {
-            RepairItem(character, character.EquipWeapons.leftHand, (repairedItem) =>
+            return RepairItem(character, character.EquipWeapons.leftHand, (repairedItem) =>
             {
                 EquipWeapons equipWeapon = character.EquipWeapons;
                 equipWeapon.leftHand = repairedItem;
@@ -73,49 +73,50 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        public static void RepairEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
+        public static bool RepairEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
         {
-            RepairItemByList(character, character.EquipItems, index, out gameMessageType);
+            return RepairItemByList(character, character.EquipItems, index, out gameMessageType);
         }
 
-        public static void RepairNonEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
+        public static bool RepairNonEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
         {
-            RepairItemByList(character, character.NonEquipItems, index, out gameMessageType);
+            return RepairItemByList(character, character.NonEquipItems, index, out gameMessageType);
         }
 
-        private static void RepairItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, out UITextKeys gameMessageType)
+        private static bool RepairItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, out UITextKeys gameMessageType)
         {
-            RepairItem(character, list[index], (repairedItem) =>
+            return RepairItem(character, list[index], (repairedItem) =>
             {
                 list[index] = repairedItem;
             }, out gameMessageType);
         }
 
-        private static void RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out UITextKeys gameMessageType)
+        private static bool RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out UITextKeys gameMessageType)
         {
-            gameMessageType = UITextKeys.UI_ERROR_CANNOT_REPAIR;
             if (repairingItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
-                return;
+                gameMessageType = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
+                return false;
             }
             BaseItem equipmentItem = repairingItem.GetEquipmentItem() as BaseItem;
             if (equipmentItem == null)
             {
                 // Cannot refine because it's not equipment item
-                return;
+                gameMessageType = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
+                return false;
             }
             float maxDurability;
             ItemRepairPrice repairPrice;
-            if (equipmentItem.CanRepair(character, repairingItem.durability, out maxDurability, out repairPrice, out gameMessageType))
-            {
-                gameMessageType = UITextKeys.UI_REPAIR_SUCCESS;
-                // Repair item
-                repairingItem.durability = maxDurability;
-                onRepaired.Invoke(repairingItem);
-                // Decrease required gold
-                GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRepairItem(character, repairPrice);
-            }
+            if (!equipmentItem.CanRepair(character, repairingItem.durability, out maxDurability, out repairPrice, out gameMessageType))
+                return false;
+            gameMessageType = UITextKeys.UI_REPAIR_SUCCESS;
+            // Repair item
+            repairingItem.durability = maxDurability;
+            onRepaired.Invoke(repairingItem);
+            // Decrease required gold
+            GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRepairItem(character, repairPrice);
+            return true;
         }
     }
 }

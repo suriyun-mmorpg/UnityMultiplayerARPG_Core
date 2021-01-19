@@ -50,7 +50,7 @@ namespace MultiplayerARPG
 
         public void OnClickRepairEquipItems()
         {
-            GameInstance.PlayingCharacterEntity.CallServerRepairEquipItems();
+            GameInstance.ClientInventoryHandlers.RequestRepairEquipItems(ClientInventoryActions.ResponseRepairEquipItems);
         }
     }
 }

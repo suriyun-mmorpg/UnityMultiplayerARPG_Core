@@ -145,7 +145,13 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            GameInstance.PlayingCharacterEntity.CallServerEnhanceSocketItem(InventoryType, (short)IndexOfData, SelectedEnhancerId, -1);
+            GameInstance.ClientInventoryHandlers.RequestEnhanceSocketItem(new RequestEnhanceSocketItemMessage()
+            {
+                inventoryType = InventoryType,
+                index = (short)IndexOfData,
+                enhancerId = SelectedEnhancerId,
+                socketIndex = -1,
+            }, ClientInventoryActions.ResponseEnhanceSocketItem);
         }
 
         public void OnClickRemoveEnhancer()
@@ -154,7 +160,12 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            GameInstance.PlayingCharacterEntity.CallServerRemoveEnhancerFromItem(InventoryType, (short)IndexOfData, (short)SelectedSocketIndex);
+            GameInstance.ClientInventoryHandlers.RequestRemoveEnhancerFromItem(new RequestRemoveEnhancerFromItemMessage()
+            {
+                inventoryType = InventoryType,
+                index = (short)IndexOfData,
+                socketIndex = (short)SelectedSocketIndex,
+            }, ClientInventoryActions.ResponseRemoveEnhancerFromItem);
         }
     }
 }

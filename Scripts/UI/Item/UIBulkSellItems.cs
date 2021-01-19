@@ -60,7 +60,10 @@ namespace MultiplayerARPG
                     continue;
                 indexes.Add((short)selectedUI.IndexOfData);
             }
-            GameInstance.PlayingCharacterEntity.CallServerSellItems(indexes.ToArray());
+            GameInstance.ClientInventoryHandlers.RequestSellItems(new RequestSellItemsMessage()
+            {
+                selectedIndexes = indexes.ToArray(),
+            }, ClientInventoryActions.ResponseSellItems);
         }
     }
 }

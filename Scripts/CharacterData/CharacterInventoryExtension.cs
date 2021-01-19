@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using System.Collections.Generic;
+
+namespace MultiplayerARPG
 {
     public static class CharacterInventoryExtension
     {
@@ -129,9 +131,9 @@
 
         public static bool EquipWeapon(this ICharacterData character, int nonEquipIndex, byte equipWeaponSet, bool isLeftHand, out UITextKeys gameMessage)
         {
-            if (character == null || nonEquipIndex < 0 ||nonEquipIndex >= character.NonEquipItems.Count)
+            if (nonEquipIndex < 0 || nonEquipIndex >= character.NonEquipItems.Count)
             {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                 return false;
             }
 
@@ -273,9 +275,9 @@
 
         public static bool EquipArmor(this ICharacterData character, int nonEquipIndex, byte equipSlotIndex, out UITextKeys gameMessage)
         {
-            if (character == null || nonEquipIndex < 0 || nonEquipIndex >= character.NonEquipItems.Count)
+            if (nonEquipIndex < 0 || nonEquipIndex >= character.NonEquipItems.Count)
             {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                 return false;
             }
 
@@ -317,9 +319,9 @@
         public static bool UnEquipArmor(this ICharacterData character, int index, bool doNotValidate, out UITextKeys gameMessage, out int unEquippedIndex, int expectedUnequippedIndex = -1)
         {
             unEquippedIndex = -1;
-            if (character == null || index < 0 || index >= character.EquipItems.Count)
+            if (index < 0 || index >= character.EquipItems.Count)
             {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                 return false;
             }
             CharacterItem unEquipItem = character.EquipItems[index];
@@ -346,7 +348,7 @@
                 toIndex < 0 || toIndex >= character.NonEquipItems.Count ||
                 fromIndex == toIndex)
             {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                 return false;
             }
 
@@ -383,6 +385,293 @@
             }
             gameMessage = UITextKeys.NONE;
             return true;
+        }
+
+        public static bool VerifyDismantleItem(this IPlayerCharacterData character, short index, short amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out int returningGold, out List<ItemAmount> returningItems)
+        {
+            gameMessage = UITextKeys.NONE;
+            returningGold = 0;
+            returningItems = new List<ItemAmount>();
+
+            if (index < 0 || index >= character.NonEquipItems.Count)
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                return false;
+            }
+
+            // Found item or not?
+            CharacterItem nonEquipItem = character.NonEquipItems[index];
+            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                return false;
+            }
+
+            if (!GameInstance.Singleton.dismantleFilter.Filter(nonEquipItem))
+            {
+                return false;
+            }
+
+            // Simulate data before applies
+            if (!simulatingNonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                return false;
+            }
+
+            // Character can receives all items or not?
+            returningItems.AddRange(BaseItem.GetDismantleReturnItems(nonEquipItem, amount));
+            if (simulatingNonEquipItems.IncreasingItemsWillOverwhelming(
+                returningItems,
+                true,
+                character.GetCaches().LimitItemWeight,
+                character.GetCaches().TotalItemWeight,
+                GameInstance.Singleton.IsLimitInventorySlot,
+                character.GetCaches().LimitItemSlot))
+            {
+                returningItems.Clear();
+                gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
+                return false;
+            }
+
+            simulatingNonEquipItems.IncreaseItems(returningItems);
+            returningGold = nonEquipItem.GetItem().DismantleReturnGold * amount;
+            return true;
+        }
+
+        public static bool DismantleItem(this IPlayerCharacterData character, short index, short amount, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            int returningGold;
+            List<ItemAmount> returningItems;
+            List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
+            if (!character.VerifyDismantleItem(index, amount, simulatingNonEquipItems, out gameMessage, out returningGold, out returningItems))
+                return false;
+
+            character.Gold = character.Gold.Increase(returningGold);
+            character.DecreaseItemsByIndex(index, amount);
+            character.IncreaseItems(returningItems);
+            character.FillEmptySlots();
+            return true;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool DismantleItems(this IPlayerCharacterData character, short[] selectedIndexes, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            gameMessage = UITextKeys.NONE;
+            List<short> indexes = new List<short>(selectedIndexes);
+            indexes.Sort();
+            Dictionary<short, short> indexAmountPairs = new Dictionary<short, short>();
+            List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
+            int returningGold = 0;
+            List<ItemAmount> returningItems = new List<ItemAmount>();
+            short tempIndex;
+            short tempAmount;
+            int tempReturningGold;
+            List<ItemAmount> tempReturningItems;
+            for (int i = indexes.Count - 1; i >= 0; --i)
+            {
+                tempIndex = indexes[i];
+                if (indexAmountPairs.ContainsKey(tempIndex))
+                    continue;
+                if (tempIndex >= character.NonEquipItems.Count)
+                    continue;
+                tempAmount = character.NonEquipItems[tempIndex].amount;
+                if (!character.VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out gameMessage, out tempReturningGold, out tempReturningItems))
+                    return false;
+                returningGold += tempReturningGold;
+                returningItems.AddRange(tempReturningItems);
+                indexAmountPairs.Add(tempIndex, tempAmount);
+            }
+            character.Gold = character.Gold.Increase(returningGold);
+            indexes.Clear();
+            indexes.AddRange(indexAmountPairs.Keys);
+            indexes.Sort();
+            for (int i = indexes.Count - 1; i >= 0; --i)
+            {
+                character.DecreaseItemsByIndex(indexes[i], indexAmountPairs[indexes[i]]);
+            }
+            character.IncreaseItems(returningItems);
+            character.FillEmptySlots();
+            return true;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    return BaseItem.RefineNonEquipItem(character, index, out gameMessage);
+                case InventoryType.EquipItems:
+                    return BaseItem.RefineEquipItem(character, index, out gameMessage);
+                case InventoryType.EquipWeaponRight:
+                    return BaseItem.RefineRightHandItem(character, out gameMessage);
+                case InventoryType.EquipWeaponLeft:
+                    return BaseItem.RefineLeftHandItem(character, out gameMessage);
+            }
+            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+            return false;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, int enhancerId, short socketIndex, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    return BaseItem.EnhanceSocketNonEquipItem(character, index, enhancerId, socketIndex, out gameMessage);
+                case InventoryType.EquipItems:
+                    return BaseItem.EnhanceSocketEquipItem(character, index, enhancerId, socketIndex, out gameMessage);
+                case InventoryType.EquipWeaponRight:
+                    return BaseItem.EnhanceSocketRightHandItem(character, enhancerId, socketIndex, out gameMessage);
+                case InventoryType.EquipWeaponLeft:
+                    return BaseItem.EnhanceSocketLeftHandItem(character, enhancerId, socketIndex, out gameMessage);
+            }
+            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+            return false;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, short socketIndex, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            if (!GameInstance.Singleton.enhancerRemoval.CanRemove(character, out gameMessage))
+                return false;
+            bool returnEnhancer = GameInstance.Singleton.enhancerRemoval.ReturnEnhancerItem;
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    return BaseItem.RemoveEnhancerFromNonEquipItem(character, index, socketIndex, returnEnhancer, out gameMessage);
+                case InventoryType.EquipItems:
+                    return BaseItem.RemoveEnhancerFromEquipItem(character, index, socketIndex, returnEnhancer, out gameMessage);
+                case InventoryType.EquipWeaponRight:
+                    return BaseItem.RemoveEnhancerFromRightHandItem(character, socketIndex, returnEnhancer, out gameMessage);
+                case InventoryType.EquipWeaponLeft:
+                    return BaseItem.RemoveEnhancerFromLeftHandItem(character, socketIndex, returnEnhancer, out gameMessage);
+            }
+            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+            return false;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool RepairItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    return BaseItem.RepairNonEquipItem(character, index, out gameMessage);
+                case InventoryType.EquipItems:
+                    return BaseItem.RepairEquipItem(character, index, out gameMessage);
+                case InventoryType.EquipWeaponRight:
+                    return BaseItem.RepairRightHandItem(character, out gameMessage);
+                case InventoryType.EquipWeaponLeft:
+                    return BaseItem.RepairLeftHandItem(character, out gameMessage);
+            }
+            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+            return false;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool RepairEquipItems(this IPlayerCharacterData character, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            bool success = false;
+            BaseItem.RepairRightHandItem(character, out gameMessage);
+            success = success || gameMessage == UITextKeys.UI_REPAIR_SUCCESS;
+            BaseItem.RepairLeftHandItem(character, out gameMessage);
+            success = success || gameMessage == UITextKeys.UI_REPAIR_SUCCESS;
+            for (int i = 0; i < character.EquipItems.Count; ++i)
+            {
+                BaseItem.RepairEquipItem(character, i, out gameMessage);
+                success = success || gameMessage == UITextKeys.UI_REPAIR_SUCCESS;
+            }
+            // Will send messages to inform that it can repair an items when any item can be repaired
+            if (success)
+                gameMessage = UITextKeys.UI_REPAIR_SUCCESS;
+            else
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_REPAIR;
+
+            return success;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool SellItem(this IPlayerCharacterData character, short index, short amount, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            if (index < 0 || index >= character.NonEquipItems.Count)
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                return false;
+            }
+
+            // Found selling item or not?
+            CharacterItem nonEquipItem = character.NonEquipItems[index];
+            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                return false;
+            }
+
+            // Remove item from inventory
+            character.DecreaseItemsByIndex(index, amount);
+            character.FillEmptySlots();
+
+            // Increase currencies
+            BaseItem item = nonEquipItem.GetItem();
+            GameInstance.Singleton.GameplayRule.IncreaseCurrenciesWhenSellItem(character, item, amount);
+            gameMessage = UITextKeys.NONE;
+            return true;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool SellItems(this IPlayerCharacterData character, short[] selectedIndexes, out UITextKeys gameMessage)
+        {
+#if !CLIENT_BUILD
+            List<short> indexes = new List<short>(selectedIndexes);
+            indexes.Sort();
+            short tempIndex;
+            for (int i = indexes.Count - 1; i >= 0; --i)
+            {
+                tempIndex = indexes[i];
+                if (tempIndex >= character.NonEquipItems.Count)
+                    continue;
+                character.SellItem(tempIndex, character.NonEquipItems[tempIndex].amount, out _);
+            }
+            gameMessage = UITextKeys.NONE;
+            return true;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
         }
     }
 }

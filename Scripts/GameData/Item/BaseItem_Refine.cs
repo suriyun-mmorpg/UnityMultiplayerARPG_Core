@@ -15,7 +15,7 @@ namespace MultiplayerARPG
             if (!this.IsEquipment())
             {
                 // Cannot refine because it's not equipment item
-                gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
+                gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
                 return false;
             }
             if (ItemRefine == null)
@@ -33,9 +33,9 @@ namespace MultiplayerARPG
             return ItemRefine.levels[level - 1].CanRefine(character, out gameMessage);
         }
 
-        public static void RefineRightHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
+        public static bool RefineRightHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
         {
-            RefineItem(character, character.EquipWeapons.rightHand, (refinedItem) =>
+            return RefineItem(character, character.EquipWeapons.rightHand, (refinedItem) =>
             {
                 EquipWeapons equipWeapon = character.EquipWeapons;
                 equipWeapon.rightHand = refinedItem;
@@ -48,9 +48,9 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        public static void RefineLeftHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
+        public static bool RefineLeftHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
         {
-            RefineItem(character, character.EquipWeapons.leftHand, (refinedItem) =>
+            return RefineItem(character, character.EquipWeapons.leftHand, (refinedItem) =>
             {
                 EquipWeapons equipWeapon = character.EquipWeapons;
                 equipWeapon.leftHand = refinedItem;
@@ -63,19 +63,19 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        public static void RefineEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
+        public static bool RefineEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
         {
-            RefineItemByList(character, character.EquipItems, index, out gameMessageType);
+            return RefineItemByList(character, character.EquipItems, index, out gameMessageType);
         }
 
-        public static void RefineNonEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
+        public static bool RefineNonEquipItem(IPlayerCharacterData character, int index, out UITextKeys gameMessageType)
         {
-            RefineItemByList(character, character.NonEquipItems, index, out gameMessageType);
+            return RefineItemByList(character, character.NonEquipItems, index, out gameMessageType);
         }
 
-        private static void RefineItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, out UITextKeys gameMessageType)
+        private static bool RefineItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, out UITextKeys gameMessageType)
         {
-            RefineItem(character, list[index], (refinedItem) =>
+            return RefineItem(character, list[index], (refinedItem) =>
             {
                 list[index] = refinedItem;
             }, () =>
@@ -87,24 +87,25 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        private static void RefineItem(IPlayerCharacterData character, CharacterItem refiningItem, System.Action<CharacterItem> onRefine, System.Action onDestroy, out UITextKeys gameMessage)
+        private static bool RefineItem(IPlayerCharacterData character, CharacterItem refiningItem, System.Action<CharacterItem> onRefine, System.Action onDestroy, out UITextKeys gameMessage)
         {
-            gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
             if (refiningItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
-                return;
+                gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
+                return false;
             }
             BaseItem equipmentItem = refiningItem.GetEquipmentItem() as BaseItem;
             if (equipmentItem == null)
             {
                 // Cannot refine because it's not equipment item
-                return;
+                gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
+                return false;
             }
             if (!equipmentItem.CanRefine(character, refiningItem.level, out gameMessage))
             {
                 // Cannot refine because of some reasons
-                return;
+                return false;
             }
             ItemRefineLevel refineLevel = equipmentItem.ItemRefine.levels[refiningItem.level - 1];
             if (Random.value <= refineLevel.SuccessRate)
@@ -144,6 +145,7 @@ namespace MultiplayerARPG
             }
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRefineItem(character, refineLevel);
+            return true;
         }
     }
 }

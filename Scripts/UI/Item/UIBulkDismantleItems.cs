@@ -77,7 +77,10 @@ namespace MultiplayerARPG
                     continue;
                 indexes.Add((short)selectedUI.IndexOfData);
             }
-            GameInstance.PlayingCharacterEntity.CallServerDismantleItems(indexes.ToArray());
+            GameInstance.ClientInventoryHandlers.RequestDismantleItems(new RequestDismantleItemsMessage()
+            {
+                selectedIndexes = indexes.ToArray(),
+            }, ClientInventoryActions.ResponseDismantleItems);
         }
     }
 }

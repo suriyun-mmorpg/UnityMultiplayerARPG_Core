@@ -118,7 +118,11 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            GameInstance.PlayingCharacterEntity.CallServerRepairItem(InventoryType, (short)IndexOfData);
+            GameInstance.ClientInventoryHandlers.RequestRepairItem(new RequestRepairItemMessage()
+            {
+                inventoryType = InventoryType,
+                index = (short)IndexOfData,
+            }, ClientInventoryActions.ResponseRepairItem);
         }
     }
 }

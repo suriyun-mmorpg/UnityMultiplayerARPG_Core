@@ -72,5 +72,14 @@
         public const ushort SwitchEquipWeaponSet = 146;
         public const ushort IncreaseAttributeAmount = 147;
         public const ushort IncreaseSkillLevel = 148;
+        public const ushort DismantleItem = 149;
+        public const ushort DismantleItems = 150;
+        public const ushort EnhanceSocketItem = 151;
+        public const ushort RefineItem = 152;
+        public const ushort RemoveEnhancerFromItem = 153;
+        public const ushort RepairItem = 154;
+        public const ushort RepairEquipItems = 155;
+        public const ushort SellItem = 156;
+        public const ushort SellItems = 157;
     }
 }

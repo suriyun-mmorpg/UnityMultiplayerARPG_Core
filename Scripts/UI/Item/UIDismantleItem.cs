@@ -118,7 +118,11 @@ namespace MultiplayerARPG
                 return;
             activated = true;
             activeItemId = CharacterItem.id;
-            GameInstance.PlayingCharacterEntity.CallServerDismantleItem((short)IndexOfData, DismantleAmount);
+            GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
+            {
+                index = (short)IndexOfData,
+                amount = DismantleAmount,
+            }, ClientInventoryActions.ResponseDismantleItem);
         }
 
         public void OnClickSetDismantleAmount()

@@ -29,5 +29,40 @@ namespace MultiplayerARPG
             RequestHandlerData requestHandler, RequestSwitchEquipWeaponSetMessage request,
             RequestProceedResultDelegate<ResponseSwitchEquipWeaponSetMessage> result);
 
+        UniTaskVoid HandleRequestDismantleItem(
+            RequestHandlerData requestHandler, RequestDismantleItemMessage request,
+            RequestProceedResultDelegate<ResponseDismantleItemMessage> result);
+
+        UniTaskVoid HandleRequestDismantleItems(
+            RequestHandlerData requestHandler, RequestDismantleItemsMessage request,
+            RequestProceedResultDelegate<ResponseDismantleItemsMessage> result);
+
+        UniTaskVoid HandleRequestEnhanceSocketItem(
+            RequestHandlerData requestHandler, RequestEnhanceSocketItemMessage request,
+            RequestProceedResultDelegate<ResponseEnhanceSocketItemMessage> result);
+
+        UniTaskVoid HandleRequestRefineItem(
+            RequestHandlerData requestHandler, RequestRefineItemMessage request,
+            RequestProceedResultDelegate<ResponseRefineItemMessage> result);
+
+        UniTaskVoid HandleRequestRemoveEnhancerFromItem(
+            RequestHandlerData requestHandler, RequestRemoveEnhancerFromItemMessage request,
+            RequestProceedResultDelegate<ResponseRemoveEnhancerFromItemMessage> result);
+
+        UniTaskVoid HandleRequestRepairItem(
+            RequestHandlerData requestHandler, RequestRepairItemMessage request,
+            RequestProceedResultDelegate<ResponseRepairItemMessage> result);
+
+        UniTaskVoid HandleRequestRepairEquipItems(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseRepairEquipItemsMessage> result);
+
+        UniTaskVoid HandleRequestSellItem(
+            RequestHandlerData requestHandler, RequestSellItemMessage request,
+            RequestProceedResultDelegate<ResponseSellItemMessage> result);
+
+        UniTaskVoid HandleRequestSellItems(
+            RequestHandlerData requestHandler, RequestSellItemsMessage request,
+            RequestProceedResultDelegate<ResponseSellItemsMessage> result);
     }
 }

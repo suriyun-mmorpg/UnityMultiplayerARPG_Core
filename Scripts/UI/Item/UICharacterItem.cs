@@ -1194,7 +1194,11 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                GameInstance.PlayingCharacterEntity.CallServerSellItem((short)IndexOfData, 1);
+                GameInstance.ClientInventoryHandlers.RequestSellItem(new RequestSellItemMessage()
+                {
+                    index = (short)IndexOfData,
+                    amount = 1,
+                }, ClientInventoryActions.ResponseSellItem);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_SELL_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_SELL_ITEM_DESCRIPTION.ToString()), OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1204,7 +1208,11 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.CallServerSellItem((short)IndexOfData, (short)amount);
+            GameInstance.ClientInventoryHandlers.RequestSellItem(new RequestSellItemMessage()
+            {
+                index = (short)IndexOfData,
+                amount = (short)amount,
+            }, ClientInventoryActions.ResponseSellItem);
         }
         #endregion
 
@@ -1361,7 +1369,11 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                GameInstance.PlayingCharacterEntity.CallServerRefineItem(InventoryType, (short)IndexOfData);
+                GameInstance.ClientInventoryHandlers.RequestRefineItem(new RequestRefineItemMessage()
+                {
+                    inventoryType = InventoryType,
+                    index = (short)IndexOfData,
+                }, ClientInventoryActions.ResponseRefineItem);
             }
         }
         #endregion
@@ -1403,7 +1415,11 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                GameInstance.PlayingCharacterEntity.CallServerDismantleItem((short)IndexOfData, 1);
+                GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
+                {
+                    index = (short)IndexOfData,
+                    amount = 1,
+                }, ClientInventoryActions.ResponseDismantleItem);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM_DESCRIPTION.ToString()), OnDismantleItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -1413,7 +1429,11 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.CallServerDismantleItem((short)IndexOfData, (short)amount);
+            GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
+            {
+                index = (short)IndexOfData,
+                amount = (short)amount,
+            }, ClientInventoryActions.ResponseDismantleItem);
         }
         #endregion
 
@@ -1449,7 +1469,11 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                GameInstance.PlayingCharacterEntity.CallServerRepairItem(InventoryType, (short)IndexOfData);
+                GameInstance.ClientInventoryHandlers.RequestRepairItem(new RequestRepairItemMessage()
+                {
+                    inventoryType = InventoryType,
+                    index = (short)IndexOfData,
+                }, ClientInventoryActions.ResponseRepairItem);
             }
         }
         #endregion

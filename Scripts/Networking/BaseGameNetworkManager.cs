@@ -163,6 +163,15 @@ namespace MultiplayerARPG
             RegisterClientResponse<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(GameNetworkingConsts.UnEquipWeapon);
             RegisterClientResponse<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(GameNetworkingConsts.UnEquipArmor);
             RegisterClientResponse<RequestSwitchEquipWeaponSetMessage, ResponseSwitchEquipWeaponSetMessage>(GameNetworkingConsts.SwitchEquipWeaponSet);
+            RegisterClientResponse<RequestDismantleItemMessage, ResponseDismantleItemMessage>(GameNetworkingConsts.DismantleItem);
+            RegisterClientResponse<RequestDismantleItemsMessage, ResponseDismantleItemsMessage>(GameNetworkingConsts.DismantleItems);
+            RegisterClientResponse<RequestEnhanceSocketItemMessage, ResponseEnhanceSocketItemMessage>(GameNetworkingConsts.EnhanceSocketItem);
+            RegisterClientResponse<RequestRefineItemMessage, ResponseRefineItemMessage>(GameNetworkingConsts.RefineItem);
+            RegisterClientResponse<RequestRemoveEnhancerFromItemMessage, ResponseRemoveEnhancerFromItemMessage>(GameNetworkingConsts.RemoveEnhancerFromItem);
+            RegisterClientResponse<RequestRepairItemMessage, ResponseRepairItemMessage>(GameNetworkingConsts.RepairItem);
+            RegisterClientResponse<EmptyMessage, ResponseRepairEquipItemsMessage>(GameNetworkingConsts.RepairEquipItems);
+            RegisterClientResponse<RequestSellItemMessage, ResponseSellItemMessage>(GameNetworkingConsts.SellItem);
+            RegisterClientResponse<RequestSellItemsMessage, ResponseSellItemsMessage>(GameNetworkingConsts.SellItems);
             // Party
             RegisterClientResponse<RequestCreatePartyMessage, ResponseCreatePartyMessage>(GameNetworkingConsts.CreateParty);
             RegisterClientResponse<RequestChangePartyLeaderMessage, ResponseChangePartyLeaderMessage>(GameNetworkingConsts.ChangePartyLeader);
@@ -249,6 +258,15 @@ namespace MultiplayerARPG
                 RegisterServerRequest<RequestUnEquipWeaponMessage, ResponseUnEquipWeaponMessage>(GameNetworkingConsts.UnEquipWeapon, ServerInventoryMessageHandlers.HandleRequestUnEquipWeapon);
                 RegisterServerRequest<RequestUnEquipArmorMessage, ResponseUnEquipArmorMessage>(GameNetworkingConsts.UnEquipArmor, ServerInventoryMessageHandlers.HandleRequestUnEquipArmor);
                 RegisterServerRequest<RequestSwitchEquipWeaponSetMessage, ResponseSwitchEquipWeaponSetMessage>(GameNetworkingConsts.SwitchEquipWeaponSet, ServerInventoryMessageHandlers.HandleRequestSwitchEquipWeaponSet);
+                RegisterServerRequest<RequestDismantleItemMessage, ResponseDismantleItemMessage>(GameNetworkingConsts.DismantleItem, ServerInventoryMessageHandlers.HandleRequestDismantleItem);
+                RegisterServerRequest<RequestDismantleItemsMessage, ResponseDismantleItemsMessage>(GameNetworkingConsts.DismantleItems, ServerInventoryMessageHandlers.HandleRequestDismantleItems);
+                RegisterServerRequest<RequestEnhanceSocketItemMessage, ResponseEnhanceSocketItemMessage>(GameNetworkingConsts.EnhanceSocketItem, ServerInventoryMessageHandlers.HandleRequestEnhanceSocketItem);
+                RegisterServerRequest<RequestRefineItemMessage, ResponseRefineItemMessage>(GameNetworkingConsts.RefineItem, ServerInventoryMessageHandlers.HandleRequestRefineItem);
+                RegisterServerRequest<RequestRemoveEnhancerFromItemMessage, ResponseRemoveEnhancerFromItemMessage>(GameNetworkingConsts.RemoveEnhancerFromItem, ServerInventoryMessageHandlers.HandleRequestRemoveEnhancerFromItem);
+                RegisterServerRequest<RequestRepairItemMessage, ResponseRepairItemMessage>(GameNetworkingConsts.RepairItem, ServerInventoryMessageHandlers.HandleRequestRepairItem);
+                RegisterServerRequest<EmptyMessage, ResponseRepairEquipItemsMessage>(GameNetworkingConsts.RepairEquipItems, ServerInventoryMessageHandlers.HandleRequestRepairEquipItems);
+                RegisterServerRequest<RequestSellItemMessage, ResponseSellItemMessage>(GameNetworkingConsts.SellItem, ServerInventoryMessageHandlers.HandleRequestSellItem);
+                RegisterServerRequest<RequestSellItemsMessage, ResponseSellItemsMessage>(GameNetworkingConsts.SellItems, ServerInventoryMessageHandlers.HandleRequestSellItems);
             }
             // Party
             if (ServerPartyMessageHandlers != null)
