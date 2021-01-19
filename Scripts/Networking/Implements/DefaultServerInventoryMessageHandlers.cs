@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
                 {
-                    error = gameMessage,
+                    message = gameMessage,
                 });
                 return;
             }
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
                 {
-                    error = gameMessage,
+                    message = gameMessage,
                 });
                 return;
             }
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
                 {
-                    error = gameMessage,
+                    message = gameMessage,
                 });
                 return;
             }
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -99,7 +99,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
                 {
-                    error = gameMessage,
+                    message = gameMessage,
                 });
                 return;
             }
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
                 {
-                    error = gameMessage,
+                    message = gameMessage,
                 });
                 return;
             }
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }

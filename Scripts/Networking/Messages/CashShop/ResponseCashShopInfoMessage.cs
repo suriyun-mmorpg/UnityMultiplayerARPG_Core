@@ -4,14 +4,14 @@ namespace MultiplayerARPG
 {
     public struct ResponseCashShopInfoMessage : INetSerializable
     {
-        public UITextKeys error;
+        public UITextKeys message;
         public int cash;
         public int[] cashShopItemIds;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (UITextKeys)reader.GetPackedUShort();
-            if (error == UITextKeys.NONE)
+            message = (UITextKeys)reader.GetPackedUShort();
+            if (message == UITextKeys.NONE)
             {
                 cash = reader.GetInt();
                 cashShopItemIds = reader.GetArray<int>();
@@ -20,8 +20,8 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedUShort((ushort)error);
-            if (error == UITextKeys.NONE)
+            writer.PutPackedUShort((ushort)message);
+            if (message == UITextKeys.NONE)
             {
                 writer.Put(cash);
                 writer.PutArray<int>(cashShopItemIds);

@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             if (inputGold != null)
                 inputGold.interactable = true;
 
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             // Success, hide this dialog
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_SEND_SUCCESS.ToString()));
             Hide();

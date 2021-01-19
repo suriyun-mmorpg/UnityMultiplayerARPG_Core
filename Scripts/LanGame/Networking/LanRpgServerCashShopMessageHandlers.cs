@@ -12,14 +12,14 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
             // Set response data
-            UITextKeys error = UITextKeys.NONE;
+            UITextKeys message = UITextKeys.NONE;
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
-                error = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
+                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
             }
             else
             {
@@ -30,10 +30,10 @@ namespace MultiplayerARPG
             }
             // Send response message
             result.Invoke(
-                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                  new ResponseCashShopInfoMessage()
                  {
-                     error = error,
+                     message = message,
                      cash = cash,
                      cashShopItemIds = cashShopItemIds.ToArray(),
                  });
@@ -45,14 +45,14 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
             // Set response data
-            UITextKeys error = UITextKeys.NONE;
+            UITextKeys message = UITextKeys.NONE;
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
-                error = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
+                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
             }
             else
             {
@@ -62,17 +62,17 @@ namespace MultiplayerARPG
                 if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
                 {
                     // Cannot find item
-                    error = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
+                    message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
                 }
                 else if (cash < cashShopItem.sellPrice)
                 {
                     // Not enough cash
-                    error = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH;
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH;
                 }
                 else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.receiveItems))
                 {
                     // Cannot carry all rewards
-                    error = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
+                    message = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 }
                 else
                 {
@@ -92,10 +92,10 @@ namespace MultiplayerARPG
             }
             // Send response message
             result.Invoke(
-                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseCashShopBuyMessage()
                 {
-                    error = error,
+                    message = message,
                     dataId = dataId,
                     cash = cash,
                 });
@@ -107,14 +107,14 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
             // Set response data
-            UITextKeys error = UITextKeys.NONE;
+            UITextKeys message = UITextKeys.NONE;
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
-                error = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
+                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
             }
             else
             {
@@ -125,10 +125,10 @@ namespace MultiplayerARPG
             }
             // Send response message
             result.Invoke(
-                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseCashPackageInfoMessage()
                 {
-                    error = error,
+                    message = message,
                     cash = cash,
                     cashPackageIds = cashPackageIds.ToArray(),
                 });
@@ -141,14 +141,14 @@ namespace MultiplayerARPG
         {
             // TODO: Validate purchasing at server side
             // Set response data
-            UITextKeys error = UITextKeys.NONE;
+            UITextKeys message = UITextKeys.NONE;
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Canot find user
-                error = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
+                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
             }
             else
             {
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
                 if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
                 {
                     // Cannot find package
-                    error = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND;
+                    message = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND;
                 }
                 else
                 {
@@ -169,10 +169,10 @@ namespace MultiplayerARPG
             }
             // Send response message
             result.Invoke(
-                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseCashPackageBuyValidationMessage()
                 {
-                    error = error,
+                    message = message,
                     dataId = dataId,
                     cash = cash,
                 });

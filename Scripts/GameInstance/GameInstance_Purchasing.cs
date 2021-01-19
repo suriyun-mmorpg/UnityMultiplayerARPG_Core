@@ -186,7 +186,7 @@ namespace MultiplayerARPG
             {
                 case AckResponseCode.Error:
                     var errorMessage = string.Empty;
-                    switch (response.error)
+                    switch (response.message)
                     {
                         case ResponseCashPackageBuyValidationMessage.Error.UserNotFound:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());

@@ -56,7 +56,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid ReadMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseReadMailMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UpdateData(response.mail);
         }
 
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid ClaimMailItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimMailItemsMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_CLAIM_SUCCESS.ToString()));
             Hide();
             if (uiMailList)
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteMailMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_DELETE_SUCCESS.ToString()));
             Hide();
             if (uiMailList)

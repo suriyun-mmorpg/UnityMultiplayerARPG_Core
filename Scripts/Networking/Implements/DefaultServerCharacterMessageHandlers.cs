@@ -13,7 +13,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseAttributeAmountMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseAttributeAmountMessage()
                 {
-                    error = gameMessage,
+                    message = gameMessage,
                 });
                 return;
             }
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseSkillLevelMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseSkillLevelMessage()
                 {
-                    error = gameMessage,
+                    message = gameMessage,
                 });
                 return;
             }

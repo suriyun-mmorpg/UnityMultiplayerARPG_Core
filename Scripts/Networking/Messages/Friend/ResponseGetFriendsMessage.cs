@@ -4,18 +4,18 @@ namespace MultiplayerARPG
 {
     public struct ResponseGetFriendsMessage : INetSerializable
     {
-        public UITextKeys error;
+        public UITextKeys message;
         public SocialCharacterData[] friends;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (UITextKeys)reader.GetPackedUShort();
+            message = (UITextKeys)reader.GetPackedUShort();
             friends = reader.GetArray<SocialCharacterData>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedUShort((ushort)error);
+            writer.PutPackedUShort((ushort)message);
             writer.PutArray(friends);
         }
     }

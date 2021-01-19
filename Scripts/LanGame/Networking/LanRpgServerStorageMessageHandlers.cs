@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND,
+                    message = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND,
                 });
                 return;
             }
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseCloseStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                     result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                     {
-                        error = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
+                        message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
                     });
                     return;
                 }
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -175,7 +175,7 @@ namespace MultiplayerARPG
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                     result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                     {
-                        error = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
+                        message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
                     });
                     return;
                 }
@@ -212,7 +212,7 @@ namespace MultiplayerARPG
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX,
+                    message = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX,
                 });
                 return;
             }
