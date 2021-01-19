@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseDepositUserGold(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDepositUserGoldMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseDepositUserGold != null)
                 onResponseDepositUserGold.Invoke(requestHandler, responseCode, response);
         }
@@ -20,6 +21,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseWithdrawUserGold(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseWithdrawUserGoldMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseWithdrawUserGold != null)
                 onResponseWithdrawUserGold.Invoke(requestHandler, responseCode, response);
         }
@@ -27,6 +29,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseDepositGuildGold(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDepositGuildGoldMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseDepositGuildGold != null)
                 onResponseDepositGuildGold.Invoke(requestHandler, responseCode, response);
         }
@@ -34,6 +37,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseWithdrawGuildGold(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseWithdrawGuildGoldMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseWithdrawGuildGold != null)
                 onResponseWithdrawGuildGold.Invoke(requestHandler, responseCode, response);
         }

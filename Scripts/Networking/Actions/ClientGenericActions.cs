@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         public static System.Action<DisconnectInfo> onClientDisconnected;
         public static System.Action onClientWarp;
         public static System.Action<ChatMessage> onClientReceiveChatMessage;
-        public static System.Action<GameMessage> onClientReceiveGameMessage;
+        public static System.Action<UITextKeys> onClientReceiveGameMessage;
         public static System.Action<int> onNotifyRewardExp;
         public static System.Action<int> onNotifyRewardGold;
         public static System.Action<int, short> onNotifyRewardItem;
@@ -37,8 +37,10 @@ namespace MultiplayerARPG
                 onClientReceiveChatMessage.Invoke(message);
         }
 
-        public static void ClientReceiveGameMessage(GameMessage message)
+        public static void ClientReceiveGameMessage(UITextKeys message)
         {
+            if (message == UITextKeys.NONE)
+                return;
             if (onClientReceiveGameMessage != null)
                 onClientReceiveGameMessage.Invoke(message);
         }

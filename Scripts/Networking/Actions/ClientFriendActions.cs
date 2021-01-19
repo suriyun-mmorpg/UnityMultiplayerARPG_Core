@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseFindCharacters(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindCharactersMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseFindCharacters != null)
                 onResponseFindCharacters.Invoke(requestHandler, responseCode, response);
         }
@@ -22,6 +23,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseGetFriends(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetFriendsMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseGetFriends != null)
                 onResponseGetFriends.Invoke(requestHandler, responseCode, response);
         }
@@ -29,6 +31,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseAddFriend(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseAddFriend != null)
                 onResponseAddFriend.Invoke(requestHandler, responseCode, response);
         }
@@ -36,6 +39,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseRemoveFriend(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseRemoveFriendMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseRemoveFriend != null)
                 onResponseRemoveFriend.Invoke(requestHandler, responseCode, response);
         }

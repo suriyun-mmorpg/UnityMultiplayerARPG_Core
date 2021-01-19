@@ -23,7 +23,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanAcceptGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
@@ -34,11 +33,13 @@ namespace MultiplayerARPG
             validateResult.Guild.AddMember(playerCharacter);
             GameInstance.ServerGuildHandlers.SetGuild(request.guildId, validateResult.Guild);
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_GUILD_INVITATION_ACCEPTED);
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToMembers(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
-            result.Invoke(AckResponseCode.Success, new ResponseAcceptGuildInvitationMessage());
+            result.Invoke(AckResponseCode.Success, new ResponseAcceptGuildInvitationMessage()
+            {
+                message = UITextKeys.UI_GUILD_INVITATION_ACCEPTED,
+            });
         }
 
         public async UniTaskVoid HandleRequestDeclineGuildInvitation(RequestHandlerData requestHandler, RequestDeclineGuildInvitationMessage request, RequestProceedResultDelegate<ResponseDeclineGuildInvitationMessage> result)
@@ -56,7 +57,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanDeclineGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
@@ -64,8 +64,10 @@ namespace MultiplayerARPG
                 return;
             }
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_GUILD_INVITATION_DECLINED);
-            result.Invoke(AckResponseCode.Success, new ResponseDeclineGuildInvitationMessage());
+            result.Invoke(AckResponseCode.Success, new ResponseDeclineGuildInvitationMessage()
+            {
+                message = UITextKeys.UI_GUILD_INVITATION_DECLINED,
+            });
         }
 
         public async UniTaskVoid HandleRequestSendGuildInvitation(RequestHandlerData requestHandler, RequestSendGuildInvitationMessage request, RequestProceedResultDelegate<ResponseSendGuildInvitationMessage> result)
@@ -83,7 +85,6 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity inviteeCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out inviteeCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
@@ -93,7 +94,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSendGuildInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
@@ -128,7 +128,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = playerCharacter.CanCreateGuild(request.guildName);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
                 {
                     message = validateResult.GameMessage,
@@ -166,7 +165,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
                 {
                     message = validateResult.GameMessage,
@@ -195,7 +193,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanKickMemberFromGuild(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
                 {
                     message = validateResult.GameMessage,
@@ -231,7 +228,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanLeaveGuild(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
                 {
                     message = validateResult.GameMessage,
@@ -279,7 +275,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMessage(playerCharacter, request.message);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
                 {
                     message = validateResult.GameMessage,
@@ -307,7 +302,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
                 {
                     message = validateResult.GameMessage,
@@ -342,7 +336,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
                 {
                     message = validateResult.GameMessage,
@@ -373,7 +366,6 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanIncreaseGuildSkillLevel(playerCharacter, request.dataId);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
                 {
                     message = validateResult.GameMessage,

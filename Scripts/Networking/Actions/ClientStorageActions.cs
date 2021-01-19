@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseOpenStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseOpenStorageMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseOpenStorage != null)
                 onResponseOpenStorage.Invoke(requestHandler, responseCode, response);
         }
@@ -25,6 +26,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseCloseStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCloseStorageMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseCloseStorage != null)
                 onResponseCloseStorage.Invoke(requestHandler, responseCode, response);
         }
@@ -32,6 +34,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseMoveItemFromStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMoveItemFromStorageMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseMoveItemFromStorage != null)
                 onResponseMoveItemFromStorage.Invoke(requestHandler, responseCode, response);
         }
@@ -39,6 +42,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseMoveItemToStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMoveItemToStorageMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseMoveItemToStorage != null)
                 onResponseMoveItemToStorage.Invoke(requestHandler, responseCode, response);
         }
@@ -46,6 +50,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseSwapOrMergeStorageItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwapOrMergeStorageItemMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseSwapOrMergeStorageItem != null)
                 onResponseSwapOrMergeStorageItem.Invoke(requestHandler, responseCode, response);
         }

@@ -332,7 +332,7 @@ namespace MultiplayerARPG
                 if (pushGameMessageCountDown <= 0 && pushingGameMessages.Count > 0)
                 {
                     pushGameMessageCountDown = COMBATANT_MESSAGE_DELAY;
-                    ClientGenericActions.ClientReceiveGameMessage(new GameMessage() { message = pushingGameMessages.Dequeue() });
+                    ClientGenericActions.ClientReceiveGameMessage(pushingGameMessages.Dequeue());
                 }
             }
         }

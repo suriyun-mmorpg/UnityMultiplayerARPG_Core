@@ -21,7 +21,6 @@ namespace MultiplayerARPG
             UITextKeys gameMessage;
             if (!playerCharacter.SwapOrMergeItem(request.fromIndex, request.toIndex, out gameMessage))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
                 {
                     message = gameMessage,
@@ -46,7 +45,6 @@ namespace MultiplayerARPG
             UITextKeys gameMessage;
             if (!playerCharacter.EquipArmor(request.nonEquipIndex, request.equipSlotIndex, out gameMessage))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
                 {
                     message = gameMessage,
@@ -71,7 +69,6 @@ namespace MultiplayerARPG
             UITextKeys gameMessage;
             if (!playerCharacter.EquipWeapon(request.nonEquipIndex, request.equipWeaponSet, request.isLeftHand, out gameMessage))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
                 {
                     message = gameMessage,
@@ -96,7 +93,6 @@ namespace MultiplayerARPG
             UITextKeys gameMessage;
             if (!playerCharacter.UnEquipArmor(request.equipIndex, false, out gameMessage, out _, request.nonEquipIndex))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
                 {
                     message = gameMessage,
@@ -121,7 +117,6 @@ namespace MultiplayerARPG
             UITextKeys gameMessage;
             if (!playerCharacter.UnEquipWeapon(request.equipWeaponSet, request.isLeftHand, false, out gameMessage, out _, request.nonEquipIndex))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
                 {
                     message = gameMessage,

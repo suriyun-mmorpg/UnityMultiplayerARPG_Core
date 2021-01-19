@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseSendPartyInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseSendPartyInvitation != null)
                 onResponseSendPartyInvitation.Invoke(requestHandler, responseCode, response);
         }
@@ -26,6 +27,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseAcceptPartyInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAcceptPartyInvitationMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseAcceptPartyInvitation != null)
                 onResponseAcceptPartyInvitation.Invoke(requestHandler, responseCode, response);
         }
@@ -33,6 +35,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseDeclinePartyInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclinePartyInvitationMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseDeclinePartyInvitation != null)
                 onResponseDeclinePartyInvitation.Invoke(requestHandler, responseCode, response);
         }
@@ -40,6 +43,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseCreateParty(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCreatePartyMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseCreateParty != null)
                 onResponseCreateParty.Invoke(requestHandler, responseCode, response);
         }
@@ -47,6 +51,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseChangePartyLeader(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangePartyLeaderMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseChangePartyLeader != null)
                 onResponseChangePartyLeader.Invoke(requestHandler, responseCode, response);
         }
@@ -54,6 +59,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseKickMemberFromParty(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromPartyMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseKickMemberFromParty != null)
                 onResponseKickMemberFromParty.Invoke(requestHandler, responseCode, response);
         }
@@ -61,6 +67,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseLeaveParty(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseLeavePartyMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseLeaveParty != null)
                 onResponseLeaveParty.Invoke(requestHandler, responseCode, response);
         }
@@ -68,6 +75,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseChangePartySetting(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangePartySettingMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseChangePartySetting != null)
                 onResponseChangePartySetting.Invoke(requestHandler, responseCode, response);
         }

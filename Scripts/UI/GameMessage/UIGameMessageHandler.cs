@@ -43,13 +43,13 @@ namespace MultiplayerARPG
             ClientGenericActions.onNotifyRewardItem -= OnNotifyRewardItem;
         }
 
-        private void OnReceiveGameMessage(GameMessage gameMessage)
+        private void OnReceiveGameMessage(UITextKeys message)
         {
             if (messagePrefab == null)
                 return;
 
             TextWrapper newMessage = Instantiate(messagePrefab);
-            newMessage.text = LanguageManager.GetText(gameMessage.message.ToString());
+            newMessage.text = LanguageManager.GetText(message.ToString());
             newMessage.transform.SetParent(messageContainer);
             newMessage.transform.localScale = Vector3.one;
             newMessage.transform.localRotation = Quaternion.identity;

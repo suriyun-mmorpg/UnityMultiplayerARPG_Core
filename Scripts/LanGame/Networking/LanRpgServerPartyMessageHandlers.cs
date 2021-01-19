@@ -23,7 +23,6 @@ namespace MultiplayerARPG
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanAcceptPartyInvitation(request.partyId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptPartyInvitationMessage()
                 {
                     message = validateResult.GameMessage,
@@ -34,11 +33,13 @@ namespace MultiplayerARPG
             validateResult.Party.AddMember(playerCharacter);
             GameInstance.ServerPartyHandlers.SetParty(request.partyId, validateResult.Party);
             GameInstance.ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_PARTY_INVITATION_ACCEPTED);
             GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, validateResult.Party);
             GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, validateResult.Party);
             GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToMembers(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
-            result.Invoke(AckResponseCode.Success, new ResponseAcceptPartyInvitationMessage());
+            result.Invoke(AckResponseCode.Success, new ResponseAcceptPartyInvitationMessage()
+            {
+                message = UITextKeys.UI_PARTY_INVITATION_ACCEPTED,
+            });
         }
 
         public async UniTaskVoid HandleRequestDeclinePartyInvitation(RequestHandlerData requestHandler, RequestDeclinePartyInvitationMessage request, RequestProceedResultDelegate<ResponseDeclinePartyInvitationMessage> result)
@@ -56,7 +57,6 @@ namespace MultiplayerARPG
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanDeclinePartyInvitation(request.partyId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseDeclinePartyInvitationMessage()
                 {
                     message = validateResult.GameMessage,
@@ -64,8 +64,10 @@ namespace MultiplayerARPG
                 return;
             }
             GameInstance.ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_PARTY_INVITATION_DECLINED);
-            result.Invoke(AckResponseCode.Success, new ResponseDeclinePartyInvitationMessage());
+            result.Invoke(AckResponseCode.Success, new ResponseDeclinePartyInvitationMessage()
+            {
+                message = UITextKeys.UI_PARTY_INVITATION_DECLINED,
+            });
         }
 
         public async UniTaskVoid HandleRequestSendPartyInvitation(RequestHandlerData requestHandler, RequestSendPartyInvitationMessage request, RequestProceedResultDelegate<ResponseSendPartyInvitationMessage> result)
@@ -83,7 +85,6 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity inviteeCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out inviteeCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 result.Invoke(AckResponseCode.Error, new ResponseSendPartyInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
@@ -93,7 +94,6 @@ namespace MultiplayerARPG
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanSendPartyInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseSendPartyInvitationMessage()
                 {
                     message = validateResult.GameMessage,
@@ -128,7 +128,6 @@ namespace MultiplayerARPG
             ValidatePartyRequestResult validateResult = playerCharacter.CanCreateParty();
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseCreatePartyMessage()
                 {
                     message = validateResult.GameMessage,
@@ -158,7 +157,6 @@ namespace MultiplayerARPG
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanChangePartyLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangePartyLeaderMessage()
                 {
                     message = validateResult.GameMessage,
@@ -186,7 +184,6 @@ namespace MultiplayerARPG
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanKickMemberFromParty(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromPartyMessage()
                 {
                     message = validateResult.GameMessage,
@@ -222,7 +219,6 @@ namespace MultiplayerARPG
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanLeaveParty(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseLeavePartyMessage()
                 {
                     message = validateResult.GameMessage,
@@ -270,7 +266,6 @@ namespace MultiplayerARPG
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanChangePartySetting(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
                 {
                     message = validateResult.GameMessage,

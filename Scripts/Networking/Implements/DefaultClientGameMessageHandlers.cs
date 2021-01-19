@@ -8,7 +8,8 @@ namespace MultiplayerARPG
     {
         public void HandleGameMessage(MessageHandlerData messageHandler)
         {
-            ClientGenericActions.ClientReceiveGameMessage(messageHandler.ReadMessage<GameMessage>());
+            GameMessage gameMessage = messageHandler.ReadMessage<GameMessage>();
+            ClientGenericActions.ClientReceiveGameMessage(gameMessage.message);
         }
 
         public void HandleNotifyRewardExp(MessageHandlerData messageHandler)

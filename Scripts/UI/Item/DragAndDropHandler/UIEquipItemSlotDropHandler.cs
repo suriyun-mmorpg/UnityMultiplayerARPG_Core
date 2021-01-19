@@ -74,10 +74,7 @@ namespace MultiplayerARPG
                         !armorItem.EquipPosition.Equals(uiCharacterItem.EquipPosition))
                     {
                         // Check if it's correct equip position or not
-                        ClientGenericActions.ClientReceiveGameMessage(new GameMessage()
-                        {
-                            message = UITextKeys.UI_ERROR_CANNOT_EQUIP
-                        });
+                        ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_EQUIP);
                         return;
                     }
                     break;
@@ -87,10 +84,7 @@ namespace MultiplayerARPG
                         shieldItem == null)
                     {
                         // Check if it's correct equip position or not
-                        ClientGenericActions.ClientReceiveGameMessage(new GameMessage()
-                        {
-                            message = UITextKeys.UI_ERROR_CANNOT_EQUIP
-                        });
+                        ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_EQUIP);
                         return;
                     }
                     break;

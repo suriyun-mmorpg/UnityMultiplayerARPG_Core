@@ -20,7 +20,6 @@ namespace MultiplayerARPG
             UITextKeys gameMessage;
             if (!playerCharacter.AddAttribute(out gameMessage, request.dataId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseAttributeAmountMessage()
                 {
                     message = gameMessage,
@@ -46,7 +45,6 @@ namespace MultiplayerARPG
             UITextKeys gameMessage;
             if (!playerCharacter.AddSkill(out gameMessage, request.dataId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseSkillLevelMessage()
                 {
                     message = gameMessage,

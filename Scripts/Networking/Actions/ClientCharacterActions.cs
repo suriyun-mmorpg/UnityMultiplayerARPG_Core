@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseIncreaseCharacterAttributeAmount(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseIncreaseAttributeAmountMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseIncreaseCharacterAttributeAmount != null)
                 onResponseIncreaseCharacterAttributeAmount.Invoke(requestHandler, responseCode, response);
         }
@@ -18,6 +19,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseIncreaseCharacterSkillLevel(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseIncreaseSkillLevelMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseIncreaseCharacterSkillLevel != null)
                 onResponseIncreaseCharacterSkillLevel.Invoke(requestHandler, responseCode, response);
         }

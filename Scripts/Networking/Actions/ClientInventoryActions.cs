@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseSwapOrMergeItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwapOrMergeItemMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseSwapOrMergeItem != null)
                 onResponseSwapOrMergeItem.Invoke(requestHandler, responseCode, response);
         }
@@ -22,6 +23,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseEquipArmor(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseEquipArmorMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseEquipArmor != null)
                 onResponseEquipArmor.Invoke(requestHandler, responseCode, response);
         }
@@ -29,6 +31,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseEquipWeapon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseEquipWeaponMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseEquipWeapon != null)
                 onResponseEquipWeapon.Invoke(requestHandler, responseCode, response);
         }
@@ -36,6 +39,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseUnEquipArmor(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseUnEquipArmorMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseUnEquipArmor != null)
                 onResponseUnEquipArmor.Invoke(requestHandler, responseCode, response);
         }
@@ -43,6 +47,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseUnEquipWeapon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseUnEquipWeaponMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseUnEquipWeapon != null)
                 onResponseUnEquipWeapon.Invoke(requestHandler, responseCode, response);
         }
@@ -50,6 +55,7 @@ namespace MultiplayerARPG
         public static async UniTaskVoid ResponseSwitchEquipWeaponSet(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwitchEquipWeaponSetMessage response)
         {
             await UniTask.Yield();
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseSwitchEquipWeaponSet != null)
                 onResponseSwitchEquipWeaponSet.Invoke(requestHandler, responseCode, response);
         }
