@@ -271,7 +271,6 @@
             return true;
         }
 
-
         public static bool EquipArmor(this ICharacterData character, int nonEquipIndex, byte equipSlotIndex, out UITextKeys gameMessage)
         {
             if (character == null || nonEquipIndex < 0 || nonEquipIndex >= character.NonEquipItems.Count)
