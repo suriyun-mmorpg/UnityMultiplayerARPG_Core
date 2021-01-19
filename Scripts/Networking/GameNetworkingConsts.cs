@@ -70,7 +70,7 @@
         public const ushort OpenStorage = 144;
         public const ushort CloseStorage = 145;
         public const ushort SwitchEquipWeaponSet = 146;
-        public const ushort IncreaseCharacterAttributeAmount = 147;
-        public const ushort IncreaseCharacterSkillLevel = 148;
+        public const ushort IncreaseAttributeAmount = 147;
+        public const ushort IncreaseSkillLevel = 148;
     }
 }

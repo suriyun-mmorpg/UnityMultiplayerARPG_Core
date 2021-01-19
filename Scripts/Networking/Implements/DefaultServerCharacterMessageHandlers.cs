@@ -1,0 +1,61 @@
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    public class DefaultServerCharacterMessageHandlers : MonoBehaviour, IServerCharacterMessageHandlers
+    {
+        public async UniTaskVoid HandleRequestIncreaseAttributeAmount(RequestHandlerData requestHandler, RequestIncreaseAttributeAmountMessage request, RequestProceedResultDelegate<ResponseIncreaseAttributeAmountMessage> result)
+        {
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseIncreaseAttributeAmountMessage()
+                {
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            UITextKeys gameMessage;
+            if (!playerCharacter.AddAttribute(out gameMessage, request.dataId))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
+                result.Invoke(AckResponseCode.Error, new ResponseIncreaseAttributeAmountMessage()
+                {
+                    error = gameMessage,
+                });
+                return;
+            }
+            playerCharacter.StatPoint -= 1;
+            result.Invoke(AckResponseCode.Success, new ResponseIncreaseAttributeAmountMessage());
+            await UniTask.Yield();
+        }
+
+        public async UniTaskVoid HandleRequestIncreaseSkillLevel(RequestHandlerData requestHandler, RequestIncreaseSkillLevelMessage request, RequestProceedResultDelegate<ResponseIncreaseSkillLevelMessage> result)
+        {
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseIncreaseSkillLevelMessage()
+                {
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            UITextKeys gameMessage;
+            if (!playerCharacter.AddSkill(out gameMessage, request.dataId))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, gameMessage);
+                result.Invoke(AckResponseCode.Error, new ResponseIncreaseSkillLevelMessage()
+                {
+                    error = gameMessage,
+                });
+                return;
+            }
+            playerCharacter.SkillPoint -= 1;
+            result.Invoke(AckResponseCode.Success, new ResponseIncreaseSkillLevelMessage());
+            await UniTask.Yield();
+        }
+    }
+}

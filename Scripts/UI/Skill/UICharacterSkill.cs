@@ -435,10 +435,10 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            GameInstance.ClientCharacterSkillHandlers.RequestIncreaseCharacterSkillLevel(new RequestIncreaseCharacterSkillLevelMessage()
+            GameInstance.ClientCharacterHandlers.RequestIncreaseSkillLevel(new RequestIncreaseSkillLevelMessage()
             {
                 dataId = Skill.DataId
-            }, ClientCharacterSkillActions.ResponseIncreaseCharacterSkillLevel);
+            }, ClientCharacterActions.ResponseIncreaseCharacterSkillLevel);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public struct ResponseIncreaseCharacterAttributeAmountMessage : INetSerializable
+    public struct ResponseIncreaseSkillLevelMessage : INetSerializable
     {
         public UITextKeys error;
 

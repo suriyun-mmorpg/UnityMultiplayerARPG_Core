@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public struct RequestIncreaseCharacterSkillLevelMessage : INetSerializable
+    public struct RequestIncreaseSkillLevelMessage : INetSerializable
     {
         public int dataId;
 

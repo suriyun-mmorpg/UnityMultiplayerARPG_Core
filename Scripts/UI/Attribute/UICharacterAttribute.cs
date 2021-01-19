@@ -69,10 +69,10 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            GameInstance.ClientCharacterAttributeHandlers.RequestIncreaseCharacterAttributeAmount(new RequestIncreaseCharacterAttributeAmountMessage()
+            GameInstance.ClientCharacterHandlers.RequestIncreaseAttributeAmount(new RequestIncreaseAttributeAmountMessage()
             {
                 dataId = Attribute.DataId
-            }, ClientCharacterAttributeActions.ResponseIncreaseCharacterAttributeAmount);
+            }, ClientCharacterActions.ResponseIncreaseCharacterAttributeAmount);
         }
     }
 }

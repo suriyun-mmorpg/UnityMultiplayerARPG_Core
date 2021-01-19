@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public struct RequestIncreaseCharacterAttributeAmountMessage : INetSerializable
+    public struct RequestIncreaseAttributeAmountMessage : INetSerializable
     {
         public int dataId;
 
