@@ -132,6 +132,7 @@ namespace MultiplayerARPG
         UI_ERROR_CHARACTER_JOINED_ANOTHER_PARTY,
         UI_ERROR_CHARACTER_NOT_JOINED_PARTY,
         UI_ERROR_PARTY_MEMBER_REACHED_LIMIT,
+        UI_ERROR_PARTY_MEMBER_CANNOT_ENTER_INSTANCE,
         // Guild
         UI_ERROR_GUILD_NOT_FOUND,
         UI_ERROR_GUILD_INVITATION_NOT_FOUND,
@@ -1146,6 +1147,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_JOINED_ANOTHER_PARTY.ToString(), "Character already joined another party");
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_PARTY.ToString(), "Character not joined the party");
             Texts.Add(UITextKeys.UI_ERROR_PARTY_MEMBER_REACHED_LIMIT.ToString(), "Party member reached limit");
+            Texts.Add(UITextKeys.UI_ERROR_PARTY_MEMBER_CANNOT_ENTER_INSTANCE.ToString(), "Only party leader can enter instance");
             // Error - Guild
             Texts.Add(UITextKeys.UI_ERROR_GUILD_NOT_FOUND.ToString(), "Guild not found");
             Texts.Add(UITextKeys.UI_ERROR_GUILD_INVITATION_NOT_FOUND.ToString(), "Guild invitation not found");
