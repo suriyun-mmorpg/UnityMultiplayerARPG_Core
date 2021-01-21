@@ -36,7 +36,6 @@ namespace MultiplayerARPG
 
         protected override void Awake()
         {
-            base.Awake();
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
             // Server Handlers
             ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
@@ -66,6 +65,7 @@ namespace MultiplayerARPG
             ClientBankHandlers = gameObject.GetOrAddComponent<IClientBankHandlers, DefaultClientBankHandlers>();
             ClientOnlineCharacterHandlers = gameObject.GetOrAddComponent<IClientOnlineCharacterHandlers, DefaultClientOnlineCharacterHandlers>();
             ClientGameMessageHandlers = gameObject.GetOrAddComponent<IClientGameMessageHandlers, DefaultClientGameMessageHandlers>();
+            base.Awake();
         }
 
         public void StartGame()
