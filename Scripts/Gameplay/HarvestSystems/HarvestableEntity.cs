@@ -190,7 +190,7 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public override bool CanReceiveDamageFrom(IGameEntity attacker)
+        public override bool CanReceiveDamageFrom(EntityInfo entityInfo)
         {
             // Harvestable entity can receive damage inside safe area
             return true;

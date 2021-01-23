@@ -26,9 +26,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual bool CanReceiveDamageFrom(IGameEntity attacker)
+        public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
         {
-            return entity.CanReceiveDamageFrom(attacker);
+            return entity.CanReceiveDamageFrom(instigator);
         }
 
         public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
 
         public virtual void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker))
+            if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker.GetInfo()))
                 return;
             List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
             foreach (DamageElement key in keys)
@@ -51,6 +51,11 @@ namespace MultiplayerARPG
         public virtual void PrepareRelatesData()
         {
             // Do nothing
+        }
+
+        public EntityInfo GetInfo()
+        {
+            return entity.GetInfo();
         }
     }
 }

@@ -936,9 +936,10 @@ namespace MultiplayerARPG
                 return false;
             if (findInFov && !IsPositionInFov(fov, characterEntity.CacheTransform.position))
                 return false;
-            return (findForAlly && characterEntity.IsAlly(this)) ||
-                (findForEnemy && characterEntity.IsEnemy(this)) ||
-                (findForNeutral && characterEntity.IsNeutral(this));
+            EntityInfo instigator = GetInfo();
+            return (findForAlly && characterEntity.IsAlly(instigator)) ||
+                (findForEnemy && characterEntity.IsEnemy(instigator)) ||
+                (findForNeutral && characterEntity.IsNeutral(instigator));
         }
         #endregion
 
@@ -1041,31 +1042,31 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool IsNeutral(BaseCharacterEntity characterEntity)
+        public bool IsNeutral(EntityInfo instigator)
         {
-            return !IsAlly(characterEntity) && !IsEnemy(characterEntity);
+            return !IsAlly(instigator) && !IsEnemy(instigator);
         }
 
-        public override bool CanReceiveDamageFrom(IGameEntity attacker)
+        public override bool CanReceiveDamageFrom(EntityInfo instigator)
         {
-            if (!base.CanReceiveDamageFrom(attacker))
+            if (!base.CanReceiveDamageFrom(instigator))
                 return false;
             // If this character is not ally so it is enemy and also can receive damage
-            return !IsAlly(attacker.Entity as BaseCharacterEntity);
+            return !IsAlly(instigator);
         }
 
-        public bool IsAlly(BaseCharacterEntity targetCharacter)
+        public bool IsAlly(EntityInfo entityInfo)
         {
             if (CurrentMapInfo == null)
                 return false;
-            return CurrentMapInfo.IsAlly(this, targetCharacter);
+            return CurrentMapInfo.IsAlly(this, entityInfo);
         }
 
-        public bool IsEnemy(BaseCharacterEntity targetCharacter)
+        public bool IsEnemy(EntityInfo entityInfo)
         {
             if (CurrentMapInfo == null)
                 return false;
-            return CurrentMapInfo.IsEnemy(this, targetCharacter);
+            return CurrentMapInfo.IsEnemy(this, entityInfo);
         }
 
         public void QueueGameMessage(UITextKeys error)

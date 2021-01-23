@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseDamageEntity : PoolDescriptor, IPoolDescriptor
     {
-        protected IGameEntity attacker;
+        protected EntityInfo instigator;
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> damageAmounts;
         protected BaseSkill skill;
@@ -56,19 +56,19 @@ namespace MultiplayerARPG
         /// <summary>
         /// Setup this component data
         /// </summary>
-        /// <param name="attacker">Attacker entity who use weapon or skill to spawn this to attack enemy</param>
+        /// <param name="instigator">Weapon's or skill's instigator who to spawn this to attack enemy</param>
         /// <param name="weapon">Weapon which was used to attack enemy</param>
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
         /// <param name="skillLevel">Level of the skill</param>
         public virtual void Setup(
-            IGameEntity attacker,
+            EntityInfo instigator,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             short skillLevel)
         {
-            this.attacker = attacker;
+            this.instigator = instigator;
             this.weapon = weapon;
             this.damageAmounts = damageAmounts;
             this.skill = skill;
@@ -77,12 +77,12 @@ namespace MultiplayerARPG
 
         public virtual void ApplyDamageTo(DamageableHitBox target)
         {
-            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
+            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(instigator))
                 return;
             if (IsClient)
                 target.PlayHitEffects(damageAmounts.Keys, skill);
             if (IsServer)
-                target.ReceiveDamage(CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
+                target.ReceiveDamage(CacheTransform.position, target, damageAmounts, weapon, skill, skillLevel);
         }
 
         public override void InitPrefab()

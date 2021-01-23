@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -36,7 +35,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Setup this component data
         /// </summary>
-        /// <param name="attacker">Attacker entity who use weapon or skill to spawn this to attack enemy</param>
+        /// <param name="instigator">Weapon's or skill's instigator who to spawn this to attack enemy</param>
         /// <param name="weapon">Weapon which was used to attack enemy</param>
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
@@ -45,7 +44,7 @@ namespace MultiplayerARPG
         /// <param name="missileSpeed">Calculated missile speed</param>
         /// <param name="lockingTarget">Locking target, if this is empty it can hit any entities</param>
         public virtual void Setup(
-            IGameEntity attacker,
+            EntityInfo instigator,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
@@ -54,7 +53,7 @@ namespace MultiplayerARPG
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            Setup(attacker, weapon, damageAmounts, skill, skillLevel);
+            Setup(instigator, weapon, damageAmounts, skill, skillLevel);
             this.missileDistance = missileDistance;
             this.missileSpeed = missileSpeed;
 
@@ -146,9 +145,6 @@ namespace MultiplayerARPG
             if (other.GetComponent<IUnHittable>() != null)
                 return;
 
-            if (attacker != null && attacker.GetGameObject() == other)
-                return;
-
             DamageableHitBox target;
             if (FindTargetHitBox(other, out target))
             {
@@ -190,12 +186,9 @@ namespace MultiplayerARPG
             if (other.GetComponent<IUnHittable>() != null)
                 return false;
 
-            if (attacker != null && attacker.GetGameObject() == other)
-                return false;
-
             target = other.GetComponent<DamageableHitBox>();
 
-            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
+            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(instigator))
                 return false;
 
             if (lockingTarget != null && lockingTarget.GetObjectId() != target.GetObjectId())

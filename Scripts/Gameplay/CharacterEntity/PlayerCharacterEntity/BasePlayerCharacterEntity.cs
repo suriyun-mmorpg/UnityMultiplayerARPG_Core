@@ -45,6 +45,20 @@ namespace MultiplayerARPG
             GameInstance.AddCharacters(CharacterDatabases);
         }
 
+        public override EntityInfo GetInfo()
+        {
+            return new EntityInfo()
+            {
+                type = EntityTypes.Player,
+                id = Id,
+                dataId = DataId,
+                factionId = FactionId,
+                partyId = PartyId,
+                guildId = GuildId,
+                isInSafeArea = IsInSafeArea,
+            };
+        }
+
         protected override void EntityAwake()
         {
             base.EntityAwake();

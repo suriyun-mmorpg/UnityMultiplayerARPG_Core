@@ -91,7 +91,7 @@ namespace MultiplayerARPG
 
         public virtual void ApplyBuffTo(BaseCharacterEntity target)
         {
-            if (target == null || (!applyBuffToEveryone && !target.IsAlly(buffApplier)))
+            if (target == null || (!applyBuffToEveryone && !target.IsAlly(buffApplier.GetInfo())))
                 return;
             target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel, buffApplier);
         }

@@ -264,7 +264,7 @@ namespace MultiplayerARPG
                             hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
 
                             // Target won't receive damage if dead or can't receive damage from this character
-                            if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(attacker) ||
+                            if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(attacker.GetInfo()) ||
                                 !attacker.IsPositionInFov(hitFov, tempDamageableHitBox.GetTransform().position))
                                 continue;
 
@@ -319,7 +319,7 @@ namespace MultiplayerARPG
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
-                                !tempDamageableHitBox.CanReceiveDamageFrom(attacker) ||
+                                !tempDamageableHitBox.CanReceiveDamageFrom(attacker.GetInfo()) ||
                                 !attacker.IsPositionInFov(hitFov, tempDamageableHitBox.GetTransform().position))
                                 continue;
 
@@ -342,7 +342,7 @@ namespace MultiplayerARPG
                                 tempDamageableHitBox = null;
                         }
                         PoolSystem.GetInstance(missileDamageEntity, damageEffectPosition, damageEffectRotation)
-                            .Setup(attacker, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableHitBox);
+                            .Setup(attacker.GetInfo(), weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableHitBox);
                     }
                     break;
                 case DamageType.Raycast:
@@ -398,7 +398,7 @@ namespace MultiplayerARPG
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
-                                !tempDamageableHitBox.CanReceiveDamageFrom(attacker))
+                                !tempDamageableHitBox.CanReceiveDamageFrom(attacker.GetInfo()))
                                 continue;
 
                             // Target receives damages

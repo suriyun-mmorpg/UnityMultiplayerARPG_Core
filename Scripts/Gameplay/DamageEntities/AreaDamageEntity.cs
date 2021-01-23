@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -19,8 +18,18 @@ namespace MultiplayerARPG
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
+        /// <summary>
+        /// Setup this component data
+        /// </summary>
+        /// <param name="instigator">Weapon's or skill's instigator who to spawn this to attack enemy</param>
+        /// <param name="weapon">Weapon which was used to attack enemy</param>
+        /// <param name="damageAmounts">Calculated damage amounts</param>
+        /// <param name="skill">Skill which was used to attack enemy</param>
+        /// <param name="skillLevel">Level of the skill</param>
+        /// <param name="areaDuration"></param>
+        /// <param name="applyDuration"></param>
         public virtual void Setup(
-            IGameEntity attacker,
+            EntityInfo instigator,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
@@ -28,7 +37,7 @@ namespace MultiplayerARPG
             float areaDuration,
             float applyDuration)
         {
-            base.Setup(attacker, weapon, damageAmounts, skill, skillLevel);
+            base.Setup(instigator, weapon, damageAmounts, skill, skillLevel);
             PushBack(areaDuration);
             this.applyDuration = applyDuration;
             lastAppliedTime = Time.unscaledTime;
@@ -67,9 +76,6 @@ namespace MultiplayerARPG
 
         protected virtual void TriggerEnter(GameObject other)
         {
-            if (attacker != null && attacker.GetGameObject() == other)
-                return;
-
             DamageableHitBox target = other.GetComponent<DamageableHitBox>();
             if (target == null)
                 return;
@@ -92,9 +98,6 @@ namespace MultiplayerARPG
 
         protected virtual void TriggerExit(GameObject other)
         {
-            if (attacker != null && attacker.GetGameObject() == other)
-                return;
-
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
             if (target == null)
                 return;

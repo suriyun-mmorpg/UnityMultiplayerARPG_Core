@@ -242,7 +242,7 @@ namespace MultiplayerARPG
                 {
                     if (findOnlyAlivePlayers && player != null && player.IsDead())
                         player = null;
-                    if (findPlayerToAttack && player != null && !player.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity))
+                    if (findPlayerToAttack && player != null && !player.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo()))
                         player = null;
                 }
             }
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
                 {
                     if (findOnlyAliveMonsters && monster != null && monster.IsDead())
                         monster = null;
-                    if (findMonsterToAttack && monster != null && !monster.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity))
+                    if (findMonsterToAttack && monster != null && !monster.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo()))
                         monster = null;
                 }
             }

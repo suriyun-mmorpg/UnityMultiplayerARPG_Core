@@ -138,7 +138,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (tempTargetEnemy.Entity == CacheEntity.Entity || tempTargetEnemy.IsHideOrDead() || !tempTargetEnemy.CanReceiveDamageFrom(CacheEntity))
+            if (tempTargetEnemy.Entity == CacheEntity.Entity || tempTargetEnemy.IsHideOrDead() || !tempTargetEnemy.CanReceiveDamageFrom(CacheEntity.GetInfo()))
             {
                 // If target is dead or in safe area stop attacking
                 CacheEntity.SetTargetEntity(null);
@@ -289,7 +289,7 @@ namespace MultiplayerARPG
 
             IDamageableEntity targetEntity;
             if (!CacheEntity.TryGetTargetEntity(out targetEntity) || targetEntity.Entity == CacheEntity.Entity ||
-                 targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(CacheEntity))
+                 targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(CacheEntity.GetInfo()))
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
                 List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(
@@ -301,7 +301,7 @@ namespace MultiplayerARPG
                 {
                     // Attack target settings
                     if (characterEntity == null || characterEntity.Entity == CacheEntity.Entity ||
-                        characterEntity.IsDead() || !characterEntity.CanReceiveDamageFrom(CacheEntity))
+                        characterEntity.IsDead() || !characterEntity.CanReceiveDamageFrom(CacheEntity.GetInfo()))
                     {
                         // If character is null or cannot receive damage from monster, skip it
                         continue;
@@ -318,7 +318,7 @@ namespace MultiplayerARPG
                 {
                     // Attack target settings
                     if (buildingEntity == null || buildingEntity.Entity == CacheEntity.Entity ||
-                        buildingEntity.IsDead() || !buildingEntity.CanReceiveDamageFrom(CacheEntity))
+                        buildingEntity.IsDead() || !buildingEntity.CanReceiveDamageFrom(CacheEntity.GetInfo()))
                     {
                         // If building is null or cannot receive damage from monster, skip it
                         continue;

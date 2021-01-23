@@ -19,5 +19,10 @@ namespace MultiplayerARPG
         {
             // Do nothing
         }
+
+        public EntityInfo GetInfo()
+        {
+            return Entity.GetInfo();
+        }
     }
 }

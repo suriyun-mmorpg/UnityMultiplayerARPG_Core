@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             }
             // Spawn area entity
             PoolSystem.GetInstance(areaDamageEntity, aimPosition, GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser))
-                .Setup(skillUser, weapon, damageAmounts, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+                .Setup(skillUser.GetInfo(), weapon, damageAmounts, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)

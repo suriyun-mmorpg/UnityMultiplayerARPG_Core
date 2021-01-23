@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         int CurrentHp { get; set; }
         Transform OpponentAimTransform { get; }
-        bool CanReceiveDamageFrom(IGameEntity attacker);
+        bool CanReceiveDamageFrom(EntityInfo instigator);
         void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill);
     }
 }

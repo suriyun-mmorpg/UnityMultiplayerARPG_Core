@@ -55,35 +55,33 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override bool IsPlayerAlly(BasePlayerCharacterEntity playerCharacter, BaseCharacterEntity targetCharacter)
+        protected override bool IsPlayerAlly(BasePlayerCharacterEntity playerCharacter, EntityInfo targetEntity)
         {
-            if (targetCharacter == null)
+            if (string.IsNullOrEmpty(targetEntity.id))
                 return false;
 
-            if (targetCharacter is BasePlayerCharacterEntity)
+            if (targetEntity.type == EntityTypes.Player)
             {
-                BasePlayerCharacterEntity targetPlayer = targetCharacter as BasePlayerCharacterEntity;
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
-                        return targetPlayer.PartyId != 0 && targetPlayer.PartyId == playerCharacter.PartyId;
+                        return targetEntity.partyId != 0 && targetEntity.partyId == playerCharacter.PartyId;
                     case PvpMode.FactionPvp:
-                        return targetPlayer.FactionId != 0 && targetPlayer.FactionId == playerCharacter.FactionId;
+                        return targetEntity.factionId != 0 && targetEntity.factionId == playerCharacter.FactionId;
                     case PvpMode.GuildPvp:
-                        return targetPlayer.GuildId != 0 && targetPlayer.GuildId == playerCharacter.GuildId;
+                        return targetEntity.guildId != 0 && targetEntity.guildId == playerCharacter.GuildId;
                     default:
                         return true;
                 }
             }
 
-            if (targetCharacter is BaseMonsterCharacterEntity)
+            if (targetEntity .type == EntityTypes.Monster)
             {
                 // If this character is summoner so it is ally
-                BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
-                if (targetMonster.IsSummoned)
+                if (targetEntity.summonerInfo != null)
                 {
                     // If summoned by someone, will have same allies with summoner
-                    return targetMonster.Summoner.IsAlly(playerCharacter);
+                    return playerCharacter.IsAlly(targetEntity.summonerInfo);
                 }
                 else
                 {
@@ -95,58 +93,55 @@ namespace MultiplayerARPG
             return false;
         }
 
-        protected override bool IsMonsterAlly(BaseMonsterCharacterEntity monsterCharacter, BaseCharacterEntity targetCharacter)
+        protected override bool IsMonsterAlly(BaseMonsterCharacterEntity monsterCharacter, EntityInfo targetEntity)
         {
-            if (targetCharacter == null)
+            if (string.IsNullOrEmpty(targetEntity.id))
                 return false;
 
             if (monsterCharacter.IsSummoned)
             {
                 // If summoned by someone, will have same allies with summoner
-                return targetCharacter == monsterCharacter.Summoner || monsterCharacter.Summoner.IsAlly(targetCharacter);
+                return targetEntity.id.Equals(monsterCharacter.Summoner.Id) || monsterCharacter.Summoner.IsAlly(targetEntity);
             }
 
-            if (targetCharacter is BaseMonsterCharacterEntity)
+            if (targetEntity.type == EntityTypes.Monster)
             {
                 // If another monster has same allyId so it is ally
-                BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
-                if (targetMonster.IsSummoned)
-                    return monsterCharacter.IsAlly(targetMonster.Summoner);
-                return targetMonster.CharacterDatabase.AllyId == monsterCharacter.CharacterDatabase.AllyId;
+                if (targetEntity.summonerInfo != null)
+                    return monsterCharacter.IsAlly(targetEntity.summonerInfo);
+                return GameInstance.MonsterCharacters[targetEntity.dataId].AllyId == monsterCharacter.CharacterDatabase.AllyId;
             }
 
             return false;
         }
 
-        protected override bool IsPlayerEnemy(BasePlayerCharacterEntity playerCharacter, BaseCharacterEntity targetCharacter)
+        protected override bool IsPlayerEnemy(BasePlayerCharacterEntity playerCharacter, EntityInfo targetEntity)
         {
-            if (targetCharacter == null)
+            if (string.IsNullOrEmpty(targetEntity.id))
                 return false;
 
-            if (targetCharacter is BasePlayerCharacterEntity)
+            if (targetEntity.type == EntityTypes.Player)
             {
-                BasePlayerCharacterEntity targetPlayer = targetCharacter as BasePlayerCharacterEntity;
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
-                        return targetPlayer.PartyId == 0 || targetPlayer.PartyId != playerCharacter.PartyId;
+                        return targetEntity.partyId == 0 || targetEntity.partyId != playerCharacter.PartyId;
                     case PvpMode.FactionPvp:
-                        return targetPlayer.FactionId == 0 || targetPlayer.FactionId != playerCharacter.FactionId;
+                        return targetEntity.factionId == 0 || targetEntity.factionId != playerCharacter.FactionId;
                     case PvpMode.GuildPvp:
-                        return targetPlayer.GuildId == 0 || targetPlayer.GuildId != playerCharacter.GuildId;
+                        return targetEntity.guildId == 0 || targetEntity.guildId != playerCharacter.GuildId;
                     default:
                         return false;
                 }
             }
 
-            if (targetCharacter is BaseMonsterCharacterEntity)
+            if (targetEntity.type == EntityTypes.Monster)
             {
                 // If this character is not summoner so it is enemy
-                BaseMonsterCharacterEntity targetMonster = targetCharacter as BaseMonsterCharacterEntity;
-                if (targetMonster.IsSummoned)
+                if (targetEntity.summonerInfo != null)
                 {
                     // If summoned by someone, will have same enemies with summoner
-                    return targetMonster.Summoner.IsEnemy(playerCharacter);
+                    return playerCharacter.IsEnemy(targetEntity.summonerInfo);
                 }
                 else
                 {
@@ -158,19 +153,19 @@ namespace MultiplayerARPG
             return false;
         }
 
-        protected override bool IsMonsterEnemy(BaseMonsterCharacterEntity monsterCharacter, BaseCharacterEntity targetCharacter)
+        protected override bool IsMonsterEnemy(BaseMonsterCharacterEntity monsterCharacter, EntityInfo targetEntity)
         {
-            if (targetCharacter == null)
+            if (string.IsNullOrEmpty(targetEntity.id))
                 return false;
 
             if (monsterCharacter.IsSummoned)
             {
                 // If summoned by someone, will have same enemies with summoner
-                return targetCharacter != monsterCharacter.Summoner && monsterCharacter.Summoner.IsEnemy(targetCharacter);
+                return targetEntity.id.Equals(monsterCharacter.Summoner.Id) && monsterCharacter.Summoner.IsEnemy(targetEntity);
             }
 
             // Attack only player by default
-            return targetCharacter is BasePlayerCharacterEntity;
+            return targetEntity.type == EntityTypes.Player;
         }
     }
 

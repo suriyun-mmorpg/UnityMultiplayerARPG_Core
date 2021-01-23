@@ -331,6 +331,15 @@ namespace MultiplayerARPG
             GameInstance.AddPoolingObjects(GetComponentsInChildren<IPoolDescriptorCollection>(true));
         }
 
+        /// <summary>
+        /// Override this function to set instigator when attacks other entities
+        /// </summary>
+        /// <returns></returns>
+        public virtual EntityInfo GetInfo()
+        {
+            return default;
+        }
+
         public virtual Bounds MakeLocalBounds()
         {
             return GameplayUtils.MakeLocalBoundsByCollider(CacheTransform);

@@ -28,31 +28,31 @@ namespace MultiplayerARPG
             position = playerCharacterData.RespawnPosition;
         }
 
-        public bool IsAlly(BaseCharacterEntity characterA, BaseCharacterEntity characterB)
+        public bool IsAlly(BaseCharacterEntity character, EntityInfo targetEntityInfo)
         {
-            if (characterA == characterB)
+            if (!string.IsNullOrEmpty(targetEntityInfo.id) && targetEntityInfo.id.Equals(character.Id))
                 return true;
-            if (characterA is BasePlayerCharacterEntity)
-                return IsPlayerAlly(characterA as BasePlayerCharacterEntity, characterB);
-            if (characterA is BaseMonsterCharacterEntity)
-                return IsMonsterAlly(characterA as BaseMonsterCharacterEntity, characterB);
+            if (character is BasePlayerCharacterEntity)
+                return IsPlayerAlly(character as BasePlayerCharacterEntity, targetEntityInfo);
+            if (character is BaseMonsterCharacterEntity)
+                return IsMonsterAlly(character as BaseMonsterCharacterEntity, targetEntityInfo);
             return false;
         }
 
-        public bool IsEnemy(BaseCharacterEntity characterA, BaseCharacterEntity characterB)
+        public bool IsEnemy(BaseCharacterEntity character, EntityInfo targetEntityInfo)
         {
-            if (characterA == characterB)
+            if (!string.IsNullOrEmpty(targetEntityInfo.id) && targetEntityInfo.id.Equals(character.Id))
                 return false;
-            if (characterA is BasePlayerCharacterEntity)
-                return IsPlayerEnemy(characterA as BasePlayerCharacterEntity, characterB);
-            if (characterA is BaseMonsterCharacterEntity)
-                return IsMonsterEnemy(characterA as BaseMonsterCharacterEntity, characterB);
+            if (character is BasePlayerCharacterEntity)
+                return IsPlayerEnemy(character as BasePlayerCharacterEntity, targetEntityInfo);
+            if (character is BaseMonsterCharacterEntity)
+                return IsMonsterEnemy(character as BaseMonsterCharacterEntity, targetEntityInfo);
             return false;
         }
 
-        protected abstract bool IsPlayerAlly(BasePlayerCharacterEntity playerCharacter, BaseCharacterEntity targetCharacter);
-        protected abstract bool IsMonsterAlly(BaseMonsterCharacterEntity monsterCharacter, BaseCharacterEntity targetCharacter);
-        protected abstract bool IsPlayerEnemy(BasePlayerCharacterEntity playerCharacter, BaseCharacterEntity targetCharacter);
-        protected abstract bool IsMonsterEnemy(BaseMonsterCharacterEntity monsterCharacter, BaseCharacterEntity targetCharacter);
+        protected abstract bool IsPlayerAlly(BasePlayerCharacterEntity playerCharacter, EntityInfo targetEntityInfo);
+        protected abstract bool IsMonsterAlly(BaseMonsterCharacterEntity monsterCharacter, EntityInfo targetEntityInfo);
+        protected abstract bool IsPlayerEnemy(BasePlayerCharacterEntity playerCharacter, EntityInfo targetEntityInfo);
+        protected abstract bool IsMonsterEnemy(BaseMonsterCharacterEntity monsterCharacter, EntityInfo targetEntityInfo);
     }
 }

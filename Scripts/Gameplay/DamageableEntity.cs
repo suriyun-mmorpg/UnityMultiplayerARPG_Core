@@ -175,7 +175,7 @@ namespace MultiplayerARPG
                 onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
         }
 
-        public virtual bool CanReceiveDamageFrom(IGameEntity attacker)
+        public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
         {
             if (IsInSafeArea)
             {
@@ -183,13 +183,13 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (attacker == null || attacker.Entity == null)
+            if (string.IsNullOrEmpty(instigator.id))
             {
                 // If attacker is unknow entity, can receive damages
                 return true;
             }
-
-            if (attacker.Entity.IsInSafeArea)
+            
+            if (instigator.isInSafeArea)
             {
                 // If attacker is in safe area, it will not receives damages
                 return false;

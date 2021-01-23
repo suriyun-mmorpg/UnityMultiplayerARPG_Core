@@ -55,21 +55,21 @@ namespace MultiplayerARPG
                 if (tempVisibleResult)
                     return;
 
-                tempVisibleResult = characterEntity.IsAlly(GameInstance.PlayingCharacterEntity);
+                tempVisibleResult = characterEntity.IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
                 if (allyIndicator != null && allyIndicator.activeSelf != tempVisibleResult)
                     allyIndicator.SetActive(tempVisibleResult);
 
                 if (tempVisibleResult)
                     return;
 
-                tempVisibleResult = characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity);
+                tempVisibleResult = characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity.GetInfo());
                 if (enemyIndicator != null && enemyIndicator.activeSelf != tempVisibleResult)
                     enemyIndicator.SetActive(tempVisibleResult);
 
                 if (tempVisibleResult)
                     return;
 
-                tempVisibleResult = characterEntity.IsNeutral(GameInstance.PlayingCharacterEntity);
+                tempVisibleResult = characterEntity.IsNeutral(GameInstance.PlayingCharacterEntity.GetInfo());
                 if (neutralIndicator != null && neutralIndicator.activeSelf != tempVisibleResult)
                     neutralIndicator.SetActive(tempVisibleResult);
             }

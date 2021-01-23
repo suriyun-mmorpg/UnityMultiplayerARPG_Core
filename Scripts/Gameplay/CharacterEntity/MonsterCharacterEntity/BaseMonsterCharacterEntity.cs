@@ -101,6 +101,18 @@ namespace MultiplayerARPG
             GameInstance.AddCharacters(CharacterDatabase);
         }
 
+        public override EntityInfo GetInfo()
+        {
+            return new EntityInfo()
+            {
+                type = EntityTypes.Monster,
+                id = Id,
+                dataId = DataId,
+                isInSafeArea = IsInSafeArea,
+                summonerInfo = Summoner != null ? Summoner.GetInfo() : default,
+            };
+        }
+
         protected override void EntityAwake()
         {
             base.EntityAwake();
@@ -190,6 +202,7 @@ namespace MultiplayerARPG
                 InstantiateUI(CurrentGameInstance.monsterCharacterUI);
 
             // Initial default data
+            Id = ObjectId.ToString();
             InitStats();
             if (SpawnArea == null)
                 SpawnPosition = CacheTransform.position;
@@ -198,7 +211,7 @@ namespace MultiplayerARPG
         public void SetAttackTarget(IDamageableEntity target)
         {
             if (target == null || target.Entity == Entity ||
-                target.IsDead() || !target.CanReceiveDamageFrom(this))
+                target.IsDead() || !target.CanReceiveDamageFrom(GetInfo()))
                 return;
             // Already have target so don't set target
             IDamageableEntity oldTarget;

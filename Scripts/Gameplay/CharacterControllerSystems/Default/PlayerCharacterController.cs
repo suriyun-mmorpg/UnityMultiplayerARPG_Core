@@ -265,7 +265,7 @@ namespace MultiplayerARPG
                 character = SelectedEntity as BaseCharacterEntity;
                 if (character == null ||
                     character == PlayerCharacterEntity ||
-                    !character.CanReceiveDamageFrom(PlayerCharacterEntity))
+                    !character.CanReceiveDamageFrom(PlayerCharacterEntity.GetInfo()))
                 {
                     character = null;
                     return false;
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
         {
             if (!TryGetDoActionEntity(out entity, TargetActionType.Attack))
                 return false;
-            if (entity == PlayerCharacterEntity || !entity.CanReceiveDamageFrom(PlayerCharacterEntity))
+            if (entity == PlayerCharacterEntity || !entity.CanReceiveDamageFrom(PlayerCharacterEntity.GetInfo()))
             {
                 entity = null;
                 return false;
