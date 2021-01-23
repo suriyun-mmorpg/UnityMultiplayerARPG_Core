@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using LiteNetLibManager;
 using System.Collections.Generic;
 
 namespace MultiplayerARPG
@@ -162,7 +161,7 @@ namespace MultiplayerARPG
                 case NpcDialogType.Normal:
                     foreach (NpcDialogMenu menu in dialog.menus)
                     {
-                        if (menu.isCloseMenu && !menu.IsPassConditions(playerCharacter)) continue;
+                        if (menu.isCloseMenu || !menu.IsPassConditions(playerCharacter)) continue;
                         FindQuestFromDialog(playerCharacter, questIds, menu.dialog, foundDialogs);
                     }
                     break;
