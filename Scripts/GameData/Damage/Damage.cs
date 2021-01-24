@@ -207,6 +207,7 @@ namespace MultiplayerARPG
 
             bool isServer = attacker.IsServer;
             bool isClient = attacker.IsClient;
+            EntityInfo instigator = attacker.GetInfo();
             int damageableLayerMask = GameInstance.Singleton.GetDamageableLayerMask();
 
             DamageableHitBox tempDamageableHitBox = null;
@@ -264,7 +265,7 @@ namespace MultiplayerARPG
                             hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
 
                             // Target won't receive damage if dead or can't receive damage from this character
-                            if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(attacker.GetInfo()) ||
+                            if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
                                 !attacker.IsPositionInFov(hitFov, tempDamageableHitBox.GetTransform().position))
                                 continue;
 
@@ -285,7 +286,7 @@ namespace MultiplayerARPG
                             if (isClient)
                                 damageTakenTarget.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
-                                damageTakenTarget.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
+                                damageTakenTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
                         }
                     }
                     else
@@ -319,7 +320,7 @@ namespace MultiplayerARPG
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
-                                !tempDamageableHitBox.CanReceiveDamageFrom(attacker.GetInfo()) ||
+                                !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
                                 !attacker.IsPositionInFov(hitFov, tempDamageableHitBox.GetTransform().position))
                                 continue;
 
@@ -327,7 +328,7 @@ namespace MultiplayerARPG
                             if (isClient)
                                 tempDamageableHitBox.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
-                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
                         }
                     }
                     break;
@@ -342,7 +343,7 @@ namespace MultiplayerARPG
                                 tempDamageableHitBox = null;
                         }
                         PoolSystem.GetInstance(missileDamageEntity, damageEffectPosition, damageEffectRotation)
-                            .Setup(attacker.GetInfo(), weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableHitBox);
+                            .Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableHitBox);
                     }
                     break;
                 case DamageType.Raycast:
@@ -398,14 +399,14 @@ namespace MultiplayerARPG
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
-                                !tempDamageableHitBox.CanReceiveDamageFrom(attacker.GetInfo()))
+                                !tempDamageableHitBox.CanReceiveDamageFrom(instigator))
                                 continue;
 
                             // Target receives damages
                             if (isClient)
                                 tempDamageableHitBox.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
-                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, attacker, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)

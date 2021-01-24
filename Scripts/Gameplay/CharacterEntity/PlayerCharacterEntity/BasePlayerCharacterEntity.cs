@@ -50,6 +50,7 @@ namespace MultiplayerARPG
             return new EntityInfo()
             {
                 type = EntityTypes.Player,
+                objectId = ObjectId,
                 id = Id,
                 dataId = DataId,
                 factionId = FactionId,
@@ -86,7 +87,7 @@ namespace MultiplayerARPG
             CurrentGameManager.RespawnCharacter(this);
         }
 
-        public override void Killed(IGameEntity lastAttacker)
+        public override void Killed(EntityInfo lastAttacker)
         {
             float expLostPercentage = CurrentGameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;

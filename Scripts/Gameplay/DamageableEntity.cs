@@ -116,32 +116,33 @@ namespace MultiplayerARPG
         /// Applying damage to this entity
         /// </summary>
         /// <param name="fromPosition"></param>
-        /// <param name="attacker"></param>
+        /// <param name="instigator"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="weapon"></param>
         /// <param name="skill"></param>
         /// <param name="skillLevel"></param>
-        internal void ApplyDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        internal void ApplyDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            ReceivingDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
+            ReceivingDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
             CombatAmountType combatAmountType;
             int totalDamage;
-            ApplyReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel, out combatAmountType, out totalDamage);
-            ReceivedDamage(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, out combatAmountType, out totalDamage);
+            ReceivedDamage(fromPosition, instigator, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
         /// <summary>
         /// This function will be called before apply receive damage
         /// </summary>
         /// <param name="fromPosition">Where is attacker?</param>
-        /// <param name="attacker">Who is attacking this?</param>
+        /// <param name="instigator">Who is attacking this?</param>
         /// <param name="damageAmounts">Damage amounts from attacker</param>
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
-        public virtual void ReceivingDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceivingDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (onReceiveDamage != null)
+            IGameEntity attacker;
+            if (onReceiveDamage != null && instigator.TryGetEntity(out attacker))
                 onReceiveDamage.Invoke(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
 
@@ -149,29 +150,30 @@ namespace MultiplayerARPG
         /// Apply damage then return damage type and calculated damage amount
         /// </summary>
         /// <param name="fromPosition">Where is attacker?</param>
-        /// <param name="attacker">Who is attacking this?</param>
+        /// <param name="instigator">Who is attacking this?</param>
         /// <param name="damageAmounts">Damage amounts from attacker</param>
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
         /// <param name="combatAmountType">Result damage type</param>
         /// <param name="totalDamage">Result damage</param>
-        protected abstract void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage);
+        protected abstract void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage);
 
         /// <summary>
         /// This function will be called after applied receive damage
         /// </summary>
         /// <param name="fromPosition">Where is attacker?</param>
-        /// <param name="attacker">Who is attacking this?</param>
+        /// <param name="instigator">Who is attacking this?</param>
         /// <param name="combatAmountType">Result damage type which receives from `ApplyReceiveDamage`</param>
         /// <param name="damage">Result damage which receives from `ApplyReceiveDamage`</param>
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
-        public virtual void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             CallAllAppendCombatAmount(combatAmountType, damage);
-            if (onReceivedDamage != null)
+            IGameEntity attacker;
+            if (onReceivedDamage != null && instigator.TryGetEntity(out attacker))
                 onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
         }
 

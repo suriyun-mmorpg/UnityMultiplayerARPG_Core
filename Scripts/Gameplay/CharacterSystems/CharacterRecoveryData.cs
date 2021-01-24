@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public float decreasingFood;
         public float decreasingWater;
 
-        public CharacterRecoveryData Apply(BaseCharacterEntity characterEntity, IGameEntity causer)
+        public CharacterRecoveryData Apply(BaseCharacterEntity characterEntity, EntityInfo causer)
         {
             int tempAmount;
             // Hp

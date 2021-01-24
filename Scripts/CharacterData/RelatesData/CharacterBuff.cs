@@ -66,7 +66,7 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
 
-        public IGameEntity BuffApplier { get; private set; }
+        public EntityInfo BuffApplier { get; private set; }
 
         private void MakeCache()
         {
@@ -239,7 +239,7 @@ namespace MultiplayerARPG
             return buffRemainsDuration <= 0f;
         }
 
-        public void Apply(IGameEntity buffApplier)
+        public void Apply(EntityInfo buffApplier)
         {
             BuffApplier = buffApplier;
             buffRemainsDuration = GetDuration();

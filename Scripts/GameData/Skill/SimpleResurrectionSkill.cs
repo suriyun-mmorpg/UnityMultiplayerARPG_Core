@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             targetEntity.CurrentWater = Mathf.CeilToInt(targetEntity.GetCaches().MaxWater * resurrectWaterRate);
             targetEntity.StopMove();
             targetEntity.CallAllOnRespawn();
-            targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
+            targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser.GetInfo());
         }
 
         public override Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel)

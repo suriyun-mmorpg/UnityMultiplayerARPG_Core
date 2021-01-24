@@ -265,7 +265,7 @@ namespace MultiplayerARPG
                     {
                         // Character will dead only when dimension type is 3D
                         CurrentHp = 0;
-                        Killed(this);
+                        Killed(GetInfo());
                     }
                     // Disable movement when character dead
                     tempEnableMovement = false;
@@ -358,7 +358,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Attack / Receive Damage / Dead / Spawn
-        public void ValidateRecovery(IGameEntity causer = null)
+        public void ValidateRecovery(EntityInfo causer)
         {
             if (!IsServer)
                 return;
@@ -393,7 +393,7 @@ namespace MultiplayerARPG
                 Killed(causer);
         }
 
-        public virtual void Killed(IGameEntity lastAttacker)
+        public virtual void Killed(EntityInfo lastAttacker)
         {
             StopAllCoroutines();
             buffs.Clear();
@@ -437,22 +437,20 @@ namespace MultiplayerARPG
         #endregion
 
         #region Helpers
-        protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            BaseCharacterEntity attackerCharacter = null;
-            if (attacker != null)
-                attackerCharacter = attacker.Entity as BaseCharacterEntity;
-
-            // Notify enemy spotted when received damage from enemy
-            NotifyEnemySpottedToAllies(attackerCharacter);
-
-            // Notify enemy spotted when damage taken to enemy
-            attackerCharacter.NotifyEnemySpottedToAllies(this);
-
             bool isCritical = false;
             bool isBlocked = false;
-            if (attackerCharacter != null)
+
+            BaseCharacterEntity attackerCharacter;
+            if (instigator.TryGetEntity(out attackerCharacter))
             {
+                // Notify enemy spotted when received damage from enemy
+                NotifyEnemySpottedToAllies(attackerCharacter);
+
+                // Notify enemy spotted when damage taken to enemy
+                attackerCharacter.NotifyEnemySpottedToAllies(this);
+
                 if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(attackerCharacter, this, out isCritical, out isBlocked))
                 {
                     // Don't hit (Miss)
@@ -463,6 +461,7 @@ namespace MultiplayerARPG
             }
 
             // Calculate damages
+            combatAmountType = CombatAmountType.NormalDamage;
             float calculatingTotalDamage = 0f;
             float calculatingDamage;
             MinMaxFloat damageAmount;
@@ -478,28 +477,29 @@ namespace MultiplayerARPG
             {
                 // If critical occurs
                 if (isCritical)
+                {
                     calculatingTotalDamage = CurrentGameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
-
+                    combatAmountType = CombatAmountType.CriticalDamage;
+                }
                 // If block occurs
                 if (isBlocked)
+                {
                     calculatingTotalDamage = CurrentGameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
+                    combatAmountType = CombatAmountType.BlockedDamage;
+                }
             }
 
             // Apply damages
-            combatAmountType = CombatAmountType.NormalDamage;
-            if (isBlocked)
-                combatAmountType = CombatAmountType.BlockedDamage;
-            else if (isCritical)
-                combatAmountType = CombatAmountType.CriticalDamage;
             totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
         }
 
-        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
-            if (attacker != null && attacker.Entity is BaseCharacterEntity)
-                CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
+            base.ReceivedDamage(fromPosition, instigator, combatAmountType, damage, weapon, skill, skillLevel);
+            BaseCharacterEntity attackerCharacter;
+            if (instigator.TryGetEntity(out attackerCharacter))
+                CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attackerCharacter, this, combatAmountType, damage, weapon, skill, skillLevel);
 
             if (combatAmountType == CombatAmountType.Miss ||
                 combatAmountType == CombatAmountType.None)
@@ -520,13 +520,13 @@ namespace MultiplayerARPG
                 CancelSkill();
 
                 // Call killed function, this should be called only once when dead
-                ValidateRecovery(attacker);
+                ValidateRecovery(instigator);
             }
             else
             {
                 // Apply debuff if character is not dead
                 if (skill != null && skill.IsDebuff())
-                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, attacker);
+                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, instigator);
             }
         }
         #endregion

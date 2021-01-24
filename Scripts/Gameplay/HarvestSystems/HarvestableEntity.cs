@@ -97,11 +97,10 @@ namespace MultiplayerARPG
             RPC(AllOnHarvestableDestroy);
         }
 
-        protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            BaseCharacterEntity attackerCharacter = null;
-            if (attacker != null)
-                attackerCharacter = attacker.Entity as BaseCharacterEntity;
+            BaseCharacterEntity attackerCharacter;
+            instigator.TryGetEntity(out attackerCharacter);
 
             // Apply damages
             float calculatingTotalDamage = 0f;
@@ -145,11 +144,12 @@ namespace MultiplayerARPG
             CurrentHp -= totalDamage;
         }
 
-        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            base.ReceivedDamage(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
-            if (attacker != null && attacker.Entity is BaseCharacterEntity)
-                CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker.Entity as BaseCharacterEntity, this, combatAmountType, damage, weapon, skill, skillLevel);
+            base.ReceivedDamage(fromPosition, instigator, combatAmountType, damage, weapon, skill, skillLevel);
+            BaseCharacterEntity attackerCharacter;
+            if (instigator.TryGetEntity(out attackerCharacter))
+                CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attackerCharacter, this, combatAmountType, damage, weapon, skill, skillLevel);
 
             if (combatAmountType == CombatAmountType.Miss ||
                 combatAmountType == CombatAmountType.None)

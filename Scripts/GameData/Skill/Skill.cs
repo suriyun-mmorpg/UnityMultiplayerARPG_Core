@@ -124,39 +124,40 @@ namespace MultiplayerARPG
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
 
+            EntityInfo instigator = skillUser.GetInfo();
             List<BaseCharacterEntity> tempCharacters;
             switch (skillBuffType)
             {
                 case SkillBuffType.BuffToUser:
-                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
+                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     break;
                 case SkillBuffType.BuffToNearbyAllies:
                     tempCharacters = skillUser.FindAliveCharacters<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, false);
                     foreach (BaseCharacterEntity applyBuffCharacter in tempCharacters)
                     {
-                        applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
+                        applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     }
-                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
+                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     break;
                 case SkillBuffType.BuffToNearbyCharacters:
                     tempCharacters = skillUser.FindAliveCharacters<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, true);
                     foreach (BaseCharacterEntity applyBuffCharacter in tempCharacters)
                     {
-                        applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
+                        applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     }
-                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
+                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     break;
                 case SkillBuffType.BuffToTarget:
                     BaseCharacterEntity targetEntity;
                     if (skillUser.TryGetTargetEntity(out targetEntity) && !targetEntity.IsDead())
-                        targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
+                        targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     break;
                 case SkillBuffType.Toggle:
                     int indexOfBuff = skillUser.IndexOfBuff(DataId, BuffType.SkillBuff);
                     if (indexOfBuff >= 0)
                         skillUser.Buffs.RemoveAt(indexOfBuff);
                     else
-                        skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser);
+                        skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     break;
             }
         }

@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         private float updatingTime;
         private float deltaTime;
         private CharacterRecoveryData nonApplierRecoveryBuff;
-        private readonly Dictionary<IGameEntity, CharacterRecoveryData> recoveryBuffs = new Dictionary<IGameEntity, CharacterRecoveryData>();
+        private readonly Dictionary<string, CharacterRecoveryData> recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
 
         public override sealed void EntityUpdate()
         {
@@ -101,10 +101,10 @@ namespace MultiplayerARPG
                     // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
                     if (duration > 0f)
                     {
-                        if (buff.BuffApplier != null && !recoveryBuffs.ContainsKey(buff.BuffApplier))
-                            recoveryBuffs.Add(buff.BuffApplier, default(CharacterRecoveryData));
+                        if (buff.BuffApplier != null && !recoveryBuffs.ContainsKey(buff.BuffApplier.id))
+                            recoveryBuffs.Add(buff.BuffApplier.id, default(CharacterRecoveryData));
 
-                        CharacterRecoveryData recoveryData = buff.BuffApplier != null ? recoveryBuffs[buff.BuffApplier] : nonApplierRecoveryBuff;
+                        CharacterRecoveryData recoveryData = buff.BuffApplier != null ? recoveryBuffs[buff.BuffApplier.id] : nonApplierRecoveryBuff;
                         float tempAmount = 0f;
                         // Damage over time
                         DamageElement damageElement;
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
                         recoveryData = recoveryData.Apply(CacheEntity, buff.BuffApplier);
 
                         if (buff.BuffApplier != null)
-                            recoveryBuffs[buff.BuffApplier] = recoveryData;
+                            recoveryBuffs[buff.BuffApplier.id] = recoveryData;
                         else
                             nonApplierRecoveryBuff = recoveryData;
 

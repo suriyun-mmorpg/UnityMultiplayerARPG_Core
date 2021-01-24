@@ -36,16 +36,16 @@ namespace MultiplayerARPG
             entity.PlayHitEffects(damageElements, skill);
         }
 
-        public virtual void ReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(attacker.GetInfo()))
+            if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
                 return;
             List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
             foreach (DamageElement key in keys)
             {
                 damageAmounts[key] = damageAmounts[key] * damageRate;
             }
-            entity.ApplyDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
+            entity.ApplyDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
         }
 
         public virtual void PrepareRelatesData()

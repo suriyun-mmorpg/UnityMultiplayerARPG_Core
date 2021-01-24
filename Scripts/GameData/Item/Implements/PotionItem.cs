@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             if (!characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1))
                 return;
             characterEntity.FillEmptySlots();
-            characterEntity.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, characterEntity);
+            characterEntity.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, characterEntity.GetInfo());
         }
 
         public bool HasCustomAimControls()

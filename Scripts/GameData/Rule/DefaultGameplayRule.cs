@@ -714,7 +714,7 @@ namespace MultiplayerARPG
             if (character.IsDead())
             {
                 // Dead by itself, so causer is itself
-                character.ValidateRecovery(character);
+                character.ValidateRecovery(character.GetInfo());
             }
         }
 

@@ -106,10 +106,11 @@ namespace MultiplayerARPG
             return new EntityInfo()
             {
                 type = EntityTypes.Monster,
-                id = Id,
+                objectId = ObjectId,
+                id = ObjectId.ToString(),
                 dataId = DataId,
                 isInSafeArea = IsInSafeArea,
-                summonerInfo = Summoner != null ? Summoner.GetInfo() : default,
+                summonerInfo = Summoner != null ? Summoner.GetInfo() : null,
             };
         }
 
@@ -202,7 +203,6 @@ namespace MultiplayerARPG
                 InstantiateUI(CurrentGameInstance.monsterCharacterUI);
 
             // Initial default data
-            Id = ObjectId.ToString();
             InitStats();
             if (SpawnArea == null)
                 SpawnPosition = CacheTransform.position;
@@ -228,13 +228,13 @@ namespace MultiplayerARPG
             return base.GetMoveSpeed();
         }
 
-        protected override void ApplyReceiveDamage(Vector3 fromPosition, IGameEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            base.ApplyReceiveDamage(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel, out combatAmountType, out totalDamage);
+            base.ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, out combatAmountType, out totalDamage);
 
-            if (attacker != null && attacker.Entity is BaseCharacterEntity)
+            BaseCharacterEntity attackerCharacter;
+            if (instigator.TryGetEntity(out attackerCharacter))
             {
-                BaseCharacterEntity attackerCharacter = attacker.Entity as BaseCharacterEntity;
                 // If character is not dead, try to attack
                 if (!this.IsDead())
                 {
@@ -253,12 +253,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ReceivedDamage(Vector3 fromPosition, IGameEntity attacker, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             // Attacker can be null when character buff's buff applier is null, So avoid it
-            if (attacker != null)
+            BaseCharacterEntity attackerCharacter;
+            if (instigator.TryGetEntity(out attackerCharacter))
             {
-                BaseCharacterEntity attackerCharacter = attacker.Entity as BaseCharacterEntity;
 
                 // If summoned by someone, summoner is attacker
                 if (attackerCharacter != null &&
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
                     receivedDamageRecords[attackerCharacter] = receivedDamageRecord;
                 }
             }
-            base.ReceivedDamage(fromPosition, attacker, damageAmountType, damage, weapon, skill, skillLevel);
+            base.ReceivedDamage(fromPosition, instigator, damageAmountType, damage, weapon, skill, skillLevel);
         }
 
         public override void GetAttackingData(
@@ -346,7 +346,7 @@ namespace MultiplayerARPG
             return CharacterDatabase.DamageInfo.GetFov();
         }
 
-        public override void Killed(IGameEntity lastAttacker)
+        public override void Killed(EntityInfo lastAttacker)
         {
             base.Killed(lastAttacker);
 
@@ -362,19 +362,20 @@ namespace MultiplayerARPG
             // Last player is last player who kill the monster
             // Whom will have permission to pickup an items before other
             BasePlayerCharacterEntity lastPlayer = null;
-            if (lastAttacker != null)
+            BaseCharacterEntity attackerCharacter;
+            if (lastAttacker.TryGetEntity(out attackerCharacter))
             {
-                if (lastAttacker.Entity is BaseMonsterCharacterEntity)
+                if (attackerCharacter is BaseMonsterCharacterEntity)
                 {
-                    tempMonsterCharacterEntity = lastAttacker.Entity as BaseMonsterCharacterEntity;
+                    tempMonsterCharacterEntity = attackerCharacter as BaseMonsterCharacterEntity;
                     if (tempMonsterCharacterEntity.Summoner != null &&
                         tempMonsterCharacterEntity.Summoner is BasePlayerCharacterEntity)
                     {
                         // Set its summoner as main enemy
-                        lastAttacker = tempMonsterCharacterEntity.Summoner;
+                        lastAttacker = tempMonsterCharacterEntity.Summoner.GetInfo();
                     }
                 }
-                lastPlayer = lastAttacker.Entity as BasePlayerCharacterEntity;
+                lastPlayer = attackerCharacter as BasePlayerCharacterEntity;
             }
             GuildData tempGuildData;
             PartyData tempPartyData;
