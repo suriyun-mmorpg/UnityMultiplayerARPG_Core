@@ -185,17 +185,7 @@ namespace MultiplayerARPG
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    var errorMessage = string.Empty;
-                    switch (response.message)
-                    {
-                        case ResponseCashPackageBuyValidationMessage.Error.UserNotFound:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USER_NOT_FOUND.ToString());
-                            break;
-                        case ResponseCashPackageBuyValidationMessage.Error.PackageNotFound:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND.ToString());
-                            break;
-                    }
-                    PurchaseResult(false, errorMessage);
+                    PurchaseResult(false, LanguageManager.GetText(response.message.ToString()));
                     break;
                 default:
                     CashPackage package;
