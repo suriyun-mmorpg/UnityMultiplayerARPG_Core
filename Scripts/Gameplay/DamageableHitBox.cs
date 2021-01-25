@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         public BaseGameEntity Entity { get { return entity.Entity; } }
         public LiteNetLibIdentity Identity { get { return entity.Identity; } }
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             if (entity == null)
                 entity = GetComponentInParent<DamageableEntity>();
