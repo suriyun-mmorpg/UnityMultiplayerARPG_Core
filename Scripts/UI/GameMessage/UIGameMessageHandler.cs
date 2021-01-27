@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRewardGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_GOLD);
         [Tooltip("Format => {0} = {Item Title}, {1} => {Amount}")]
         public UILocaleKeySetting formatKeyRewardItem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_ITEM);
+        public Color errorMessageColor = Color.red;
         public Transform messageContainer;
         public float visibleDuration;
 
@@ -50,6 +51,8 @@ namespace MultiplayerARPG
 
             TextWrapper newMessage = Instantiate(messagePrefab);
             newMessage.text = LanguageManager.GetText(message.ToString());
+            if (message.ToString().ToUpper().StartsWith("UI_ERROR"))
+                newMessage.color = errorMessageColor;
             newMessage.transform.SetParent(messageContainer);
             newMessage.transform.localScale = Vector3.one;
             newMessage.transform.localRotation = Quaternion.identity;
