@@ -30,6 +30,26 @@ public class TextWrapper : MonoBehaviour
         }
     }
 
+    public virtual Color color
+    {
+        get
+        {
+            if (unityText != null) return unityText.color;
+#if USE_TEXT_MESH_PRO
+            if (textMeshText != null) return textMeshText.color;
+#endif
+            return Color.clear;
+        }
+
+        set
+        {
+            if (unityText != null) unityText.color = value;
+#if USE_TEXT_MESH_PRO
+            if (textMeshText != null) textMeshText.color = value;
+#endif
+        }
+    }
+
     void Awake()
     {
         if (unityText == null) unityText = GetComponent<Text>();
