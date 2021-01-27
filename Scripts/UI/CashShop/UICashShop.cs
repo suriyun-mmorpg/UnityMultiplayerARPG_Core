@@ -141,7 +141,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_SUCCESS_CASH_SHOP_BUY.ToString()));
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString()));
             RefreshCashShopInfo();
         }
     }

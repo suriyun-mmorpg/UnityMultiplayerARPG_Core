@@ -86,7 +86,7 @@ namespace MultiplayerARPG
 
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             // Success, hide this dialog
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_SEND_SUCCESS.ToString()));
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_SENT.ToString()));
             Hide();
         }
     }

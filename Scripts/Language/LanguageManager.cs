@@ -284,6 +284,14 @@ namespace MultiplayerARPG
                         data.key = UITextKeys.UI_ERROR_ATTRIBUTE_REACHED_MAX_AMOUNT.ToString();
                     if ("SkillReachedMaxLevel".Equals(data.key))
                         data.key = UITextKeys.UI_ERROR_SKILL_REACHED_MAX_LEVEL.ToString();
+                    if ("UI_SUCCESS_CASH_SHOP_BUY".Equals(data.key))
+                        data.key = UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString();
+                    if ("UI_MAIL_SEND_SUCCESS".Equals(data.key))
+                        data.key = UITextKeys.UI_MAIL_SENT.ToString();
+                    if ("UI_MAIL_CLAIM_SUCCESS".Equals(data.key))
+                        data.key = UITextKeys.UI_MAIL_CLAIMED.ToString();
+                    if ("UI_MAIL_DELETE_SUCCESS".Equals(data.key))
+                        data.key = UITextKeys.UI_MAIL_DELETED.ToString();
                     language.dataList[i] = data;
                 }
             }
