@@ -89,9 +89,10 @@ namespace MultiplayerARPG
 
         private async UniTaskVoid FindCharactersCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseFindCharactersMessage response)
         {
-            await UniTask.Yield();
+            ClientFriendActions.ResponseFindCharacters(responseHandler, responseCode, response).Forget();
             if (responseCode == AckResponseCode.Success)
                 UpdateFoundCharactersUIs(response.characters);
+            await UniTask.Yield();
         }
 
         public void OnClickAddFriend()
@@ -109,9 +110,9 @@ namespace MultiplayerARPG
             });
         }
 
-        public async UniTaskVoid AddFriendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
+        public async UniTaskVoid AddFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
         {
-            ClientFriendActions.ResponseAddFriend(requestHandler, responseCode, response).Forget();
+            ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response).Forget();
             if (responseCode == AckResponseCode.Success)
                 onFriendAdded.Invoke();
             await UniTask.Yield();

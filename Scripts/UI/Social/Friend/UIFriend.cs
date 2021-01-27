@@ -28,9 +28,10 @@ namespace MultiplayerARPG
 
         private async UniTaskVoid GetFriendsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetFriendsMessage response)
         {
-            await UniTask.Yield();
+            ClientFriendActions.ResponseGetFriends(responseHandler, responseCode, response).Forget();
             if (responseCode == AckResponseCode.Success)
                 UpdateFriendsUIs(response.friends);
+            await UniTask.Yield();
         }
 
         private void UpdateFriendsUIs(SocialCharacterData[] friends)
@@ -105,9 +106,9 @@ namespace MultiplayerARPG
             });
         }
 
-        public async UniTaskVoid RemoveFriendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseRemoveFriendMessage response)
+        public async UniTaskVoid RemoveFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseRemoveFriendMessage response)
         {
-            ClientFriendActions.ResponseRemoveFriend(requestHandler, responseCode, response).Forget();
+            ClientFriendActions.ResponseRemoveFriend(responseHandler, responseCode, response).Forget();
             if (responseCode == AckResponseCode.Success)
                 onFriendRemoved.Invoke();
             await UniTask.Yield();
