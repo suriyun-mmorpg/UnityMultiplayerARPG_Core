@@ -77,6 +77,14 @@ public class UIBase : MonoBehaviour
         this.InvokeInstanceDevExtMethods("Hide");
     }
 
+    public void SetVisible(bool isVisible)
+    {
+        if (!isVisible && IsVisible())
+            Hide();
+        if (isVisible && !IsVisible())
+            Show();
+    }
+
     public void Toggle()
     {
         if (IsVisible())
