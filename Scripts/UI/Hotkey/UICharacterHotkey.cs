@@ -1,8 +1,12 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+#if USE_TEXT_MESH_PRO
+using TMPro;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -71,14 +75,16 @@ namespace MultiplayerARPG
             if (Input.GetKeyDown(key))
             {
                 bool canUse = true;
-                InputField[] fields = FindObjectsOfType<InputField>();
-                foreach (InputField field in fields)
+                if (EventSystem.current.currentSelectedGameObject != null)
                 {
-                    if (field.isFocused)
-                    {
+                    InputField field = EventSystem.current.currentSelectedGameObject.GetComponent<InputField>();
+                    if (field != null && field.isFocused)
                         canUse = false;
-                        break;
-                    }
+#if USE_TEXT_MESH_PRO
+                    TMP_InputField tmpField = EventSystem.current.currentSelectedGameObject.GetComponent<TMP_InputField>();
+                    if (tmpField != null && tmpField.isFocused)
+                        canUse = false;
+#endif
                 }
                 if (canUse)
                     OnClickUse();
