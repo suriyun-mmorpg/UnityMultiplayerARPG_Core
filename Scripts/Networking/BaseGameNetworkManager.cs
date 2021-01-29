@@ -68,7 +68,7 @@ namespace MultiplayerARPG
 
         public override uint PacketVersion()
         {
-            return 7;
+            return 9;
         }
 
         protected override void Awake()
