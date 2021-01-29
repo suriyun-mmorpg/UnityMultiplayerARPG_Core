@@ -645,16 +645,15 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// All layers except `buildingLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `characterLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
-        public int GetMonsterSpawnGroundDetectionLayerMask()
+        public int GetGameEntityGroundDetectionLayerMask()
         {
             int layerMask = 0;
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
-            layerMask = layerMask | buildingLayer.Mask;
-            layerMask = layerMask | harvestableLayer.Mask;
+            layerMask = layerMask | characterLayer.Mask;
             layerMask = MixWithIgnoreRaycastLayers(layerMask);
             return ~layerMask;
         }

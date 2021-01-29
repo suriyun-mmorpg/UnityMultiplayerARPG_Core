@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(-900)]
     public class CharacterAlignOnGround : MonoBehaviour
     {
         public Transform rootBoneTransform;

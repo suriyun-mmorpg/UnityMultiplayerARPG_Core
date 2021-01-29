@@ -13,8 +13,14 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public class RigidBodyEntityMovement : BaseEntityMovement
     {
-        // Buffer to avoid character fall underground when teleport
-        public const float GROUND_BUFFER = 0.16f;
+        /// <summary>
+        /// Buffer to avoid character fall underground when teleport
+        /// </summary>
+        public const float GROUND_BUFFER = 0.00f;
+        /// <summary>
+        /// Buffer to fix invalid teleport position
+        /// </summary>
+        public const byte FRAME_BUFFER = 3;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -83,6 +89,8 @@ namespace MultiplayerARPG
         private float tempEntityMoveSpeed;
         private float tempCurrentMoveSpeed;
         private CollisionFlags collisionFlags;
+        private byte framesAfterTeleported;
+        private Vector3 teleportedPosition;
 
         public override void EntityAwake()
         {
@@ -91,6 +99,7 @@ namespace MultiplayerARPG
             CacheAnimator = GetComponent<Animator>();
             // Prepare network transform component
             CacheNetTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
+            CacheNetTransform.onTeleport += OnTeleport;
             // Prepare rigidbody component
             CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
             // Prepare collider component
@@ -131,6 +140,9 @@ namespace MultiplayerARPG
                     CacheNetTransform.ownerClientNotInterpolate = true;
                     break;
             }
+
+            if (framesAfterTeleported > 0)
+                framesAfterTeleported--;
         }
 
         public override void ComponentOnEnable()
@@ -139,20 +151,26 @@ namespace MultiplayerARPG
             CacheOpenCharacterController.enabled = true;
             CacheOpenCharacterController.SetPosition(CacheTransform.position, true);
             tempVerticalVelocity = 0;
-            CacheNetTransform.onTeleport += OnTeleport;
         }
 
         public override void ComponentOnDisable()
         {
             CacheNetTransform.enabled = false;
             CacheOpenCharacterController.enabled = false;
+        }
+
+        public override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
             CacheNetTransform.onTeleport -= OnTeleport;
         }
 
         protected void OnTeleport(Vector3 position, Quaternion rotation)
         {
-            CacheOpenCharacterController.SetPosition(position, true);
             tempVerticalVelocity = 0;
+            framesAfterTeleported = FRAME_BUFFER;
+            teleportedPosition = position;
+            yRotation = rotation.eulerAngles.y;
         }
 
         protected void OnAnimatorMove()
@@ -289,15 +307,15 @@ namespace MultiplayerARPG
             return Quaternion.Euler(0f, yRotation, 0f);
         }
 
-        public override void Teleport(Vector3 position)
+        public override void Teleport(Vector3 position, Quaternion rotation)
         {
-            CacheNetTransform.Teleport(position + (Vector3.up * GROUND_BUFFER), Quaternion.Euler(0, CacheEntity.MovementTransform.eulerAngles.y, 0));
+            CacheNetTransform.Teleport(position + (Vector3.up * GROUND_BUFFER), rotation);
         }
 
         public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
-            int foundCount = physicFunctions.RaycastDown(fromPosition, Physics.DefaultRaycastLayers, findDistance, QueryTriggerInteraction.Ignore);
+            int foundCount = physicFunctions.RaycastDown(fromPosition, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), findDistance, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < foundCount; ++i)
             {
                 if (physicFunctions.GetRaycastTransform(i).root == CacheTransform.root)
@@ -313,9 +331,12 @@ namespace MultiplayerARPG
             if ((CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
                 (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
                 return;
-
+            if (framesAfterTeleported > 0)
+            {
+                CacheOpenCharacterController.SetPosition(teleportedPosition, true);
+                return;
+            }
             UpdateMovement(Time.deltaTime);
-
             tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
             if (isUnderWater)
                 tempMovementState |= MovementState.IsUnderWater;

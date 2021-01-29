@@ -262,15 +262,15 @@ namespace MultiplayerARPG
             return Quaternion.Euler(0f, yRotation, 0f);
         }
 
-        public override void Teleport(Vector3 position)
+        public override void Teleport(Vector3 position, Quaternion rotation)
         {
-            CacheNetTransform.Teleport(position, Quaternion.Euler(0, CacheEntity.MovementTransform.eulerAngles.y, 0));
+            CacheNetTransform.Teleport(position, rotation);
         }
 
         public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
-            int foundCount = physicFunctions.RaycastDown(fromPosition, Physics.DefaultRaycastLayers, findDistance, QueryTriggerInteraction.Ignore);
+            int foundCount = physicFunctions.RaycastDown(fromPosition, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), findDistance, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < foundCount; ++i)
             {
                 if (physicFunctions.GetRaycastTransform(i).root == CacheTransform.root)

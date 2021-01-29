@@ -198,10 +198,17 @@ namespace MultiplayerARPG
                 BaseGameEntity passenger;
                 if (Manager.TryGetEntityByObjectId(syncPassengerIds[seatIndex], out passenger))
                 {
-                    passenger.ExitedVehicle(
-                        Seats[seatIndex].exitTransform != null ?
-                        Seats[seatIndex].exitTransform.position :
-                        passenger.CacheTransform.position);
+                    if (Seats[seatIndex].exitTransform != null) {
+                        passenger.ExitedVehicle(
+                            Seats[seatIndex].exitTransform.position,
+                            Seats[seatIndex].exitTransform.rotation);
+                    }
+                    else
+                    {
+                        passenger.ExitedVehicle(
+                            MovementTransform.position,
+                            MovementTransform.rotation);
+                    }
                 }
                 syncPassengerIds[seatIndex] = 0;
                 return true;

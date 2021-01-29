@@ -151,7 +151,7 @@ namespace MultiplayerARPG
             return lookRotation;
         }
 
-        public override void Teleport(Vector3 position)
+        public override void Teleport(Vector3 position, Quaternion rotation)
         {
             CacheNetTransform.Teleport(position, Quaternion.identity);
         }

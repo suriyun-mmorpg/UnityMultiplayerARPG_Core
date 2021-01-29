@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         void PointClickMovement(Vector3 position);
         void SetLookRotation(Quaternion rotation);
         Quaternion GetLookRotation();
-        void Teleport(Vector3 position);
+        void Teleport(Vector3 position, Quaternion rotation);
         bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
     }
 }

@@ -337,9 +337,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void OnTeleport(Vector3 position)
+        protected override void OnTeleport(Vector3 position, Quaternion rotation)
         {
-            base.OnTeleport(position);
+            base.OnTeleport(position, rotation);
             // Clear target entity when teleport
             SetTargetEntity(null);
         }

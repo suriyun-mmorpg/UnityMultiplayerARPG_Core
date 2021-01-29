@@ -142,7 +142,7 @@ namespace MultiplayerARPG
                     if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > CurrentGameInstance.maxFollowSummonerDistance)
                     {
                         // Teleport to summoner if too far from summoner
-                        Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner));
+                        Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), Quaternion.LookRotation(-MovementTransform.forward));
                     }
                 }
             }
@@ -540,7 +540,7 @@ namespace MultiplayerARPG
 
             base.Respawn();
             StopMove();
-            Teleport(SpawnPosition);
+            Teleport(SpawnPosition, Quaternion.LookRotation(-MovementTransform.forward));
         }
 
         public virtual void DestroyAndRespawn()

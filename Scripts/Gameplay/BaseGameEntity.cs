@@ -241,7 +241,9 @@ namespace MultiplayerARPG
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
-        protected Vector3? teleportingPosition;
+        protected bool isTeleporting;
+        protected Vector3 teleportingPosition;
+        protected Quaternion teleportingRotation;
         protected bool lastGrounded;
         protected Vector3 lastGroundedPosition;
 
@@ -486,6 +488,12 @@ namespace MultiplayerARPG
                 CacheTransform.position = PassengingVehicleSeat.passengingTransform.position;
                 CacheTransform.rotation = PassengingVehicleSeat.passengingTransform.rotation;
             }
+
+            if (isTeleporting && ActiveMovement != null)
+            {
+                Teleport(teleportingPosition, teleportingRotation);
+                isTeleporting = false;
+            }
         }
 
         private void FixedUpdate()
@@ -541,12 +549,6 @@ namespace MultiplayerARPG
             SetupNetElements();
 
             passengingVehicle.onChange += OnPassengingVehicleChange;
-
-            if (teleportingPosition.HasValue)
-            {
-                Teleport(teleportingPosition.Value);
-                teleportingPosition = null;
-            }
         }
 
         protected virtual void SetupNetElements()
@@ -777,18 +779,20 @@ namespace MultiplayerARPG
             return Quaternion.identity;
         }
 
-        public void Teleport(Vector3 position)
+        public void Teleport(Vector3 position, Quaternion rotation)
         {
             if (ActiveMovement == null)
             {
                 teleportingPosition = position;
+                teleportingRotation = rotation;
+                isTeleporting = true;
                 return;
             }
             Vector3 groundedPosition;
             if (FindGroundedPosition(position, GROUND_DETECTION_DISTANCE, out groundedPosition))
                 position = groundedPosition;
-            OnTeleport(position);
-            ActiveMovement.Teleport(position);
+            OnTeleport(position, rotation);
+            ActiveMovement.Teleport(position, rotation);
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 // Ground check / ground damage will be calculated at server while dimension type is 3d only
@@ -797,7 +801,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void OnTeleport(Vector3 position)
+        protected virtual void OnTeleport(Vector3 position, Quaternion rotation)
         {
 
         }
@@ -950,7 +954,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// This function will be called by Vehicle Entity to inform that this entity exited vehicle
         /// </summary>
-        public void ExitedVehicle(Vector3 exitPosition)
+        public void ExitedVehicle(Vector3 exitPosition, Quaternion exitRotation)
         {
             // Clear passenging vehicle data
             PassengingVehicle = default(PassengingVehicle);
@@ -959,7 +963,7 @@ namespace MultiplayerARPG
             RPC(AllOnExitVehicle);
 
             // Teleport to exit transform
-            Teleport(exitPosition);
+            Teleport(exitPosition, exitRotation);
         }
 
         /// <summary>
