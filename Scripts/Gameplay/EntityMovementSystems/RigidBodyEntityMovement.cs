@@ -72,6 +72,10 @@ namespace MultiplayerARPG
         private float applyJumpForceCountDown;
         private Collider waterCollider;
         private float yRotation;
+        private Vector3 platformMotion;
+        private Transform groundedTransform;
+        private Vector3 groundedLocalPosition;
+        private Vector3 oldGroundedPosition;
 
         // Optimize garbage collector
         private MovementState tempMovementState;
@@ -112,6 +116,7 @@ namespace MultiplayerARPG
             {
                 comp.SetRadiusHeightAndCenter(radius, height, center, true, true);
             });
+            CacheOpenCharacterController.collision += OnCharacterControllerCollision;
             // Setup
             StopMove();
         }
@@ -163,10 +168,12 @@ namespace MultiplayerARPG
         {
             base.EntityOnDestroy();
             CacheNetTransform.onTeleport -= OnTeleport;
+            CacheOpenCharacterController.collision -= OnCharacterControllerCollision;
         }
 
         protected void OnTeleport(Vector3 position, Quaternion rotation)
         {
+            airborneElapsed = 0;
             tempVerticalVelocity = 0;
             framesAfterTeleported = FRAME_BUFFER;
             teleportedPosition = position;
@@ -365,13 +372,13 @@ namespace MultiplayerARPG
             tempTargetDistance = -1f;
             WaterCheck();
 
+            bool isGrounded = CacheOpenCharacterController.isGrounded || airborneElapsed < airborneDelay;
+
             // Update airborne elasped
             if (CacheOpenCharacterController.isGrounded)
                 airborneElapsed = 0f;
             else
                 airborneElapsed += deltaTime;
-
-            bool isGrounded = CacheOpenCharacterController.isGrounded || airborneElapsed < airborneDelay;
 
             if (HasNavPaths)
             {
@@ -525,7 +532,19 @@ namespace MultiplayerARPG
                 tempMoveVelocity.y = tempVerticalVelocity;
             }
 
-            collisionFlags = CacheOpenCharacterController.Move(tempMoveVelocity * deltaTime);
+            platformMotion = Vector3.zero;
+            if (isGrounded && !isUnderWater)
+            {
+                // Apply platform motion
+                if (groundedTransform != null && deltaTime > 0.0f)
+                {
+                    Vector3 newGroundedPosition = groundedTransform.TransformPoint(groundedLocalPosition);
+                    platformMotion = (newGroundedPosition - oldGroundedPosition) / deltaTime;
+                    oldGroundedPosition = newGroundedPosition;
+                }
+            }
+
+            collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
             if ((collisionFlags & CollisionFlags.CollidedBelow) == CollisionFlags.CollidedBelow ||
                 (collisionFlags & CollisionFlags.CollidedAbove) == CollisionFlags.CollidedAbove)
             {
@@ -587,6 +606,13 @@ namespace MultiplayerARPG
                 // Exit water
                 waterCollider = null;
             }
+        }
+
+        private void OnCharacterControllerCollision(OpenCharacterController.CollisionInfo info)
+        {
+            groundedTransform = info.collider.transform;
+            oldGroundedPosition = info.point;
+            groundedLocalPosition = groundedTransform.InverseTransformPoint(oldGroundedPosition);
         }
 
 #if UNITY_EDITOR
