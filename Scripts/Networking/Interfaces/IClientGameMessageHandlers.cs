@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IClientGameMessageHandlers
+    public partial interface IClientGameMessageHandlers
     {
         void HandleGameMessage(MessageHandlerData messageHandler);
         void HandleUpdatePartyMember(MessageHandlerData messageHandler);

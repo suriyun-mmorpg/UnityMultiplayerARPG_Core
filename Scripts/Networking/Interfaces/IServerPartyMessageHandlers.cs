@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public interface IServerPartyMessageHandlers
+    public partial interface IServerPartyMessageHandlers
     {
         UniTaskVoid HandleRequestCreateParty(
             RequestHandlerData requestHandler, RequestCreatePartyMessage request,

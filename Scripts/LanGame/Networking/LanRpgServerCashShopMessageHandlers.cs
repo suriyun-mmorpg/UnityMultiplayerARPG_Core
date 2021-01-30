@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class LanRpgServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
+    public partial class LanRpgServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
     {
         public UniTaskVoid HandleRequestCashShopInfo(
             RequestHandlerData requestHandler, EmptyMessage request,

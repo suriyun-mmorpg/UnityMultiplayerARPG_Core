@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IClientFriendHandlers
+    public partial interface IClientFriendHandlers
     {
         bool RequestFindCharacters(RequestFindCharactersMessage data, ResponseDelegate<ResponseFindCharactersMessage> callback);
         bool RequestGetFriends(ResponseDelegate<ResponseGetFriendsMessage> callback);

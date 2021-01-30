@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultClientGuildHandlers : MonoBehaviour, IClientGuildHandlers
+    public partial class DefaultClientGuildHandlers : MonoBehaviour, IClientGuildHandlers
     {
         public GuildData ClientGuild { get; set; }
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }

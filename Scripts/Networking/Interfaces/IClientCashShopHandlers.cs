@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IClientCashShopHandlers
+    public partial interface IClientCashShopHandlers
     {
         bool RequestCashShopInfo(ResponseDelegate<ResponseCashShopInfoMessage> callback);
         bool RequestCashPackageInfo(ResponseDelegate<ResponseCashPackageInfoMessage> callback);

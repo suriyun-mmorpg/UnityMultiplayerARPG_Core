@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultClientCashShopHandlers : MonoBehaviour, IClientCashShopHandlers
+    public partial class DefaultClientCashShopHandlers : MonoBehaviour, IClientCashShopHandlers
     {
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 

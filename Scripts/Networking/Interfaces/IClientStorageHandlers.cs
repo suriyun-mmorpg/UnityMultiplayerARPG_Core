@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IClientStorageHandlers
+    public partial interface IClientStorageHandlers
     {
         bool RequestOpenStorage(RequestOpenStorageMessage data, ResponseDelegate<ResponseOpenStorageMessage> callback);
         bool RequestCloseStorage(ResponseDelegate<ResponseCloseStorageMessage> callback);

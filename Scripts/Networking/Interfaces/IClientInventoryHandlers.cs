@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IClientInventoryHandlers
+    public partial interface IClientInventoryHandlers
     {
         bool RequestSwapOrMergeItem(RequestSwapOrMergeItemMessage data, ResponseDelegate<ResponseSwapOrMergeItemMessage> callback);
         bool RequestEquipWeapon(RequestEquipWeaponMessage data, ResponseDelegate<ResponseEquipWeaponMessage> callback);

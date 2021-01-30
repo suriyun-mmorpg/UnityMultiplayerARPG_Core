@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultClientPartyHandlers : MonoBehaviour, IClientPartyHandlers
+    public partial class DefaultClientPartyHandlers : MonoBehaviour, IClientPartyHandlers
     {
         public PartyData ClientParty { get; set; }
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }

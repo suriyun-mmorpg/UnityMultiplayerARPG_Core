@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IServerOnlineCharacterHandlers
+    public partial interface IServerOnlineCharacterHandlers
     {
         bool IsCharacterOnline(string characterId);
         void HandleRequestOnlineCharacter(MessageHandlerData messageHandler);

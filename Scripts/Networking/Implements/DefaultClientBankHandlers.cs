@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultClientBankHandlers : MonoBehaviour, IClientBankHandlers
+    public partial class DefaultClientBankHandlers : MonoBehaviour, IClientBankHandlers
     {
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 

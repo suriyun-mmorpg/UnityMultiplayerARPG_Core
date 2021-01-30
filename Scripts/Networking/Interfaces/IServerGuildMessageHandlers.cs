@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public interface IServerGuildMessageHandlers
+    public partial interface IServerGuildMessageHandlers
     {
         UniTaskVoid HandleRequestCreateGuild(
             RequestHandlerData requestHandler, RequestCreateGuildMessage request,

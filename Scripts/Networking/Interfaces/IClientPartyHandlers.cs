@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IClientPartyHandlers
+    public partial interface IClientPartyHandlers
     {
         bool RequestCreateParty(RequestCreatePartyMessage data, ResponseDelegate<ResponseCreatePartyMessage> callback);
         bool RequestChangePartyLeader(RequestChangePartyLeaderMessage data, ResponseDelegate<ResponseChangePartyLeaderMessage> callback);

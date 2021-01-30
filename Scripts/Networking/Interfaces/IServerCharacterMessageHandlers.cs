@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public interface IServerCharacterMessageHandlers
+    public partial interface IServerCharacterMessageHandlers
     {
         UniTaskVoid HandleRequestIncreaseAttributeAmount(
             RequestHandlerData requestHandler, RequestIncreaseAttributeAmountMessage request,

@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface IServerBuildingHandlers
+    public partial interface IServerBuildingHandlers
     {
         /// <summary>
         /// Count placed buildings

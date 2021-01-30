@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultServerBuildingHandlers : MonoBehaviour, IServerBuildingHandlers
+    public partial class DefaultServerBuildingHandlers : MonoBehaviour, IServerBuildingHandlers
     {
         public static readonly ConcurrentDictionary<string, IBuildingSaveData> BuildingEntities = new ConcurrentDictionary<string, IBuildingSaveData>();
 

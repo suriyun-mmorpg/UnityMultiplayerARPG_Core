@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultServerGuildHandlers : MonoBehaviour, IServerGuildHandlers
+    public partial class DefaultServerGuildHandlers : MonoBehaviour, IServerGuildHandlers
     {
         public const int GuildInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, GuildData> Guilds = new ConcurrentDictionary<int, GuildData>();

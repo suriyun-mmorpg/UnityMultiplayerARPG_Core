@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface IServerCashShopMessageHandlers
+    public partial interface IServerCashShopMessageHandlers
     {
         UniTaskVoid HandleRequestCashShopInfo(
             RequestHandlerData requestHandler, EmptyMessage request,

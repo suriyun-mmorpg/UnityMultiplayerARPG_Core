@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IServerGameMessageHandlers
+    public partial interface IServerGameMessageHandlers
     {
         void SendGameMessage(long connectionId, UITextKeys message);
         void NotifyRewardExp(long connectionId, int exp);

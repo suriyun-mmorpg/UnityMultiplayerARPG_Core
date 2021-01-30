@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultClientMailHandlers : MonoBehaviour, IClientMailHandlers
+    public partial class DefaultClientMailHandlers : MonoBehaviour, IClientMailHandlers
     {
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 

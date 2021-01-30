@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface IServerStorageHandlers
+    public partial interface IServerStorageHandlers
     {
         /// <summary>
         /// Get all storages and all items which cached in current server

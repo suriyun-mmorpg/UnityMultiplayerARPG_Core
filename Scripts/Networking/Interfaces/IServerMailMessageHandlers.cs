@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface IServerMailMessageHandlers
+    public partial interface IServerMailMessageHandlers
     {
         UniTaskVoid HandleRequestMailList(
             RequestHandlerData requestHandler, RequestMailListMessage request,

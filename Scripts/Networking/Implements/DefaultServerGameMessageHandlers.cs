@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultServerGameMessageHandlers : MonoBehaviour, IServerGameMessageHandlers
+    public partial class DefaultServerGameMessageHandlers : MonoBehaviour, IServerGameMessageHandlers
     {
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 

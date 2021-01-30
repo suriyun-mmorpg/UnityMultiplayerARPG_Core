@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultClientOnlineCharacterHandlers : MonoBehaviour, IClientOnlineCharacterHandlers
+    public partial class DefaultClientOnlineCharacterHandlers : MonoBehaviour, IClientOnlineCharacterHandlers
     {
         public static readonly ConcurrentDictionary<string, float> OnlineRequestTimes = new ConcurrentDictionary<string, float>();
         public static readonly ConcurrentDictionary<string, float> OnlineCharacterIds = new ConcurrentDictionary<string, float>();

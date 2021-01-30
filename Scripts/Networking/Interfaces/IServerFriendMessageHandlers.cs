@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface IServerFriendMessageHandlers
+    public partial interface IServerFriendMessageHandlers
     {
         UniTaskVoid HandleRequestFindCharacters(
             RequestHandlerData requestHandler, RequestFindCharactersMessage request,

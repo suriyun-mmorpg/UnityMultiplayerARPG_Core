@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public interface IServerInventoryMessageHandlers
+    public partial interface IServerInventoryMessageHandlers
     {
         UniTaskVoid HandleRequestSwapOrMergeItem(
             RequestHandlerData requestHandler, RequestSwapOrMergeItemMessage request,

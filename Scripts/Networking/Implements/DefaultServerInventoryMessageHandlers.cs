@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultServerInventoryMessageHandlers : MonoBehaviour, IServerInventoryMessageHandlers
+    public partial class DefaultServerInventoryMessageHandlers : MonoBehaviour, IServerInventoryMessageHandlers
     {
         public async UniTaskVoid HandleRequestSwapOrMergeItem(RequestHandlerData requestHandler, RequestSwapOrMergeItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeItemMessage> result)
         {
@@ -170,7 +170,7 @@ namespace MultiplayerARPG
             }
             byte equipWeaponSet = request.equipWeaponSet;
             if (equipWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
-                equipWeaponSet = (byte)(GameInstance.Singleton.maxEquipWeaponSet - 1);
+                equipWeaponSet = 0;
             playerCharacter.FillWeaponSetsIfNeeded(equipWeaponSet);
             playerCharacter.EquipWeaponSet = equipWeaponSet;
             result.Invoke(AckResponseCode.Success, new ResponseSwitchEquipWeaponSetMessage());

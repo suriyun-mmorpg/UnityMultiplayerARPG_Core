@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultServerPartyHandlers : MonoBehaviour, IServerPartyHandlers
+    public partial class DefaultServerPartyHandlers : MonoBehaviour, IServerPartyHandlers
     {
         public const int PartyInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, PartyData> Parties = new ConcurrentDictionary<int, PartyData>();

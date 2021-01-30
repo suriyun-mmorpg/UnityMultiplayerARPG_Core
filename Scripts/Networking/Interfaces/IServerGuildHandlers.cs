@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface IServerGuildHandlers
+    public partial interface IServerGuildHandlers
     {
         /// <summary>
         /// Count guilds

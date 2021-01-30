@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class LanRpgServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
+    public partial class LanRpgServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
     {
         public async UniTaskVoid HandleRequestDepositGuildGold(RequestHandlerData requestHandler, RequestDepositGuildGoldMessage request, RequestProceedResultDelegate<ResponseDepositGuildGoldMessage> result)
         {

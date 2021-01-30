@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class LanRpgServerPartyMessageHandlers : MonoBehaviour, IServerPartyMessageHandlers
+    public partial class LanRpgServerPartyMessageHandlers : MonoBehaviour, IServerPartyMessageHandlers
     {
         public static int Id { get; set; }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultClientGameMessageHandlers : MonoBehaviour, IClientGameMessageHandlers
+    public partial class DefaultClientGameMessageHandlers : MonoBehaviour, IClientGameMessageHandlers
     {
         public void HandleGameMessage(MessageHandlerData messageHandler)
         {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultClientStorageHandlers : MonoBehaviour, IClientStorageHandlers
+    public partial class DefaultClientStorageHandlers : MonoBehaviour, IClientStorageHandlers
     {
         public StorageType StorageType { get; set; }
         public string StorageOwnerId { get; set; }

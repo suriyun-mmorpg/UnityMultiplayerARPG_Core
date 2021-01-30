@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public interface IClientBankHandlers
+    public partial interface IClientBankHandlers
     {
         bool RequestWithdrawUserGold(RequestWithdrawUserGoldMessage data, ResponseDelegate<ResponseWithdrawUserGoldMessage> callback);
         bool RequestDepositUserGold(RequestDepositUserGoldMessage data, ResponseDelegate<ResponseDepositUserGoldMessage> callback);

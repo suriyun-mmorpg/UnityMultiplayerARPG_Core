@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// These properties and functions will be called at server only
     /// </summary>
-    public interface IServerBankMessageHandlers
+    public partial interface IServerBankMessageHandlers
     {
         UniTaskVoid HandleRequestWithdrawUserGold(
             RequestHandlerData requestHandler, RequestWithdrawUserGoldMessage request,
