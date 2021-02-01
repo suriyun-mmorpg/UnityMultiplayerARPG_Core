@@ -7,14 +7,26 @@ using UnityEngine.UI;
 public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public static readonly HashSet<GameObject> DraggingObjects = new HashSet<GameObject>();
+    public enum ScrollRectAllowing
+    {
+        None,
+        AllowVerticalScrolling,
+        AllowHorizontalScrolling,
+    }
 
     public Transform rootTransform;
+    public ScrollRectAllowing scrollRectAllowing;
+    [Tooltip("This will be used while `scrollRectAllowing` is not `None`")]
+    public float beginDragMinDelta = 15f;
+    public ScrollRect scrollRect;
 
     public Canvas CacheCanvas { get; protected set; }
 
     public List<Graphic> CacheGraphics { get; protected set; }
 
     public virtual bool CanDrag { get { return true; } }
+
+    public bool IsScrolling { get; protected set; }
 
     [System.NonSerialized]
     public bool isDropped;
@@ -29,6 +41,9 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
     {
         if (rootTransform == null)
             rootTransform = transform;
+
+        if (scrollRect == null)
+            scrollRect = GetComponentInParent<ScrollRect>();
 
         CacheCanvas = GetComponentInParent<Canvas>();
         // Find root canvas, will use it to set as parent while dragging
@@ -46,6 +61,25 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public virtual void OnBeginDrag(PointerEventData eventData)
     {
+        if (scrollRect != null)
+        {
+            if (scrollRectAllowing == ScrollRectAllowing.AllowVerticalScrolling &&
+                Mathf.Abs(eventData.delta.x) < beginDragMinDelta)
+            {
+                IsScrolling = true;
+                scrollRect.SendMessage("OnBeginDrag", eventData);
+                return;
+            }
+
+            if (scrollRectAllowing == ScrollRectAllowing.AllowHorizontalScrolling &&
+                Mathf.Abs(eventData.delta.y) < beginDragMinDelta)
+            {
+                IsScrolling = true;
+                scrollRect.SendMessage("OnBeginDrag", eventData);
+                return;
+            }
+        }
+
         defaultSiblingIndex = rootTransform.GetSiblingIndex();
         defaultParent = rootTransform.parent;
         defaultLocalPosition = rootTransform.localPosition;
@@ -73,6 +107,11 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public virtual void OnDrag(PointerEventData eventData)
     {
+        if (IsScrolling)
+        {
+            scrollRect.SendMessage("OnDrag", eventData);
+            return;
+        }
         if (!CanDrag)
             return;
         rootTransform.position = Input.mousePosition;
@@ -80,6 +119,12 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public virtual void OnEndDrag(PointerEventData eventData)
     {
+        if (IsScrolling)
+        {
+            scrollRect.SendMessage("OnEndDrag", eventData);
+            IsScrolling = false;
+            return;
+        }
         DraggingObjects.Remove(gameObject);
         rootTransform.SetParent(defaultParent);
         rootTransform.SetSiblingIndex(defaultSiblingIndex);

@@ -85,6 +85,11 @@ namespace MultiplayerARPG
 
         public override void OnEndDrag(PointerEventData eventData)
         {
+            if (IsScrolling)
+            {
+                base.OnEndDrag(eventData);
+                return;
+            }
             base.OnEndDrag(eventData);
             if (isDropped || !CanDrag)
                 return;
