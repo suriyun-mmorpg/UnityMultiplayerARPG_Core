@@ -540,6 +540,7 @@ namespace MultiplayerARPG
                 {
                     Vector3 newGroundedPosition = groundedTransform.TransformPoint(groundedLocalPosition);
                     platformMotion = (newGroundedPosition - oldGroundedPosition) / deltaTime;
+                    platformMotion.y = 0;
                     oldGroundedPosition = newGroundedPosition;
                 }
             }
@@ -610,9 +611,12 @@ namespace MultiplayerARPG
 
         private void OnCharacterControllerCollision(OpenCharacterController.CollisionInfo info)
         {
-            groundedTransform = info.collider.transform;
-            oldGroundedPosition = info.point;
-            groundedLocalPosition = groundedTransform.InverseTransformPoint(oldGroundedPosition);
+            if (CacheOpenCharacterController.isGrounded)
+            {
+                groundedTransform = info.collider.transform;
+                oldGroundedPosition = info.point;
+                groundedLocalPosition = groundedTransform.InverseTransformPoint(oldGroundedPosition);
+            }
         }
 
 #if UNITY_EDITOR
