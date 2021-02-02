@@ -126,11 +126,11 @@ namespace MultiplayerARPG
             CacheDiscovery.StopServer();
         }
 
-        protected override void LateUpdate()
+        protected override void FixedUpdate()
         {
-            base.LateUpdate();
-            float tempUnscaledTime = Time.unscaledTime;
-            if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
+            base.FixedUpdate();
+            float tempTime = Time.fixedTime;
+            if (tempTime - lastSaveTime > autoSaveDuration)
             {
                 Profiler.BeginSample("LanRpgNetworkManager - Save Data");
                 BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
@@ -144,7 +144,7 @@ namespace MultiplayerARPG
                     }
                 }
                 Profiler.EndSample();
-                lastSaveTime = tempUnscaledTime;
+                lastSaveTime = tempTime;
             }
 
             if (IsServer && pendingSpawnPlayerCharacters.Count > 0 && isReadyToInstantiatePlayers)

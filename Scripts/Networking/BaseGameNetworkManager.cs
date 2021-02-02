@@ -79,9 +79,9 @@ namespace MultiplayerARPG
             base.Awake();
         }
 
-        protected override void LateUpdate()
+        protected override void FixedUpdate()
         {
-            base.LateUpdate();
+            base.FixedUpdate();
             float tempDeltaTime = Time.unscaledDeltaTime;
             if (IsServer)
             {
