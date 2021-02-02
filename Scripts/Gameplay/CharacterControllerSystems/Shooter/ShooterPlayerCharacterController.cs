@@ -955,7 +955,6 @@ namespace MultiplayerARPG
                     {
                         await UniTask.Yield();
                     }
-                    UpdateLookAtTarget();
                     UseSkill(isLeftHandAttacking);
                 }
                 else if (tempPressAttackRight || tempPressAttackLeft)
@@ -965,7 +964,6 @@ namespace MultiplayerARPG
                     {
                         await UniTask.Yield();
                     }
-                    UpdateLookAtTarget();
                     Attack(isLeftHandAttacking);
                 }
                 else if (activateInput.IsHold && activatingEntityOrDoAction)
@@ -974,7 +972,6 @@ namespace MultiplayerARPG
                     {
                         await UniTask.Yield();
                     }
-                    UpdateLookAtTarget();
                     HoldActivate();
                 }
                 else if (activateInput.IsRelease && activatingEntityOrDoAction)
@@ -983,7 +980,6 @@ namespace MultiplayerARPG
                     {
                         await UniTask.Yield();
                     }
-                    UpdateLookAtTarget();
                     Activate();
                 }
                 else
