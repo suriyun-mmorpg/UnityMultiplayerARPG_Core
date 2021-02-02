@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -262,6 +263,7 @@ namespace MultiplayerARPG
         InputStateManager reloadInput;
         InputStateManager exitVehicleInput;
         InputStateManager switchEquipWeaponSetInput;
+        bool updatingInputs;
         // Entity detector
         NearbyEntityDetector warpPortalEntityDetector;
         // Temp physic variables
@@ -542,10 +544,13 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.AimPosition = aimPosition;
 
             // Update input
-            if (ConstructingBuildingEntity == null)
-                UpdateInputs_BattleMode();
-            else
-                UpdateInputs_BuildMode();
+            if (!updatingInputs)
+            {
+                if (ConstructingBuildingEntity == null)
+                    UpdateInputs_BattleMode().Forget();
+                else
+                    UpdateInputs_BuildMode().Forget();
+            }
 
             // Hide Npc UIs when move
             if (moveDirection.sqrMagnitude > 0f)
@@ -847,8 +852,9 @@ namespace MultiplayerARPG
             moveDirection.Normalize();
         }
 
-        private void UpdateInputs_BattleMode()
+        private async UniTaskVoid UpdateInputs_BattleMode()
         {
+            updatingInputs = true;
             // Have to release fire key, then check press fire key later on next frame
             if (mustReleaseFireKey)
             {
@@ -937,31 +943,46 @@ namespace MultiplayerARPG
                 if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
                 {
                     activatingEntityOrDoAction = true;
-                    SetTargetLookDirectionWhileDoingAction();
+                    while (!SetTargetLookDirectionWhileDoingAction())
+                    {
+                        await UniTask.Yield();
+                    }
                 }
                 else if (queueUsingSkill.skill != null)
                 {
                     activatingEntityOrDoAction = true;
-                    SetTargetLookDirectionWhileDoingAction();
+                    while (!SetTargetLookDirectionWhileDoingAction())
+                    {
+                        await UniTask.Yield();
+                    }
                     UpdateLookAtTarget();
                     UseSkill(isLeftHandAttacking);
                 }
                 else if (tempPressAttackRight || tempPressAttackLeft)
                 {
                     activatingEntityOrDoAction = true;
-                    SetTargetLookDirectionWhileDoingAction();
+                    while (!SetTargetLookDirectionWhileDoingAction())
+                    {
+                        await UniTask.Yield();
+                    }
                     UpdateLookAtTarget();
                     Attack(isLeftHandAttacking);
                 }
                 else if (activateInput.IsHold && activatingEntityOrDoAction)
                 {
-                    SetTargetLookDirectionWhileDoingAction();
+                    while (!SetTargetLookDirectionWhileDoingAction())
+                    {
+                        await UniTask.Yield();
+                    }
                     UpdateLookAtTarget();
                     HoldActivate();
                 }
                 else if (activateInput.IsRelease && activatingEntityOrDoAction)
                 {
-                    SetTargetLookDirectionWhileDoingAction();
+                    while (!SetTargetLookDirectionWhileDoingAction())
+                    {
+                        await UniTask.Yield();
+                    }
                     UpdateLookAtTarget();
                     Activate();
                 }
@@ -1049,11 +1070,15 @@ namespace MultiplayerARPG
                 // Reload ammo when empty and not press any keys
                 ReloadAmmo();
             }
+
+            updatingInputs = false;
         }
 
-        private void UpdateInputs_BuildMode()
+        private async UniTaskVoid UpdateInputs_BuildMode()
         {
             SetTargetLookDirectionWhileMoving();
+            updatingInputs = false;
+            await UniTask.Yield();
         }
 
         private void ReloadAmmo()
@@ -1138,14 +1163,18 @@ namespace MultiplayerARPG
             UpdateRecoil();
         }
 
-        private void SetTargetLookDirectionWhileDoingAction()
+        /// <summary>
+        /// Return true if it's turned forwarding
+        /// </summary>
+        /// <returns></returns>
+        private bool SetTargetLookDirectionWhileDoingAction()
         {
             switch (ViewMode)
             {
                 case ShooterControllerViewMode.Fps:
                     // Just look at camera forward while character playing action animation
                     targetLookDirection = cameraForward;
-                    break;
+                    return true;
                 case ShooterControllerViewMode.Tps:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
                     Vector3 doActionLookDirection = turnForwardWhileDoingAction ? cameraForward : aimDirection;
@@ -1155,14 +1184,16 @@ namespace MultiplayerARPG
                         Quaternion targetRot = Quaternion.LookRotation(doActionLookDirection);
                         currentRot = Quaternion.Slerp(currentRot, targetRot, turnSpeedWileDoingAction * Time.deltaTime);
                         targetLookDirection = currentRot * Vector3.forward;
+                        return Quaternion.Angle(currentRot, targetRot) <= 1f;
                     }
                     else
                     {
                         // Turn immediately because turn speed <= 0
                         targetLookDirection = doActionLookDirection;
+                        return true;
                     }
-                    break;
             }
+            return false;
         }
 
         private void SetTargetLookDirectionWhileMoving()
