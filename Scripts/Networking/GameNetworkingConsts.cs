@@ -84,5 +84,8 @@
         public const ushort SendFriendRequest = 158;
         public const ushort AcceptFriendRequest = 159;
         public const ushort DeclineFriendRequest = 160;
+        public const ushort SendGuildRequest = 161;
+        public const ushort AcceptGuildRequest = 162;
+        public const ushort DeclineGuildRequest = 163;
     }
 }

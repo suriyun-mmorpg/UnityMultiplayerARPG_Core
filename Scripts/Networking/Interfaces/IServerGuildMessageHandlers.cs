@@ -48,5 +48,17 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestIncreaseGuildSkillLevel(
             RequestHandlerData requestHandler, RequestIncreaseGuildSkillLevelMessage request,
             RequestProceedResultDelegate<ResponseIncreaseGuildSkillLevelMessage> result);
+
+        UniTaskVoid HandleRequestSendGuildRequest(
+            RequestHandlerData requestHandler, RequestSendGuildRequestMessage request,
+            RequestProceedResultDelegate<ResponseSendGuildRequestMessage> result);
+
+        UniTaskVoid HandleRequestAcceptGuildRequest(
+            RequestHandlerData requestHandler, RequestAcceptGuildRequestMessage request,
+            RequestProceedResultDelegate<ResponseAcceptGuildRequestMessage> result);
+
+        UniTaskVoid HandleRequestDeclineGuildRequest(
+            RequestHandlerData requestHandler, RequestDeclineGuildRequestMessage request,
+            RequestProceedResultDelegate<ResponseDeclineGuildRequestMessage> result);
     }
 }

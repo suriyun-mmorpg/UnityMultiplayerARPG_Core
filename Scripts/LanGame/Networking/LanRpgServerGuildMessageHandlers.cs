@@ -378,5 +378,23 @@ namespace MultiplayerARPG
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(validateResult.Guild);
             result.Invoke(AckResponseCode.Success, new ResponseIncreaseGuildSkillLevelMessage());
         }
+
+        public async UniTaskVoid HandleRequestSendGuildRequest(RequestHandlerData requestHandler, RequestSendGuildRequestMessage request, RequestProceedResultDelegate<ResponseSendGuildRequestMessage> result)
+        {
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseSendGuildRequestMessage());
+            await UniTask.Yield();
+        }
+
+        public async UniTaskVoid HandleRequestAcceptGuildRequest(RequestHandlerData requestHandler, RequestAcceptGuildRequestMessage request, RequestProceedResultDelegate<ResponseAcceptGuildRequestMessage> result)
+        {
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseAcceptGuildRequestMessage());
+            await UniTask.Yield();
+        }
+
+        public async UniTaskVoid HandleRequestDeclineGuildRequest(RequestHandlerData requestHandler, RequestDeclineGuildRequestMessage request, RequestProceedResultDelegate<ResponseDeclineGuildRequestMessage> result)
+        {
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseDeclineGuildRequestMessage());
+            await UniTask.Yield();
+        }
     }
 }
