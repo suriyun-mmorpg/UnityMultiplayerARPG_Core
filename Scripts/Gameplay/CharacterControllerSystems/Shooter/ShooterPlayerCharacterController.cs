@@ -76,6 +76,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool turnForwardWhileDoingAction = true;
         [SerializeField]
+        private float stoppedPlayingAttackOrUseSkillAnimationDelay = 0.5f;
+        [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
         private float turnSpeed = 0f;
         [SerializeField]
@@ -263,6 +265,7 @@ namespace MultiplayerARPG
         InputStateManager reloadInput;
         InputStateManager exitVehicleInput;
         InputStateManager switchEquipWeaponSetInput;
+        float lastPlayingAttackOrUseSkillAnimationTime;
         bool updatingInputs;
         // Entity detector
         NearbyEntityDetector warpPortalEntityDetector;
@@ -869,6 +872,8 @@ namespace MultiplayerARPG
                     !GetSecondaryAttackButton()))
                     mustReleaseFireKey = false;
             }
+            if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
+                lastPlayingAttackOrUseSkillAnimationTime = Time.unscaledTime;
             bool anyKeyPressed = false;
             bool activatingEntityOrDoAction = false;
             if (queueUsingSkill.skill != null ||
@@ -1044,12 +1049,6 @@ namespace MultiplayerARPG
                 }, ClientInventoryActions.ResponseSwitchEquipWeaponSet);
             }
 
-            if (!anyKeyPressed && !activatingEntityOrDoAction)
-            {
-                // Update look direction while moving without doing any action
-                SetTargetLookDirectionWhileMoving();
-            }
-
             // Setup releasing state
             if (tempPressAttackRight && rightHandWeapon != null && rightHandWeapon.FireType == FireType.SingleFire)
             {
@@ -1069,6 +1068,24 @@ namespace MultiplayerARPG
             {
                 // Reload ammo when empty and not press any keys
                 ReloadAmmo();
+            }
+
+            // Update look direction
+            if (!anyKeyPressed && !activatingEntityOrDoAction)
+            {
+                // Update look direction while moving without doing any action
+                if (Time.unscaledTime - lastPlayingAttackOrUseSkillAnimationTime < stoppedPlayingAttackOrUseSkillAnimationDelay)
+                {
+                    activatingEntityOrDoAction = true;
+                    while (!SetTargetLookDirectionWhileDoingAction())
+                    {
+                        await UniTask.Yield();
+                    }
+                }
+                else
+                {
+                    SetTargetLookDirectionWhileMoving();
+                }
             }
 
             updatingInputs = false;
