@@ -30,5 +30,20 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.RemoveFriend, data, responseDelegate: callback);
         }
+
+        public bool RequestSendFriendRequest(RequestSendFriendRequestMessage data, ResponseDelegate<ResponseSendFriendRequestMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.SendFriendRequest, data, responseDelegate: callback);
+        }
+
+        public bool RequestAcceptFriendRequest(RequestAcceptFriendRequestMessage data, ResponseDelegate<ResponseAcceptFriendRequestMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.AcceptFriendRequest, data, responseDelegate: callback);
+        }
+
+        public bool RequestDeclineFriendRequest(RequestDeclineFriendRequestMessage data, ResponseDelegate<ResponseDeclineFriendRequestMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.DeclineFriendRequest, data, responseDelegate: callback);
+        }
     }
 }

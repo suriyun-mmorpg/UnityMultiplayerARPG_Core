@@ -8,5 +8,8 @@ namespace MultiplayerARPG
         bool RequestGetFriends(ResponseDelegate<ResponseGetFriendsMessage> callback);
         bool RequestAddFriend(RequestAddFriendMessage data, ResponseDelegate<ResponseAddFriendMessage> callback);
         bool RequestRemoveFriend(RequestRemoveFriendMessage data, ResponseDelegate<ResponseRemoveFriendMessage> callback);
+        bool RequestSendFriendRequest(RequestSendFriendRequestMessage data, ResponseDelegate<ResponseSendFriendRequestMessage> callback);
+        bool RequestAcceptFriendRequest(RequestAcceptFriendRequestMessage data, ResponseDelegate<ResponseAcceptFriendRequestMessage> callback);
+        bool RequestDeclineFriendRequest(RequestDeclineFriendRequestMessage data, ResponseDelegate<ResponseDeclineFriendRequestMessage> callback);
     }
 }

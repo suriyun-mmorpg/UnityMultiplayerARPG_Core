@@ -81,5 +81,8 @@
         public const ushort RepairEquipItems = 155;
         public const ushort SellItem = 156;
         public const ushort SellItems = 157;
+        public const ushort SendFriendRequest = 158;
+        public const ushort AcceptFriendRequest = 159;
+        public const ushort DeclineFriendRequest = 160;
     }
 }

@@ -23,5 +23,17 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestRemoveFriend(
             RequestHandlerData requestHandler, RequestRemoveFriendMessage request,
             RequestProceedResultDelegate<ResponseRemoveFriendMessage> result);
+
+        UniTaskVoid HandleRequestSendFriendRequest(
+            RequestHandlerData requestHandler, RequestSendFriendRequestMessage request,
+            RequestProceedResultDelegate<ResponseSendFriendRequestMessage> result);
+
+        UniTaskVoid HandleRequestAcceptFriendRequest(
+            RequestHandlerData requestHandler, RequestAcceptFriendRequestMessage request,
+            RequestProceedResultDelegate<ResponseAcceptFriendRequestMessage> result);
+
+        UniTaskVoid HandleRequestDeclineFriendRequest(
+            RequestHandlerData requestHandler, RequestDeclineFriendRequestMessage request,
+            RequestProceedResultDelegate<ResponseDeclineFriendRequestMessage> result);
     }
 }
