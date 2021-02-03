@@ -4,16 +4,16 @@ namespace MultiplayerARPG
 {
     public struct RequestDeclineFriendRequestMessage : INetSerializable
     {
-        public string friendId;
+        public string requesterId;
 
         public void Deserialize(NetDataReader reader)
         {
-            friendId = reader.GetString();
+            requesterId = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(friendId);
+            writer.Put(requesterId);
         }
     }
 }
