@@ -54,7 +54,7 @@ namespace MultiplayerARPG
 
         [Header("Craft")]
         public ItemCraft itemCraft;
-        
+
         [System.NonSerialized]
         private Dictionary<Attribute, float> cacheEffectivenessAttributes;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
@@ -149,7 +149,9 @@ namespace MultiplayerARPG
                     break;
                 case SkillBuffType.BuffToTarget:
                     BaseCharacterEntity targetEntity;
-                    if (skillUser.TryGetTargetEntity(out targetEntity) && !targetEntity.IsDead())
+                    if (!skillUser.TryGetTargetEntity(out targetEntity))
+                        targetEntity = skillUser;
+                    if (!targetEntity.IsDead())
                         targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     break;
                 case SkillBuffType.Toggle:
@@ -343,6 +345,18 @@ namespace MultiplayerARPG
             if (IsAttack())
                 return GetDamageInfo(skillUser, isLeftHand).GetDamageTransform(skillUser, isLeftHand);
             return base.GetApplyTransform(skillUser, isLeftHand);
+        }
+
+        public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out UITextKeys gameMessage, bool isItem = false)
+        {
+            bool canUse = base.CanUse(character, level, isLeftHand, out gameMessage, isItem);
+            if (!canUse && gameMessage == UITextKeys.UI_ERROR_NO_SKILL_TARGET)
+            {
+                // Still allow to use skill but it's going to set applies target to skill user
+                gameMessage = UITextKeys.NONE;
+                return true;
+            }
+            return canUse;
         }
     }
 }
