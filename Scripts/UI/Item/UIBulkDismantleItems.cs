@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -16,6 +15,12 @@ namespace MultiplayerARPG
         public UIItemAmounts uiReturnItems;
         public TextWrapper uiTextReturnGold;
 
+        private void OnEnable()
+        {
+            if (uiNonEquipItems == null)
+                uiNonEquipItems = FindObjectOfType<UINonEquipItems>();
+        }
+
         private void OnDisable()
         {
             uiNonEquipItems.CacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
@@ -28,8 +33,6 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            if (uiNonEquipItems == null)
-                uiNonEquipItems = FindObjectOfType<UINonEquipItems>();
             int returnGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
             CharacterItem tempCharacterItem;
