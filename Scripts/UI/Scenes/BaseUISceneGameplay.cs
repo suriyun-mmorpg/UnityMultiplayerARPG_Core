@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                 UISceneGlobal.Singleton.uiPasswordDialog.IsVisible())
                 return true;
 
-            if (FindObjectOfType<UIBlockController>())
+            if (UIBlockController.IsBlockController())
                 return true;
 
             return false;
