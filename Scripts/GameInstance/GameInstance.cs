@@ -654,6 +654,7 @@ namespace MultiplayerARPG
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | itemDropLayer.Mask;
             layerMask = MixWithIgnoreRaycastLayers(layerMask);
             return ~layerMask;
         }
