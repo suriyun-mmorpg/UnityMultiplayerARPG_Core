@@ -138,11 +138,9 @@ namespace MultiplayerARPG
             {
                 case MovementSecure.ServerAuthoritative:
                     CacheNetTransform.ownerClientCanSendTransform = false;
-                    CacheNetTransform.ownerClientNotInterpolate = false;
                     break;
                 case MovementSecure.NotSecure:
                     CacheNetTransform.ownerClientCanSendTransform = true;
-                    CacheNetTransform.ownerClientNotInterpolate = true;
                     break;
             }
 
