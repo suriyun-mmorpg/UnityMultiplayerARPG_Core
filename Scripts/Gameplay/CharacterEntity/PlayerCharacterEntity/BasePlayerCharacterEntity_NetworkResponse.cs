@@ -145,7 +145,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            CurrentGameManager.DestroyBuildingEntity(buildingEntity.Id);
+            buildingEntity.Destroy();
 #endif
         }
 

@@ -410,6 +410,7 @@ namespace MultiplayerARPG
                     child.Destroy();
                 }
                 children.Clear();
+                CurrentGameManager.DestroyBuildingEntity(Id);
             }
         }
 

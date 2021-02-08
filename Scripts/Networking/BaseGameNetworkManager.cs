@@ -837,12 +837,7 @@ namespace MultiplayerARPG
 
         public virtual void DestroyBuildingEntity(string id)
         {
-            BuildingEntity buildingEntity;
-            if (ServerBuildingHandlers.TryGetBuilding(id, out buildingEntity))
-            {
-                buildingEntity.Destroy();
-                ServerBuildingHandlers.RemoveBuilding(id);
-            }
+            ServerBuildingHandlers.RemoveBuilding(id);
         }
 
         public void SetMapInfo(string mapId)
