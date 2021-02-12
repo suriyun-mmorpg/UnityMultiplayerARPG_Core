@@ -72,9 +72,8 @@ namespace MultiplayerARPG
             }, MailSendCallback);
         }
 
-        private async UniTaskVoid MailSendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendMailMessage response)
+        private void MailSendCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendMailMessage response)
         {
-            await UniTask.Yield();
             if (inputReceiverName != null)
                 inputReceiverName.interactable = true;
             if (inputTitle != null)

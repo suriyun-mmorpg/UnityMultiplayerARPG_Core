@@ -19,89 +19,78 @@ namespace MultiplayerARPG
         public static System.Action<GuildInvitationData> onNotifyGuildInvitation;
         public static System.Action<GuildData> onNotifyGuildUpdated;
 
-        public static async UniTaskVoid ResponseSendGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
+        public static void ResponseSendGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseSendGuildInvitation != null)
                 onResponseSendGuildInvitation.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseAcceptGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAcceptGuildInvitationMessage response)
+        public static void ResponseAcceptGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAcceptGuildInvitationMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseAcceptGuildInvitation != null)
                 onResponseAcceptGuildInvitation.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseDeclineGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclineGuildInvitationMessage response)
+        public static void ResponseDeclineGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclineGuildInvitationMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseDeclineGuildInvitation != null)
                 onResponseDeclineGuildInvitation.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseCreateGuild(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCreateGuildMessage response)
+        public static void ResponseCreateGuild(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCreateGuildMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseCreateGuild != null)
                 onResponseCreateGuild.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseChangeGuildLeader(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildLeaderMessage response)
+        public static void ResponseChangeGuildLeader(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildLeaderMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseChangeGuildLeader != null)
                 onResponseChangeGuildLeader.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseKickMemberFromGuild(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromGuildMessage response)
+        public static void ResponseKickMemberFromGuild(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromGuildMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseKickMemberFromGuild != null)
                 onResponseKickMemberFromGuild.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseLeaveGuild(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseLeaveGuildMessage response)
+        public static void ResponseLeaveGuild(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseLeaveGuildMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseLeaveGuild != null)
                 onResponseLeaveGuild.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseChangeGuildMessage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildMessageMessage response)
+        public static void ResponseChangeGuildMessage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildMessageMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseChangeGuildMessage != null)
                 onResponseChangeGuildMessage.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseChangeGuildRole(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildRoleMessage response)
+        public static void ResponseChangeGuildRole(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildRoleMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseChangeGuildRole != null)
                 onResponseChangeGuildRole.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseChangeMemberGuildRole(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeMemberGuildRoleMessage response)
+        public static void ResponseChangeMemberGuildRole(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeMemberGuildRoleMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseChangeMemberGuildRole != null)
                 onResponseChangeMemberGuildRole.Invoke(requestHandler, responseCode, response);
         }
 
-        public static async UniTaskVoid ResponseIncreaseGuildSkillLevel(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseIncreaseGuildSkillLevelMessage response)
+        public static void ResponseIncreaseGuildSkillLevel(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseIncreaseGuildSkillLevelMessage response)
         {
-            await UniTask.Yield();
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseIncreaseGuildSkillLevel != null)
                 onResponseIncreaseGuildSkillLevel.Invoke(requestHandler, responseCode, response);

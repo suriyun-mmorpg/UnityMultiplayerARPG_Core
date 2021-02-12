@@ -109,9 +109,8 @@ namespace MultiplayerARPG
             RefreshCashPackageInfo();
         }
 
-        private async UniTaskVoid ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
+        private void ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
         {
-            await UniTask.Yield();
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
 
             if (uiTextCash != null)

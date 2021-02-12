@@ -53,9 +53,8 @@ namespace MultiplayerARPG
             }, ReadMailCallback);
         }
 
-        private async UniTaskVoid ReadMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseReadMailMessage response)
+        private void ReadMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseReadMailMessage response)
         {
-            await UniTask.Yield();
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UpdateData(response.mail);
         }
@@ -68,9 +67,8 @@ namespace MultiplayerARPG
             }, ClaimMailItemsCallback);
         }
 
-        private async UniTaskVoid ClaimMailItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimMailItemsMessage response)
+        private void ClaimMailItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimMailItemsMessage response)
         {
-            await UniTask.Yield();
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_CLAIMED.ToString()));
             Hide();
@@ -86,9 +84,8 @@ namespace MultiplayerARPG
             }, DeleteMailCallback);
         }
 
-        private async UniTaskVoid DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteMailMessage response)
+        private void DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteMailMessage response)
         {
-            await UniTask.Yield();
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_DELETED.ToString()));
             Hide();

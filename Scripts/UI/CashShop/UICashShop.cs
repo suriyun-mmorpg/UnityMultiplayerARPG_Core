@@ -101,9 +101,8 @@ namespace MultiplayerARPG
             }, ResponseCashShopBuy);
         }
 
-        private async UniTaskVoid ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
+        private void ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
         {
-            await UniTask.Yield();
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
 
             if (uiTextCash != null)
@@ -137,9 +136,8 @@ namespace MultiplayerARPG
             });
         }
 
-        private async UniTaskVoid ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)
+        private void ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)
         {
-            await UniTask.Yield();
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString()));
             RefreshCashShopInfo();

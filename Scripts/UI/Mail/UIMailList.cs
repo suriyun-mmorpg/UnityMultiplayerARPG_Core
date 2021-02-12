@@ -103,9 +103,8 @@ namespace MultiplayerARPG
             }, MailListCallback);
         }
 
-        private async UniTaskVoid MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
+        private void MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {
-            await UniTask.Yield();
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
