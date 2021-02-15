@@ -21,15 +21,17 @@ namespace MultiplayerARPG
         [Header("Casted Effects")]
         public GameEffect[] damageHitEffects;
 
-        [Header("Available Weapons")]
+        [Header("Required Equipments")]
+        [Tooltip("If this is `TRUE`, character have to equip shield to use skill")]
+        public bool requireShield;
+
         [Tooltip("Characters will be able to use skill if this list is empty or equipping one in this list")]
         public WeaponType[] availableWeapons;
 
-        [Header("Required One Of Armors")]
         [Tooltip("Characters will be able to use skill if this list is empty or equipping one in this list")]
         public ArmorType[] availableArmors;
 
-        [Header("Required One Of Driving Vehicles")]
+        [Header("Required Vehicles")]
         [Tooltip("Characters will be able to use skill if this list is empty or driving one in this list")]
         public VehicleType[] availableVehicles;
 
@@ -490,7 +492,16 @@ namespace MultiplayerARPG
                 {
                     case SkillType.Active:
                         available = true;
-                        if (CacheAvailableWeapons.Count > 0)
+                        if (requireShield)
+                        {
+                            available = false;
+                            IShieldItem leftShieldItem = character.EquipWeapons.GetLeftHandShieldItem();
+                            if (leftShieldItem != null)
+                            {
+                                available = true;
+                            }
+                        }
+                        if (available && CacheAvailableWeapons.Count > 0)
                         {
                             available = false;
                             IWeaponItem rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
