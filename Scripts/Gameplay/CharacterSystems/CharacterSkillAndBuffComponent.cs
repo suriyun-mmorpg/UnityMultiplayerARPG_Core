@@ -124,31 +124,31 @@ namespace MultiplayerARPG
                         if (tempAmount > 0)
                             recoveryData.recoveryingHp += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingHp += tempAmount;
+                            recoveryData.decreasingHp += -tempAmount;
                         // Mp recovery
                         tempAmount = (float)buff.GetRecoveryMp() / duration * updatingTime;
                         if (tempAmount > 0)
                             recoveryData.recoveryingMp += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingMp += tempAmount;
+                            recoveryData.decreasingMp += -tempAmount;
                         // Stamina recovery
                         tempAmount = (float)buff.GetRecoveryStamina() / duration * updatingTime;
                         if (tempAmount > 0)
                             recoveryData.recoveryingStamina += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingStamina += tempAmount;
+                            recoveryData.decreasingStamina += -tempAmount;
                         // Food recovery
                         tempAmount = (float)buff.GetRecoveryFood() / duration * updatingTime;
                         if (tempAmount > 0)
                             recoveryData.recoveryingFood += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingFood += tempAmount;
+                            recoveryData.decreasingFood += -tempAmount;
                         // Water recovery
                         tempAmount = (float)buff.GetRecoveryWater() / duration * updatingTime;
                         if (tempAmount > 0)
                             recoveryData.recoveryingWater += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingWater += tempAmount;
+                            recoveryData.decreasingWater += -tempAmount;
 
                         recoveryData = recoveryData.Apply(CacheEntity, buff.BuffApplier);
 
