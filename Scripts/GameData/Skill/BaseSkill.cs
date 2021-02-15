@@ -476,7 +476,6 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            bool available = true;
             BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
             if (playerCharacter != null)
             {
@@ -491,19 +490,18 @@ namespace MultiplayerARPG
                 switch (SkillType)
                 {
                     case SkillType.Active:
-                        available = true;
                         if (requireShield)
                         {
-                            available = false;
                             IShieldItem leftShieldItem = character.EquipWeapons.GetLeftHandShieldItem();
-                            if (leftShieldItem != null)
+                            if (leftShieldItem == null)
                             {
-                                available = true;
+                                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_WITHOUT_SHIELD;
+                                return false;
                             }
                         }
-                        if (available && CacheAvailableWeapons.Count > 0)
+                        if (CacheAvailableWeapons.Count > 0)
                         {
-                            available = false;
+                            bool available = false;
                             IWeaponItem rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
                             IWeaponItem leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
                             if (rightWeaponItem != null && CacheAvailableWeapons.Contains(rightWeaponItem.WeaponType))
@@ -519,10 +517,15 @@ namespace MultiplayerARPG
                             {
                                 available = true;
                             }
+                            if (!available)
+                            {
+                                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON;
+                                return false;
+                            }
                         }
-                        if (available && CacheAvailableArmors.Count > 0)
+                        if (CacheAvailableArmors.Count > 0)
                         {
-                            available = false;
+                            bool available = false;
                             IArmorItem armorItem;
                             foreach (CharacterItem characterItem in character.EquipItems)
                             {
@@ -533,15 +536,20 @@ namespace MultiplayerARPG
                                     break;
                                 }
                             }
-                        }
-                        if (available && CacheAvailableVehicles.Count > 0)
-                        {
-                            available = false;
-                            if (character.PassengingVehicleType != null &&
-                                CacheAvailableVehicles.Contains(character.PassengingVehicleType) &&
-                                character.PassengingVehicleEntity.IsDriver(character.PassengingVehicle.seatIndex))
+                            if (!available)
                             {
-                                available = true;
+                                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_ARMOR;
+                                return false;
+                            }
+                        }
+                        if (CacheAvailableVehicles.Count > 0)
+                        {
+                            if (character.PassengingVehicleType == null ||
+                                !character.PassengingVehicleEntity.IsDriver(character.PassengingVehicle.seatIndex) ||
+                                !CacheAvailableVehicles.Contains(character.PassengingVehicleType))
+                            {
+                                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_VEHICLE;
+                                return false;
                             }
                         }
                         break;
@@ -552,12 +560,6 @@ namespace MultiplayerARPG
                     default:
                         return false;
                 }
-            }
-
-            if (!available)
-            {
-                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON;
-                return false;
             }
 
             if (character.CurrentHp < GetConsumeHp(level))

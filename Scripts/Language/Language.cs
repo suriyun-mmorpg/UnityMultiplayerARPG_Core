@@ -167,7 +167,10 @@ namespace MultiplayerARPG
         UI_ERROR_NOT_ENOUGH_STAMINA,
         // Skills
         UI_ERROR_SKILL_LEVEL_IS_ZERO,
+        UI_ERROR_CANNOT_USE_SKILL_WITHOUT_SHIELD,
         UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON,
+        UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_ARMOR,
+        UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_VEHICLE,
         UI_ERROR_SKILL_IS_COOLING_DOWN,
         UI_ERROR_SKILL_IS_NOT_LEARNED,
         UI_ERROR_NO_SKILL_TARGET,
@@ -1184,7 +1187,10 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_STAMINA.ToString(), "Not enough Stamina");
             // Error - Skill
             Texts.Add(UITextKeys.UI_ERROR_SKILL_LEVEL_IS_ZERO.ToString(), "Skill not trained yet");
-            Texts.Add(UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON.ToString(), "Cannot use skill by current weapon");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_USE_SKILL_WITHOUT_SHIELD.ToString(), "Cannot use skill without shield");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON.ToString(), "Cannot use skill by current weapons");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_ARMOR.ToString(), "Cannot use skill by current armors");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_VEHICLE.ToString(), "Cannot use skill by current vehicle");
             Texts.Add(UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN.ToString(), "Skill is cooling down");
             Texts.Add(UITextKeys.UI_ERROR_SKILL_IS_NOT_LEARNED.ToString(), "Skill is not learned");
             Texts.Add(UITextKeys.UI_ERROR_NO_SKILL_TARGET.ToString(), "No target");
