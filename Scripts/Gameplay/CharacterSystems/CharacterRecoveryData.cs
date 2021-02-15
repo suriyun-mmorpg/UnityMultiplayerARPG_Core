@@ -37,10 +37,10 @@ namespace MultiplayerARPG
             // Decrease Hp
             if (characterEntity.CurrentHp > 0)
             {
-                if (decreasingHp >= 1)
+                if (decreasingHp <= -1)
                 {
                     tempAmount = (int)decreasingHp;
-                    characterEntity.CurrentHp -= tempAmount;
+                    characterEntity.CurrentHp += tempAmount;
                     characterEntity.ReceivedDamage(characterEntity.CacheTransform.position, causer, CombatAmountType.NormalDamage, tempAmount, null, null, 0);
                     decreasingHp -= tempAmount;
                 }
@@ -65,10 +65,10 @@ namespace MultiplayerARPG
             // Decrease Mp
             if (characterEntity.CurrentMp > 0)
             {
-                if (decreasingMp >= 1)
+                if (decreasingMp <= -1)
                 {
                     tempAmount = (int)decreasingMp;
-                    characterEntity.CurrentMp -= tempAmount;
+                    characterEntity.CurrentMp += tempAmount;
                     characterEntity.CallAllAppendCombatAmount(CombatAmountType.MpRecovery, tempAmount);
                     decreasingMp -= tempAmount;
                 }
@@ -93,10 +93,10 @@ namespace MultiplayerARPG
             // Decrease Stamina
             if (characterEntity.CurrentStamina > 0)
             {
-                if (decreasingStamina >= 1)
+                if (decreasingStamina <= -1)
                 {
                     tempAmount = (int)decreasingStamina;
-                    characterEntity.CurrentStamina -= tempAmount;
+                    characterEntity.CurrentStamina += tempAmount;
                     characterEntity.CallAllAppendCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
                     decreasingStamina -= tempAmount;
                 }
@@ -121,10 +121,10 @@ namespace MultiplayerARPG
             // Decrease Food
             if (characterEntity.CurrentFood > 0)
             {
-                if (decreasingFood >= 1)
+                if (decreasingFood <= -1)
                 {
                     tempAmount = (int)decreasingFood;
-                    characterEntity.CurrentFood -= tempAmount;
+                    characterEntity.CurrentFood += tempAmount;
                     characterEntity.CallAllAppendCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
                     decreasingFood -= tempAmount;
                 }
@@ -149,10 +149,10 @@ namespace MultiplayerARPG
             // Decrease Water
             if (characterEntity.CurrentWater > 0)
             {
-                if (decreasingWater >= 1)
+                if (decreasingWater <= -1)
                 {
                     tempAmount = (int)decreasingWater;
-                    characterEntity.CurrentWater -= tempAmount;
+                    characterEntity.CurrentWater += tempAmount;
                     characterEntity.CallAllAppendCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
                     decreasingWater -= tempAmount;
                 }
