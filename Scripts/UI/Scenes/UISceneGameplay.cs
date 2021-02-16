@@ -641,6 +641,19 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void HideStorageDialog()
+        {
+            // Hide all of storage UIs
+            if (uiPlayerStorageItems != null)
+                uiPlayerStorageItems.Hide();
+            if (uiGuildStorageItems != null)
+                uiGuildStorageItems.Hide();
+            if (uiBuildingStorageItems != null)
+                uiBuildingStorageItems.Hide();
+            if (uiBuildingCampfireItems != null)
+                uiBuildingCampfireItems.Hide();
+        }
+
         public override void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity)
         {
             if (uiBuildingCraftItems == null)

@@ -167,6 +167,7 @@ namespace MultiplayerARPG
         public abstract void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit);
+        public abstract void HideStorageDialog();
         public abstract void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity);
         public abstract void OnControllerSetup(BasePlayerCharacterEntity characterEntity);
         public abstract void OnControllerDesetup(BasePlayerCharacterEntity characterEntity);

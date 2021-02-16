@@ -63,6 +63,7 @@ namespace MultiplayerARPG
         {
             GameInstance.OpenedStorageType = StorageType.None;
             GameInstance.OpenedStorageOwnerId = string.Empty;
+            GameInstance.ItemUIVisibilityManager.HideStorageDialog();
             if (onNotifyStorageClosed != null)
                 onNotifyStorageClosed.Invoke();
         }
