@@ -39,6 +39,7 @@ namespace MultiplayerARPG
             {
                 usingStorageClients[storageId].Remove(connectionId);
                 usingStorageIds.TryRemove(connectionId, out _);
+                GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId);
             }
             await UniTask.Yield();
         }
