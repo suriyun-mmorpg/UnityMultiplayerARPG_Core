@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         public UICharacterQuest uiCharacterQuest;
 
         [Header("Craft Item Dialog")]
-        public UICraftItem uiCraftItem;
+        public UIItemCraft uiCraftItem;
 
         [Header("Quest Accept Menu Title")]
         public string messageQuestAccept = "Accept";

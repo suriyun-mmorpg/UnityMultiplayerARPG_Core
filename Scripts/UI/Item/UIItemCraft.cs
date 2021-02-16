@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class UICraftItem : UISelectionEntry<ItemCraft>
+    public partial class UIItemCraft : UISelectionEntry<ItemCraft>
     {
         public ItemCraft ItemCraft { get { return Data; } }
         public BaseItem CraftingItem { get { return ItemCraft.CraftingItem; } }

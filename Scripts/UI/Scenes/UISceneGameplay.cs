@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UICampfireItems uiBuildingCampfireItems;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
-        public UICraftItems uiBuildingCraftItems;
+        public UIItemCrafts uiBuildingCraftItems;
         public UIBase uiIsWarping;
 
         [Header("Other Settings")]
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             if (uiBuildingCampfireItems == null)
                 uiBuildingCampfireItems = gameObject.GetComponentInChildren<UICampfireItems>(true);
             if (uiBuildingCraftItems == null)
-                uiBuildingCraftItems = gameObject.GetComponentInChildren<UICraftItems>(true);
+                uiBuildingCraftItems = gameObject.GetComponentInChildren<UIItemCrafts>(true);
 
             if (blockControllerUis != null && blockControllerUis.Count > 0)
             {

@@ -62,10 +62,26 @@ namespace MultiplayerARPG
 
     #region Events for UI Craft Item
     [System.Serializable]
-    public class CraftItemEvent : UnityEvent<ItemCraft> { }
+    public class ItemCraftEvent : UnityEvent<ItemCraft> { }
 
     [System.Serializable]
-    public class UICraftItemEvent : UnityEvent<UICraftItem> { }
+    public class UIItemCraftEvent : UnityEvent<UIItemCraft> { }
+    #endregion
+
+    #region Events for UI Crafting Item
+    [System.Serializable]
+    public class CraftingItemEvent : UnityEvent<CraftingItem> { }
+
+    [System.Serializable]
+    public class UICraftingItemEvent : UnityEvent<UICraftingItem> { }
+    #endregion
+
+    #region Events for UI Item Craft Formula
+    [System.Serializable]
+    public class ItemCraftFormulaEvent : UnityEvent<ItemCraftFormula> { }
+
+    [System.Serializable]
+    public class UIItemCraftFormulaEvent : UnityEvent<UIItemCraftFormula> { }
     #endregion
 
     #region Events for UI Character Quest

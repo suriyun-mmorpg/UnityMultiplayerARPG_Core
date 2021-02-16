@@ -59,7 +59,7 @@ namespace MultiplayerARPG
         public UISkillRequirement uiRequirement;
         public TextWrapper uiTextSummon;
         public TextWrapper uiTextMount;
-        public UICraftItem uiCraftItem;
+        public UIItemCraft uiCraftItem;
 
         [Header("Skill Attack")]
         public UIDamageElementAmount uiDamageAmount;
