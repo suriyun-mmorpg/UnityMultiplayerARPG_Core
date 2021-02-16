@@ -12,13 +12,14 @@ namespace MultiplayerARPG
         [SerializeField]
         private short amount;
         [SerializeField]
+        private int requireGold;
+        [SerializeField]
         [ArrayElementTitle("item")]
         private ItemAmount[] craftRequirements;
-        [SerializeField]
-        private int requireGold;
 
         public BaseItem CraftingItem { get { return craftingItem; } }
         public short Amount { get { return amount; } }
+        public int RequireGold { get { return requireGold; } }
 
         [System.NonSerialized]
         private Dictionary<BaseItem, short> cacheCraftRequirements;
@@ -31,7 +32,6 @@ namespace MultiplayerARPG
                 return cacheCraftRequirements;
             }
         }
-        public int RequireGold { get { return requireGold; } }
 
         public bool CanCraft(IPlayerCharacterData character)
         {

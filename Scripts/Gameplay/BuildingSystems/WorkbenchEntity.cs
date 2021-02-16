@@ -51,10 +51,7 @@ namespace MultiplayerARPG
                 foreach (ItemCraft itemCraft in CacheItemCrafts.Values)
                 {
                     items.Add(itemCraft.CraftingItem);
-                    foreach (BaseItem item in itemCraft.CacheCraftRequirements.Keys)
-                    {
-                        items.Add(item);
-                    }
+                    items.AddRange(itemCraft.CacheCraftRequirements.Keys);
                 }
                 GameInstance.AddItems(items);
             }

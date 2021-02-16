@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            
+
             if (uiRequireItemAmounts != null)
             {
                 if (CraftingItem == null)
