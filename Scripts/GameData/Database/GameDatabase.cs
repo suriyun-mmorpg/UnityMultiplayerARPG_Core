@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         public Attribute[] attributes;
         public Currency[] currencies;
         public BaseItem[] items;
+        public ItemCraftFormula[] itemCraftFormulas;
         public GuildSkill[] guildSkills;
         public BaseMapInfo[] mapInfos;
         public Quest[] quests;
@@ -32,6 +33,7 @@ namespace MultiplayerARPG
         public Currency[] currencies;
         public DamageElement[] damageElements;
         public BaseItem[] items;
+        public ItemCraftFormula[] itemCraftFormulas;
         public ArmorType[] armorTypes;
         public WeaponType[] weaponTypes;
         public AmmoType[] ammoTypes;
@@ -50,6 +52,7 @@ namespace MultiplayerARPG
             GameInstance.AddAttributes(attributes);
             GameInstance.AddCurrencies(currencies);
             GameInstance.AddItems(items);
+            GameInstance.AddItemCraftFormulas(itemCraftFormulas);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);

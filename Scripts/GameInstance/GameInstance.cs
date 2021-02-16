@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
+        public static readonly Dictionary<int, ItemCraftFormula> ItemCraftFormulas = new Dictionary<int, ItemCraftFormula>();
         public static readonly Dictionary<int, Harvestable> Harvestables = new Dictionary<int, Harvestable>();
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
@@ -477,6 +478,7 @@ namespace MultiplayerARPG
             Attributes.Clear();
             Currencies.Clear();
             Items.Clear();
+            ItemCraftFormulas.Clear();
             Characters.Clear();
             PlayerCharacters.Clear();
             MonsterCharacters.Clear();
@@ -766,6 +768,16 @@ namespace MultiplayerARPG
         public static void AddItems(IEnumerable<BaseItem> items)
         {
             AddManyGameData(Items, items);
+        }
+
+        public static void AddItemCraftFormulas(params ItemCraftFormula[] itemCraftFormulas)
+        {
+            AddItemCraftFormulas((IEnumerable<ItemCraftFormula>)itemCraftFormulas);
+        }
+
+        public static void AddItemCraftFormulas(IEnumerable<ItemCraftFormula> itemCraftFormulas)
+        {
+            AddManyGameData(ItemCraftFormulas, itemCraftFormulas);
         }
 
         public static void AddHarvestables(params Harvestable[] harvestables)
