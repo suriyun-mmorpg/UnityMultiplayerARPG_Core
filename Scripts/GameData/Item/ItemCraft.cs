@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         private ItemAmount[] craftRequirements;
 
         public BaseItem CraftingItem { get { return craftingItem; } }
-        public short Amount { get { return amount; } }
+        public short Amount { get { return (short)(amount > 0 ? amount : 1); } }
         public int RequireGold { get { return requireGold; } }
 
         [System.NonSerialized]
@@ -40,9 +40,6 @@ namespace MultiplayerARPG
 
         public bool CanCraft(IPlayerCharacterData character, out UITextKeys gameMessage)
         {
-            // Mininmum amount is 1
-            if (amount <= 0)
-                amount = 1;
             gameMessage = UITextKeys.NONE;
             if (craftingItem == null)
             {
@@ -54,7 +51,7 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
-            if (character.IncreasingItemsWillOverwhelming(craftingItem.DataId, amount))
+            if (character.IncreasingItemsWillOverwhelming(craftingItem.DataId, Amount))
             {
                 gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 return false;
