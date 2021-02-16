@@ -877,6 +877,10 @@ namespace MultiplayerARPG
         /// Format => {0} = {List Of Vehicle Type}
         /// </summary>
         UI_FORMAT_AVAILABLE_VEHICLES,
+        /// <summary>
+        /// Format => {0} = {Craft Duration}
+        /// </summary>
+        UI_FORMAT_CRAFT_DURATION,
     }
 
     public static class DefaultLocale
@@ -1032,6 +1036,8 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_TITLE.ToString(), "Title: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_CONTENT.ToString(), "{0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_MAIL_SENT_DATE.ToString(), "Date: {0}");
+            // Format - UI Crafting
+            Texts.Add(UIFormatKeys.UI_FORMAT_CRAFT_DURATION.ToString(), "Duration: {0}");
             // Error - Generic Error
             Texts.Add(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString(), "Service is not available");
             Texts.Add(UITextKeys.UI_ERROR_REQUEST_TIMEOUT.ToString(), "Request timeout");
