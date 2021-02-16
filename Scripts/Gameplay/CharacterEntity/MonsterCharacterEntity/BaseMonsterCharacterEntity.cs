@@ -373,6 +373,8 @@ namespace MultiplayerARPG
                     {
                         // Set its summoner as main enemy
                         lastAttacker = tempMonsterCharacterEntity.Summoner.GetInfo();
+                        if (lastAttacker != null)
+                            lastAttacker.TryGetEntity(out attackerCharacter);
                     }
                 }
                 lastPlayer = attackerCharacter as BasePlayerCharacterEntity;
