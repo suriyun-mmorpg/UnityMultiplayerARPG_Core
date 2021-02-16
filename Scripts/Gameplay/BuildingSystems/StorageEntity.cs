@@ -63,11 +63,14 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            bool updatingIsOpen = GameInstance.ServerStorageHandlers.IsStorageEntityOpen(this);
-            if (updatingIsOpen != dirtyIsOpen)
+            if (IsServer)
             {
-                dirtyIsOpen = updatingIsOpen;
-                isOpen.Value = updatingIsOpen;
+                bool updatingIsOpen = GameInstance.ServerStorageHandlers.IsStorageEntityOpen(this);
+                if (updatingIsOpen != dirtyIsOpen)
+                {
+                    dirtyIsOpen = updatingIsOpen;
+                    isOpen.Value = updatingIsOpen;
+                }
             }
         }
     }
