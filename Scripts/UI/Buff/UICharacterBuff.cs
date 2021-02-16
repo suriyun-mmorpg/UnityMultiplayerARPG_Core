@@ -24,7 +24,6 @@ namespace MultiplayerARPG
         public UIBuff uiBuff;
 
         protected float buffRemainsDuration;
-        protected BaseGameData tempGameData;
 
         protected override void OnDisable()
         {
@@ -76,7 +75,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            tempGameData = null;
+            BaseGameData tempGameData = null;
             // Update remains duration
             buffRemainsDuration = CharacterBuff.buffRemainsDuration;
 
