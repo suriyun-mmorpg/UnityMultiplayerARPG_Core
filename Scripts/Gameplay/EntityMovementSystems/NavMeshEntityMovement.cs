@@ -8,6 +8,9 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public class NavMeshEntityMovement : BaseEntityMovement
     {
+        [Tooltip("If calculated paths +1 higher than this value, it will stop moving. If this is 0 it will not applies")]
+        public byte maxPathsForKeyMovement = 1;
+
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public NavMeshAgent CacheNavMeshAgent { get; private set; }
 
@@ -56,16 +59,16 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             // Register Network functions
-            RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
+            RegisterNetFunction<Vector3, bool>(NetFuncPointClickMovement);
             RegisterNetFunction<short>(NetFuncUpdateYRotation);
             RegisterNetFunction(StopMove);
         }
 
-        protected void NetFuncPointClickMovement(Vector3 position)
+        protected void NetFuncPointClickMovement(Vector3 position, bool useKeyMovement)
         {
             if (!CacheEntity.CanMove())
                 return;
-            SetMovePaths(position);
+            SetMovePaths(position, useKeyMovement);
         }
 
         protected void NetFuncUpdateYRotation(short yRotation)
@@ -77,8 +80,22 @@ namespace MultiplayerARPG
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (moveDirection.sqrMagnitude > 0.25f)
-                PointClickMovement(CacheTransform.position + moveDirection);
+            if (!CacheEntity.CanMove())
+                return;
+
+            if (moveDirection.sqrMagnitude <= 0f)
+                return;
+
+            Vector3 position = CacheTransform.position + moveDirection;
+            switch (CacheEntity.MovementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position, true);
+                    break;
+                case MovementSecure.NotSecure:
+                    SetMovePaths(position, true);
+                    break;
+            }
         }
 
         public override void PointClickMovement(Vector3 position)
@@ -89,10 +106,10 @@ namespace MultiplayerARPG
             switch (CacheEntity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
+                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position, false);
                     break;
                 case MovementSecure.NotSecure:
-                    SetMovePaths(position);
+                    SetMovePaths(position, false);
                     break;
             }
         }
@@ -159,12 +176,12 @@ namespace MultiplayerARPG
             CacheEntity.SetMovement((CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
         }
 
-        protected void SetMovePaths(Vector3 position)
+        protected void SetMovePaths(Vector3 position, bool useKeyMovement)
         {
-            SetMovePaths(position, CacheEntity.GetMoveSpeed());
+            SetMovePaths(position, CacheEntity.GetMoveSpeed(), useKeyMovement);
         }
 
-        protected void SetMovePaths(Vector3 position, float moveSpeed)
+        protected void SetMovePaths(Vector3 position, float moveSpeed, bool useKeyMovement)
         {
             if (!CacheEntity.CanMove())
                 return;
@@ -176,6 +193,8 @@ namespace MultiplayerARPG
             {
                 CacheNavMeshAgent.isStopped = false;
                 CacheNavMeshAgent.SetDestination(position);
+                if (useKeyMovement && maxPathsForKeyMovement > 0 && CacheNavMeshAgent.path.corners.Length > maxPathsForKeyMovement + 1)
+                    CacheNavMeshAgent.isStopped = true;
             }
         }
     }
