@@ -84,6 +84,7 @@ namespace MultiplayerARPG
             }
             set
             {
+                this.FillWeaponSetsIfNeeded(EquipWeaponSet);
                 SelectableWeaponSets[EquipWeaponSet] = value;
             }
         }
