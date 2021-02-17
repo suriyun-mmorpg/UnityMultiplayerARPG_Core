@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -13,6 +11,36 @@ namespace MultiplayerARPG
         {
             raycasts2D = new RaycastHit2D[allocSize];
             overlapColliders2D = new Collider2D[allocSize];
+        }
+
+        public bool SingleRaycast(Vector3 start, Vector3 end, out PhysicRaycastResult result, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            result = new PhysicRaycastResult();
+            RaycastHit2D hit = Physics2D.Raycast(start, (end - start).normalized, Vector3.Distance(start, end), layerMask);
+            if (hit.collider != null)
+            {
+                result.point = hit.point;
+                result.normal = hit.normal;
+                result.distance = hit.distance;
+                result.transform = hit.transform;
+                return true;
+            }
+            return false;
+        }
+
+        public bool SingleRaycast(Vector3 origin, Vector3 direction, out PhysicRaycastResult result, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            result = new PhysicRaycastResult();
+            RaycastHit2D hit = Physics2D.Raycast(origin, direction, distance, layerMask);
+            if (hit.collider != null)
+            {
+                result.point = hit.point;
+                result.normal = hit.normal;
+                result.distance = hit.distance;
+                result.transform = hit.transform;
+                return true;
+            }
+            return false;
         }
 
         public int Raycast(Vector3 start, Vector3 end, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
@@ -62,19 +90,14 @@ namespace MultiplayerARPG
             return raycasts2D[index].transform;
         }
 
-        public Transform GetRaycastColliderTransform(int index)
-        {
-            return raycasts2D[index].collider.transform;
-        }
-
         public GameObject GetRaycastObject(int index)
         {
             return raycasts2D[index].transform.gameObject;
         }
 
-        public GameObject GetRaycastColliderObject(int index)
+        public Vector3 GetRaycastColliderClosestPoint(int index, Vector3 position)
         {
-            return raycasts2D[index].collider.gameObject;
+            return raycasts2D[index].collider.ClosestPoint(position);
         }
 
         public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
@@ -86,6 +109,11 @@ namespace MultiplayerARPG
         public GameObject GetOverlapObject(int index)
         {
             return overlapColliders2D[index].gameObject;
+        }
+
+        public Vector3 GetOverlapColliderClosestPoint(int index, Vector3 position)
+        {
+            return overlapColliders2D[index].ClosestPoint(position);
         }
     }
 }
