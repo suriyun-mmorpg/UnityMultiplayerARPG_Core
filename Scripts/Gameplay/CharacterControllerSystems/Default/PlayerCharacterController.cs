@@ -61,6 +61,8 @@ namespace MultiplayerARPG
         protected bool buildRotationSnap;
         [SerializeField]
         protected float buildRotateAngle = 45f;
+        [SerializeField]
+        protected float buildRotateSpeed = 200f;
 
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
@@ -236,25 +238,6 @@ namespace MultiplayerARPG
                     position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, Mathf.Round(position.y / buildGridSize) * buildGridSize) + buildGridOffsets;
             }
             return position;
-        }
-
-        private Quaternion GetBuildingPlaceRotation(float angles)
-        {
-            Vector3 eulerAngles = Vector3.zero;
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-            {
-                if (buildRotationSnap)
-                {
-                    // Make Y rotation set to 0, 90, 180
-                    eulerAngles.y = Mathf.Round(angles / 90) * 90;
-                }
-                else
-                {
-                    // Rotate by set angles
-                    eulerAngles.y = angles;
-                }
-            }
-            return Quaternion.Euler(eulerAngles);
         }
 
         public bool TryGetSelectedTargetAsAttackingEntity(out BaseCharacterEntity character)

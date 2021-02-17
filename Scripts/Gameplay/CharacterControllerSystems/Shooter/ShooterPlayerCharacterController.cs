@@ -50,7 +50,11 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool clampBuildPositionByBuildDistance = false;
         [SerializeField]
-        private float buildRotateAngle = 45f;
+        protected bool buildRotationSnap;
+        [SerializeField]
+        protected float buildRotateAngle = 45f;
+        [SerializeField]
+        protected float buildRotateSpeed = 200f;
         [SerializeField]
         private RectTransform crosshairRect;
 
@@ -1516,10 +1520,30 @@ namespace MultiplayerARPG
                 buildYRotate = 0f;
             }
             // Rotate by keys
-            if (InputManager.GetButtonDown("RotateLeft"))
-                buildYRotate -= buildRotateAngle;
-            else if (InputManager.GetButtonDown("RotateRight"))
-                buildYRotate += buildRotateAngle;
+            Vector3 buildingAngles = Vector3.zero;
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+            {
+                if (buildRotationSnap)
+                {
+                    if (InputManager.GetButtonDown("RotateLeft"))
+                        buildYRotate -= buildRotateAngle;
+                    if (InputManager.GetButtonDown("RotateRight"))
+                        buildYRotate += buildRotateAngle;
+                    // Make Y rotation set to 0, 90, 180
+                    buildingAngles.y = buildYRotate = Mathf.Round(buildYRotate / buildRotateAngle) * buildRotateAngle;
+                }
+                else
+                {
+                    float deltaTime = Time.deltaTime;
+                    if (InputManager.GetButton("RotateLeft"))
+                        buildYRotate -= buildRotateSpeed * deltaTime;
+                    if (InputManager.GetButton("RotateRight"))
+                        buildYRotate += buildRotateSpeed * deltaTime;
+                    // Rotate by set angles
+                    buildingAngles.y = buildYRotate;
+                }
+            }
+            ConstructingBuildingEntity.Rotation = Quaternion.Euler(buildingAngles);
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
             // Default aim position (aim to sky/space)

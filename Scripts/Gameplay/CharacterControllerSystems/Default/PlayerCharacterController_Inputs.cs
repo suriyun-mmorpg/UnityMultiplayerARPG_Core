@@ -941,11 +941,30 @@ namespace MultiplayerARPG
                 buildYRotate = 0;
             }
             // Rotate by keys
-            if (InputManager.GetButtonDown("RotateLeft"))
-                buildYRotate -= buildRotateAngle;
-            else if (InputManager.GetButtonDown("RotateRight"))
-                buildYRotate += buildRotateAngle;
-            ConstructingBuildingEntity.Rotation = GetBuildingPlaceRotation(buildYRotate);
+            Vector3 buildingAngles = Vector3.zero;
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+            {
+                if (buildRotationSnap)
+                {
+                    if (InputManager.GetButtonDown("RotateLeft"))
+                        buildYRotate -= buildRotateAngle;
+                    if (InputManager.GetButtonDown("RotateRight"))
+                        buildYRotate += buildRotateAngle;
+                    // Make Y rotation set to 0, 90, 180
+                    buildingAngles.y = buildYRotate = Mathf.Round(buildYRotate / buildRotateAngle) * buildRotateAngle;
+                }
+                else
+                {
+                    float deltaTime = Time.deltaTime;
+                    if (InputManager.GetButton("RotateLeft"))
+                        buildYRotate -= buildRotateSpeed * deltaTime;
+                    if (InputManager.GetButton("RotateRight"))
+                        buildYRotate += buildRotateSpeed * deltaTime;
+                    // Rotate by set angles
+                    buildingAngles.y = buildYRotate;
+                }
+            }
+            ConstructingBuildingEntity.Rotation = Quaternion.Euler(buildingAngles);
             // Find position to place building
             if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
                 FindAndSetBuildingAreaByAxes(aimAxes);
