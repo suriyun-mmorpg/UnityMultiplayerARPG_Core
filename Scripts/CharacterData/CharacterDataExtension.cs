@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public static partial class CharacterDataExtension
     {
+        private const string LogTag = "CharacterDataExtension";
+
         public static BaseCharacter GetDatabase(this ICharacterData data)
         {
             if (data == null || data.DataId == 0)
@@ -682,8 +684,15 @@ namespace MultiplayerARPG
 
         public static void FillWeaponSetsIfNeeded(this ICharacterData data, byte equipWeaponSet)
         {
+            if (data is IGameEntity && !(data as IGameEntity).Entity.IsServer)
+            {
+                Logging.LogWarning(LogTag, "Client can't fill weapon sets");
+                return;
+            }
             while (data.SelectableWeaponSets.Count <= equipWeaponSet)
+            {
                 data.SelectableWeaponSets.Add(new EquipWeapons());
+            }
         }
         #endregion
 

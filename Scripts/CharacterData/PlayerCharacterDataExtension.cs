@@ -201,6 +201,8 @@ namespace MultiplayerARPG
                 characterSkill.level = 0;
                 character.Skills.Add(characterSkill);
             }
+            // Prepare weapon sets
+            character.FillWeaponSetsIfNeeded(character.EquipWeaponSet);
             // Right hand & left hand items
             BaseItem rightHandEquipItem = playerCharacter.RightHandEquipItem;
             BaseItem leftHandEquipItem = playerCharacter.LeftHandEquipItem;

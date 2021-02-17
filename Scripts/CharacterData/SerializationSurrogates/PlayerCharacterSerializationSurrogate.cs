@@ -23,7 +23,6 @@ namespace MultiplayerARPG
             info.AddValue("currentStamina", data.CurrentStamina);
             info.AddValue("currentFood", data.CurrentFood);
             info.AddValue("currentWater", data.CurrentWater);
-            info.AddValue("equipWeapons", data.EquipWeapons);
             info.AddValue("equipWeaponSet", data.EquipWeaponSet);
             info.AddListValue("selectableWeaponSets", data.SelectableWeaponSets);
             info.AddListValue("attributes", data.Attributes);
@@ -48,6 +47,7 @@ namespace MultiplayerARPG
             info.AddValue("lastUpdate", data.LastUpdate);
             info.AddListValue("hotkeys", data.Hotkeys);
             info.AddListValue("quests", data.Quests);
+            info.AddValue("equipWeapons", data.EquipWeapons);
             info.AddListValue("currencies", data.Currencies);
             this.InvokeInstanceDevExtMethods("GetObjectData", obj, info, context);
         }
@@ -70,7 +70,6 @@ namespace MultiplayerARPG
             data.CurrentStamina = info.GetInt32("currentStamina");
             data.CurrentFood = info.GetInt32("currentFood");
             data.CurrentWater = info.GetInt32("currentWater");
-            data.EquipWeapons = (EquipWeapons)info.GetValue("equipWeapons", typeof(EquipWeapons));
             data.Attributes = info.GetListValue<CharacterAttribute>("attributes");
             data.Skills = info.GetListValue<CharacterSkill>("skills");
             data.SkillUsages = info.GetListValue<CharacterSkillUsage>("skillUsages");
@@ -127,6 +126,7 @@ namespace MultiplayerARPG
                 data.Currencies = info.GetListValue<CharacterCurrency>("currencies");
             }
             catch { }
+            data.EquipWeapons = (EquipWeapons)info.GetValue("equipWeapons", typeof(EquipWeapons));
             this.InvokeInstanceDevExtMethods("SetObjectData", obj, info, context, selector);
 
             obj = data;
