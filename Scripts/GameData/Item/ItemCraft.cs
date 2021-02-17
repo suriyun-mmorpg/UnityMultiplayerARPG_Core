@@ -74,10 +74,7 @@ namespace MultiplayerARPG
 
         public void CraftItem(IPlayerCharacterData character)
         {
-            // Mininmum amount is 1
-            if (amount <= 0)
-                amount = 1;
-            if (character.IncreaseItems(CharacterItem.Create(craftingItem, 1, amount)))
+            if (character.IncreaseItems(CharacterItem.Create(craftingItem, 1, Amount)))
             {
                 // Reduce item when able to increase craft item
                 foreach (ItemAmount craftRequirement in craftRequirements)
