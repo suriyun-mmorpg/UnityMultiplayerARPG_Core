@@ -73,12 +73,17 @@ namespace MultiplayerARPG
             if (skillType == SkillType.CraftItem &&
                 skillUser is BasePlayerCharacterEntity)
             {
+                // Apply craft skill at server only
+                if (!skillUser.IsServer)
+                    return;
                 BasePlayerCharacterEntity castedCharacter = skillUser as BasePlayerCharacterEntity;
                 UITextKeys gameMessage;
                 if (!itemCraft.CanCraft(castedCharacter, out gameMessage))
+                {
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(skillUser.ConnectionId, gameMessage);
-                else
-                    itemCraft.CraftItem(castedCharacter);
+                    return;
+                }
+                itemCraft.CraftItem(castedCharacter);
                 return;
             }
 
