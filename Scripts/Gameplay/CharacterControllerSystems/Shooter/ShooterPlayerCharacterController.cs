@@ -1543,7 +1543,6 @@ namespace MultiplayerARPG
                     buildingAngles.y = buildYRotate;
                 }
             }
-            ConstructingBuildingEntity.Rotation = Quaternion.Euler(buildingAngles);
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
             // Default aim position (aim to sky/space)
