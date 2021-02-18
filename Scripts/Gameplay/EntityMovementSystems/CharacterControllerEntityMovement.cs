@@ -284,15 +284,23 @@ namespace MultiplayerARPG
         public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
+            float nearestDistance = float.MaxValue;
+            bool foundGround = false;
+            float tempDistance;
             int foundCount = physicFunctions.RaycastDown(fromPosition, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), findDistance, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < foundCount; ++i)
             {
                 if (physicFunctions.GetRaycastTransform(i).root == CacheTransform.root)
                     continue;
-                result = physicFunctions.GetRaycastPoint(i);
-                return true;
+                tempDistance = Vector3.Distance(fromPosition, physicFunctions.GetRaycastPoint(i));
+                if (tempDistance < nearestDistance)
+                {
+                    result = physicFunctions.GetRaycastPoint(i);
+                    nearestDistance = tempDistance;
+                    foundGround = true;
+                }
             }
-            return false;
+            return foundGround;
         }
 
         public override void EntityUpdate()
