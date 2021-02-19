@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_DO_ACTION_ALL_LAYERS = Animator.StringToHash("DoActionAllLayers");
         public static readonly int ANIM_IS_CASTING_SKILL = Animator.StringToHash("IsCastingSkill");
         public static readonly int ANIM_IS_CASTING_SKILL_ALL_LAYERS = Animator.StringToHash("IsCastingSkillAllLayers");
-        public static readonly int ANIM_IS_WEAPON_PULLING = Animator.StringToHash("IsWeaponPulling");
+        public static readonly int ANIM_IS_WEAPON_CHARGE = Animator.StringToHash("IsWeaponCharge");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
         public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
         public static readonly int ANIM_PICKUP = Animator.StringToHash("Pickup");
@@ -787,12 +787,12 @@ namespace MultiplayerARPG
             StopActionAnimation();
             StopSkillCastAnimation();
             StopWeaponChargeAnimation();
-            AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponChargeClip(dataId) : GetLeftHandWeaponChargeClip(dataId);
-            bool hasClip = pullingClip != null && animator.isActiveAndEnabled;
+            AnimationClip chargeClip = isLeftHand ? GetRightHandWeaponChargeClip(dataId) : GetLeftHandWeaponChargeClip(dataId);
+            bool hasClip = chargeClip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
-                CacheAnimatorController[CLIP_WEAPON_CHARGE] = pullingClip;
-                animator.SetBool(ANIM_IS_WEAPON_PULLING, true);
+                CacheAnimatorController[CLIP_WEAPON_CHARGE] = chargeClip;
+                animator.SetBool(ANIM_IS_WEAPON_CHARGE, true);
             }
         }
 
@@ -818,7 +818,7 @@ namespace MultiplayerARPG
         {
             if (animator.isActiveAndEnabled)
             {
-                animator.SetBool(ANIM_IS_WEAPON_PULLING, false);
+                animator.SetBool(ANIM_IS_WEAPON_CHARGE, false);
             }
         }
 
