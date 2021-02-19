@@ -100,6 +100,22 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool CallAllPlayChargeAnimation(bool isLeftHand)
+        {
+            if (this.IsDead())
+                return false;
+            RPC(AllPlayChargeAnimation, isLeftHand);
+            return true;
+        }
+
+        public bool CallAllStopChargeAnimation()
+        {
+            if (this.IsDead())
+                return false;
+            RPC(AllStopChargeAnimation);
+            return true;
+        }
+
         public bool CallAllPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
         {
             if (this.IsDead())

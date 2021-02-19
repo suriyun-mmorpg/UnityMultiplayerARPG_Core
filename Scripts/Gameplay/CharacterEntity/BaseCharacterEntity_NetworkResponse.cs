@@ -39,6 +39,28 @@ namespace MultiplayerARPG
         }
 
         [AllRpc]
+        protected void AllPlayChargeAnimation(bool isLeftHand)
+        {
+            // Get weapon type data
+            int weaponTypeDataId = this.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DataId;
+            // Play animation
+            if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+            if (FpsModel && FpsModel.gameObject.activeSelf)
+                FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+        }
+
+        [AllRpc]
+        protected void AllStopChargeAnimation()
+        {
+            // Play animation
+            if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                CharacterModel.StopWeaponChargeAnimation();
+            if (FpsModel && FpsModel.gameObject.activeSelf)
+                FpsModel.StopWeaponChargeAnimation();
+        }
+
+        [AllRpc]
         protected void AllPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
         {
             ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();

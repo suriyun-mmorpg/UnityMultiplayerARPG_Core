@@ -377,95 +377,75 @@ namespace MultiplayerARPG
             return tempActionAnimation;
         }
 
-        public ActionAnimation[] GetRightHandAttackAnimations(WeaponType weaponType)
-        {
-            return GetRightHandAttackAnimations(weaponType.DataId);
-        }
-
         public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheWeaponAnimations[dataId].rightHandAttackAnimations != null)
-                return GetAnims().CacheWeaponAnimations[dataId].rightHandAttackAnimations;
+            WeaponAnimations anims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.rightHandAttackAnimations != null)
+                return anims.rightHandAttackAnimations;
             return defaultAnimations.rightHandAttackAnimations;
-        }
-
-        public ActionAnimation[] GetLeftHandAttackAnimations(WeaponType weaponType)
-        {
-            return GetLeftHandAttackAnimations(weaponType.DataId);
         }
 
         public ActionAnimation[] GetLeftHandAttackAnimations(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheWeaponAnimations[dataId].leftHandAttackAnimations != null)
-                return GetAnims().CacheWeaponAnimations[dataId].leftHandAttackAnimations;
+            WeaponAnimations anims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.leftHandAttackAnimations != null)
+                return anims.leftHandAttackAnimations;
             return defaultAnimations.leftHandAttackAnimations;
-        }
-
-        public AnimationClip GetRightHandWeaponChargeClip(WeaponType weaponType)
-        {
-            return GetRightHandWeaponChargeClip(weaponType.DataId);
         }
 
         public AnimationClip GetRightHandWeaponChargeClip(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheWeaponAnimations[dataId].rightHandChargeClip != null)
-                return GetAnims().CacheWeaponAnimations[dataId].rightHandChargeClip;
+            WeaponAnimations anims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.rightHandChargeClip != null)
+                return anims.rightHandChargeClip;
             return defaultAnimations.rightHandChargeClip;
-        }
-
-        public AnimationClip GetLeftHandWeaponChargeClip(WeaponType weaponType)
-        {
-            return GetLeftHandWeaponChargeClip(weaponType.DataId);
         }
 
         public AnimationClip GetLeftHandWeaponChargeClip(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheWeaponAnimations[dataId].leftHandChargeClip != null)
-                return GetAnims().CacheWeaponAnimations[dataId].leftHandChargeClip;
+            WeaponAnimations anims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.leftHandChargeClip != null)
+                return anims.leftHandChargeClip;
             return defaultAnimations.leftHandChargeClip;
         }
 
         public AnimationClip GetSkillCastClip(int dataId)
         {
-            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheSkillAnimations[dataId].castClip != null)
-                return GetAnims().CacheSkillAnimations[dataId].castClip;
+            SkillAnimations anims;
+            if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out anims) && anims.castClip != null)
+                return anims.castClip;
             return defaultAnimations.skillCastClip;
         }
 
         public bool IsSkillCastClipPlayingAllLayers(int dataId)
         {
-            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheSkillAnimations[dataId].castClip != null)
-                return GetAnims().CacheSkillAnimations[dataId].playCastClipAllLayers;
+            SkillAnimations anims;
+            if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out anims) && anims.castClip != null)
+                return anims.playCastClipAllLayers;
             return defaultAnimations.playSkillCastClipAllLayers;
         }
 
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheSkillAnimations[dataId].activateAnimation.clip != null)
-                return GetAnims().CacheSkillAnimations[dataId].activateAnimation;
+            SkillAnimations anims;
+            if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out anims) && anims.activateAnimation.clip != null)
+                return anims.activateAnimation;
             return defaultAnimations.skillActivateAnimation;
         }
 
         public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheWeaponAnimations[dataId].rightHandReloadAnimation.clip != null)
-                return GetAnims().CacheWeaponAnimations[dataId].rightHandReloadAnimation;
+            WeaponAnimations anims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.rightHandReloadAnimation.clip != null)
+                return anims.rightHandReloadAnimation;
             return defaultAnimations.rightHandReloadAnimation;
         }
 
         public ActionAnimation GetLeftHandReloadAnimation(int dataId)
         {
-            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheWeaponAnimations[dataId].leftHandReloadAnimation.clip != null)
-                return GetAnims().CacheWeaponAnimations[dataId].leftHandReloadAnimation;
+            WeaponAnimations anims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.leftHandReloadAnimation.clip != null)
+                return anims.leftHandReloadAnimation;
             return defaultAnimations.leftHandReloadAnimation;
         }
 

@@ -272,6 +272,26 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Is function will be called at server to order character to start weapon charging
+        /// </summary>
+        [ServerRpc]
+        protected virtual void ServerStartWeaponCharge(bool isLeftHand)
+        {
+            // TODO: May have charge power which increase attack damage
+            CallAllPlayChargeAnimation(isLeftHand);
+        }
+
+        /// <summary>
+        /// Is function will be called at server to order character to stop weapon charging
+        /// </summary>
+        [ServerRpc]
+        protected virtual void ServerStopWeaponCharge()
+        {
+            // TODO: If there is charge power, stop it. But there is no charge power yet so just stop playing animation
+            CallAllStopChargeAnimation();
+        }
+
+        /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
         [ServerRpc]

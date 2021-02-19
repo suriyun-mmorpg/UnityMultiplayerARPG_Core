@@ -161,11 +161,13 @@ namespace MultiplayerARPG
             {
                 CharacterModel.StopActionAnimation();
                 CharacterModel.StopSkillCastAnimation();
+                CharacterModel.StopWeaponChargeAnimation();
             }
             if (FpsModel && FpsModel.gameObject.activeSelf)
             {
                 FpsModel.StopActionAnimation();
                 FpsModel.StopSkillCastAnimation();
+                FpsModel.StopWeaponChargeAnimation();
             }
         }
 
