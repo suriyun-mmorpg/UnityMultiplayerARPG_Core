@@ -209,6 +209,14 @@ namespace MultiplayerARPG
             equipType = weaponItem.EquipType;
             return true;
         }
+
+        public static WeaponType GetWeaponTypeOrDefault<T>(this T weaponItem)
+            where T : IWeaponItem
+        {
+            if (weaponItem == null || !weaponItem.IsWeapon())
+                return GameInstance.Singleton.DefaultWeaponType;
+            return weaponItem.WeaponType;
+        }
         #endregion
 
         public static bool CanEquip<T>(this T item, ICharacterData character, short level, out UITextKeys gameMessage)
