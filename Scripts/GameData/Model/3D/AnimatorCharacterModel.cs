@@ -701,6 +701,7 @@ namespace MultiplayerARPG
         {
             StopActionAnimation();
             StopSkillCastAnimation();
+            StopWeaponChargeAnimation();
             return StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
         }
 
@@ -744,6 +745,7 @@ namespace MultiplayerARPG
         {
             StopActionAnimation();
             StopSkillCastAnimation();
+            StopWeaponChargeAnimation();
             return StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
         }
 
@@ -782,6 +784,9 @@ namespace MultiplayerARPG
 
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
+            StopActionAnimation();
+            StopSkillCastAnimation();
+            StopWeaponChargeAnimation();
             AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponChargeClip(dataId) : GetLeftHandWeaponChargeClip(dataId);
             bool hasClip = pullingClip != null && animator.isActiveAndEnabled;
             if (hasClip)
