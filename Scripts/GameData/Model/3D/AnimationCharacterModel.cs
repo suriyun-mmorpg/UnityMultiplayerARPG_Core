@@ -740,12 +740,26 @@ namespace MultiplayerARPG
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }
 
+        public override void PlayWeaponPullingClip(int dataId, bool isLeftHand)
+        {
+            AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponPullingClip(dataId) : GetLeftHandWeaponPullingClip(dataId);
+            if (legacyAnimation.GetClip(CLIP_WEAPON_PULLING) != null)
+                legacyAnimation.RemoveClip(CLIP_WEAPON_PULLING);
+            legacyAnimation.AddClip(pullingClip, CLIP_WEAPON_PULLING);
+            CrossFadeLegacyAnimation(CLIP_WEAPON_PULLING, actionClipFadeLength, WrapMode.Once);
+        }
+
         public override void StopActionAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }
 
         public override void StopSkillCastAnimation()
+        {
+            CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
+        }
+
+        public override void StopWeaponPullingAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }

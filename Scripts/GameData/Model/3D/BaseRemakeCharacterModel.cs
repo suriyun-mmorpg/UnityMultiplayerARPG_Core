@@ -75,6 +75,7 @@ namespace MultiplayerARPG
         public const string CLIP_DEAD = "__Dead";
         public const string CLIP_ACTION = "__Action";
         public const string CLIP_CAST_SKILL = "__CastSkill";
+        public const string CLIP_WEAPON_PULLING = "__WeaponPulling";
         public const string CLIP_PICKUP = "__Pickup";
 
         [Header("Renderer")]
@@ -402,6 +403,32 @@ namespace MultiplayerARPG
             return defaultAnimations.leftHandAttackAnimations;
         }
 
+        public AnimationClip GetRightHandWeaponPullingClip(WeaponType weaponType)
+        {
+            return GetRightHandWeaponPullingClip(weaponType.DataId);
+        }
+
+        public AnimationClip GetRightHandWeaponPullingClip(int dataId)
+        {
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].rightHandPullClip != null)
+                return GetAnims().CacheWeaponAnimations[dataId].rightHandPullClip;
+            return defaultAnimations.rightHandPullClip;
+        }
+
+        public AnimationClip GetLeftHandWeaponPullingClip(WeaponType weaponType)
+        {
+            return GetLeftHandWeaponPullingClip(weaponType.DataId);
+        }
+
+        public AnimationClip GetLeftHandWeaponPullingClip(int dataId)
+        {
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].leftHandPullClip != null)
+                return GetAnims().CacheWeaponAnimations[dataId].leftHandPullClip;
+            return defaultAnimations.leftHandPullClip;
+        }
+
         public AnimationClip GetSkillCastClip(int dataId)
         {
             if (GetAnims().CacheSkillAnimations.ContainsKey(dataId) &&
@@ -443,7 +470,7 @@ namespace MultiplayerARPG
         }
 
         public override bool GetRandomRightHandAttackAnimation(
-            int dataId, 
+            int dataId,
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,

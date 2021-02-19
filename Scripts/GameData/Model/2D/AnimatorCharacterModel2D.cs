@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -377,6 +376,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void PlayWeaponPullingClip(int dataId, bool isLeftHand)
+        {
+            // TODO: May implement pulling animation for 2D models
+        }
+
         public override void StopActionAnimation()
         {
             animator.SetBool(ANIM_DO_ACTION, false);
@@ -385,6 +389,11 @@ namespace MultiplayerARPG
         public override void StopSkillCastAnimation()
         {
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+        }
+
+        public override void StopWeaponPullingAnimation()
+        {
+            // TODO: May implement pulling animation for 2D models
         }
 
         public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)

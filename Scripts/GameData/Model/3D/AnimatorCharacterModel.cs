@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_DO_ACTION_ALL_LAYERS = Animator.StringToHash("DoActionAllLayers");
         public static readonly int ANIM_IS_CASTING_SKILL = Animator.StringToHash("IsCastingSkill");
         public static readonly int ANIM_IS_CASTING_SKILL_ALL_LAYERS = Animator.StringToHash("IsCastingSkillAllLayers");
+        public static readonly int ANIM_IS_WEAPON_PULLING = Animator.StringToHash("IsWeaponPulling");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
         public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
         public static readonly int ANIM_PICKUP = Animator.StringToHash("Pickup");
@@ -779,6 +780,17 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void PlayWeaponPullingClip(int dataId, bool isLeftHand)
+        {
+            AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponPullingClip(dataId) : GetLeftHandWeaponPullingClip(dataId);
+            bool hasClip = pullingClip != null && animator.isActiveAndEnabled;
+            if (hasClip)
+            {
+                CacheAnimatorController[CLIP_WEAPON_PULLING] = pullingClip;
+                animator.SetBool(ANIM_IS_WEAPON_PULLING, true);
+            }
+        }
+
         public override void StopActionAnimation()
         {
             if (animator.isActiveAndEnabled)
@@ -794,6 +806,14 @@ namespace MultiplayerARPG
             {
                 animator.SetBool(ANIM_IS_CASTING_SKILL, false);
                 animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
+            }
+        }
+
+        public override void StopWeaponPullingAnimation()
+        {
+            if (animator.isActiveAndEnabled)
+            {
+                animator.SetBool(ANIM_IS_WEAPON_PULLING, false);
             }
         }
 

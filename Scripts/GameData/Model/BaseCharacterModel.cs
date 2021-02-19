@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -645,8 +644,10 @@ namespace MultiplayerARPG
         public abstract void PlayMoveAnimation();
         public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
         public abstract Coroutine PlaySkillCastClip(int dataId, float duration);
+        public abstract void PlayWeaponPullingClip(int dataId, bool isLeftHand);
         public abstract void StopActionAnimation();
         public abstract void StopSkillCastAnimation();
+        public abstract void StopWeaponPullingAnimation();
         public abstract bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);

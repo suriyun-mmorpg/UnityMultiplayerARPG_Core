@@ -302,6 +302,11 @@ namespace MultiplayerARPG
             playingAction = false;
         }
 
+        public override void PlayWeaponPullingClip(int dataId, bool isLeftHand)
+        {
+            // TODO: May implement pulling animation for 2D models
+        }
+
         public override void StopActionAnimation()
         {
             playingAction = false;
@@ -310,6 +315,11 @@ namespace MultiplayerARPG
         public override void StopSkillCastAnimation()
         {
             playingAction = false;
+        }
+
+        public override void StopWeaponPullingAnimation()
+        {
+            // TODO: May implement pulling animation for 2D models
         }
 
         public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)

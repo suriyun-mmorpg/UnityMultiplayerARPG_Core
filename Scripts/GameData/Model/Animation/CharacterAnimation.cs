@@ -68,7 +68,7 @@ namespace MultiplayerARPG
         {
             return extraDuration;
         }
-        
+
         public float[] GetTriggerDurations()
         {
             if (multiHitTriggerDurationRates != null &&
@@ -205,6 +205,8 @@ namespace MultiplayerARPG
         public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
+        public AnimationClip rightHandPullClip;
+        public AnimationClip leftHandPullClip;
         [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip")]
@@ -342,6 +344,8 @@ namespace MultiplayerARPG
         public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
+        public AnimationClip rightHandPullClip;
+        public AnimationClip leftHandPullClip;
         [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip")]
