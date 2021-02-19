@@ -205,8 +205,8 @@ namespace MultiplayerARPG
         public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
-        public AnimationClip rightHandPullClip;
-        public AnimationClip leftHandPullClip;
+        public AnimationClip rightHandChargeClip;
+        public AnimationClip leftHandChargeClip;
         [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip")]
@@ -344,8 +344,8 @@ namespace MultiplayerARPG
         public float pickupAnimSpeedRate;
 
         [Header("Attack movements")]
-        public AnimationClip rightHandPullClip;
-        public AnimationClip leftHandPullClip;
+        public AnimationClip rightHandChargeClip;
+        public AnimationClip leftHandChargeClip;
         [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip")]

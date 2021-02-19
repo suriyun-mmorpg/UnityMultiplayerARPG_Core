@@ -740,13 +740,13 @@ namespace MultiplayerARPG
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }
 
-        public override void PlayWeaponPullingClip(int dataId, bool isLeftHand)
+        public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
-            AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponPullingClip(dataId) : GetLeftHandWeaponPullingClip(dataId);
-            if (legacyAnimation.GetClip(CLIP_WEAPON_PULLING) != null)
-                legacyAnimation.RemoveClip(CLIP_WEAPON_PULLING);
-            legacyAnimation.AddClip(pullingClip, CLIP_WEAPON_PULLING);
-            CrossFadeLegacyAnimation(CLIP_WEAPON_PULLING, actionClipFadeLength, WrapMode.Once);
+            AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponChargeClip(dataId) : GetLeftHandWeaponChargeClip(dataId);
+            if (legacyAnimation.GetClip(CLIP_WEAPON_CHARGE) != null)
+                legacyAnimation.RemoveClip(CLIP_WEAPON_CHARGE);
+            legacyAnimation.AddClip(pullingClip, CLIP_WEAPON_CHARGE);
+            CrossFadeLegacyAnimation(CLIP_WEAPON_CHARGE, actionClipFadeLength, WrapMode.Once);
         }
 
         public override void StopActionAnimation()
@@ -759,7 +759,7 @@ namespace MultiplayerARPG
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }
 
-        public override void StopWeaponPullingAnimation()
+        public override void StopWeaponChargeAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }

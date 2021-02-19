@@ -628,7 +628,7 @@ namespace MultiplayerARPG
             return StartCoroutine(PlaySkillCastClip_Animator(dataId, duration));
         }
 
-        public override void PlayWeaponPullingClip(int dataId, bool isLeftHand)
+        public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
             // This character model not supports weapon pulling clip, use `AnimatorCharacterModel` or `AnimationCharacterModel` instead.
         }
@@ -654,7 +654,7 @@ namespace MultiplayerARPG
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }
 
-        public override void StopWeaponPullingAnimation()
+        public override void StopWeaponChargeAnimation()
         {
             // This character model not supports weapon pulling clip, use `AnimatorCharacterModel` or `AnimationCharacterModel` instead.
         }

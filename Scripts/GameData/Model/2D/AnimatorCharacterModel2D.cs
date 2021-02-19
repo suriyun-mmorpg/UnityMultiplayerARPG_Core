@@ -376,7 +376,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void PlayWeaponPullingClip(int dataId, bool isLeftHand)
+        public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
             // TODO: May implement pulling animation for 2D models
         }
@@ -391,7 +391,7 @@ namespace MultiplayerARPG
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }
 
-        public override void StopWeaponPullingAnimation()
+        public override void StopWeaponChargeAnimation()
         {
             // TODO: May implement pulling animation for 2D models
         }

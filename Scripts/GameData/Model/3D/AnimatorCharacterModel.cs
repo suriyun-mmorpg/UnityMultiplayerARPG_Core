@@ -780,13 +780,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void PlayWeaponPullingClip(int dataId, bool isLeftHand)
+        public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
-            AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponPullingClip(dataId) : GetLeftHandWeaponPullingClip(dataId);
+            AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponChargeClip(dataId) : GetLeftHandWeaponChargeClip(dataId);
             bool hasClip = pullingClip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
-                CacheAnimatorController[CLIP_WEAPON_PULLING] = pullingClip;
+                CacheAnimatorController[CLIP_WEAPON_CHARGE] = pullingClip;
                 animator.SetBool(ANIM_IS_WEAPON_PULLING, true);
             }
         }
@@ -809,7 +809,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void StopWeaponPullingAnimation()
+        public override void StopWeaponChargeAnimation()
         {
             if (animator.isActiveAndEnabled)
             {

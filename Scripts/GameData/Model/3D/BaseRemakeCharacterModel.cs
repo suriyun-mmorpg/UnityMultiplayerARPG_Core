@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         public const string CLIP_DEAD = "__Dead";
         public const string CLIP_ACTION = "__Action";
         public const string CLIP_CAST_SKILL = "__CastSkill";
-        public const string CLIP_WEAPON_PULLING = "__WeaponPulling";
+        public const string CLIP_WEAPON_CHARGE = "__WeaponCharge";
         public const string CLIP_PICKUP = "__Pickup";
 
         [Header("Renderer")]
@@ -403,30 +403,30 @@ namespace MultiplayerARPG
             return defaultAnimations.leftHandAttackAnimations;
         }
 
-        public AnimationClip GetRightHandWeaponPullingClip(WeaponType weaponType)
+        public AnimationClip GetRightHandWeaponChargeClip(WeaponType weaponType)
         {
-            return GetRightHandWeaponPullingClip(weaponType.DataId);
+            return GetRightHandWeaponChargeClip(weaponType.DataId);
         }
 
-        public AnimationClip GetRightHandWeaponPullingClip(int dataId)
+        public AnimationClip GetRightHandWeaponChargeClip(int dataId)
         {
             if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheWeaponAnimations[dataId].rightHandPullClip != null)
-                return GetAnims().CacheWeaponAnimations[dataId].rightHandPullClip;
-            return defaultAnimations.rightHandPullClip;
+                GetAnims().CacheWeaponAnimations[dataId].rightHandChargeClip != null)
+                return GetAnims().CacheWeaponAnimations[dataId].rightHandChargeClip;
+            return defaultAnimations.rightHandChargeClip;
         }
 
-        public AnimationClip GetLeftHandWeaponPullingClip(WeaponType weaponType)
+        public AnimationClip GetLeftHandWeaponChargeClip(WeaponType weaponType)
         {
-            return GetLeftHandWeaponPullingClip(weaponType.DataId);
+            return GetLeftHandWeaponChargeClip(weaponType.DataId);
         }
 
-        public AnimationClip GetLeftHandWeaponPullingClip(int dataId)
+        public AnimationClip GetLeftHandWeaponChargeClip(int dataId)
         {
             if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
-                GetAnims().CacheWeaponAnimations[dataId].leftHandPullClip != null)
-                return GetAnims().CacheWeaponAnimations[dataId].leftHandPullClip;
-            return defaultAnimations.leftHandPullClip;
+                GetAnims().CacheWeaponAnimations[dataId].leftHandChargeClip != null)
+                return GetAnims().CacheWeaponAnimations[dataId].leftHandChargeClip;
+            return defaultAnimations.leftHandChargeClip;
         }
 
         public AnimationClip GetSkillCastClip(int dataId)
