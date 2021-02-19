@@ -4,5 +4,6 @@
     {
         SingleFire,
         Automatic,
+        FireOnRelease,
     }
 }
