@@ -26,7 +26,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class SyncListCraftingItem : LiteNetLibSyncList<CraftingQueueItem>
+    public class SyncListCraftingQueueItem : LiteNetLibSyncList<CraftingQueueItem>
     {
     }
 }

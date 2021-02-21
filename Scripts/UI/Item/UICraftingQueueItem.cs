@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICraftingQueueItem : UISelectionEntry<CraftingQueueItem>
+    public class UICraftingQueueItem : UIDataForCharacter<CraftingQueueItem>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Amount}")]
@@ -109,12 +109,12 @@ namespace MultiplayerARPG
             short amount;
             if (inputAmount == null || !short.TryParse(inputAmount.text, out amount))
                 amount = 1;
-            // TODO: Implement this
+            GameInstance.PlayingCharacterEntity.Crafting.ChangeCraftingQueueItem(IndexOfData, amount);
         }
 
         public void OnClickCancel()
         {
-            // TODO: Implement this
+            GameInstance.PlayingCharacterEntity.Crafting.CancelCraftingQueueItem(IndexOfData);
         }
     }
 }

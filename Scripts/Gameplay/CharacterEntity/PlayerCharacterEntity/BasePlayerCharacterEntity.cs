@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(PlayerCharacterCraftingComponent))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
         public BaseNpcDialog CurrentNpcDialog { get; set; }
@@ -39,6 +40,8 @@ namespace MultiplayerARPG
             get { return controllerPrefab; }
         }
 
+        public PlayerCharacterCraftingComponent Crafting { get; private set; }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -64,6 +67,12 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.playerTag;
+        }
+
+        public override void InitialRequiredComponents()
+        {
+            base.InitialRequiredComponents();
+            Crafting = gameObject.GetOrAddComponent<PlayerCharacterCraftingComponent>();
         }
 
         protected override void EntityUpdate()

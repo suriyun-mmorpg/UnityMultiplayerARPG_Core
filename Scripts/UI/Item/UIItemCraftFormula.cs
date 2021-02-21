@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             short amount;
             if (inputAmount == null || !short.TryParse(inputAmount.text, out amount))
                 amount = 1;
-            // TODO: Implement this
+            GameInstance.PlayingCharacterEntity.Crafting.AppendCraftingQueueItem(Data.DataId, amount);
         }
     }
 }

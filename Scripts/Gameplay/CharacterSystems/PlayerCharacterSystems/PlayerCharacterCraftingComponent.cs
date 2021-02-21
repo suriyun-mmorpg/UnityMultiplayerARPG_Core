@@ -4,22 +4,23 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [DisallowMultipleComponent]
     public class PlayerCharacterCraftingComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
         [SerializeField]
         private int maxQueueSize = 8;
-        private SyncListCraftingItem craftingItems = new SyncListCraftingItem();
+        private SyncListCraftingQueueItem craftingQueueItems = new SyncListCraftingQueueItem();
         private float timeCounter;
 
         public IList<CraftingQueueItem> CraftingItems
         {
-            get { return craftingItems; }
+            get { return craftingQueueItems; }
         }
 
         public override sealed void OnSetup()
         {
             base.OnSetup();
-            craftingItems.forOwnerOnly = true;
+            craftingQueueItems.forOwnerOnly = true;
         }
 
         public override sealed void EntityUpdate()
@@ -27,24 +28,24 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             if (CacheEntity.IsDead())
             {
-                if (craftingItems.Count > 0)
-                    craftingItems.Clear();
+                if (craftingQueueItems.Count > 0)
+                    craftingQueueItems.Clear();
                 return;
             }
 
-            if (craftingItems.Count == 0)
+            if (craftingQueueItems.Count == 0)
             {
                 timeCounter = 0f;
                 return;
             }
 
-            CraftingQueueItem craftingItem = craftingItems[0];
+            CraftingQueueItem craftingItem = craftingQueueItems[0];
             ItemCraftFormula formula = GameInstance.ItemCraftFormulas[craftingItem.dataId];
             UITextKeys errorMessage;
             if (!formula.ItemCraft.CanCraft(CacheEntity, out errorMessage))
             {
                 timeCounter = 0f;
-                craftingItems.RemoveAt(0);
+                craftingQueueItems.RemoveAt(0);
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(CacheEntity.ConnectionId, errorMessage);
                 return;
             }
@@ -63,27 +64,27 @@ namespace MultiplayerARPG
                     {
                         --craftingItem.amount;
                         craftingItem.craftRemainsDuration = formula.CraftDuration;
-                        craftingItems[0] = craftingItem;
+                        craftingQueueItems[0] = craftingItem;
                     }
                     else
                     {
-                        craftingItems.RemoveAt(0);
+                        craftingQueueItems.RemoveAt(0);
                     }
                 }
                 else
                 {
                     // Update remains duration
-                    craftingItems[0] = craftingItem;
+                    craftingQueueItems[0] = craftingItem;
                 }
             }
         }
 
-        public void AppendCraftingQueue(int dataId, short amount)
+        public void AppendCraftingQueueItem(int dataId, short amount)
         {
             RPC(RpcAppendCraftingQueueItem, dataId, amount);
         }
 
-        public void ChangeCraftingQueue(int index, short amount)
+        public void ChangeCraftingQueueItem(int index, short amount)
         {
             RPC(RpcChangeCraftingQueueItem, index, amount);
         }
@@ -101,9 +102,9 @@ namespace MultiplayerARPG
             ItemCraftFormula itemCraftFormula;
             if (!GameInstance.ItemCraftFormulas.TryGetValue(dataId, out itemCraftFormula))
                 return;
-            if (craftingItems.Count >= maxQueueSize)
+            if (craftingQueueItems.Count >= maxQueueSize)
                 return;
-            craftingItems.Add(new CraftingQueueItem()
+            craftingQueueItems.Add(new CraftingQueueItem()
             {
                 dataId = dataId,
                 amount = amount,
@@ -116,16 +117,16 @@ namespace MultiplayerARPG
         {
             if (CacheEntity.IsDead())
                 return;
-            if (index < 0 || index >= craftingItems.Count)
+            if (index < 0 || index >= craftingQueueItems.Count)
                 return;
             if (amount <= 0)
             {
-                craftingItems.RemoveAt(index);
+                craftingQueueItems.RemoveAt(index);
                 return;
             }
-            CraftingQueueItem craftingItem = craftingItems[index];
+            CraftingQueueItem craftingItem = craftingQueueItems[index];
             craftingItem.amount = amount;
-            craftingItems[index] = craftingItem;
+            craftingQueueItems[index] = craftingItem;
         }
 
         [ServerRpc]
@@ -133,9 +134,9 @@ namespace MultiplayerARPG
         {
             if (CacheEntity.IsDead())
                 return;
-            if (index < 0 || index >= craftingItems.Count)
+            if (index < 0 || index >= craftingQueueItems.Count)
                 return;
-            craftingItems.RemoveAt(index);
+            craftingQueueItems.RemoveAt(index);
         }
     }
 }

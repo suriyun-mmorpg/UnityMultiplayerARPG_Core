@@ -2,8 +2,14 @@
 
 namespace MultiplayerARPG
 {
-    public class ItemCraftFormula : BaseGameData
+
+    [CreateAssetMenu(fileName = "Item Craft Formula", menuName = "Create GameData/Item Craft Formula", order = -4880)]
+    public class ItemCraftFormula : ScriptableObject, IGameData
     {
+        public virtual string Id { get { return name; } }
+
+        public int DataId { get { return Id.GenerateHashId(); } }
+
         [SerializeField]
         private ItemCraft itemCraft;
 
@@ -18,6 +24,16 @@ namespace MultiplayerARPG
         public float CraftDuration
         {
             get { return craftDuration; }
+        }
+
+        public void PrepareRelatesData()
+        {
+
+        }
+
+        public bool Validate()
+        {
+            return false;
         }
     }
 }
