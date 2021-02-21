@@ -8,8 +8,15 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public class NavMeshEntityMovement : BaseEntityMovement
     {
+        [Header("Movement Settings")]
         [Tooltip("If calculated paths +1 higher than this value, it will stop moving. If this is 0 it will not applies")]
         public byte maxPathsForKeyMovement = 1;
+
+        [Header("Interpolate, Extrapolate Settings")]
+        public LiteNetLibTransform.InterpolateMode interpolateMode = LiteNetLibTransform.InterpolateMode.FixedSpeed;
+        public LiteNetLibTransform.ExtrapolateMode extrapolateMode = LiteNetLibTransform.ExtrapolateMode.FixedSpeed;
+        [Range(0.01f, 1f)]
+        public float extrapolateSpeedRate = 0.5f;
 
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public NavMeshAgent CacheNavMeshAgent { get; private set; }
@@ -163,6 +170,18 @@ namespace MultiplayerARPG
                 return true;
             }
             return false;
+        }
+
+        public override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            float moveSpeed = CacheEntity.GetMoveSpeed();
+            CacheNetTransform.interpolateMode = interpolateMode;
+            if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
+                CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
+            CacheNetTransform.extrapolateMode = extrapolateMode;
+            if (extrapolateMode == LiteNetLibTransform.ExtrapolateMode.FixedSpeed)
+                CacheNetTransform.fixedExtrapolateSpeed = moveSpeed * extrapolateSpeedRate;
         }
 
         public override void EntityFixedUpdate()

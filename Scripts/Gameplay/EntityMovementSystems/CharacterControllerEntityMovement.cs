@@ -28,6 +28,12 @@ namespace MultiplayerARPG
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
 
+        [Header("Interpolate, Extrapolate Settings")]
+        public LiteNetLibTransform.InterpolateMode interpolateMode = LiteNetLibTransform.InterpolateMode.FixedSpeed;
+        public LiteNetLibTransform.ExtrapolateMode extrapolateMode = LiteNetLibTransform.ExtrapolateMode.FixedSpeed;
+        [Range(0.01f, 1f)]
+        public float extrapolateSpeedRate = 0.5f;
+
         [Header("Root Motion Settings")]
         public bool useRootMotionForMovement;
         public bool useRootMotionForAirMovement;
@@ -305,9 +311,18 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
+            float moveSpeed = CacheEntity.GetMoveSpeed();
+            CacheNetTransform.interpolateMode = interpolateMode;
+            if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
+                CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
+            CacheNetTransform.extrapolateMode = extrapolateMode;
+            if (extrapolateMode == LiteNetLibTransform.ExtrapolateMode.FixedSpeed)
+                CacheNetTransform.fixedExtrapolateSpeed = moveSpeed * extrapolateSpeedRate;
+
             if ((CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
                 (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
                 return;
+
             UpdateMovement(Time.deltaTime);
             tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
             if (isUnderWater)

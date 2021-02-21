@@ -7,12 +7,16 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public class RigidBodyEntityMovement2D : BaseEntityMovement
     {
-        #region Settings
-        [Header("Movement AI")]
+        [Header("Movement Settings")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
-        #endregion
-        
+
+        [Header("Interpolate, Extrapolate Settings")]
+        public LiteNetLibTransform.InterpolateMode interpolateMode = LiteNetLibTransform.InterpolateMode.FixedSpeed;
+        public LiteNetLibTransform.ExtrapolateMode extrapolateMode = LiteNetLibTransform.ExtrapolateMode.FixedSpeed;
+        [Range(0.01f, 1f)]
+        public float extrapolateSpeedRate = 0.5f;
+
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
 
@@ -158,6 +162,18 @@ namespace MultiplayerARPG
         {
             result = fromPosition;
             return true;
+        }
+
+        public override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            float moveSpeed = CacheEntity.GetMoveSpeed();
+            CacheNetTransform.interpolateMode = interpolateMode;
+            if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
+                CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
+            CacheNetTransform.extrapolateMode = extrapolateMode;
+            if (extrapolateMode == LiteNetLibTransform.ExtrapolateMode.FixedSpeed)
+                CacheNetTransform.fixedExtrapolateSpeed = moveSpeed * extrapolateSpeedRate;
         }
 
         public override void EntityFixedUpdate()
