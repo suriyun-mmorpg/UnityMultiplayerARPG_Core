@@ -28,7 +28,7 @@ namespace MultiplayerARPG
 
         [Header("Interpolate, Extrapolate Settings")]
         public LiteNetLibTransform.InterpolateMode interpolateMode = LiteNetLibTransform.InterpolateMode.FixedSpeed;
-        public LiteNetLibTransform.ExtrapolateMode extrapolateMode = LiteNetLibTransform.ExtrapolateMode.FixedSpeed;
+        public LiteNetLibTransform.ExtrapolateMode extrapolateMode = LiteNetLibTransform.ExtrapolateMode.None;
         [Range(0.01f, 1f)]
         public float extrapolateSpeedRate = 0.5f;
 
