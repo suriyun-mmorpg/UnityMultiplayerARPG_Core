@@ -3,23 +3,23 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICraftingItem : UISelectionEntry<CraftingItem>
+    public class UICraftingQueueItem : UISelectionEntry<CraftingQueueItem>
     {
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Title}")]
-        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Craft Duration}")]
         public UILocaleKeySetting formatKeyCraftDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CRAFT_DURATION);
         [Tooltip("Format => {0} = {Craft Remains Duration}")]
         public UILocaleKeySetting formatKeyCraftRemainsDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
-        public TextWrapper uiTextTitle;
-        public Image imageIcon;
+        public TextWrapper uiTextAmount;
         public TextWrapper uiTextDuration;
         public TextWrapper uiTextRemainsDuration;
         public Image imageDurationGage;
-        public UIItemCraft uiCraftItem;
+        public UIItemCraft uiItemCraft;
+        public InputFieldWrapper inputAmount;
 
         protected float craftRemainsDuration;
 
@@ -56,6 +56,13 @@ namespace MultiplayerARPG
             if (GameInstance.ItemCraftFormulas.TryGetValue(Data.dataId, out formula))
                 craftDuration = formula.CraftDuration;
 
+            if (uiTextAmount != null)
+            {
+                uiTextAmount.text = string.Format(
+                    LanguageManager.GetText(formatKeyAmount),
+                    Data.amount.ToString("N0"));
+            }
+
             if (uiTextDuration != null)
             {
                 uiTextDuration.text = string.Format(
@@ -83,32 +90,31 @@ namespace MultiplayerARPG
             // Update remains duration
             craftRemainsDuration = Data.craftRemainsDuration;
 
-            if (uiTextTitle != null)
-            {
-                uiTextTitle.text = string.Format(
-                    LanguageManager.GetText(formatKeyTitle),
-                    formula == null ? LanguageManager.GetUnknowTitle() : formula.Title);
-            }
-
-            if (imageIcon != null)
-            {
-                Sprite iconSprite = formula == null ? null : formula.icon;
-                imageIcon.gameObject.SetActive(iconSprite != null);
-                imageIcon.sprite = iconSprite;
-            }
-
-            if (uiCraftItem != null)
+            if (uiItemCraft != null)
             {
                 if (formula == null)
                 {
-                    uiCraftItem.Hide();
+                    uiItemCraft.Hide();
                 }
                 else
                 {
-                    uiCraftItem.Show();
-                    uiCraftItem.Data = formula.ItemCraft;
+                    uiItemCraft.Show();
+                    uiItemCraft.Data = formula.ItemCraft;
                 }
             }
+        }
+
+        public void OnClickChange()
+        {
+            short amount;
+            if (inputAmount == null || !short.TryParse(inputAmount.text, out amount))
+                amount = 1;
+            // TODO: Implement this
+        }
+
+        public void OnClickCancel()
+        {
+            // TODO: Implement this
         }
     }
 }

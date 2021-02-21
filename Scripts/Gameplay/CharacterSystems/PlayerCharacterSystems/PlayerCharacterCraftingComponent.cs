@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         private SyncListCraftingItem craftingItems = new SyncListCraftingItem();
         private float timeCounter;
 
-        public IList<CraftingItem> CraftingItems
+        public IList<CraftingQueueItem> CraftingItems
         {
             get { return craftingItems; }
         }
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            CraftingItem craftingItem = craftingItems[0];
+            CraftingQueueItem craftingItem = craftingItems[0];
             ItemCraftFormula formula = GameInstance.ItemCraftFormulas[craftingItem.dataId];
             UITextKeys errorMessage;
             if (!formula.ItemCraft.CanCraft(CacheEntity, out errorMessage))
@@ -80,16 +80,21 @@ namespace MultiplayerARPG
 
         public void AppendCraftingQueue(int dataId, short amount)
         {
-            RPC(RpcAppendCraftingQueue, dataId, amount);
+            RPC(RpcAppendCraftingQueueItem, dataId, amount);
         }
 
         public void ChangeCraftingQueue(int index, short amount)
         {
-            RPC(RpcChangeCraftingQueue, index, amount);
+            RPC(RpcChangeCraftingQueueItem, index, amount);
+        }
+
+        public void CancelCraftingQueueItem(int index)
+        {
+            RPC(RpcCancelCraftingQueueItem, index);
         }
 
         [ServerRpc]
-        private void RpcAppendCraftingQueue(int dataId, short amount)
+        private void RpcAppendCraftingQueueItem(int dataId, short amount)
         {
             if (CacheEntity.IsDead())
                 return;
@@ -98,7 +103,7 @@ namespace MultiplayerARPG
                 return;
             if (craftingItems.Count >= maxQueueSize)
                 return;
-            craftingItems.Add(new CraftingItem()
+            craftingItems.Add(new CraftingQueueItem()
             {
                 dataId = dataId,
                 amount = amount,
@@ -107,7 +112,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        private void RpcChangeCraftingQueue(int index, short amount)
+        private void RpcChangeCraftingQueueItem(int index, short amount)
         {
             if (CacheEntity.IsDead())
                 return;
@@ -118,9 +123,19 @@ namespace MultiplayerARPG
                 craftingItems.RemoveAt(index);
                 return;
             }
-            CraftingItem craftingItem = craftingItems[index];
+            CraftingQueueItem craftingItem = craftingItems[index];
             craftingItem.amount = amount;
             craftingItems[index] = craftingItem;
+        }
+
+        [ServerRpc]
+        private void RpcCancelCraftingQueueItem(int index)
+        {
+            if (CacheEntity.IsDead())
+                return;
+            if (index < 0 || index >= craftingItems.Count)
+                return;
+            craftingItems.RemoveAt(index);
         }
     }
 }

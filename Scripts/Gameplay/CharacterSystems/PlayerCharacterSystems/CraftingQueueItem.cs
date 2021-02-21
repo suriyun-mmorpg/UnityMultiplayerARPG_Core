@@ -4,7 +4,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct CraftingItem : INetSerializable
+    public struct CraftingQueueItem : INetSerializable
     {
         public int dataId;
         public short amount;
@@ -26,7 +26,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class SyncListCraftingItem : LiteNetLibSyncList<CraftingItem>
+    public class SyncListCraftingItem : LiteNetLibSyncList<CraftingQueueItem>
     {
     }
 }
