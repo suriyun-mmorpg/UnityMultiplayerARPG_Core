@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         protected bool isExploded;
 
         public Rigidbody CacheRigidbody { get; private set; }
+        public Rigidbody2D CacheRigidbody2D { get; private set; }
 
         protected float throwedTime;
         protected bool destroying;
@@ -26,6 +27,7 @@ namespace MultiplayerARPG
             base.Awake();
             gameObject.layer = PhysicLayers.IgnoreRaycast;
             CacheRigidbody = GetComponent<Rigidbody>();
+            CacheRigidbody2D = GetComponent<Rigidbody2D>();
         }
 
         /// <summary>
@@ -47,16 +49,10 @@ namespace MultiplayerARPG
             float throwForce,
             float lifetime)
         {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                Debug.LogWarning("[Grenade Damage Entity] was made for 3D games only");
-                PushBack(destroyDelay);
-                destroying = true;
-                return;
-            }
             Setup(instigator, weapon, damageAmounts, skill, skillLevel);
             this.throwForce = throwForce;
             this.lifetime = lifetime;
+
             if (lifetime <= 0)
             {
                 // Explode immediately when lifetime is 0
@@ -68,7 +64,10 @@ namespace MultiplayerARPG
             isExploded = false;
             destroying = false;
             throwedTime = Time.unscaledTime;
-            CacheRigidbody.AddForce(CacheTransform.forward * throwForce, ForceMode.Impulse);
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                CacheRigidbody2D.AddForce(CacheTransform.forward * throwForce, ForceMode2D.Impulse);
+            else
+                CacheRigidbody.AddForce(CacheTransform.forward * throwForce, ForceMode.Impulse);
         }
 
         protected virtual void Update()
