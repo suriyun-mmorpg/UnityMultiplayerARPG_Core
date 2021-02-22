@@ -12,7 +12,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct DamageInfo
+    public struct DamageInfo : IDamageInfo
     {
         public DamageType damageType;
 
@@ -140,31 +140,6 @@ namespace MultiplayerARPG
             return transform;
         }
 
-        private void GetDamagePositionAndRotation(BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
-        {
-            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
-                GetDamagePositionAndRotation2D(attacker, isLeftHand, forEffect, aimPosition, stagger, out position, out direction, out rotation);
-            else
-                GetDamagePositionAndRotation3D(attacker, isLeftHand, forEffect, aimPosition, stagger, out position, out direction, out rotation);
-        }
-
-        private void GetDamagePositionAndRotation2D(BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
-        {
-            Transform transform = forEffect ? GetDamageEffectTransform(attacker, isLeftHand) : GetDamageTransform(attacker, isLeftHand);
-            position = transform.position;
-            direction = attacker.Direction2D;
-            rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(direction.y, direction.x) * (180 / Mathf.PI)) + 90);
-        }
-
-        private void GetDamagePositionAndRotation3D(BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
-        {
-            Transform aimTransform = forEffect ? GetDamageEffectTransform(attacker, isLeftHand) : GetDamageTransform(attacker, isLeftHand);
-            position = aimTransform.position;
-            Vector3 eulerAngles = Quaternion.LookRotation(aimPosition - position).eulerAngles + stagger;
-            rotation = Quaternion.Euler(eulerAngles);
-            direction = rotation * Vector3.forward;
-        }
-
         /// <summary>
         /// This function can be called at both client and server
         /// For server it will instantiates damage entities if needed
@@ -216,13 +191,13 @@ namespace MultiplayerARPG
             Vector3 damagePosition;
             Vector3 damageDirection;
             Quaternion damageRotation;
-            GetDamagePositionAndRotation(attacker, isLeftHand, false, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
+            this.GetDamagePositionAndRotation(attacker, isLeftHand, false, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
 
             // Damage effect transform data
             Vector3 damageEffectPosition;
             Vector3 damageEffectDirection;
             Quaternion damageEffectRotation;
-            GetDamagePositionAndRotation(attacker, isLeftHand, true, aimPosition, stagger, out damageEffectPosition, out damageEffectDirection, out damageEffectRotation);
+            this.GetDamagePositionAndRotation(attacker, isLeftHand, true, aimPosition, stagger, out damageEffectPosition, out damageEffectDirection, out damageEffectRotation);
 #if UNITY_EDITOR
             attacker.SetDebugDamage(damagePosition, damageDirection, damageRotation);
 #endif
