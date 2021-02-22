@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         protected float launchTime;
         protected float missileDuration;
         protected bool destroying;
+        protected Vector3 previousPosition;
 
         protected override void Awake()
         {
@@ -30,6 +31,7 @@ namespace MultiplayerARPG
             gameObject.layer = PhysicLayers.IgnoreRaycast;
             CacheRigidbody = GetComponent<Rigidbody>();
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
+            previousPosition = CacheTransform.position;
         }
 
         /// <summary>
@@ -82,6 +84,26 @@ namespace MultiplayerARPG
                 Explode();
                 PushBack(destroyDelay);
                 destroying = true;
+            }
+
+            if (!destroying)
+            {
+                Vector3 dir = (previousPosition - CacheTransform.position).normalized;
+                float dist = Vector3.Distance(CacheTransform.position, previousPosition);
+                // Raycast to previous position to check is it hitting something or not
+                // If hit, explode
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                {
+                    RaycastHit2D hit = Physics2D.Raycast(previousPosition, dir, dist);
+                    TriggerEnter(hit.transform.gameObject);
+                }
+                else
+                {
+                    RaycastHit hit;
+                    if (Physics.Raycast(previousPosition, dir, out hit, dist))
+                        TriggerEnter(hit.transform.gameObject);
+                }
+                previousPosition = CacheTransform.position;
             }
         }
 
