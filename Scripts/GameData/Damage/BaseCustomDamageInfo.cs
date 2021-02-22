@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseCustomDamageInfo : ScriptableObject
+    public abstract class BaseCustomDamageInfo : ScriptableObject, IDamageInfo
     {
         public abstract void LaunchDamageEntity(
             BaseCharacterEntity attacker,
