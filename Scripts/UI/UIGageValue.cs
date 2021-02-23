@@ -29,6 +29,15 @@ namespace MultiplayerARPG
 
         private float rate;
 
+        public void SetVisible(bool isVisible)
+        {
+            if (textValue != null)
+                textValue.SetGameObjectActive(isVisible);
+
+            if (imageGage != null)
+                imageGage.gameObject.SetActive(isVisible);
+        }
+
         public void Update(int current, int max)
         {
             Update((float)current, (float)max);
