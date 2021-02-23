@@ -104,13 +104,13 @@ namespace MultiplayerARPG
                 }
                 else if (tempRightHandWeapon != null)
                 {
-                    if (tempLeftHandShield != null && tempRightHandWeapon.EquipType == WeaponItemEquipType.TwoHand)
+                    if (tempLeftHandShield != null && tempRightHandWeapon.GetEquipType() == WeaponItemEquipType.TwoHand)
                     {
                         Logging.LogWarning(ToString(), "Cannot set left hand equipment because it's equipping two hand weapon");
                         leftHandEquipItem = null;
                         hasChanges = true;
                     }
-                    else if (tempLeftHandWeapon != null && tempRightHandWeapon.EquipType != WeaponItemEquipType.OneHandCanDual)
+                    else if (tempLeftHandWeapon != null && tempRightHandWeapon.GetEquipType() != WeaponItemEquipType.OneHandCanDual)
                     {
                         Logging.LogWarning(ToString(), "Cannot set left hand equipment because it's equipping one hand weapon which cannot equip dual");
                         leftHandEquipItem = null;
@@ -118,8 +118,8 @@ namespace MultiplayerARPG
                     }
                 }
                 if (tempLeftHandWeapon != null &&
-                    (tempLeftHandWeapon.EquipType == WeaponItemEquipType.OneHand ||
-                    tempLeftHandWeapon.EquipType == WeaponItemEquipType.TwoHand))
+                    (tempLeftHandWeapon.GetEquipType() == WeaponItemEquipType.OneHand ||
+                    tempLeftHandWeapon.GetEquipType() == WeaponItemEquipType.TwoHand))
                 {
                     Logging.LogWarning(ToString(), "Left hand weapon cannot be OneHand or TwoHand");
                     leftHandEquipItem = null;

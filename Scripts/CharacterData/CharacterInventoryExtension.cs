@@ -33,7 +33,7 @@ namespace MultiplayerARPG
             IWeaponItem equippingWeaponItem = equippingItem.GetWeaponItem();
             if (equippingWeaponItem != null)
             {
-                switch (equippingWeaponItem.EquipType)
+                switch (equippingWeaponItem.GetEquipType())
                 {
                     case WeaponItemEquipType.OneHand:
                         // If weapon is one hand its equip position must be right hand

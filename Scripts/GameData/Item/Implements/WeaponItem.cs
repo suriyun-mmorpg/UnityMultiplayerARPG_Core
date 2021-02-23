@@ -25,11 +25,6 @@ namespace MultiplayerARPG
             get { return weaponType; }
         }
 
-        public WeaponItemEquipType EquipType
-        {
-            get { return WeaponType.EquipType; }
-        }
-
         [SerializeField]
         private EquipmentModel[] offHandEquipmentModels;
         public EquipmentModel[] OffHandEquipmentModels
@@ -119,6 +114,13 @@ namespace MultiplayerARPG
         public byte FireSpread
         {
             get { return fireSpread; }
+        }
+
+        [SerializeField]
+        private bool destroyImmediatelyAfterFired;
+        public bool DestroyImmediatelyAfterFired
+        {
+            get { return destroyImmediatelyAfterFired; }
         }
 
         public override void PrepareRelatesData()

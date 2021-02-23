@@ -92,6 +92,7 @@ namespace MultiplayerARPG
         public FireType fireType;
         public Vector2 fireStagger;
         public byte fireSpread;
+        private bool destroyImmediatelyAfterFired;
 
         [Header("Equip Models")]
         public EquipmentModel[] equipmentModels;
@@ -324,11 +325,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public WeaponItemEquipType EquipType
-        {
-            get { return WeaponType == null ? WeaponItemEquipType.OneHand : WeaponType.EquipType; }
-        }
-
         public EquipmentModel[] OffHandEquipmentModels
         {
             get { return subEquipmentModels; }
@@ -392,6 +388,11 @@ namespace MultiplayerARPG
         public byte FireSpread
         {
             get { return fireSpread; }
+        }
+
+        public bool DestroyImmediatelyAfterFired
+        {
+            get { return destroyImmediatelyAfterFired; }
         }
         #endregion
 

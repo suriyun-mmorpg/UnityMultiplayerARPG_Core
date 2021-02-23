@@ -184,6 +184,14 @@ namespace MultiplayerARPG
         #endregion
 
         #region Weapon Extension
+        public static WeaponItemEquipType GetEquipType<T>(this T weaponItem)
+            where T : IWeaponItem
+        {
+            if (weaponItem == null || !weaponItem.IsWeapon() || !weaponItem.WeaponType)
+                return WeaponItemEquipType.OneHand;
+            return weaponItem.WeaponType.EquipType;
+        }
+
         public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, short itemLevel, float statsRate, ICharacterData character)
             where T : IWeaponItem
         {
@@ -206,7 +214,7 @@ namespace MultiplayerARPG
             equipType = WeaponItemEquipType.OneHand;
             if (weaponItem == null || !weaponItem.IsWeapon())
                 return false;
-            equipType = weaponItem.EquipType;
+            equipType = weaponItem.GetEquipType();
             return true;
         }
 
