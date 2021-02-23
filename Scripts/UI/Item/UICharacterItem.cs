@@ -73,8 +73,10 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSellPrice;
         public TextWrapper uiTextStack;
         public TextWrapper uiTextDurability;
+        public UIGageValue uiGageDurability;
         public TextWrapper uiTextWeight;
         public TextWrapper uiTextExp;
+        public UIGageValue uiGageExp;
         public TextWrapper uiTextLockRemainsDuration;
 
         [Header("Equipment - UI Elements")]
@@ -358,25 +360,35 @@ namespace MultiplayerARPG
                 uiTextStack.text = stackString;
             }
 
-            if (uiTextDurability != null)
+            if (Item != null)
             {
-                string durabilityString;
-                if (Item == null)
+                bool showDurability = EquipmentItem != null && EquipmentItem.MaxDurability > 0;
+                if (uiTextDurability != null)
                 {
-                    durabilityString = string.Format(
-                        LanguageManager.GetText(formatKeyDurability),
-                        0.ToString("N0"),
-                        0.ToString("N0"));
+                    uiTextDurability.SetGameObjectActive(showDurability);
+                    if (showDurability)
+                    {
+                        uiTextDurability.text = string.Format(
+                            LanguageManager.GetText(formatKeyDurability),
+                            CharacterItem.durability.ToString("N0"),
+                            EquipmentItem.MaxDurability.ToString("N0"));
+                    }
                 }
-                else
+
+                if (uiGageDurability != null)
                 {
-                    durabilityString = string.Format(
-                        LanguageManager.GetText(formatKeyDurability),
-                        CharacterItem.durability.ToString("N0"),
-                        EquipmentItem != null ? EquipmentItem.MaxDurability.ToString("N0") : 0.ToString("N0"));
+                    uiGageDurability.SetVisible(showDurability);
+                    if (showDurability)
+                        uiGageDurability.Update(CharacterItem.durability, EquipmentItem.MaxDurability);
                 }
-                uiTextDurability.SetGameObjectActive(EquipmentItem != null && EquipmentItem.MaxDurability > 0);
-                uiTextDurability.text = durabilityString;
+            }
+            else
+            {
+                if (uiTextDurability != null)
+                    uiTextDurability.SetGameObjectActive(false);
+
+                if (uiGageDurability != null)
+                    uiGageDurability.SetVisible(false);
             }
 
             if (uiTextWeight != null)
@@ -693,11 +705,20 @@ namespace MultiplayerARPG
                         currentExp.ToString("N0"),
                         nextLevelExp.ToString("N0"));
                 }
+
+                if (uiGageExp != null)
+                {
+                    uiGageExp.SetVisible(true);
+                    uiGageExp.Update(currentExp, nextLevelExp);
+                }
             }
             else
             {
                 if (uiTextExp != null)
                     uiTextExp.SetGameObjectActive(false);
+
+                if (uiGageExp != null)
+                    uiGageExp.SetVisible(false);
             }
 
             if (uiTextBuilding != null)
