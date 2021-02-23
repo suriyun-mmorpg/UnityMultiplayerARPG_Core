@@ -45,6 +45,7 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectItemCraftFormula);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnItemDialogHide);
+            UpdateData();
         }
 
         protected virtual void OnDisable()
@@ -52,7 +53,6 @@ namespace MultiplayerARPG
             if (uiDialog != null)
                 uiDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnItemDialogHide()
@@ -80,14 +80,14 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateData(IList<ItemCraftFormula> formulas)
+        protected void UpdateData()
         {
             int selectedIdx = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.IndexOf(CacheItemSelectionManager.SelectedUI) : -1;
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
             UIItemCraftFormula tempUiItemCraftFormula;
-            CacheItemList.Generate(formulas, (index, formula, ui) =>
+            CacheItemList.Generate(GameInstance.ItemCraftFormulas.Values, (index, formula, ui) =>
             {
                 tempUiItemCraftFormula = ui.GetComponent<UIItemCraftFormula>();
                 tempUiItemCraftFormula.Data = formula;

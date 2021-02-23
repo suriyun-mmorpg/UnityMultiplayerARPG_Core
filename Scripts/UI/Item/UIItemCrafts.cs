@@ -86,7 +86,6 @@ namespace MultiplayerARPG
             if (uiDialog != null)
                 uiDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
-            base.Hide();
         }
 
         protected void OnItemDialogHide()

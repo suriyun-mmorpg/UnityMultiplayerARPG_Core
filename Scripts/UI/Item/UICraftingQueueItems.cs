@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -45,6 +46,8 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCraftingItem);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnItemDialogHide);
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.Crafting.QueueItems.onOperation += OnCraftingQueueItemsOperation;
         }
 
         protected virtual void OnDisable()
@@ -52,7 +55,8 @@ namespace MultiplayerARPG
             if (uiDialog != null)
                 uiDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
-            base.Hide();
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.Crafting.QueueItems.onOperation -= OnCraftingQueueItemsOperation;
         }
 
         protected void OnItemDialogHide()
@@ -80,17 +84,22 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateData(IList<CraftingQueueItem> craftingItems)
+        protected void OnCraftingQueueItemsOperation(LiteNetLibSyncList.Operation op, int itemIndex)
+        {
+            UpdateData();
+        }
+
+        protected void UpdateData()
         {
             int selectedIdx = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.IndexOf(CacheItemSelectionManager.SelectedUI) : -1;
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
             UICraftingQueueItem tempUiCraftingItem;
-            CacheItemList.Generate(craftingItems, (index, craftingItem, ui) =>
+            CacheItemList.Generate(GameInstance.PlayingCharacterEntity.Crafting.QueueItems, (index, craftingItem, ui) =>
             {
                 tempUiCraftingItem = ui.GetComponent<UICraftingQueueItem>();
-                tempUiCraftingItem.Data = craftingItem;
+                tempUiCraftingItem.Setup(craftingItem, GameInstance.PlayingCharacterEntity, index);
                 tempUiCraftingItem.Show();
                 CacheItemSelectionManager.Add(tempUiCraftingItem);
                 if (selectedIdx == index)

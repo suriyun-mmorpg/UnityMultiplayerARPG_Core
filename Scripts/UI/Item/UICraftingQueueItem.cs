@@ -49,6 +49,10 @@ namespace MultiplayerARPG
             else
                 craftRemainsDuration = 0f;
 
+            // Only first queue will show remains duration
+            if (IndexOfData > 0)
+                craftRemainsDuration = 0f;
+
             // Update UIs
             float craftDuration = 0;
 
