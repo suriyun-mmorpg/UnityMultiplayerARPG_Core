@@ -433,7 +433,8 @@ namespace MultiplayerARPG
             GameInstance.AddPoolingObjects(new IPoolDescriptor[]
             {
                 missileDamageEntity,
-                projectileEffect
+                throwableDamageEntity,
+                projectileEffect,
             });
             if (customDamageInfo != null)
                 customDamageInfo.PrepareRelatesData();
