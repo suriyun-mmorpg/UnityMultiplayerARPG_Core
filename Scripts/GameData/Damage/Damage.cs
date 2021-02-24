@@ -61,7 +61,10 @@ namespace MultiplayerARPG
                 case DamageType.Raycast:
                     return missileDistance;
                 case DamageType.Throwable:
-                    return throwForce * throwableLifeTime;
+                    // NOTE: It is actually can't find actual distance by simple math because it has many factors,
+                    // Such as thrown position, distance from ground, gravity. 
+                    // So all throwable weapons are suited for shooter games only.
+                    return throwForce * 0.5f;
                 case DamageType.Custom:
                     return customDamageInfo.GetDistance();
             }

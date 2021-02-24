@@ -202,5 +202,17 @@ namespace MultiplayerARPG
             RPC(ServerReload, isLeftHand);
             return true;
         }
+
+        public bool CallServerStartWeaponCharge(bool isLeftHand)
+        {
+            RPC(ServerStartWeaponCharge, isLeftHand);
+            return true;
+        }
+
+        public bool CallServerStopWeaponCharge()
+        {
+            RPC(ServerStopWeaponCharge);
+            return true;
+        }
     }
 }

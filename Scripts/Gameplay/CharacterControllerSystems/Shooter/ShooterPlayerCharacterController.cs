@@ -862,6 +862,12 @@ namespace MultiplayerARPG
         private async UniTaskVoid UpdateInputs_BattleMode()
         {
             updatingInputs = true;
+            FireType rightHandFireType = FireType.SingleFire;
+            FireType leftHandFireType = FireType.SingleFire;
+            if (rightHandWeapon != null)
+                rightHandFireType = rightHandWeapon.FireType;
+            if (leftHandWeapon != null)
+                leftHandFireType = leftHandWeapon.FireType;
             // Have to release fire key, then check press fire key later on next frame
             if (mustReleaseFireKey)
             {
@@ -870,11 +876,21 @@ namespace MultiplayerARPG
                 if (!isLeftHandAttacking &&
                     (GetPrimaryAttackButtonUp() ||
                     !GetPrimaryAttackButton()))
+                {
                     mustReleaseFireKey = false;
+                    // Button released, start attacking while fire type is fire on release
+                    if (rightHandFireType == FireType.FireOnRelease)
+                        Attack(isLeftHandAttacking);
+                }
                 if (isLeftHandAttacking &&
                     (GetSecondaryAttackButtonUp() ||
                     !GetSecondaryAttackButton()))
+                {
                     mustReleaseFireKey = false;
+                    // Button released, start attacking while fire type is fire on release
+                    if (leftHandFireType == FireType.FireOnRelease)
+                        Attack(isLeftHandAttacking);
+                }
             }
             if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
                 lastPlayingAttackOrUseSkillAnimationTime = Time.unscaledTime;
@@ -975,7 +991,22 @@ namespace MultiplayerARPG
                         await UniTask.Yield();
                     }
                     UpdateLookAtTarget();
-                    Attack(isLeftHandAttacking);
+                    if (!isLeftHandAttacking)
+                    {
+                        // Fire on release weapons have to release to fire, so when start holding, play weapon charge animation
+                        if (rightHandFireType == FireType.FireOnRelease)
+                            WeaponCharge(isLeftHandAttacking);
+                        else
+                            Attack(isLeftHandAttacking);
+                    }
+                    else
+                    {
+                        // Fire on release weapons have to release to fire, so when start holding, play weapon charge animation
+                        if (leftHandFireType == FireType.FireOnRelease)
+                            WeaponCharge(isLeftHandAttacking);
+                        else
+                            Attack(isLeftHandAttacking);
+                    }
                 }
                 else if (activateInput.IsHold && activatingEntityOrDoAction)
                 {
@@ -1054,14 +1085,14 @@ namespace MultiplayerARPG
             }
 
             // Setup releasing state
-            if (tempPressAttackRight && rightHandWeapon != null && rightHandWeapon.FireType == FireType.SingleFire)
+            if (tempPressAttackRight && rightHandFireType != FireType.Automatic)
             {
-                // The weapon's fire mode is single fire, so player have to release fire key for next fire
+                // The weapon's fire mode is single fire or fire on release, so player have to release fire key for next fire
                 mustReleaseFireKey = true;
             }
-            else if (tempPressAttackLeft && leftHandWeapon != null && leftHandWeapon.FireType == FireType.SingleFire)
+            else if (tempPressAttackLeft && leftHandFireType != FireType.Automatic)
             {
-                // The weapon's fire mode is single fire, so player have to release fire key for next fire
+                // The weapon's fire mode is single fire or fire on release, so player have to release fire key for next fire
                 mustReleaseFireKey = true;
             }
 
@@ -1354,6 +1385,11 @@ namespace MultiplayerARPG
         {
             // Set this to `TRUE` to update crosshair
             isDoingAction = PlayerCharacterEntity.CallServerAttack(isLeftHand);
+        }
+
+        public void WeaponCharge(bool isLeftHand)
+        {
+            PlayerCharacterEntity.CallServerStartWeaponCharge(isLeftHand);
         }
 
         public void ActivateWeaponAbility()

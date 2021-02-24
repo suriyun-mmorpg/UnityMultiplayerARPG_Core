@@ -65,9 +65,17 @@ namespace MultiplayerARPG
             destroying = false;
             throwedTime = Time.unscaledTime;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+            {
+                CacheRigidbody2D.velocity = Vector2.zero;
+                CacheRigidbody2D.angularVelocity = 0f;
                 CacheRigidbody2D.AddForce(CacheTransform.forward * throwForce, ForceMode2D.Impulse);
+            }
             else
+            {
+                CacheRigidbody.velocity = Vector3.zero;
+                CacheRigidbody.angularVelocity = Vector3.zero;
                 CacheRigidbody.AddForce(CacheTransform.forward * throwForce, ForceMode.Impulse);
+            }
         }
 
         protected virtual void Update()
