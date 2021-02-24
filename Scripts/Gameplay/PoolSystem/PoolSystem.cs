@@ -94,6 +94,7 @@ namespace MultiplayerARPG
                     obj.transform.SetParent(PoolingTransform);
 #endif
                 }
+                obj.ObjectPrefab = prefab;
                 obj.transform.position = position;
                 obj.transform.rotation = rotation;
                 obj.gameObject.SetActive(true);
