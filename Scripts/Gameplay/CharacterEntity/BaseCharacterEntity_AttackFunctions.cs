@@ -468,9 +468,14 @@ namespace MultiplayerARPG
                     await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, attackCancellationTokenSource.Token);
                 }
             }
-            catch
+            catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
+            }
+            catch (System.Exception ex)
+            {
+                // Other errors
+                Logging.LogException(LogTag, ex);
             }
             finally
             {

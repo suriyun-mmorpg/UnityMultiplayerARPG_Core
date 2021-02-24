@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         Melee,
         Missile,
         Raycast,
+        Throwable,
         Custom = 254
     }
 
@@ -40,67 +41,66 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee), nameof(DamageType.Raycast) })]
         public ImpactEffects impactEffects;
 
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
+        public float throwForce;
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
+        public float throwableLifeTime;
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
+        public ThrowableDamageEntity throwableDamageEntity;
+
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Custom) })]
         public BaseCustomDamageInfo customDamageInfo;
 
         public float GetDistance()
         {
-            float distance = 0f;
             switch (damageType)
             {
                 case DamageType.Melee:
-                    distance = hitDistance;
-                    break;
+                    return hitDistance;
                 case DamageType.Missile:
                 case DamageType.Raycast:
-                    distance = missileDistance;
-                    break;
+                    return missileDistance;
+                case DamageType.Throwable:
+                    return throwForce * throwableLifeTime;
                 case DamageType.Custom:
-                    distance = customDamageInfo.GetDistance();
-                    break;
+                    return customDamageInfo.GetDistance();
             }
-            return distance;
+            return 0f;
         }
 
         public float GetFov()
         {
-            float fov = 0f;
             switch (damageType)
             {
                 case DamageType.Melee:
-                    fov = hitFov;
-                    break;
+                    return hitFov;
                 case DamageType.Missile:
                 case DamageType.Raycast:
-                    fov = 10f;
-                    break;
+                case DamageType.Throwable:
+                    return 10f;
                 case DamageType.Custom:
-                    fov = customDamageInfo.GetFov();
-                    break;
+                    return customDamageInfo.GetFov();
             }
-            return fov;
+            return 0f;
         }
 
         public Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
-            Transform transform = null;
             switch (damageType)
             {
                 case DamageType.Melee:
                     // Use melee damage transform for distance calculation
-                    transform = attacker.MeleeDamageTransform;
-                    break;
+                    return attacker.MeleeDamageTransform;
                 case DamageType.Missile:
                 case DamageType.Raycast:
+                case DamageType.Throwable:
                     // Always use missile transform for distance calculation
                     // custom transforms (set via `EquipmentEntity`) will be used for muzzle effects and fake shot effects only
-                    transform = attacker.MissileDamageTransform;
-                    break;
+                    return attacker.MissileDamageTransform;
                 case DamageType.Custom:
-                    transform = customDamageInfo.GetDamageTransform(attacker, isLeftHand);
-                    break;
+                    return customDamageInfo.GetDamageTransform(attacker, isLeftHand);
             }
-            return transform;
+            return attacker.MeleeDamageTransform;
         }
 
         public Transform GetDamageEffectTransform(BaseCharacterEntity attacker, bool isLeftHand)
@@ -113,6 +113,7 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Missile:
                 case DamageType.Raycast:
+                case DamageType.Throwable:
                     if (attacker.ModelManager.IsFps)
                     {
                         if (attacker.FpsModel && attacker.FpsModel.gameObject.activeSelf)
@@ -415,6 +416,13 @@ namespace MultiplayerARPG
                     {
                         PoolSystem.GetInstance(projectileEffect, damageEffectPosition, damageEffectRotation)
                             .Setup(minDistance, missileSpeed);
+                    }
+                    break;
+                case DamageType.Throwable:
+                    if (throwableDamageEntity != null)
+                    {
+                        PoolSystem.GetInstance(throwableDamageEntity, damageEffectPosition, damageEffectRotation)
+                            .Setup(instigator, weapon, damageAmounts, skill, skillLevel, throwForce, throwableLifeTime);
                     }
                     break;
             }

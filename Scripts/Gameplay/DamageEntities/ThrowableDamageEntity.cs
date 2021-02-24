@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class GrenadeDamageEntity : BaseDamageEntity
+    public class ThrowableDamageEntity : BaseDamageEntity
     {
         public float destroyDelay;
         public UnityEvent onExploded;
