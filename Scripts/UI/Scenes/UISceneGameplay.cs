@@ -602,13 +602,13 @@ namespace MultiplayerARPG
         {
             // Hide all of storage UIs
             if (uiPlayerStorageItems != null)
-                uiPlayerStorageItems.Hide();
+                uiPlayerStorageItems.Hide(true);
             if (uiGuildStorageItems != null)
-                uiGuildStorageItems.Hide();
+                uiGuildStorageItems.Hide(true);
             if (uiBuildingStorageItems != null)
-                uiBuildingStorageItems.Hide();
+                uiBuildingStorageItems.Hide(true);
             if (uiBuildingCampfireItems != null)
-                uiBuildingCampfireItems.Hide();
+                uiBuildingCampfireItems.Hide(true);
             // Show only selected storage type
             switch (storageType)
             {

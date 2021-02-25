@@ -21,6 +21,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
 
+        private bool doNotCloseStorageOnDisable;
+
         private UIList cacheItemList;
         public UIList CacheItemList
         {
@@ -71,7 +73,9 @@ namespace MultiplayerARPG
         {
             ClientStorageActions.onNotifyStorageItemsUpdated -= UpdateData;
             // Close storage
-            GameInstance.ClientStorageHandlers.RequestCloseStorage(ClientStorageActions.ResponseCloseStorage);
+            if (!doNotCloseStorageOnDisable)
+                GameInstance.ClientStorageHandlers.RequestCloseStorage(ClientStorageActions.ResponseCloseStorage);
+            doNotCloseStorageOnDisable = false;
             // Clear data
             StorageType = StorageType.None;
             StorageOwnerId = string.Empty;
@@ -82,6 +86,18 @@ namespace MultiplayerARPG
             if (uiItemDialog != null)
                 uiItemDialog.onHide.RemoveListener(OnDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
+        }
+
+        public override void Hide()
+        {
+            doNotCloseStorageOnDisable = false;
+            base.Hide();
+        }
+
+        public void Hide(bool doNotCloseStorageOnDisable)
+        {
+            this.doNotCloseStorageOnDisable = doNotCloseStorageOnDisable;
+            base.Hide();
         }
 
         protected virtual void Update()
