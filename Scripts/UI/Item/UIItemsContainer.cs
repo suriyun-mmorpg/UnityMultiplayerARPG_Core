@@ -66,8 +66,16 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.DeselectSelectedUI();
         }
 
+        private void Update()
+        {
+            if (TargetEntity == null || Vector3.Distance(GameInstance.PlayingCharacterEntity.CacheTransform.position, TargetEntity.CacheTransform.position) > GameInstance.Singleton.pickUpItemDistance)
+                Hide();
+        }
+
         public void Show(ItemsContainerEntity targetEntity)
         {
+            if (targetEntity == null || Vector3.Distance(GameInstance.PlayingCharacterEntity.CacheTransform.position, targetEntity.CacheTransform.position) > GameInstance.Singleton.pickUpItemDistance)
+                return;
             TargetEntity = targetEntity;
             Show();
         }
