@@ -1112,7 +1112,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible dealing dialog
-            if (GameInstance.ItemUIVisibilityManager.IsDealingDialogVisibleWithDealingState() &&
+            if (BaseUISceneGameplay.Singleton.IsDealingDialogVisibleWithDealingState() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isDealingStateEntered)

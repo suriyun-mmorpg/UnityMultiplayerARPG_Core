@@ -1,25 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class UIStorageItems : UIBase
+    public class UIItemsContainer : UIBase
     {
-        [Header("String Formats")]
-        [Tooltip("Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
-        public UILocaleKeySetting formatKeyWeightLimit = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_WEIGHT);
-        [Tooltip("Format => {0} = {Current Used Slots}, {1} = {Slot Limit}")]
-        public UILocaleKeySetting formatKeySlotLimit = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_SLOT);
-
         [Header("UI Elements")]
         public UICharacterItem uiItemDialog;
-        [FormerlySerializedAs("uiCharacterItemPrefab")]
         public UICharacterItem uiPrefab;
-        [FormerlySerializedAs("uiCharacterItemContainer")]
         public Transform uiContainer;
-        public TextWrapper uiTextWeightLimit;
-        public TextWrapper uiTextSlotLimit;
+
+        [Header("Other Settings")]
+        public bool pickUpOnSelect;
 
         private UIList cacheItemList;
         public UIList CacheItemList
@@ -48,17 +42,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public StorageType StorageType { get; private set; }
-        public string StorageOwnerId { get; private set; }
-        public BaseGameEntity TargetEntity { get; private set; }
-        public short WeightLimit { get; private set; }
-        public short SlotLimit { get; private set; }
-        public float TotalWeight { get; private set; }
-        public short UsedSlots { get; private set; }
+        public ItemsContainerEntity TargetEntity { get; private set; }
 
         protected virtual void OnEnable()
         {
-            ClientStorageActions.onNotifyStorageItemsUpdated += UpdateData;
+            if (TargetEntity != null)
+                TargetEntity.Items.onOperation += OnItemsOperation;
             CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelect);
             CacheItemSelectionManager.eventOnSelected.AddListener(OnSelect);
             CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
@@ -69,53 +58,28 @@ namespace MultiplayerARPG
 
         protected virtual void OnDisable()
         {
-            ClientStorageActions.onNotifyStorageItemsUpdated -= UpdateData;
-            // Close storage
-            GameInstance.ClientStorageHandlers.RequestCloseStorage(ClientStorageActions.ResponseCloseStorage);
-            // Clear data
-            StorageType = StorageType.None;
-            StorageOwnerId = string.Empty;
-            TargetEntity = null;
-            WeightLimit = 0;
-            SlotLimit = 0;
+            if (TargetEntity != null)
+                TargetEntity.Items.onOperation -= OnItemsOperation;
             // Hide
             if (uiItemDialog != null)
                 uiItemDialog.onHide.RemoveListener(OnDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
         }
 
-        protected virtual void Update()
+        public void Show(ItemsContainerEntity targetEntity)
         {
-            if (uiTextWeightLimit != null)
-            {
-                if (WeightLimit <= 0)
-                    uiTextWeightLimit.text = LanguageManager.GetText(UITextKeys.UI_LABEL_UNLIMIT_WEIGHT.ToString());
-                else
-                    uiTextWeightLimit.text = string.Format(LanguageManager.GetText(formatKeyWeightLimit), TotalWeight.ToString("N2"), WeightLimit.ToString("N2"));
-            }
-
-            if (uiTextSlotLimit != null)
-            {
-                if (SlotLimit <= 0)
-                    uiTextSlotLimit.text = LanguageManager.GetText(UITextKeys.UI_LABEL_UNLIMIT_SLOT.ToString());
-                else
-                    uiTextSlotLimit.text = string.Format(LanguageManager.GetText(formatKeySlotLimit), UsedSlots.ToString("N0"), SlotLimit.ToString("N0"));
-            }
-        }
-
-        public void Show(StorageType storageType, string storageOwnerId, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
-        {
-            StorageType = storageType;
-            StorageOwnerId = storageOwnerId;
             TargetEntity = targetEntity;
-            WeightLimit = weightLimit;
-            SlotLimit = slotLimit;
             Show();
         }
 
         protected void OnDialogHide()
         {
             CacheItemSelectionManager.DeselectSelectedUI();
+        }
+
+        protected virtual void OnItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateData(TargetEntity.Items);
         }
 
         protected void OnSelect(UICharacterItem ui)
@@ -131,6 +95,8 @@ namespace MultiplayerARPG
                 uiItemDialog.Setup(ui.Data, GameInstance.PlayingCharacter, ui.IndexOfData);
                 uiItemDialog.Show();
             }
+            if (pickUpOnSelect)
+                OnClickPickUpSelectedItem();
         }
 
         protected void OnDeselect(UICharacterItem ui)
@@ -143,13 +109,18 @@ namespace MultiplayerARPG
             }
         }
 
+        public void OnClickPickUpSelectedItem()
+        {
+            int selectedIndex = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.IndexOfData : -1;
+            if (selectedIndex < 0)
+                return;
+            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(TargetEntity.ObjectId, selectedIndex);
+        }
+
         public void UpdateData(IList<CharacterItem> characterItems)
         {
-            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
+            int selectedIndex = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.IndexOfData : -1;
             CacheItemSelectionManager.Clear();
-
-            TotalWeight = 0;
-            UsedSlots = 0;
 
             if (characterItems == null || characterItems.Count == 0)
             {
@@ -164,18 +135,13 @@ namespace MultiplayerARPG
             CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterItem>();
-                tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), GameInstance.PlayingCharacter, index);
+                tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.Unknow), GameInstance.PlayingCharacter, index);
                 tempUI.Show();
-                if (characterItem.NotEmptySlot())
-                {
-                    TotalWeight += characterItem.GetItem().Weight * characterItem.amount;
-                    UsedSlots++;
-                }
                 UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
                     dragHandler.SetupForStorageItems(tempUI);
                 CacheItemSelectionManager.Add(tempUI);
-                if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
+                if (selectedIndex == index)
                     selectedUI = tempUI;
             });
             if (selectedUI == null)

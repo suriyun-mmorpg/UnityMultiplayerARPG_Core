@@ -298,37 +298,40 @@ namespace MultiplayerARPG
 
         public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
         {
-            GameInstance gameInstance = GameInstance.Singleton;
+            return DropItem(GameInstance.Singleton.itemDropEntityPrefab, dropper, dropData, looters);
+        }
+
+        public static ItemDropEntity DropItem(ItemDropEntity prefab, BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
+        {
             Vector3 dropPosition = dropper.CacheTransform.position;
             Quaternion dropRotation = Quaternion.identity;
-            switch (gameInstance.DimensionType)
+            switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension3D:
                     // Random position around dropper with its height
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
                     // Random rotation
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
                     break;
                 case DimensionType.Dimension2D:
                     // Random position around dropper
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
                     break;
             }
-            return DropItem(dropPosition, dropRotation, dropData, looters);
+            return DropItem(prefab, dropPosition, dropRotation, dropData, looters);
         }
 
-        public static ItemDropEntity DropItem(Vector3 dropPosition, Quaternion dropRotation, CharacterItem dropItem, IEnumerable<uint> looters = null)
+        public static ItemDropEntity DropItem(ItemDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, CharacterItem dropItem, IEnumerable<uint> looters = null)
         {
-            GameInstance gameInstance = GameInstance.Singleton;
-            if (gameInstance.itemDropEntityPrefab == null)
+            if (prefab == null)
                 return null;
 
-            if (gameInstance.DimensionType == DimensionType.Dimension3D)
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
             {
                 // Find drop position on ground
-                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, gameInstance.GetItemDropGroundDetectionLayerMask());
+                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
             }
-            GameObject spawnObj = Instantiate(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, dropRotation);
+            GameObject spawnObj = Instantiate(prefab.gameObject, dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();
             itemDropEntity.PutOnPlaceholder = true;
             itemDropEntity.DropItems = new List<CharacterItem> { dropItem };

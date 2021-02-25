@@ -45,6 +45,9 @@ namespace MultiplayerARPG
                     targetWarpPortal = null;
                     if (ActivatableEntityDetector.warpPortals.Count > 0)
                         targetWarpPortal = ActivatableEntityDetector.warpPortals[0];
+                    targetItemsContainer = null;
+                    if (ItemDropEntityDetector.itemsContainers.Count > 0)
+                        targetItemsContainer = ItemDropEntityDetector.itemsContainers[0];
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null)
                     {
@@ -73,6 +76,11 @@ namespace MultiplayerARPG
                     {
                         // Enter warp, For some warp portals that `warpImmediatelyWhenEnter` is FALSE
                         PlayerCharacterEntity.CallServerEnterWarp(targetWarpPortal.ObjectId);
+                    }
+                    else if (targetItemsContainer != null)
+                    {
+                        // Show items
+                        BaseUISceneGameplay.Singleton.ShowItemsContainerDialog(targetItemsContainer);
                     }
                 }
                 // Pick up nearby items

@@ -48,10 +48,10 @@ namespace MultiplayerARPG
         protected virtual void OnEnable()
         {
             CacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelect);
+            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelect);
+            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
+            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselect);
             if (uiItemDialog != null)
                 uiItemDialog.onHide.AddListener(OnItemDialogHide);
         }
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.DeselectSelectedUI();
         }
 
-        protected virtual void OnSelectCharacterItem(UICharacterItem ui)
+        protected virtual void OnSelect(UICharacterItem ui)
         {
             if (ui.Data.characterItem.IsEmptySlot())
             {
@@ -83,7 +83,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void OnDeselectCharacterItem(UICharacterItem ui)
+        protected virtual void OnDeselect(UICharacterItem ui)
         {
             if (uiItemDialog != null && CacheItemSelectionManager.selectionMode == UISelectionMode.SelectSingle)
             {

@@ -8,7 +8,6 @@
         bool IsRepairItemDialogVisible();
         bool IsEnhanceSocketItemDialogVisible();
         bool IsStorageDialogVisible();
-        bool IsDealingDialogVisibleWithDealingState();
         void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData);
         void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
         void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);

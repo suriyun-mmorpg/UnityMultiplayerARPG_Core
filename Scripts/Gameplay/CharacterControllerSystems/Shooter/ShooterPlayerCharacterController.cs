@@ -283,6 +283,7 @@ namespace MultiplayerARPG
         BuildingEntity targetBuilding;
         VehicleEntity targetVehicle;
         WarpPortalEntity targetWarpPortal;
+        ItemsContainerEntity targetItemsContainer;
         // Temp data
         IGameEntity tempGameEntity;
         Ray centerRay;
@@ -912,6 +913,7 @@ namespace MultiplayerARPG
                 targetBuilding = null;
                 targetVehicle = null;
                 targetWarpPortal = null;
+                targetItemsContainer = null;
                 if (!tempPressAttackRight && !tempPressAttackLeft)
                 {
                     if (activateInput.IsHold)
@@ -959,6 +961,11 @@ namespace MultiplayerARPG
                             {
                                 activatingEntityOrDoAction = true;
                                 targetWarpPortal = SelectedEntity as WarpPortalEntity;
+                            }
+                            if (SelectedEntity is ItemsContainerEntity)
+                            {
+                                activatingEntityOrDoAction = true;
+                                targetItemsContainer = SelectedEntity as ItemsContainerEntity;
                             }
                         }
                     }
@@ -1452,6 +1459,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.CallServerEnterVehicle(targetVehicle.ObjectId);
             else if (targetWarpPortal != null)
                 PlayerCharacterEntity.CallServerEnterWarp(targetWarpPortal.ObjectId);
+            else if (targetItemsContainer != null)
+                BaseUISceneGameplay.Singleton.ShowItemsContainerDialog(targetItemsContainer);
         }
 
         public void UseSkill(bool isLeftHand)

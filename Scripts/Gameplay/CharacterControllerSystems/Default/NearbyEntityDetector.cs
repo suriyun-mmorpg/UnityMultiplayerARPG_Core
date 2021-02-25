@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public bool findOnlyActivatableBuildings;
         public bool findVehicle;
         public bool findWarpPortal;
+        public bool findItemsContainer;
         public readonly List<BaseCharacterEntity> characters = new List<BaseCharacterEntity>();
         public readonly List<BasePlayerCharacterEntity> players = new List<BasePlayerCharacterEntity>();
         public readonly List<BaseMonsterCharacterEntity> monsters = new List<BaseMonsterCharacterEntity>();
@@ -30,6 +31,7 @@ namespace MultiplayerARPG
         public readonly List<BuildingEntity> buildings = new List<BuildingEntity>();
         public readonly List<VehicleEntity> vehicles = new List<VehicleEntity>();
         public readonly List<WarpPortalEntity> warpPortals = new List<WarpPortalEntity>();
+        public readonly List<ItemsContainerEntity> itemsContainers = new List<ItemsContainerEntity>();
         private readonly HashSet<Collider> excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> excludeCollider2Ds = new HashSet<Collider2D>();
         private SphereCollider cacheCollider;
@@ -86,6 +88,7 @@ namespace MultiplayerARPG
             SortNearestEntity(buildings);
             SortNearestEntity(vehicles);
             SortNearestEntity(warpPortals);
+            SortNearestEntity(itemsContainers);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -143,7 +146,8 @@ namespace MultiplayerARPG
             BuildingEntity building;
             VehicleEntity vehicle;
             WarpPortalEntity warpPortal;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal);
+            ItemsContainerEntity itemsContainer;
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer);
 
             if (player != null)
             {
@@ -185,10 +189,16 @@ namespace MultiplayerARPG
                     vehicles.Add(vehicle);
                 return true;
             }
-            if (warpPortals != null)
+            if (warpPortal != null)
             {
                 if (!warpPortals.Contains(warpPortal))
                     warpPortals.Add(warpPortal);
+                return true;
+            }
+            if (itemsContainer != null)
+            {
+                if (!itemsContainers.Contains(itemsContainer))
+                    itemsContainers.Add(itemsContainer);
                 return true;
             }
             return false;
@@ -203,7 +213,8 @@ namespace MultiplayerARPG
             BuildingEntity building;
             VehicleEntity vehicle;
             WarpPortalEntity warpPortal;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, false);
+            ItemsContainerEntity itemsContainer;
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, false);
 
             if (player != null)
                 return characters.Remove(player) && players.Remove(player);
@@ -219,6 +230,8 @@ namespace MultiplayerARPG
                 return vehicles.Remove(vehicle);
             if (warpPortal != null)
                 return warpPortals.Remove(warpPortal);
+            if (itemsContainer != null)
+                return itemsContainers.Remove(itemsContainer);
             return false;
         }
 
@@ -230,6 +243,7 @@ namespace MultiplayerARPG
             out BuildingEntity building,
             out VehicleEntity vehicle,
             out WarpPortalEntity warpPortal,
+            out ItemsContainerEntity itemsContainer,
             bool findWithAdvanceOptions = true)
         {
             player = null;
@@ -290,6 +304,10 @@ namespace MultiplayerARPG
             warpPortal = null;
             if (findWarpPortal)
                 warpPortal = other.GetComponent<WarpPortalEntity>();
+
+            itemsContainer = null;
+            if (findItemsContainer)
+                itemsContainer = other.GetComponent<ItemsContainerEntity>();
         }
 
         private void SortNearestEntity<T>(List<T> entities) where T : BaseGameEntity

@@ -4,9 +4,9 @@
     {
         public bool pickUpOnSelect;
 
-        protected override void OnSelectCharacterItem(UICharacterItem ui)
+        protected override void OnSelect(UICharacterItem ui)
         {
-            base.OnSelectCharacterItem(ui);
+            base.OnSelect(ui);
             if (pickUpOnSelect)
                 OnClickPickUpSelectedItem();
         }

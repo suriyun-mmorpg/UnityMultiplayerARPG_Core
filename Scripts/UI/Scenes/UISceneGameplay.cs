@@ -70,6 +70,8 @@ namespace MultiplayerARPG
         public UICampfireItems uiBuildingCampfireItems;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIItemCrafts uiBuildingCraftItems;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
+        public UIItemsContainer uiItemsContainer;
         public UIBase uiIsWarping;
 
         [Header("Other Settings")]
@@ -140,6 +142,8 @@ namespace MultiplayerARPG
                 uiBuildingCampfireItems = gameObject.GetComponentInChildren<UICampfireItems>(true);
             if (uiBuildingCraftItems == null)
                 uiBuildingCraftItems = gameObject.GetComponentInChildren<UIItemCrafts>(true);
+            if (uiItemsContainer == null)
+                uiItemsContainer = gameObject.GetComponentInChildren<UIItemsContainer>(true);
 
             if (blockControllerUis != null && blockControllerUis.Count > 0)
             {
@@ -550,6 +554,12 @@ namespace MultiplayerARPG
                 (uiBuildingCampfireItems != null && uiBuildingCampfireItems.IsVisible());
         }
 
+        public override bool IsItemsContainerDialogVisible()
+        {
+            return uiItemsContainer != null &&
+                uiItemsContainer.IsVisible();
+        }
+
         public override bool IsDealingDialogVisibleWithDealingState()
         {
             return uiDealing != null && uiDealing.IsVisible() &&
@@ -652,6 +662,12 @@ namespace MultiplayerARPG
                 uiBuildingStorageItems.Hide();
             if (uiBuildingCampfireItems != null)
                 uiBuildingCampfireItems.Hide();
+        }
+
+        public override void ShowItemsContainerDialog(ItemsContainerEntity itemsContainerEntity)
+        {
+            if (uiItemsContainer != null)
+                uiItemsContainer.Show(itemsContainerEntity);
         }
 
         public override void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity)

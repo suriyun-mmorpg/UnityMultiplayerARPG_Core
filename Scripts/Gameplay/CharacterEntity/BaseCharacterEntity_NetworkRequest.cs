@@ -149,6 +149,15 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool CallServerPickupItemFromContainer(uint objectId, int index)
+        {
+            if (!CanDoActions())
+                return false;
+            RPC(ServerPickupItemFromContainer, objectId, index);
+            CallAllPlayPickupAnimation();
+            return true;
+        }
+
         public bool CallServerPickupNearbyItems()
         {
             if (!CanDoActions())

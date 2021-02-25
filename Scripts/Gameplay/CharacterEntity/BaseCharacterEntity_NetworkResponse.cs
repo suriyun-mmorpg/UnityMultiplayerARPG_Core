@@ -112,6 +112,50 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// This will be called at server to order character to pickup selected item from items container
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="index"></param>
+        [ServerRpc]
+        protected virtual void ServerPickupItemFromContainer(uint objectId, int index)
+        {
+#if !CLIENT_BUILD
+            if (!CanDoActions())
+                return;
+
+            ItemsContainerEntity itemsContainerEntity;
+            if (!Manager.TryGetEntityByObjectId(objectId, out itemsContainerEntity))
+            {
+                // Can't find the entity
+                return;
+            }
+
+            if (!IsGameEntityInDistance(itemsContainerEntity, CurrentGameInstance.pickUpItemDistance))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+
+            if (index < 0 || index >= itemsContainerEntity.Items.Count)
+                return;
+
+            CharacterItem pickingItem = itemsContainerEntity.Items[index];
+            if (this.IncreasingItemsWillOverwhelming(pickingItem.dataId, pickingItem.amount))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
+                return;
+            }
+
+            this.IncreaseItems(pickingItem, (dataId, level, amount) =>
+            {
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
+            });
+            itemsContainerEntity.Items.RemoveAt(index);
+            this.FillEmptySlots();
+#endif
+        }
+
+        /// <summary>
         /// This will be called at server to order character to pickup nearby items
         /// </summary>
         [ServerRpc]
