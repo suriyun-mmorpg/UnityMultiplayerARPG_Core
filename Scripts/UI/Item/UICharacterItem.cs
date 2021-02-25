@@ -1184,7 +1184,7 @@ namespace MultiplayerARPG
         public void OnClickDrop()
         {
             // Only unequipped equipment can be dropped
-            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems || GameInstance.PlayingCharacterEntity == null)
                 return;
 
             if (CharacterItem.amount == 1)

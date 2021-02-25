@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             base.OnEndDrag(eventData);
             if (isDropped || !CanDrag)
                 return;
-            if (sourceLocation == SourceLocation.NonEquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
+            if (sourceLocation == SourceLocation.NonEquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject == null || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
                 uiCharacterItem.OnClickDrop();
             if (sourceLocation == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
                 uiCharacterItem.OnClickUnEquip();
