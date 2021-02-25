@@ -29,6 +29,13 @@ namespace MultiplayerARPG
         UniTaskVoid CloseStorage(long connectionId);
 
         /// <summary>
+        /// Get opened storage Id by connection Id
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <returns></returns>
+        bool TryGetOpenedStorageId(long connectionId, out StorageId storageId);
+
+        /// <summary>
         /// Increase items to storage
         /// </summary>
         /// <param name="storageId"></param>

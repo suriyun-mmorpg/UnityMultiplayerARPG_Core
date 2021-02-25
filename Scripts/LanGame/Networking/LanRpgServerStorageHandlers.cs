@@ -44,6 +44,11 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
+        public bool TryGetOpenedStorageId(long connectionId, out StorageId storageId)
+        {
+            return usingStorageIds.TryGetValue(connectionId, out storageId);
+        }
+
         public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
         {
             await UniTask.Yield();
