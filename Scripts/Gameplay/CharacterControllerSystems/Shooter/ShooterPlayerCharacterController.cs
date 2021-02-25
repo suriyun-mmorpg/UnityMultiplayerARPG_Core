@@ -1460,7 +1460,7 @@ namespace MultiplayerARPG
             else if (targetWarpPortal != null)
                 PlayerCharacterEntity.CallServerEnterWarp(targetWarpPortal.ObjectId);
             else if (targetItemsContainer != null)
-                BaseUISceneGameplay.Singleton.ShowItemsContainerDialog(targetItemsContainer);
+                ShowItemsContainerDialog(targetItemsContainer);
         }
 
         public void UseSkill(bool isLeftHand)

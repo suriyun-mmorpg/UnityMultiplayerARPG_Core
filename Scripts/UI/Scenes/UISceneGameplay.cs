@@ -670,6 +670,12 @@ namespace MultiplayerARPG
                 uiItemsContainer.Show(itemsContainerEntity);
         }
 
+        public override void HideItemsContainerDialog()
+        {
+            if (uiItemsContainer != null)
+                uiItemsContainer.Hide();
+        }
+
         public override void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity)
         {
             if (uiBuildingCraftItems == null)

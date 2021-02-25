@@ -80,7 +80,7 @@ namespace MultiplayerARPG
                     else if (targetItemsContainer != null)
                     {
                         // Show items
-                        BaseUISceneGameplay.Singleton.ShowItemsContainerDialog(targetItemsContainer);
+                        ShowItemsContainerDialog(targetItemsContainer);
                     }
                 }
                 // Pick up nearby items

@@ -221,6 +221,16 @@ namespace MultiplayerARPG
             CacheUISceneGameplay.HideCurrentBuildingDialog();
         }
 
+        protected void ShowItemsContainerDialog(ItemsContainerEntity itemsContainerEntity)
+        {
+            CacheUISceneGameplay.ShowItemsContainerDialog(itemsContainerEntity);
+        }
+
+        protected void HideItemsContainerDialog()
+        {
+            CacheUISceneGameplay.HideItemsContainerDialog();
+        }
+
         protected void HideNpcDialog()
         {
             CacheUISceneGameplay.HideNpcDialog();
