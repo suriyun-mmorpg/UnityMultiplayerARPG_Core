@@ -881,6 +881,11 @@ namespace MultiplayerARPG
         /// Format => {0} = {Craft Duration}
         /// </summary>
         UI_FORMAT_CRAFT_DURATION,
+        // 1.63 New Formats
+        /// <summary>
+        /// Format => {0} = {Currency Title}, {1} = {Amount}
+        /// </summary>
+        UI_FORMAT_REWARD_CURRENCY,
     }
 
     public static class DefaultLocale
@@ -1328,6 +1333,7 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_CURRENT_CURRENCY.ToString(), "{0}: {1}/{2}");
             Texts.Add(UIFormatKeys.UI_FORMAT_CURRENT_CURRENCY_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString(), "{0}: {1}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_REWARD_CURRENCY.ToString(), "Reward {0}: {1}");
         }
     }
 
