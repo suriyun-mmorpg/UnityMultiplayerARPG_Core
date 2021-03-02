@@ -10,8 +10,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
     [RequireComponent(typeof(OpenCharacterController))]
-    [RequireComponent(typeof(LiteNetLibTransform))]
-    public class RigidBodyEntityMovement : BaseEntityMovement
+    public class RigidBodyEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         /// <summary>
         /// Buffer to avoid character fall underground when teleport
@@ -52,13 +51,14 @@ namespace MultiplayerARPG
         public bool useRootMotionForFall;
         public bool useRootMotionWhileNotMoving;
 
+        public BaseGameEntity Entity { get { return CacheEntity; } }
         public Animator CacheAnimator { get; private set; }
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public Rigidbody CacheRigidbody { get; private set; }
         public CapsuleCollider CacheCapsuleCollider { get; private set; }
         public OpenCharacterController CacheOpenCharacterController { get; private set; }
 
-        public override float StoppingDistance
+        public float StoppingDistance
         {
             get { return stoppingDistance; }
         }
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
         {
             base.EntityLateUpdate();
             // Setup network components
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CacheNetTransform.ownerClientCanSendTransform = false;
@@ -190,20 +190,20 @@ namespace MultiplayerARPG
                 return;
 
             if (useRootMotionWhileNotMoving &&
-                !CacheEntity.MovementState.HasFlag(MovementState.Forward) &&
-                !CacheEntity.MovementState.HasFlag(MovementState.Backward) &&
-                !CacheEntity.MovementState.HasFlag(MovementState.Left) &&
-                !CacheEntity.MovementState.HasFlag(MovementState.Right) &&
-                !CacheEntity.MovementState.HasFlag(MovementState.IsJump))
+                !Entity.MovementState.HasFlag(MovementState.Forward) &&
+                !Entity.MovementState.HasFlag(MovementState.Backward) &&
+                !Entity.MovementState.HasFlag(MovementState.Left) &&
+                !Entity.MovementState.HasFlag(MovementState.Right) &&
+                !Entity.MovementState.HasFlag(MovementState.IsJump))
             {
                 // No movement, apply root motion position / rotation
                 CacheAnimator.ApplyBuiltinRootMotion();
                 return;
             }
 
-            if (CacheEntity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForMovement)
+            if (Entity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForMovement)
                 CacheAnimator.ApplyBuiltinRootMotion();
-            if (!CacheEntity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForAirMovement)
+            if (!Entity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForAirMovement)
                 CacheAnimator.ApplyBuiltinRootMotion();
         }
 
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncKeyMovement(DirectionVector3 inputDirection, MovementState movementState)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
             tempInputDirection = inputDirection;
             tempMovementState = movementState;
@@ -231,7 +231,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncPointClickMovement(Vector3 position)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
             tempMovementState = MovementState.Forward;
             SetMovePaths(position, true);
@@ -239,7 +239,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncUpdateYRotation(short yRotation)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
             if (!HasNavPaths)
             {
@@ -248,19 +248,19 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void StopMove()
+        public void StopMove()
         {
             navPaths = null;
             if (IsOwnerClient && !IsServer)
                 CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
-        public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
+        public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
 
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
@@ -278,12 +278,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void PointClickMovement(Vector3 position)
+        public void PointClickMovement(Vector3 position)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
 
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
@@ -295,12 +295,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void SetLookRotation(Quaternion rotation)
+        public void SetLookRotation(Quaternion rotation)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
 
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
@@ -313,17 +313,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public override Quaternion GetLookRotation()
+        public Quaternion GetLookRotation()
         {
             return Quaternion.Euler(0f, yRotation, 0f);
         }
 
-        public override void Teleport(Vector3 position, Quaternion rotation)
+        public void Teleport(Vector3 position, Quaternion rotation)
         {
             CacheNetTransform.Teleport(position + (Vector3.up * GROUND_BUFFER), rotation);
         }
 
-        public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
             float nearestDistance = float.MaxValue;
@@ -347,7 +347,7 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            float moveSpeed = CacheEntity.GetMoveSpeed();
+            float moveSpeed = Entity.GetMoveSpeed();
             CacheNetTransform.interpolateMode = interpolateMode;
             if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
                 CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
@@ -355,8 +355,8 @@ namespace MultiplayerARPG
             if (extrapolateMode == LiteNetLibTransform.ExtrapolateMode.FixedSpeed)
                 CacheNetTransform.fixedExtrapolateSpeed = moveSpeed * extrapolateSpeedRate;
 
-            if ((CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
-                (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
+            if ((Entity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
+                (Entity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
                 return;
 
             if (framesAfterTeleported > 0)
@@ -371,7 +371,7 @@ namespace MultiplayerARPG
                 tempMovementState |= MovementState.IsUnderWater;
             if (CacheOpenCharacterController.isGrounded || airborneElapsed < airborneDelay)
                 tempMovementState |= MovementState.IsGrounded;
-            CacheEntity.SetMovement(tempMovementState);
+            Entity.SetMovement(tempMovementState);
         }
 
         private void WaterCheck()
@@ -432,7 +432,7 @@ namespace MultiplayerARPG
                 tempMoveDirection.Normalize();
             }
 
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
             {
                 tempMoveDirection = Vector3.zero;
                 isJumping = false;
@@ -440,7 +440,7 @@ namespace MultiplayerARPG
             }
 
             // Prepare movement speed
-            tempEntityMoveSpeed = applyingJumpForce ? 0f : CacheEntity.GetMoveSpeed();
+            tempEntityMoveSpeed = applyingJumpForce ? 0f : Entity.GetMoveSpeed();
             tempCurrentMoveSpeed = tempEntityMoveSpeed;
 
             // Calculate vertical velocity by gravity
@@ -461,7 +461,7 @@ namespace MultiplayerARPG
             if (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
             {
                 airborneElapsed = airborneDelay;
-                CacheEntity.CallAllPlayJumpAnimation();
+                Entity.CallAllPlayJumpAnimation();
                 applyingJumpForce = true;
                 applyJumpForceCountDown = 0f;
                 switch (applyJumpForceMode)
@@ -470,8 +470,8 @@ namespace MultiplayerARPG
                         applyJumpForceCountDown = applyJumpForceFixedDuration;
                         break;
                     case ApplyJumpForceMode.ApplyAfterJumpDuration:
-                        if (CacheEntity.Model is IJumppableModel)
-                            applyJumpForceCountDown = (CacheEntity.Model as IJumppableModel).GetJumpAnimationDuration();
+                        if (Entity.Model is IJumppableModel)
+                            applyJumpForceCountDown = (Entity.Model as IJumppableModel).GetJumpAnimationDuration();
                         break;
                 }
             }

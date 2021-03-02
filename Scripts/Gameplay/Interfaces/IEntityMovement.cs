@@ -2,8 +2,9 @@
 
 namespace MultiplayerARPG
 {
-    public interface IEntityMovement : IGameEntity
+    public interface IEntityMovement
     {
+        BaseGameEntity Entity { get; }
         float StoppingDistance { get; }
         void StopMove();
         void KeyMovement(Vector3 moveDirection, MovementState movementState);
@@ -12,5 +13,9 @@ namespace MultiplayerARPG
         Quaternion GetLookRotation();
         void Teleport(Vector3 position, Quaternion rotation);
         bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
+    }
+
+    public interface IEntityMovementComponent : IEntityMovement, IGameEntityComponent
+    {
     }
 }

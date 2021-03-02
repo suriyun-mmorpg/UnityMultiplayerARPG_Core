@@ -106,7 +106,7 @@ namespace MultiplayerARPG
         private MovementSecure movementSecure;
         public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
 
-        public BaseEntityMovement Movement { get; private set; }
+        public IEntityMovementComponent Movement { get; private set; }
 
         public Transform MovementTransform
         {
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
                 if (PassengingVehicleEntity != null)
                 {
                     // Track movement position by vehicle entity
-                    return PassengingVehicleEntity.GetTransform();
+                    return PassengingVehicleEntity.Entity.CacheTransform;
                 }
                 return CacheTransform;
             }
@@ -320,7 +320,7 @@ namespace MultiplayerARPG
                 cameraTargetTransform = CacheTransform;
             if (fpsCameraTargetTransform == null)
                 fpsCameraTargetTransform = CacheTransform;
-            Movement = GetComponent<BaseEntityMovement>();
+            Movement = GetComponent<IEntityMovementComponent>();
         }
 
         /// <summary>
@@ -905,7 +905,7 @@ namespace MultiplayerARPG
 
             // Change object owner to driver
             if (vehicle.IsDriver(seatIndex))
-                Manager.Assets.SetObjectOwner(vehicle.GetObjectId(), ConnectionId);
+                Manager.Assets.SetObjectOwner(vehicle.Entity.ObjectId, ConnectionId);
 
             // Set passenger to vehicle
             vehicle.SetPassenger(seatIndex, this);
@@ -913,7 +913,7 @@ namespace MultiplayerARPG
             // Set mount info
             PassengingVehicle passengingVehicle = new PassengingVehicle()
             {
-                objectId = vehicle.GetObjectId(),
+                objectId = vehicle.Entity.ObjectId,
                 seatIndex = seatIndex,
             };
             PassengingVehicle = passengingVehicle;
@@ -931,7 +931,7 @@ namespace MultiplayerARPG
 
             // Clear object owner from driver
             if (PassengingVehicleEntity.IsDriver(PassengingVehicle.seatIndex))
-                Manager.Assets.SetObjectOwner(PassengingVehicleEntity.GetObjectId(), -1);
+                Manager.Assets.SetObjectOwner(PassengingVehicleEntity.Entity.ObjectId, -1);
 
             BaseGameEntity vehicleEntity = PassengingVehicleEntity.Entity;
             if (isDestroying)

@@ -8,14 +8,14 @@ namespace MultiplayerARPG
         {
             if (gameEntity == null || !gameEntity.Entity)
                 return -1;
-            return gameEntity.Identity.ConnectionId;
+            return gameEntity.Entity.ConnectionId;
         }
 
         public static uint GetObjectId(this IGameEntity gameEntity)
         {
             if (gameEntity == null || !gameEntity.Entity)
                 return 0;
-            return gameEntity.Identity.ObjectId;
+            return gameEntity.Entity.ObjectId;
         }
 
         public static Transform GetTransform(this IGameEntity gameEntity)

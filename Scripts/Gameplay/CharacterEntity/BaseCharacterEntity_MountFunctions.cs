@@ -1,7 +1,4 @@
-﻿using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -17,7 +14,7 @@ namespace MultiplayerARPG
             Vector3 enterPosition = CacheTransform.position;
             if (PassengingVehicleEntity != null)
             {
-                enterPosition = PassengingVehicleEntity.GetTransform().position;
+                enterPosition = PassengingVehicleEntity.Entity.CacheTransform.position;
                 ExitVehicle();
             }
 

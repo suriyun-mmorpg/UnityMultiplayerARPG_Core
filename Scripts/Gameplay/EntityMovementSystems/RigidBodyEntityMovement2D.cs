@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class RigidBodyEntityMovement2D : BaseEntityMovement
+    public class RigidBodyEntityMovement2D : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         [Header("Movement Settings")]
         [Range(0.01f, 1f)]
@@ -17,10 +17,11 @@ namespace MultiplayerARPG
         [Range(0.01f, 1f)]
         public float extrapolateSpeedRate = 0.5f;
 
+        public BaseGameEntity Entity { get { return CacheEntity; } }
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
 
-        public override float StoppingDistance
+        public float StoppingDistance
         {
             get { return stoppingDistance; }
         }
@@ -49,7 +50,7 @@ namespace MultiplayerARPG
         {
             base.EntityLateUpdate();
             // Setup network components
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CacheNetTransform.ownerClientCanSendTransform = false;
@@ -83,14 +84,14 @@ namespace MultiplayerARPG
 
         protected void NetFuncPointClickMovement(Vector3 position)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
             currentDestination = position;
         }
 
         protected void NetFuncKeyMovement(DirectionVector2 direction)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
             // Devide inputs to float value
             tempInputDirection = direction;
@@ -98,7 +99,7 @@ namespace MultiplayerARPG
                 currentDestination = null;
         }
 
-        public override void StopMove()
+        public virtual void StopMove()
         {
             currentDestination = null;
             CacheRigidbody2D.velocity = Vector2.zero;
@@ -106,12 +107,12 @@ namespace MultiplayerARPG
                 CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
-        public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
+        public virtual void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
 
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
@@ -126,12 +127,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void PointClickMovement(Vector3 position)
+        public virtual void PointClickMovement(Vector3 position)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
 
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
@@ -142,23 +143,23 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void SetLookRotation(Quaternion rotation)
+        public virtual void SetLookRotation(Quaternion rotation)
         {
             lookRotation = rotation;
-            CacheEntity.SetDirection2D(lookRotation * Vector3.forward);
+            Entity.SetDirection2D(lookRotation * Vector3.forward);
         }
 
-        public override Quaternion GetLookRotation()
+        public Quaternion GetLookRotation()
         {
             return lookRotation;
         }
 
-        public override void Teleport(Vector3 position, Quaternion rotation)
+        public void Teleport(Vector3 position, Quaternion rotation)
         {
             CacheNetTransform.Teleport(position, Quaternion.identity);
         }
 
-        public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
             return true;
@@ -167,7 +168,7 @@ namespace MultiplayerARPG
         public override void EntityUpdate()
         {
             base.EntityUpdate();
-            float moveSpeed = CacheEntity.GetMoveSpeed();
+            float moveSpeed = Entity.GetMoveSpeed();
             CacheNetTransform.interpolateMode = interpolateMode;
             if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
                 CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
@@ -178,10 +179,10 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
-            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
                 return;
 
-            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
+            if (Entity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
                 return;
 
             tempMoveDirection = Vector2.zero;
@@ -194,7 +195,7 @@ namespace MultiplayerARPG
                     StopMove();
             }
 
-            if (CacheEntity.CanMove())
+            if (Entity.CanMove())
             {
                 // If move by WASD keys, set move direction to input direction
                 if (tempInputDirection.magnitude > 0.5f)
@@ -205,8 +206,8 @@ namespace MultiplayerARPG
                 {
                     if (tempMoveDirectionMagnitude > 1)
                         tempMoveDirection = tempMoveDirection.normalized;
-                    CacheEntity.SetDirection2D(tempMoveDirection);
-                    CacheRigidbody2D.velocity = tempMoveDirection * CacheEntity.GetMoveSpeed();
+                    Entity.SetDirection2D(tempMoveDirection);
+                    CacheRigidbody2D.velocity = tempMoveDirection * Entity.GetMoveSpeed();
                 }
                 else
                 {
@@ -215,7 +216,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            CacheEntity.SetMovement((CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            Entity.SetMovement((CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
         }
     }
 }

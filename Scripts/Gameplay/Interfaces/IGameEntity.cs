@@ -6,7 +6,6 @@ namespace MultiplayerARPG
     {
         BaseGameEntity Entity { get; }
         LiteNetLibIdentity Identity { get; }
-
         void PrepareRelatesData();
         EntityInfo GetInfo();
     }

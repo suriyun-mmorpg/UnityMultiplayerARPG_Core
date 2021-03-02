@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class NavMeshEntityMovement : BaseEntityMovement
+    public class NavMeshEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         [Header("Movement Settings")]
         [Tooltip("If calculated paths +1 higher than this value, it will stop moving. If this is 0 it will not applies")]
@@ -18,10 +18,11 @@ namespace MultiplayerARPG
         [Range(0.01f, 1f)]
         public float extrapolateSpeedRate = 0.5f;
 
+        public BaseGameEntity Entity { get { return CacheEntity; } }
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public NavMeshAgent CacheNavMeshAgent { get; private set; }
 
-        public override float StoppingDistance
+        public float StoppingDistance
         {
             get { return CacheNavMeshAgent.stoppingDistance; }
         }
@@ -39,7 +40,7 @@ namespace MultiplayerARPG
         {
             base.EntityLateUpdate();
             // Setup network components
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CacheNetTransform.ownerClientCanSendTransform = false;
@@ -73,28 +74,28 @@ namespace MultiplayerARPG
 
         protected void NetFuncPointClickMovement(Vector3 position, bool useKeyMovement)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
             SetMovePaths(position, useKeyMovement);
         }
 
         protected void NetFuncUpdateYRotation(short yRotation)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
             CacheTransform.eulerAngles = new Vector3(0, yRotation, 0);
         }
 
-        public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
+        public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
 
             if (moveDirection.sqrMagnitude <= 0f)
                 return;
 
             Vector3 position = CacheTransform.position + moveDirection;
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position, true);
@@ -105,12 +106,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void PointClickMovement(Vector3 position)
+        public void PointClickMovement(Vector3 position)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
 
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position, false);
@@ -121,7 +122,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void StopMove()
+        public void StopMove()
         {
             CacheNavMeshAgent.updatePosition = false;
             CacheNavMeshAgent.updateRotation = false;
@@ -130,13 +131,13 @@ namespace MultiplayerARPG
                 CacheNavMeshAgent.isStopped = true;
         }
 
-        public override void SetLookRotation(Quaternion rotation)
+        public void SetLookRotation(Quaternion rotation)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
 
             Vector3 eulerAngles = rotation.eulerAngles;
-            switch (CacheEntity.MovementSecure)
+            switch (Entity.MovementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
@@ -150,17 +151,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public override Quaternion GetLookRotation()
+        public Quaternion GetLookRotation()
         {
             return CacheTransform.rotation;
         }
 
-        public override void Teleport(Vector3 position, Quaternion rotation)
+        public void Teleport(Vector3 position, Quaternion rotation)
         {
             CacheNetTransform.Teleport(position, rotation);
         }
 
-        public override bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
             NavMeshHit navHit;
@@ -175,7 +176,7 @@ namespace MultiplayerARPG
         public override void EntityUpdate()
         {
             base.EntityUpdate();
-            float moveSpeed = CacheEntity.GetMoveSpeed();
+            float moveSpeed = Entity.GetMoveSpeed();
             CacheNetTransform.interpolateMode = interpolateMode;
             if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
                 CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
@@ -186,23 +187,23 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
-            if (CacheEntity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
                 return;
 
-            if (CacheEntity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
+            if (Entity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
                 return;
 
-            CacheEntity.SetMovement((CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            Entity.SetMovement((CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
         }
 
         protected void SetMovePaths(Vector3 position, bool useKeyMovement)
         {
-            SetMovePaths(position, CacheEntity.GetMoveSpeed(), useKeyMovement);
+            SetMovePaths(position, Entity.GetMoveSpeed(), useKeyMovement);
         }
 
         protected void SetMovePaths(Vector3 position, float moveSpeed, bool useKeyMovement)
         {
-            if (!CacheEntity.CanMove())
+            if (!Entity.CanMove())
                 return;
             CacheNavMeshAgent.updatePosition = true;
             CacheNavMeshAgent.updateRotation = true;
