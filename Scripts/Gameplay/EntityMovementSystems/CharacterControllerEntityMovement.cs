@@ -604,5 +604,33 @@ namespace MultiplayerARPG
                 }
             }
         }
+
+        public void HandleSyncTransformAtClient(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleTeleportAtClient(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleTurningMovementAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleTeleportAtServer(MessageHandlerData messageHandler)
+        {
+        }
     }
 }

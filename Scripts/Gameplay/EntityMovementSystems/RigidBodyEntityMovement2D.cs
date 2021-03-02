@@ -217,5 +217,33 @@ namespace MultiplayerARPG
 
             Entity.SetMovement((CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
         }
+
+        public void HandleSyncTransformAtClient(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleTeleportAtClient(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleTurningMovementAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleTeleportAtServer(MessageHandlerData messageHandler)
+        {
+        }
     }
 }

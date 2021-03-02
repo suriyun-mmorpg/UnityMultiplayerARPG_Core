@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -17,5 +18,12 @@ namespace MultiplayerARPG
 
     public interface IEntityMovementComponent : IEntityMovement, IGameEntityComponent
     {
+        void HandleSyncTransformAtClient(MessageHandlerData messageHandler);
+        void HandleTeleportAtClient(MessageHandlerData messageHandler);
+        void HandleKeyMovementAtServer(MessageHandlerData messageHandler);
+        void HandlePointClickMovementAtServer(MessageHandlerData messageHandler);
+        void HandleTurningMovementAtServer(MessageHandlerData messageHandler);
+        void HandleSyncTransformAtServer(MessageHandlerData messageHandler);
+        void HandleTeleportAtServer(MessageHandlerData messageHandler);
     }
 }

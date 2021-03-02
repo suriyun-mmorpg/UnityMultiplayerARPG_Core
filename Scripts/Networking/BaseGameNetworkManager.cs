@@ -113,6 +113,8 @@ namespace MultiplayerARPG
             RegisterClientMessage(GameNetworkingConsts.Chat, HandleChatAtClient);
             RegisterClientMessage(GameNetworkingConsts.UpdateTimeOfDay, HandleUpdateDayNightTimeAtClient);
             RegisterClientMessage(GameNetworkingConsts.UpdateMapInfo, HandleUpdateMapInfoAtClient);
+            RegisterClientMessage(GameNetworkingConsts.SyncTransform, HandleSyncTransformAtClient);
+            RegisterClientMessage(GameNetworkingConsts.Teleport, HandleTeleportAtClient);
             if (ClientOnlineCharacterHandlers != null)
             {
                 RegisterClientMessage(GameNetworkingConsts.NotifyOnlineCharacter, ClientOnlineCharacterHandlers.HandleNotifyOnlineCharacter);
@@ -136,6 +138,11 @@ namespace MultiplayerARPG
             }
             // Server messages
             RegisterServerMessage(GameNetworkingConsts.Chat, HandleChatAtServer);
+            RegisterServerMessage(GameNetworkingConsts.KeyMovement, HandleKeyMovementAtServer);
+            RegisterServerMessage(GameNetworkingConsts.PointClickMovement, HandlePointClickMovementAtServer);
+            RegisterServerMessage(GameNetworkingConsts.TurningMovement, HandleTurningMovementAtServer);
+            RegisterServerMessage(GameNetworkingConsts.SyncTransform, HandleSyncTransformAtServer);
+            RegisterServerMessage(GameNetworkingConsts.Teleport, HandleTeleportAtServer);
             if (ServerOnlineCharacterHandlers != null)
             {
                 RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerOnlineCharacterHandlers.HandleRequestOnlineCharacter);
@@ -397,15 +404,6 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveChatMessage(messageHandler.ReadMessage<ChatMessage>());
         }
 
-        protected void HandleUpdateMapInfoAtClient(MessageHandlerData messageHandler)
-        {
-            // Don't set map info again at server
-            if (IsServer)
-                return;
-            UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
-            SetMapInfo(message.mapId);
-        }
-
         protected void HandleUpdateDayNightTimeAtClient(MessageHandlerData messageHandler)
         {
             // Don't set time of day again at server
@@ -415,9 +413,74 @@ namespace MultiplayerARPG
             CurrentGameInstance.DayNightTimeUpdater.SetTimeOfDay(message.timeOfDay);
         }
 
+        protected void HandleUpdateMapInfoAtClient(MessageHandlerData messageHandler)
+        {
+            // Don't set map info again at server
+            if (IsServer)
+                return;
+            UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
+            SetMapInfo(message.mapId);
+        }
+
+        protected void HandleSyncTransformAtClient(MessageHandlerData messageHandler)
+        {
+            uint objectId = messageHandler.Reader.GetPackedUInt();
+            BaseGameEntity gameEntity;
+            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
+                gameEntity.Movement.HandleSyncTransformAtClient(messageHandler);
+        }
+
+        protected void HandleTeleportAtClient(MessageHandlerData messageHandler)
+        {
+            uint objectId = messageHandler.Reader.GetPackedUInt();
+            BaseGameEntity gameEntity;
+            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
+                gameEntity.Movement.HandleTeleportAtClient(messageHandler);
+        }
+
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ReadChatMessage(FillChatChannelId(messageHandler.ReadMessage<ChatMessage>()));
+        }
+
+        protected void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
+        {
+            uint objectId = messageHandler.Reader.GetPackedUInt();
+            BaseGameEntity gameEntity;
+            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
+                gameEntity.Movement.HandleKeyMovementAtServer(messageHandler);
+        }
+
+        protected void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
+        {
+            uint objectId = messageHandler.Reader.GetPackedUInt();
+            BaseGameEntity gameEntity;
+            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
+                gameEntity.Movement.HandlePointClickMovementAtServer(messageHandler);
+        }
+
+        protected void HandleTurningMovementAtServer(MessageHandlerData messageHandler)
+        {
+            uint objectId = messageHandler.Reader.GetPackedUInt();
+            BaseGameEntity gameEntity;
+            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
+                gameEntity.Movement.HandleTurningMovementAtServer(messageHandler);
+        }
+
+        protected void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
+        {
+            uint objectId = messageHandler.Reader.GetPackedUInt();
+            BaseGameEntity gameEntity;
+            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
+                gameEntity.Movement.HandleSyncTransformAtServer(messageHandler);
+        }
+
+        protected void HandleTeleportAtServer(MessageHandlerData messageHandler)
+        {
+            uint objectId = messageHandler.Reader.GetPackedUInt();
+            BaseGameEntity gameEntity;
+            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
+                gameEntity.Movement.HandleTeleportAtServer(messageHandler);
         }
 
         protected ChatMessage FillChatChannelId(ChatMessage message)
