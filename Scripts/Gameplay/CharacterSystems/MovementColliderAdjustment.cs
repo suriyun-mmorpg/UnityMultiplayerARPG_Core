@@ -189,14 +189,14 @@ namespace MultiplayerARPG
             if (openCharacterController == null && capsuleCollider == null)
                 return;
 
-            bool isUnderWater = CacheEntity.MovementState.HasFlag(MovementState.IsUnderWater);
+            bool isUnderWater = Entity.MovementState.HasFlag(MovementState.IsUnderWater);
             if (isUnderWater && isUnderWater != previousIsUnderWater)
             {
                 Apply(swimSettings);
             }
-            else if (CacheEntity.ExtraMovementState != previousExtraMovementState)
+            else if (Entity.ExtraMovementState != previousExtraMovementState)
             {
-                switch (CacheEntity.ExtraMovementState)
+                switch (Entity.ExtraMovementState)
                 {
                     case ExtraMovementState.IsCrouching:
                         Apply(crouchSettings);
@@ -210,7 +210,7 @@ namespace MultiplayerARPG
                 }
             }
             previousIsUnderWater = isUnderWater;
-            previousExtraMovementState = CacheEntity.ExtraMovementState;
+            previousExtraMovementState = Entity.ExtraMovementState;
         }
 
         private void Apply(Settings settings)

@@ -18,7 +18,6 @@ namespace MultiplayerARPG
         [Range(0.01f, 1f)]
         public float extrapolateSpeedRate = 0.5f;
 
-        public BaseGameEntity Entity { get { return CacheEntity; } }
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public NavMeshAgent CacheNavMeshAgent { get; private set; }
 

@@ -40,7 +40,6 @@ namespace MultiplayerARPG
         public bool useRootMotionForFall;
         public bool useRootMotionWhileNotMoving;
 
-        public BaseGameEntity Entity { get { return CacheEntity; } }
         public Animator CacheAnimator { get; private set; }
         public LiteNetLibTransform CacheNetTransform { get; private set; }
         public CharacterController CacheCharacterController { get; private set; }

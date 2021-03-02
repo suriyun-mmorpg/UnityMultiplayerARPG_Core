@@ -104,13 +104,13 @@ namespace MultiplayerARPG
             if (targetTransform == null)
                 return;
 
-            if (CacheEntity.MovementState.HasFlag(MovementState.IsUnderWater))
+            if (Entity.MovementState.HasFlag(MovementState.IsUnderWater))
             {
                 Apply(swimSettings);
             }
             else
             {
-                switch (CacheEntity.ExtraMovementState)
+                switch (Entity.ExtraMovementState)
                 {
                     case ExtraMovementState.IsCrouching:
                         Apply(crouchSettings);

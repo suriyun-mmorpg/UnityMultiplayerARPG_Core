@@ -15,61 +15,61 @@ namespace MultiplayerARPG
 
         public override sealed void EntityUpdate()
         {
-            if (!CacheEntity.IsServer)
+            if (!Entity.IsServer)
                 return;
 
             deltaTime = Time.unscaledDeltaTime;
 
-            if (CacheEntity.IsRecaching || CacheEntity.IsDead())
+            if (Entity.IsRecaching || Entity.IsDead())
                 return;
 
             updatingTime += deltaTime;
             if (updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
                 // Removing summons if it should
-                int count = CacheEntity.Summons.Count;
+                int count = Entity.Summons.Count;
                 CharacterSummon summon;
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    summon = CacheEntity.Summons[i];
+                    summon = Entity.Summons[i];
                     if (summon.ShouldRemove())
                     {
-                        CacheEntity.Summons.RemoveAt(i);
-                        summon.UnSummon(CacheEntity);
+                        Entity.Summons.RemoveAt(i);
+                        summon.UnSummon(Entity);
                     }
                     else
                     {
                         summon.Update(updatingTime);
-                        CacheEntity.Summons[i] = summon;
+                        Entity.Summons[i] = summon;
                     }
                 }
                 // Removing skill usages if it should
-                count = CacheEntity.SkillUsages.Count;
+                count = Entity.SkillUsages.Count;
                 CharacterSkillUsage skillUsage;
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    skillUsage = CacheEntity.SkillUsages[i];
+                    skillUsage = Entity.SkillUsages[i];
                     if (skillUsage.ShouldRemove())
-                        CacheEntity.SkillUsages.RemoveAt(i);
+                        Entity.SkillUsages.RemoveAt(i);
                     else
                     {
                         skillUsage.Update(updatingTime);
-                        CacheEntity.SkillUsages[i] = skillUsage;
+                        Entity.SkillUsages[i] = skillUsage;
                     }
                 }
                 // Removing non-equip items if it should
-                count = CacheEntity.NonEquipItems.Count;
+                count = Entity.NonEquipItems.Count;
                 bool hasRemovedItem = false;
                 CharacterItem nonEquipItem;
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    nonEquipItem = CacheEntity.NonEquipItems[i];
+                    nonEquipItem = Entity.NonEquipItems[i];
                     if (nonEquipItem.ShouldRemove())
                     {
                         if (CurrentGameInstance.IsLimitInventorySlot)
-                            CacheEntity.NonEquipItems[i] = CharacterItem.Empty;
+                            Entity.NonEquipItems[i] = CharacterItem.Empty;
                         else
-                            CacheEntity.NonEquipItems.RemoveAt(i);
+                            Entity.NonEquipItems.RemoveAt(i);
                         hasRemovedItem = true;
                     }
                     else
@@ -77,26 +77,26 @@ namespace MultiplayerARPG
                         if (nonEquipItem.IsLock())
                         {
                             nonEquipItem.Update(updatingTime);
-                            CacheEntity.NonEquipItems[i] = nonEquipItem;
+                            Entity.NonEquipItems[i] = nonEquipItem;
                         }
                     }
                 }
                 if (hasRemovedItem)
-                    CacheEntity.FillEmptySlots();
+                    Entity.FillEmptySlots();
                 // Removing buffs if it should
-                count = CacheEntity.Buffs.Count;
+                count = Entity.Buffs.Count;
                 CharacterBuff buff;
                 float duration;
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    buff = CacheEntity.Buffs[i];
+                    buff = Entity.Buffs[i];
                     duration = buff.GetDuration();
                     if (buff.ShouldRemove())
-                        CacheEntity.Buffs.RemoveAt(i);
+                        Entity.Buffs.RemoveAt(i);
                     else
                     {
                         buff.Update(updatingTime);
-                        CacheEntity.Buffs[i] = buff;
+                        Entity.Buffs[i] = buff;
                     }
                     // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
                     if (duration > 0f)
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
                         {
                             damageElement = damageOverTime.Key;
                             damageAmount = damageOverTime.Value;
-                            damage = damageElement.GetDamageReducedByResistance(CacheEntity.GetCaches().Resistances, CacheEntity.GetCaches().Armors, damageAmount.Random());
+                            damage = damageElement.GetDamageReducedByResistance(Entity.GetCaches().Resistances, Entity.GetCaches().Armors, damageAmount.Random());
                             if (damage > 0f)
                                 tempAmount += damage / duration * updatingTime;
                         }
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
                         else if (tempAmount < 0)
                             recoveryData.decreasingWater += -tempAmount;
 
-                        recoveryData = recoveryData.Apply(CacheEntity, buff.BuffApplier);
+                        recoveryData = recoveryData.Apply(Entity, buff.BuffApplier);
 
                         if (buff.BuffApplier != null)
                             recoveryBuffs[buff.BuffApplier.id] = recoveryData;
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
                             nonApplierRecoveryBuff = recoveryData;
 
                         // Causer is the entity whom applied buffs to this entity
-                        CacheEntity.ValidateRecovery(buff.BuffApplier);
+                        Entity.ValidateRecovery(buff.BuffApplier);
                     }
                 }
                 updatingTime = 0;

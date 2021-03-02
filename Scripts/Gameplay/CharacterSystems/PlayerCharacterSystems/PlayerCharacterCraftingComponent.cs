@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         public override sealed void EntityUpdate()
         {
             base.EntityUpdate();
-            if (CacheEntity.IsDead())
+            if (Entity.IsDead())
             {
                 if (queueItems.Count > 0)
                     queueItems.Clear();
@@ -42,11 +42,11 @@ namespace MultiplayerARPG
             CraftingQueueItem craftingItem = queueItems[0];
             ItemCraftFormula formula = GameInstance.ItemCraftFormulas[craftingItem.dataId];
             UITextKeys errorMessage;
-            if (!formula.ItemCraft.CanCraft(CacheEntity, out errorMessage))
+            if (!formula.ItemCraft.CanCraft(Entity, out errorMessage))
             {
                 timeCounter = 0f;
                 queueItems.RemoveAt(0);
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(CacheEntity.ConnectionId, errorMessage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(Entity.ConnectionId, errorMessage);
                 return;
             }
 
@@ -58,7 +58,7 @@ namespace MultiplayerARPG
                 if (craftingItem.craftRemainsDuration <= 0f)
                 {
                     // Reduce items and add crafting item
-                    formula.ItemCraft.CraftItem(CacheEntity);
+                    formula.ItemCraft.CraftItem(Entity);
                     // Reduce amount
                     if (craftingItem.amount > 1)
                     {
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         private void RpcAppendCraftingQueueItem(int dataId, short amount)
         {
-            if (CacheEntity.IsDead())
+            if (Entity.IsDead())
                 return;
             ItemCraftFormula itemCraftFormula;
             if (!GameInstance.ItemCraftFormulas.TryGetValue(dataId, out itemCraftFormula))
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         private void RpcChangeCraftingQueueItem(int index, short amount)
         {
-            if (CacheEntity.IsDead())
+            if (Entity.IsDead())
                 return;
             if (index < 0 || index >= queueItems.Count)
                 return;
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         private void RpcCancelCraftingQueueItem(int index)
         {
-            if (CacheEntity.IsDead())
+            if (Entity.IsDead())
                 return;
             if (index < 0 || index >= queueItems.Count)
                 return;

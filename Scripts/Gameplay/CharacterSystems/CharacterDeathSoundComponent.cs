@@ -12,9 +12,9 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            if (dirtyIsDead != CacheEntity.IsDead())
+            if (dirtyIsDead != Entity.IsDead())
             {
-                dirtyIsDead = CacheEntity.IsDead();
+                dirtyIsDead = Entity.IsDead();
                 if (dirtyIsDead)
                     PlaySound();
             }

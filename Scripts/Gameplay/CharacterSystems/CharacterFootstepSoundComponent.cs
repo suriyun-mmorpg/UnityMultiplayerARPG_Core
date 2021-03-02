@@ -89,13 +89,13 @@ namespace MultiplayerARPG
 
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 
-            if (CacheEntity.MovementState.HasFlag(MovementState.IsUnderWater))
+            if (Entity.MovementState.HasFlag(MovementState.IsUnderWater))
             {
                 currentFootstepSettings = swimFootstepSettings;
             }
             else
             {
-                switch (CacheEntity.ExtraMovementState)
+                switch (Entity.ExtraMovementState)
                 {
                     case ExtraMovementState.IsSprinting:
                         currentFootstepSettings = sprintFootstepSettings;
@@ -112,10 +112,10 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!CacheEntity.MovementState.HasFlag(MovementState.Forward) &&
-                !CacheEntity.MovementState.HasFlag(MovementState.Backward) &&
-                !CacheEntity.MovementState.HasFlag(MovementState.Right) &&
-                !CacheEntity.MovementState.HasFlag(MovementState.Left))
+            if (!Entity.MovementState.HasFlag(MovementState.Forward) &&
+                !Entity.MovementState.HasFlag(MovementState.Backward) &&
+                !Entity.MovementState.HasFlag(MovementState.Right) &&
+                !Entity.MovementState.HasFlag(MovementState.Left))
             {
                 // No movement
                 delayCounter = 0f;
@@ -123,9 +123,9 @@ namespace MultiplayerARPG
             }
 
             delayCounter += Time.deltaTime;
-            if (delayCounter >= currentFootstepSettings.stepDelay / CacheEntity.MoveAnimationSpeedMultiplier)
+            if (delayCounter >= currentFootstepSettings.stepDelay / Entity.MoveAnimationSpeedMultiplier)
             {
-                if (CacheEntity.MovementState.HasFlag(MovementState.IsGrounded))
+                if (Entity.MovementState.HasFlag(MovementState.IsGrounded))
                     PlaySound();
 
                 delayCounter = 0f;
@@ -138,11 +138,11 @@ namespace MultiplayerARPG
                 return;
 
             // Don't play sound while muting footstep sound
-            if (CacheEntity.MuteFootstepSound)
+            if (Entity.MuteFootstepSound)
                 return;
 
             // Don't play sound while passenging vehicle
-            if (CacheEntity.PassengingVehicleEntity != null)
+            if (Entity.PassengingVehicleEntity != null)
                 return;
 
             audioSource.clip = currentFootstepSettings.soundData.GetRandomedAudioClip();

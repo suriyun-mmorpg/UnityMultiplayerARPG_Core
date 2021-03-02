@@ -37,20 +37,20 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            if (!IsServer || CacheEntity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
+            if (!IsServer || Entity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
                 return;
 
-            if (CacheEntity.IsDead())
+            if (Entity.IsDead())
             {
-                CacheEntity.StopMove();
-                CacheEntity.SetTargetEntity(null);
+                Entity.StopMove();
+                Entity.SetTargetEntity(null);
                 return;
             }
 
             float deltaTime = Time.unscaledDeltaTime;
 
-            Vector3 currentPosition = CacheEntity.MovementTransform.position;
-            if (CacheEntity.Summoner != null)
+            Vector3 currentPosition = Entity.MovementTransform.position;
+            if (Entity.Summoner != null)
             {
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                         }
                     }
 
-                    if (Vector3.Distance(currentPosition, CacheEntity.Summoner.CacheTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
+                    if (Vector3.Distance(currentPosition, Entity.Summoner.CacheTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
                     {
                         // Follow summoner
                         FollowSummoner();
@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (CacheEntity.IsInSafeArea)
+                if (Entity.IsInSafeArea)
                 {
                     // If monster move into safe area, wander to another place
                     RandomWanderDestination();
@@ -131,29 +131,29 @@ namespace MultiplayerARPG
         /// <returns></returns>
         private bool UpdateAttackEnemy(float deltaTime, Vector3 currentPosition)
         {
-            if (!CacheEntity.TryGetTargetEntity(out tempTargetEnemy))
+            if (!Entity.TryGetTargetEntity(out tempTargetEnemy))
             {
                 // No target, stop attacking
                 ClearActionState();
                 return false;
             }
 
-            if (tempTargetEnemy.Entity == CacheEntity.Entity || tempTargetEnemy.IsHideOrDead() || !tempTargetEnemy.CanReceiveDamageFrom(CacheEntity.GetInfo()))
+            if (tempTargetEnemy.Entity == Entity.Entity || tempTargetEnemy.IsHideOrDead() || !tempTargetEnemy.CanReceiveDamageFrom(Entity.GetInfo()))
             {
                 // If target is dead or in safe area stop attacking
-                CacheEntity.SetTargetEntity(null);
+                Entity.SetTargetEntity(null);
                 ClearActionState();
                 return false;
             }
 
             // If it has target then go to target
-            if (tempTargetEnemy != null && !CacheEntity.IsPlayingActionAnimation() && !alreadySetActionState)
+            if (tempTargetEnemy != null && !Entity.IsPlayingActionAnimation() && !alreadySetActionState)
             {
                 // Random action state to do next time
-                if (MonsterDatabase.RandomSkill(CacheEntity, out queueSkill, out queueSkillLevel) && queueSkill != null)
+                if (MonsterDatabase.RandomSkill(Entity, out queueSkill, out queueSkillLevel) && queueSkill != null)
                 {
                     // Cooling down
-                    if (CacheEntity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) >= 0)
+                    if (Entity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) >= 0)
                     {
                         queueSkill = null;
                         queueSkillLevel = 0;
@@ -169,39 +169,39 @@ namespace MultiplayerARPG
             if (OverlappedEntity(tempTargetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
                 startedFollowEnemy = false;
-                CacheEntity.StopMove();
+                Entity.StopMove();
                 // Lookat target then do something when it's in range
                 Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
                 if (lookAtDirection.sqrMagnitude > 0)
                 {
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                     {
-                        Quaternion currentLookAtRotation = CacheEntity.GetLookRotation();
+                        Quaternion currentLookAtRotation = Entity.GetLookRotation();
                         Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
                         lookRotationEuler.x = 0;
                         lookRotationEuler.z = 0;
                         currentLookAtRotation = Quaternion.RotateTowards(currentLookAtRotation, Quaternion.Euler(lookRotationEuler), turnToEnemySpeed * Time.deltaTime);
-                        CacheEntity.SetLookRotation(currentLookAtRotation);
+                        Entity.SetLookRotation(currentLookAtRotation);
                     }
                     else
                     {
                         // Update 2D direction
-                        CacheEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
+                        Entity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
                     }
                 }
 
-                if (CacheEntity.IsPlayingActionAnimation())
+                if (Entity.IsPlayingActionAnimation())
                     return true;
 
-                if (queueSkill != null && CacheEntity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) < 0)
+                if (queueSkill != null && Entity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) < 0)
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
-                    CacheEntity.CallServerUseSkill(queueSkill.DataId, false, tempTargetEnemy.OpponentAimTransform.position);
+                    Entity.CallServerUseSkill(queueSkill.DataId, false, tempTargetEnemy.OpponentAimTransform.position);
                 }
                 else
                 {
                     // Attack when no queue skill
-                    CacheEntity.CallServerAttack(false);
+                    Entity.CallServerAttack(false);
                 }
 
                 ClearActionState();
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
                 // Update destination if target's position changed
                 SetDestination(targetPosition, attackDistance);
 
-                if (CacheEntity.Summoner == null)
+                if (Entity.Summoner == null)
                 {
                     startFollowEnemyElasped += deltaTime;
                     // Stop following target and move to position nearby spawn position when follow enemy too long
@@ -230,16 +230,16 @@ namespace MultiplayerARPG
 
         public void SetDestination(Vector3 destination, float distance)
         {
-            Vector3 direction = (destination - CacheEntity.MovementTransform.position).normalized;
-            Vector3 position = destination - (direction * (distance - CacheEntity.StoppingDistance));
-            CacheEntity.SetExtraMovement(ExtraMovementState.None);
-            CacheEntity.PointClickMovement(position);
+            Vector3 direction = (destination - Entity.MovementTransform.position).normalized;
+            Vector3 position = destination - (direction * (distance - Entity.StoppingDistance));
+            Entity.SetExtraMovement(ExtraMovementState.None);
+            Entity.PointClickMovement(position);
         }
 
         public void SetWanderDestination(Vector3 destination)
         {
-            CacheEntity.SetExtraMovement(ExtraMovementState.IsWalking);
-            CacheEntity.PointClickMovement(destination);
+            Entity.SetExtraMovement(ExtraMovementState.IsWalking);
+            Entity.PointClickMovement(destination);
         }
 
         public virtual void RandomWanderDestination()
@@ -247,14 +247,14 @@ namespace MultiplayerARPG
             // Random position around spawn point
             Vector3 randomPosition;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = Entity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
-                randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = Entity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             // Random position around summoner
-            if (CacheEntity.Summoner != null)
-                randomPosition = GameInstance.Singleton.GameplayRule.GetSummonPosition(CacheEntity.Summoner);
+            if (Entity.Summoner != null)
+                randomPosition = GameInstance.Singleton.GameplayRule.GetSummonPosition(Entity.Summoner);
 
-            CacheEntity.SetTargetEntity(null);
+            Entity.SetTargetEntity(null);
             SetWanderDestination(randomPosition);
             randomedWanderDelay = Random.Range(randomWanderDelayMin, randomWanderDelayMax);
         }
@@ -264,14 +264,14 @@ namespace MultiplayerARPG
             // Random position around spawn point
             Vector3 randomPosition;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = Entity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             else
-                randomPosition = CacheEntity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+                randomPosition = Entity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             // Random position around summoner
-            if (CacheEntity.Summoner != null)
-                randomPosition = GameInstance.Singleton.GameplayRule.GetSummonPosition(CacheEntity.Summoner);
+            if (Entity.Summoner != null)
+                randomPosition = GameInstance.Singleton.GameplayRule.GetSummonPosition(Entity.Summoner);
 
-            CacheEntity.SetTargetEntity(null);
+            Entity.SetTargetEntity(null);
             SetDestination(randomPosition, 0f);
         }
 
@@ -284,55 +284,55 @@ namespace MultiplayerARPG
         {
             // Aggressive monster or summoned monster will find target to attack
             if (MonsterDatabase.Characteristic != MonsterCharacteristic.Aggressive &&
-                CacheEntity.Summoner == null)
+                Entity.Summoner == null)
                 return false;
 
             IDamageableEntity targetEntity;
-            if (!CacheEntity.TryGetTargetEntity(out targetEntity) || targetEntity.Entity == CacheEntity.Entity ||
-                 targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(CacheEntity.GetInfo()))
+            if (!Entity.TryGetTargetEntity(out targetEntity) || targetEntity.Entity == Entity.Entity ||
+                 targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
-                List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(
+                List<BaseCharacterEntity> characterEntities = Entity.FindAliveCharacters<BaseCharacterEntity>(
                     MonsterDatabase.VisualRange,
                     false, /* Don't find an allies */
                     true,  /* Always find an enemies */
-                    CacheEntity.IsSummoned && isAggressiveWhileSummonerIdle /* Find enemy while summoned and aggresively */);
+                    Entity.IsSummoned && isAggressiveWhileSummonerIdle /* Find enemy while summoned and aggresively */);
                 foreach (BaseCharacterEntity characterEntity in characterEntities)
                 {
                     // Attack target settings
-                    if (characterEntity == null || characterEntity.Entity == CacheEntity.Entity ||
-                        characterEntity.IsDead() || !characterEntity.CanReceiveDamageFrom(CacheEntity.GetInfo()))
+                    if (characterEntity == null || characterEntity.Entity == Entity.Entity ||
+                        characterEntity.IsDead() || !characterEntity.CanReceiveDamageFrom(Entity.GetInfo()))
                     {
                         // If character is null or cannot receive damage from monster, skip it
                         continue;
                     }
                     // Found target, attack it
-                    CacheEntity.SetAttackTarget(characterEntity);
+                    Entity.SetAttackTarget(characterEntity);
                     return true;
                 }
                 if (!isAttackBuilding)
                     return false;
                 // Find building to attack
-                List<BuildingEntity> buildingEntities = CacheEntity.FindAliveDamageableEntities<BuildingEntity>(MonsterDatabase.VisualRange, CurrentGameInstance.buildingLayer.Mask);
+                List<BuildingEntity> buildingEntities = Entity.FindAliveDamageableEntities<BuildingEntity>(MonsterDatabase.VisualRange, CurrentGameInstance.buildingLayer.Mask);
                 foreach (BuildingEntity buildingEntity in buildingEntities)
                 {
                     // Attack target settings
-                    if (buildingEntity == null || buildingEntity.Entity == CacheEntity.Entity ||
-                        buildingEntity.IsDead() || !buildingEntity.CanReceiveDamageFrom(CacheEntity.GetInfo()))
+                    if (buildingEntity == null || buildingEntity.Entity == Entity.Entity ||
+                        buildingEntity.IsDead() || !buildingEntity.CanReceiveDamageFrom(Entity.GetInfo()))
                     {
                         // If building is null or cannot receive damage from monster, skip it
                         continue;
                     }
-                    if (CacheEntity.Summoner != null)
+                    if (Entity.Summoner != null)
                     {
-                        if (CacheEntity.Summoner.Id.Equals(buildingEntity.CreatorId))
+                        if (Entity.Summoner.Id.Equals(buildingEntity.CreatorId))
                         {
                             // If building was built by summoner, skip it
                             continue;
                         }
                     }
                     // Found target, attack it
-                    CacheEntity.SetAttackTarget(buildingEntity);
+                    Entity.SetAttackTarget(buildingEntity);
                     return true;
                 }
             }
@@ -349,14 +349,14 @@ namespace MultiplayerARPG
 
         protected Transform GetDamageTransform()
         {
-            return queueSkill != null ? queueSkill.GetApplyTransform(CacheEntity, isLeftHandAttacking) :
-                CacheEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(CacheEntity, isLeftHandAttacking);
+            return queueSkill != null ? queueSkill.GetApplyTransform(Entity, isLeftHandAttacking) :
+                Entity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(Entity, isLeftHandAttacking);
         }
 
         protected float GetAttackDistance()
         {
-            return queueSkill != null && queueSkill.IsAttack() ? queueSkill.GetCastDistance(CacheEntity, queueSkillLevel, isLeftHandAttacking) :
-                CacheEntity.GetAttackDistance(isLeftHandAttacking);
+            return queueSkill != null && queueSkill.IsAttack() ? queueSkill.GetCastDistance(Entity, queueSkillLevel, isLeftHandAttacking) :
+                Entity.GetAttackDistance(isLeftHandAttacking);
         }
 
         protected virtual bool OverlappedEntity<T>(T entity, Vector3 measuringPosition, Vector3 targetPosition, float distance)
@@ -365,7 +365,7 @@ namespace MultiplayerARPG
             if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
                 return true;
             // Target is far from controlling entity, try overlap the entity
-            return CacheEntity.FindPhysicFunctions.IsGameEntityInDistance(entity, measuringPosition, distance, false);
+            return Entity.FindPhysicFunctions.IsGameEntityInDistance(entity, measuringPosition, distance, false);
         }
     }
 }

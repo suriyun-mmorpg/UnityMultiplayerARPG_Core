@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         public MonsterCharacter MonsterDatabase
         {
-            get { return CacheEntity.CharacterDatabase; }
+            get { return Entity.CharacterDatabase; }
         }
     }
 }

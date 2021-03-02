@@ -19,7 +19,7 @@ namespace MultiplayerARPG
     {
         private bool isFoundEntity;
         private T cacheEntity;
-        public T CacheEntity
+        public T Entity
         {
             get
             {
@@ -31,11 +31,13 @@ namespace MultiplayerARPG
                 return cacheEntity;
             }
         }
+        [System.Obsolete("Keeping this for backward compatibility, use `Entity` instead.")]
+        public T CacheEntity { get { return Entity; } }
 
-        public GameInstance CurrentGameInstance { get { return CacheEntity.CurrentGameInstance; } }
-        public BaseGameplayRule CurrentGameplayRule { get { return CacheEntity.CurrentGameplayRule; } }
-        public BaseGameNetworkManager CurrentGameManager { get { return CacheEntity.CurrentGameManager; } }
-        public Transform CacheTransform { get { return CacheEntity.CacheTransform; } }
+        public GameInstance CurrentGameInstance { get { return Entity.CurrentGameInstance; } }
+        public BaseGameplayRule CurrentGameplayRule { get { return Entity.CurrentGameplayRule; } }
+        public BaseGameNetworkManager CurrentGameManager { get { return Entity.CurrentGameManager; } }
+        public Transform CacheTransform { get { return Entity.CacheTransform; } }
 
         private bool isEnabled;
         public bool Enabled
