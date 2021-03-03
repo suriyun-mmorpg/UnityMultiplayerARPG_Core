@@ -1,6 +1,5 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -36,7 +35,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.SetLookRotation, (writer) =>
+            movement.Entity.ClientSendPacket(DeliveryMethod.Unreliable, GameNetworkingConsts.SetLookRotation, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));

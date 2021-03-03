@@ -79,7 +79,8 @@ namespace MultiplayerARPG
         private Transform groundedTransform;
         private Vector3 groundedLocalPosition;
         private Vector3 oldGroundedPosition;
-        private long acceptedTimestamp;
+        private long acceptedInputTimestamp;
+        private long acceptedRotationTimestamp;
         private Vector3 acceptedPosition;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
@@ -603,9 +604,9 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
-            if (acceptedTimestamp < timestamp)
+            if (acceptedInputTimestamp < timestamp)
             {
-                acceptedTimestamp = timestamp;
+                acceptedInputTimestamp = timestamp;
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
@@ -636,9 +637,9 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             messageHandler.Reader.ReadTeleportMessage3D(out position, out yAngle, out timestamp);
-            if (acceptedTimestamp < timestamp)
+            if (acceptedInputTimestamp < timestamp)
             {
-                acceptedTimestamp = timestamp;
+                acceptedInputTimestamp = timestamp;
                 yRotation = yAngle;
                 OnTeleport(position);
             }
@@ -662,9 +663,9 @@ namespace MultiplayerARPG
             MovementState movementState;
             long timestamp;
             messageHandler.Reader.ReadKeyMovementMessage3D(out inputDirection, out movementState, out timestamp);
-            if (acceptedTimestamp < timestamp)
+            if (acceptedInputTimestamp < timestamp)
             {
-                acceptedTimestamp = timestamp;
+                acceptedInputTimestamp = timestamp;
                 tempInputDirection = inputDirection;
                 tempMovementState = movementState;
                 if (tempInputDirection.sqrMagnitude > 0)
@@ -691,9 +692,9 @@ namespace MultiplayerARPG
             Vector3 position;
             long timestamp;
             messageHandler.Reader.ReadPointClickMovementMessage3D(out position, out timestamp);
-            if (acceptedTimestamp < timestamp)
+            if (acceptedInputTimestamp < timestamp)
             {
-                acceptedTimestamp = timestamp;
+                acceptedInputTimestamp = timestamp;
                 tempMovementState = MovementState.Forward;
                 SetMovePaths(position, true);
             }
@@ -713,17 +714,12 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
-            if (HasNavPaths)
-            {
-                // Character is moving by nav-paths and it will turning following those paths and won't turn by inputs
-                return;
-            }
             float yAngle;
             long timestamp;
             messageHandler.Reader.ReadSetLookRotationMessage3D(out yAngle, out timestamp);
-            if (acceptedTimestamp < timestamp)
+            if (acceptedRotationTimestamp < timestamp)
             {
-                acceptedTimestamp = timestamp;
+                acceptedRotationTimestamp = timestamp;
                 yRotation = yAngle;
                 UpdateRotation();
             }
@@ -745,9 +741,9 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
-            if (acceptedTimestamp < timestamp)
+            if (acceptedInputTimestamp < timestamp)
             {
-                acceptedTimestamp = timestamp;
+                acceptedInputTimestamp = timestamp;
                 yRotation = yAngle;
                 if (Vector3.Distance(position, acceptedPosition) > moveThreshold)
                 {
@@ -771,9 +767,9 @@ namespace MultiplayerARPG
             }
             long timestamp;
             messageHandler.Reader.ReadStopMoveMessage(out timestamp);
-            if (acceptedTimestamp < timestamp)
+            if (acceptedInputTimestamp < timestamp)
             {
-                acceptedTimestamp = timestamp;
+                acceptedInputTimestamp = timestamp;
                 navPaths = null;
             }
         }
