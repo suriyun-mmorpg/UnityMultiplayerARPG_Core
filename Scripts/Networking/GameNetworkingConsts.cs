@@ -90,8 +90,9 @@
         // Entity movement
         public const ushort KeyMovement = 164;
         public const ushort PointClickMovement = 165;
-        public const ushort TurningMovement = 166;
+        public const ushort SetLookRotation = 166;
         public const ushort SyncTransform = 167;
         public const ushort Teleport = 168;
+        public const ushort StopMove = 169;
     }
 }

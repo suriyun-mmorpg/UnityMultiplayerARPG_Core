@@ -621,7 +621,7 @@ namespace MultiplayerARPG
         {
         }
 
-        public void HandleTurningMovementAtServer(MessageHandlerData messageHandler)
+        public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
         {
         }
 
@@ -630,6 +630,10 @@ namespace MultiplayerARPG
         }
 
         public void HandleTeleportAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleStopMoveAtServer(MessageHandlerData messageHandler)
         {
         }
     }

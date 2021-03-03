@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using StandardAssets.Characters.Physics;
 using System.Collections.Generic;
@@ -12,10 +13,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(OpenCharacterController))]
     public class RigidBodyEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        /// <summary>
-        /// Buffer to avoid character fall underground when teleport
-        /// </summary>
-        public const float GROUND_BUFFER = 0.00f;
         /// <summary>
         /// Buffer to fix invalid teleport position
         /// </summary>
@@ -52,7 +49,6 @@ namespace MultiplayerARPG
         public bool useRootMotionWhileNotMoving;
 
         public Animator CacheAnimator { get; private set; }
-        public LiteNetLibTransform CacheNetTransform { get; private set; }
         public Rigidbody CacheRigidbody { get; private set; }
         public CapsuleCollider CacheCapsuleCollider { get; private set; }
         public OpenCharacterController CacheOpenCharacterController { get; private set; }
@@ -106,9 +102,6 @@ namespace MultiplayerARPG
             physicFunctions = new PhysicFunctions(30);
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
-            // Prepare network transform component
-            CacheNetTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
-            CacheNetTransform.onTeleport += OnTeleport;
             // Prepare rigidbody component
             CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
             // Prepare collider component
@@ -130,7 +123,6 @@ namespace MultiplayerARPG
         {
             yRotation = CacheTransform.eulerAngles.y;
             tempCurrentPosition = CacheTransform.position;
-            tempCurrentPosition.y += GROUND_BUFFER;
             CacheOpenCharacterController.SetPosition(tempCurrentPosition, true);
             tempVerticalVelocity = 0;
         }
@@ -138,24 +130,12 @@ namespace MultiplayerARPG
         public override void EntityLateUpdate()
         {
             base.EntityLateUpdate();
-            // Setup network components
-            switch (Entity.MovementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    CacheNetTransform.ownerClientCanSendTransform = false;
-                    break;
-                case MovementSecure.NotSecure:
-                    CacheNetTransform.ownerClientCanSendTransform = true;
-                    break;
-            }
-
             if (framesAfterTeleported > 0)
                 framesAfterTeleported--;
         }
 
         public override void ComponentOnEnable()
         {
-            CacheNetTransform.enabled = true;
             CacheOpenCharacterController.enabled = true;
             CacheOpenCharacterController.SetPosition(CacheTransform.position, true);
             tempVerticalVelocity = 0;
@@ -163,24 +143,13 @@ namespace MultiplayerARPG
 
         public override void ComponentOnDisable()
         {
-            CacheNetTransform.enabled = false;
             CacheOpenCharacterController.enabled = false;
         }
 
         public override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
-            CacheNetTransform.onTeleport -= OnTeleport;
             CacheOpenCharacterController.collision -= OnCharacterControllerCollision;
-        }
-
-        protected void OnTeleport(Vector3 position, Quaternion rotation)
-        {
-            airborneElapsed = 0;
-            tempVerticalVelocity = 0;
-            framesAfterTeleported = FRAME_BUFFER;
-            teleportedPosition = position;
-            yRotation = rotation.eulerAngles.y;
         }
 
         protected void OnAnimatorMove()
@@ -206,74 +175,31 @@ namespace MultiplayerARPG
                 CacheAnimator.ApplyBuiltinRootMotion();
         }
 
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            // Register Network functions
-            RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            RegisterNetFunction<DirectionVector3, MovementState>(NetFuncKeyMovement);
-            RegisterNetFunction<short>(NetFuncUpdateYRotation);
-            RegisterNetFunction(StopMove);
-        }
-
-        protected void NetFuncKeyMovement(DirectionVector3 inputDirection, MovementState movementState)
-        {
-            if (!Entity.CanMove())
-                return;
-            tempInputDirection = inputDirection;
-            tempMovementState = movementState;
-            if (tempInputDirection.sqrMagnitude > 0)
-                navPaths = null;
-            if (!isJumping && !applyingJumpForce)
-                isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
-        }
-
-        protected void NetFuncPointClickMovement(Vector3 position)
-        {
-            if (!Entity.CanMove())
-                return;
-            tempMovementState = MovementState.Forward;
-            SetMovePaths(position, true);
-        }
-
-        protected void NetFuncUpdateYRotation(short yRotation)
-        {
-            if (!Entity.CanMove())
-                return;
-            if (!HasNavPaths)
-            {
-                this.yRotation = yRotation;
-                UpdateRotation();
-            }
-        }
-
         public void StopMove()
         {
             navPaths = null;
             if (IsOwnerClient && !IsServer)
-                CallNetFunction(StopMove, FunctionReceivers.Server);
+                Manager.ClientSendPacket(DeliveryMethod.Sequenced, GameNetworkingConsts.StopMove);
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
             if (!Entity.CanMove())
                 return;
-
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                case MovementSecure.ServerAuthoritative:
-                    // Multiply with 100 and cast to sbyte to reduce packet size
-                    // then it will be devided with 100 later on server side
-                    CallNetFunction(NetFuncKeyMovement, DeliveryMethod.Sequenced, FunctionReceivers.Server, new DirectionVector3(moveDirection), movementState);
-                    break;
-                case MovementSecure.NotSecure:
-                    tempInputDirection = moveDirection;
-                    tempMovementState = movementState;
-                    if (tempInputDirection.sqrMagnitude > 0)
-                        navPaths = null;
-                    if (!isJumping && !applyingJumpForce)
-                        isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
-                    break;
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendKeyMovement(moveDirection, movementState);
+            }
+            if (IsOwnerClient)
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                tempInputDirection = moveDirection;
+                tempMovementState = movementState;
+                if (tempInputDirection.sqrMagnitude > 0)
+                    navPaths = null;
+                if (!isJumping && !applyingJumpForce)
+                    isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
             }
         }
 
@@ -281,16 +207,16 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                case MovementSecure.ServerAuthoritative:
-                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
-                    break;
-                case MovementSecure.NotSecure:
-                    tempMovementState = MovementState.Forward;
-                    SetMovePaths(position, true);
-                    break;
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendPointClickMovement(position);
+            }
+            if (IsOwnerClient)
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                tempMovementState = MovementState.Forward;
+                SetMovePaths(position, true);
             }
         }
 
@@ -298,17 +224,16 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                case MovementSecure.ServerAuthoritative:
-                    // Cast to short to reduce packet size
-                    CallNetFunction(NetFuncUpdateYRotation, DeliveryMethod.Sequenced, FunctionReceivers.Server, (short)rotation.eulerAngles.y);
-                    break;
-                case MovementSecure.NotSecure:
-                    if (!HasNavPaths)
-                        yRotation = rotation.eulerAngles.y;
-                    break;
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendSetLookRotation(rotation);
+            }
+            if (IsOwnerClient)
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                if (!HasNavPaths)
+                    yRotation = rotation.eulerAngles.y;
             }
         }
 
@@ -319,7 +244,8 @@ namespace MultiplayerARPG
 
         public void Teleport(Vector3 position, Quaternion rotation)
         {
-            CacheNetTransform.Teleport(position + (Vector3.up * GROUND_BUFFER), rotation);
+            // TODO: Have to test while secure mode is non-secure
+            this.ServerSendTeleport3D(position, rotation);
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -346,14 +272,6 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            float moveSpeed = Entity.GetMoveSpeed();
-            CacheNetTransform.interpolateMode = interpolateMode;
-            if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
-                CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
-            CacheNetTransform.extrapolateMode = extrapolateMode;
-            if (extrapolateMode == LiteNetLibTransform.ExtrapolateMode.FixedSpeed)
-                CacheNetTransform.fixedExtrapolateSpeed = moveSpeed * extrapolateSpeedRate;
-
             if ((Entity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
                 (Entity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
                 return;
@@ -371,6 +289,20 @@ namespace MultiplayerARPG
             if (CacheOpenCharacterController.isGrounded || airborneElapsed < airborneDelay)
                 tempMovementState |= MovementState.IsGrounded;
             Entity.SetMovement(tempMovementState);
+        }
+
+        public override void EntityFixedUpdate()
+        {
+            base.EntityFixedUpdate();
+            switch (Entity.MovementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    this.ServerSendSyncTransform3D();
+                    break;
+                case MovementSecure.NotSecure:
+                    this.ClientSendSyncTransform3D();
+                    break;
+            }
         }
 
         private void WaterCheck()
@@ -642,30 +574,104 @@ namespace MultiplayerARPG
 
         public void HandleSyncTransformAtClient(MessageHandlerData messageHandler)
         {
+            Vector3 position;
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
+            yRotation = yAngle;
+            // TODO: check timestamp before applies movement
+            SetMovePaths(position, false);
         }
 
         public void HandleTeleportAtClient(MessageHandlerData messageHandler)
         {
+            Vector3 position;
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadTeleportMessage3D(out position, out yAngle, out timestamp);
+            yRotation = yAngle;
+            // TODO: check timestamp before applies movement
+            OnTeleport(position);
         }
 
         public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
         {
+            if (!Entity.CanMove())
+                return;
+            DirectionVector3 inputDirection;
+            MovementState movementState;
+            long timestamp;
+            messageHandler.Reader.ReadKeyMovementMessage3D(out inputDirection, out movementState, out timestamp);
+            // TODO: check timestamp before applies movement
+            tempInputDirection = inputDirection;
+            tempMovementState = movementState;
+            if (tempInputDirection.sqrMagnitude > 0)
+                navPaths = null;
+            if (!isJumping && !applyingJumpForce)
+                isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
         }
 
         public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
         {
+            if (!Entity.CanMove())
+                return;
+
+            Vector3 position;
+            long timestamp;
+            messageHandler.Reader.ReadPointClickMovementMessage3D(out position, out timestamp);
+            // TODO: check timestamp before applies movement
+            tempMovementState = MovementState.Forward;
+            SetMovePaths(position, true);
         }
 
-        public void HandleTurningMovementAtServer(MessageHandlerData messageHandler)
+        public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
         {
+            if (!Entity.CanMove())
+                return;
+            if (!HasNavPaths)
+            {
+                float yAngle;
+                long timestamp;
+                messageHandler.Reader.ReadSetLookRotationMessage3D(out yAngle, out timestamp);
+                yRotation = yAngle;
+                // TODO: check timestamp before applies movement
+                UpdateRotation();
+            }
         }
 
         public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
         {
+            Vector3 position;
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
+            yRotation = yAngle;
+            // TODO: check timestamp before applies movement
+            SetMovePaths(position, false);
         }
 
         public void HandleTeleportAtServer(MessageHandlerData messageHandler)
         {
+            Vector3 position;
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadTeleportMessage3D(out position, out yAngle, out timestamp);
+            yRotation = yAngle;
+            // TODO: check timestamp before applies movement
+            OnTeleport(position);
+        }
+        
+        public void HandleStopMoveAtServer(MessageHandlerData messageHandler)
+        {
+            navPaths = null;
+        }
+
+        protected void OnTeleport(Vector3 position)
+        {
+            airborneElapsed = 0;
+            tempVerticalVelocity = 0;
+            framesAfterTeleported = FRAME_BUFFER;
+            teleportedPosition = position;
         }
 
 #if UNITY_EDITOR

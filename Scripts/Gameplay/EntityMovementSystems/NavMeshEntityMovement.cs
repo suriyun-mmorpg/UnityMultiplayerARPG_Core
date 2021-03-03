@@ -216,5 +216,37 @@ namespace MultiplayerARPG
                     CacheNavMeshAgent.isStopped = true;
             }
         }
+
+        public void HandleSyncTransformAtClient(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleTeleportAtClient(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleTeleportAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleStopMoveAtServer(MessageHandlerData messageHandler)
+        {
+        }
     }
 }
