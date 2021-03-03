@@ -16,7 +16,7 @@ namespace MultiplayerARPG
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 new DirectionVector3(moveDirection).Serialize(writer);
                 writer.Put((byte)movementState);
-                writer.PutPackedLong(movement.Entity.Manager.Timestamp);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
             });
         }
 
@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector3(position);
-                writer.PutPackedLong(movement.Entity.Manager.Timestamp);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
             });
         }
 
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.Timestamp);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
             });
         }
 
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector3(movement.Entity.CacheTransform.position);
                 writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.Timestamp);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
             });
         }
 
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector3(movement.Entity.CacheTransform.position);
                 writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.Timestamp);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
             });
         }
 
@@ -79,7 +79,18 @@ namespace MultiplayerARPG
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector3(position);
                 writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.Timestamp);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
+            });
+        }
+
+        public static void ClientSendStopMove(this IEntityMovement movement)
+        {
+            if (!movement.Entity.IsOwnerClient)
+                return;
+            movement.Entity.ClientSendPacket(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.StopMove, (writer) =>
+            {
+                writer.PutPackedUInt(movement.Entity.ObjectId);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
             });
         }
 
@@ -114,6 +125,11 @@ namespace MultiplayerARPG
         {
             position = reader.GetVector3();
             yAngle = GetDecompressedAngle(reader.GetPackedInt());
+            timestamp = reader.GetPackedLong();
+        }
+
+        public static void ReadStopMoveMessage(this NetDataReader reader, out long timestamp)
+        {
             timestamp = reader.GetPackedLong();
         }
 

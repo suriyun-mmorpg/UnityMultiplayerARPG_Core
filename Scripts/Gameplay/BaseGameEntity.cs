@@ -792,7 +792,8 @@ namespace MultiplayerARPG
             if (FindGroundedPosition(position, GROUND_DETECTION_DISTANCE, out groundedPosition))
                 position = groundedPosition;
             OnTeleport(position, rotation);
-            ActiveMovement.Teleport(position, rotation);
+            if (IsServer)
+                ActiveMovement.Teleport(position, rotation);
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 // Ground check / ground damage will be calculated at server while dimension type is 3d only

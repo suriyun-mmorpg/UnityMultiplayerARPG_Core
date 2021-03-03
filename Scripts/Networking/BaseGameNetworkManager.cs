@@ -142,7 +142,6 @@ namespace MultiplayerARPG
             RegisterServerMessage(GameNetworkingConsts.PointClickMovement, HandlePointClickMovementAtServer);
             RegisterServerMessage(GameNetworkingConsts.SetLookRotation, HandleSetLookRotationAtServer);
             RegisterServerMessage(GameNetworkingConsts.SyncTransform, HandleSyncTransformAtServer);
-            RegisterServerMessage(GameNetworkingConsts.Teleport, HandleTeleportAtServer);
             RegisterServerMessage(GameNetworkingConsts.StopMove, HandleStopMoveAtServer);
             if (ServerOnlineCharacterHandlers != null)
             {
@@ -474,14 +473,6 @@ namespace MultiplayerARPG
             BaseGameEntity gameEntity;
             if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
                 gameEntity.Movement.HandleSyncTransformAtServer(messageHandler);
-        }
-
-        protected void HandleTeleportAtServer(MessageHandlerData messageHandler)
-        {
-            uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
-                gameEntity.Movement.HandleTeleportAtServer(messageHandler);
         }
 
         protected void HandleStopMoveAtServer(MessageHandlerData messageHandler)

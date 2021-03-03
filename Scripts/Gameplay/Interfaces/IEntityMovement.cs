@@ -24,7 +24,6 @@ namespace MultiplayerARPG
         void HandlePointClickMovementAtServer(MessageHandlerData messageHandler);
         void HandleSetLookRotationAtServer(MessageHandlerData messageHandler);
         void HandleSyncTransformAtServer(MessageHandlerData messageHandler);
-        void HandleTeleportAtServer(MessageHandlerData messageHandler);
         void HandleStopMoveAtServer(MessageHandlerData messageHandler);
     }
 }

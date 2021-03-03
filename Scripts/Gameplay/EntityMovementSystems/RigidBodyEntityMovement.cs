@@ -35,11 +35,13 @@ namespace MultiplayerARPG
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
 
-        [Header("Interpolate, Extrapolate Settings")]
-        public LiteNetLibTransform.InterpolateMode interpolateMode = LiteNetLibTransform.InterpolateMode.FixedSpeed;
-        public LiteNetLibTransform.ExtrapolateMode extrapolateMode = LiteNetLibTransform.ExtrapolateMode.None;
-        [Range(0.01f, 1f)]
-        public float extrapolateSpeedRate = 0.5f;
+        [Header("Networking Settings")]
+        public float moveThreshold = 0.1f;
+        public float snapThreshold = 5.0f;
+        [Range(0.01f, 2f)]
+        public float clientSyncTransformInterval = 0.1f;
+        [Range(0.01f, 2f)]
+        public float serverSyncTransformInterval = 0.1f;
 
         [Header("Root Motion Settings")]
         public bool useRootMotionForMovement;
@@ -77,6 +79,10 @@ namespace MultiplayerARPG
         private Transform groundedTransform;
         private Vector3 groundedLocalPosition;
         private Vector3 oldGroundedPosition;
+        private long acceptedTimestamp;
+        private Vector3 acceptedPosition;
+        private float lastServerSyncTransform;
+        private float lastClientSyncTransform;
 
         // Optimize garbage collector
         private MovementState tempMovementState;
@@ -177,9 +183,12 @@ namespace MultiplayerARPG
 
         public void StopMove()
         {
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendStopMove();
+            }
             navPaths = null;
-            if (IsOwnerClient && !IsServer)
-                Manager.ClientSendPacket(DeliveryMethod.Sequenced, GameNetworkingConsts.StopMove);
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -244,8 +253,14 @@ namespace MultiplayerARPG
 
         public void Teleport(Vector3 position, Quaternion rotation)
         {
-            // TODO: Have to test while secure mode is non-secure
+            if (!IsServer)
+            {
+                Logging.LogWarning("RigidBodyEntityMovement", "Teleport function shouldn't be called at client");
+                return;
+            }
             this.ServerSendTeleport3D(position, rotation);
+            yRotation = rotation.eulerAngles.y;
+            OnTeleport(position);
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -272,10 +287,6 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            if ((Entity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer) ||
-                (Entity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient))
-                return;
-
             if (framesAfterTeleported > 0)
             {
                 CacheOpenCharacterController.SetPosition(teleportedPosition, true);
@@ -283,25 +294,34 @@ namespace MultiplayerARPG
             }
 
             UpdateMovement(Time.deltaTime);
-            tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
-            if (isUnderWater)
-                tempMovementState |= MovementState.IsUnderWater;
-            if (CacheOpenCharacterController.isGrounded || airborneElapsed < airborneDelay)
-                tempMovementState |= MovementState.IsGrounded;
-            Entity.SetMovement(tempMovementState);
+            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
+            {
+                tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
+                if (isUnderWater)
+                    tempMovementState |= MovementState.IsUnderWater;
+                if (CacheOpenCharacterController.isGrounded || airborneElapsed < airborneDelay)
+                    tempMovementState |= MovementState.IsGrounded;
+                Entity.SetMovement(tempMovementState);
+            }
         }
 
         public override void EntityFixedUpdate()
         {
             base.EntityFixedUpdate();
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
             {
-                case MovementSecure.ServerAuthoritative:
-                    this.ServerSendSyncTransform3D();
-                    break;
-                case MovementSecure.NotSecure:
+                if (Time.unscaledTime - lastClientSyncTransform > clientSyncTransformInterval)
+                {
+                    // Sync transform from owner client to server
                     this.ClientSendSyncTransform3D();
-                    break;
+                    lastClientSyncTransform = Time.unscaledTime;
+                }
+            }
+            if (Time.unscaledTime - lastServerSyncTransform > serverSyncTransformInterval)
+            {
+                // Sync transform from server to all clients (include owner client)
+                this.ServerSendSyncTransform3D();
+                lastServerSyncTransform = Time.unscaledTime;
             }
         }
 
@@ -574,96 +594,188 @@ namespace MultiplayerARPG
 
         public void HandleSyncTransformAtClient(MessageHandlerData messageHandler)
         {
+            if (IsServer)
+            {
+                // Don't read and apply transform, because it was done at server
+                return;
+            }
             Vector3 position;
             float yAngle;
             long timestamp;
             messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
-            yRotation = yAngle;
-            // TODO: check timestamp before applies movement
-            SetMovePaths(position, false);
+            if (acceptedTimestamp < timestamp)
+            {
+                acceptedTimestamp = timestamp;
+                // Snap character to the position if character is too far from the position
+                if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
+                {
+                    StopMove();
+                    yRotation = yAngle;
+                    OnTeleport(position);
+                }
+                else if (!IsOwnerClient)
+                {
+                    yRotation = yAngle;
+                    if (Vector3.Distance(position, acceptedPosition) > moveThreshold)
+                    {
+                        acceptedPosition = position;
+                        SetMovePaths(position, false);
+                    }
+                }
+            }
         }
 
         public void HandleTeleportAtClient(MessageHandlerData messageHandler)
         {
+            if (IsServer)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
             Vector3 position;
             float yAngle;
             long timestamp;
             messageHandler.Reader.ReadTeleportMessage3D(out position, out yAngle, out timestamp);
-            yRotation = yAngle;
-            // TODO: check timestamp before applies movement
-            OnTeleport(position);
+            if (acceptedTimestamp < timestamp)
+            {
+                acceptedTimestamp = timestamp;
+                yRotation = yAngle;
+                OnTeleport(position);
+            }
         }
 
         public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
             if (!Entity.CanMove())
                 return;
             DirectionVector3 inputDirection;
             MovementState movementState;
             long timestamp;
             messageHandler.Reader.ReadKeyMovementMessage3D(out inputDirection, out movementState, out timestamp);
-            // TODO: check timestamp before applies movement
-            tempInputDirection = inputDirection;
-            tempMovementState = movementState;
-            if (tempInputDirection.sqrMagnitude > 0)
-                navPaths = null;
-            if (!isJumping && !applyingJumpForce)
-                isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
+            if (acceptedTimestamp < timestamp)
+            {
+                acceptedTimestamp = timestamp;
+                tempInputDirection = inputDirection;
+                tempMovementState = movementState;
+                if (tempInputDirection.sqrMagnitude > 0)
+                    navPaths = null;
+                if (!isJumping && !applyingJumpForce)
+                    isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
+            }
         }
 
         public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
             if (!Entity.CanMove())
                 return;
-
             Vector3 position;
             long timestamp;
             messageHandler.Reader.ReadPointClickMovementMessage3D(out position, out timestamp);
-            // TODO: check timestamp before applies movement
-            tempMovementState = MovementState.Forward;
-            SetMovePaths(position, true);
+            if (acceptedTimestamp < timestamp)
+            {
+                acceptedTimestamp = timestamp;
+                tempMovementState = MovementState.Forward;
+                SetMovePaths(position, true);
+            }
         }
 
         public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
             if (!Entity.CanMove())
                 return;
-            if (!HasNavPaths)
+            if (HasNavPaths)
             {
-                float yAngle;
-                long timestamp;
-                messageHandler.Reader.ReadSetLookRotationMessage3D(out yAngle, out timestamp);
+                // Character is moving by nav-paths and it will turning following those paths and won't turn by inputs
+                return;
+            }
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadSetLookRotationMessage3D(out yAngle, out timestamp);
+            if (acceptedTimestamp < timestamp)
+            {
+                acceptedTimestamp = timestamp;
                 yRotation = yAngle;
-                // TODO: check timestamp before applies movement
                 UpdateRotation();
             }
         }
 
         public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Movement handling at server, so don't read sync transform from client
+                return;
+            }
             Vector3 position;
             float yAngle;
             long timestamp;
             messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
-            yRotation = yAngle;
-            // TODO: check timestamp before applies movement
-            SetMovePaths(position, false);
+            if (acceptedTimestamp < timestamp)
+            {
+                acceptedTimestamp = timestamp;
+                yRotation = yAngle;
+                if (Vector3.Distance(position, acceptedPosition) > moveThreshold)
+                {
+                    acceptedPosition = position;
+                    SetMovePaths(position, false);
+                }
+            }
         }
 
-        public void HandleTeleportAtServer(MessageHandlerData messageHandler)
-        {
-            Vector3 position;
-            float yAngle;
-            long timestamp;
-            messageHandler.Reader.ReadTeleportMessage3D(out position, out yAngle, out timestamp);
-            yRotation = yAngle;
-            // TODO: check timestamp before applies movement
-            OnTeleport(position);
-        }
-        
         public void HandleStopMoveAtServer(MessageHandlerData messageHandler)
         {
-            navPaths = null;
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
+            long timestamp;
+            messageHandler.Reader.ReadStopMoveMessage(out timestamp);
+            if (acceptedTimestamp < timestamp)
+            {
+                acceptedTimestamp = timestamp;
+                navPaths = null;
+            }
         }
 
         protected void OnTeleport(Vector3 position)
