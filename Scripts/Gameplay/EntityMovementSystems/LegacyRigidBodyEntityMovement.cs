@@ -257,20 +257,6 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
-            {
-                if (CacheRigidbody.useGravity)
-                    CacheRigidbody.useGravity = false;
-                return;
-            }
-
-            if (Entity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
-            {
-                if (CacheRigidbody.useGravity)
-                    CacheRigidbody.useGravity = false;
-                return;
-            }
-
             // Turn Use Gravity when this is allowed to update
             if (!useRootMotionForFall && CacheRigidbody.useGravity != !isUnderWater)
                 CacheRigidbody.useGravity = !isUnderWater;
@@ -278,13 +264,15 @@ namespace MultiplayerARPG
                 CacheRigidbody.useGravity = false;
 
             UpdateMovement(Time.deltaTime);
-
-            tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
-            if (isUnderWater)
-                tempMovementState |= MovementState.IsUnderWater;
-            if (isGrounded)
-                tempMovementState |= MovementState.IsGrounded;
-            Entity.SetMovement(tempMovementState);
+            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
+            {
+                tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
+                if (isUnderWater)
+                    tempMovementState |= MovementState.IsUnderWater;
+                if (isGrounded)
+                    tempMovementState |= MovementState.IsGrounded;
+                Entity.SetMovement(tempMovementState);
+            }
 
             if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
@@ -530,7 +518,8 @@ namespace MultiplayerARPG
 
                 if (acceptedJump || isJumping)
                 {
-                    Entity.CallAllPlayJumpAnimation();
+                    sendingJump = true;
+                    Entity.PlayJumpAnimation();
                     applyingJumpForce = true;
                     applyJumpForceCountDown = 0f;
                     switch (applyJumpForceMode)
