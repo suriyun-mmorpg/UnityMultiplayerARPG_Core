@@ -79,7 +79,6 @@ namespace MultiplayerARPG
         private Transform groundedTransform;
         private Vector3 groundedLocalPosition;
         private Vector3 oldGroundedPosition;
-
         private long acceptedPositionTimestamp;
         private long acceptedRotationTimestamp;
         private long acceptedJumpTimestamp;
@@ -300,7 +299,7 @@ namespace MultiplayerARPG
         {
             if (framesAfterTeleported > 0)
             {
-                CacheOpenCharacterController.SetPosition(teleportedPosition, true);
+                CacheOpenCharacterController.SetPosition(teleportedPosition, false);
                 return;
             }
 
@@ -634,7 +633,7 @@ namespace MultiplayerARPG
                 {
                     StopMove();
                     yRotation = yAngle;
-                    CacheOpenCharacterController.SetPosition(position, true);
+                    CacheOpenCharacterController.SetPosition(position, false);
                 }
                 else if (!IsOwnerClient)
                 {
@@ -786,7 +785,16 @@ namespace MultiplayerARPG
                 if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
                 {
                     acceptedPosition = position;
-                    SetMovePaths(position, false);
+                    if (!IsClient)
+                    {
+                        // If it's server only (not a host), set position follows the client immediately
+                        CacheOpenCharacterController.SetPosition(position, false);
+                    }
+                    else
+                    {
+                        // It's both server and client, translate position
+                        SetMovePaths(position, false);
+                    }
                 }
             }
         }
