@@ -132,7 +132,7 @@ namespace MultiplayerARPG
                 return;
             }
             this.ServerSendTeleport3D(position, rotation);
-            CacheTransform.position = position;
+            OnTeleport(position);
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -235,7 +235,7 @@ namespace MultiplayerARPG
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
-                CacheTransform.position = position;
+                OnTeleport(position);
             }
         }
 
@@ -358,6 +358,11 @@ namespace MultiplayerARPG
         public void HandleJumpAtServer(MessageHandlerData messageHandler)
         {
             // There is no jump for 2D
+        }
+
+        protected virtual void OnTeleport(Vector2 position)
+        {
+            CacheTransform.position = position;
         }
     }
 }
