@@ -82,9 +82,10 @@ namespace MultiplayerARPG
 
         private long acceptedPositionTimestamp;
         private long acceptedRotationTimestamp;
+        private long acceptedJumpTimestamp;
         private Vector3 acceptedPosition;
-        private bool syncingJump;
-        private bool syncedJump;
+        private bool acceptedJump;
+        private bool sendingJump;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
 
@@ -314,22 +315,34 @@ namespace MultiplayerARPG
                 Entity.SetMovement(tempMovementState);
             }
 
-            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
+                // Sync transform from owner client to server (except it's both owner client and server)
                 if (Time.unscaledTime - lastClientSyncTransform > clientSyncTransformInterval)
                 {
-                    // Sync transform from owner client to server
-                    this.ClientSendSyncTransform3D(syncingJump);
+                    this.ClientSendSyncTransform3D();
+                    if (sendingJump)
+                    {
+                        this.ClientSendJump();
+                        sendingJump = false;
+                    }
                     lastClientSyncTransform = Time.unscaledTime;
                 }
             }
-            if (Time.unscaledTime - lastServerSyncTransform > serverSyncTransformInterval)
+            if (IsServer)
             {
                 // Sync transform from server to all clients (include owner client)
-                this.ServerSendSyncTransform3D(syncingJump);
-                lastServerSyncTransform = Time.unscaledTime;
+                if (Time.unscaledTime - lastServerSyncTransform > serverSyncTransformInterval)
+                {
+                    this.ServerSendSyncTransform3D();
+                    if (sendingJump)
+                    {
+                        this.ServerSendJump();
+                        sendingJump = false;
+                    }
+                    lastServerSyncTransform = Time.unscaledTime;
+                }
             }
-            syncingJump = false;
         }
 
         private void WaterCheck()
@@ -416,9 +429,9 @@ namespace MultiplayerARPG
             }
 
             // Jumping 
-            if (syncedJump || (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping))
+            if (acceptedJump || (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping))
             {
-                syncingJump = true;
+                sendingJump = true;
                 airborneElapsed = airborneDelay;
                 Entity.PlayJumpAnimation();
                 applyingJumpForce = true;
@@ -537,7 +550,7 @@ namespace MultiplayerARPG
 
             UpdateRotation();
             isJumping = false;
-            syncedJump = false;
+            acceptedJump = false;
         }
 
         protected void UpdateRotation()
@@ -611,9 +624,8 @@ namespace MultiplayerARPG
             }
             Vector3 position;
             float yAngle;
-            bool jumping;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out jumping, out timestamp);
+            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
@@ -627,9 +639,6 @@ namespace MultiplayerARPG
                 else if (!IsOwnerClient)
                 {
                     yRotation = yAngle;
-                    syncedJump = jumping;
-                    if (syncedJump)
-                        Debug.LogError("here");
                     if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
                     {
                         acceptedPosition = position;
@@ -655,6 +664,22 @@ namespace MultiplayerARPG
                 acceptedPositionTimestamp = timestamp;
                 yRotation = yAngle;
                 OnTeleport(position);
+            }
+        }
+
+        public void HandleJumpAtClient(MessageHandlerData messageHandler)
+        {
+            if (IsOwnerClient || IsServer)
+            {
+                // Don't read and apply transform, because it was done
+                return;
+            }
+            long timestamp;
+            messageHandler.Reader.ReadJumpMessage(out timestamp);
+            if (acceptedJumpTimestamp < timestamp)
+            {
+                acceptedJumpTimestamp = timestamp;
+                acceptedJump = true;
             }
         }
 
@@ -752,14 +777,12 @@ namespace MultiplayerARPG
             }
             Vector3 position;
             float yAngle;
-            bool jumping;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out jumping, out timestamp);
+            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
                 yRotation = yAngle;
-                syncedJump = jumping;
                 if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
                 {
                     acceptedPosition = position;
@@ -786,6 +809,27 @@ namespace MultiplayerARPG
             {
                 acceptedPositionTimestamp = timestamp;
                 navPaths = null;
+            }
+        }
+
+        public void HandleJumpAtServer(MessageHandlerData messageHandler)
+        {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Movement handling at server, so don't read sync transform from client
+                return;
+            }
+            long timestamp;
+            messageHandler.Reader.ReadJumpMessage(out timestamp);
+            if (acceptedJumpTimestamp < timestamp)
+            {
+                acceptedJumpTimestamp = timestamp;
+                acceptedJump = true;
             }
         }
 

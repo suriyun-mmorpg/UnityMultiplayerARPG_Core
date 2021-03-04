@@ -662,6 +662,10 @@ namespace MultiplayerARPG
         {
         }
 
+        public void HandleJumpAtClient(MessageHandlerData messageHandler)
+        {
+        }
+
         public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
         {
         }
@@ -679,6 +683,10 @@ namespace MultiplayerARPG
         }
 
         public void HandleStopMoveAtServer(MessageHandlerData messageHandler)
+        {
+        }
+
+        public void HandleJumpAtServer(MessageHandlerData messageHandler)
         {
         }
     }
