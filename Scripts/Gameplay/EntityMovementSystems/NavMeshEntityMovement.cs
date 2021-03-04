@@ -44,6 +44,8 @@ namespace MultiplayerARPG
                 Logging.LogWarning("NavMeshEntityMovement", "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
                 disablingComp.enabled = false;
             }
+            // Setup
+            StopMoveFunction();
         }
 
         public override void ComponentOnEnable()
@@ -65,7 +67,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendKeyMovement(moveDirection, movementState);
+                this.ClientSendKeyMovement3D(moveDirection, movementState);
             }
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
@@ -81,7 +83,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendPointClickMovement(position);
+                this.ClientSendPointClickMovement3D(position);
             }
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
@@ -116,7 +118,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendSetLookRotation(rotation);
+                this.ClientSendSetLookRotation3D(rotation);
             }
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {

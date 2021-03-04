@@ -133,7 +133,7 @@ namespace MultiplayerARPG
                 disablingComp.enabled = false;
             }
             // Setup
-            StopMove();
+            StopMoveFunction();
         }
 
         public override void EntityStart()
@@ -214,7 +214,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendKeyMovement(moveDirection, movementState);
+                this.ClientSendKeyMovement3D(moveDirection, movementState);
             }
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
@@ -235,7 +235,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendPointClickMovement(position);
+                this.ClientSendPointClickMovement3D(position);
             }
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
@@ -252,7 +252,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendSetLookRotation(rotation);
+                this.ClientSendSetLookRotation3D(rotation);
             }
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
