@@ -6,7 +6,8 @@ namespace MultiplayerARPG
 {
     public static class EntityMovementFunctions
     {
-        public static void ClientSendKeyMovement(this IEntityMovement movement, Vector3 moveDirection, MovementState movementState)
+        #region 3D
+        public static void ClientSendKeyMovement3D(this IEntityMovement movement, Vector3 moveDirection, MovementState movementState)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
@@ -19,7 +20,7 @@ namespace MultiplayerARPG
             });
         }
 
-        public static void ClientSendPointClickMovement(this IEntityMovement movement, Vector3 position)
+        public static void ClientSendPointClickMovement3D(this IEntityMovement movement, Vector3 position)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
@@ -31,7 +32,7 @@ namespace MultiplayerARPG
             });
         }
 
-        public static void ClientSendSetLookRotation(this IEntityMovement movement, Quaternion rotation)
+        public static void ClientSendSetLookRotation3D(this IEntityMovement movement, Quaternion rotation)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
@@ -158,7 +159,96 @@ namespace MultiplayerARPG
         {
             timestamp = reader.GetPackedLong();
         }
+        #endregion
 
+        #region 2D
+        public static void ClientSendKeyMovement2D(this IEntityMovement movement, Vector2 moveDirection)
+        {
+            if (!movement.Entity.IsOwnerClient)
+                return;
+            movement.Entity.ClientSendPacket(DeliveryMethod.Unreliable, GameNetworkingConsts.KeyMovement, (writer) =>
+            {
+                writer.PutPackedUInt(movement.Entity.ObjectId);
+                new DirectionVector2(moveDirection).Serialize(writer);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
+            });
+        }
+
+        public static void ClientSendPointClickMovement2D(this IEntityMovement movement, Vector2 position)
+        {
+            if (!movement.Entity.IsOwnerClient)
+                return;
+            movement.Entity.ClientSendPacket(DeliveryMethod.Unreliable, GameNetworkingConsts.PointClickMovement, (writer) =>
+            {
+                writer.PutPackedUInt(movement.Entity.ObjectId);
+                writer.PutVector2(position);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
+            });
+        }
+
+        public static void ServerSendSyncTransform2D(this IEntityMovement movement)
+        {
+            if (!movement.Entity.IsServer)
+                return;
+            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
+            {
+                writer.PutPackedUInt(movement.Entity.ObjectId);
+                writer.PutVector2(movement.Entity.CacheTransform.position);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
+            });
+        }
+
+        public static void ClientSendSyncTransform2D(this IEntityMovement movement)
+        {
+            if (!movement.Entity.IsOwnerClient)
+                return;
+            movement.Entity.ClientSendPacket(DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
+            {
+                writer.PutPackedUInt(movement.Entity.ObjectId);
+                writer.PutVector2(movement.Entity.CacheTransform.position);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
+            });
+        }
+
+        public static void ServerSendTeleport2D(this IEntityMovement movement, Vector2 position)
+        {
+            if (!movement.Entity.IsServer)
+                return;
+            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Teleport, (writer) =>
+            {
+                writer.PutPackedUInt(movement.Entity.ObjectId);
+                writer.PutVector2(position);
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
+            });
+        }
+
+        public static void ReadKeyMovementMessage2D(this NetDataReader reader, out DirectionVector2 inputDirection, out long timestamp)
+        {
+            inputDirection = new DirectionVector2();
+            inputDirection.Deserialize(reader);
+            timestamp = reader.GetPackedLong();
+        }
+
+        public static void ReadPointClickMovementMessage2D(this NetDataReader reader, out Vector2 position, out long timestamp)
+        {
+            position = reader.GetVector2();
+            timestamp = reader.GetPackedLong();
+        }
+
+        public static void ReadSyncTransformMessage2D(this NetDataReader reader, out Vector2 position, out long timestamp)
+        {
+            position = reader.GetVector2();
+            timestamp = reader.GetPackedLong();
+        }
+
+        public static void ReadTeleportMessage2D(this NetDataReader reader, out Vector2 position, out long timestamp)
+        {
+            position = reader.GetVector2();
+            timestamp = reader.GetPackedLong();
+        }
+        #endregion
+
+        #region Helpers
         public static int GetCompressedAngle(float angle)
         {
             return Mathf.RoundToInt(angle * 1000);
@@ -168,5 +258,6 @@ namespace MultiplayerARPG
         {
             return compressedAngle * 0.001f;
         }
+        #endregion
     }
 }
