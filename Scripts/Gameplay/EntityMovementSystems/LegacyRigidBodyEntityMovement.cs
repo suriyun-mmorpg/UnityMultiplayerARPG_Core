@@ -25,12 +25,6 @@ namespace MultiplayerARPG
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
 
-        [Header("Interpolate, Extrapolate Settings")]
-        public LiteNetLibTransform.InterpolateMode interpolateMode = LiteNetLibTransform.InterpolateMode.FixedSpeed;
-        public LiteNetLibTransform.ExtrapolateMode extrapolateMode = LiteNetLibTransform.ExtrapolateMode.None;
-        [Range(0.01f, 1f)]
-        public float extrapolateSpeedRate = 0.5f;
-
         [Header("Root Motion Settings")]
         public bool useRootMotionForMovement;
         public bool useRootMotionForAirMovement;
@@ -38,8 +32,15 @@ namespace MultiplayerARPG
         public bool useRootMotionForFall;
         public bool useRootMotionWhileNotMoving;
 
+        [Header("Networking Settings")]
+        public float moveThreshold = 0.01f;
+        public float snapThreshold = 5.0f;
+        [Range(0.00825f, 0.1f)]
+        public float clientSyncTransformInterval = 0.05f;
+        [Range(0.00825f, 0.1f)]
+        public float serverSyncTransformInterval = 0.05f;
+
         public Animator CacheAnimator { get; private set; }
-        public LiteNetLibTransform CacheNetTransform { get; private set; }
         public Rigidbody CacheRigidbody { get; private set; }
         public CapsuleCollider CacheCapsuleCollider { get; private set; }
 
@@ -64,6 +65,14 @@ namespace MultiplayerARPG
         private float applyJumpForceCountDown;
         private Collider waterCollider;
         private float yRotation;
+        private long acceptedPositionTimestamp;
+        private long acceptedRotationTimestamp;
+        private long acceptedJumpTimestamp;
+        private Vector3 acceptedPosition;
+        private bool acceptedJump;
+        private bool sendingJump;
+        private float lastServerSyncTransform;
+        private float lastClientSyncTransform;
 
         // Optimize garbage collector
         private MovementState tempMovementState;
@@ -87,12 +96,17 @@ namespace MultiplayerARPG
             physicFunctions = new PhysicFunctions(30);
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
-            // Prepare network transform component
-            CacheNetTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
             // Prepare rigidbody component
             CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
             // Prepare collider component
             CacheCapsuleCollider = gameObject.GetOrAddComponent<CapsuleCollider>();
+            // Disable unused component
+            LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
+            if (disablingComp != null)
+            {
+                Logging.LogWarning("RigidBodyEntityMovement", "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
+                disablingComp.enabled = false;
+            }
             // Setup
             CacheRigidbody.useGravity = false;
             StopMove();
@@ -103,30 +117,13 @@ namespace MultiplayerARPG
             yRotation = CacheTransform.eulerAngles.y;
         }
 
-        public override void EntityLateUpdate()
-        {
-            base.EntityLateUpdate();
-            // Setup network components
-            switch (Entity.MovementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    CacheNetTransform.ownerClientCanSendTransform = false;
-                    break;
-                case MovementSecure.NotSecure:
-                    CacheNetTransform.ownerClientCanSendTransform = true;
-                    break;
-            }
-        }
-
         public override void ComponentOnEnable()
         {
-            CacheNetTransform.enabled = true;
             CacheRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
         }
 
         public override void ComponentOnDisable()
         {
-            CacheNetTransform.enabled = false;
             CacheRigidbody.constraints = RigidbodyConstraints.FreezeAll;
         }
 
@@ -153,75 +150,35 @@ namespace MultiplayerARPG
                 CacheAnimator.ApplyBuiltinRootMotion();
         }
 
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            // Register Network functions
-            RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            RegisterNetFunction<DirectionVector3, MovementState>(NetFuncKeyMovement);
-            RegisterNetFunction<short>(NetFuncUpdateYRotation);
-            RegisterNetFunction(StopMove);
-        }
-
-        protected void NetFuncKeyMovement(DirectionVector3 inputDirection, MovementState movementState)
-        {
-            if (!Entity.CanMove())
-                return;
-            tempInputDirection = inputDirection;
-            tempMovementState = movementState;
-            if (tempInputDirection.sqrMagnitude > 0)
-                navPaths = null;
-            if (!isJumping && !applyingJumpForce)
-                isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
-        }
-
-        protected void NetFuncPointClickMovement(Vector3 position)
-        {
-            if (!Entity.CanMove())
-                return;
-            tempMovementState = MovementState.Forward;
-            SetMovePaths(position, true);
-        }
-
-        protected void NetFuncUpdateYRotation(short yRotation)
-        {
-            if (!Entity.CanMove())
-                return;
-            if (!HasNavPaths)
-            {
-                this.yRotation = yRotation;
-                UpdateRotation();
-            }
-        }
-
         public void StopMove()
         {
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendStopMove();
+            }
             navPaths = null;
             CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
-            if (IsOwnerClient && !IsServer)
-                CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
             if (!Entity.CanMove())
                 return;
-
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                case MovementSecure.ServerAuthoritative:
-                    // Multiply with 100 and cast to sbyte to reduce packet size
-                    // then it will be devided with 100 later on server side
-                    CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector3(moveDirection), movementState);
-                    break;
-                case MovementSecure.NotSecure:
-                    tempInputDirection = moveDirection;
-                    tempMovementState = movementState;
-                    if (tempInputDirection.sqrMagnitude > 0)
-                        navPaths = null;
-                    if (!isJumping && !applyingJumpForce)
-                        isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
-                    break;
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendKeyMovement(moveDirection, movementState);
+            }
+            if (IsOwnerClient)
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                tempInputDirection = moveDirection;
+                tempMovementState = movementState;
+                if (tempInputDirection.sqrMagnitude > 0)
+                    navPaths = null;
+                if (!isJumping && !applyingJumpForce)
+                    isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
             }
         }
 
@@ -229,16 +186,16 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                case MovementSecure.ServerAuthoritative:
-                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
-                    break;
-                case MovementSecure.NotSecure:
-                    tempMovementState = MovementState.Forward;
-                    SetMovePaths(position, true);
-                    break;
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendPointClickMovement(position);
+            }
+            if (IsOwnerClient)
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                tempMovementState = MovementState.Forward;
+                SetMovePaths(position, true);
             }
         }
 
@@ -246,17 +203,16 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                case MovementSecure.ServerAuthoritative:
-                    // Cast to short to reduce packet size
-                    CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)rotation.eulerAngles.y);
-                    break;
-                case MovementSecure.NotSecure:
-                    if (!HasNavPaths)
-                        yRotation = rotation.eulerAngles.y;
-                    break;
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendSetLookRotation(rotation);
+            }
+            if (IsOwnerClient)
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                if (!HasNavPaths)
+                    yRotation = rotation.eulerAngles.y;
             }
         }
 
@@ -267,7 +223,14 @@ namespace MultiplayerARPG
 
         public void Teleport(Vector3 position, Quaternion rotation)
         {
-            CacheNetTransform.Teleport(position, rotation);
+            if (!IsServer)
+            {
+                Logging.LogWarning("LegacyRigidBodyEntityMovement", "Teleport function shouldn't be called at client [" + name + "]");
+                return;
+            }
+            this.ServerSendTeleport3D(position, rotation);
+            yRotation = rotation.eulerAngles.y;
+            CacheTransform.position = position;
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -290,18 +253,6 @@ namespace MultiplayerARPG
                 }
             }
             return foundGround;
-        }
-
-        public override void EntityUpdate()
-        {
-            base.EntityUpdate();
-            float moveSpeed = Entity.GetMoveSpeed();
-            CacheNetTransform.interpolateMode = interpolateMode;
-            if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
-                CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
-            CacheNetTransform.extrapolateMode = extrapolateMode;
-            if (extrapolateMode == LiteNetLibTransform.ExtrapolateMode.FixedSpeed)
-                CacheNetTransform.fixedExtrapolateSpeed = moveSpeed * extrapolateSpeedRate;
         }
 
         public override void EntityFixedUpdate()
@@ -334,6 +285,35 @@ namespace MultiplayerARPG
             if (isGrounded)
                 tempMovementState |= MovementState.IsGrounded;
             Entity.SetMovement(tempMovementState);
+
+            if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
+            {
+                // Sync transform from owner client to server (except it's both owner client and server)
+                if (Time.unscaledTime - lastClientSyncTransform > clientSyncTransformInterval)
+                {
+                    this.ClientSendSyncTransform3D();
+                    if (sendingJump)
+                    {
+                        this.ClientSendJump();
+                        sendingJump = false;
+                    }
+                    lastClientSyncTransform = Time.unscaledTime;
+                }
+            }
+            if (IsServer)
+            {
+                // Sync transform from server to all clients (include owner client)
+                if (Time.unscaledTime - lastServerSyncTransform > serverSyncTransformInterval)
+                {
+                    this.ServerSendSyncTransform3D();
+                    if (sendingJump)
+                    {
+                        this.ServerSendJump();
+                        sendingJump = false;
+                    }
+                    lastServerSyncTransform = Time.unscaledTime;
+                }
+            }
         }
 
         private int GetGroundDetectionLayerMask()
@@ -656,38 +636,230 @@ namespace MultiplayerARPG
 
         public void HandleSyncTransformAtClient(MessageHandlerData messageHandler)
         {
+            if (IsServer)
+            {
+                // Don't read and apply transform, because it was done at server
+                return;
+            }
+            Vector3 position;
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                // Snap character to the position if character is too far from the position
+                if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
+                {
+                    StopMove();
+                    yRotation = yAngle;
+                    CacheTransform.position = position;
+                }
+                else if (!IsOwnerClient)
+                {
+                    yRotation = yAngle;
+                    if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
+                    {
+                        acceptedPosition = position;
+                        SetMovePaths(position, false);
+                    }
+                }
+            }
         }
 
         public void HandleTeleportAtClient(MessageHandlerData messageHandler)
         {
+            if (IsServer)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
+            Vector3 position;
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadTeleportMessage3D(out position, out yAngle, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                yRotation = yAngle;
+                CacheTransform.position = position;
+            }
         }
 
         public void HandleJumpAtClient(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient || IsServer)
+            {
+                // Don't read and apply transform, because it was done
+                return;
+            }
+            long timestamp;
+            messageHandler.Reader.ReadJumpMessage(out timestamp);
+            if (acceptedJumpTimestamp < timestamp)
+            {
+                acceptedJumpTimestamp = timestamp;
+                acceptedJump = true;
+            }
         }
 
         public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
+            if (!Entity.CanMove())
+                return;
+            DirectionVector3 inputDirection;
+            MovementState movementState;
+            long timestamp;
+            messageHandler.Reader.ReadKeyMovementMessage3D(out inputDirection, out movementState, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                tempInputDirection = inputDirection;
+                tempMovementState = movementState;
+                if (tempInputDirection.sqrMagnitude > 0)
+                    navPaths = null;
+                if (!isJumping && !applyingJumpForce)
+                    isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
+            }
         }
 
         public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
+            if (!Entity.CanMove())
+                return;
+            Vector3 position;
+            long timestamp;
+            messageHandler.Reader.ReadPointClickMovementMessage3D(out position, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                tempMovementState = MovementState.Forward;
+                SetMovePaths(position, true);
+            }
         }
 
         public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
+            if (!Entity.CanMove())
+                return;
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadSetLookRotationMessage3D(out yAngle, out timestamp);
+            if (acceptedRotationTimestamp < timestamp)
+            {
+                acceptedRotationTimestamp = timestamp;
+                yRotation = yAngle;
+                UpdateRotation();
+            }
         }
 
         public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Movement handling at server, so don't read sync transform from client
+                return;
+            }
+            Vector3 position;
+            float yAngle;
+            long timestamp;
+            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                yRotation = yAngle;
+                if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
+                {
+                    acceptedPosition = position;
+                    if (!IsClient)
+                    {
+                        // If it's server only (not a host), set position follows the client immediately
+                        CacheTransform.position = position;
+                    }
+                    else
+                    {
+                        // It's both server and client, translate position
+                        SetMovePaths(position, false);
+                    }
+                }
+            }
         }
 
         public void HandleStopMoveAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
+            long timestamp;
+            messageHandler.Reader.ReadStopMoveMessage(out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                navPaths = null;
+                CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
+            }
         }
 
         public void HandleJumpAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Movement handling at server, so don't read sync transform from client
+                return;
+            }
+            long timestamp;
+            messageHandler.Reader.ReadJumpMessage(out timestamp);
+            if (acceptedJumpTimestamp < timestamp)
+            {
+                acceptedJumpTimestamp = timestamp;
+                acceptedJump = true;
+            }
         }
     }
 }
