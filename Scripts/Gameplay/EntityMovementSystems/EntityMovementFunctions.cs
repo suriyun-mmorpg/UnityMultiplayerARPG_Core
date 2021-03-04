@@ -6,6 +6,13 @@ namespace MultiplayerARPG
 {
     public static class EntityMovementFunctions
     {
+        #region Generic Functions
+        public static bool CanPredictMovement(this IEntityMovement movement)
+        {
+            return movement.Entity.IsOwnerClient || (movement.Entity.IsServer && movement.Entity.MovementSecure == MovementSecure.ServerAuthoritative);
+        }
+        #endregion
+
         #region 3D
         public static void ClientSendKeyMovement3D(this IEntityMovement movement, Vector3 moveDirection, MovementState movementState)
         {

@@ -31,10 +31,8 @@ namespace MultiplayerARPG
         private Vector2 tempInputDirection;
         private Vector2 tempMoveDirection;
         private Vector2 tempCurrentPosition;
-        private Vector2 tempTargetDirection;
         private Quaternion lookRotation;
         private long acceptedPositionTimestamp;
-        private long acceptedRotationTimestamp;
         private Vector3 acceptedPosition;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
@@ -90,7 +88,7 @@ namespace MultiplayerARPG
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 this.ClientSendKeyMovement2D(moveDirection);
             }
-            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
+            if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 tempInputDirection = moveDirection;
@@ -108,7 +106,7 @@ namespace MultiplayerARPG
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 this.ClientSendPointClickMovement2D(position);
             }
-            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
+            if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 currentDestination = position;
