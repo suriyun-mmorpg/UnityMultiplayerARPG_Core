@@ -36,12 +36,13 @@ namespace MultiplayerARPG
         public bool autoSwimToSurface;
 
         [Header("Networking Settings")]
-        public float moveThreshold = 0.1f;
+        public float moveThreshold = 0.01f;
         public float snapThreshold = 5.0f;
-        [Range(0.01f, 2f)]
-        public float clientSyncTransformInterval = 0.1f;
-        [Range(0.01f, 2f)]
-        public float serverSyncTransformInterval = 0.1f;
+        [Range(0.00825f, 0.1f)]
+        public float clientSyncTransformInterval = 0.05f;
+        [Range(0.00825f, 0.1f)]
+        public float serverSyncTransformInterval = 0.05f;
+
 
         [Header("Root Motion Settings")]
         public bool useRootMotionForMovement;
