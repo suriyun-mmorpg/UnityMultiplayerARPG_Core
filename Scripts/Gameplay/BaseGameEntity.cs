@@ -635,15 +635,13 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllPlayJumpAnimation()
         {
-            if (Model && Model is IJumppableModel)
-                (Model as IJumppableModel).PlayJumpAnimation();
+            this.PlayJumpAnimation();
         }
 
         [AllRpc]
         protected void AllPlayPickupAnimation()
         {
-            if (Model && Model is IPickupableModel)
-                (Model as IPickupableModel).PlayPickupAnimation();
+            this.PlayPickupAnimation();
         }
 
         [ServerRpc]

@@ -79,9 +79,12 @@ namespace MultiplayerARPG
         private Transform groundedTransform;
         private Vector3 groundedLocalPosition;
         private Vector3 oldGroundedPosition;
-        private long acceptedInputTimestamp;
+
+        private long acceptedPositionTimestamp;
         private long acceptedRotationTimestamp;
         private Vector3 acceptedPosition;
+        private bool syncingJump;
+        private bool syncedJump;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
 
@@ -122,6 +125,12 @@ namespace MultiplayerARPG
                 comp.SetRadiusHeightAndCenter(radius, height, center, true, true);
             });
             CacheOpenCharacterController.collision += OnCharacterControllerCollision;
+            LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
+            if (disablingComp != null)
+            {
+                Logging.LogWarning("RigidBodyEntityMovement", "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
+                disablingComp.enabled = false;
+            }
             // Setup
             StopMove();
         }
@@ -256,7 +265,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                Logging.LogWarning("RigidBodyEntityMovement", "Teleport function shouldn't be called at client");
+                Logging.LogWarning("RigidBodyEntityMovement", "Teleport function shouldn't be called at client [" + name + "]");
                 return;
             }
             this.ServerSendTeleport3D(position, rotation);
@@ -304,26 +313,23 @@ namespace MultiplayerARPG
                     tempMovementState |= MovementState.IsGrounded;
                 Entity.SetMovement(tempMovementState);
             }
-        }
 
-        public override void EntityFixedUpdate()
-        {
-            base.EntityFixedUpdate();
             if (Entity.MovementSecure == MovementSecure.NotSecure)
             {
                 if (Time.unscaledTime - lastClientSyncTransform > clientSyncTransformInterval)
                 {
                     // Sync transform from owner client to server
-                    this.ClientSendSyncTransform3D();
+                    this.ClientSendSyncTransform3D(syncingJump);
                     lastClientSyncTransform = Time.unscaledTime;
                 }
             }
             if (Time.unscaledTime - lastServerSyncTransform > serverSyncTransformInterval)
             {
                 // Sync transform from server to all clients (include owner client)
-                this.ServerSendSyncTransform3D();
+                this.ServerSendSyncTransform3D(syncingJump);
                 lastServerSyncTransform = Time.unscaledTime;
             }
+            syncingJump = false;
         }
 
         private void WaterCheck()
@@ -410,10 +416,11 @@ namespace MultiplayerARPG
             }
 
             // Jumping 
-            if (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping)
+            if (syncedJump || (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping))
             {
+                syncingJump = true;
                 airborneElapsed = airborneDelay;
-                Entity.CallAllPlayJumpAnimation();
+                Entity.PlayJumpAnimation();
                 applyingJumpForce = true;
                 applyJumpForceCountDown = 0f;
                 switch (applyJumpForceMode)
@@ -438,6 +445,7 @@ namespace MultiplayerARPG
                         tempVerticalVelocity = CalculateJumpVerticalSpeed();
                 }
             }
+
             // Updating horizontal movement (WASD inputs)
             if (tempMoveDirection.sqrMagnitude > 0f)
             {
@@ -529,6 +537,7 @@ namespace MultiplayerARPG
 
             UpdateRotation();
             isJumping = false;
+            syncedJump = false;
         }
 
         protected void UpdateRotation()
@@ -602,11 +611,12 @@ namespace MultiplayerARPG
             }
             Vector3 position;
             float yAngle;
+            bool jumping;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
-            if (acceptedInputTimestamp < timestamp)
+            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out jumping, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedInputTimestamp = timestamp;
+                acceptedPositionTimestamp = timestamp;
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
@@ -617,7 +627,10 @@ namespace MultiplayerARPG
                 else if (!IsOwnerClient)
                 {
                     yRotation = yAngle;
-                    if (Vector3.Distance(position, acceptedPosition) > moveThreshold)
+                    syncedJump = jumping;
+                    if (syncedJump)
+                        Debug.LogError("here");
+                    if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
                     {
                         acceptedPosition = position;
                         SetMovePaths(position, false);
@@ -637,9 +650,9 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             messageHandler.Reader.ReadTeleportMessage3D(out position, out yAngle, out timestamp);
-            if (acceptedInputTimestamp < timestamp)
+            if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedInputTimestamp = timestamp;
+                acceptedPositionTimestamp = timestamp;
                 yRotation = yAngle;
                 OnTeleport(position);
             }
@@ -663,9 +676,9 @@ namespace MultiplayerARPG
             MovementState movementState;
             long timestamp;
             messageHandler.Reader.ReadKeyMovementMessage3D(out inputDirection, out movementState, out timestamp);
-            if (acceptedInputTimestamp < timestamp)
+            if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedInputTimestamp = timestamp;
+                acceptedPositionTimestamp = timestamp;
                 tempInputDirection = inputDirection;
                 tempMovementState = movementState;
                 if (tempInputDirection.sqrMagnitude > 0)
@@ -692,9 +705,9 @@ namespace MultiplayerARPG
             Vector3 position;
             long timestamp;
             messageHandler.Reader.ReadPointClickMovementMessage3D(out position, out timestamp);
-            if (acceptedInputTimestamp < timestamp)
+            if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedInputTimestamp = timestamp;
+                acceptedPositionTimestamp = timestamp;
                 tempMovementState = MovementState.Forward;
                 SetMovePaths(position, true);
             }
@@ -739,13 +752,15 @@ namespace MultiplayerARPG
             }
             Vector3 position;
             float yAngle;
+            bool jumping;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
-            if (acceptedInputTimestamp < timestamp)
+            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out jumping, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedInputTimestamp = timestamp;
+                acceptedPositionTimestamp = timestamp;
                 yRotation = yAngle;
-                if (Vector3.Distance(position, acceptedPosition) > moveThreshold)
+                syncedJump = jumping;
+                if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
                 {
                     acceptedPosition = position;
                     SetMovePaths(position, false);
@@ -767,9 +782,9 @@ namespace MultiplayerARPG
             }
             long timestamp;
             messageHandler.Reader.ReadStopMoveMessage(out timestamp);
-            if (acceptedInputTimestamp < timestamp)
+            if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedInputTimestamp = timestamp;
+                acceptedPositionTimestamp = timestamp;
                 navPaths = null;
             }
         }

@@ -282,6 +282,11 @@ public static class GenericUtils
         return color;
     }
 
+    public static Vector3 GetXZ(this Vector3 position)
+    {
+        return new Vector3(position.x, 0, position.z);
+    }
+
     public static string ToBonusString(this short value, string format = "N0")
     {
         return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
