@@ -35,6 +35,13 @@ namespace MultiplayerARPG
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
 
+        [Header("Root Motion Settings")]
+        public bool useRootMotionForMovement;
+        public bool useRootMotionForAirMovement;
+        public bool useRootMotionForJump;
+        public bool useRootMotionForFall;
+        public bool useRootMotionWhileNotMoving;
+
         [Header("Networking Settings")]
         public float moveThreshold = 0.01f;
         public float snapThreshold = 5.0f;
@@ -42,14 +49,6 @@ namespace MultiplayerARPG
         public float clientSyncTransformInterval = 0.05f;
         [Range(0.00825f, 0.1f)]
         public float serverSyncTransformInterval = 0.05f;
-
-
-        [Header("Root Motion Settings")]
-        public bool useRootMotionForMovement;
-        public bool useRootMotionForAirMovement;
-        public bool useRootMotionForJump;
-        public bool useRootMotionForFall;
-        public bool useRootMotionWhileNotMoving;
 
         public Animator CacheAnimator { get; private set; }
         public Rigidbody CacheRigidbody { get; private set; }
