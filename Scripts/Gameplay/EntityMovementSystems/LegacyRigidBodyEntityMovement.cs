@@ -524,11 +524,11 @@ namespace MultiplayerARPG
                     CacheRigidbody.velocity = new Vector3(CacheRigidbody.velocity.x, tempCurrentMoveSpeed, CacheRigidbody.velocity.z);
                 }
             }
-            else if (isGrounded)
+            else if (acceptedJump || isGrounded)
             {
                 CacheRigidbody.drag = 5f;
 
-                if (isJumping)
+                if (acceptedJump || isJumping)
                 {
                     Entity.CallAllPlayJumpAnimation();
                     applyingJumpForce = true;
@@ -580,6 +580,7 @@ namespace MultiplayerARPG
 
             UpdateRotation();
             isJumping = false;
+            acceptedJump = false;
         }
 
         protected void UpdateRotation()
