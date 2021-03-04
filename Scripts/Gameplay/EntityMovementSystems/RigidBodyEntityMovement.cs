@@ -634,7 +634,7 @@ namespace MultiplayerARPG
                 {
                     StopMove();
                     yRotation = yAngle;
-                    OnTeleport(position);
+                    CacheOpenCharacterController.SetPosition(position, true);
                 }
                 else if (!IsOwnerClient)
                 {
