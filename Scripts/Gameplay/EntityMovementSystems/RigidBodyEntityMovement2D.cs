@@ -4,20 +4,20 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(LiteNetLibTransform))]
     public class RigidBodyEntityMovement2D : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         [Header("Movement Settings")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
 
-        [Header("Interpolate, Extrapolate Settings")]
-        public LiteNetLibTransform.InterpolateMode interpolateMode = LiteNetLibTransform.InterpolateMode.FixedSpeed;
-        public LiteNetLibTransform.ExtrapolateMode extrapolateMode = LiteNetLibTransform.ExtrapolateMode.None;
-        [Range(0.01f, 1f)]
-        public float extrapolateSpeedRate = 0.5f;
+        [Header("Networking Settings")]
+        public float moveThreshold = 0.01f;
+        public float snapThreshold = 5.0f;
+        [Range(0.00825f, 0.1f)]
+        public float clientSyncTransformInterval = 0.05f;
+        [Range(0.00825f, 0.1f)]
+        public float serverSyncTransformInterval = 0.05f;
 
-        public LiteNetLibTransform CacheNetTransform { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
 
         public float StoppingDistance
@@ -33,96 +33,69 @@ namespace MultiplayerARPG
         private Vector2 tempCurrentPosition;
         private Vector2 tempTargetDirection;
         private Quaternion lookRotation;
+        private long acceptedPositionTimestamp;
+        private long acceptedRotationTimestamp;
+        private Vector3 acceptedPosition;
+        private float lastServerSyncTransform;
+        private float lastClientSyncTransform;
 
         public override void EntityAwake()
         {
-            // Prepare network transform component
-            CacheNetTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
             // Prepare rigidbody component
             CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
+            // Disable unused component
+            LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
+            if (disablingComp != null)
+            {
+                Logging.LogWarning("NavMeshEntityMovement", "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
+                disablingComp.enabled = false;
+            }
             // Setup
             CacheRigidbody2D.gravityScale = 0;
-            StopMove();
-        }
-
-        public override void EntityLateUpdate()
-        {
-            base.EntityLateUpdate();
-            // Setup network components
-            switch (Entity.MovementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    CacheNetTransform.ownerClientCanSendTransform = false;
-                    break;
-                case MovementSecure.NotSecure:
-                    CacheNetTransform.ownerClientCanSendTransform = true;
-                    break;
-            }
+            StopMoveFunction();
         }
 
         public override void ComponentOnEnable()
         {
-            CacheNetTransform.enabled = true;
             CacheRigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
 
         public override void ComponentOnDisable()
         {
-            CacheNetTransform.enabled = false;
             CacheRigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
-        }
-
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            // Register Network functions
-            RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            RegisterNetFunction<DirectionVector2>(NetFuncKeyMovement);
-            RegisterNetFunction(StopMove);
-        }
-
-        protected void NetFuncPointClickMovement(Vector3 position)
-        {
-            if (!Entity.CanMove())
-                return;
-            currentDestination = position;
-        }
-
-        protected void NetFuncKeyMovement(DirectionVector2 direction)
-        {
-            if (!Entity.CanMove())
-                return;
-            // Devide inputs to float value
-            tempInputDirection = direction;
-            if (tempInputDirection.sqrMagnitude > 0)
-                currentDestination = null;
         }
 
         public virtual void StopMove()
         {
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendStopMove();
+            }
+            StopMoveFunction();
+        }
+
+        private void StopMoveFunction()
+        {
             currentDestination = null;
             CacheRigidbody2D.velocity = Vector2.zero;
-            if (IsOwnerClient && !IsServer)
-                CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
         public virtual void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
             if (!Entity.CanMove())
                 return;
-
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                case MovementSecure.ServerAuthoritative:
-                    // Multiply with 100 and cast to sbyte to reduce packet size
-                    // then it will be devided with 100 later on server side
-                    CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, new DirectionVector2(moveDirection));
-                    break;
-                case MovementSecure.NotSecure:
-                    tempInputDirection = moveDirection;
-                    if (tempInputDirection.sqrMagnitude > 0)
-                        currentDestination = null;
-                    break;
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendKeyMovement2D(moveDirection);
+            }
+            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                tempInputDirection = moveDirection;
+                if (tempInputDirection.sqrMagnitude > 0)
+                    currentDestination = null;
             }
         }
 
@@ -130,15 +103,15 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-
-            switch (Entity.MovementSecure)
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                case MovementSecure.ServerAuthoritative:
-                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
-                    break;
-                case MovementSecure.NotSecure:
-                    currentDestination = position;
-                    break;
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                this.ClientSendPointClickMovement2D(position);
+            }
+            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                currentDestination = position;
             }
         }
 
@@ -155,7 +128,13 @@ namespace MultiplayerARPG
 
         public void Teleport(Vector3 position, Quaternion rotation)
         {
-            CacheNetTransform.Teleport(position, Quaternion.identity);
+            if (!IsServer)
+            {
+                Logging.LogWarning("RigidBodyEntityMovement2D", "Teleport function shouldn't be called at client [" + name + "]");
+                return;
+            }
+            this.ServerSendTeleport3D(position, rotation);
+            CacheTransform.position = position;
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -164,28 +143,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void EntityUpdate()
-        {
-            base.EntityUpdate();
-            float moveSpeed = Entity.GetMoveSpeed();
-            CacheNetTransform.interpolateMode = interpolateMode;
-            if (interpolateMode == LiteNetLibTransform.InterpolateMode.FixedSpeed)
-                CacheNetTransform.fixedInterpolateSpeed = moveSpeed;
-            CacheNetTransform.extrapolateMode = extrapolateMode;
-            if (extrapolateMode == LiteNetLibTransform.ExtrapolateMode.FixedSpeed)
-                CacheNetTransform.fixedExtrapolateSpeed = moveSpeed * extrapolateSpeedRate;
-        }
-
         public override void EntityFixedUpdate()
         {
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && !IsServer)
-                return;
-
-            if (Entity.MovementSecure == MovementSecure.NotSecure && !IsOwnerClient)
-                return;
-
             tempMoveDirection = Vector2.zero;
-
             if (currentDestination.HasValue)
             {
                 tempCurrentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
@@ -193,7 +153,6 @@ namespace MultiplayerARPG
                 if (Vector2.Distance(currentDestination.Value, tempCurrentPosition) < StoppingDistance)
                     StopMove();
             }
-
             if (Entity.CanMove())
             {
                 // If move by WASD keys, set move direction to input direction
@@ -214,44 +173,193 @@ namespace MultiplayerARPG
                     CacheRigidbody2D.velocity = new Vector2(0, 0);
                 }
             }
-
             Entity.SetMovement((CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
+            {
+                // Sync transform from owner client to server (except it's both owner client and server)
+                if (Time.unscaledTime - lastClientSyncTransform > clientSyncTransformInterval)
+                {
+                    this.ClientSendSyncTransform2D();
+                    lastClientSyncTransform = Time.unscaledTime;
+                }
+            }
+            if (IsServer)
+            {
+                // Sync transform from server to all clients (include owner client)
+                if (Time.unscaledTime - lastServerSyncTransform > serverSyncTransformInterval)
+                {
+                    this.ServerSendSyncTransform2D();
+                    lastServerSyncTransform = Time.unscaledTime;
+                }
+            }
         }
 
         public void HandleSyncTransformAtClient(MessageHandlerData messageHandler)
         {
+            if (IsServer)
+            {
+                // Don't read and apply transform, because it was done at server
+                return;
+            }
+            Vector2 position;
+            long timestamp;
+            messageHandler.Reader.ReadSyncTransformMessage2D(out position, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                // Snap character to the position if character is too far from the position
+                if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
+                {
+                    StopMove();
+                    CacheTransform.position = position;
+                }
+                else if (!IsOwnerClient)
+                {
+                    if (Vector2.Distance(position, acceptedPosition) > moveThreshold)
+                    {
+                        acceptedPosition = position;
+                        currentDestination = position;
+                    }
+                }
+            }
         }
 
         public void HandleTeleportAtClient(MessageHandlerData messageHandler)
         {
+            if (IsServer)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
+            Vector2 position;
+            long timestamp;
+            messageHandler.Reader.ReadTeleportMessage2D(out position, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                CacheTransform.position = position;
+            }
         }
 
         public void HandleJumpAtClient(MessageHandlerData messageHandler)
         {
+            // There is no jump for 2D
         }
 
         public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
+            if (!Entity.CanMove())
+                return;
+            DirectionVector2 inputDirection;
+            long timestamp;
+            messageHandler.Reader.ReadKeyMovementMessage2D(out inputDirection, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                tempInputDirection = inputDirection;
+                if (tempInputDirection.sqrMagnitude > 0)
+                    currentDestination = null;
+            }
         }
 
         public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
+            if (!Entity.CanMove())
+                return;
+            Vector2 position;
+            long timestamp;
+            messageHandler.Reader.ReadPointClickMovementMessage2D(out position, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                currentDestination = position;
+            }
         }
 
         public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
         {
+            // There is no look rotation for 2D
         }
 
         public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Movement handling at server, so don't read sync transform from client
+                return;
+            }
+            Vector2 position;
+            long timestamp;
+            messageHandler.Reader.ReadSyncTransformMessage2D(out position, out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                if (Vector2.Distance(position, acceptedPosition) > moveThreshold)
+                {
+                    acceptedPosition = position;
+                    if (!IsClient)
+                    {
+                        // If it's server only (not a host), set position follows the client immediately
+                        CacheTransform.position = position;
+                    }
+                    else
+                    {
+                        // It's both server and client, translate position
+                        currentDestination = position;
+                    }
+                }
+            }
         }
 
         public void HandleStopMoveAtServer(MessageHandlerData messageHandler)
         {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
+                return;
+            }
+            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
+                return;
+            }
+            long timestamp;
+            messageHandler.Reader.ReadStopMoveMessage(out timestamp);
+            if (acceptedPositionTimestamp < timestamp)
+            {
+                acceptedPositionTimestamp = timestamp;
+                StopMoveFunction();
+            }
         }
 
         public void HandleJumpAtServer(MessageHandlerData messageHandler)
         {
+            // There is no jump for 2D
         }
     }
 }
