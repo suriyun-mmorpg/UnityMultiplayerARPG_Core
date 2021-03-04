@@ -157,6 +157,11 @@ namespace MultiplayerARPG
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 this.ClientSendStopMove();
             }
+            StopMoveFunction();
+        }
+
+        private void StopMoveFunction()
+        {
             navPaths = null;
             CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
         }
@@ -826,8 +831,7 @@ namespace MultiplayerARPG
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
-                navPaths = null;
-                CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
+                StopMoveFunction();
             }
         }
 
