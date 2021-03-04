@@ -175,7 +175,7 @@ namespace MultiplayerARPG
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 this.ClientSendKeyMovement(moveDirection, movementState);
             }
-            if (IsOwnerClient)
+            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 tempInputDirection = moveDirection;
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 this.ClientSendPointClickMovement(position);
             }
-            if (IsOwnerClient)
+            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 tempMovementState = MovementState.Forward;
@@ -213,7 +213,7 @@ namespace MultiplayerARPG
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 this.ClientSendSetLookRotation(rotation);
             }
-            if (IsOwnerClient)
+            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 if (!HasNavPaths)
