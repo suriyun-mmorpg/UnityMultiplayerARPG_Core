@@ -125,6 +125,7 @@ namespace MultiplayerARPG
                 comp.SetRadiusHeightAndCenter(radius, height, center, true, true);
             });
             CacheOpenCharacterController.collision += OnCharacterControllerCollision;
+            // Disable unused component
             LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
             if (disablingComp != null)
             {
@@ -313,7 +314,11 @@ namespace MultiplayerARPG
                     tempMovementState |= MovementState.IsGrounded;
                 Entity.SetMovement(tempMovementState);
             }
+        }
 
+        public override void EntityFixedUpdate()
+        {
+            base.EntityFixedUpdate();
             if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
