@@ -172,6 +172,11 @@ namespace MultiplayerARPG
                 }
             }
             Entity.SetMovement((CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            SyncTransform();
+        }
+
+        protected void SyncTransform()
+        {
             if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
