@@ -1,6 +1,4 @@
-﻿using LiteNetLib;
-using LiteNetLib.Utils;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using StandardAssets.Characters.Physics;
 using System.Collections.Generic;
 using UnityEngine;
@@ -645,7 +643,6 @@ namespace MultiplayerARPG
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
-                    StopMove();
                     yRotation = yAngle;
                     CacheOpenCharacterController.SetPosition(position, false);
                 }
