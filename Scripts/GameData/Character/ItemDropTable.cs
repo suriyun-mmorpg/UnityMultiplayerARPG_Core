@@ -7,5 +7,7 @@ namespace MultiplayerARPG
     {
         [ArrayElementTitle("item")]
         public ItemDrop[] randomItems;
+        [ArrayElementTitle("currency")]
+        public CurrencyRandomAmount[] randomCurrencies;
     }
 }

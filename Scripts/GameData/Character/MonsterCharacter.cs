@@ -98,6 +98,8 @@ namespace MultiplayerARPG
         [SerializeField]
         [ArrayElementTitle("item")]
         private ItemDrop[] randomItems;
+        [ArrayElementTitle("currency")]
+        public CurrencyRandomAmount[] randomCurrencies;
         [SerializeField]
         private ItemDropTable itemDropTable;
 
@@ -149,6 +151,44 @@ namespace MultiplayerARPG
                     }
                 }
                 return cacheRandomItems;
+            }
+        }
+
+        [System.NonSerialized]
+        private List<CurrencyRandomAmount> cacheRandomCurrencies;
+        public List<CurrencyRandomAmount> CacheRandomCurrencies
+        {
+            get
+            {
+                if (cacheRandomCurrencies == null)
+                {
+                    int i;
+                    cacheRandomCurrencies = new List<CurrencyRandomAmount>();
+                    if (randomCurrencies != null &&
+                        randomCurrencies.Length > 0)
+                    {
+                        for (i = 0; i < randomCurrencies.Length; ++i)
+                        {
+                            if (randomCurrencies[i].currency == null ||
+                                randomCurrencies[i].minAmount <= 0)
+                                continue;
+                            cacheRandomCurrencies.Add(randomCurrencies[i]);
+                        }
+                    }
+                    if (itemDropTable != null &&
+                        itemDropTable.randomCurrencies != null &&
+                        itemDropTable.randomCurrencies.Length > 0)
+                    {
+                        for (i = 0; i < itemDropTable.randomCurrencies.Length; ++i)
+                        {
+                            if (itemDropTable.randomCurrencies[i].currency == null ||
+                                itemDropTable.randomCurrencies[i].minAmount <= 0)
+                                continue;
+                            cacheRandomCurrencies.Add(itemDropTable.randomCurrencies[i]);
+                        }
+                    }
+                }
+                return cacheRandomCurrencies;
             }
         }
 
@@ -315,12 +355,24 @@ namespace MultiplayerARPG
             if (CacheRandomItems.Count == 0)
                 return;
             ItemDrop randomItem;
-            for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
+            for (int count = 0; count < CacheRandomItems.Count && count < maxDropItems; ++count)
             {
                 randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
                 if (Random.value > randomItem.dropRate)
                     continue;
                 onRandomItem.Invoke(randomItem.item, randomItem.amount);
+            }
+        }
+
+        public virtual void RandomCurrencies(System.Action<Currency, int> onRandomCurrency)
+        {
+            if (CacheRandomCurrencies.Count == 0)
+                return;
+            CurrencyRandomAmount randomCurrency;
+            for (int count = 0; count < CacheRandomCurrencies.Count; ++count)
+            {
+                randomCurrency = CacheRandomCurrencies[count];
+                onRandomCurrency.Invoke(randomCurrency.currency, Random.Range(randomCurrency.minAmount, randomCurrency.maxAmount));
             }
         }
 

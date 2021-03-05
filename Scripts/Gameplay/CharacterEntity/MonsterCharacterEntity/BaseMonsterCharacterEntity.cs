@@ -511,6 +511,8 @@ namespace MultiplayerARPG
             receivedDamageRecords.Clear();
             // Drop items
             CharacterDatabase.RandomItems(OnRandomDropItem);
+            // Drop currency
+            CharacterDatabase.RandomCurrencies(OnRandomDropCurrency);
             // Clear looters because they are already set to dropped items
             looters.Clear();
 
@@ -533,6 +535,17 @@ namespace MultiplayerARPG
             if (amount > item.MaxStack)
                 amount = item.MaxStack;
             ItemDropEntity.DropItem(this, CharacterItem.Create(item, 1, amount), looters);
+        }
+
+        private void OnRandomDropCurrency(Currency currency, int amount)
+        {
+            BasePlayerCharacterEntity playerCharacterEntity;
+            foreach (uint looter in looters)
+            {
+                if (!Manager.Assets.TryGetSpawnedObject(looter, out playerCharacterEntity))
+                    continue;
+                playerCharacterEntity.IncreaseCurrency(currency, amount);
+            }
         }
 
         public override void Respawn()

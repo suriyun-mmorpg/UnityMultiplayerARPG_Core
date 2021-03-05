@@ -13,4 +13,12 @@ namespace MultiplayerARPG
         public Currency currency;
         public int amount;
     }
+
+    [System.Serializable]
+    public struct CurrencyRandomAmount
+    {
+        public Currency currency;
+        public int minAmount;
+        public int maxAmount;
+    }
 }
