@@ -45,10 +45,14 @@ namespace MultiplayerARPG
             {
                 case OverrideRespawnPointMode.Override:
                     List<OverrideRespawnPoint> overrideRespawnPoints;
-                    if (CacheOverrideRespawnPoints.TryGetValue(playerCharacterData.FactionId, out overrideRespawnPoints))
+                    if (CacheOverrideRespawnPoints.TryGetValue(playerCharacterData.FactionId, out overrideRespawnPoints) ||
+                        CacheOverrideRespawnPoints.TryGetValue(0, out overrideRespawnPoints))
                     {
                         OverrideRespawnPoint overrideRespawnPoint = overrideRespawnPoints[Random.Range(0, overrideRespawnPoints.Count)];
-                        mapName = overrideRespawnPoint.respawnMapInfo.Id;
+                        if (overrideRespawnPoint.respawnMapInfo != null)
+                            mapName = overrideRespawnPoint.respawnMapInfo.Id;
+                        else
+                            mapName = BaseGameNetworkManager.CurrentMapInfo.Id;
                         position = overrideRespawnPoint.respawnPosition;
                     }
                     break;
@@ -75,7 +79,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (targetEntity .type == EntityTypes.Monster)
+            if (targetEntity.type == EntityTypes.Monster)
             {
                 // If this character is summoner so it is ally
                 if (targetEntity.summonerInfo != null)
@@ -183,11 +187,12 @@ namespace MultiplayerARPG
         Override,
     }
 
-    [SerializeField]
+    [System.Serializable]
     public struct OverrideRespawnPoint
     {
         [Tooltip("If this is not empty, character who have the same faction will respawn to this point")]
         public Faction forFaction;
+        [Tooltip("IF this is empty, it will respawn in current map")]
         public BaseMapInfo respawnMapInfo;
         public Vector3 respawnPosition;
     }
