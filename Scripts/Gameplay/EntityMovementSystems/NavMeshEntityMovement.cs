@@ -136,7 +136,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                Logging.LogWarning("CharacterControllerEntityMovement", "Teleport function shouldn't be called at client [" + name + "]");
+                Logging.LogWarning("NavMeshEntityMovement", "Teleport function shouldn't be called at client [" + name + "]");
                 return;
             }
             this.ServerSendTeleport3D(position, rotation);
@@ -159,6 +159,11 @@ namespace MultiplayerARPG
         public override void EntityFixedUpdate()
         {
             Entity.SetMovement((CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            SyncTransform();
+        }
+
+        private void SyncTransform()
+        {
             if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
@@ -179,12 +184,12 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void SetMovePaths(Vector3 position, bool useKeyMovement)
+        private void SetMovePaths(Vector3 position, bool useKeyMovement)
         {
             SetMovePaths(position, Entity.GetMoveSpeed(), useKeyMovement);
         }
 
-        protected void SetMovePaths(Vector3 position, float moveSpeed, bool useKeyMovement)
+        private void SetMovePaths(Vector3 position, float moveSpeed, bool useKeyMovement)
         {
             if (!Entity.CanMove())
                 return;

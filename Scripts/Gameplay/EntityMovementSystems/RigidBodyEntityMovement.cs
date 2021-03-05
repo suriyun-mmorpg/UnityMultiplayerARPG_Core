@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             get { return stoppingDistance; }
         }
 
-        public Queue<Vector3> navPaths { get; protected set; }
+        public Queue<Vector3> navPaths { get; private set; }
         public bool HasNavPaths
         {
             get { return navPaths != null && navPaths.Count > 0; }
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
             CacheOpenCharacterController.collision -= OnCharacterControllerCollision;
         }
 
-        protected void OnAnimatorMove()
+        private void OnAnimatorMove()
         {
             if (!CacheAnimator)
                 return;
@@ -323,7 +323,11 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
-            base.EntityFixedUpdate();
+            SyncTransform();
+        }
+
+        private void SyncTransform()
+        {
             if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
@@ -562,12 +566,12 @@ namespace MultiplayerARPG
             acceptedJump = false;
         }
 
-        protected void UpdateRotation()
+        private void UpdateRotation()
         {
             CacheTransform.eulerAngles = new Vector3(0f, yRotation, 0f);
         }
 
-        protected void SetMovePaths(Vector3 position, bool useNavMesh)
+        private void SetMovePaths(Vector3 position, bool useNavMesh)
         {
             if (useNavMesh)
             {
@@ -851,7 +855,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnTeleport(Vector3 position)
+        private void OnTeleport(Vector3 position)
         {
             airborneElapsed = 0;
             tempVerticalVelocity = 0;
