@@ -650,8 +650,11 @@ namespace MultiplayerARPG
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
-                    yRotation = yAngle;
-                    CacheTransform.position = position;
+                    if (!IsOwnerClient || Entity.Manager.ServerUnixTime < timestamp)
+                    {
+                        yRotation = yAngle;
+                        CacheTransform.position = position;
+                    }
                 }
                 else if (!IsOwnerClient)
                 {
