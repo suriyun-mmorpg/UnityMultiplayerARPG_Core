@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         void HandleNotifyRewardExp(MessageHandlerData messageHandler);
         void HandleNotifyRewardGold(MessageHandlerData messageHandler);
         void HandleNotifyRewardItem(MessageHandlerData messageHandler);
+        void HandleNotifyRewardCurrency(MessageHandlerData messageHandler);
         void HandleNotifyStorageOpened(MessageHandlerData messageHandler);
         void HandleNotifyStorageClosed(MessageHandlerData messageHandler);
         void HandleNotifyStorageItems(MessageHandlerData messageHandler);

@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         public static System.Action<int> onNotifyRewardExp;
         public static System.Action<int> onNotifyRewardGold;
         public static System.Action<int, short> onNotifyRewardItem;
+        public static System.Action<int, int> onNotifyRewardCurrency;
 
         public static void ClientConnected()
         {
@@ -61,6 +62,12 @@ namespace MultiplayerARPG
         {
             if (onNotifyRewardItem != null)
                 onNotifyRewardItem.Invoke(dataId, amount);
+        }
+
+        public static void NotifyRewardCurrency(int dataId, int amount)
+        {
+            if (onNotifyRewardCurrency != null)
+                onNotifyRewardCurrency.Invoke(dataId, amount);
         }
     }
 }

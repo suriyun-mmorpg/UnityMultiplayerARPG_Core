@@ -95,5 +95,7 @@
         public const ushort Teleport = 168;
         public const ushort StopMove = 169;
         public const ushort Jump = 170;
+        // New notify type
+        public const ushort NotifyRewardCurrency = 171;
     }
 }

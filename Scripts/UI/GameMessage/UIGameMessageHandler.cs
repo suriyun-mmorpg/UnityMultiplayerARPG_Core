@@ -8,12 +8,15 @@ namespace MultiplayerARPG
         public TextWrapper rewardExpPrefab;
         public TextWrapper rewardGoldPrefab;
         public TextWrapper rewardItemPrefab;
+        public TextWrapper rewardCurrencyPrefab;
         [Tooltip("Format => {0} = {Exp Amount}")]
         public UILocaleKeySetting formatKeyRewardExp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_EXP);
         [Tooltip("Format => {0} = {Gold Amount}")]
         public UILocaleKeySetting formatKeyRewardGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_GOLD);
         [Tooltip("Format => {0} = {Item Title}, {1} => {Amount}")]
         public UILocaleKeySetting formatKeyRewardItem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_ITEM);
+        [Tooltip("Format => {0} = {Item Title}, {1} => {Amount}")]
+        public UILocaleKeySetting formatKeyRewardCurrency = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_CURRENCY);
         public Color errorMessageColor = Color.red;
         public Transform messageContainer;
         public float visibleDuration;
@@ -26,6 +29,8 @@ namespace MultiplayerARPG
                 rewardGoldPrefab = messagePrefab;
             if (!rewardItemPrefab)
                 rewardItemPrefab = messagePrefab;
+            if (!rewardCurrencyPrefab)
+                rewardCurrencyPrefab = messagePrefab;
         }
 
         private void OnEnable()
@@ -34,6 +39,7 @@ namespace MultiplayerARPG
             ClientGenericActions.onNotifyRewardExp += OnNotifyRewardExp;
             ClientGenericActions.onNotifyRewardGold += OnNotifyRewardGold;
             ClientGenericActions.onNotifyRewardItem += OnNotifyRewardItem;
+            ClientGenericActions.onNotifyRewardCurrency += OnNotifyRewardCurrency;
         }
 
         private void OnDisable()
@@ -42,6 +48,7 @@ namespace MultiplayerARPG
             ClientGenericActions.onNotifyRewardExp -= OnNotifyRewardExp;
             ClientGenericActions.onNotifyRewardGold -= OnNotifyRewardGold;
             ClientGenericActions.onNotifyRewardItem -= OnNotifyRewardItem;
+            ClientGenericActions.onNotifyRewardCurrency -= OnNotifyRewardCurrency;
         }
 
         private void OnReceiveGameMessage(UITextKeys message)
@@ -93,6 +100,20 @@ namespace MultiplayerARPG
 
             TextWrapper newMessage = Instantiate(rewardItemPrefab);
             newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardItem.ToString()), item.Title, amount);
+            newMessage.transform.SetParent(messageContainer);
+            newMessage.transform.localScale = Vector3.one;
+            newMessage.transform.localRotation = Quaternion.identity;
+            Destroy(newMessage.gameObject, visibleDuration);
+        }
+
+        private void OnNotifyRewardCurrency(int dataId, int amount)
+        {
+            Currency currency;
+            if (rewardCurrencyPrefab == null || !GameInstance.Currencies.TryGetValue(dataId, out currency))
+                return;
+
+            TextWrapper newMessage = Instantiate(rewardCurrencyPrefab);
+            newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardCurrency.ToString()), currency.Title, amount);
             newMessage.transform.SetParent(messageContainer);
             newMessage.transform.localScale = Vector3.one;
             newMessage.transform.localRotation = Quaternion.identity;

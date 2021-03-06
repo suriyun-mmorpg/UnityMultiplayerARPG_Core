@@ -29,6 +29,13 @@ namespace MultiplayerARPG
                 messageHandler.Reader.GetPackedShort());
         }
 
+        public void HandleNotifyRewardCurrency(MessageHandlerData messageHandler)
+        {
+            ClientGenericActions.NotifyRewardCurrency(
+                messageHandler.Reader.GetPackedInt(),
+                messageHandler.Reader.GetPackedInt());
+        }
+
         public void HandleNotifyStorageOpened(MessageHandlerData messageHandler)
         {
             ClientStorageActions.NotifyStorageOpened(

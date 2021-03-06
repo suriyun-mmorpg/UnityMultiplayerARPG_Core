@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         void NotifyRewardExp(long connectionId, int exp);
         void NotifyRewardGold(long connectionId, int gold);
         void NotifyRewardItem(long connectionId, int dataId, short amount);
+        void NotifyRewardCurrency(long connectionId, int dataId, int amount);
         // Storage
         void NotifyStorageItems(long connectionId, List<CharacterItem> storageItems);
         void NotifyStorageOpened(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit);

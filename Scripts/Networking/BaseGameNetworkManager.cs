@@ -68,7 +68,7 @@ namespace MultiplayerARPG
 
         public override uint PacketVersion()
         {
-            return 10;
+            return 12;
         }
 
         protected override void Awake()
@@ -131,6 +131,7 @@ namespace MultiplayerARPG
                 RegisterClientMessage(GameNetworkingConsts.NotifyRewardExp, ClientGameMessageHandlers.HandleNotifyRewardExp);
                 RegisterClientMessage(GameNetworkingConsts.NotifyRewardGold, ClientGameMessageHandlers.HandleNotifyRewardGold);
                 RegisterClientMessage(GameNetworkingConsts.NotifyRewardItem, ClientGameMessageHandlers.HandleNotifyRewardItem);
+                RegisterClientMessage(GameNetworkingConsts.NotifyRewardCurrency, ClientGameMessageHandlers.HandleNotifyRewardCurrency);
                 RegisterClientMessage(GameNetworkingConsts.NotifyStorageOpened, ClientGameMessageHandlers.HandleNotifyStorageOpened);
                 RegisterClientMessage(GameNetworkingConsts.NotifyStorageClosed, ClientGameMessageHandlers.HandleNotifyStorageClosed);
                 RegisterClientMessage(GameNetworkingConsts.NotifyStorageItemsUpdated, ClientGameMessageHandlers.HandleNotifyStorageItems);

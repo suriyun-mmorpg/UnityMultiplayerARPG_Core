@@ -886,6 +886,10 @@ namespace MultiplayerARPG
         /// Format => {0} = {Currency Title}, {1} = {Amount}
         /// </summary>
         UI_FORMAT_REWARD_CURRENCY,
+        /// <summary>
+        /// Format => {0} = {Currency Title}, {1} = {Amount}
+        /// </summary>
+        UI_FORMAT_NOTIFY_REWARD_CURRENCY,
     }
 
     public static class DefaultLocale
@@ -1326,6 +1330,7 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_EXP.ToString(), "Obtain {0} Exp");
             Texts.Add(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_GOLD.ToString(), "Obtain {0} Gold");
             Texts.Add(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_ITEM.ToString(), "Obtain {0} x {1} ea");
+            Texts.Add(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_CURRENCY.ToString(), "Obtain {1} {0}");
             // Format - 1.61 - Talk to NPC quest task
             Texts.Add(UIFormatKeys.UI_FORMAT_QUEST_TASK_TALK_TO_NPC.ToString(), "Talk to {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_QUEST_TASK_TALK_TO_NPC_COMPLETE.ToString(), "Talk to {0}: Complete");

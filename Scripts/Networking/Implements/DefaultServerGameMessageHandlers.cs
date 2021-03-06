@@ -52,6 +52,17 @@ namespace MultiplayerARPG
             });
         }
 
+        public void NotifyRewardCurrency(long connectionId, int dataId, int amount)
+        {
+            if (amount <= 0)
+                return;
+            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardCurrency, (writer) =>
+            {
+                writer.PutPackedInt(dataId);
+                writer.PutPackedInt(amount);
+            });
+        }
+
         // Storage
         public void NotifyStorageItems(long connectionId, List<CharacterItem> storageItems)
         {
