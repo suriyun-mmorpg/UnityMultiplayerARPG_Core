@@ -241,6 +241,7 @@ namespace MultiplayerARPG
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
+        protected bool dirtyIsHide;
         protected bool isTeleporting;
         protected Vector3 teleportingPosition;
         protected Quaternion teleportingRotation;
@@ -474,7 +475,15 @@ namespace MultiplayerARPG
             EntityLateUpdate();
             if (onLateUpdate != null)
                 onLateUpdate.Invoke();
+            // Update identity's hide status
+            bool isHide = IsHide();
+            if (dirtyIsHide != isHide)
+            {
+                dirtyIsHide = isHide;
+                Identity.IsHide = dirtyIsHide;
+            }
         }
+
         protected virtual void EntityLateUpdate()
         {
             if (textTitle != null)
