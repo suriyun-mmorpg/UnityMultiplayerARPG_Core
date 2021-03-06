@@ -741,7 +741,8 @@ namespace MultiplayerARPG
                     return false;
                 }
             }
-            return false;
+            // Not hit anything, assume that it can interact
+            return true;
         }
 
         public override Vector3 GetSummonPosition(BaseCharacterEntity character)
