@@ -720,11 +720,12 @@ namespace MultiplayerARPG
 
         public override bool CanInteractEntity(BaseCharacterEntity character, uint objectId)
         {
-            LiteNetLibIdentity identity;
-            if (!character.Manager.Assets.TryGetSpawnedObject(objectId, out identity))
+            BaseGameEntity interactingEntity;
+            if (!character.Manager.Assets.TryGetSpawnedObject(objectId, out interactingEntity))
                 return false;
             // This function will sort: near to far, so loop from 0
-            int count = character.FindPhysicFunctions.Raycast(character.MeleeDamageTransform.position, identity.transform.position, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
+            float dist = Vector3.Distance(character.MeleeDamageTransform.position, interactingEntity.transform.position);
+            int count = character.FindPhysicFunctions.Raycast(character.MeleeDamageTransform.position, character.CacheTransform.forward, dist, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
             IGameEntity gameEntity;
             for (int i = 0; i < count; ++i)
             {
