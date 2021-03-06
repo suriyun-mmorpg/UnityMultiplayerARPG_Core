@@ -462,6 +462,16 @@ namespace MultiplayerARPG
                     }
                 }
 
+                if (IsServer && weaponItem.DestroyImmediatelyAfterFired)
+                {
+                    EquipWeapons equipWeapons = EquipWeapons;
+                    if (isLeftHand)
+                        equipWeapons.leftHand = CharacterItem.Empty;
+                    else
+                        equipWeapons.rightHand = CharacterItem.Empty;
+                    EquipWeapons = equipWeapons;
+                }
+
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
