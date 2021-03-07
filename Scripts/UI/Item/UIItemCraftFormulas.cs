@@ -6,6 +6,8 @@ namespace MultiplayerARPG
 {
     public class UIItemCraftFormulas : UIBase
     {
+        [Header("UI Elements")]
+        public GameObject listEmptyObject;
         public UIItemCraftFormula uiDialog;
         public UIItemCraftFormula uiPrefab;
         public Transform uiContainer;
@@ -96,6 +98,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     tempUiItemCraftFormula.OnClickSelect();
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(GameInstance.ItemCraftFormulas.Count == 0);
         }
     }
 }

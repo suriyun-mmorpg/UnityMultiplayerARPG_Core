@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
 
         [Header("UI Elements")]
+        public GameObject listEmptyObject;
         public UICashShopItem uiCashShopItemDialog;
         public UICashShopItem uiCashShopItemPrefab;
         public Transform uiCashShopItemContainer;
@@ -134,6 +135,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     uiCashShopItem.OnClickSelect();
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(cashShopItems.Count == 0);
         }
 
         private void ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)

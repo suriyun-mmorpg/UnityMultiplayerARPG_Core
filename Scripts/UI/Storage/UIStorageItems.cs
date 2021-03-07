@@ -13,7 +13,9 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeySlotLimit = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_SLOT);
 
         [Header("UI Elements")]
-        public UICharacterItem uiItemDialog;
+        public GameObject listEmptyObject;
+        [FormerlySerializedAs("uiItemDialog")]
+        public UICharacterItem uiDialog;
         [FormerlySerializedAs("uiCharacterItemPrefab")]
         public UICharacterItem uiPrefab;
         [FormerlySerializedAs("uiCharacterItemContainer")]
@@ -65,8 +67,8 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnSelected.AddListener(OnSelect);
             CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
             CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselect);
-            if (uiItemDialog != null)
-                uiItemDialog.onHide.AddListener(OnDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.AddListener(OnDialogHide);
         }
 
         protected virtual void OnDisable()
@@ -83,8 +85,8 @@ namespace MultiplayerARPG
             WeightLimit = 0;
             SlotLimit = 0;
             // Hide
-            if (uiItemDialog != null)
-                uiItemDialog.onHide.RemoveListener(OnDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.RemoveListener(OnDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
         }
 
@@ -141,21 +143,21 @@ namespace MultiplayerARPG
                 CacheItemSelectionManager.DeselectSelectedUI();
                 return;
             }
-            if (uiItemDialog != null)
+            if (uiDialog != null)
             {
-                uiItemDialog.selectionManager = CacheItemSelectionManager;
-                uiItemDialog.Setup(ui.Data, GameInstance.PlayingCharacter, ui.IndexOfData);
-                uiItemDialog.Show();
+                uiDialog.selectionManager = CacheItemSelectionManager;
+                uiDialog.Setup(ui.Data, GameInstance.PlayingCharacter, ui.IndexOfData);
+                uiDialog.Show();
             }
         }
 
         protected void OnDeselect(UICharacterItem ui)
         {
-            if (uiItemDialog != null)
+            if (uiDialog != null)
             {
-                uiItemDialog.onHide.RemoveListener(OnDialogHide);
-                uiItemDialog.Hide();
-                uiItemDialog.onHide.AddListener(OnDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
+                uiDialog.Hide();
+                uiDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
@@ -169,12 +171,14 @@ namespace MultiplayerARPG
 
             if (characterItems == null || characterItems.Count == 0)
             {
-                if (uiItemDialog != null)
-                    uiItemDialog.Hide();
+                if (uiDialog != null)
+                    uiDialog.Hide();
                 CacheItemList.HideAll();
+                if (listEmptyObject != null)
+                    listEmptyObject.SetActive(false);
                 return;
             }
-
+            int showingCount = 0;
             UICharacterItem selectedUI = null;
             UICharacterItem tempUI;
             CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
@@ -193,19 +197,22 @@ namespace MultiplayerARPG
                 CacheItemSelectionManager.Add(tempUI);
                 if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
                     selectedUI = tempUI;
+                showingCount++;
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(showingCount == 0);
             if (selectedUI == null)
             {
                 CacheItemSelectionManager.DeselectSelectedUI();
             }
             else
             {
-                bool defaultDontShowComparingEquipments = uiItemDialog != null ? uiItemDialog.dontShowComparingEquipments : false;
-                if (uiItemDialog != null)
-                    uiItemDialog.dontShowComparingEquipments = true;
+                bool defaultDontShowComparingEquipments = uiDialog != null ? uiDialog.dontShowComparingEquipments : false;
+                if (uiDialog != null)
+                    uiDialog.dontShowComparingEquipments = true;
                 selectedUI.OnClickSelect();
-                if (uiItemDialog != null)
-                    uiItemDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
+                if (uiDialog != null)
+                    uiDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
             }
         }
     }

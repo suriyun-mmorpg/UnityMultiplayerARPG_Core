@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
 
         [Header("UI Elements")]
+        public GameObject listEmptyObject;
         public UICashPackage uiCashPackageDialog;
         public UICashPackage uiCashPackagePrefab;
         public Transform uiCashPackageContainer;
@@ -145,6 +146,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     tempUiCashPackage.OnClickSelect();
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(cashPackages.Count == 0);
         }
     }
 }

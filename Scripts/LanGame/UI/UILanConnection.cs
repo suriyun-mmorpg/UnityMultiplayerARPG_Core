@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public InputField inputNetworkAddress;
 
         [Header("Discovery connection UI elements")]
+        public GameObject listEmptyObject;
         public UIDiscoveryEntry discoveryEntryPrefab;
         public Transform discoveryEntryContainer;
 
@@ -117,6 +118,8 @@ namespace MultiplayerARPG
                 entry.Data = data;
                 CacheSelectionManager.Add(entry);
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(discoveries.Count == 0);
         }
 
         public IPEndPoint GetSelectedRemoteEndPoint()

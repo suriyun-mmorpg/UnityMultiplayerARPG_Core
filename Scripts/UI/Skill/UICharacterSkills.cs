@@ -1,6 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -8,12 +9,17 @@ namespace MultiplayerARPG
     {
         public ICharacterData character { get; protected set; }
 
-        [Header("UI Elements")]
-        public UICharacterSkill uiSkillDialog;
-        public UICharacterSkill uiCharacterSkillPrefab;
         public List<string> filterCategories;
         public List<SkillType> filterSkillTypes;
-        public Transform uiCharacterSkillContainer;
+
+        [Header("UI Elements")]
+        public GameObject listEmptyObject;
+        [FormerlySerializedAs("uiSkillDialog")]
+        public UICharacterSkill uiDialog;
+        [FormerlySerializedAs("uiCharacterSkillPrefab")]
+        public UICharacterSkill uiPrefab;
+        [FormerlySerializedAs("uiCharacterSkillContainer")]
+        public Transform uiContainer;
 
         [Header("Options")]
         [Tooltip("If this is `TRUE` it won't update data when controlling character's data changes")]
@@ -37,8 +43,8 @@ namespace MultiplayerARPG
                 if (cacheSkillList == null)
                 {
                     cacheSkillList = gameObject.AddComponent<UIList>();
-                    cacheSkillList.uiPrefab = uiCharacterSkillPrefab.gameObject;
-                    cacheSkillList.uiContainer = uiCharacterSkillContainer;
+                    cacheSkillList.uiPrefab = uiPrefab.gameObject;
+                    cacheSkillList.uiContainer = uiContainer;
                 }
                 return cacheSkillList;
             }
@@ -62,16 +68,16 @@ namespace MultiplayerARPG
             CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
             CacheSkillSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSkill);
             CacheSkillSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSkill);
-            if (uiSkillDialog != null)
-                uiSkillDialog.onHide.AddListener(OnSkillDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.AddListener(OnSkillDialogHide);
             UpdateOwningCharacterData();
             RegisterOwningCharacterEvents();
         }
 
         protected virtual void OnDisable()
         {
-            if (uiSkillDialog != null)
-                uiSkillDialog.onHide.RemoveListener(OnSkillDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.RemoveListener(OnSkillDialogHide);
             CacheSkillSelectionManager.DeselectSelectedUI();
             UnregisterOwningCharacterEvents();
         }
@@ -135,21 +141,21 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterSkill(UICharacterSkill ui)
         {
-            if (uiSkillDialog != null)
+            if (uiDialog != null)
             {
-                uiSkillDialog.selectionManager = CacheSkillSelectionManager;
-                uiSkillDialog.Setup(ui.Data, character, ui.IndexOfData);
-                uiSkillDialog.Show();
+                uiDialog.selectionManager = CacheSkillSelectionManager;
+                uiDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiDialog.Show();
             }
         }
 
         protected void OnDeselectCharacterSkill(UICharacterSkill ui)
         {
-            if (uiSkillDialog != null)
+            if (uiDialog != null)
             {
-                uiSkillDialog.onHide.RemoveListener(OnSkillDialogHide);
-                uiSkillDialog.Hide();
-                uiSkillDialog.onHide.AddListener(OnSkillDialogHide);
+                uiDialog.onHide.RemoveListener(OnSkillDialogHide);
+                uiDialog.Hide();
+                uiDialog.onHide.AddListener(OnSkillDialogHide);
             }
         }
 
@@ -157,59 +163,63 @@ namespace MultiplayerARPG
         {
             this.character = character;
             int selectedSkillId = CacheSkillSelectionManager.SelectedUI != null ? CacheSkillSelectionManager.SelectedUI.Skill.DataId : 0;
-            CacheSkillSelectionManager.DeselectSelectedUI();
             CacheSkillSelectionManager.Clear();
 
-            if (character == null)
+            if (character == null || character.GetDatabase() == null)
             {
+                if (uiDialog != null)
+                    uiDialog.Hide();
                 CacheSkillList.HideAll();
+                if (listEmptyObject != null)
+                    listEmptyObject.SetActive(false);
                 return;
             }
 
-            BaseCharacter database = character.GetDatabase();
-            if (database != null)
+            int showingCount = 0;
+            UICharacterSkill tempUI;
+            CharacterSkill tempCharacterSkill;
+            BaseSkill tempSkill;
+            int tempIndexOfSkill;
+            // Combine skills from database (skill that can level up) with increased skill and equipment skill
+            CacheSkillList.Generate(character.GetCaches().Skills, (index, skillLevel, ui) =>
             {
-                // Generate UIs
-                UICharacterSkill tempUiCharacterSkill;
-                CharacterSkill tempCharacterSkill;
-                BaseSkill tempSkill;
-                int tempIndexOfSkill;
-                // Combine skills from database (skill that can level up) with increased skill and equipment skill
-                CacheSkillList.Generate(character.GetCaches().Skills, (index, skillLevel, ui) =>
+                tempUI = ui.GetComponent<UICharacterSkill>();
+                if (string.IsNullOrEmpty(skillLevel.Key.category) ||
+                    filterCategories == null || filterCategories.Count == 0 ||
+                    filterCategories.Contains(skillLevel.Key.category))
                 {
-                    tempUiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                    if (string.IsNullOrEmpty(skillLevel.Key.category) ||
-                        filterCategories == null || filterCategories.Count == 0 ||
-                        filterCategories.Contains(skillLevel.Key.category))
+                    if (filterSkillTypes == null || filterSkillTypes.Count == 0 ||
+                        filterSkillTypes.Contains(skillLevel.Key.SkillType))
                     {
-                        if (filterSkillTypes == null || filterSkillTypes.Count == 0 ||
-                            filterSkillTypes.Contains(skillLevel.Key.SkillType))
-                        {
-                            tempSkill = skillLevel.Key;
-                            tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
+                        tempSkill = skillLevel.Key;
+                        tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
                             // Set character skill data
                             tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
                             // Set UI data
-                            tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill), character, tempIndexOfSkill);
-                            tempUiCharacterSkill.Show();
-                            UICharacterSkillDragHandler dragHandler = tempUiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
-                            if (dragHandler != null)
-                                dragHandler.SetupForSkills(tempUiCharacterSkill);
-                            CacheSkillSelectionManager.Add(tempUiCharacterSkill);
-                            if (selectedSkillId == skillLevel.Key.DataId)
-                                tempUiCharacterSkill.OnClickSelect();
-                        }
-                        else
-                        {
-                            tempUiCharacterSkill.Hide();
-                        }
+                            tempUI.Setup(new UICharacterSkillData(tempCharacterSkill), character, tempIndexOfSkill);
+                        tempUI.Show();
+                        UICharacterSkillDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterSkillDragHandler>();
+                        if (dragHandler != null)
+                            dragHandler.SetupForSkills(tempUI);
+                        CacheSkillSelectionManager.Add(tempUI);
+                        if (selectedSkillId == skillLevel.Key.DataId)
+                            tempUI.OnClickSelect();
+                        showingCount++;
                     }
                     else
                     {
-                        tempUiCharacterSkill.Hide();
+                            // Hide because skill's type not matches in the filter list
+                            tempUI.Hide();
                     }
-                });
-            }
+                }
+                else
+                {
+                        // Hide because skill's category not matches in the filter list
+                        tempUI.Hide();
+                }
+            });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(showingCount == 0);
         }
     }
 }

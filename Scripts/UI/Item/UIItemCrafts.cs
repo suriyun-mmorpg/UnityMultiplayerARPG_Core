@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public partial class UIItemCrafts : UIBase
     {
+        [Header("UI Elements")]
+        public GameObject listEmptyObject;
         [FormerlySerializedAs("uiCraftItemDialog")]
         public UIItemCraft uiDialog;
         [FormerlySerializedAs("uiCraftItemPrefab")]
@@ -129,6 +131,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     tempUiCraftItem.OnClickSelect();
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(itemCrafts.Count == 0);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     public class UIMailList : UIBase
     {
         [Header("UI Elements")]
+        public GameObject listEmptyObject;
         public UIMail uiDialog;
         public UIMailListEntry uiPrefab;
         public Transform uiContainer;
@@ -108,6 +109,8 @@ namespace MultiplayerARPG
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(true);
             if (responseCode == AckResponseCode.Unimplemented ||
                 responseCode == AckResponseCode.Timeout)
                 return;
@@ -121,6 +124,8 @@ namespace MultiplayerARPG
                 if (selectedId == mailListEntry.Id)
                     tempUi.OnClickSelect();
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(response.mails.Length == 0);
         }
     }
 }

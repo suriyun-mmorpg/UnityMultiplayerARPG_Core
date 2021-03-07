@@ -1,11 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
     public class UIFriend : UISocialGroup<UISocialCharacter>
     {
+        public GameObject listEmptyObject;
         public UnityEvent onFriendRemoved;
 
         protected override void OnEnable()
@@ -58,6 +59,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     uiFriend.OnClickSelect();
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(friends.Length == 0);
         }
 
         public override bool CanKick(string characterId)

@@ -1,11 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
     public class UIFindCharacters : UISocialGroup<UISocialCharacter>
     {
+        public GameObject listEmptyObject;
         public InputFieldWrapper inputCharacterName;
         public UnityEvent onFriendAdded;
 
@@ -44,6 +45,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     uiFoundCharacter.OnClickSelect();
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(foundCharacters.Length == 0);
         }
 
         public override bool CanKick(string characterId)
