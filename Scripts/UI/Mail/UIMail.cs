@@ -29,6 +29,8 @@ namespace MultiplayerARPG
         public UICharacterItems uiItems;
         public TextWrapper textSentDate;
         public UIMailList uiMailList;
+        public GameObject[] readObjects;
+        public GameObject[] unreadObjects;
 
         private string mailId;
         public string MailId
@@ -173,6 +175,22 @@ namespace MultiplayerARPG
                 textSentDate.text = string.Format(
                     LanguageManager.GetText(formatSentDate),
                     dateTime.GetPrettyDate());
+            }
+
+            if (readObjects != null && readObjects.Length > 0)
+            {
+                for (int i = 0; i < readObjects.Length; ++i)
+                {
+                    readObjects[i].SetActive(mail != null && mail.IsRead);
+                }
+            }
+
+            if (unreadObjects != null && unreadObjects.Length > 0)
+            {
+                for (int i = 0; i < unreadObjects.Length; ++i)
+                {
+                    unreadObjects[i].SetActive(mail == null || !mail.IsRead);
+                }
             }
         }
     }
