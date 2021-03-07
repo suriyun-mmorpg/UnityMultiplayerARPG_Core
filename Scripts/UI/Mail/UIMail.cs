@@ -31,6 +31,8 @@ namespace MultiplayerARPG
         public UIMailList uiMailList;
         public GameObject[] readObjects;
         public GameObject[] unreadObjects;
+        public GameObject[] claimObjects;
+        public GameObject[] unclaimObjects;
 
         private string mailId;
         public string MailId
@@ -190,6 +192,22 @@ namespace MultiplayerARPG
                 for (int i = 0; i < unreadObjects.Length; ++i)
                 {
                     unreadObjects[i].SetActive(mail == null || !mail.IsRead);
+                }
+            }
+
+            if (claimObjects != null && claimObjects.Length > 0)
+            {
+                for (int i = 0; i < claimObjects.Length; ++i)
+                {
+                    claimObjects[i].SetActive(mail != null && mail.IsClaim);
+                }
+            }
+
+            if (unclaimObjects != null && unclaimObjects.Length > 0)
+            {
+                for (int i = 0; i < unclaimObjects.Length; ++i)
+                {
+                    unclaimObjects[i].SetActive(mail == null || !mail.IsClaim);
                 }
             }
         }
