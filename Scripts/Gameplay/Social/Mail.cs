@@ -24,6 +24,11 @@ namespace MultiplayerARPG
         public int DeleteTimestamp { get; set; }
         public int SentTimestamp { get; set; }
 
+        public bool HasItemsToClaim()
+        {
+            return Gold != 0 || Currencies.Count > 0 || Items.Count > 0;
+        }
+
         public Dictionary<int, int> ReadCurrencies(string currencies)
         {
             Currencies.Clear();

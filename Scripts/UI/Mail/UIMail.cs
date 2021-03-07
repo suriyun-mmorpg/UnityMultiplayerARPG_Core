@@ -125,6 +125,7 @@ namespace MultiplayerARPG
                 textGold.text = string.Format(
                     LanguageManager.GetText(formatGold),
                     mail == null ? "0" : mail.Gold.ToString("N0"));
+                textGold.gameObject.SetActive(mail != null && mail.Gold != 0);
             }
 
             if (uiCurrencies != null)
@@ -199,7 +200,7 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < claimObjects.Length; ++i)
                 {
-                    claimObjects[i].SetActive(mail != null && mail.IsClaim);
+                    claimObjects[i].SetActive(mail != null && mail.HasItemsToClaim() && mail.IsClaim);
                 }
             }
 
@@ -207,7 +208,7 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < unclaimObjects.Length; ++i)
                 {
-                    unclaimObjects[i].SetActive(mail == null || !mail.IsClaim);
+                    unclaimObjects[i].SetActive(mail != null && mail.HasItemsToClaim() && !mail.IsClaim);
                 }
             }
         }
