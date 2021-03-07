@@ -18,8 +18,6 @@ namespace MultiplayerARPG
         public TextWrapper textSentDate;
         public GameObject[] readObjects;
         public GameObject[] unreadObjects;
-        public GameObject[] claimObjects;
-        public GameObject[] unclaimObjects;
 
         protected override void UpdateData()
         {
@@ -60,22 +58,6 @@ namespace MultiplayerARPG
                 for (int i = 0; i < unreadObjects.Length; ++i)
                 {
                     unreadObjects[i].SetActive(Data == null || !Data.IsRead);
-                }
-            }
-
-            if (claimObjects != null && claimObjects.Length > 0)
-            {
-                for (int i = 0; i < claimObjects.Length; ++i)
-                {
-                    claimObjects[i].SetActive(Data != null && Data.IsClaim);
-                }
-            }
-
-            if (unclaimObjects != null && unclaimObjects.Length > 0)
-            {
-                for (int i = 0; i < unclaimObjects.Length; ++i)
-                {
-                    unclaimObjects[i].SetActive(Data == null || !Data.IsClaim);
                 }
             }
         }
