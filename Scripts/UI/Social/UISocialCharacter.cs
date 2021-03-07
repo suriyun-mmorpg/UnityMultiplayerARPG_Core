@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
@@ -28,6 +30,10 @@ namespace MultiplayerARPG
         [Tooltip("These objects will be activated when this social member is not leader")]
         public GameObject[] memberIsNotLeaderObjects;
         public UICharacterClass uiCharacterClass;
+
+        [Header("Events")]
+        public UnityEvent onFriendAdded;
+        public UnityEvent onFriendRemoved;
 
         protected override void Update()
         {
@@ -106,6 +112,42 @@ namespace MultiplayerARPG
             GameInstance.PlayerCharacters.TryGetValue(Data.socialCharacter.dataId, out character);
             if (uiCharacterClass != null)
                 uiCharacterClass.Data = character;
+        }
+
+        public void OnClickAddFriend()
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), Data.socialCharacter.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
+                {
+                    friendId = Data.socialCharacter.id,
+                }, AddFriendCallback);
+            });
+        }
+
+        public void AddFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
+        {
+            ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response).Forget();
+            if (responseCode == AckResponseCode.Success)
+                onFriendAdded.Invoke();
+        }
+
+        public void OnClickRemoveFriend()
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.socialCharacter.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
+                {
+                    friendId = Data.socialCharacter.id,
+                }, RemoveFriendCallback);
+            });
+        }
+
+        private void RemoveFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseRemoveFriendMessage response)
+        {
+            ClientFriendActions.ResponseRemoveFriend(responseHandler, responseCode, response).Forget();
+            if (responseCode == AckResponseCode.Success)
+                onFriendRemoved.Invoke();
         }
     }
 }
