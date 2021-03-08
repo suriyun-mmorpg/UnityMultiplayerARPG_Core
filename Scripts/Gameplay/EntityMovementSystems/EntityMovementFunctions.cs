@@ -81,7 +81,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Teleport, (writer) =>
+            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Teleport, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector3(position);
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.StopMove, (writer) =>
+            movement.Entity.ClientSendPacket(DeliveryMethod.ReliableUnordered, GameNetworkingConsts.StopMove, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
@@ -105,7 +105,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Jump, (writer) =>
+            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Jump, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Jump, (writer) =>
+            movement.Entity.ClientSendPacket(DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Jump, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Teleport, (writer) =>
+            movement.Entity.ServerSendPacketToSubscribers(DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Teleport, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector2(position);
