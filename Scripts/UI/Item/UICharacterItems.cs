@@ -6,6 +6,7 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterItems : UIBase
     {
+        [Header("Filter")]
         public List<string> filterCategories;
         public List<ItemType> filterItemTypes;
 
@@ -18,8 +19,6 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiCharacterItemContainer")]
         public Transform uiContainer;
         public bool isUnknowSource;
-
-        public virtual ICharacterData Character { get; set; }
 
         private UIList cacheItemList;
         public UIList CacheItemList
@@ -46,6 +45,8 @@ namespace MultiplayerARPG
                 return cacheItemSelectionManager;
             }
         }
+
+        public virtual ICharacterData Character { get; set; }
 
         private UISelectionMode dirtySelectionMode;
 

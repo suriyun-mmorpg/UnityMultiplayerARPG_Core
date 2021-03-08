@@ -7,8 +7,7 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterSkills : UIBase
     {
-        public ICharacterData character { get; protected set; }
-
+        [Header("Filter")]
         public List<string> filterCategories;
         public List<SkillType> filterSkillTypes;
 
@@ -61,6 +60,8 @@ namespace MultiplayerARPG
                 return cacheSkillSelectionManager;
             }
         }
+
+        public ICharacterData Character { get; protected set; }
 
         protected virtual void OnEnable()
         {
@@ -144,7 +145,7 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.selectionManager = CacheSkillSelectionManager;
-                uiDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiDialog.Setup(ui.Data, Character, ui.IndexOfData);
                 uiDialog.Show();
             }
         }
@@ -161,7 +162,7 @@ namespace MultiplayerARPG
 
         public void UpdateData(ICharacterData character)
         {
-            this.character = character;
+            Character = character;
             int selectedSkillId = CacheSkillSelectionManager.SelectedUI != null ? CacheSkillSelectionManager.SelectedUI.Skill.DataId : 0;
             CacheSkillSelectionManager.Clear();
 
