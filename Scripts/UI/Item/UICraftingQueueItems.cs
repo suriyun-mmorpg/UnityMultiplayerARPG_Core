@@ -48,6 +48,7 @@ namespace MultiplayerARPG
                 uiDialog.onHide.AddListener(OnItemDialogHide);
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.Crafting.QueueItems.onOperation += OnCraftingQueueItemsOperation;
+            UpdateData();
         }
 
         protected virtual void OnDisable()
