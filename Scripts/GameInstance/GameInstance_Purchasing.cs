@@ -169,9 +169,8 @@ namespace MultiplayerARPG
             return PurchaseProcessingResult.Pending;
         }
 
-        private async UniTaskVoid ResponseCashPackageBuyValidation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageBuyValidationMessage response)
+        private void ResponseCashPackageBuyValidation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageBuyValidationMessage response)
         {
-            await UniTask.Yield();
             if (responseCode == AckResponseCode.Unimplemented)
             {
                 PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString()));
