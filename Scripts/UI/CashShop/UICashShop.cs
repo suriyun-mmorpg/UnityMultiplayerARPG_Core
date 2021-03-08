@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
-using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -10,6 +9,9 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Cash Amount}")]
         public UILocaleKeySetting formatKeyCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
+
+        [Header("Filter")]
+        public List<string> filterCategories;
 
         [Header("UI Elements")]
         public GameObject listEmptyObject;
@@ -122,18 +124,31 @@ namespace MultiplayerARPG
             }
 
             int selectedIdx = CacheCashShopSelectionManager.SelectedUI != null ? CacheCashShopSelectionManager.IndexOf(CacheCashShopSelectionManager.SelectedUI) : -1;
-            CacheCashShopSelectionManager.DeselectSelectedUI();
             CacheCashShopSelectionManager.Clear();
 
+            int showingCount = 0;
+            UICashShopItem tempUI;
             CacheCashShopList.Generate(cashShopItems, (index, cashShopItem, ui) =>
             {
-                UICashShopItem uiCashShopItem = ui.GetComponent<UICashShopItem>();
-                uiCashShopItem.uiCashShop = this;
-                uiCashShopItem.Data = cashShopItem;
-                uiCashShopItem.Show();
-                CacheCashShopSelectionManager.Add(uiCashShopItem);
-                if (selectedIdx == index)
-                    uiCashShopItem.OnClickSelect();
+                tempUI = ui.GetComponent<UICashShopItem>();
+                if (cashShopItem == null ||
+                    string.IsNullOrEmpty(cashShopItem.category) ||
+                    filterCategories == null || filterCategories.Count == 0 ||
+                    filterCategories.Contains(cashShopItem.category))
+                {
+                    tempUI.uiCashShop = this;
+                    tempUI.Data = cashShopItem;
+                    tempUI.Show();
+                    CacheCashShopSelectionManager.Add(tempUI);
+                    if (selectedIdx == index)
+                        tempUI.OnClickSelect();
+                    showingCount++;
+                }
+                else
+                {
+                    // Hide because item's category not matches in the filter list
+                    tempUI.Hide();
+                }
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(cashShopItems.Count == 0);
