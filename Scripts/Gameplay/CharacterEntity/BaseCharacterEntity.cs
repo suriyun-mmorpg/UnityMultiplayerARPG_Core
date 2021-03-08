@@ -433,11 +433,14 @@ namespace MultiplayerARPG
             int rewardedGold;
             CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType, out rewardedGold);
             GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, rewardedGold);
-            foreach (CurrencyAmount currency in reward.currencies)
+            if (reward.currencies != null && reward.currencies.Length > 0)
             {
-                if (currency.currency == null || currency.amount == 0)
-                    continue;
-                GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, currency.currency.DataId, currency.amount);
+                foreach (CurrencyAmount currency in reward.currencies)
+                {
+                    if (currency.currency == null || currency.amount == 0)
+                        continue;
+                    GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, currency.currency.DataId, currency.amount);
+                }
             }
         }
         #endregion
