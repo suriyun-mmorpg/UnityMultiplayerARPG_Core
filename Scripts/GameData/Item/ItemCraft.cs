@@ -76,6 +76,9 @@ namespace MultiplayerARPG
         {
             if (character.IncreaseItems(CharacterItem.Create(craftingItem, 1, Amount)))
             {
+                // Send notify reward item message to client
+                if (character is BasePlayerCharacterEntity)
+                    GameInstance.ServerGameMessageHandlers.NotifyRewardItem((character as BasePlayerCharacterEntity).ConnectionId, craftingItem.DataId, Amount);
                 // Reduce item when able to increase craft item
                 foreach (ItemAmount craftRequirement in craftRequirements)
                 {
