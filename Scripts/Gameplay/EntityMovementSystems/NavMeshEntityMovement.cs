@@ -164,22 +164,23 @@ namespace MultiplayerARPG
 
         private void SyncTransform()
         {
+            float currentTime = Time.fixedTime;
             if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
-                if (Time.unscaledTime - lastClientSyncTransform > clientSyncTransformInterval)
+                if (currentTime - lastClientSyncTransform > clientSyncTransformInterval)
                 {
                     this.ClientSendSyncTransform3D();
-                    lastClientSyncTransform = Time.unscaledTime;
+                    lastClientSyncTransform = currentTime;
                 }
             }
             if (IsServer)
             {
                 // Sync transform from server to all clients (include owner client)
-                if (Time.unscaledTime - lastServerSyncTransform > serverSyncTransformInterval)
+                if (currentTime - lastServerSyncTransform > serverSyncTransformInterval)
                 {
                     this.ServerSendSyncTransform3D();
-                    lastServerSyncTransform = Time.unscaledTime;
+                    lastServerSyncTransform = currentTime;
                 }
             }
         }
@@ -223,11 +224,8 @@ namespace MultiplayerARPG
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
-                    if (!IsOwnerClient || Entity.Manager.ServerUnixTime < timestamp)
-                    {
-                        CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-                        CacheNavMeshAgent.Warp(position);
-                    }
+                    CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                    CacheNavMeshAgent.Warp(position);
                 }
                 else if (!IsOwnerClient)
                 {
