@@ -13,19 +13,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Activity functions
-        public virtual void RespawnCharacter(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            string respawnMapName = playerCharacterEntity.RespawnMapName;
-            Vector3 respawnPosition = playerCharacterEntity.RespawnPosition;
-            if (CurrentMapInfo != null)
-            {
-                CurrentMapInfo.GetRespawnPoint(playerCharacterEntity, out respawnMapName, out respawnPosition);
-            }
-            WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition, false, Vector3.zero);
-        }
-        #endregion
-
         /// <summary>
         /// Get current map Id for saving purpose
         /// </summary>
@@ -78,7 +65,7 @@ namespace MultiplayerARPG
         /// <param name="position"></param>
         /// <param name="overrideRotation"></param>
         /// <param name="rotation"></param>
-        protected abstract void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
+        public abstract void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
 
         /// <summary>
         /// Warp character to instance map
@@ -88,7 +75,7 @@ namespace MultiplayerARPG
         /// <param name="position"></param>
         /// <param name="overrideRotation"></param>
         /// <param name="rotation"></param>
-        protected abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
+        public abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
 
         /// <summary>
         /// Check if this game network manager is for instance map or not

@@ -46,6 +46,8 @@ namespace MultiplayerARPG
         [Range(0.00825f, 0.1f)]
         public float clientSyncTransformInterval = 0.05f;
         [Range(0.00825f, 0.1f)]
+        public float clientSendInputsInterval = 0.05f;
+        [Range(0.00825f, 0.1f)]
         public float serverSyncTransformInterval = 0.05f;
 
         public Animator CacheAnimator { get; private set; }
@@ -85,6 +87,7 @@ namespace MultiplayerARPG
         private bool sendingJump;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
+        private float lastClientSendInputs;
 
         // Optimize garbage collector
         private MovementState tempMovementState;
@@ -212,7 +215,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendKeyMovement3D(moveDirection, movementState);
+                //this.ClientSendKeyMovement3D(moveDirection, movementState);
             }
             if (this.CanPredictMovement())
             {
@@ -233,7 +236,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendPointClickMovement3D(position);
+                //this.ClientSendPointClickMovement3D(position);
             }
             if (this.CanPredictMovement())
             {
@@ -250,7 +253,7 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendSetLookRotation3D(rotation);
+                //this.ClientSendSetLookRotation3D(rotation);
             }
             if (this.CanPredictMovement())
             {
@@ -339,6 +342,13 @@ namespace MultiplayerARPG
                         sendingJump = false;
                     }
                     lastClientSyncTransform = currentTime;
+                }
+            }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
+            {
+                if (currentTime - lastClientSendInputs > clientSendInputsInterval)
+                {
+                    clientSendInputsInterval = currentTime;
                 }
             }
             if (IsServer)

@@ -1,5 +1,4 @@
-﻿using LiteNetLibManager;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -92,14 +91,6 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return false;
             RPC(ServerUseGuildSkill, dataId);
-            return true;
-        }
-
-        public bool CallServerRespawn()
-        {
-            if (!this.IsDead())
-                return false;
-            RPC(ServerRespawn);
             return true;
         }
 

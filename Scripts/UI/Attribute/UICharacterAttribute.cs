@@ -72,7 +72,7 @@ namespace MultiplayerARPG
             GameInstance.ClientCharacterHandlers.RequestIncreaseAttributeAmount(new RequestIncreaseAttributeAmountMessage()
             {
                 dataId = Attribute.DataId
-            }, ClientCharacterActions.ResponseIncreaseCharacterAttributeAmount);
+            }, ClientCharacterActions.ResponseIncreaseAttributeAmount);
         }
     }
 }

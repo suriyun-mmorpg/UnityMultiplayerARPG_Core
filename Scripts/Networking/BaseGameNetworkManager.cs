@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         // Server Handlers
         protected IServerUserHandlers ServerUserHandlers { get; set; }
         protected IServerBuildingHandlers ServerBuildingHandlers { get; set; }
-        protected IServerOnlineCharacterHandlers ServerOnlineCharacterHandlers { get; set; }
+        protected IServerCharacterHandlers ServerCharacterHandlers { get; set; }
         protected IServerGameMessageHandlers ServerGameMessageHandlers { get; set; }
         protected IServerStorageHandlers ServerStorageHandlers { get; set; }
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
@@ -146,9 +146,9 @@ namespace MultiplayerARPG
             RegisterServerMessage(GameNetworkingConsts.SyncTransform, HandleSyncTransformAtServer);
             RegisterServerMessage(GameNetworkingConsts.StopMove, HandleStopMoveAtServer);
             RegisterServerMessage(GameNetworkingConsts.Jump, HandleJumpAtServer);
-            if (ServerOnlineCharacterHandlers != null)
+            if (ServerCharacterHandlers != null)
             {
-                RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerOnlineCharacterHandlers.HandleRequestOnlineCharacter);
+                RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerCharacterHandlers.HandleRequestOnlineCharacter);
             }
             // Request to server (response to client)
             // Cash shop
@@ -265,8 +265,8 @@ namespace MultiplayerARPG
                 ServerUserHandlers.ClearUsersAndPlayerCharacters();
             if (ServerBuildingHandlers != null)
                 ServerBuildingHandlers.ClearBuildings();
-            if (ServerOnlineCharacterHandlers != null)
-                ServerOnlineCharacterHandlers.ClearOnlineCharacters();
+            if (ServerCharacterHandlers != null)
+                ServerCharacterHandlers.ClearOnlineCharacters();
             if (ServerStorageHandlers != null)
                 ServerStorageHandlers.ClearStorage();
             if (ServerPartyHandlers != null)
@@ -292,7 +292,7 @@ namespace MultiplayerARPG
             GameInstance.ServerUserHandlers = ServerUserHandlers;
             GameInstance.ServerBuildingHandlers = ServerBuildingHandlers;
             GameInstance.ServerGameMessageHandlers = ServerGameMessageHandlers;
-            GameInstance.ServerOnlineCharacterHandlers = ServerOnlineCharacterHandlers;
+            GameInstance.ServerCharacterHandlers = ServerCharacterHandlers;
             GameInstance.ServerStorageHandlers = ServerStorageHandlers;
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;
@@ -357,7 +357,7 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            ServerOnlineCharacterHandlers.MarkOnlineCharacter(playerCharacterEntity.Id);
+            ServerCharacterHandlers.MarkOnlineCharacter(playerCharacterEntity.Id);
         }
 
         protected virtual void UpdateOnlineCharacters()

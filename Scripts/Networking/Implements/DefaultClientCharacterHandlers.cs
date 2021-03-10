@@ -21,5 +21,10 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.IncreaseSkillLevel, data, responseDelegate: callback);
         }
+
+        public bool RequestRespawn(RequestRespawnMessage data, ResponseDelegate<ResponseRespawnMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.Respawn, data, responseDelegate: callback);
+        }
     }
 }

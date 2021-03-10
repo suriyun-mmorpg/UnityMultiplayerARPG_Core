@@ -405,7 +405,6 @@ namespace MultiplayerARPG
         {
             if (!IsServer || !this.IsDead())
                 return;
-            CurrentGameInstance.GameplayRule.OnCharacterRespawn(this);
             lastGrounded = true;
             lastGroundedPosition = CacheTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;

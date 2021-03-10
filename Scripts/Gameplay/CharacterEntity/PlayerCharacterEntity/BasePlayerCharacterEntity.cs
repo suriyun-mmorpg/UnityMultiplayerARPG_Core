@@ -88,14 +88,6 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override void Respawn()
-        {
-            if (!IsServer || !this.IsDead())
-                return;
-            base.Respawn();
-            CurrentGameManager.RespawnCharacter(this);
-        }
-
         public override void Killed(EntityInfo lastAttacker)
         {
             // Dead time

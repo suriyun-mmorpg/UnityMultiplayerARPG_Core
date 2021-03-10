@@ -97,5 +97,7 @@
         public const ushort Jump = 170;
         // New notify type
         public const ushort NotifyRewardCurrency = 171;
+        // 1.63c
+        public const ushort Respawn = 172;
     }
 }

@@ -438,7 +438,7 @@ namespace MultiplayerARPG
             GameInstance.ClientCharacterHandlers.RequestIncreaseSkillLevel(new RequestIncreaseSkillLevelMessage()
             {
                 dataId = Skill.DataId
-            }, ClientCharacterActions.ResponseIncreaseCharacterSkillLevel);
+            }, ClientCharacterActions.ResponseIncreaseSkillLevel);
         }
     }
 }

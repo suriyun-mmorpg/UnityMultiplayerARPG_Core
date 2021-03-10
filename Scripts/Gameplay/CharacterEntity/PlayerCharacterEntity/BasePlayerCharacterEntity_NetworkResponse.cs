@@ -37,14 +37,6 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerRespawn()
-        {
-#if !CLIENT_BUILD
-            Respawn();
-#endif
-        }
-
-        [ServerRpc]
         protected void ServerAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
         {
 #if !CLIENT_BUILD

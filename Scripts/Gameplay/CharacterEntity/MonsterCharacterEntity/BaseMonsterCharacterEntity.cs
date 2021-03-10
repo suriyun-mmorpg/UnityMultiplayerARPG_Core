@@ -552,7 +552,6 @@ namespace MultiplayerARPG
         {
             if (!IsServer || !this.IsDead())
                 return;
-
             base.Respawn();
             StopMove();
             Teleport(SpawnPosition, Quaternion.LookRotation(-MovementTransform.forward));

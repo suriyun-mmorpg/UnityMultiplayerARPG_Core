@@ -55,5 +55,27 @@ namespace MultiplayerARPG
             result.Invoke(AckResponseCode.Success, new ResponseIncreaseSkillLevelMessage());
             await UniTask.Yield();
         }
+
+        public async UniTaskVoid HandleRequestRespawn(RequestHandlerData requestHandler, RequestRespawnMessage request, RequestProceedResultDelegate<ResponseRespawnMessage> result)
+        {
+            BasePlayerCharacterEntity playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseRespawnMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
+            playerCharacter.Respawn();
+            string respawnMapName = playerCharacter.RespawnMapName;
+            Vector3 respawnPosition = playerCharacter.RespawnPosition;
+            if (BaseGameNetworkManager.CurrentMapInfo != null)
+                BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacter, out respawnMapName, out respawnPosition);
+            BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacter, respawnMapName, respawnPosition, false, Vector3.zero);
+            result.Invoke(AckResponseCode.Success, new ResponseRespawnMessage());
+            await UniTask.Yield();
+        }
     }
 }

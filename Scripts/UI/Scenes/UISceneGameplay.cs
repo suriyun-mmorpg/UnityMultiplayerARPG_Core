@@ -313,7 +313,10 @@ namespace MultiplayerARPG
 
         public void OnClickRespawn()
         {
-            GameInstance.PlayingCharacterEntity.CallServerRespawn();
+            GameInstance.ClientCharacterHandlers.RequestRespawn(new RequestRespawnMessage()
+            {
+                option = 0,
+            }, ClientCharacterActions.ResponseRespawn);
         }
 
         public void OnClickExit()

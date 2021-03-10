@@ -12,5 +12,9 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestIncreaseSkillLevel(
             RequestHandlerData requestHandler, RequestIncreaseSkillLevelMessage request,
             RequestProceedResultDelegate<ResponseIncreaseSkillLevelMessage> result);
+
+        UniTaskVoid HandleRequestRespawn(
+            RequestHandlerData requestHandler, RequestRespawnMessage request,
+            RequestProceedResultDelegate<ResponseRespawnMessage> result);
     }
 }

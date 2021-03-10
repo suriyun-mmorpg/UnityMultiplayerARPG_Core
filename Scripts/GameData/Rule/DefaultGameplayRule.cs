@@ -463,7 +463,7 @@ namespace MultiplayerARPG
                 return 0f;
         }
 
-        public override void OnCharacterRespawn(BaseCharacterEntity character)
+        public override void OnCharacterRespawn(ICharacterData character)
         {
             character.CurrentHp = character.GetCaches().MaxHp;
             character.CurrentMp = character.GetCaches().MaxMp;
