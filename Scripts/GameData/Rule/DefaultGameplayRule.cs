@@ -722,8 +722,9 @@ namespace MultiplayerARPG
             if (!character.Manager.Assets.TryGetSpawnedObject(objectId, out interactingEntity))
                 return false;
             // This function will sort: near to far, so loop from 0
-            float dist = Vector3.Distance(character.MeleeDamageTransform.position, interactingEntity.transform.position);
-            int count = character.FindPhysicFunctions.Raycast(character.MeleeDamageTransform.position, character.CacheTransform.forward, dist, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
+            float dist = Vector3.Distance(character.CacheTransform.position, interactingEntity.CacheTransform.position);
+            Vector3 dir = (interactingEntity.CacheTransform.position - character.CacheTransform.position).normalized;
+            int count = character.FindPhysicFunctions.Raycast(character.MeleeDamageTransform.position, dir, dist, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
             IGameEntity gameEntity;
             for (int i = 0; i < count; ++i)
             {
