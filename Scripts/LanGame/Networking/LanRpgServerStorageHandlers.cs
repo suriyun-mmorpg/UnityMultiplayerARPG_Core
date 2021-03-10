@@ -28,7 +28,9 @@ namespace MultiplayerARPG
             uint storageObjectId;
             Storage storage = GetStorage(storageId, out storageObjectId);
             GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(connectionId, storageId.storageType, storageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, GetStorageItems(storageId));
+            List<CharacterItem> storageItems = GetStorageItems(storageId);
+            storageItems.FillEmptySlots(storage.slotLimit > 0, storage.slotLimit);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, storageItems);
             await UniTask.Yield();
         }
 
