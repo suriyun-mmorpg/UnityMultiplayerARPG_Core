@@ -44,6 +44,7 @@ namespace MultiplayerARPG
             info.AddValue("respawnMapName", data.RespawnMapName);
             info.AddValue("respawnPosition", data.RespawnPosition);
             info.AddValue("mountDataId", data.MountDataId);
+            info.AddValue("lastDeadTime", data.LastDeadTime);
             info.AddValue("lastUpdate", data.LastUpdate);
             info.AddListValue("hotkeys", data.Hotkeys);
             info.AddListValue("quests", data.Quests);
@@ -115,6 +116,12 @@ namespace MultiplayerARPG
             try
             {
                 data.MountDataId = info.GetInt32("mountDataId");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.LastDeadTime = info.GetInt32("lastDeadTime");
             }
             catch { }
             data.LastUpdate = info.GetInt32("lastUpdate");
