@@ -401,9 +401,9 @@ namespace MultiplayerARPG
             CallAllOnDead();
         }
 
-        public virtual void Respawn()
+        public virtual void OnRespawn()
         {
-            if (!IsServer || !this.IsDead())
+            if (!IsServer)
                 return;
             lastGrounded = true;
             lastGroundedPosition = CacheTransform.position;

@@ -45,5 +45,25 @@ namespace MultiplayerARPG
         {
             OnlineCharacterIds.Clear();
         }
+
+        public void Respawn(int option, IPlayerCharacterData playerCharacter)
+        {
+            GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
+            string respawnMapName = playerCharacter.RespawnMapName;
+            Vector3 respawnPosition = playerCharacter.RespawnPosition;
+            if (BaseGameNetworkManager.CurrentMapInfo != null)
+                BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacter, out respawnMapName, out respawnPosition);
+            if (playerCharacter is BasePlayerCharacterEntity)
+            {
+                BasePlayerCharacterEntity entity = playerCharacter as BasePlayerCharacterEntity;
+                BaseGameNetworkManager.Singleton.WarpCharacter(entity, respawnMapName, respawnPosition, false, Vector3.zero);
+                entity.OnRespawn();
+            }
+            else
+            {
+                playerCharacter.CurrentMapName = respawnMapName;
+                playerCharacter.CurrentPosition = respawnPosition;
+            }
+        }
     }
 }

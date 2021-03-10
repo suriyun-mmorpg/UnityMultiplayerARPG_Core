@@ -165,6 +165,7 @@ namespace MultiplayerARPG
         UI_ERROR_NOT_ENOUGH_HP,
         UI_ERROR_NOT_ENOUGH_MP,
         UI_ERROR_NOT_ENOUGH_STAMINA,
+        UI_ERROR_NOT_DEAD,
         // Skills
         UI_ERROR_SKILL_LEVEL_IS_ZERO,
         UI_ERROR_CANNOT_USE_SKILL_WITHOUT_SHIELD,
@@ -1200,6 +1201,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_HP.ToString(), "Not enough Hp");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_MP.ToString(), "Not enough Mp");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_STAMINA.ToString(), "Not enough Stamina");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_DEAD.ToString(), "Cannot respawn");
             // Error - Skill
             Texts.Add(UITextKeys.UI_ERROR_SKILL_LEVEL_IS_ZERO.ToString(), "Skill not trained yet");
             Texts.Add(UITextKeys.UI_ERROR_CANNOT_USE_SKILL_WITHOUT_SHIELD.ToString(), "Cannot use skill without shield");

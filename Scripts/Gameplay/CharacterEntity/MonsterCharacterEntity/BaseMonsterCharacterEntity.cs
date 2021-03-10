@@ -548,15 +548,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void Respawn()
-        {
-            if (!IsServer || !this.IsDead())
-                return;
-            base.Respawn();
-            StopMove();
-            Teleport(SpawnPosition, Quaternion.LookRotation(-MovementTransform.forward));
-        }
-
         public virtual void DestroyAndRespawn()
         {
             if (!IsServer)

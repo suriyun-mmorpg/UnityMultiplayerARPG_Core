@@ -110,7 +110,7 @@ namespace MultiplayerARPG
 
 #if !CLIENT_BUILD
             if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
-                Respawn();
+                GameInstance.ServerCharacterHandlers.Respawn(0, this);
 #endif
         }
 

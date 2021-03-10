@@ -58,7 +58,7 @@ namespace MultiplayerARPG
 
         public async UniTaskVoid HandleRequestRespawn(RequestHandlerData requestHandler, RequestRespawnMessage request, RequestProceedResultDelegate<ResponseRespawnMessage> result)
         {
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRespawnMessage()
@@ -67,13 +67,15 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
-            playerCharacter.Respawn();
-            string respawnMapName = playerCharacter.RespawnMapName;
-            Vector3 respawnPosition = playerCharacter.RespawnPosition;
-            if (BaseGameNetworkManager.CurrentMapInfo != null)
-                BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacter, out respawnMapName, out respawnPosition);
-            BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacter, respawnMapName, respawnPosition, false, Vector3.zero);
+            if (playerCharacter.CurrentHp > 0)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseRespawnMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_DEAD,
+                });
+                return;
+            }
+            GameInstance.ServerCharacterHandlers.Respawn(request.option, playerCharacter);
             result.Invoke(AckResponseCode.Success, new ResponseRespawnMessage());
             await UniTask.Yield();
         }
