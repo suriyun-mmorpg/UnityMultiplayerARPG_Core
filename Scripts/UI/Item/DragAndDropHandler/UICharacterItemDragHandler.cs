@@ -1,4 +1,5 @@
-﻿using UnityEngine.EventSystems;
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
@@ -12,6 +13,9 @@ namespace MultiplayerARPG
             Hotkey,
             Unknow = 254,
         }
+
+        [Tooltip("If this is `TRUE`, it have to be dropped on drop handler to proceed activities")]
+        public bool requireDropArea;
 
         public SourceLocation sourceLocation { get; protected set; }
         // Non Equip / Equip items data
@@ -93,9 +97,11 @@ namespace MultiplayerARPG
             base.OnEndDrag(eventData);
             if (isDropped || !CanDrag)
                 return;
-            if (sourceLocation == SourceLocation.NonEquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject == null || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
+            if (requireDropArea)
+                return;
+            if (sourceLocation == SourceLocation.NonEquipItems)
                 uiCharacterItem.OnClickDrop();
-            if (sourceLocation == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
+            if (sourceLocation == SourceLocation.EquipItems)
                 uiCharacterItem.OnClickUnEquip();
             if (sourceLocation == SourceLocation.StorageItems)
                 uiCharacterItem.OnClickMoveFromStorage();

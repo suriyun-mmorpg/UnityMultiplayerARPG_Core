@@ -1,4 +1,5 @@
-﻿using UnityEngine.EventSystems;
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
@@ -9,6 +10,9 @@ namespace MultiplayerARPG
             Skills,
             Hotkey,
         }
+
+        [Tooltip("If this is `TRUE`, it have to be dropped on drop handler to proceed activities")]
+        public bool requireDropArea;
 
         public SourceLocation sourceLocation { get; protected set; }
         // Skills data
@@ -69,6 +73,8 @@ namespace MultiplayerARPG
             }
             base.OnEndDrag(eventData);
             if (isDropped || !CanDrag)
+                return;
+            if (requireDropArea)
                 return;
             if (sourceLocation == SourceLocation.Hotkey)
                 GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
