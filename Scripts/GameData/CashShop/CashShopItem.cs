@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -9,8 +8,15 @@ namespace MultiplayerARPG
     {
         [Header("Cash Shop Item Configs")]
         public string externalIconUrl;
-        public int sellPrice;
+        [FormerlySerializedAs("sellPrice")]
+        [Tooltip("Required user's cash")]
+        public int sellPriceCash;
+        [Tooltip("Required is user's gold, not character's gold")]
+        public int sellPriceGold;
+        [Tooltip("Gold which character will receives")]
         public int receiveGold;
+        [ArrayElementTitle("currency")]
+        public CurrencyAmount[] receiveCurrencies;
         [ArrayElementTitle("item")]
         public ItemAmount[] receiveItems;
     }

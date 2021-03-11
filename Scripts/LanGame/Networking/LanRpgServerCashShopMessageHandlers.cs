@@ -47,7 +47,8 @@ namespace MultiplayerARPG
             // Set response data
             UITextKeys message = UITextKeys.NONE;
             int dataId = request.dataId;
-            int cash = 0;
+            int userCash = 0;
+            int userGold = 0;
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -57,17 +58,23 @@ namespace MultiplayerARPG
             else
             {
                 // Get user cash amount
-                cash = playerCharacter.UserCash;
+                userCash = playerCharacter.UserCash;
+                userGold = playerCharacter.UserGold;
                 CashShopItem cashShopItem;
                 if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
                 {
                     // Cannot find item
                     message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
                 }
-                else if (cash < cashShopItem.sellPrice)
+                else if (userCash < cashShopItem.sellPriceCash)
                 {
                     // Not enough cash
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH;
+                }
+                else if (userGold < cashShopItem.sellPriceGold)
+                {
+                    // Not enough gold
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 }
                 else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.receiveItems))
                 {
@@ -77,17 +84,25 @@ namespace MultiplayerARPG
                 else
                 {
                     // Decrease cash amount
-                    cash -= cashShopItem.sellPrice;
-                    playerCharacter.UserCash = cash;
+                    userCash -= cashShopItem.sellPriceCash;
+                    playerCharacter.UserCash = userCash;
+                    // Decrease gold amount
+                    userGold -= cashShopItem.sellPriceGold;
+                    playerCharacter.UserGold = userGold;
                     // Increase character gold
                     playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.receiveGold);
-                    // Increase character item
-                    foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
+                    // Increase currencies
+                    playerCharacter.IncreaseCurrencies(cashShopItem.receiveCurrencies);
+                    // Increase character items
+                    if (cashShopItem.receiveItems != null && cashShopItem.receiveItems.Length > 0)
                     {
-                        if (receiveItem.item == null || receiveItem.amount <= 0) continue;
-                        playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
+                        foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
+                        {
+                            if (receiveItem.item == null || receiveItem.amount <= 0) continue;
+                            playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
+                        }
+                        playerCharacter.FillEmptySlots();
                     }
-                    playerCharacter.FillEmptySlots();
                 }
             }
             // Send response message
@@ -97,7 +112,8 @@ namespace MultiplayerARPG
                 {
                     message = message,
                     dataId = dataId,
-                    cash = cash,
+                    userCash = userCash,
+                    userGold = userGold,
                 });
             return default;
         }

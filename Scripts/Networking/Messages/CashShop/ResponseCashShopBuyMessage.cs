@@ -6,7 +6,8 @@ namespace MultiplayerARPG
     {
         public UITextKeys message;
         public int dataId;
-        public int cash;
+        public int userCash;
+        public int userGold;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -14,7 +15,8 @@ namespace MultiplayerARPG
             if (message == UITextKeys.NONE)
             {
                 dataId = reader.GetInt();
-                cash = reader.GetInt();
+                userCash = reader.GetInt();
+                userGold = reader.GetInt();
             }
         }
 
@@ -24,7 +26,8 @@ namespace MultiplayerARPG
             if (message == UITextKeys.NONE)
             {
                 writer.Put(dataId);
-                writer.Put(cash);
+                writer.Put(userCash);
+                writer.Put(userGold);
             }
         }
     }

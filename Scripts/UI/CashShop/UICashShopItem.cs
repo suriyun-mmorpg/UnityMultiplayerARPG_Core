@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -12,8 +13,11 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Description}")]
         public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [FormerlySerializedAs("formatKeySellPrice")]
         [Tooltip("Format => {0} = {Sell Price}")]
-        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
+        public UILocaleKeySetting formatKeySellPriceCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
+        [Tooltip("Format => {0} = {Sell Price}")]
+        public UILocaleKeySetting formatKeySellPriceGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
 
         [Header("UI Elements")]
         public UICashShop uiCashShop;
@@ -21,7 +25,12 @@ namespace MultiplayerARPG
         public TextWrapper uiTextDescription;
         public Image imageIcon;
         public RawImage rawImageExternalIcon;
-        public TextWrapper uiTextSellPrice;
+        [FormerlySerializedAs("uiTextSellPrice")]
+        public TextWrapper uiTextSellPriceCash;
+        public TextWrapper uiTextSellPriceGold;
+        public TextWrapper textRecieveGold;
+        public UICharacterCurrencies uiReceiveCurrencies;
+        public UICharacterItems uiReceiveItems;
 
         protected override void UpdateData()
         {
@@ -52,11 +61,18 @@ namespace MultiplayerARPG
                     StartCoroutine(LoadExternalIcon());
             }
 
-            if (uiTextSellPrice != null)
+            if (uiTextSellPriceCash != null)
             {
-                uiTextSellPrice.text = string.Format(
-                    LanguageManager.GetText(formatKeySellPrice),
-                    Data == null ? 0.ToString("N0") : Data.sellPrice.ToString("N0"));
+                uiTextSellPriceCash.text = string.Format(
+                    LanguageManager.GetText(formatKeySellPriceCash),
+                    Data == null ? 0.ToString("N0") : Data.sellPriceCash.ToString("N0"));
+            }
+
+            if (uiTextSellPriceGold != null)
+            {
+                uiTextSellPriceGold.text = string.Format(
+                    LanguageManager.GetText(formatKeySellPriceGold),
+                    Data == null ? 0.ToString("N0") : Data.sellPriceGold.ToString("N0"));
             }
         }
 
