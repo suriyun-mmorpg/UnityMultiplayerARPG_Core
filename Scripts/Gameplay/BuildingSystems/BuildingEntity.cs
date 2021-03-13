@@ -5,9 +5,6 @@ using UnityEngine.Profiling;
 using UnityEngine.Tilemaps;
 using LiteNetLibManager;
 using UnityEngine.Events;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
