@@ -337,6 +337,7 @@ namespace MultiplayerARPG
             {
                 if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
                 {
+                    Debug.LogError("Send");
                     this.ClientSendPointClickMovement3D_2(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
                     currentInput = null;
@@ -455,7 +456,7 @@ namespace MultiplayerARPG
             // Jumping 
             if (acceptedJump || (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping))
             {
-                currentInput.SetJump();
+                currentInput = this.SetJump(currentInput);
                 sendingJump = true;
                 airborneElapsed = airborneDelay;
                 Entity.PlayJumpAnimation();
@@ -508,11 +509,11 @@ namespace MultiplayerARPG
                     tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                 tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
                 // Set inputs
-                currentInput = currentInput.SetMovementState(tempMovementState);
+                currentInput = this.SetMovementState(currentInput, tempMovementState);
                 if (HasNavPaths)
-                    currentInput = currentInput.SetPosition(tempTargetPosition);
+                    currentInput = this.SetPosition(currentInput, tempTargetPosition);
                 else
-                    currentInput = currentInput.SetPosition(tempPredictPosition);
+                    currentInput = this.SetPosition(currentInput, tempPredictPosition);
             }
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
@@ -537,7 +538,7 @@ namespace MultiplayerARPG
                         tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                     // Swim up or dive down to surface
                     tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
-                    currentInput = currentInput.SetYPosition(tempPredictPosition.y);
+                    currentInput = this.SetYPosition(currentInput, tempPredictPosition.y);
                 }
             }
             else
@@ -569,7 +570,7 @@ namespace MultiplayerARPG
 
             UpdateRotation();
             if (currentInput != null)
-                currentInput = currentInput.SetRotation(CacheTransform.rotation);
+                currentInput = this.SetRotation(currentInput, CacheTransform.rotation);
             isJumping = false;
             acceptedJump = false;
         }

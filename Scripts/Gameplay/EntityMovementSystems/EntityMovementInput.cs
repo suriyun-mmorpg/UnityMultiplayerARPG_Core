@@ -12,62 +12,71 @@ namespace MultiplayerARPG
 
     public static class EntityMovementInputExtension
     {
-        public static EntityMovementInput SetIsKeyMovement(this EntityMovementInput input, bool isKeyMovement)
+        public static EntityMovementInput InitInput(this IEntityMovementComponent entityMovement)
+        {
+            return new EntityMovementInput()
+            {
+                Position = entityMovement.Entity.CacheTransform.position,
+                Rotation = entityMovement.Entity.CacheTransform.rotation,
+            };
+        }
+
+        public static EntityMovementInput SetIsKeyMovement(this IEntityMovementComponent entityMovement, EntityMovementInput input, bool isKeyMovement)
         {
             if (input == null)
-                input = new EntityMovementInput();
+                input = entityMovement.InitInput();
             input.IsKeyMovement = isKeyMovement;
             return input;
         }
 
-        public static EntityMovementInput SetMovementState(this EntityMovementInput input, MovementState movementState)
+        public static EntityMovementInput SetMovementState(this IEntityMovementComponent entityMovement, EntityMovementInput input, MovementState movementState)
         {
             if (input == null)
-                input = new EntityMovementInput();
+                input = entityMovement.InitInput();
             bool isJump = input.MovementState.HasFlag(MovementState.IsJump);
             input.MovementState = movementState;
             if (isJump)
-                input = input.SetJump();
+                input = entityMovement.SetJump(input);
             return input;
         }
 
-        public static EntityMovementInput SetPosition(this EntityMovementInput input, Vector3 position)
+        public static EntityMovementInput SetPosition(this IEntityMovementComponent entityMovement, EntityMovementInput input, Vector3 position)
         {
             if (input == null)
-                input = new EntityMovementInput();
+                input = entityMovement.InitInput();
             input.Position = position;
             return input;
         }
 
-        public static EntityMovementInput SetYPosition(this EntityMovementInput input, float yPosition)
+        public static EntityMovementInput SetYPosition(this IEntityMovementComponent entityMovement, EntityMovementInput input, float yPosition)
         {
             if (input == null)
-                input = new EntityMovementInput();
+                input = entityMovement.InitInput();
             Vector3 position = input.Position;
             position.y = yPosition;
             input.Position = position;
             return input;
         }
 
-        public static EntityMovementInput SetRotation(this EntityMovementInput input, Quaternion rotation)
+        public static EntityMovementInput SetRotation(this IEntityMovementComponent entityMovement, EntityMovementInput input, Quaternion rotation)
         {
             if (input == null)
-                input = new EntityMovementInput();
+                input = entityMovement.InitInput();
             input.Rotation = rotation;
             return input;
         }
 
-        public static EntityMovementInput SetJump(this EntityMovementInput input)
+        public static EntityMovementInput SetJump(this IEntityMovementComponent entityMovement, EntityMovementInput input)
         {
             if (input == null)
-                input = new EntityMovementInput();
+                input = entityMovement.InitInput();
             input.MovementState = input.MovementState | MovementState.IsJump;
             return input;
         }
 
-        public static bool DifferInputEnoughToSend(this IEntityMovement entityMovement, EntityMovementInput oldInput, EntityMovementInput newInput)
+        public static bool DifferInputEnoughToSend(this IEntityMovementComponent entityMovement, EntityMovementInput oldInput, EntityMovementInput newInput)
         {
-            if (entityMovement == null || newInput == null)
+            if (newInput == null)
                 return false;
             if (oldInput == null)
                 return true;
