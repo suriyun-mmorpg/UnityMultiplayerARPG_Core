@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         public GameEffect[] weaponLaunchEffects;
         [Tooltip("These game effects must placed as this children, it will active when launch (can place muzzle sound effects here)")]
         public AudioClip[] weaponLaunchSoundEffects;
-        [Tooltip("These game effect prefabs will, it will instantiate to container when launch (can place muzzle effects here)")]
+        [Tooltip("These game effects prefabs will instantiates to container when launch (can place muzzle effects here)")]
         public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
