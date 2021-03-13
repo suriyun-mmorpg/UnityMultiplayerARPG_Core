@@ -39,6 +39,21 @@ namespace MultiplayerARPG
             });
         }
 
+        public static void ClientSendPointClickMovement3D_2(this IEntityMovement movement, bool isKeyMovement, MovementState movementState, Vector3 position, Quaternion rotation)
+        {
+            if (!movement.Entity.IsOwnerClient)
+                return;
+            movement.Entity.ClientSendPacket(DeliveryMethod.ReliableSequenced, GameNetworkingConsts.PointClickMovement, (writer) =>
+            {
+                writer.PutPackedUInt(movement.Entity.ObjectId);
+                writer.Put(isKeyMovement);
+                writer.Put((byte)movementState);
+                writer.PutVector3(position);
+                writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
+                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
+            });
+        }
+
         public static void ClientSendSetLookRotation3D(this IEntityMovement movement, Quaternion rotation)
         {
             if (!movement.Entity.IsOwnerClient)
@@ -134,6 +149,15 @@ namespace MultiplayerARPG
         public static void ReadPointClickMovementMessage3D(this NetDataReader reader, out Vector3 position, out long timestamp)
         {
             position = reader.GetVector3();
+            timestamp = reader.GetPackedLong();
+        }
+
+        public static void ReadPointClickMovementMessage3D_2(this NetDataReader reader, out bool isKeyMovement, out MovementState movementState, out Vector3 position, out float yAngle, out long timestamp)
+        {
+            isKeyMovement = reader.GetBool();
+            movementState = (MovementState)reader.GetByte();
+            position = reader.GetVector3();
+            yAngle = GetDecompressedAngle(reader.GetPackedInt());
             timestamp = reader.GetPackedLong();
         }
 
