@@ -30,7 +30,7 @@ namespace MultiplayerARPG
                     try
                     {
                         // I tried to avoid null exception but it still ocurring
-                        if (instance != null && instance.gameObject != null)
+                        if ((Object)instance != null)
                             Object.Destroy(instance.gameObject);
                     }
                     catch { }
@@ -41,7 +41,13 @@ namespace MultiplayerARPG
 
         public static void InitPool(IPoolDescriptor prefab)
         {
-            if (prefab == null || m_Pools.ContainsKey(prefab))
+            if ((Object)prefab == null)
+            {
+                Debug.LogWarning("[PoolSystem] Cannot init prefab: " + prefab);
+                return;
+            }
+
+            if (m_Pools.ContainsKey(prefab))
                 return;
 
             prefab.InitPrefab();
