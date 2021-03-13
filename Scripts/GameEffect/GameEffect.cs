@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class GameEffect : PoolDescriptor, IPoolDescriptor
+    public class GameEffect : PoolDescriptor
     {
         public string effectSocket;
         public bool isLoop;
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
         {
             if (this == null)
             {
-                Debug.LogWarning("The Game Effect is null, this should not happens " + this);
+                Debug.LogWarning("The Game Effect is null, this should not happens");
                 return;
             }
             FxCollection.InitPrefab();

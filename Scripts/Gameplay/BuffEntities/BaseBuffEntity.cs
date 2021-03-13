@@ -100,7 +100,7 @@ namespace MultiplayerARPG
         {
             if (this == null)
             {
-                Debug.LogWarning("The Base Bufff Entity is null, this should not happens " + this);
+                Debug.LogWarning("The Base Bufff Entity is null, this should not happens");
                 return;
             }
             // Prepare audio sources

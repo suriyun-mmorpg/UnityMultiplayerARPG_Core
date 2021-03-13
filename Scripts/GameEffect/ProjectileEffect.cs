@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class ProjectileEffect : PoolDescriptor, IPoolDescriptor
+    public class ProjectileEffect : PoolDescriptor
     {
         public float speed;
         public float lifeTime = 1;
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
         {
             if (this == null)
             {
-                Debug.LogWarning("The Projectile Effect is null, this should not happens " + this);
+                Debug.LogWarning("The Projectile Effect is null, this should not happens");
                 return;
             }
             FxCollection.InitPrefab();

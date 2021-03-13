@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseDamageEntity : PoolDescriptor, IPoolDescriptor
+    public abstract partial class BaseDamageEntity : PoolDescriptor
     {
         protected EntityInfo instigator;
         protected CharacterItem weapon;
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
         {
             if (this == null)
             {
-                Debug.LogWarning("The Base Damage Entity is null, this should not happens " + this);
+                Debug.LogWarning("The Base Damage Entity is null, this should not happens");
                 return;
             }
             FxCollection.InitPrefab();
