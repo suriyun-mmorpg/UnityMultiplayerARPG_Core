@@ -43,13 +43,13 @@ namespace MultiplayerARPG
                     switch (currentState)
                     {
                         case State.Default:
-                            meshRenderer.materials = defaultMaterials;
+                            meshRenderer.sharedMaterials = defaultMaterials;
                             break;
                         case State.CanBuild:
-                            meshRenderer.materials = canBuildMaterials;
+                            meshRenderer.sharedMaterials = canBuildMaterials;
                             break;
                         case State.CannotBuild:
-                            meshRenderer.materials = cannotBuildMaterials;
+                            meshRenderer.sharedMaterials = cannotBuildMaterials;
                             break;
                     }
                 }
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
 
             meshRenderer = GetComponent<MeshRenderer>();
             if (meshRenderer != null)
-                defaultMaterials = meshRenderer.materials;
+                defaultMaterials = meshRenderer.sharedMaterials;
 
             spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
