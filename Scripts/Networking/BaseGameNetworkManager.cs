@@ -140,8 +140,7 @@ namespace MultiplayerARPG
             }
             // Server messages
             RegisterServerMessage(GameNetworkingConsts.Chat, HandleChatAtServer);
-            RegisterServerMessage(GameNetworkingConsts.KeyMovement, HandleKeyMovementAtServer);
-            RegisterServerMessage(GameNetworkingConsts.PointClickMovement, HandlePointClickMovementAtServer);
+            RegisterServerMessage(GameNetworkingConsts.MovementInput, HandleMovementInputAtServer);
             RegisterServerMessage(GameNetworkingConsts.SetLookRotation, HandleSetLookRotationAtServer);
             RegisterServerMessage(GameNetworkingConsts.SyncTransform, HandleSyncTransformAtServer);
             RegisterServerMessage(GameNetworkingConsts.StopMove, HandleStopMoveAtServer);
@@ -455,20 +454,12 @@ namespace MultiplayerARPG
             ReadChatMessage(FillChatChannelId(messageHandler.ReadMessage<ChatMessage>()));
         }
 
-        protected void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
+        protected void HandleMovementInputAtServer(MessageHandlerData messageHandler)
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
             BaseGameEntity gameEntity;
             if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
-                gameEntity.Movement.HandleKeyMovementAtServer(messageHandler);
-        }
-
-        protected void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
-        {
-            uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
-                gameEntity.Movement.HandlePointClickMovementAtServer(messageHandler);
+                gameEntity.Movement.HandleMovementInputAtServer(messageHandler);
         }
 
         protected void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)

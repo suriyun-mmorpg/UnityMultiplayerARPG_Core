@@ -21,7 +21,7 @@ namespace MultiplayerARPG
             };
         }
 
-        public static EntityMovementInput SetIsKeyMovement(this IEntityMovementComponent entityMovement, EntityMovementInput input, bool isKeyMovement)
+        public static EntityMovementInput SetInputIsKeyMovement(this IEntityMovementComponent entityMovement, EntityMovementInput input, bool isKeyMovement)
         {
             if (input == null)
                 input = entityMovement.InitInput();
@@ -29,18 +29,18 @@ namespace MultiplayerARPG
             return input;
         }
 
-        public static EntityMovementInput SetMovementState(this IEntityMovementComponent entityMovement, EntityMovementInput input, MovementState movementState)
+        public static EntityMovementInput SetInputMovementState(this IEntityMovementComponent entityMovement, EntityMovementInput input, MovementState movementState)
         {
             if (input == null)
                 input = entityMovement.InitInput();
             bool isJump = input.MovementState.HasFlag(MovementState.IsJump);
             input.MovementState = movementState;
             if (isJump)
-                input = entityMovement.SetJump(input);
+                input = entityMovement.SetInputJump(input);
             return input;
         }
 
-        public static EntityMovementInput SetPosition(this IEntityMovementComponent entityMovement, EntityMovementInput input, Vector3 position)
+        public static EntityMovementInput SetInputPosition(this IEntityMovementComponent entityMovement, EntityMovementInput input, Vector3 position)
         {
             if (input == null)
                 input = entityMovement.InitInput();
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             return input;
         }
 
-        public static EntityMovementInput SetYPosition(this IEntityMovementComponent entityMovement, EntityMovementInput input, float yPosition)
+        public static EntityMovementInput SetInputYPosition(this IEntityMovementComponent entityMovement, EntityMovementInput input, float yPosition)
         {
             if (input == null)
                 input = entityMovement.InitInput();
@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             return input;
         }
 
-        public static EntityMovementInput SetRotation(this IEntityMovementComponent entityMovement, EntityMovementInput input, Quaternion rotation)
+        public static EntityMovementInput SetInputRotation(this IEntityMovementComponent entityMovement, EntityMovementInput input, Quaternion rotation)
         {
             if (input == null)
                 input = entityMovement.InitInput();
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             return input;
         }
 
-        public static EntityMovementInput SetJump(this IEntityMovementComponent entityMovement, EntityMovementInput input)
+        public static EntityMovementInput SetInputJump(this IEntityMovementComponent entityMovement, EntityMovementInput input)
         {
             if (input == null)
                 input = entityMovement.InitInput();

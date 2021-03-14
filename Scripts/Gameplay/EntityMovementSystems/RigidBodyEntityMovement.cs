@@ -337,7 +337,7 @@ namespace MultiplayerARPG
             {
                 if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
                 {
-                    this.ClientSendPointClickMovement3D_2(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
+                    this.ClientSendMovementInput3D(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
                     currentInput = null;
                     lastClientSendInputs = currentTime;
@@ -455,7 +455,7 @@ namespace MultiplayerARPG
             // Jumping 
             if (acceptedJump || (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping))
             {
-                currentInput = this.SetJump(currentInput);
+                currentInput = this.SetInputJump(currentInput);
                 sendingJump = true;
                 airborneElapsed = airborneDelay;
                 Entity.PlayJumpAnimation();
@@ -508,11 +508,11 @@ namespace MultiplayerARPG
                     tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                 tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
                 // Set inputs
-                currentInput = this.SetMovementState(currentInput, tempMovementState);
+                currentInput = this.SetInputMovementState(currentInput, tempMovementState);
                 if (HasNavPaths)
-                    currentInput = this.SetPosition(currentInput, tempTargetPosition);
+                    currentInput = this.SetInputPosition(currentInput, tempTargetPosition);
                 else
-                    currentInput = this.SetPosition(currentInput, tempPredictPosition);
+                    currentInput = this.SetInputPosition(currentInput, tempPredictPosition);
             }
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
@@ -537,7 +537,8 @@ namespace MultiplayerARPG
                         tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                     // Swim up or dive down to surface
                     tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
-                    currentInput = this.SetYPosition(currentInput, tempPredictPosition.y);
+                    if (!HasNavPaths)
+                        currentInput = this.SetInputYPosition(currentInput, tempPredictPosition.y);
                 }
             }
             else
@@ -569,7 +570,7 @@ namespace MultiplayerARPG
 
             UpdateRotation();
             if (currentInput != null)
-                currentInput = this.SetRotation(currentInput, CacheTransform.rotation);
+                currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
             isJumping = false;
             acceptedJump = false;
         }
@@ -703,37 +704,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
-        {
-            if (IsOwnerClient)
-            {
-                // Don't read and apply inputs, because it was done (this is both owner client and server)
-                return;
-            }
-            if (Entity.MovementSecure == MovementSecure.NotSecure)
-            {
-                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
-                return;
-            }
-            if (!Entity.CanMove())
-                return;
-            DirectionVector3 inputDirection;
-            MovementState movementState;
-            long timestamp;
-            messageHandler.Reader.ReadKeyMovementMessage3D(out inputDirection, out movementState, out timestamp);
-            if (acceptedPositionTimestamp < timestamp)
-            {
-                acceptedPositionTimestamp = timestamp;
-                tempInputDirection = inputDirection;
-                tempMovementState = movementState;
-                if (tempInputDirection.sqrMagnitude > 0)
-                    navPaths = null;
-                if (!isJumping && !applyingJumpForce)
-                    isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
-            }
-        }
-
-        public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
+        public void HandleMovementInputAtServer(MessageHandlerData messageHandler)
         {
             if (IsOwnerClient)
             {
@@ -752,7 +723,7 @@ namespace MultiplayerARPG
             Vector3 position;
             float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadPointClickMovementMessage3D_2(out isKeyMovement, out movementState, out position, out yAngle, out timestamp);
+            messageHandler.Reader.ReadMovementInputMessage3D(out isKeyMovement, out movementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;

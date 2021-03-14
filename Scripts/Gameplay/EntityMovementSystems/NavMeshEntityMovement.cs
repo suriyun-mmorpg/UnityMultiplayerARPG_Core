@@ -75,8 +75,8 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 SetMovePaths(CacheTransform.position + moveDirection, true);
-                currentInput = this.SetPosition(currentInput, CacheTransform.position + moveDirection);
-                currentInput = this.SetIsKeyMovement(currentInput, true);
+                currentInput = this.SetInputPosition(currentInput, CacheTransform.position + moveDirection);
+                currentInput = this.SetInputIsKeyMovement(currentInput, true);
             }
         }
 
@@ -88,8 +88,8 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 SetMovePaths(position, false);
-                currentInput = this.SetPosition(currentInput, position);
-                currentInput = this.SetIsKeyMovement(currentInput, false);
+                currentInput = this.SetInputPosition(currentInput, position);
+                currentInput = this.SetInputIsKeyMovement(currentInput, false);
             }
         }
 
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 CacheTransform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
-                currentInput = this.SetRotation(currentInput, CacheTransform.rotation);
+                currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
             }
         }
 
@@ -175,7 +175,7 @@ namespace MultiplayerARPG
             {
                 if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
                 {
-                    this.ClientSendPointClickMovement3D_2(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
+                    this.ClientSendMovementInput3D(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
                     currentInput = null;
                     lastClientSendInputs = currentTime;
@@ -270,33 +270,7 @@ namespace MultiplayerARPG
             // There is no jump for navmesh
         }
 
-        public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
-        {
-            if (IsOwnerClient)
-            {
-                // Don't read and apply inputs, because it was done (this is both owner client and server)
-                return;
-            }
-            if (Entity.MovementSecure == MovementSecure.NotSecure)
-            {
-                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
-                return;
-            }
-            if (!Entity.CanMove())
-                return;
-            DirectionVector3 inputDirection;
-            MovementState movementState;
-            long timestamp;
-            messageHandler.Reader.ReadKeyMovementMessage3D(out inputDirection, out movementState, out timestamp);
-            if (acceptedPositionTimestamp < timestamp)
-            {
-                acceptedPositionTimestamp = timestamp;
-                Vector3 position = CacheTransform.position + inputDirection;
-                SetMovePaths(position, true);
-            }
-        }
-
-        public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
+        public void HandleMovementInputAtServer(MessageHandlerData messageHandler)
         {
             if (IsOwnerClient)
             {
@@ -315,7 +289,7 @@ namespace MultiplayerARPG
             Vector3 position;
             float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadPointClickMovementMessage3D_2(out isKeyMovement, out movementState, out position, out yAngle, out timestamp);
+            messageHandler.Reader.ReadMovementInputMessage3D(out isKeyMovement, out movementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;

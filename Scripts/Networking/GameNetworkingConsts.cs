@@ -88,8 +88,7 @@
         public const ushort AcceptGuildRequest = 162;
         public const ushort DeclineGuildRequest = 163;
         // Entity movement
-        public const ushort KeyMovement = 164;
-        public const ushort PointClickMovement = 165;
+        public const ushort MovementInput = 165;
         public const ushort SetLookRotation = 166;
         public const ushort SyncTransform = 167;
         public const ushort Teleport = 168;

@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         [Range(0.00825f, 0.1f)]
         public float clientSyncTransformInterval = 0.05f;
         [Range(0.00825f, 0.1f)]
+        public float clientSendInputsInterval = 0.05f;
+        [Range(0.00825f, 0.1f)]
         public float serverSyncTransformInterval = 0.05f;
 
         public Rigidbody2D CacheRigidbody2D { get; private set; }
@@ -28,7 +30,6 @@ namespace MultiplayerARPG
         protected Vector2? currentDestination;
 
         private float tempMoveDirectionMagnitude;
-        private Vector2 tempInputDirection;
         private Vector2 tempMoveDirection;
         private Vector2 tempCurrentPosition;
         private Quaternion lookRotation;
@@ -36,6 +37,10 @@ namespace MultiplayerARPG
         private Vector3 acceptedPosition;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
+        private float lastClientSendInputs;
+
+        private EntityMovementInput oldInput;
+        private EntityMovementInput currentInput;
 
         public override void EntityAwake()
         {
@@ -81,31 +86,15 @@ namespace MultiplayerARPG
 
         public virtual void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (!Entity.CanMove())
+            if (moveDirection.sqrMagnitude <= 0.25f)
                 return;
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendKeyMovement2D(moveDirection);
-            }
-            if (this.CanPredictMovement())
-            {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                tempInputDirection = moveDirection;
-                if (tempInputDirection.sqrMagnitude > 0)
-                    currentDestination = null;
-            }
+            PointClickMovement(CacheTransform.position + moveDirection);
         }
 
         public virtual void PointClickMovement(Vector3 position)
         {
             if (!Entity.CanMove())
                 return;
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendPointClickMovement2D(position);
-            }
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
@@ -146,6 +135,7 @@ namespace MultiplayerARPG
             tempMoveDirection = Vector2.zero;
             if (currentDestination.HasValue)
             {
+                currentInput = this.SetInputPosition(currentInput, currentDestination.Value);
                 tempCurrentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
                 tempMoveDirection = (currentDestination.Value - tempCurrentPosition).normalized;
                 if (Vector2.Distance(currentDestination.Value, tempCurrentPosition) < StoppingDistance)
@@ -153,10 +143,6 @@ namespace MultiplayerARPG
             }
             if (Entity.CanMove())
             {
-                // If move by WASD keys, set move direction to input direction
-                if (tempInputDirection.magnitude > 0.5f)
-                    tempMoveDirection = tempInputDirection;
-
                 tempMoveDirectionMagnitude = tempMoveDirection.magnitude;
                 if (tempMoveDirectionMagnitude > 0f)
                 {
@@ -185,6 +171,16 @@ namespace MultiplayerARPG
                 {
                     this.ClientSendSyncTransform2D();
                     lastClientSyncTransform = currentTime;
+                }
+            }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
+            {
+                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
+                {
+                    this.ClientSendMovementInput2D(currentInput.Position);
+                    oldInput = currentInput;
+                    currentInput = null;
+                    lastClientSendInputs = currentTime;
                 }
             }
             if (IsServer)
@@ -249,33 +245,7 @@ namespace MultiplayerARPG
             // There is no jump for 2D
         }
 
-        public void HandleKeyMovementAtServer(MessageHandlerData messageHandler)
-        {
-            if (IsOwnerClient)
-            {
-                // Don't read and apply inputs, because it was done (this is both owner client and server)
-                return;
-            }
-            if (Entity.MovementSecure == MovementSecure.NotSecure)
-            {
-                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
-                return;
-            }
-            if (!Entity.CanMove())
-                return;
-            DirectionVector2 inputDirection;
-            long timestamp;
-            messageHandler.Reader.ReadKeyMovementMessage2D(out inputDirection, out timestamp);
-            if (acceptedPositionTimestamp < timestamp)
-            {
-                acceptedPositionTimestamp = timestamp;
-                tempInputDirection = inputDirection;
-                if (tempInputDirection.sqrMagnitude > 0)
-                    currentDestination = null;
-            }
-        }
-
-        public void HandlePointClickMovementAtServer(MessageHandlerData messageHandler)
+        public void HandleMovementInputAtServer(MessageHandlerData messageHandler)
         {
             if (IsOwnerClient)
             {
@@ -291,7 +261,7 @@ namespace MultiplayerARPG
                 return;
             Vector2 position;
             long timestamp;
-            messageHandler.Reader.ReadPointClickMovementMessage2D(out position, out timestamp);
+            messageHandler.Reader.ReadMovementInputMessage2D(out position, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
