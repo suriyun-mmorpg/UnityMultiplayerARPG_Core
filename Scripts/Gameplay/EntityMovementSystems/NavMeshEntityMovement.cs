@@ -17,6 +17,8 @@ namespace MultiplayerARPG
         [Range(0.00825f, 0.1f)]
         public float clientSyncTransformInterval = 0.05f;
         [Range(0.00825f, 0.1f)]
+        public float clientSendInputsInterval = 0.05f;
+        [Range(0.00825f, 0.1f)]
         public float serverSyncTransformInterval = 0.05f;
 
         public NavMeshAgent CacheNavMeshAgent { get; private set; }
@@ -29,8 +31,13 @@ namespace MultiplayerARPG
         private long acceptedPositionTimestamp;
         private long acceptedRotationTimestamp;
         private Vector3 acceptedPosition;
+        private Vector3? clientTargetPosition;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
+        private float lastClientSendInputs;
+
+        private EntityMovementInput oldInput;
+        private EntityMovementInput currentInput;
 
         public override void EntityAwake()
         {
@@ -64,15 +71,12 @@ namespace MultiplayerARPG
                 return;
             if (moveDirection.sqrMagnitude <= 0)
                 return;
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendKeyMovement3D(moveDirection, movementState);
-            }
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 SetMovePaths(CacheTransform.position + moveDirection, true);
+                currentInput = this.SetPosition(currentInput, CacheTransform.position + moveDirection);
+                currentInput = this.SetIsKeyMovement(currentInput, true);
             }
         }
 
@@ -80,15 +84,12 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendPointClickMovement3D(position);
-            }
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 SetMovePaths(position, false);
+                currentInput = this.SetPosition(currentInput, position);
+                currentInput = this.SetIsKeyMovement(currentInput, false);
             }
         }
 
@@ -115,21 +116,17 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendSetLookRotation3D(rotation);
-            }
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                CacheTransform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+                CacheTransform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
+                currentInput = this.SetRotation(currentInput, CacheTransform.rotation);
             }
         }
 
         public Quaternion GetLookRotation()
         {
-            return CacheTransform.rotation;
+            return Quaternion.Euler(0f, CacheTransform.eulerAngles.y, 0f);
         }
 
         public void Teleport(Vector3 position, Quaternion rotation)
@@ -140,7 +137,7 @@ namespace MultiplayerARPG
                 return;
             }
             this.ServerSendTeleport3D(position, rotation);
-            CacheTransform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+            CacheTransform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
             CacheNavMeshAgent.Warp(position);
         }
 
@@ -172,6 +169,16 @@ namespace MultiplayerARPG
                 {
                     this.ClientSendSyncTransform3D();
                     lastClientSyncTransform = currentTime;
+                }
+            }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
+            {
+                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
+                {
+                    this.ClientSendPointClickMovement3D_2(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
+                    oldInput = currentInput;
+                    currentInput = null;
+                    lastClientSendInputs = currentTime;
                 }
             }
             if (IsServer)
@@ -303,13 +310,17 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
+            bool isKeyMovement;
+            MovementState movementState;
             Vector3 position;
+            float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadPointClickMovementMessage3D(out position, out timestamp);
+            messageHandler.Reader.ReadPointClickMovementMessage3D_2(out isKeyMovement, out movementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
-                SetMovePaths(position, true);
+                CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                SetMovePaths(position, isKeyMovement);
             }
         }
 
