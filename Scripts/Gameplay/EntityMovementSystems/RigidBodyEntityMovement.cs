@@ -337,7 +337,6 @@ namespace MultiplayerARPG
             {
                 if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
                 {
-                    Debug.LogError("Send");
                     this.ClientSendPointClickMovement3D_2(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
                     currentInput = null;
