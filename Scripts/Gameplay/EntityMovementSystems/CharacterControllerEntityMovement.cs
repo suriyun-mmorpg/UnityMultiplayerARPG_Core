@@ -39,6 +39,8 @@ namespace MultiplayerARPG
         [Range(0.00825f, 0.1f)]
         public float clientSyncTransformInterval = 0.05f;
         [Range(0.00825f, 0.1f)]
+        public float clientSendInputsInterval = 0.05f;
+        [Range(0.00825f, 0.1f)]
         public float serverSyncTransformInterval = 0.05f;
 
         public Animator CacheAnimator { get; private set; }
@@ -72,10 +74,15 @@ namespace MultiplayerARPG
         private long acceptedRotationTimestamp;
         private long acceptedJumpTimestamp;
         private Vector3 acceptedPosition;
+        private Vector3? clientTargetPosition;
         private bool acceptedJump;
         private bool sendingJump;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
+        private float lastClientSendInputs;
+
+        private EntityMovementInput oldInput;
+        private EntityMovementInput currentInput;
 
         // Optimize garbage collector
         private MovementState tempMovementState;
@@ -172,11 +179,6 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendKeyMovement3D(moveDirection, movementState);
-            }
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
@@ -193,11 +195,6 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendPointClickMovement3D(position);
-            }
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
@@ -210,11 +207,6 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                this.ClientSendSetLookRotation3D(rotation);
-            }
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
@@ -298,6 +290,16 @@ namespace MultiplayerARPG
                     lastClientSyncTransform = currentTime;
                 }
             }
+            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
+            {
+                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
+                {
+                    this.ClientSendPointClickMovement3D_2(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
+                    oldInput = currentInput;
+                    currentInput = null;
+                    lastClientSendInputs = currentTime;
+                }
+            }
             if (IsServer)
             {
                 // Sync transform from server to all clients (include owner client)
@@ -329,6 +331,7 @@ namespace MultiplayerARPG
 
         private void UpdateMovement(float deltaTime)
         {
+            tempCurrentPosition = CacheTransform.position;
             tempMoveVelocity = Vector3.zero;
             tempMoveDirection = Vector3.zero;
             tempTargetDistance = -1f;
@@ -346,17 +349,16 @@ namespace MultiplayerARPG
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
                 tempTargetPosition = navPaths.Peek();
-                tempCurrentPosition = CacheTransform.position;
-                tempTargetPosition.y = 0;
-                tempCurrentPosition.y = 0;
-                tempMoveDirection = tempTargetPosition - tempCurrentPosition;
-                tempMoveDirection.Normalize();
+                tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                 if (tempTargetDistance < StoppingDistance)
                 {
                     navPaths.Dequeue();
                     if (!HasNavPaths)
+                    {
                         StopMove();
+                        tempMoveDirection = Vector3.zero;
+                    }
                 }
                 else
                 {
@@ -364,12 +366,22 @@ namespace MultiplayerARPG
                     yRotation = Quaternion.LookRotation(tempMoveDirection).eulerAngles.y;
                 }
             }
-
-            // If move by WASD keys, set move direction to input direction
-            if (tempInputDirection.sqrMagnitude > 0f)
+            else if (clientTargetPosition.HasValue)
             {
-                tempMoveDirection = tempInputDirection;
-                tempMoveDirection.Normalize();
+                tempTargetPosition = clientTargetPosition.Value;
+                tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
+                tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
+                if (tempTargetDistance < StoppingDistance)
+                {
+                    clientTargetPosition = null;
+                    StopMove();
+                    tempMoveDirection = Vector3.zero;
+                }
+            }
+            else if (tempInputDirection.sqrMagnitude > 0f)
+            {
+                tempMoveDirection = tempInputDirection.normalized;
+                tempTargetPosition = tempCurrentPosition + tempMoveDirection;
             }
 
             if (!Entity.CanMove())
@@ -400,6 +412,7 @@ namespace MultiplayerARPG
             // Jumping 
             if (acceptedJump || (isGrounded && isJumping))
             {
+                currentInput = this.SetJump(currentInput);
                 sendingJump = true;
                 airborneElapsed = airborneDelay;
                 Entity.PlayJumpAnimation();
@@ -442,32 +455,30 @@ namespace MultiplayerARPG
                 if (Vector3.Angle(tempHorizontalMoveDirection, CacheTransform.forward) > 120)
                     tempCurrentMoveSpeed *= backwardMoveSpeedRate;
 
+                // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above
+                tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
+                tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * tempCurrentMoveSpeed * deltaTime);
+                tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
+                // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                // rigidbody will reaching target and character is moving pass it,
+                // so adjust move speed by distance and time (with physic formula: v=s/t)
+                if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                    tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
+                // Set inputs
+                currentInput = this.SetMovementState(currentInput, tempMovementState);
                 if (HasNavPaths)
-                {
-                    // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above
-                    tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
-                    tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * tempCurrentMoveSpeed * deltaTime);
-                    tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
-                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
-                    // rigidbody will reaching target and character is moving pass it,
-                    // so adjust move speed by distance and time (with physic formula: v=s/t)
-                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
-                    tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
-                }
+                    currentInput = this.SetPosition(currentInput, tempTargetPosition);
                 else
-                {
-                    // Move with wasd keys so it does not have to adjust speed
-                    tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
-                }
+                    currentInput = this.SetPosition(currentInput, tempPredictPosition);
             }
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
             {
                 tempCurrentMoveSpeed = tempEntityMoveSpeed;
                 // Move up to surface while under water
-                if (autoSwimToSurface || tempMoveDirection.y > 0)
+                if (autoSwimToSurface || Mathf.Abs(tempMoveDirection.y) > 0)
                 {
                     if (autoSwimToSurface)
                         tempMoveDirection.y = 1f;
@@ -485,11 +496,7 @@ namespace MultiplayerARPG
                         tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                     // Swim up to surface
                     tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
-                }
-                else
-                {
-                    // Dive down under water
-                    tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
+                    currentInput = this.SetYPosition(currentInput, tempPredictPosition.y);
                 }
             }
             else
@@ -520,6 +527,8 @@ namespace MultiplayerARPG
             }
 
             UpdateRotation();
+            if (currentInput != null)
+                currentInput = this.SetRotation(currentInput, CacheTransform.rotation);
             isJumping = false;
             acceptedJump = false;
         }
@@ -701,14 +710,28 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
+            bool isKeyMovement;
+            MovementState movementState;
             Vector3 position;
+            float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadPointClickMovementMessage3D(out position, out timestamp);
+            messageHandler.Reader.ReadPointClickMovementMessage3D_2(out isKeyMovement, out movementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
-                tempMovementState = MovementState.Forward;
-                SetMovePaths(position, true);
+                navPaths = null;
+                tempMovementState = movementState;
+                clientTargetPosition = null;
+                if (isKeyMovement)
+                {
+                    SetMovePaths(position, true);
+                }
+                else
+                {
+                    clientTargetPosition = position;
+                }
+                yRotation = yAngle;
+                acceptedJump = movementState.HasFlag(MovementState.IsJump);
             }
         }
 
