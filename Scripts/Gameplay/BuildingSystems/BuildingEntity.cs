@@ -359,7 +359,9 @@ namespace MultiplayerARPG
 
         public void TriggerEnterEntity(BaseGameEntity networkEntity)
         {
-            if (networkEntity != null && !triggerEntities.Contains(networkEntity))
+            if (networkEntity != null &&
+                !triggerEntities.Contains(networkEntity) &&
+                networkEntity.Entity != Entity)
                 triggerEntities.Add(networkEntity);
         }
 
@@ -373,7 +375,8 @@ namespace MultiplayerARPG
         {
             if (buildingMaterial != null &&
                 buildingMaterial.BuildingEntity != this &&
-                !triggerMaterials.Contains(buildingMaterial))
+                !triggerMaterials.Contains(buildingMaterial) &&
+                buildingMaterial.Entity != Entity)
                 triggerMaterials.Add(buildingMaterial);
         }
 
@@ -385,7 +388,8 @@ namespace MultiplayerARPG
 
         public void TriggerEnterTilemap(TilemapCollider2D tilemapCollider)
         {
-            if (tilemapCollider != null && !triggerTilemaps.Contains(tilemapCollider))
+            if (tilemapCollider != null &&
+                !triggerTilemaps.Contains(tilemapCollider))
                 triggerTilemaps.Add(tilemapCollider);
         }
 
