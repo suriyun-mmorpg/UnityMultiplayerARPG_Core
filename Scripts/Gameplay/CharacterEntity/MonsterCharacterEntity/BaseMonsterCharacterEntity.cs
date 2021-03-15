@@ -574,6 +574,7 @@ namespace MultiplayerARPG
                 Identity.ObjectId,
                 SpawnPosition,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+            OnRespawn();
         }
 
         public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)
