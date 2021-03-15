@@ -350,7 +350,7 @@ namespace MultiplayerARPG
                 // Set `tempTargetPosition` and `tempCurrentPosition`
                 tempTargetPosition = navPaths.Peek();
                 tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
-                tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
+                tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
                 if (tempTargetDistance < StoppingDistance)
                 {
                     navPaths.Dequeue();
@@ -370,7 +370,7 @@ namespace MultiplayerARPG
             {
                 tempTargetPosition = clientTargetPosition.Value;
                 tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
-                tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
+                tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
                 if (tempTargetDistance < StoppingDistance)
                 {
                     clientTargetPosition = null;
