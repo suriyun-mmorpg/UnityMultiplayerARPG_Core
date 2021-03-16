@@ -10,6 +10,8 @@ namespace MultiplayerARPG
         [Header("Movement Settings")]
         [Tooltip("If calculated paths +1 higher than this value, it will stop moving. If this is 0 it will not applies")]
         public byte maxPathsForKeyMovement = 1;
+        public ObstacleAvoidanceType obstacleAvoidanceWhileMoving = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
+        public ObstacleAvoidanceType obstacleAvoidanceWhileStationary = ObstacleAvoidanceType.NoObstacleAvoidance;
 
         [Header("Networking Settings")]
         public float moveThreshold = 0.01f;
@@ -107,7 +109,6 @@ namespace MultiplayerARPG
         {
             CacheNavMeshAgent.updatePosition = false;
             CacheNavMeshAgent.updateRotation = false;
-            CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
             if (CacheNavMeshAgent.isOnNavMesh)
                 CacheNavMeshAgent.isStopped = true;
         }
@@ -155,6 +156,8 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
+            bool isStationary = CacheNavMeshAgent.isStopped || CacheNavMeshAgent.remainingDistance <= CacheNavMeshAgent.stoppingDistance;
+            CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
             Entity.SetMovement((CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
             SyncTransform();
         }
@@ -203,7 +206,6 @@ namespace MultiplayerARPG
                 return;
             CacheNavMeshAgent.updatePosition = true;
             CacheNavMeshAgent.updateRotation = true;
-            CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
             CacheNavMeshAgent.speed = moveSpeed;
             if (CacheNavMeshAgent.isOnNavMesh)
             {
