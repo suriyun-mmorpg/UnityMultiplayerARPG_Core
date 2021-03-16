@@ -300,30 +300,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
-        {
-            if (IsOwnerClient)
-            {
-                // Don't read and apply inputs, because it was done (this is both owner client and server)
-                return;
-            }
-            if (Entity.MovementSecure == MovementSecure.NotSecure)
-            {
-                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
-                return;
-            }
-            if (!Entity.CanMove())
-                return;
-            float yAngle;
-            long timestamp;
-            messageHandler.Reader.ReadSetLookRotationMessage3D(out yAngle, out timestamp);
-            if (acceptedRotationTimestamp < timestamp)
-            {
-                acceptedRotationTimestamp = timestamp;
-                CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-            }
-        }
-
         public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
         {
             if (IsOwnerClient)

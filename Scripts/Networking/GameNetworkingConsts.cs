@@ -89,7 +89,6 @@
         public const ushort DeclineGuildRequest = 163;
         // Entity movement
         public const ushort MovementInput = 165;
-        public const ushort SetLookRotation = 166;
         public const ushort SyncTransform = 167;
         public const ushort Teleport = 168;
         public const ushort StopMove = 169;

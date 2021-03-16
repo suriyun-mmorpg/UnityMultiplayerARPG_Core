@@ -528,8 +528,7 @@ namespace MultiplayerARPG
             }
 
             UpdateRotation();
-            if (currentInput != null)
-                currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
+            currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
             isJumping = false;
             acceptedJump = false;
         }
@@ -703,31 +702,6 @@ namespace MultiplayerARPG
                 }
                 yRotation = yAngle;
                 acceptedJump = movementState.HasFlag(MovementState.IsJump);
-            }
-        }
-
-        public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
-        {
-            if (IsOwnerClient)
-            {
-                // Don't read and apply inputs, because it was done (this is both owner client and server)
-                return;
-            }
-            if (Entity.MovementSecure == MovementSecure.NotSecure)
-            {
-                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
-                return;
-            }
-            if (!Entity.CanMove())
-                return;
-            float yAngle;
-            long timestamp;
-            messageHandler.Reader.ReadSetLookRotationMessage3D(out yAngle, out timestamp);
-            if (acceptedRotationTimestamp < timestamp)
-            {
-                acceptedRotationTimestamp = timestamp;
-                yRotation = yAngle;
-                UpdateRotation();
             }
         }
 

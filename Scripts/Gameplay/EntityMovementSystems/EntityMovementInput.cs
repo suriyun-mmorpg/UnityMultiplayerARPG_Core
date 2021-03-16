@@ -83,7 +83,15 @@ namespace MultiplayerARPG
             if (Vector3.Distance(newInput.Position, oldInput.Position) > entityMovement.StoppingDistance)
                 return true;
             if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 1)
+            {
+                Debug.LogError("1");
                 return true;
+            }
+            else
+            {
+
+                Quaternion.Angle(newInput.Rotation, oldInput.Rotation);
+            }
             if (newInput.MovementState.HasFlag(MovementState.IsJump))
                 return true;
             return false;

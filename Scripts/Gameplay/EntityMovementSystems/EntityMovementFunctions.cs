@@ -29,18 +29,6 @@ namespace MultiplayerARPG
             });
         }
 
-        public static void ClientSendSetLookRotation3D(this IEntityMovement movement, Quaternion rotation)
-        {
-            if (!movement.Entity.IsOwnerClient)
-                return;
-            movement.Entity.ClientSendPacket(DeliveryMethod.Unreliable, GameNetworkingConsts.SetLookRotation, (writer) =>
-            {
-                writer.PutPackedUInt(movement.Entity.ObjectId);
-                writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
-            });
-        }
-
         public static void ServerSendSyncTransform3D(this IEntityMovement movement)
         {
             if (!movement.Entity.IsServer)
@@ -118,12 +106,6 @@ namespace MultiplayerARPG
             isKeyMovement = reader.GetBool();
             movementState = (MovementState)reader.GetByte();
             position = reader.GetVector3();
-            yAngle = GetDecompressedAngle(reader.GetPackedInt());
-            timestamp = reader.GetPackedLong();
-        }
-
-        public static void ReadSetLookRotationMessage3D(this NetDataReader reader, out float yAngle, out long timestamp)
-        {
             yAngle = GetDecompressedAngle(reader.GetPackedInt());
             timestamp = reader.GetPackedLong();
         }

@@ -141,7 +141,6 @@ namespace MultiplayerARPG
             // Server messages
             RegisterServerMessage(GameNetworkingConsts.Chat, HandleChatAtServer);
             RegisterServerMessage(GameNetworkingConsts.MovementInput, HandleMovementInputAtServer);
-            RegisterServerMessage(GameNetworkingConsts.SetLookRotation, HandleSetLookRotationAtServer);
             RegisterServerMessage(GameNetworkingConsts.SyncTransform, HandleSyncTransformAtServer);
             RegisterServerMessage(GameNetworkingConsts.StopMove, HandleStopMoveAtServer);
             RegisterServerMessage(GameNetworkingConsts.Jump, HandleJumpAtServer);
@@ -460,14 +459,6 @@ namespace MultiplayerARPG
             BaseGameEntity gameEntity;
             if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
                 gameEntity.Movement.HandleMovementInputAtServer(messageHandler);
-        }
-
-        protected void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
-        {
-            uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
-                gameEntity.Movement.HandleSetLookRotationAtServer(messageHandler);
         }
 
         protected void HandleSyncTransformAtServer(MessageHandlerData messageHandler)

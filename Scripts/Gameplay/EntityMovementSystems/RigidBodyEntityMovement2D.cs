@@ -269,11 +269,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public void HandleSetLookRotationAtServer(MessageHandlerData messageHandler)
-        {
-            // There is no look rotation for 2D
-        }
-
         public void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
         {
             if (IsOwnerClient)
