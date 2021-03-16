@@ -71,10 +71,12 @@ namespace MultiplayerARPG
         private Vector3 groundedLocalPosition;
         private Vector3 oldGroundedPosition;
         private long acceptedPositionTimestamp;
-        private long acceptedRotationTimestamp;
         private long acceptedJumpTimestamp;
         private Vector3 acceptedPosition;
         private Vector3? clientTargetPosition;
+        private float? targetYRotation;
+        private float yRotateLerpTime;
+        private float yRotateLerpDuration;
         private bool acceptedJump;
         private bool sendingJump;
         private float lastServerSyncTransform;
@@ -364,6 +366,7 @@ namespace MultiplayerARPG
                 {
                     // Turn character to destination
                     yRotation = Quaternion.LookRotation(tempMoveDirection).eulerAngles.y;
+                    targetYRotation = null;
                 }
             }
             else if (clientTargetPosition.HasValue)
@@ -527,6 +530,14 @@ namespace MultiplayerARPG
                 tempVerticalVelocity = 0f;
             }
 
+            if (targetYRotation.HasValue)
+            {
+                yRotateLerpTime += deltaTime;
+                float lerpTimeRate = yRotateLerpTime / yRotateLerpDuration;
+                yRotation = Mathf.LerpAngle(yRotation, targetYRotation.Value, lerpTimeRate);
+                if (lerpTimeRate >= 1f)
+                    targetYRotation = null;
+            }
             UpdateRotation();
             currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
             isJumping = false;
@@ -621,7 +632,9 @@ namespace MultiplayerARPG
                 }
                 else if (!IsOwnerClient)
                 {
-                    yRotation = yAngle;
+                    targetYRotation = yAngle;
+                    yRotateLerpTime = 0;
+                    yRotateLerpDuration = serverSyncTransformInterval;
                     if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
                     {
                         acceptedPosition = position;
@@ -700,7 +713,17 @@ namespace MultiplayerARPG
                 {
                     clientTargetPosition = position;
                 }
-                yRotation = yAngle;
+                // It's host, it has player seeing character turning so interpolate rotation
+                if (IsClient)
+                {
+                    targetYRotation = yAngle;
+                    yRotateLerpTime = 0;
+                    yRotateLerpDuration = clientSendInputsInterval;
+                }
+                else
+                {
+                    yRotation = yAngle;
+                }
                 acceptedJump = movementState.HasFlag(MovementState.IsJump);
             }
         }

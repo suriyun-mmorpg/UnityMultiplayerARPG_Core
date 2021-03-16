@@ -31,9 +31,7 @@ namespace MultiplayerARPG
         }
 
         private long acceptedPositionTimestamp;
-        private long acceptedRotationTimestamp;
         private Vector3 acceptedPosition;
-        private Vector3? clientTargetPosition;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
         private float lastClientSendInputs;
