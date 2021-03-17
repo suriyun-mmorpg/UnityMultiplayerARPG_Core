@@ -1,9 +1,13 @@
-﻿using UnityEngine;
+﻿using LiteNetLib;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        public const byte ACTION_TO_SERVER_DATA_CHANNEL = 1;
+        public const byte ACTION_TO_CLIENT_DATA_CHANNEL = 1;
+
         public bool ValidateRequestAttack(bool isLeftHand)
         {
             if (!CanAttack())
@@ -31,7 +35,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestAttack(isLeftHand))
                 return false;
-            RPC(ServerAttack, isLeftHand, aimPosition);
+            RPC(ServerAttack, ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, aimPosition);
             return true;
         }
 
@@ -64,7 +68,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
-            RPC(ServerUseSkill, dataId, isLeftHand, aimPosition);
+            RPC(ServerUseSkill, ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, dataId, isLeftHand, aimPosition);
             return true;
         }
 
@@ -72,7 +76,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(AllPlayAttackAnimation, isLeftHand, animationIndex, randomSeed, aimPosition);
+            RPC(AllPlayAttackAnimation, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, randomSeed, aimPosition);
             return true;
         }
 
@@ -80,7 +84,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(AllPlayUseSkillAnimation, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+            RPC(AllPlayUseSkillAnimation, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
             return true;
         }
 
@@ -88,7 +92,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(AllPlayChargeAnimation, isLeftHand);
+            RPC(AllPlayChargeAnimation, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
             return true;
         }
 
@@ -96,7 +100,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(AllStopChargeAnimation);
+            RPC(AllStopChargeAnimation, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
 
@@ -104,7 +108,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(AllPlayReloadAnimation, isLeftHand, reloadingAmmoAmount);
+            RPC(AllPlayReloadAnimation, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, reloadingAmmoAmount);
             return true;
         }
 
@@ -112,7 +116,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(ServerSkillCastingInterrupt);
+            RPC(ServerSkillCastingInterrupt, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
 
@@ -120,7 +124,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(AllOnSkillCastingInterrupt);
+            RPC(AllOnSkillCastingInterrupt, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
 
