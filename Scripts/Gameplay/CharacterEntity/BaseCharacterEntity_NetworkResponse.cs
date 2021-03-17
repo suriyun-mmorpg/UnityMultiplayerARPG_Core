@@ -8,24 +8,13 @@ namespace MultiplayerARPG
     public partial class BaseCharacterEntity
     {
         [AllRpc]
-        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex, int randomSeed)
+        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex, int randomSeed, AimPosition aimPosition)
         {
-            AttackRoutine(isLeftHand, animationIndex, randomSeed).Forget();
+            AttackRoutine(isLeftHand, animationIndex, randomSeed, aimPosition).Forget();
         }
 
         [AllRpc]
-        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
-        {
-            PlayUseSkillFunction(isLeftHand, animationIndex, skillDataId, skillLevel, null);
-        }
-
-        [AllRpc]
-        protected void AllPlayUseSkillAnimationWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
-        {
-            PlayUseSkillFunction(isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
-        }
-
-        protected virtual void PlayUseSkillFunction(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3? aimPosition)
+        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
         {
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)

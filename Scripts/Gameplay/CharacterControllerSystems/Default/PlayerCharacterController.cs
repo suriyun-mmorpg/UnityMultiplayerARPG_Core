@@ -353,7 +353,7 @@ namespace MultiplayerARPG
 
         public void RequestAttack()
         {
-            if (PlayerCharacterEntity.CallServerAttack(isLeftHandAttacking))
+            if (PlayerCharacterEntity.CallServerAttack(isLeftHandAttacking, new AimPosition()))
                 isLeftHandAttacking = !isLeftHandAttacking;
         }
 
@@ -370,21 +370,15 @@ namespace MultiplayerARPG
                 !PlayerCharacterEntity.IsPlayingActionAnimation() &&
                 !PlayerCharacterEntity.IsAttackingOrUsingSkill)
             {
+                AimPosition aimPosition = new AimPosition();
+                aimPosition.hasValue = queueUsingSkill.aimPosition.HasValue;
+                if (aimPosition.hasValue)
+                    aimPosition.value = queueUsingSkill.aimPosition.Value;
                 bool canUseSkill;
                 if (queueUsingSkill.itemIndex >= 0)
-                {
-                    if (queueUsingSkill.aimPosition.HasValue)
-                        canUseSkill = PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, queueUsingSkill.aimPosition.Value);
-                    else
-                        canUseSkill = PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking);
-                }
+                    canUseSkill = PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, aimPosition);
                 else
-                {
-                    if (queueUsingSkill.aimPosition.HasValue)
-                        canUseSkill = PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, queueUsingSkill.aimPosition.Value);
-                    else
-                        canUseSkill = PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking);
-                }
+                    canUseSkill = PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, aimPosition);
                 if (canUseSkill)
                     isLeftHandAttacking = !isLeftHandAttacking;
                 ClearQueueUsingSkill();

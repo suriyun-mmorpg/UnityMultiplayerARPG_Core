@@ -470,8 +470,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // No nearby target, so attack immediately
-                    if (PlayerCharacterEntity.CallServerAttack(isLeftHandAttacking))
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                    RequestAttack();
                     isFollowingTarget = false;
                 }
             }
@@ -490,8 +489,7 @@ namespace MultiplayerARPG
                     TurnCharacterToEntity(SelectedEntity);
                 }
                 // Not lock target, so not finding target and attack immediately
-                if (PlayerCharacterEntity.CallServerAttack(isLeftHandAttacking))
-                    isLeftHandAttacking = !isLeftHandAttacking;
+                RequestAttack();
                 isFollowingTarget = false;
             }
         }

@@ -12,16 +12,6 @@ namespace MultiplayerARPG
     {
         protected CancellationTokenSource reloadCancellationTokenSource;
         protected CancellationTokenSource attackCancellationTokenSource;
-        /// <summary>
-        /// This will be `TRUE` if it's allowing to change aim position instead of using default aim position (character's forward)
-        /// So it should be `TRUE` while player's controller is shooter controller
-        /// </summary>
-        public virtual bool HasAimPosition { get; set; }
-
-        /// <summary>
-        /// This will be used if `HasAimPosition` is `TRUE` to change default aim position to this value
-        /// </summary>
-        public virtual Vector3 AimPosition { get; set; }
 
         public Vector3 GetDefaultAttackAimPosition(bool isLeftHand)
         {
@@ -295,7 +285,7 @@ namespace MultiplayerARPG
         /// Is function will be called at server to order character to attack
         /// </summary>
         [ServerRpc]
-        protected virtual void ServerAttack(bool isLeftHand)
+        protected virtual void ServerAttack(bool isLeftHand, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
             if (!CanAttack())
@@ -332,11 +322,11 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex, Random.Range(int.MinValue, int.MaxValue));
+            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex, Random.Range(int.MinValue, int.MaxValue), aimPosition);
 #endif
         }
 
-        protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex, int randomSeed)
+        protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex, int randomSeed, AimPosition attackAimPosition)
         {
             // Attack animation still playing, skip it
             if (attackCancellationTokenSource != null)
@@ -416,8 +406,8 @@ namespace MultiplayerARPG
 
                     // Get aim position by character's forward
                     Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
-                    if (HasAimPosition)
-                        aimPosition = AimPosition;
+                    if (attackAimPosition.hasValue)
+                        aimPosition = attackAimPosition.value;
 
                     // Call on attack to extend attack functionality while attacking
                     bool overrideDefaultAttack = false;

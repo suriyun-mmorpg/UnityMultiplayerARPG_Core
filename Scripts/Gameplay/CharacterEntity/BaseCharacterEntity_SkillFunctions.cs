@@ -64,30 +64,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="dataId"></param>
         /// <param name="isLeftHand"></param>
-        [ServerRpc]
-        protected void ServerUseSkill(int dataId, bool isLeftHand)
-        {
-#if !CLIENT_BUILD
-            UseSkillFunction(dataId, isLeftHand, null);
-#endif
-        }
-
-        /// <summary>
-        /// Is function will be called at server to order character to use skill
-        /// </summary>
-        /// <param name="dataId"></param>
-        /// <param name="isLeftHand"></param>
         /// <param name="aimPosition"></param>
         [ServerRpc]
-        protected void ServerUseSkillWithAimPosition(int dataId, bool isLeftHand, Vector3 aimPosition)
+        protected void ServerUseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
-            UseSkillFunction(dataId, isLeftHand, aimPosition);
-#endif
-        }
-
-        protected virtual void UseSkillFunction(int dataId, bool isLeftHand, Vector3? aimPosition)
-        {
             if (!CanUseSkill())
                 return;
 
@@ -130,10 +111,8 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            if (!aimPosition.HasValue)
-                CallAllPlaySkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel);
-            else
-                CallAllPlaySkillAnimationWithAimPosition(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition.Value);
+            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition);
+#endif
         }
 
         /// <summary>
@@ -171,7 +150,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async UniTaskVoid UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, Vector3? skillAimPosition)
+        protected async UniTaskVoid UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, AimPosition skillAimPosition)
         {
             // Skill animation still playing, skip it
             if (skillCancellationTokenSource != null)
@@ -291,10 +270,8 @@ namespace MultiplayerARPG
 
                     // Get aim position by character's forward
                     Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
-                    if (skill.HasCustomAimControls() && skillAimPosition.HasValue)
-                        aimPosition = skillAimPosition.Value;
-                    else if (HasAimPosition)
-                        aimPosition = AimPosition;
+                    if (skillAimPosition.hasValue)
+                        aimPosition = skillAimPosition.value;
 
                     // Trigger skill event
                     if (onUseSkillRoutine != null)

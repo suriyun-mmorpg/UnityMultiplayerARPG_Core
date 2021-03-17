@@ -70,19 +70,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerUseSkillItem(short index, bool isLeftHand)
+        public bool CallServerUseSkillItem(short index, bool isLeftHand, AimPosition aimPosition)
         {
             if (!ValidateRequestUseSkillItem(index, isLeftHand))
                 return false;
-            RPC(ServerUseSkillItem, index, isLeftHand);
-            return true;
-        }
-
-        public bool CallServerUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
-        {
-            if (!ValidateRequestUseSkillItem(index, isLeftHand))
-                return false;
-            RPC(ServerUseSkillItemWithAimPosition, index, isLeftHand, aimPosition);
+            RPC(ServerUseSkillItem, index, isLeftHand, aimPosition);
             return true;
         }
 

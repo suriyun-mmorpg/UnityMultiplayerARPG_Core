@@ -38,29 +38,11 @@ namespace MultiplayerARPG
         /// This function will be called at server to order character to use item
         /// </summary>
         /// <param name="itemIndex"></param>
-        [ServerRpc]
-        protected void ServerUseSkillItem(short itemIndex, bool isLeftHand)
-        {
-#if !CLIENT_BUILD
-            UseItemSkill(itemIndex, isLeftHand, null);
-#endif
-        }
-
-        /// <summary>
-        /// This function will be called at server to order character to use item
-        /// </summary>
-        /// <param name="itemIndex"></param>
         /// <param name="aimPosition"></param>
         [ServerRpc]
-        protected void ServerUseSkillItemWithAimPosition(short itemIndex, bool isLeftHand, Vector3 aimPosition)
+        protected void ServerUseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
-            UseItemSkill(itemIndex, isLeftHand, aimPosition);
-#endif
-        }
-
-        protected void UseItemSkill(short itemIndex, bool isLeftHand, Vector3? aimPosition)
-        {
             if (!CanUseItem() || !CanUseSkill())
                 return;
 
@@ -113,10 +95,8 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            if (!aimPosition.HasValue)
-                CallAllPlaySkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel);
-            else
-                CallAllPlaySkillAnimationWithAimPosition(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, aimPosition.Value);
+            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, aimPosition);
+#endif
         }
     }
 }

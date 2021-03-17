@@ -27,11 +27,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerAttack(bool isLeftHand)
+        public bool CallServerAttack(bool isLeftHand, AimPosition aimPosition)
         {
             if (!ValidateRequestAttack(isLeftHand))
                 return false;
-            RPC(ServerAttack, isLeftHand);
+            RPC(ServerAttack, isLeftHand, aimPosition);
             return true;
         }
 
@@ -60,43 +60,27 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerUseSkill(int dataId, bool isLeftHand)
+        public bool CallServerUseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
         {
             if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
-            RPC(ServerUseSkill, dataId, isLeftHand);
+            RPC(ServerUseSkill, dataId, isLeftHand, aimPosition);
             return true;
         }
 
-        public bool CallServerUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
-        {
-            if (!ValidateRequestUseSKill(dataId, isLeftHand))
-                return false;
-            RPC(ServerUseSkillWithAimPosition, dataId, isLeftHand, aimPosition);
-            return true;
-        }
-
-        public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex, int randomSeed)
+        public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex, int randomSeed, AimPosition aimPosition)
         {
             if (this.IsDead())
                 return false;
-            RPC(AllPlayAttackAnimation, isLeftHand, animationIndex, randomSeed);
+            RPC(AllPlayAttackAnimation, isLeftHand, animationIndex, randomSeed, aimPosition);
             return true;
         }
 
-        public bool CallAllPlaySkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel)
+        public bool CallAllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
         {
             if (this.IsDead())
                 return false;
-            RPC(AllPlayUseSkillAnimation, isLeftHand, animationIndex, skillDataId, skillLevel);
-            return true;
-        }
-
-        public bool CallAllPlaySkillAnimationWithAimPosition(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, Vector3 aimPosition)
-        {
-            if (this.IsDead())
-                return false;
-            RPC(AllPlayUseSkillAnimationWithAimPosition, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+            RPC(AllPlayUseSkillAnimation, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
             return true;
         }
 

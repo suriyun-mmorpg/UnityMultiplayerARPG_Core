@@ -35,10 +35,6 @@ namespace MultiplayerARPG
         protected SyncFieldInt lastDeadTime = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldBool isWarping = new SyncFieldBool();
-        [SerializeField]
-        protected SyncFieldBool hasAimPosition = new SyncFieldBool();
-        [SerializeField]
-        protected SyncFieldVector3 aimPosition = new SyncFieldVector3();
         [Header("Player Character Sync Lists")]
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -149,8 +145,6 @@ namespace MultiplayerARPG
         public string RespawnMapName { get { return respawnMapName.Value; } set { respawnMapName.Value = value; } }
         public Vector3 RespawnPosition { get { return respawnPosition.Value; } set { respawnPosition.Value = value; } }
         public bool IsWarping { get { return isWarping.Value; } set { isWarping.Value = value; } }
-        public override bool HasAimPosition { get { return hasAimPosition.Value; } set { hasAimPosition.Value = value; } }
-        public override Vector3 AimPosition { get { return aimPosition.Value; } set { aimPosition.Value = value; } }
         public int MountDataId
         {
             get

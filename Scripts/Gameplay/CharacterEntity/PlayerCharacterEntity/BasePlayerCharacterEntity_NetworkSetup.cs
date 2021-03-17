@@ -36,10 +36,6 @@ namespace MultiplayerARPG
             respawnMapName.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             respawnPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
             respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            hasAimPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            hasAimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
-            aimPosition.deliveryMethod = DeliveryMethod.Sequenced;
-            aimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
