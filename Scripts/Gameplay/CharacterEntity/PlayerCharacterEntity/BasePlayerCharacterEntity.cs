@@ -42,6 +42,16 @@ namespace MultiplayerARPG
 
         public PlayerCharacterCraftingComponent Crafting { get; private set; }
 
+        public int IndexOfCharacterDatabase(int dataId)
+        {
+            for (int i = 0; i < CharacterDatabases.Length; ++i)
+            {
+                if (CharacterDatabases[i] != null && CharacterDatabases[i].DataId == dataId)
+                    return i;
+            }
+            return -1;
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
