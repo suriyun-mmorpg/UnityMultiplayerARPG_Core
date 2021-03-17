@@ -74,19 +74,30 @@ namespace MultiplayerARPG
             return input;
         }
 
-        public static bool DifferInputEnoughToSend(this IEntityMovementComponent entityMovement, EntityMovementInput oldInput, EntityMovementInput newInput)
+        public static bool DifferInputEnoughToSend(this IEntityMovementComponent entityMovement, EntityMovementInput oldInput, EntityMovementInput newInput, out InputState state)
         {
+            state = InputState.None;
             if (newInput == null)
                 return false;
             if (oldInput == null)
+            {
+                state = InputState.PositionChanged |
+                    InputState.RotationChanged |
+                    InputState.IsJump;
+                if (newInput.IsKeyMovement)
+                    state |= InputState.IsKeyMovement;
                 return true;
+            }
+            // TODO: Send delta changes
+            if (newInput.IsKeyMovement)
+                state |= InputState.IsKeyMovement;
             if (Vector3.Distance(newInput.Position, oldInput.Position) > entityMovement.StoppingDistance)
-                return true;
+                state |= InputState.PositionChanged;
             if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 1)
-                return true;
+                state |= InputState.RotationChanged;
             if (newInput.MovementState.HasFlag(MovementState.IsJump))
-                return true;
-            return false;
+                state |= InputState.IsJump;
+            return state != InputState.None;
         }
     }
 }

@@ -174,9 +174,10 @@ namespace MultiplayerARPG
             }
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
-                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
+                InputState inputState;
+                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
-                    this.ClientSendMovementInput3D(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
+                    this.ClientSendMovementInput3D(inputState, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
                     currentInput = null;
                     lastClientSendInputs = currentTime;
@@ -284,17 +285,18 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
-            bool isKeyMovement;
+            InputState inputState;
             MovementState movementState;
             Vector3 position;
             float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadMovementInputMessage3D(out isKeyMovement, out movementState, out position, out yAngle, out timestamp);
+            messageHandler.Reader.ReadMovementInputMessage3D(out inputState, out movementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
-                CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-                SetMovePaths(position, isKeyMovement);
+                if (inputState.HasFlag(InputState.RotationChanged))
+                    CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                SetMovePaths(position, inputState.HasFlag(InputState.IsKeyMovement));
             }
         }
 

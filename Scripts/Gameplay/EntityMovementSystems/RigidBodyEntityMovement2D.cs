@@ -175,7 +175,8 @@ namespace MultiplayerARPG
             }
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
-                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
+                InputState inputState;
+                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
                     this.ClientSendMovementInput2D(currentInput.Position);
                     oldInput = currentInput;

@@ -337,9 +337,10 @@ namespace MultiplayerARPG
             }
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
-                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput))
+                InputState inputState;
+                if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
-                    this.ClientSendMovementInput3D(currentInput.IsKeyMovement, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
+                    this.ClientSendMovementInput3D(inputState, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
                     currentInput = null;
                     lastClientSendInputs = currentTime;
@@ -675,7 +676,7 @@ namespace MultiplayerARPG
                     if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
                     {
                         acceptedPosition = position;
-                        SetMovePaths(position, false);
+                        clientTargetPosition = position;
                     }
                 }
             }
@@ -730,38 +731,43 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
-            bool isKeyMovement;
+            InputState inputState;
             MovementState movementState;
             Vector3 position;
             float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadMovementInputMessage3D(out isKeyMovement, out movementState, out position, out yAngle, out timestamp);
+            messageHandler.Reader.ReadMovementInputMessage3D(out inputState, out movementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
                 navPaths = null;
                 tempMovementState = movementState;
                 clientTargetPosition = null;
-                if (isKeyMovement)
+                if (inputState.HasFlag(InputState.PositionChanged))
                 {
-                    SetMovePaths(position, true);
+                    if (inputState.HasFlag(InputState.IsKeyMovement))
+                    {
+                        clientTargetPosition = position;
+                    }
+                    else
+                    {
+                        SetMovePaths(position, true);
+                    }
                 }
-                else
+                if (inputState.HasFlag(InputState.RotationChanged))
                 {
-                    clientTargetPosition = position;
+                    if (IsClient)
+                    {
+                        targetYRotation = yAngle;
+                        yRotateLerpTime = 0;
+                        yRotateLerpDuration = clientSendInputsInterval;
+                    }
+                    else
+                    {
+                        yRotation = yAngle;
+                    }
                 }
-                // It's host, it has player seeing character turning so interpolate rotation
-                if (IsClient)
-                {
-                    targetYRotation = yAngle;
-                    yRotateLerpTime = 0;
-                    yRotateLerpDuration = clientSendInputsInterval;
-                }
-                else
-                {
-                    yRotation = yAngle;
-                }
-                acceptedJump = movementState.HasFlag(MovementState.IsJump);
+                acceptedJump = inputState.HasFlag(InputState.IsJump);
             }
         }
 

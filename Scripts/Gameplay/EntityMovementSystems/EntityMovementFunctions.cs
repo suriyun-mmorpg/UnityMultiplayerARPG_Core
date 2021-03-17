@@ -14,17 +14,19 @@ namespace MultiplayerARPG
         #endregion
 
         #region 3D
-        public static void ClientSendMovementInput3D(this IEntityMovement movement, bool isKeyMovement, MovementState movementState, Vector3 position, Quaternion rotation)
+        public static void ClientSendMovementInput3D(this IEntityMovement movement, InputState inputState, MovementState movementState, Vector3 position, Quaternion rotation)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
             movement.Entity.ClientSendPacket(DeliveryMethod.ReliableSequenced, GameNetworkingConsts.MovementInput, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
-                writer.Put(isKeyMovement);
-                writer.Put((byte)movementState);
-                writer.PutVector3(position);
-                writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
+                writer.PutPackedInt((int)inputState);
+                writer.PutPackedInt((int)movementState);
+                if (inputState.HasFlag(InputState.PositionChanged))
+                    writer.PutVector3(position);
+                if (inputState.HasFlag(InputState.RotationChanged))
+                    writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
                 writer.PutPackedLong(movement.Entity.Manager.ServerUnixTime);
             });
         }
@@ -101,12 +103,16 @@ namespace MultiplayerARPG
             });
         }
 
-        public static void ReadMovementInputMessage3D(this NetDataReader reader, out bool isKeyMovement, out MovementState movementState, out Vector3 position, out float yAngle, out long timestamp)
+        public static void ReadMovementInputMessage3D(this NetDataReader reader, out InputState inputState, out MovementState movementState, out Vector3 position, out float yAngle, out long timestamp)
         {
-            isKeyMovement = reader.GetBool();
-            movementState = (MovementState)reader.GetByte();
-            position = reader.GetVector3();
-            yAngle = GetDecompressedAngle(reader.GetPackedInt());
+            inputState = (InputState)reader.GetPackedInt();
+            movementState = (MovementState)reader.GetPackedInt();
+            position = Vector3.zero;
+            if (inputState.HasFlag(InputState.PositionChanged))
+                position = reader.GetVector3();
+            yAngle = 0f;
+            if (inputState.HasFlag(InputState.RotationChanged))
+                yAngle = GetDecompressedAngle(reader.GetPackedInt());
             timestamp = reader.GetPackedLong();
         }
 
