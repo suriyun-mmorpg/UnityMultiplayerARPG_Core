@@ -81,11 +81,11 @@ namespace MultiplayerARPG
                 return false;
             if (oldInput == null)
             {
-                state = InputState.PositionChanged |
-                    InputState.RotationChanged |
-                    InputState.IsJump;
+                state = InputState.PositionChanged | InputState.RotationChanged;
                 if (newInput.IsKeyMovement)
                     state |= InputState.IsKeyMovement;
+                if (newInput.MovementState.HasFlag(MovementState.IsJump))
+                    state |= InputState.IsJump;
                 return true;
             }
             // TODO: Send delta changes

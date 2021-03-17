@@ -410,7 +410,6 @@ namespace MultiplayerARPG
                 {
                     // Turn character to destination
                     yRotation = Quaternion.LookRotation(tempMoveDirection).eulerAngles.y;
-                    targetYRotation = null;
                 }
             }
             else if (clientTargetPosition.HasValue)
@@ -514,9 +513,15 @@ namespace MultiplayerARPG
                 // Set inputs
                 currentInput = this.SetInputMovementState(currentInput, tempMovementState);
                 if (HasNavPaths)
+                {
                     currentInput = this.SetInputPosition(currentInput, tempTargetPosition);
+                    currentInput = this.SetInputIsKeyMovement(currentInput, false);
+                }
                 else
+                {
                     currentInput = this.SetInputPosition(currentInput, tempPredictPosition);
+                    currentInput = this.SetInputIsKeyMovement(currentInput, true);
+                }
             }
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
@@ -743,6 +748,7 @@ namespace MultiplayerARPG
                 navPaths = null;
                 tempMovementState = movementState;
                 clientTargetPosition = null;
+                targetYRotation = null;
                 if (inputState.HasFlag(InputState.PositionChanged))
                 {
                     if (inputState.HasFlag(InputState.IsKeyMovement))

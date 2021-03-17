@@ -473,9 +473,15 @@ namespace MultiplayerARPG
                 // Set inputs
                 currentInput = this.SetInputMovementState(currentInput, tempMovementState);
                 if (HasNavPaths)
+                {
                     currentInput = this.SetInputPosition(currentInput, tempTargetPosition);
+                    currentInput = this.SetInputIsKeyMovement(currentInput, false);
+                }
                 else
+                {
                     currentInput = this.SetInputPosition(currentInput, tempPredictPosition);
+                    currentInput = this.SetInputIsKeyMovement(currentInput, true);
+                }
             }
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
