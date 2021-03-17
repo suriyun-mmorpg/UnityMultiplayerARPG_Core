@@ -36,7 +36,7 @@ namespace MultiplayerARPG
             OnlineRequestTimes.TryRemove(characterId, out _);
             OnlineRequestTimes.TryAdd(characterId, Time.unscaledTime);
 
-            Manager.ClientSendPacket(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
+            Manager.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
             {
                 writer.Put(characterId);
             });

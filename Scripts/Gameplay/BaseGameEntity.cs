@@ -842,11 +842,11 @@ namespace MultiplayerARPG
                 if (IsServer)
                     MovementState = movementState;
                 else if (IsOwnerClient)
-                    RPC(ServerSetMovement, DeliveryMethod.Sequenced, movementState);
+                    RPC(ServerSetMovement, 0, DeliveryMethod.Sequenced, movementState);
             }
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                RPC(ServerSetMovement, DeliveryMethod.Sequenced, movementState);
+                RPC(ServerSetMovement, 0, DeliveryMethod.Sequenced, movementState);
         }
 
         public void SetExtraMovement(ExtraMovementState extraMovementState)
@@ -887,11 +887,11 @@ namespace MultiplayerARPG
                 if (IsServer)
                     ExtraMovementState = extraMovementState;
                 else if (IsOwnerClient)
-                    RPC(ServerSetExtraMovement, DeliveryMethod.Sequenced, extraMovementState);
+                    RPC(ServerSetExtraMovement, 0, DeliveryMethod.Sequenced, extraMovementState);
             }
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                RPC(ServerSetExtraMovement, DeliveryMethod.Sequenced, extraMovementState);
+                RPC(ServerSetExtraMovement, 0, DeliveryMethod.Sequenced, extraMovementState);
         }
 
         public void SetDirection2D(Vector2 direction)
@@ -903,7 +903,7 @@ namespace MultiplayerARPG
                 Direction2D = direction;
 
             if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                RPC(ServerUpdateDirection2D, DeliveryMethod.Sequenced, new DirectionVector2(LocalDirection2D));
+                RPC(ServerUpdateDirection2D, 0, DeliveryMethod.Sequenced, new DirectionVector2(LocalDirection2D));
         }
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)

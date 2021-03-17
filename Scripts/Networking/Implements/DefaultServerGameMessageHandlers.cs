@@ -18,14 +18,14 @@ namespace MultiplayerARPG
         {
             GameMessage message = new GameMessage();
             message.message = type;
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.GameMessage, message);
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.GameMessage, message);
         }
 
         public void NotifyRewardExp(long connectionId, int exp)
         {
             if (exp <= 0)
                 return;
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardExp, (writer) =>
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardExp, (writer) =>
             {
                 writer.PutPackedInt(exp);
             });
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
         {
             if (gold <= 0)
                 return;
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardGold, (writer) =>
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardGold, (writer) =>
             {
                 writer.PutPackedInt(gold);
             });
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
         {
             if (amount <= 0)
                 return;
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardItem, (writer) =>
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardItem, (writer) =>
             {
                 writer.PutPackedInt(dataId);
                 writer.PutPackedShort(amount);
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
         {
             if (amount <= 0)
                 return;
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardCurrency, (writer) =>
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardCurrency, (writer) =>
             {
                 writer.PutPackedInt(dataId);
                 writer.PutPackedInt(amount);
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
         // Storage
         public void NotifyStorageItems(long connectionId, List<CharacterItem> storageItems)
         {
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageItemsUpdated, (writer) =>
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageItemsUpdated, (writer) =>
             {
                 writer.PutList(storageItems);
             });
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
 
         public void NotifyStorageOpened(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
         {
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageOpened, (writer) =>
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageOpened, (writer) =>
             {
                 writer.Put((byte)storageType);
                 writer.Put(storageOwnerId);
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
 
         public void NotifyStorageClosed(long connectionId)
         {
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageClosed);
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageClosed);
         }
 
         // Party
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
 
         public void SendNotifyPartyInvitation(long connectionId, PartyInvitationData invitation)
         {
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyPartyInvitation, invitation);
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyPartyInvitation, invitation);
         }
 
         // Guild
@@ -193,13 +193,13 @@ namespace MultiplayerARPG
 
         public void SendNotifyGuildInvitation(long connectionId, GuildInvitationData invitation)
         {
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyGuildInvitation, invitation);
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyGuildInvitation, invitation);
         }
 
         // Friends
         public void SendSetFriends(long connectionId, SocialCharacterData[] friends)
         {
-            Manager.ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateFriends, (writer) =>
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateFriends, (writer) =>
             {
                 writer.PutArray(friends);
             });

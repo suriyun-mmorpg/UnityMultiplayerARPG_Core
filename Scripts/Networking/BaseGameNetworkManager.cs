@@ -529,10 +529,10 @@ namespace MultiplayerARPG
                             List<BasePlayerCharacterEntity> receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(CurrentGameInstance.localChatDistance, false, true, true, true);
                             foreach (BasePlayerCharacterEntity receiver in receivers)
                             {
-                                ServerSendPacket(receiver.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                ServerSendPacket(receiver.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
                             // Send messages to sender
-                            ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                            ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                         }
                     }
                     break;
@@ -540,7 +540,7 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(message.sender))
                     {
                         // Send message to all clients
-                        ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
                 case ChatChannel.Whisper:
@@ -548,13 +548,13 @@ namespace MultiplayerARPG
                         ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
                         // If found sender send whisper message to sender
-                        ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     if (!string.IsNullOrEmpty(message.receiver) &&
                         ServerUserHandlers.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
                     {
                         // If found receiver send whisper message to receiver
-                        ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
                 case ChatChannel.Party:
@@ -567,7 +567,7 @@ namespace MultiplayerARPG
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If party member is online, send party message to the member
-                                ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
@@ -582,7 +582,7 @@ namespace MultiplayerARPG
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If guild member is online, send guild message to the member
-                                ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
@@ -591,7 +591,7 @@ namespace MultiplayerARPG
                     if (CanSendSystemAnnounce(message.sender))
                     {
                         // Send message to all clients
-                        ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
             }
@@ -656,7 +656,7 @@ namespace MultiplayerARPG
             chatMessage.message = message;
             chatMessage.sender = senderName;
             chatMessage.receiver = receiverName;
-            ClientSendPacket(DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, chatMessage);
+            ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, chatMessage);
         }
 
         public void Quit()
@@ -943,7 +943,7 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = new UpdateMapInfoMessage();
             message.mapId = CurrentMapInfo.Id;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, message);
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, message);
         }
 
         public void SendTimeOfDay()
@@ -962,7 +962,7 @@ namespace MultiplayerARPG
                 return;
             UpdateTimeOfDayMessage message = new UpdateTimeOfDayMessage();
             message.timeOfDay = CurrentGameInstance.DayNightTimeUpdater.TimeOfDay;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateTimeOfDay, message);
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateTimeOfDay, message);
         }
 
         public bool IsReadyToInstantiateObjects()

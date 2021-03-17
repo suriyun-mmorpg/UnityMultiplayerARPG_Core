@@ -8,9 +8,9 @@ namespace MultiplayerARPG
         private static void Send(LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, INetSerializable message)
         {
             if (!connectionId.HasValue)
-                manager.ClientSendPacket(DeliveryMethod.ReliableOrdered, msgType, message.Serialize);
+                manager.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, msgType, message.Serialize);
             else
-                manager.ServerSendPacket(connectionId.Value, DeliveryMethod.ReliableOrdered, msgType, message.Serialize);
+                manager.ServerSendPacket(connectionId.Value, 0, DeliveryMethod.ReliableOrdered, msgType, message.Serialize);
         }
 
         public static void SendEnterChat(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, ChatChannel channel, string message, string senderName, string receiverName, int channelId)

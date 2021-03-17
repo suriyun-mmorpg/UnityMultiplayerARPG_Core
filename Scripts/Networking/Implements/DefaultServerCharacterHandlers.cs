@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             if (IsCharacterOnline(characterId))
             {
                 // Notify back online character
-                Manager.ServerSendPacket(messageHandler.ConnectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
+                Manager.ServerSendPacket(messageHandler.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
                 {
                     writer.Put(characterId);
                 });
