@@ -9,6 +9,8 @@ namespace MultiplayerARPG
     public abstract partial class BaseGameData : ScriptableObject, IGameData
     {
         [Header("Game Data Configs")]
+        [Tooltip("Game data ID, if this is empty it will uses file's name as ID")]
+        public string id;
         [Tooltip("Default title")]
         public string title;
         [Tooltip("Titles by language keys")]
@@ -21,7 +23,10 @@ namespace MultiplayerARPG
         public string category;
         public Sprite icon;
         
-        public virtual string Id { get { return name; } }
+        public virtual string Id
+        {
+            get { return string.IsNullOrEmpty(id) ? name : id; }
+        }
         public virtual string Title
         {
             get { return Language.GetText(titles, title); }
@@ -30,7 +35,17 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(descriptions, description); }
         }
-        public int DataId { get { return MakeDataId(Id); } }
+
+        private int? dataId;
+        public int DataId
+        {
+            get
+            {
+                if (!dataId.HasValue)
+                    dataId = MakeDataId(Id);
+                return dataId.Value;
+            }
+        }
 
         public static int MakeDataId(string id)
         {
