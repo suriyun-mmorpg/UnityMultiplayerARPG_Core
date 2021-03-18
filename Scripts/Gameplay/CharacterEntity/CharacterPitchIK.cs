@@ -13,6 +13,10 @@ namespace MultiplayerARPG
 
         public Animator animator;
         public Axis axis = Axis.Z;
+        public bool enableWhileStanding = true;
+        public bool enableWhileCrouching = true;
+        public bool enableWhileCrawling = true;
+        public bool enableWhileSwiming = true;
         public HumanBodyBones pitchBone = HumanBodyBones.UpperChest;
         public Vector3 rotateOffset;
         public bool inversePitch = true;
@@ -23,6 +27,37 @@ namespace MultiplayerARPG
         private float tempPitch;
         private Quaternion tempRotation;
         private Quaternion pitchRotation;
+
+        public bool Enabling
+        {
+            get
+            {
+                if (!characterEntity || characterEntity.IsDead())
+                    return false;
+                if (characterEntity.MovementState == MovementState.IsUnderWater)
+                {
+                    if (!enableWhileSwiming)
+                        return false;
+                    return true;
+                }
+                switch (characterEntity.ExtraMovementState)
+                {
+                    case ExtraMovementState.IsCrouching:
+                        if (!enableWhileCrouching)
+                            return false;
+                        break;
+                    case ExtraMovementState.IsCrawling:
+                        if (!enableWhileCrawling)
+                            return false;
+                        break;
+                    default:
+                        if (!enableWhileStanding)
+                            return false;
+                        break;
+                }
+                return true;
+            }
+        }
 
         private void Start()
         {
@@ -43,7 +78,7 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (!characterEntity || characterEntity.IsDead())
+            if (!Enabling)
                 return;
             tempPitch = characterEntity.Pitch;
             if (maxAngle > 0f)
@@ -76,7 +111,7 @@ namespace MultiplayerARPG
 
         private void OnAnimatorIK(int layerIndex)
         {
-            if (!characterEntity || characterEntity.IsDead())
+            if (!Enabling)
                 return;
             animator.SetBoneLocalRotation(pitchBone, pitchRotation);
         }
