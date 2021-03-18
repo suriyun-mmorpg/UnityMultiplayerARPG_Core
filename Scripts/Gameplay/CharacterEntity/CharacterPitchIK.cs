@@ -61,14 +61,14 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            characterEntity = GetComponent<BaseCharacterEntity>();
+            characterEntity = GetComponentInParent<BaseCharacterEntity>();
             if (characterEntity == null)
             {
                 enabled = false;
                 return;
             }
             if (animator == null)
-                animator = GetComponent<Animator>();
+                animator = GetComponentInParent<Animator>();
             if (animator == null)
             {
                 enabled = false;
