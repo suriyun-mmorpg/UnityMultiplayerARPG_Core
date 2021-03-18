@@ -173,6 +173,7 @@ namespace MultiplayerARPG
                 Sprite iconSprite = GuildSkill == null ? null : GuildSkill.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
+                imageIcon.preserveAspect = true;
             }
 
             if (uiTextSkillType != null)

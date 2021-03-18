@@ -64,6 +64,7 @@ namespace MultiplayerARPG
                 Sprite iconSprite = Attribute == null ? null : Attribute.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
+                imageIcon.preserveAspect = true;
             }
         }
 
