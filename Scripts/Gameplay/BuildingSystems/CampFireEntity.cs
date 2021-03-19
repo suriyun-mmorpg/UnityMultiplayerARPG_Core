@@ -164,27 +164,23 @@ namespace MultiplayerARPG
 
             ConvertItem convertData;
             List<CharacterItem> items = new List<CharacterItem>(GameInstance.ServerStorageHandlers.GetStorageEntityItems(this));
-            foreach (CharacterItem item in items)
+            CharacterItem tempItem;
+            for (int i = 0; i < items.Count; ++i)
             {
-                if (!CacheConvertItems.ContainsKey(item.dataId))
+                tempItem = items[i];
+                if (!CacheConvertItems.ContainsKey(tempItem.dataId))
                     continue;
 
-                convertData = CacheConvertItems[item.dataId];
-                if (item.amount < convertData.item.amount)
+                convertData = CacheConvertItems[tempItem.dataId];
+
+                if (!convertRemainsDuration.ContainsKey(tempItem.dataId))
+                    convertRemainsDuration.Add(tempItem.dataId, convertData.convertInterval);
+
+                convertRemainsDuration[tempItem.dataId] -= tempDeltaTime;
+
+                if (convertRemainsDuration[tempItem.dataId] <= 0f)
                 {
-                    if (convertRemainsDuration.ContainsKey(item.dataId))
-                        convertRemainsDuration.Remove(item.dataId);
-                    continue;
-                }
-
-                if (!convertRemainsDuration.ContainsKey(item.dataId))
-                    convertRemainsDuration.Add(item.dataId, convertData.convertInterval);
-
-                convertRemainsDuration[item.dataId] -= tempDeltaTime;
-
-                if (convertRemainsDuration[item.dataId] <= 0f)
-                {
-                    convertRemainsDuration[item.dataId] = convertData.convertInterval;
+                    convertRemainsDuration[tempItem.dataId] = convertData.convertInterval;
                     ConvertItem(convertData).Forget();
                 }
             }
@@ -229,12 +225,16 @@ namespace MultiplayerARPG
                 return true;
             }
             List<CharacterItem> items = GameInstance.ServerStorageHandlers.GetStorageEntityItems(this);
+            Dictionary<int, short> countItems = new Dictionary<int, short>();
             foreach (CharacterItem item in items)
             {
-                if (CacheFuelItems.ContainsKey(item.dataId) &&
-                    item.amount >= CacheFuelItems[item.dataId].item.amount)
+                if (CacheFuelItems.ContainsKey(item.dataId))
                 {
-                    return true;
+                    if (!countItems.ContainsKey(item.dataId))
+                        countItems.Add(item.dataId, 0);
+                    countItems[item.dataId] += item.amount;
+                    if (countItems[item.dataId] >= CacheFuelItems[item.dataId].item.amount)
+                        return true;
                 }
             }
             return false;
