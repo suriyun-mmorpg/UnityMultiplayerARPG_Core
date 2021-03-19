@@ -56,11 +56,13 @@ namespace UtilsComponents
 
         public void FadeIn()
         {
+            alpha = 0;
             currentFadeState = FadeState.FadeIn;
         }
 
         public void FadeOut()
         {
+            alpha = 1;
             currentFadeState = FadeState.FadeOut;
         }
     }
