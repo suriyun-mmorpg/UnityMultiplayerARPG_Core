@@ -353,7 +353,12 @@ namespace MultiplayerARPG
 
         public void RequestAttack()
         {
-            if (PlayerCharacterEntity.CallServerAttack(isLeftHandAttacking, new AimPosition()))
+            AimPosition aimPosition = new AimPosition()
+            {
+                hasValue = true,
+                value = PlayerCharacterEntity.GetDefaultAttackAimPosition(ref isLeftHandAttacking),
+            };
+            if (PlayerCharacterEntity.CallServerAttack(isLeftHandAttacking, aimPosition))
                 isLeftHandAttacking = !isLeftHandAttacking;
         }
 
@@ -373,14 +378,26 @@ namespace MultiplayerARPG
                 AimPosition aimPosition = new AimPosition();
                 aimPosition.hasValue = queueUsingSkill.aimPosition.HasValue;
                 if (aimPosition.hasValue)
+                {
                     aimPosition.value = queueUsingSkill.aimPosition.Value;
+                }
+                else if (queueUsingSkill.skill.IsAttack())
+                {
+                    aimPosition.value = PlayerCharacterEntity.GetDefaultAttackAimPosition(ref isLeftHandAttacking);
+                }
                 bool canUseSkill;
                 if (queueUsingSkill.itemIndex >= 0)
+                {
                     canUseSkill = PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, aimPosition);
+                }
                 else
+                {
                     canUseSkill = PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, aimPosition);
+                }
                 if (canUseSkill)
+                {
                     isLeftHandAttacking = !isLeftHandAttacking;
+                }
                 ClearQueueUsingSkill();
             }
         }

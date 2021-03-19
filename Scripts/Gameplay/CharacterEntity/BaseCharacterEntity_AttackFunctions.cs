@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         protected CancellationTokenSource reloadCancellationTokenSource;
         protected CancellationTokenSource attackCancellationTokenSource;
 
-        public Vector3 GetDefaultAttackAimPosition(bool isLeftHand)
+        public Vector3 GetDefaultAttackAimPosition(ref bool isLeftHand)
         {
             return GetDefaultAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand);
         }

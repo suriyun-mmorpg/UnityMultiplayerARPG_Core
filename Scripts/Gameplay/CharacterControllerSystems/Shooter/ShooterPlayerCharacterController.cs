@@ -1467,17 +1467,19 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkill.skill != null)
             {
-                AimPosition aimPosition = new AimPosition();
-                aimPosition.hasValue = queueUsingSkill.aimPosition.HasValue;
-                if (aimPosition.hasValue)
-                    aimPosition.value = queueUsingSkill.aimPosition.Value;
+                AimPosition skillAimPosition = new AimPosition();
+                skillAimPosition.hasValue = queueUsingSkill.aimPosition.HasValue;
+                if (skillAimPosition.hasValue)
+                    skillAimPosition.value = queueUsingSkill.aimPosition.Value;
+                else if (queueUsingSkill.skill.IsAttack())
+                    skillAimPosition.value = aimPosition;
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    isDoingAction = PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, aimPosition);
+                    isDoingAction = PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, skillAimPosition);
                 }
                 else
                 {
-                    isDoingAction = PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHand, aimPosition);
+                    isDoingAction = PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHand, skillAimPosition);
                 }
             }
             ClearQueueUsingSkill();
