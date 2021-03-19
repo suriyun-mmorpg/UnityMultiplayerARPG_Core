@@ -1470,9 +1470,13 @@ namespace MultiplayerARPG
                 AimPosition skillAimPosition = new AimPosition();
                 skillAimPosition.hasValue = queueUsingSkill.aimPosition.HasValue;
                 if (skillAimPosition.hasValue)
+                {
                     skillAimPosition.value = queueUsingSkill.aimPosition.Value;
+                }
                 else if (queueUsingSkill.skill.IsAttack())
+                {
                     skillAimPosition.value = aimPosition;
+                }
                 if (queueUsingSkill.itemIndex >= 0)
                 {
                     isDoingAction = PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, skillAimPosition);
