@@ -411,11 +411,11 @@ namespace MultiplayerARPG
 
                     // Call on attack to extend attack functionality while attacking
                     bool overrideDefaultAttack = false;
-                    foreach (CharacterSkill characterSkill in Skills)
+                    foreach (KeyValuePair<BaseSkill, short> skillLevel in this.GetCaches().Skills)
                     {
-                        if (characterSkill.level <= 0)
+                        if (skillLevel.Value <= 0)
                             continue;
-                        if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition))
+                        if (skillLevel.Key.OnAttack(this, skillLevel.Value, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition))
                             overrideDefaultAttack = true;
                     }
 
