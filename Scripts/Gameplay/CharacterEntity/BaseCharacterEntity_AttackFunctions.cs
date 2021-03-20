@@ -209,7 +209,7 @@ namespace MultiplayerARPG
             IWeaponItem weaponItem = weapon.GetWeaponItem();
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileWeaponReloading = GetMoveSpeedRateWhileReloading(weaponItem);
+            MoveSpeedRateWhileReloading = GetMoveSpeedRateWhileReloading(weaponItem);
             try
             {
                 // Animations will plays on clients only

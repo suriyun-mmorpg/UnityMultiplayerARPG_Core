@@ -38,8 +38,8 @@ namespace MultiplayerARPG
             if (FpsModel && FpsModel.gameObject.activeSelf)
                 FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
             // Set weapon charging state
-            MoveSpeedRateWhileWeaponCharging = GetMoveSpeedRateWhileCharging(weaponItem);
-            IsWeaponCharging = true;
+            MoveSpeedRateWhileCharging = GetMoveSpeedRateWhileCharging(weaponItem);
+            IsCharging = true;
         }
 
         [AllRpc]
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             if (FpsModel && FpsModel.gameObject.activeSelf)
                 FpsModel.StopWeaponChargeAnimation();
             // Set weapon charging state
-            IsWeaponCharging = false;
+            IsCharging = false;
         }
 
         [AllRpc]

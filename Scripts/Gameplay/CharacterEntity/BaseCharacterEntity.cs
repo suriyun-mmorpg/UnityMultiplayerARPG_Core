@@ -82,10 +82,10 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
         public short ReloadingAmmoAmount { get; protected set; }
-        public bool IsWeaponReloading { get; protected set; }
-        public float MoveSpeedRateWhileWeaponReloading { get; protected set; }
-        public bool IsWeaponCharging { get; protected set; }
-        public float MoveSpeedRateWhileWeaponCharging { get; protected set; }
+        public bool IsReloading { get; protected set; }
+        public float MoveSpeedRateWhileReloading { get; protected set; }
+        public bool IsCharging { get; protected set; }
+        public float MoveSpeedRateWhileCharging { get; protected set; }
         public bool IsAttackingOrUsingSkill { get; protected set; }
         public float MoveSpeedRateWhileAttackingOrUsingSkill { get; protected set; }
         public float RespawnGroundedCheckCountDown { get; protected set; }
@@ -175,7 +175,7 @@ namespace MultiplayerARPG
             ClearActionStates();
             AnimActionType = animActionType;
             ReloadingAmmoAmount = reloadingAmmoAmount;
-            IsWeaponReloading = true;
+            IsReloading = true;
         }
 
         protected virtual void ClearActionStates()
@@ -186,8 +186,8 @@ namespace MultiplayerARPG
             UsingSkillLevel = 0;
             ReloadingAmmoAmount = 0;
             IsAttackingOrUsingSkill = false;
-            IsWeaponReloading = false;
-            IsWeaponCharging = false;
+            IsReloading = false;
+            IsCharging = false;
         }
 
         protected override void OnValidate()
@@ -670,7 +670,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanDoActions()
         {
-            return !this.IsDead() && !IsPlayingActionAnimation() && !IsAttackingOrUsingSkill;
+            return !this.IsDead() && !IsAttackingOrUsingSkill && !IsReloading && !IsCharging && !IsPlayingActionAnimation();
         }
 
         public float GetAttackSpeed()
@@ -690,13 +690,13 @@ namespace MultiplayerARPG
             {
                 moveSpeed *= MoveSpeedRateWhileAttackingOrUsingSkill;
             }
-            else if (IsWeaponReloading)
+            else if (IsReloading)
             {
-                moveSpeed *= MoveSpeedRateWhileWeaponReloading;
+                moveSpeed *= MoveSpeedRateWhileReloading;
             }
-            else if (IsWeaponCharging)
+            else if (IsCharging)
             {
-                moveSpeed *= MoveSpeedRateWhileWeaponCharging;
+                moveSpeed *= MoveSpeedRateWhileCharging;
             }
 
             if (movementState.HasFlag(MovementState.IsUnderWater))
