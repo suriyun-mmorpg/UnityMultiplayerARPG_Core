@@ -386,7 +386,7 @@ namespace MultiplayerARPG
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
                     // Play special effects after trigger duration
-                    tempTriggerDuration = totalDuration * triggerDurations[hitIndex];
+                    tempTriggerDuration = triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, attackCancellationTokenSource.Token);
 

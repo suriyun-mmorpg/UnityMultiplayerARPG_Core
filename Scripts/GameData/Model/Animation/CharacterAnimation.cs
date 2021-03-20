@@ -71,17 +71,20 @@ namespace MultiplayerARPG
 
         public float[] GetTriggerDurations()
         {
+            float clipLength = GetClipLength();
             if (multiHitTriggerDurationRates != null &&
                 multiHitTriggerDurationRates.Length > 0)
             {
+                float previousRate = 0f;
                 float[] durations = new float[multiHitTriggerDurationRates.Length];
                 for (int i = 0; i < durations.Length; ++i)
                 {
-                    durations[i] = GetClipLength() * multiHitTriggerDurationRates[i];
+                    durations[i] = clipLength * (multiHitTriggerDurationRates[i] - previousRate);
+                    previousRate = multiHitTriggerDurationRates[i];
                 }
                 return durations;
             }
-            return new float[] { GetClipLength() * triggerDurationRate };
+            return new float[] { clipLength * triggerDurationRate };
         }
 
         public float GetTotalDuration()

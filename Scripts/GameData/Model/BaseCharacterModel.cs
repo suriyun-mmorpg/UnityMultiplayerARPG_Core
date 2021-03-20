@@ -418,6 +418,8 @@ namespace MultiplayerARPG
                     equipmentEntities[equipPosition].Add(tempEquipmentEntity);
                     if (equipmentEntity == null)
                         equipmentEntity = tempEquipmentEntity;
+                    tempEquipmentEntity.transform.localPosition = tempEquipmentEntity.offsetsPosition;
+                    tempEquipmentEntity.transform.localEulerAngles = tempEquipmentEntity.offsetsEulerAngles;
                 }
             }
             // Cache Models
