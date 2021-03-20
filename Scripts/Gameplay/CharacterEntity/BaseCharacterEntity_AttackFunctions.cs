@@ -209,7 +209,7 @@ namespace MultiplayerARPG
             IWeaponItem weaponItem = weapon.GetWeaponItem();
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileWeaponReloading = weaponItem.MoveSpeedRateWhileReloading;
+            MoveSpeedRateWhileWeaponReloading = GetMoveSpeedRateWhileReloading(weaponItem);
             try
             {
                 // Animations will plays on clients only
@@ -365,7 +365,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamages(ref isLeftHand);
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileAttackingOrUsingSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
+            MoveSpeedRateWhileAttackingOrUsingSkill = GetMoveSpeedRateWhileAttacking(weaponItem);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= GetAnimSpeedRate(AnimActionType);
@@ -380,6 +380,12 @@ namespace MultiplayerARPG
                     if (FpsModel && FpsModel.gameObject.activeSelf)
                         FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
+
+                Vector3 aimPosition;
+                if (attackAimPosition.hasValue)
+                    aimPosition = attackAimPosition.value;
+                else
+                    aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
 
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
@@ -403,11 +409,6 @@ namespace MultiplayerARPG
                             AnimActionType == AnimActionType.AttackLeftHand)
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, CharacterModel.GenericAudioSource);
                     }
-
-                    // Get aim position by character's forward
-                    Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
-                    if (attackAimPosition.hasValue)
-                        aimPosition = attackAimPosition.value;
 
                     // Call on attack to extend attack functionality while attacking
                     bool overrideDefaultAttack = false;

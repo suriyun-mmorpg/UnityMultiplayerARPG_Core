@@ -199,7 +199,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileAttackingOrUsingSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, skill);
+            MoveSpeedRateWhileAttackingOrUsingSkill = skill.moveSpeedRateWhileUsingSkill;
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= GetAnimSpeedRate(AnimActionType);
@@ -244,6 +244,12 @@ namespace MultiplayerARPG
                         FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
 
+                Vector3 aimPosition;
+                if (skillAimPosition.hasValue)
+                    aimPosition = skillAimPosition.value;
+                else
+                    aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
+
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
@@ -267,11 +273,6 @@ namespace MultiplayerARPG
                             AnimActionType == AnimActionType.AttackLeftHand))
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, CharacterModel.GenericAudioSource);
                     }
-
-                    // Get aim position by character's forward
-                    Vector3 aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
-                    if (skillAimPosition.hasValue)
-                        aimPosition = skillAimPosition.value;
 
                     // Trigger skill event
                     if (onUseSkillRoutine != null)

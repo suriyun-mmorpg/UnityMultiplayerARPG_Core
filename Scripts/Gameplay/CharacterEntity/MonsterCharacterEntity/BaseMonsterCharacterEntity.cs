@@ -611,21 +611,9 @@ namespace MultiplayerARPG
                 SetAttackTarget(attacker);
         }
 
-        public override float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, BaseSkill skill)
+        public override float GetMoveSpeedRateWhileAttacking(IWeaponItem weaponItem)
         {
-            switch (animActionType)
-            {
-                case AnimActionType.AttackRightHand:
-                case AnimActionType.AttackLeftHand:
-                    return CharacterDatabase.MoveSpeedRateWhileAttacking;
-                case AnimActionType.SkillRightHand:
-                case AnimActionType.SkillLeftHand:
-                    // Calculate move speed rate while doing action at clients and server
-                    if (skill != null)
-                        return skill.moveSpeedRateWhileUsingSkill;
-                    break;
-            }
-            return 1f;
+            return CharacterDatabase.MoveSpeedRateWhileAttacking;
         }
     }
 

@@ -1037,25 +1037,19 @@ namespace MultiplayerARPG
             return 1f;
         }
 
-        public virtual float GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType animActionType, BaseSkill skill)
+        public virtual float GetMoveSpeedRateWhileReloading(IWeaponItem weaponItem)
         {
-            if (skill != null)
-                return skill.moveSpeedRateWhileUsingSkill;
-            IWeaponItem tempItem;
-            switch (animActionType)
-            {
-                case AnimActionType.AttackRightHand:
-                    tempItem = EquipWeapons.GetRightHandWeaponItem();
-                    if (tempItem != null)
-                        return tempItem.MoveSpeedRateWhileAttacking;
-                    return CurrentGameInstance.DefaultWeaponItem.MoveSpeedRateWhileAttacking;
-                case AnimActionType.AttackLeftHand:
-                    tempItem = EquipWeapons.GetLeftHandWeaponItem();
-                    if (tempItem != null)
-                        return tempItem.MoveSpeedRateWhileAttacking;
-                    return CurrentGameInstance.DefaultWeaponItem.MoveSpeedRateWhileAttacking;
-            }
-            return 1f;
+            return weaponItem.MoveSpeedRateWhileReloading;
+        }
+
+        public virtual float GetMoveSpeedRateWhileCharging(IWeaponItem weaponItem)
+        {
+            return weaponItem.MoveSpeedRateWhileCharging;
+        }
+
+        public virtual float GetMoveSpeedRateWhileAttacking(IWeaponItem weaponItem)
+        {
+            return weaponItem.MoveSpeedRateWhileAttacking;
         }
         #endregion
 
