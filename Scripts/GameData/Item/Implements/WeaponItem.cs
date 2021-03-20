@@ -47,6 +47,20 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private float moveSpeedRateWhileReloading = 1f;
+        public float MoveSpeedRateWhileReloading
+        {
+            get { return moveSpeedRateWhileReloading; }
+        }
+
+        [SerializeField]
+        private float moveSpeedRateWhileCharging = 1f;
+        public float MoveSpeedRateWhileCharging
+        {
+            get { return moveSpeedRateWhileCharging; }
+        }
+
+        [SerializeField]
         private float moveSpeedRateWhileAttacking = 0f;
         public float MoveSpeedRateWhileAttacking
         {

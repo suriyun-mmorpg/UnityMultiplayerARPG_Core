@@ -199,7 +199,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, skill);
+            MoveSpeedRateWhileAttackingOrUsingSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, skill);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= GetAnimSpeedRate(AnimActionType);

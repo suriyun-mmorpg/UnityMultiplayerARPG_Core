@@ -209,7 +209,7 @@ namespace MultiplayerARPG
             IWeaponItem weaponItem = weapon.GetWeaponItem();
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
+            MoveSpeedRateWhileWeaponReloading = weaponItem.MoveSpeedRateWhileReloading;
             try
             {
                 // Animations will plays on clients only
@@ -365,7 +365,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamages(ref isLeftHand);
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileAttackOrUseSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
+            MoveSpeedRateWhileAttackingOrUsingSkill = GetMoveSpeedRateWhileAttackOrUseSkill(AnimActionType, null);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= GetAnimSpeedRate(AnimActionType);

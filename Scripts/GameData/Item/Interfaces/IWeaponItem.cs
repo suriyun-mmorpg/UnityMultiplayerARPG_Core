@@ -21,6 +21,14 @@ namespace MultiplayerARPG
         /// </summary>
         IncrementalMinMaxFloat HarvestDamageAmount { get; }
         /// <summary>
+        /// This will be multiplied with character's movement speed while reloading this weapon
+        /// </summary>
+        float MoveSpeedRateWhileReloading { get; }
+        /// <summary>
+        /// This will be multiplied with character's movement speed while charging this weapon
+        /// </summary>
+        float MoveSpeedRateWhileCharging { get; }
+        /// <summary>
         /// This will be multiplied with character's movement speed while attacking with this weapon
         /// </summary>
         float MoveSpeedRateWhileAttacking { get; }

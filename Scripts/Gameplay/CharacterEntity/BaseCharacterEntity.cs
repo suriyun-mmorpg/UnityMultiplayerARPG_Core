@@ -82,8 +82,12 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
         public short ReloadingAmmoAmount { get; protected set; }
+        public bool IsWeaponReloading { get; protected set; }
+        public float MoveSpeedRateWhileWeaponReloading { get; protected set; }
+        public bool IsWeaponCharging { get; protected set; }
+        public float MoveSpeedRateWhileWeaponCharging { get; protected set; }
         public bool IsAttackingOrUsingSkill { get; protected set; }
-        public float MoveSpeedRateWhileAttackOrUseSkill { get; protected set; }
+        public float MoveSpeedRateWhileAttackingOrUsingSkill { get; protected set; }
         public float RespawnGroundedCheckCountDown { get; protected set; }
         protected float lastMountTime;
         protected float lastActionTime;
@@ -171,7 +175,7 @@ namespace MultiplayerARPG
             ClearActionStates();
             AnimActionType = animActionType;
             ReloadingAmmoAmount = reloadingAmmoAmount;
-            IsAttackingOrUsingSkill = true;
+            IsWeaponReloading = true;
         }
 
         protected virtual void ClearActionStates()
@@ -182,6 +186,8 @@ namespace MultiplayerARPG
             UsingSkillLevel = 0;
             ReloadingAmmoAmount = 0;
             IsAttackingOrUsingSkill = false;
+            IsWeaponReloading = false;
+            IsWeaponCharging = false;
         }
 
         protected override void OnValidate()
@@ -681,7 +687,17 @@ namespace MultiplayerARPG
             float moveSpeed = this.GetCaches().MoveSpeed;
 
             if (IsAttackingOrUsingSkill)
-                moveSpeed *= MoveSpeedRateWhileAttackOrUseSkill;
+            {
+                moveSpeed *= MoveSpeedRateWhileAttackingOrUsingSkill;
+            }
+            else if (IsWeaponReloading)
+            {
+                moveSpeed *= MoveSpeedRateWhileWeaponReloading;
+            }
+            else if (IsWeaponCharging)
+            {
+                moveSpeed *= MoveSpeedRateWhileWeaponCharging;
+            }
 
             if (movementState.HasFlag(MovementState.IsUnderWater))
             {
@@ -1025,15 +1041,18 @@ namespace MultiplayerARPG
         {
             if (skill != null)
                 return skill.moveSpeedRateWhileUsingSkill;
+            IWeaponItem tempItem;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    if (EquipWeapons.GetRightHandWeaponItem() != null)
-                        return EquipWeapons.GetRightHandWeaponItem().MoveSpeedRateWhileAttacking;
+                    tempItem = EquipWeapons.GetRightHandWeaponItem();
+                    if (tempItem != null)
+                        return tempItem.MoveSpeedRateWhileAttacking;
                     return CurrentGameInstance.DefaultWeaponItem.MoveSpeedRateWhileAttacking;
                 case AnimActionType.AttackLeftHand:
-                    if (EquipWeapons.GetLeftHandWeaponItem() != null)
-                        return EquipWeapons.GetLeftHandWeaponItem().MoveSpeedRateWhileAttacking;
+                    tempItem = EquipWeapons.GetLeftHandWeaponItem();
+                    if (tempItem != null)
+                        return tempItem.MoveSpeedRateWhileAttacking;
                     return CurrentGameInstance.DefaultWeaponItem.MoveSpeedRateWhileAttacking;
             }
             return 1f;

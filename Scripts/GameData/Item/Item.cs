@@ -55,6 +55,12 @@ namespace MultiplayerARPG
         public DamageIncremental damageAmount;
         public IncrementalMinMaxFloat harvestDamageAmount;
         [Range(0f, 1f)]
+        [Tooltip("This is move speed rate while reloading this weapon")]
+        public float moveSpeedRateWhileReloading = 1f;
+        [Range(0f, 1f)]
+        [Tooltip("This is move speed rate while charging this weapon")]
+        public float moveSpeedRateWhileCharging = 1f;
+        [Range(0f, 1f)]
         [Tooltip("This is move speed rate while attacking with this weapon")]
         public float moveSpeedRateWhileAttacking = 0f;
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
@@ -338,6 +344,16 @@ namespace MultiplayerARPG
         public IncrementalMinMaxFloat HarvestDamageAmount
         {
             get { return harvestDamageAmount; }
+        }
+
+        public float MoveSpeedRateWhileReloading
+        {
+            get { return moveSpeedRateWhileReloading; }
+        }
+
+        public float MoveSpeedRateWhileCharging
+        {
+            get { return moveSpeedRateWhileCharging; }
         }
 
         public float MoveSpeedRateWhileAttacking

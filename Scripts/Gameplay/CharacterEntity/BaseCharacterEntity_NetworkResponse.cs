@@ -30,12 +30,16 @@ namespace MultiplayerARPG
         protected void AllPlayChargeAnimation(bool isLeftHand)
         {
             // Get weapon type data
-            int weaponTypeDataId = this.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DataId;
+            IWeaponItem weapon = this.GetAvailableWeapon(ref isLeftHand).GetWeaponItem();
+            int weaponTypeDataId = weapon.WeaponType.DataId;
             // Play animation
             if (CharacterModel && CharacterModel.gameObject.activeSelf)
                 CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
             if (FpsModel && FpsModel.gameObject.activeSelf)
                 FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+            // Set weapon charging state
+            MoveSpeedRateWhileWeaponCharging = weapon.MoveSpeedRateWhileCharging;
+            IsWeaponCharging = true;
         }
 
         [AllRpc]
@@ -46,6 +50,8 @@ namespace MultiplayerARPG
                 CharacterModel.StopWeaponChargeAnimation();
             if (FpsModel && FpsModel.gameObject.activeSelf)
                 FpsModel.StopWeaponChargeAnimation();
+            // Set weapon charging state
+            IsWeaponCharging = false;
         }
 
         [AllRpc]
