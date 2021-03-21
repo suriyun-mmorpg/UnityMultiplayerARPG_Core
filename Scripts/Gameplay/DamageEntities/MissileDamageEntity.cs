@@ -141,6 +141,7 @@ namespace MultiplayerARPG
 
         protected override void OnPushBack()
         {
+            previousPosition = null;
             if (onDestroy != null)
                 onDestroy.Invoke();
             base.OnPushBack();
