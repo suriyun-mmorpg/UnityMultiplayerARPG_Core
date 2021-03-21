@@ -28,12 +28,6 @@ namespace MultiplayerARPG
         public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
-        [Tooltip("This is transform which will be used to calculate offsets between equip container and this equipment entity")]
-        public Transform offsetsTransform;
-        [Tooltip("This is offsets between equip container and this equipment entity")]
-        public Vector3 offsetsPosition;
-        [Tooltip("This is offsets between equip container and this equipment entity")]
-        public Vector3 offsetsEulerAngles;
 
         public IEnumerable<IPoolDescriptor> PoolDescriptors
         {
@@ -69,15 +63,6 @@ namespace MultiplayerARPG
 
             if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
                 poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
-        }
-
-        [ContextMenu("Calculate Offsets")]
-        public void CalculateOffsets()
-        {
-            if (offsetsTransform == null)
-                return;
-            offsetsPosition = offsetsTransform.position - transform.position;
-            offsetsEulerAngles = offsetsTransform.eulerAngles - transform.eulerAngles;
         }
 
         public abstract void OnLevelChanged(int level);
