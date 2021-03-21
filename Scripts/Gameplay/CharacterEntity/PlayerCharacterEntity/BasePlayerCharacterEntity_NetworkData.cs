@@ -10,6 +10,9 @@ namespace MultiplayerARPG
         #region Sync data
         [Header("Player Character Sync Fields")]
         [SerializeField]
+        [Range(0.00825f, 0.1f)]
+        public float clientSendAimPositionInterval = 0.05f;
+        [SerializeField]
         protected SyncFieldInt dataId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt factionId = new SyncFieldInt();
@@ -42,6 +45,10 @@ namespace MultiplayerARPG
         protected SyncListCharacterQuest quests = new SyncListCharacterQuest();
         [SerializeField]
         protected SyncListCharacterCurrency currencies = new SyncListCharacterCurrency();
+        #endregion
+
+        #region Data Sending State
+        protected float lastClientSendAimPosition;
         #endregion
 
         #region Dealing System

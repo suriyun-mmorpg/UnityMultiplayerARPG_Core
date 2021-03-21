@@ -29,8 +29,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldByte pitch = new SyncFieldByte();
         [SerializeField]
-        protected SyncFieldVector3 aimPosition = new SyncFieldVector3();
-        [SerializeField]
         protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
         [Header("Character Sync Lists")]
         [SerializeField]
@@ -75,8 +73,30 @@ namespace MultiplayerARPG
             }
         }
         public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
-        public float Pitch { get { return (float)pitch.Value * 0.01f * 360f; } set { pitch.Value = (byte)(value / 360f * 100); } }
-        public Vector3 AimPosition { get { return aimPosition.Value; } set { aimPosition.Value = value; } }
+        public float Pitch
+        {
+            get
+            {
+                return (float)pitch.Value * 0.01f * 360f;
+            }
+            set
+            {
+                pitch.Value = (byte)(value / 360f * 100);
+            }
+        }
+        private Vector3 aimPosition;
+        public Vector3 AimPosition
+        {
+            get
+            {
+                return aimPosition;
+            }
+            set
+            {
+                if (IsServer || IsOwnerClient)
+                    aimPosition = value;
+            }
+        }
 
         public IList<EquipWeapons> SelectableWeaponSets
         {

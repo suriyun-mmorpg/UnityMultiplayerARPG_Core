@@ -98,6 +98,6 @@
         // 1.63c
         public const ushort Respawn = 172;
         // 1.63g
-        public const ushort AimPosition = 173;
+        public const ushort SetAimPosition = 173;
     }
 }

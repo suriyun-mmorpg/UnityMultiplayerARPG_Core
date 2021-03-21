@@ -411,7 +411,7 @@ namespace MultiplayerARPG
                     {
                         if (skillLevel.Value <= 0)
                             continue;
-                        if (skillLevel.Key.OnAttack(this, skillLevel.Value, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition))
+                        if (skillLevel.Key.OnAttack(this, skillLevel.Value, isLeftHand, weapon, hitIndex, damageAmounts, AimPosition))
                             overrideDefaultAttack = true;
                     }
 
@@ -420,26 +420,18 @@ namespace MultiplayerARPG
                     {
                         // Trigger attack event
                         if (onAttackRoutine != null)
-                        {
-                            onAttackRoutine.Invoke(
-                                isLeftHand,
-                                weapon,
-                                hitIndex,
-                                damageInfo,
-                                damageAmounts,
-                                aimPosition);
-                        }
+                            onAttackRoutine.Invoke(isLeftHand, weapon, hitIndex, damageInfo, damageAmounts, AimPosition);
 
                         // Apply attack damages
                         if (IsServer)
                         {
                             int randomSeed = Random.Range(0, 255);
-                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, aimPosition, randomSeed);
+                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, AimPosition, randomSeed);
                             SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                             if (isLeftHand)
                                 simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
                             simulateData.randomSeed = (byte)randomSeed;
-                            simulateData.aimPosition = aimPosition;
+                            simulateData.aimPosition = AimPosition;
                             CallAllSimulateLaunchDamageEntity(simulateData);
                         }
                     }

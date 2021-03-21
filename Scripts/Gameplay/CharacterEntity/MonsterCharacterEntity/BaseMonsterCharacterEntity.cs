@@ -570,6 +570,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
             InitStats();
+            Teleport(SpawnPosition, CacheTransform.rotation);
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 SpawnPosition,

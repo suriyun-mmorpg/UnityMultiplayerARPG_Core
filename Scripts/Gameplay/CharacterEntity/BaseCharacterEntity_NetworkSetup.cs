@@ -29,11 +29,6 @@ namespace MultiplayerARPG
             equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            aimPosition.dataChannel = ACTION_TO_CLIENT_DATA_CHANNEL;
-            aimPosition.deliveryMethod = DeliveryMethod.Sequenced;
-            aimPosition.clientDataChannel = ACTION_TO_SERVER_DATA_CHANNEL;
-            aimPosition.clientDeliveryMethod = DeliveryMethod.Sequenced;
-            aimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             targetEntityId.dataChannel = ACTION_TO_CLIENT_DATA_CHANNEL;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;

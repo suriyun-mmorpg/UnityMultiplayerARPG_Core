@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLib;
+using LiteNetLib.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Serialization;
@@ -94,6 +96,25 @@ namespace MultiplayerARPG
                 StopMove();
                 SetTargetEntity(null);
                 return;
+            }
+            Profiler.EndSample();
+        }
+
+        protected override void EntityFixedUpdate()
+        {
+            Profiler.BeginSample("BasePlayerCharacterEntity - FixedUpdate");
+            float currentTime = Time.fixedTime;
+            base.EntityFixedUpdate();
+            if (IsOwnerClient && !this.IsDead())
+            {
+                if (currentTime - lastClientSendAimPosition > clientSendAimPositionInterval)
+                {
+                    ClientSendPacket(ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.Sequenced, GameNetworkingConsts.SetAimPosition, (writer) =>
+                    {
+                        writer.PutVector3(AimPosition);
+                    });
+                    lastClientSendAimPosition = currentTime;
+                }
             }
             Profiler.EndSample();
         }

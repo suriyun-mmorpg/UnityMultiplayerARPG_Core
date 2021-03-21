@@ -150,6 +150,7 @@ namespace MultiplayerARPG
             RegisterServerMessage(GameNetworkingConsts.SyncTransform, HandleSyncTransformAtServer);
             RegisterServerMessage(GameNetworkingConsts.StopMove, HandleStopMoveAtServer);
             RegisterServerMessage(GameNetworkingConsts.Jump, HandleJumpAtServer);
+            RegisterServerMessage(GameNetworkingConsts.SetAimPosition, HandleSetAimPositionAtServer);
             if (ServerCharacterHandlers != null)
             {
                 RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerCharacterHandlers.HandleRequestOnlineCharacter);
@@ -462,34 +463,37 @@ namespace MultiplayerARPG
 
         protected void HandleMovementInputAtServer(MessageHandlerData messageHandler)
         {
-            uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
-                gameEntity.Movement.HandleMovementInputAtServer(messageHandler);
+            BasePlayerCharacterEntity gameEntity;
+            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity) && gameEntity.ActiveMovement != null)
+                gameEntity.ActiveMovement.HandleMovementInputAtServer(messageHandler);
         }
 
         protected void HandleSyncTransformAtServer(MessageHandlerData messageHandler)
         {
-            uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
-                gameEntity.Movement.HandleSyncTransformAtServer(messageHandler);
+            BasePlayerCharacterEntity gameEntity;
+            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity) && gameEntity.ActiveMovement != null)
+                gameEntity.ActiveMovement.HandleSyncTransformAtServer(messageHandler);
         }
 
         protected void HandleStopMoveAtServer(MessageHandlerData messageHandler)
         {
-            uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
-                gameEntity.Movement.HandleStopMoveAtServer(messageHandler);
+            BasePlayerCharacterEntity gameEntity;
+            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity) && gameEntity.ActiveMovement != null)
+                gameEntity.ActiveMovement.HandleStopMoveAtServer(messageHandler);
         }
 
         protected void HandleJumpAtServer(MessageHandlerData messageHandler)
         {
-            uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Movement != null)
-                gameEntity.Movement.HandleJumpAtServer(messageHandler);
+            BasePlayerCharacterEntity gameEntity;
+            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity) && gameEntity.ActiveMovement != null)
+                gameEntity.ActiveMovement.HandleJumpAtServer(messageHandler);
+        }
+
+        protected void HandleSetAimPositionAtServer(MessageHandlerData messageHandler)
+        {
+            BasePlayerCharacterEntity gameEntity;
+            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity))
+                gameEntity.AimPosition = messageHandler.Reader.GetVector3();
         }
 
         protected ChatMessage FillChatChannelId(ChatMessage message)

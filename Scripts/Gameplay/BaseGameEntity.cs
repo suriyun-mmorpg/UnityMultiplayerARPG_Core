@@ -164,12 +164,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public IEntityMovement ActiveMovement
+        public IEntityMovementComponent ActiveMovement
         {
             get
             {
                 if (PassengingVehicleEntity != null)
-                    return PassengingVehicleEntity;
+                    return PassengingVehicleEntity.Entity.Movement;
                 return Movement;
             }
         }
