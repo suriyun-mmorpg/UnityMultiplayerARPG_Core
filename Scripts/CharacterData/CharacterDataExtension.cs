@@ -1065,7 +1065,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Decrease Ammos
+        #region Ammo Functions
         public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount, out Dictionary<CharacterItem, short> decreaseItems)
         {
             decreaseItems = new Dictionary<CharacterItem, short>();
@@ -1224,42 +1224,59 @@ namespace MultiplayerARPG
         {
             if (data is BaseMonsterCharacterEntity)
             {
-                BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
                 isLeftHand = false;
-                return monsterCharacterEntity.CharacterDatabase.DamageInfo;
+                return (data as BaseMonsterCharacterEntity).CharacterDatabase.DamageInfo;
             }
-            else
-            {
-                return data.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DamageInfo;
-            }
+            return data.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DamageInfo;
         }
 
-        public static Transform GetWeaponDamageTransform(this BaseCharacterEntity characterEntity, ref bool isLeftHand)
+        public static DamageInfo GetWeaponDamageInfo(this ICharacterData data, IWeaponItem weaponItem)
         {
-            if (characterEntity is BaseMonsterCharacterEntity)
-            {
-                BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-                isLeftHand = false;
-                return monsterCharacterEntity.CharacterDatabase.DamageInfo.GetDamageTransform(characterEntity, isLeftHand);
-            }
-            else
-            {
-                return characterEntity.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DamageInfo.GetDamageTransform(characterEntity, isLeftHand);
-            }
+            if (data is BaseMonsterCharacterEntity)
+                return (data as BaseMonsterCharacterEntity).CharacterDatabase.DamageInfo;
+            return weaponItem.WeaponType.DamageInfo;
         }
 
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetWeaponDamage(this ICharacterData data, ref bool isLeftHand)
+        public static KeyValuePair<DamageElement, MinMaxFloat> GetWeaponDamages(this ICharacterData data, ref bool isLeftHand)
+        {
+            if (data is BaseMonsterCharacterEntity)
+            {
+                isLeftHand = false;
+                BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
+                return GameDataHelpers.MakeDamage(monsterCharacterEntity.CharacterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
+            }
+            return data.GetAvailableWeapon(ref isLeftHand).GetDamageAmount(data);
+        }
+
+        public static KeyValuePair<DamageElement, MinMaxFloat> GetWeaponDamages(this ICharacterData data, CharacterItem weapon)
         {
             if (data is BaseMonsterCharacterEntity)
             {
                 BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
-                isLeftHand = false;
                 return GameDataHelpers.MakeDamage(monsterCharacterEntity.CharacterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
             }
-            else
-            {
-                return data.GetAvailableWeapon(ref isLeftHand).GetDamageAmount(data);
-            }
+            return weapon.GetDamageAmount(data);
+        }
+
+        public static float GetMoveSpeedRateWhileReloading(this ICharacterData data, IWeaponItem weaponItem)
+        {
+            if (data is BaseMonsterCharacterEntity)
+                return 1f;
+            return weaponItem.MoveSpeedRateWhileReloading;
+        }
+
+        public static float GetMoveSpeedRateWhileCharging(this ICharacterData data, IWeaponItem weaponItem)
+        {
+            if (data is BaseMonsterCharacterEntity)
+                return 1f;
+            return weaponItem.MoveSpeedRateWhileCharging;
+        }
+
+        public static float GetMoveSpeedRateWhileAttacking(this ICharacterData data, IWeaponItem weaponItem)
+        {
+            if (data is BaseMonsterCharacterEntity)
+                return (data as BaseMonsterCharacterEntity).CharacterDatabase.MoveSpeedRateWhileAttacking;
+            return weaponItem.MoveSpeedRateWhileAttacking;
         }
 
         public static int IndexOfAttribute(this ICharacterData data, int dataId)

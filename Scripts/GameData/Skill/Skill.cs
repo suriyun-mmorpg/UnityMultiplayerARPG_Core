@@ -105,10 +105,11 @@ namespace MultiplayerARPG
                 if (skillUser.IsServer && GetUseAmmoAmount() > 0)
                 {
                     // Increase damage with ammo damage
-                    Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                    skillUser.ReduceAmmo(weapon, isLeftHand, out increaseDamages, GetUseAmmoAmount());
-                    if (increaseDamages != null)
-                        damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
+                    IAmmoItem ammoItem;
+                    short ammoLevel;
+                    skillUser.ReduceAmmo(weapon, isLeftHand, out ammoItem, out ammoLevel, GetUseAmmoAmount());
+                    if (ammoItem != null)
+                        damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, ammoItem.GetIncreaseDamages(ammoLevel));
                 }
 
                 // Launch damage entity to apply damage to other characters
@@ -267,7 +268,7 @@ namespace MultiplayerARPG
                 case SkillAttackType.Normal:
                     return GameDataHelpers.MakeDamage(damageAmount, skillLevel, 1f, GetEffectivenessDamage(skillUser));
                 case SkillAttackType.BasedOnWeapon:
-                    return skillUser.GetWeaponDamage(ref isLeftHand);
+                    return skillUser.GetWeaponDamages(ref isLeftHand);
             }
             return new KeyValuePair<DamageElement, MinMaxFloat>();
         }

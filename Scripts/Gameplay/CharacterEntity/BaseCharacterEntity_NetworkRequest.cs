@@ -31,11 +31,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerAttack(bool isLeftHand, AimPosition aimPosition)
+        public bool CallServerAttack(bool isLeftHand)
         {
             if (!ValidateRequestAttack(isLeftHand))
                 return false;
-            RPC(ServerAttack, ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, aimPosition);
+            RPC(ServerAttack, ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
             return true;
         }
 
@@ -72,11 +72,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex, int randomSeed, AimPosition aimPosition)
+        public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
             if (this.IsDead())
                 return false;
-            RPC(AllPlayAttackAnimation, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, randomSeed, aimPosition);
+            RPC(AllPlayAttackAnimation, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex);
             return true;
         }
 
@@ -125,6 +125,14 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return false;
             RPC(AllOnSkillCastingInterrupt, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+            return true;
+        }
+
+        public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
+        {
+            if (this.IsDead())
+                return false;
+            RPC(AllSimulateLaunchDamageEntity, ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             return true;
         }
 

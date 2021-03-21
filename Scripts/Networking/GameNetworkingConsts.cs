@@ -97,5 +97,7 @@
         public const ushort NotifyRewardCurrency = 171;
         // 1.63c
         public const ushort Respawn = 172;
+        // 1.63g
+        public const ushort AimPosition = 173;
     }
 }

@@ -190,6 +190,7 @@ namespace MultiplayerARPG
                     }
                 }
 
+                Entity.AimPosition = Entity.GetDefaultAttackAimPosition(ref isLeftHandAttacking);
                 if (Entity.IsPlayingActionAnimation())
                     return true;
 
@@ -205,7 +206,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Attack when no queue skill
-                    Entity.CallServerAttack(false, new AimPosition());
+                    Entity.CallServerAttack(false);
                 }
 
                 ClearActionState();
@@ -354,7 +355,7 @@ namespace MultiplayerARPG
         protected Transform GetDamageTransform()
         {
             return queueSkill != null ? queueSkill.GetApplyTransform(Entity, isLeftHandAttacking) :
-                Entity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(Entity, isLeftHandAttacking);
+                Entity.GetWeaponDamageInfo(null).GetDamageTransform(Entity, isLeftHandAttacking);
         }
 
         protected float GetAttackDistance()

@@ -1036,21 +1036,6 @@ namespace MultiplayerARPG
                 return GetAttackSpeed();
             return 1f;
         }
-
-        public virtual float GetMoveSpeedRateWhileReloading(IWeaponItem weaponItem)
-        {
-            return weaponItem.MoveSpeedRateWhileReloading;
-        }
-
-        public virtual float GetMoveSpeedRateWhileCharging(IWeaponItem weaponItem)
-        {
-            return weaponItem.MoveSpeedRateWhileCharging;
-        }
-
-        public virtual float GetMoveSpeedRateWhileAttacking(IWeaponItem weaponItem)
-        {
-            return weaponItem.MoveSpeedRateWhileAttacking;
-        }
         #endregion
 
         protected virtual void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)

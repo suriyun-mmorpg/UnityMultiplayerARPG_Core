@@ -195,7 +195,6 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, skillLevel, isLeftHand);
 
             // Calculate move speed rate while doing action at clients and server
@@ -244,12 +243,6 @@ namespace MultiplayerARPG
                         FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
 
-                Vector3 aimPosition;
-                if (skillAimPosition.hasValue)
-                    aimPosition = skillAimPosition.value;
-                else
-                    aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
-
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
@@ -274,12 +267,31 @@ namespace MultiplayerARPG
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, CharacterModel.GenericAudioSource);
                     }
 
+                    // Get aim position by character's forward
+                    Vector3 aimPosition;
+                    if (skill.HasCustomAimControls() && skillAimPosition.hasValue)
+                        aimPosition = skillAimPosition.value;
+                    else
+                        aimPosition = AimPosition;
+
                     // Trigger skill event
                     if (onUseSkillRoutine != null)
                         onUseSkillRoutine.Invoke(skill, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
 
                     // Apply skill buffs, summons and attack damages
-                    skill.ApplySkill(this, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+                    if (IsServer)
+                    {
+                        skill.ApplySkill(this, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+                        SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
+                        if (isLeftHand)
+                            simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
+                        simulateData.state |= SimulateLaunchDamageEntityState.IsSkill;
+                        simulateData.skillDataId = skill.DataId;
+                        simulateData.skillLevel = skillLevel;
+                        simulateData.hitIndex = hitIndex;
+                        simulateData.aimPosition = aimPosition;
+                        CallAllSimulateLaunchDamageEntity(simulateData);
+                    }
 
                     if (remainsDuration <= 0f)
                     {

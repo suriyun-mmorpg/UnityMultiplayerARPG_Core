@@ -27,8 +27,7 @@ namespace MultiplayerARPG
         int hitIndex,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-        Vector3 aimPosition,
-        int randomSeed);
+        Vector3 aimPosition);
     public delegate void UseSkillRoutineDelegate(
         BaseSkill skill,
         short level,

@@ -7,9 +7,9 @@ namespace MultiplayerARPG
     public partial class BaseCharacterEntity
     {
         [AllRpc]
-        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex, int randomSeed, AimPosition aimPosition)
+        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
-            AttackRoutine(isLeftHand, animationIndex, randomSeed, aimPosition).Forget();
+            AttackRoutine(isLeftHand, animationIndex).Forget();
         }
 
         [AllRpc]
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
             if (FpsModel && FpsModel.gameObject.activeSelf)
                 FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
             // Set weapon charging state
-            MoveSpeedRateWhileCharging = GetMoveSpeedRateWhileCharging(weaponItem);
+            MoveSpeedRateWhileCharging = this.GetMoveSpeedRateWhileCharging(weaponItem);
             IsCharging = true;
         }
 

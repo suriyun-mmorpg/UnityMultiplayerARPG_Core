@@ -22,26 +22,13 @@ namespace MultiplayerARPG
                 value = reader.GetVector3();
         }
 
-        public static AimPosition CreateForAttack(BasePlayerCharacterEntity entity, ref bool isLeftHand)
-        {
-            return new AimPosition()
-            {
-                hasValue = true,
-                value = entity.GetDefaultAttackAimPosition(ref isLeftHand),
-            };
-        }
-
-        public static AimPosition CreateForSkill(BasePlayerCharacterEntity entity, Vector3? vector3, bool isAttack, ref bool isLeftHand)
+        public static AimPosition Create(Vector3? vector3)
         {
             AimPosition aimPosition = new AimPosition();
             aimPosition.hasValue = vector3.HasValue;
             if (aimPosition.hasValue)
             {
                 aimPosition.value = vector3.Value;
-            }
-            else if (isAttack)
-            {
-                aimPosition.value = entity.GetDefaultAttackAimPosition(ref isLeftHand);
             }
             return aimPosition;
         }

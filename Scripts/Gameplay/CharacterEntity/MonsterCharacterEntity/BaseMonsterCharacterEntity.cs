@@ -610,11 +610,6 @@ namespace MultiplayerARPG
                 CharacterDatabase.Characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
-
-        public override float GetMoveSpeedRateWhileAttacking(IWeaponItem weaponItem)
-        {
-            return CharacterDatabase.MoveSpeedRateWhileAttacking;
-        }
     }
 
     public struct ReceivedDamageRecord

@@ -62,11 +62,11 @@ namespace MultiplayerARPG
             animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
         }
 
-        public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamages(ref bool isLeftHand)
+        public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamagesWithBuffs(CharacterItem weapon)
         {
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Calculate all damages
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetWeaponDamage(ref isLeftHand));
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetWeaponDamages(weapon));
             // Sum damage with buffs
             damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetCaches().IncreaseDamages);
 
@@ -98,9 +98,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ReduceAmmo(CharacterItem weapon, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamges, short amount = 1)
+        public void ReduceAmmo(CharacterItem weapon, bool isLeftHand, out IAmmoItem ammoItem, out short ammoLevel, short amount = 1)
         {
-            increaseDamges = null;
+            ammoItem = null;
+            ammoLevel = 1;
+
             // Avoid null data
             if (weapon == null)
                 return;
@@ -114,9 +116,8 @@ namespace MultiplayerARPG
                 {
                     this.FillEmptySlots();
                     CharacterItem ammoCharacterItem = decreaseAmmoItems.FirstOrDefault().Key;
-                    IAmmoItem ammoItem = ammoCharacterItem.GetAmmoItem();
-                    if (ammoItem != null)
-                        increaseDamges = ammoItem.GetIncreaseDamages(ammoCharacterItem.level);
+                    ammoItem = ammoCharacterItem.GetAmmoItem();
+                    ammoLevel = ammoCharacterItem.level;
                 }
             }
             else
@@ -209,7 +210,7 @@ namespace MultiplayerARPG
             IWeaponItem weaponItem = weapon.GetWeaponItem();
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileReloading = GetMoveSpeedRateWhileReloading(weaponItem);
+            MoveSpeedRateWhileReloading = this.GetMoveSpeedRateWhileReloading(weaponItem);
             try
             {
                 // Animations will plays on clients only
@@ -285,7 +286,7 @@ namespace MultiplayerARPG
         /// Is function will be called at server to order character to attack
         /// </summary>
         [ServerRpc]
-        protected virtual void ServerAttack(bool isLeftHand, AimPosition aimPosition)
+        protected virtual void ServerAttack(bool isLeftHand)
         {
 #if !CLIENT_BUILD
             if (!CanAttack())
@@ -322,11 +323,11 @@ namespace MultiplayerARPG
             IsAttackingOrUsingSkill = true;
 
             // Play animations
-            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex, Random.Range(int.MinValue, int.MaxValue), aimPosition);
+            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex);
 #endif
         }
 
-        protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex, int randomSeed, AimPosition attackAimPosition)
+        protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex)
         {
             // Attack animation still playing, skip it
             if (attackCancellationTokenSource != null)
@@ -361,11 +362,11 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            DamageInfo damageInfo = this.GetWeaponDamageInfo(ref isLeftHand);
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamages(ref isLeftHand);
+            DamageInfo damageInfo = this.GetWeaponDamageInfo(weaponItem);
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamagesWithBuffs(weapon);
 
             // Calculate move speed rate while doing action at clients and server
-            MoveSpeedRateWhileAttackingOrUsingSkill = GetMoveSpeedRateWhileAttacking(weaponItem);
+            MoveSpeedRateWhileAttackingOrUsingSkill = this.GetMoveSpeedRateWhileAttacking(weaponItem);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= GetAnimSpeedRate(AnimActionType);
@@ -380,12 +381,6 @@ namespace MultiplayerARPG
                     if (FpsModel && FpsModel.gameObject.activeSelf)
                         FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
-
-                Vector3 aimPosition;
-                if (attackAimPosition.hasValue)
-                    aimPosition = attackAimPosition.value;
-                else
-                    aimPosition = GetDefaultAttackAimPosition(damageInfo, isLeftHand);
 
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
@@ -432,18 +427,21 @@ namespace MultiplayerARPG
                                 hitIndex,
                                 damageInfo,
                                 damageAmounts,
-                                aimPosition,
-                                randomSeed);
+                                aimPosition);
                         }
 
                         // Apply attack damages
-                        ApplyAttack(
-                            isLeftHand,
-                            weapon,
-                            damageInfo,
-                            damageAmounts,
-                            aimPosition,
-                            randomSeed);
+                        if (IsServer)
+                        {
+                            int randomSeed = Random.Range(0, 255);
+                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, aimPosition, randomSeed);
+                            SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
+                            if (isLeftHand)
+                                simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
+                            simulateData.randomSeed = (byte)randomSeed;
+                            simulateData.aimPosition = aimPosition;
+                            CallAllSimulateLaunchDamageEntity(simulateData);
+                        }
                     }
 
                     if (remainsDuration <= 0f)
@@ -489,13 +487,14 @@ namespace MultiplayerARPG
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition, int randomSeed)
         {
-            // Increase damage with ammo damage
             if (IsServer)
             {
-                Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                ReduceAmmo(weapon, isLeftHand, out increaseDamages);
-                if (increaseDamages != null)
-                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
+                // Increase damage with ammo damage
+                IAmmoItem ammoItem;
+                short ammoLevel;
+                ReduceAmmo(weapon, isLeftHand, out ammoItem, out ammoLevel);
+                if (ammoItem != null)
+                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, ammoItem.GetIncreaseDamages(ammoLevel));
             }
 
             byte fireSpread = 0;
@@ -507,6 +506,10 @@ namespace MultiplayerARPG
                 fireStagger = weapon.GetWeaponItem().FireStagger;
             }
 
+            // Random fire stagger seed while it's not simulating
+            randomSeed = Random.Range(0, 255);
+
+            // Fire
             Vector3 stagger;
             for (int i = 0; i < fireSpread + 1; ++i)
             {
@@ -521,6 +524,32 @@ namespace MultiplayerARPG
                     0,
                     aimPosition,
                     stagger);
+            }
+        }
+
+        [AllRpc]
+        protected void AllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
+        {
+            if (IsServer)
+                return;
+
+            bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
+            if (data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
+            {
+                BaseSkill skill = data.GetSkill();
+                if (skill != null)
+                {
+                    CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
+                    Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(this, data.skillLevel, isLeftHand);
+                    skill.ApplySkill(this, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.aimPosition);
+                }
+            }
+            else
+            {
+                CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
+                DamageInfo damageInfo = this.GetWeaponDamageInfo(weapon.GetWeaponItem());
+                Dictionary<DamageElement, MinMaxFloat> damageAmounts = GetWeaponDamagesWithBuffs(weapon);
+                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, data.randomSeed);
             }
         }
 

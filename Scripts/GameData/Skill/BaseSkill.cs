@@ -338,7 +338,7 @@ namespace MultiplayerARPG
             if (damageInflictions != null && damageInflictions.Count > 0)
             {
                 // Prepare weapon damage amount
-                KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount = skillUser.GetWeaponDamage(ref isLeftHand);
+                KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount = skillUser.GetWeaponDamages(ref isLeftHand);
                 foreach (DamageElement element in damageInflictions.Keys)
                 {
                     if (element == null) continue;
