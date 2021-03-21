@@ -741,10 +741,10 @@ namespace MultiplayerARPG
 
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
-            AnimationClip pullingClip = isLeftHand ? GetRightHandWeaponChargeClip(dataId) : GetLeftHandWeaponChargeClip(dataId);
+            AnimationClip chargeClip = isLeftHand ? GetLeftHandWeaponChargeClip(dataId) : GetRightHandWeaponChargeClip(dataId);
             if (legacyAnimation.GetClip(CLIP_WEAPON_CHARGE) != null)
                 legacyAnimation.RemoveClip(CLIP_WEAPON_CHARGE);
-            legacyAnimation.AddClip(pullingClip, CLIP_WEAPON_CHARGE);
+            legacyAnimation.AddClip(chargeClip, CLIP_WEAPON_CHARGE);
             CrossFadeLegacyAnimation(CLIP_WEAPON_CHARGE, actionClipFadeLength, WrapMode.Once);
         }
 

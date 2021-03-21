@@ -786,7 +786,7 @@ namespace MultiplayerARPG
             StopActionAnimation();
             StopSkillCastAnimation();
             StopWeaponChargeAnimation();
-            AnimationClip chargeClip = isLeftHand ? GetRightHandWeaponChargeClip(dataId) : GetLeftHandWeaponChargeClip(dataId);
+            AnimationClip chargeClip = isLeftHand ? GetLeftHandWeaponChargeClip(dataId) : GetRightHandWeaponChargeClip(dataId);
             bool hasClip = chargeClip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {

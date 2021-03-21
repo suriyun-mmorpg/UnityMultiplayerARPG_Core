@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         // Server Handlers
+        protected IServerMailHandlers ServerMailHandlers { get; set; }
         protected IServerUserHandlers ServerUserHandlers { get; set; }
         protected IServerBuildingHandlers ServerBuildingHandlers { get; set; }
         protected IServerCharacterHandlers ServerCharacterHandlers { get; set; }
@@ -65,6 +66,11 @@ namespace MultiplayerARPG
         public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish;
+        // Other events
+        public System.Action<long, BasePlayerCharacterEntity> onRegisterCharacter;
+        public System.Action<long> onUnregisterCharacter;
+        public System.Action<long, string> onRegisterUser;
+        public System.Action<long> onUnregisterUser;
 
         public override uint PacketVersion()
         {
@@ -288,6 +294,7 @@ namespace MultiplayerARPG
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
+            GameInstance.ServerMailHandlers = ServerMailHandlers;
             GameInstance.ServerUserHandlers = ServerUserHandlers;
             GameInstance.ServerBuildingHandlers = ServerBuildingHandlers;
             GameInstance.ServerGameMessageHandlers = ServerGameMessageHandlers;
@@ -559,7 +566,7 @@ namespace MultiplayerARPG
                     break;
                 case ChatChannel.Party:
                     PartyData party;
-                    if (GameInstance.ServerPartyHandlers.TryGetParty(message.channelId, out party))
+                    if (ServerPartyHandlers.TryGetParty(message.channelId, out party))
                     {
                         foreach (string memberId in party.GetMemberIds())
                         {
@@ -574,7 +581,7 @@ namespace MultiplayerARPG
                     break;
                 case ChatChannel.Guild:
                     GuildData guild;
-                    if (GameInstance.ServerGuildHandlers.TryGetGuild(message.channelId, out guild))
+                    if (ServerGuildHandlers.TryGetGuild(message.channelId, out guild))
                     {
                         foreach (string memberId in guild.GetMemberIds())
                         {
@@ -867,23 +874,31 @@ namespace MultiplayerARPG
 
         public virtual void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacter)
         {
-            ServerUserHandlers.AddPlayerCharacter(connectionId, playerCharacter);
+            bool success = ServerUserHandlers.AddPlayerCharacter(connectionId, playerCharacter);
+            if (success && onRegisterCharacter != null)
+                onRegisterCharacter.Invoke(connectionId, playerCharacter);
         }
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
         {
             ServerStorageHandlers.CloseStorage(connectionId).Forget();
-            ServerUserHandlers.RemovePlayerCharacter(connectionId);
+            bool success = ServerUserHandlers.RemovePlayerCharacter(connectionId);
+            if (success && onUnregisterCharacter != null)
+                onUnregisterCharacter.Invoke(connectionId);
         }
 
         public virtual void RegisterUserId(long connectionId, string userId)
         {
-            ServerUserHandlers.AddUserId(connectionId, userId);
+            bool success = ServerUserHandlers.AddUserId(connectionId, userId);
+            if (success && onRegisterUser != null)
+                onRegisterUser.Invoke(connectionId, userId);
         }
 
         public virtual void UnregisterUserId(long connectionId)
         {
-            ServerUserHandlers.RemoveUserId(connectionId);
+            bool success = ServerUserHandlers.RemoveUserId(connectionId);
+            if (success && onUnregisterUser != null)
+                onUnregisterUser.Invoke(connectionId);
         }
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
