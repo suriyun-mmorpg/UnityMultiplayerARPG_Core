@@ -716,6 +716,21 @@ namespace MultiplayerARPG
             AddManyGameData(Currencies, currencies);
         }
 
+        public static void AddCurrencies(params CurrencyAmount[] currencyAmounts)
+        {
+            AddCurrencies((IEnumerable<CurrencyAmount>)currencyAmounts);
+        }
+
+        public static void AddCurrencies(IEnumerable<CurrencyAmount> currencyAmounts)
+        {
+            if (currencyAmounts == null)
+                return;
+            foreach (CurrencyAmount currencyAmount in currencyAmounts)
+            {
+                AddGameData(Currencies, currencyAmount.currency);
+            }
+        }
+
         public static void AddItems(params ItemAmount[] itemAmounts)
         {
             AddItems((IEnumerable<ItemAmount>)itemAmounts);
