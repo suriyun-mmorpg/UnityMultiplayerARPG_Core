@@ -498,9 +498,6 @@ namespace MultiplayerARPG
                 fireStagger = weapon.GetWeaponItem().FireStagger;
             }
 
-            // Random fire stagger seed while it's not simulating
-            randomSeed = Random.Range(0, 255);
-
             // Fire
             Vector3 stagger;
             for (int i = 0; i < fireSpread + 1; ++i)
