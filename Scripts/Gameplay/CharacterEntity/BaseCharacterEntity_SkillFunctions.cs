@@ -9,7 +9,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected CancellationTokenSource skillCancellationTokenSource;
+        protected List<CancellationTokenSource> skillCancellationTokenSources = new List<CancellationTokenSource>();
         public bool IsCastingSkillCanBeInterrupted { get; protected set; }
         public bool IsCastingSkillInterrupted { get; protected set; }
         public float CastingSkillDuration { get; protected set; }
@@ -152,12 +152,9 @@ namespace MultiplayerARPG
 
         protected async UniTaskVoid UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, AimPosition skillAimPosition)
         {
-            // Skill animation still playing, skip it
-            if (skillCancellationTokenSource != null)
-                return;
-
             // Prepare cancellation
-            skillCancellationTokenSource = new CancellationTokenSource();
+            CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
+            skillCancellationTokenSources.Add(skillCancellationTokenSource);
 
             // Prepare requires data and get skill data
             AnimActionType animActionType;
@@ -313,7 +310,7 @@ namespace MultiplayerARPG
             finally
             {
                 skillCancellationTokenSource.Dispose();
-                skillCancellationTokenSource = null;
+                skillCancellationTokenSources.Remove(skillCancellationTokenSource);
             }
             // Clear action states at clients and server
             ClearActionStates();
@@ -321,9 +318,12 @@ namespace MultiplayerARPG
 
         protected void CancelSkill()
         {
-            if (skillCancellationTokenSource != null &&
-                !skillCancellationTokenSource.IsCancellationRequested)
-                skillCancellationTokenSource.Cancel();
+            for (int i = skillCancellationTokenSources.Count - 1; i >= 0; --i)
+            {
+                if (!skillCancellationTokenSources[i].IsCancellationRequested)
+                    skillCancellationTokenSources[i].Cancel();
+                skillCancellationTokenSources.RemoveAt(i);
+            }
         }
     }
 }

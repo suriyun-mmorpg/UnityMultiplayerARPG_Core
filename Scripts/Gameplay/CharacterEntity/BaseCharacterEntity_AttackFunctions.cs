@@ -10,8 +10,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected CancellationTokenSource reloadCancellationTokenSource;
-        protected CancellationTokenSource attackCancellationTokenSource;
+        protected List<CancellationTokenSource> reloadCancellationTokenSources = new List<CancellationTokenSource>();
+        protected List<CancellationTokenSource> attackCancellationTokenSources = new List<CancellationTokenSource>();
 
         public Vector3 GetDefaultAttackAimPosition(ref bool isLeftHand)
         {
@@ -175,11 +175,9 @@ namespace MultiplayerARPG
 
         protected async UniTaskVoid ReloadRoutine(bool isLeftHand, short reloadingAmmoAmount)
         {
-            // Reload animation still playing, skip it
-            if (reloadCancellationTokenSource != null)
-                return;
             // Prepare cancellation
-            reloadCancellationTokenSource = new CancellationTokenSource();
+            CancellationTokenSource reloadCancellationTokenSource = new CancellationTokenSource();
+            reloadCancellationTokenSources.Add(reloadCancellationTokenSource);
 
             // Prepare requires data and get weapon data
             AnimActionType animActionType;
@@ -256,7 +254,7 @@ namespace MultiplayerARPG
             finally
             {
                 reloadCancellationTokenSource.Dispose();
-                reloadCancellationTokenSource = null;
+                reloadCancellationTokenSources.Remove(reloadCancellationTokenSource);
             }
             // Clear action states at clients and server
             ClearActionStates();
@@ -329,11 +327,9 @@ namespace MultiplayerARPG
 
         protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex)
         {
-            // Attack animation still playing, skip it
-            if (attackCancellationTokenSource != null)
-                return;
             // Prepare cancellation
-            attackCancellationTokenSource = new CancellationTokenSource();
+            CancellationTokenSource attackCancellationTokenSource = new CancellationTokenSource();
+            attackCancellationTokenSources.Add(attackCancellationTokenSource);
 
             // Prepare requires data and get weapon data
             AnimActionType animActionType;
@@ -471,7 +467,7 @@ namespace MultiplayerARPG
             finally
             {
                 attackCancellationTokenSource.Dispose();
-                attackCancellationTokenSource = null;
+                attackCancellationTokenSources.Remove(attackCancellationTokenSource);
             }
             // Clear action states at clients and server
             ClearActionStates();
@@ -544,16 +540,22 @@ namespace MultiplayerARPG
 
         protected void CancelReload()
         {
-            if (reloadCancellationTokenSource != null &&
-                !reloadCancellationTokenSource.IsCancellationRequested)
-                reloadCancellationTokenSource.Cancel();
+            for (int i = reloadCancellationTokenSources.Count - 1; i >= 0; --i)
+            {
+                if (!reloadCancellationTokenSources[i].IsCancellationRequested)
+                    reloadCancellationTokenSources[i].Cancel();
+                reloadCancellationTokenSources.RemoveAt(i);
+            }
         }
 
         protected void CancelAttack()
         {
-            if (attackCancellationTokenSource != null &&
-                !attackCancellationTokenSource.IsCancellationRequested)
-                attackCancellationTokenSource.Cancel();
+            for (int i = attackCancellationTokenSources.Count - 1; i >= 0; --i)
+            {
+                if (!attackCancellationTokenSources[i].IsCancellationRequested)
+                    attackCancellationTokenSources[i].Cancel();
+                attackCancellationTokenSources.RemoveAt(i);
+            }
         }
     }
 }
