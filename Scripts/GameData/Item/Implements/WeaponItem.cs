@@ -30,6 +30,7 @@ namespace MultiplayerARPG
         public EquipmentModel[] OffHandEquipmentModels
         {
             get { return offHandEquipmentModels; }
+            set { offHandEquipmentModels = value; }
         }
 
         [SerializeField]

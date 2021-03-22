@@ -59,6 +59,7 @@ namespace MultiplayerARPG
         public EquipmentModel[] EquipmentModels
         {
             get { return equipmentModels; }
+            set { equipmentModels = value; }
         }
 
         [SerializeField]

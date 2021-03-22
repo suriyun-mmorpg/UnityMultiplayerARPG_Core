@@ -50,7 +50,7 @@ namespace MultiplayerARPG
 
         public abstract ItemType ItemType { get; }
 
-        public GameObject DropModel { get { return dropModel; } }
+        public GameObject DropModel { get { return dropModel; } set { dropModel = value; } }
 
         public int SellPrice { get { return sellPrice; } }
 
