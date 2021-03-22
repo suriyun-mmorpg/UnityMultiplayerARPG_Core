@@ -190,6 +190,7 @@ namespace MultiplayerARPG
                     if (equipmentContainer.transform == null) continue;
                     Gizmos.color = Color.green;
                     Gizmos.DrawWireSphere(equipmentContainer.transform.position, 0.1f);
+                    Gizmos.DrawSphere(equipmentContainer.transform.position, 0.03f);
                     Handles.Label(equipmentContainer.transform.position, equipmentContainer.equipSocket + "(Equipment)");
                 }
             }

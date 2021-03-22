@@ -123,6 +123,7 @@ namespace MultiplayerARPG
                     if (effectContainer.transform == null) continue;
                     Gizmos.color = Color.blue;
                     Gizmos.DrawWireSphere(effectContainer.transform.position, 0.1f);
+                    Gizmos.DrawSphere(effectContainer.transform.position, 0.03f);
                     Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
                 }
             }
