@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -64,6 +67,16 @@ namespace MultiplayerARPG
             if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
                 poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
         }
+
+#if UNITY_EDITOR
+        protected virtual void OnDrawGizmos()
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, 0.1f);
+            Gizmos.DrawSphere(transform.position, 0.03f);
+            Handles.Label(transform.position, name + "(Pivot)");
+        }
+#endif
 
         public abstract void OnLevelChanged(int level);
     }
