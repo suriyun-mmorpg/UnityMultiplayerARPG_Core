@@ -188,7 +188,7 @@ namespace MultiplayerARPG
                 foreach (EquipmentContainer equipmentContainer in equipmentContainers)
                 {
                     if (equipmentContainer.transform == null) continue;
-                    Gizmos.color = Color.green;
+                    Gizmos.color = new Color(0, 1, 0, 0.5f);
                     Gizmos.DrawWireSphere(equipmentContainer.transform.position, 0.1f);
                     Gizmos.DrawSphere(equipmentContainer.transform.position, 0.03f);
                     Handles.Label(equipmentContainer.transform.position, equipmentContainer.equipSocket + "(Equipment)");

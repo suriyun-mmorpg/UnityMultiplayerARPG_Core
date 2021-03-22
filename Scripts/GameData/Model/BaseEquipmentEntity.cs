@@ -71,10 +71,16 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
-            Gizmos.color = Color.green;
+            Gizmos.color = new Color(0, 1, 0, 0.5f);
             Gizmos.DrawWireSphere(transform.position, 0.1f);
             Gizmos.DrawSphere(transform.position, 0.03f);
             Handles.Label(transform.position, name + "(Pivot)");
+            if (missileDamageTransform != null)
+            {
+                Gizmos.color = new Color(1, 0, 0, 0.5f);
+                Gizmos.DrawSphere(missileDamageTransform.position, 0.03f);
+                Handles.Label(missileDamageTransform.position, name + "(MissleDamage)");
+            }
         }
 #endif
 

@@ -121,7 +121,7 @@ namespace MultiplayerARPG
                 foreach (EffectContainer effectContainer in effectContainers)
                 {
                     if (effectContainer.transform == null) continue;
-                    Gizmos.color = Color.blue;
+                    Gizmos.color = new Color(0, 0, 1, 0.5f);
                     Gizmos.DrawWireSphere(effectContainer.transform.position, 0.1f);
                     Gizmos.DrawSphere(effectContainer.transform.position, 0.03f);
                     Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
