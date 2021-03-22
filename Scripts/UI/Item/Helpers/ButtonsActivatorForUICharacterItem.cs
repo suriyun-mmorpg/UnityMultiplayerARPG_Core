@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(UICharacterItem))]
     public class ButtonsActivatorForUICharacterItem : MonoBehaviour
     {
         public Button buttonEquip;
@@ -18,6 +19,7 @@ namespace MultiplayerARPG
         public Button buttonMoveFromStorage;
         public Button buttonDrop;
         private UICharacterItem ui;
+
         private void Start()
         {
             ui = GetComponent<UICharacterItem>();
