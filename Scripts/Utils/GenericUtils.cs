@@ -145,14 +145,17 @@ public static class GenericUtils
         return result;
     }
 
-    public static void RemoveChildren(this Transform transform)
+    public static void RemoveChildren(this Transform transform, bool immediatelyMode = false)
     {
         if (transform == null)
             return;
         for (int i = transform.childCount - 1; i >= 0; --i)
         {
             Transform lastChild = transform.GetChild(i);
-            Object.Destroy(lastChild.gameObject);
+            if (!immediatelyMode)
+                Object.Destroy(lastChild.gameObject);
+            else
+                Object.DestroyImmediate(lastChild.gameObject);
         }
     }
 
