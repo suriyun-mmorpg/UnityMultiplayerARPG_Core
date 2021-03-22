@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -19,6 +20,9 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
     [Tooltip("This will be used while `scrollRectAllowing` is not `None`")]
     public float beginDragMinDelta = 15f;
     public ScrollRect scrollRect;
+    public UnityEvent onStart = new UnityEvent();
+    public UnityEvent onBeginDrag = new UnityEvent();
+    public UnityEvent onEndDrag = new UnityEvent();
 
     public Canvas CacheCanvas { get; protected set; }
 
@@ -57,6 +61,8 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
             if (graphic.raycastTarget)
                 CacheGraphics.Add(graphic);
         }
+
+        onStart.Invoke();
     }
 
     public virtual void OnBeginDrag(PointerEventData eventData)
@@ -103,6 +109,8 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
         {
             graphic.raycastTarget = false;
         }
+
+        onBeginDrag.Invoke();
     }
 
     public virtual void OnDrag(PointerEventData eventData)
@@ -140,5 +148,7 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
         {
             graphic.raycastTarget = true;
         }
+
+        onEndDrag.Invoke();
     }
 }
