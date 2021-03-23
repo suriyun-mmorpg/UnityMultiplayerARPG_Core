@@ -341,7 +341,7 @@ namespace MultiplayerARPG
             tempTargetDistance = -1f;
             WaterCheck();
 
-            bool isGrounded = CacheCharacterController.isGrounded || airborneElapsed < airborneDelay;
+            bool isGrounded = CacheCharacterController.isGrounded;
             bool isAirborne = !isGrounded && !isUnderWater && airborneElapsed >= airborneDelay;
 
             // Update airborne elasped
