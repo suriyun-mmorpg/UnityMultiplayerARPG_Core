@@ -74,6 +74,10 @@ namespace MultiplayerARPG
         public TextWrapper uiTextStack;
         public TextWrapper uiTextDurability;
         public UIGageValue uiGageDurability;
+        public TextWrapper uiTextCurrentAmmo;
+        public TextWrapper uiTextReserveAmmo;
+        public TextWrapper uiTextSumAmmo;
+        public GameObject noRequireAmmoSymbol;
         public TextWrapper uiTextWeight;
         public TextWrapper uiTextExp;
         public UIGageValue uiGageExp;
@@ -361,26 +365,21 @@ namespace MultiplayerARPG
                 uiTextStack.text = stackString;
             }
 
-            if (Item != null)
+            if (EquipmentItem != null && EquipmentItem.MaxDurability > 0)
             {
-                bool showDurability = EquipmentItem != null && EquipmentItem.MaxDurability > 0;
                 if (uiTextDurability != null)
                 {
-                    uiTextDurability.SetGameObjectActive(showDurability);
-                    if (showDurability)
-                    {
-                        uiTextDurability.text = string.Format(
-                            LanguageManager.GetText(formatKeyDurability),
-                            CharacterItem.durability.ToString("N0"),
-                            EquipmentItem.MaxDurability.ToString("N0"));
-                    }
+                    uiTextDurability.SetGameObjectActive(true);
+                    uiTextDurability.text = string.Format(
+                        LanguageManager.GetText(formatKeyDurability),
+                        CharacterItem.durability.ToString("N0"),
+                        EquipmentItem.MaxDurability.ToString("N0"));
                 }
 
                 if (uiGageDurability != null)
                 {
-                    uiGageDurability.SetVisible(showDurability);
-                    if (showDurability)
-                        uiGageDurability.Update(CharacterItem.durability, EquipmentItem.MaxDurability);
+                    uiGageDurability.SetVisible(true);
+                    uiGageDurability.Update(CharacterItem.durability, EquipmentItem.MaxDurability);
                 }
             }
             else
@@ -390,6 +389,49 @@ namespace MultiplayerARPG
 
                 if (uiGageDurability != null)
                     uiGageDurability.SetVisible(false);
+            }
+
+            if (WeaponItem != null && WeaponItem.WeaponType.RequireAmmoType != null)
+            {
+                int currentAmmo = 0;
+                int reserveAmmo = 0;
+                if (uiTextCurrentAmmo != null)
+                {
+                    uiTextCurrentAmmo.SetGameObjectActive(WeaponItem.AmmoCapacity > 0);
+                    currentAmmo = CharacterItem.ammo;
+                    uiTextCurrentAmmo.text = currentAmmo.ToString("N0");
+                }
+
+                if (uiTextReserveAmmo != null)
+                {
+                    uiTextReserveAmmo.SetGameObjectActive(true);
+                    if (GameInstance.PlayingCharacter != null)
+                        reserveAmmo = GameInstance.PlayingCharacter.CountAmmos(WeaponItem.WeaponType.RequireAmmoType);
+                    uiTextReserveAmmo.text = reserveAmmo.ToString("N0");
+                }
+
+                if (uiTextSumAmmo != null)
+                {
+                    uiTextSumAmmo.SetGameObjectActive(true);
+                    uiTextSumAmmo.text = (currentAmmo + reserveAmmo).ToString("N0");
+                }
+
+                if (noRequireAmmoSymbol != null)
+                    noRequireAmmoSymbol.SetActive(false);
+            }
+            else
+            {
+                if (uiTextCurrentAmmo != null)
+                    uiTextCurrentAmmo.SetGameObjectActive(false);
+
+                if (uiTextReserveAmmo != null)
+                    uiTextReserveAmmo.SetGameObjectActive(false);
+
+                if (uiTextSumAmmo != null)
+                    uiTextSumAmmo.SetGameObjectActive(false);
+
+                if (noRequireAmmoSymbol != null)
+                    noRequireAmmoSymbol.SetActive(true);
             }
 
             if (uiTextWeight != null)

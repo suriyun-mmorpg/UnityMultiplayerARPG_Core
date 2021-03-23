@@ -1,6 +1,4 @@
 ﻿using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -13,10 +11,14 @@ namespace MultiplayerARPG
         public GameObject uiRightHandAmmoRoot;
         public TextWrapper uiTextRightHandCurrentAmmo;
         public TextWrapper uiTextRightHandReserveAmmo;
+        public TextWrapper uiTextRightHandSumAmmo;
+        public GameObject rightHandNoRequireAmmoSymbol;
         [Header("Left Hand Ammo Amount")]
         public GameObject uiLeftHandAmmoRoot;
         public TextWrapper uiTextLeftHandCurrentAmmo;
         public TextWrapper uiTextLeftHandReserveAmmo;
+        public TextWrapper uiTextLeftHandSumAmmo;
+        public GameObject leftHandNoRequireAmmoSymbol;
 
         private void OnEnable()
         {
@@ -66,33 +68,45 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, character.EquipWeapons.rightHand);
-            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, character.EquipWeapons.leftHand);
+            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandNoRequireAmmoSymbol, character.EquipWeapons.rightHand);
+            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandNoRequireAmmoSymbol, character.EquipWeapons.leftHand);
         }
 
-        private void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, CharacterItem characterItem)
+        private void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject noRequireAmmoSymbol, CharacterItem characterItem)
         {
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
             bool isActive = weaponItem != null && weaponItem.WeaponType.RequireAmmoType != null;
             if (root != null)
                 root.SetActive(isActive);
 
+            int currentAmmo = 0;
+            int reserveAmmo = 0;
+
             if (textCurrentAmmo != null)
             {
                 textCurrentAmmo.SetGameObjectActive(isActive && weaponItem.AmmoCapacity > 0);
+                currentAmmo = characterItem.ammo;
                 if (isActive)
-                    textCurrentAmmo.text = characterItem.ammo.ToString("N0");
+                    textCurrentAmmo.text = currentAmmo.ToString("N0");
             }
 
             if (textReserveAmmo != null)
             {
                 textReserveAmmo.SetGameObjectActive(isActive);
+                if (character != null)
+                    reserveAmmo = character.CountAmmos(weaponItem.WeaponType.RequireAmmoType);
                 if (isActive)
-                {
-                    int ammoAmount = character != null && weaponItem.WeaponType.RequireAmmoType != null ? character.CountAmmos(weaponItem.WeaponType.RequireAmmoType) : 0;
-                    textReserveAmmo.text = ammoAmount.ToString("N0");
-                }
+                    textReserveAmmo.text = reserveAmmo.ToString("N0");
             }
+
+            if (textSumAmmo != null)
+            {
+                textSumAmmo.SetGameObjectActive(isActive);
+                textSumAmmo.text = (currentAmmo + reserveAmmo).ToString("N0");
+            }
+
+            if (noRequireAmmoSymbol != null)
+                noRequireAmmoSymbol.SetActive(!isActive);
         }
     }
 }
