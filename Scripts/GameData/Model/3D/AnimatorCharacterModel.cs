@@ -29,7 +29,6 @@ namespace MultiplayerARPG
         public static readonly int ANIM_IS_WEAPON_CHARGE = Animator.StringToHash("IsWeaponCharge");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
         public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
-        public static readonly int ANIM_LANDED = Animator.StringToHash("Landed");
         public static readonly int ANIM_PICKUP = Animator.StringToHash("Pickup");
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
         public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
@@ -37,6 +36,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_DEAD_CLIP_MULTIPLIER = Animator.StringToHash("DeadSpeedMultiplier");
         public static readonly int ANIM_JUMP_CLIP_MULTIPLIER = Animator.StringToHash("JumpSpeedMultiplier");
         public static readonly int ANIM_FALL_CLIP_MULTIPLIER = Animator.StringToHash("FallSpeedMultiplier");
+        public static readonly int ANIM_LANDED_CLIP_MULTIPLIER = Animator.StringToHash("LandedSpeedMultiplier");
         public static readonly int ANIM_PICKUP_CLIP_MULTIPLIER = Animator.StringToHash("PickupSpeedMultiplier");
         public static readonly int ANIM_MOVE_TYPE = Animator.StringToHash("MoveType");
 
@@ -88,10 +88,10 @@ namespace MultiplayerARPG
         private float swimMoveAnimSpeedRate;
         private float jumpAnimSpeedRate;
         private float fallAnimSpeedRate;
+        private float landedAnimSpeedRate;
         private float hurtAnimSpeedRate;
         private float deadAnimSpeedRate;
         private float pickupAnimSpeedRate;
-        private bool isLanded = true;
 
         protected override void Awake()
         {
@@ -262,6 +262,7 @@ namespace MultiplayerARPG
                 // Other
                 defaultAnimations.jumpClip,
                 defaultAnimations.fallClip,
+                defaultAnimations.landedClip,
                 defaultAnimations.hurtClip,
                 defaultAnimations.deadClip,
                 defaultAnimations.pickupClip,
@@ -278,6 +279,7 @@ namespace MultiplayerARPG
                 defaultAnimations.swimMoveAnimSpeedRate,
                 defaultAnimations.jumpAnimSpeedRate,
                 defaultAnimations.fallAnimSpeedRate,
+                defaultAnimations.landedAnimSpeedRate,
                 defaultAnimations.hurtAnimSpeedRate,
                 defaultAnimations.deadAnimSpeedRate,
                 defaultAnimations.pickupAnimSpeedRate);
@@ -346,6 +348,7 @@ namespace MultiplayerARPG
             // Other
             AnimationClip jumpClip,
             AnimationClip fallClip,
+            AnimationClip landedClip,
             AnimationClip hurtClip,
             AnimationClip deadClip,
             AnimationClip pickupClip,
@@ -362,6 +365,7 @@ namespace MultiplayerARPG
             float swimMoveAnimSpeedRate,
             float jumpAnimSpeedRate,
             float fallAnimSpeedRate,
+            float landedAnimSpeedRate,
             float hurtAnimSpeedRate,
             float deadAnimSpeedRate,
             float pickupAnimSpeedRate)
@@ -430,6 +434,7 @@ namespace MultiplayerARPG
             // Other
             OverrideAnimationClip(CLIP_JUMP, jumpClip != null ? jumpClip : defaultAnimations.jumpClip);
             OverrideAnimationClip(CLIP_FALL, fallClip != null ? fallClip : defaultAnimations.fallClip);
+            OverrideAnimationClip(CLIP_LANDED, landedClip != null ? landedClip : defaultAnimations.landedClip);
             OverrideAnimationClip(CLIP_HURT, hurtClip != null ? hurtClip : defaultAnimations.hurtClip);
             OverrideAnimationClip(CLIP_DEAD, deadClip != null ? deadClip : defaultAnimations.deadClip);
             OverrideAnimationClip(CLIP_PICKUP, pickupClip != null ? pickupClip : defaultAnimations.pickupClip);
@@ -463,6 +468,8 @@ namespace MultiplayerARPG
                 defaultAnimations.jumpAnimSpeedRate > 0f ? defaultAnimations.jumpAnimSpeedRate : 1f;
             this.fallAnimSpeedRate = fallAnimSpeedRate > 0f ? fallAnimSpeedRate :
                 defaultAnimations.fallAnimSpeedRate > 0f ? defaultAnimations.fallAnimSpeedRate : 1f;
+            this.landedAnimSpeedRate = landedAnimSpeedRate > 0f ? landedAnimSpeedRate :
+                defaultAnimations.landedAnimSpeedRate > 0f ? defaultAnimations.landedAnimSpeedRate : 1f;
             this.hurtAnimSpeedRate = hurtAnimSpeedRate > 0f ? hurtAnimSpeedRate :
                 defaultAnimations.hurtAnimSpeedRate > 0f ? defaultAnimations.hurtAnimSpeedRate : 1f;
             this.deadAnimSpeedRate = deadAnimSpeedRate > 0f ? deadAnimSpeedRate :
@@ -567,6 +574,7 @@ namespace MultiplayerARPG
                 // Other
                 weaponAnimations.jumpClip,
                 weaponAnimations.fallClip,
+                weaponAnimations.landedClip,
                 weaponAnimations.hurtClip,
                 weaponAnimations.deadClip,
                 weaponAnimations.pickupClip,
@@ -583,6 +591,7 @@ namespace MultiplayerARPG
                 weaponAnimations.swimMoveAnimSpeedRate,
                 weaponAnimations.jumpAnimSpeedRate,
                 weaponAnimations.fallAnimSpeedRate,
+                weaponAnimations.landedAnimSpeedRate,
                 weaponAnimations.hurtAnimSpeedRate,
                 weaponAnimations.deadAnimSpeedRate,
                 weaponAnimations.pickupAnimSpeedRate);
@@ -692,18 +701,12 @@ namespace MultiplayerARPG
             animator.SetFloat(ANIM_DEAD_CLIP_MULTIPLIER, deadAnimSpeedRate);
             animator.SetFloat(ANIM_JUMP_CLIP_MULTIPLIER, jumpAnimSpeedRate);
             animator.SetFloat(ANIM_FALL_CLIP_MULTIPLIER, fallAnimSpeedRate);
+            animator.SetFloat(ANIM_LANDED_CLIP_MULTIPLIER, landedAnimSpeedRate);
             animator.SetFloat(ANIM_PICKUP_CLIP_MULTIPLIER, pickupAnimSpeedRate);
             animator.SetBool(ANIM_IS_DEAD, isDead);
             animator.SetBool(ANIM_IS_GROUNDED, isGrounded);
             animator.SetBool(ANIM_IS_UNDER_WATER, isUnderWater);
             animator.SetInteger(ANIM_MOVE_TYPE, moveType);
-            if (isGrounded && !isLanded)
-            {
-                PlayLandedAnimation();
-                isLanded = true;
-            }
-            if (!isGrounded)
-                isLanded = false;
         }
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
@@ -885,23 +888,6 @@ namespace MultiplayerARPG
             {
                 animator.ResetTrigger(ANIM_PICKUP);
                 animator.SetTrigger(ANIM_PICKUP);
-            }
-        }
-
-        public void PlayLandedAnimation()
-        {
-            if (!animationClipOverrides.ContainsKey(CLIP_LANDED))
-                return;
-            StartCoroutine(PlayLandedAnimationRoutine());
-        }
-
-        IEnumerator PlayLandedAnimationRoutine()
-        {
-            yield return null;
-            if (animator.isActiveAndEnabled)
-            {
-                animator.ResetTrigger(ANIM_LANDED);
-                animator.SetTrigger(ANIM_LANDED);
             }
         }
 

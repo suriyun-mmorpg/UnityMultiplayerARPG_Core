@@ -128,6 +128,7 @@ namespace MultiplayerARPG
                 // Other
                 defaultAnimations.jumpClip,
                 defaultAnimations.fallClip,
+                defaultAnimations.landedClip,
                 defaultAnimations.hurtClip,
                 defaultAnimations.deadClip,
                 defaultAnimations.pickupClip,
@@ -144,6 +145,7 @@ namespace MultiplayerARPG
                 defaultAnimations.swimMoveAnimSpeedRate,
                 defaultAnimations.jumpAnimSpeedRate,
                 defaultAnimations.fallAnimSpeedRate,
+                defaultAnimations.landedAnimSpeedRate,
                 defaultAnimations.hurtAnimSpeedRate,
                 defaultAnimations.deadAnimSpeedRate,
                 defaultAnimations.pickupAnimSpeedRate);
@@ -212,6 +214,7 @@ namespace MultiplayerARPG
             // Other
             AnimationClip jumpClip,
             AnimationClip fallClip,
+            AnimationClip landedClip,
             AnimationClip hurtClip,
             AnimationClip deadClip,
             AnimationClip pickupClip,
@@ -228,6 +231,7 @@ namespace MultiplayerARPG
             float swimMoveAnimSpeedRate,
             float jumpAnimSpeedRate,
             float fallAnimSpeedRate,
+            float landedAnimSpeedRate,
             float hurtAnimSpeedRate,
             float deadAnimSpeedRate,
             float pickupAnimSpeedRate)
@@ -580,6 +584,7 @@ namespace MultiplayerARPG
                 // Other
                 weaponAnimations.jumpClip,
                 weaponAnimations.fallClip,
+                weaponAnimations.landedClip,
                 weaponAnimations.hurtClip,
                 weaponAnimations.deadClip,
                 weaponAnimations.pickupClip,
@@ -596,6 +601,7 @@ namespace MultiplayerARPG
                 weaponAnimations.swimMoveAnimSpeedRate,
                 weaponAnimations.jumpAnimSpeedRate,
                 weaponAnimations.fallAnimSpeedRate,
+                weaponAnimations.landedAnimSpeedRate,
                 weaponAnimations.hurtAnimSpeedRate,
                 weaponAnimations.deadAnimSpeedRate,
                 weaponAnimations.pickupAnimSpeedRate);
