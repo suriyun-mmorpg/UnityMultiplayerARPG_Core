@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         public float moveClipFadeLength = 0.1f;
         public float jumpClipFadeLength = 0.1f;
         public float fallClipFadeLength = 0.1f;
+        public float landClipFadeLength = 0.1f;
         public float hurtClipFadeLength = 0.1f;
         public float deadClipFadeLength = 0.1f;
         public float pickupClipFadeLength = 0.1f;
@@ -23,9 +24,9 @@ namespace MultiplayerARPG
         [Header("Relates Components")]
         public Animation legacyAnimation;
 
-        // Private state validater
         private bool isSetupComponent;
         private string lastFadedLegacyClipName;
+        private bool isLanded = true;
 
         protected override void Awake()
         {
@@ -619,9 +620,15 @@ namespace MultiplayerARPG
                 else if (!movementState.HasFlag(MovementState.IsGrounded))
                 {
                     CrossFadeLegacyAnimation(CLIP_FALL, fallClipFadeLength, WrapMode.Loop);
+                    isLanded = false;
                 }
                 else
                 {
+                    if (!isLanded)
+                    {
+                        PlayLandedAnimation();
+                        isLanded = true;
+                    }
                     switch (extraMovementState)
                     {
                         case ExtraMovementState.IsSprinting:
@@ -789,6 +796,13 @@ namespace MultiplayerARPG
             if (legacyAnimation.GetClip(CLIP_PICKUP) == null)
                 return;
             CrossFadeLegacyAnimation(CLIP_PICKUP, pickupClipFadeLength, WrapMode.Once);
+        }
+
+        public void PlayLandedAnimation()
+        {
+            if (legacyAnimation.GetClip(CLIP_LANDED) == null)
+                return;
+            CrossFadeLegacyAnimation(CLIP_LANDED, landClipFadeLength, WrapMode.Once);
         }
     }
 }

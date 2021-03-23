@@ -71,6 +71,7 @@ namespace MultiplayerARPG
         // Other
         public const string CLIP_JUMP = "__Jump";
         public const string CLIP_FALL = "__Fall";
+        public const string CLIP_LANDED = "__Landed";
         public const string CLIP_HURT = "__Hurt";
         public const string CLIP_DEAD = "__Dead";
         public const string CLIP_ACTION = "__Action";

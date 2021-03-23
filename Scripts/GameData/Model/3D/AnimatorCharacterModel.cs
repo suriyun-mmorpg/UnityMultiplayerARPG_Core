@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_IS_WEAPON_CHARGE = Animator.StringToHash("IsWeaponCharge");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
         public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
+        public static readonly int ANIM_LANDED = Animator.StringToHash("Landed");
         public static readonly int ANIM_PICKUP = Animator.StringToHash("Pickup");
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
         public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
@@ -74,8 +75,6 @@ namespace MultiplayerARPG
         private Dictionary<string, AnimationClip> animationClipOverrides = new Dictionary<string, AnimationClip>();
         private int[] actionStateNameHashes;
         private int[] castSkillStateNameHashes;
-
-        // Private state validater
         private bool isSetupComponent;
         private float idleAnimSpeedRate;
         private float moveAnimSpeedRate;
@@ -92,6 +91,7 @@ namespace MultiplayerARPG
         private float hurtAnimSpeedRate;
         private float deadAnimSpeedRate;
         private float pickupAnimSpeedRate;
+        private bool isLanded = true;
 
         protected override void Awake()
         {
@@ -683,6 +683,8 @@ namespace MultiplayerARPG
 
             // Set animator parameters
             float deltaTime = animator.updateMode == AnimatorUpdateMode.AnimatePhysics ? Time.fixedDeltaTime : Time.deltaTime;
+            bool isUnderWater = movementState.HasFlag(MovementState.IsUnderWater);
+            bool isGrounded = !isUnderWater && movementState.HasFlag(MovementState.IsGrounded);
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed, movementDampingTme, deltaTime);
             animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : sideMoveSpeed, movementDampingTme, deltaTime);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);
@@ -692,9 +694,16 @@ namespace MultiplayerARPG
             animator.SetFloat(ANIM_FALL_CLIP_MULTIPLIER, fallAnimSpeedRate);
             animator.SetFloat(ANIM_PICKUP_CLIP_MULTIPLIER, pickupAnimSpeedRate);
             animator.SetBool(ANIM_IS_DEAD, isDead);
-            animator.SetBool(ANIM_IS_GROUNDED, !movementState.HasFlag(MovementState.IsUnderWater) && movementState.HasFlag(MovementState.IsGrounded));
-            animator.SetBool(ANIM_IS_UNDER_WATER, movementState.HasFlag(MovementState.IsUnderWater));
+            animator.SetBool(ANIM_IS_GROUNDED, isGrounded);
+            animator.SetBool(ANIM_IS_UNDER_WATER, isUnderWater);
             animator.SetInteger(ANIM_MOVE_TYPE, moveType);
+            if (isGrounded && !isLanded)
+            {
+                PlayLandedAnimation();
+                isLanded = true;
+            }
+            if (!isGrounded)
+                isLanded = false;
         }
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
@@ -866,16 +875,33 @@ namespace MultiplayerARPG
         {
             if (!animationClipOverrides.ContainsKey(CLIP_PICKUP))
                 return;
-            StartCoroutine(PlayPickUpAnimationRoutine());
+            StartCoroutine(PlayPickupAnimationRoutine());
         }
 
-        IEnumerator PlayPickUpAnimationRoutine()
+        IEnumerator PlayPickupAnimationRoutine()
         {
             yield return null;
             if (animator.isActiveAndEnabled)
             {
                 animator.ResetTrigger(ANIM_PICKUP);
                 animator.SetTrigger(ANIM_PICKUP);
+            }
+        }
+
+        public void PlayLandedAnimation()
+        {
+            if (!animationClipOverrides.ContainsKey(CLIP_LANDED))
+                return;
+            StartCoroutine(PlayLandedAnimationRoutine());
+        }
+
+        IEnumerator PlayLandedAnimationRoutine()
+        {
+            yield return null;
+            if (animator.isActiveAndEnabled)
+            {
+                animator.ResetTrigger(ANIM_LANDED);
+                animator.SetTrigger(ANIM_LANDED);
             }
         }
 
