@@ -157,7 +157,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: __AdvanceCharacter 1
+  m_Name: __AdvanceCharacterWithLanded
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: IsDead
