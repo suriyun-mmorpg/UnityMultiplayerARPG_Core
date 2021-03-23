@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             int currentAmmo = characterItem.ammo;
             int reserveAmmo = 0;
             if (character != null && isActive)
-                character.CountAmmos(weaponItem.WeaponType.RequireAmmoType);
+                reserveAmmo = character.CountAmmos(weaponItem.WeaponType.RequireAmmoType);
 
             if (textCurrentAmmo != null)
             {
