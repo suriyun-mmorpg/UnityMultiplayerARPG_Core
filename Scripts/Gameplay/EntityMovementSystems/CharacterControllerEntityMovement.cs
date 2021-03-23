@@ -22,6 +22,8 @@ namespace MultiplayerARPG
         public float stickGroundForce = 9.6f;
         [Tooltip("Delay before character change from grounded state to airborne")]
         public float airborneDelay = 0.01f;
+        public bool doNotChangeVelocityWhileAirborne;
+        public float landedPauseMovementDuration = 0f;
         [Range(0.1f, 1f)]
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
@@ -82,11 +84,8 @@ namespace MultiplayerARPG
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
         private float lastClientSendInputs;
-
         private EntityMovementInput oldInput;
         private EntityMovementInput currentInput;
-
-        // Optimize garbage collector
         private MovementState tempMovementState;
         private Vector3 tempInputDirection;
         private Vector3 tempMoveDirection;
@@ -95,6 +94,7 @@ namespace MultiplayerARPG
         private Vector3 tempTargetPosition;
         private Vector3 tempCurrentPosition;
         private Vector3 tempPredictPosition;
+        private Vector3 velocityBeforeAirborne;
         private float tempVerticalVelocity;
         private float tempSqrMagnitude;
         private float tempPredictSqrMagnitude;
@@ -102,6 +102,7 @@ namespace MultiplayerARPG
         private float tempEntityMoveSpeed;
         private float tempCurrentMoveSpeed;
         private CollisionFlags collisionFlags;
+        private float pauseMovementCountDown;
 
         public override void EntityAwake()
         {
@@ -340,7 +341,8 @@ namespace MultiplayerARPG
             tempTargetDistance = -1f;
             WaterCheck();
 
-            bool isGrounded = CacheCharacterController.isGrounded;
+            bool isGrounded = CacheCharacterController.isGrounded || airborneElapsed < airborneDelay;
+            bool isAirborne = !isGrounded && !isUnderWater && airborneElapsed >= airborneDelay;
 
             // Update airborne elasped
             if (isGrounded)
@@ -448,7 +450,11 @@ namespace MultiplayerARPG
                 }
             }
             // Updating horizontal movement (WASD inputs)
-            if (tempMoveDirection.sqrMagnitude > 0f)
+            if (!isAirborne)
+            {
+                velocityBeforeAirborne = Vector3.zero;
+            }
+            if (pauseMovementCountDown <= 0f && tempMoveDirection.sqrMagnitude > 0f && (!isAirborne || !doNotChangeVelocityWhileAirborne))
             {
                 // Calculate only horizontal move direction
                 tempHorizontalMoveDirection = tempMoveDirection;
@@ -470,6 +476,7 @@ namespace MultiplayerARPG
                 if (tempPredictSqrMagnitude >= tempSqrMagnitude)
                     tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                 tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
+                velocityBeforeAirborne = tempMoveVelocity;
                 // Set inputs
                 currentInput = this.SetInputMovementState(currentInput, tempMovementState);
                 if (HasNavPaths)
@@ -482,6 +489,18 @@ namespace MultiplayerARPG
                     currentInput = this.SetInputPosition(currentInput, tempPredictPosition);
                     currentInput = this.SetInputIsKeyMovement(currentInput, true);
                 }
+            }
+            // Moves by velocity before airborne
+            if (isAirborne)
+            {
+                if (doNotChangeVelocityWhileAirborne)
+                    tempMoveVelocity = velocityBeforeAirborne;
+                pauseMovementCountDown = landedPauseMovementDuration;
+            }
+            else
+            {
+                if (pauseMovementCountDown > 0f)
+                    pauseMovementCountDown -= deltaTime;
             }
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
