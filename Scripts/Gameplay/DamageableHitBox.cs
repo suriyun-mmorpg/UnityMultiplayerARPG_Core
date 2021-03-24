@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using LiteNetLibManager;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -57,5 +60,12 @@ namespace MultiplayerARPG
         {
             return entity.GetInfo();
         }
+
+#if UNITY_EDITOR
+        protected virtual void OnDrawGizmos()
+        {
+            Handles.Label(transform.position, name + "(HitBox)");
+        }
+#endif
     }
 }
