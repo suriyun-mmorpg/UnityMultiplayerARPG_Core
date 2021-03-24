@@ -670,7 +670,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanDoActions()
         {
-            return !this.IsDead() && !IsAttackingOrUsingSkill && !IsReloading && !IsCharging && !IsPlayingActionAnimation();
+            return !this.IsDead() && !IsAttackingOrUsingSkill && !IsReloading && !IsPlayingActionAnimation();
         }
 
         public float GetAttackSpeed()
