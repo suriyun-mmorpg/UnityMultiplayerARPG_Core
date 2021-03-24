@@ -91,16 +91,30 @@ namespace MultiplayerARPG
 
         [SerializeField]
         private AudioClip launchClip;
+        [SerializeField]
+        private AudioClip[] launchClips;
         public AudioClip LaunchClip
         {
-            get { return launchClip; }
+            get
+            {
+                if (launchClips != null && launchClips.Length > 0)
+                    return launchClips[Random.Range(0, launchClips.Length - 1)];
+                return launchClip;
+            }
         }
 
         [SerializeField]
         private AudioClip reloadClip;
+        [SerializeField]
+        private AudioClip[] reloadClips;
         public AudioClip ReloadClip
         {
-            get { return reloadClip; }
+            get
+            {
+                if (reloadClips != null && reloadClips.Length > 0)
+                    return reloadClips[Random.Range(0, reloadClips.Length - 1)];
+                return reloadClip;
+            }
         }
 
         [SerializeField]
