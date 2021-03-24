@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         [Header("Filter")]
         public List<string> filterCategories;
         public List<ItemType> filterItemTypes;
+        public bool doNotShowEmptySlots;
 
         [Header("UI Elements")]
         public GameObject listEmptyObject;
@@ -123,6 +124,7 @@ namespace MultiplayerARPG
                 tempUI = ui.GetComponent<UICharacterItem>();
                 tempItem = characterItem.GetItem();
                 if (!GameInstance.Singleton.IsLimitInventorySlot ||
+                    doNotShowEmptySlots ||
                     (filterCategories != null && filterCategories.Count > 0) ||
                     (filterItemTypes != null && filterItemTypes.Count > 0))
                 {
