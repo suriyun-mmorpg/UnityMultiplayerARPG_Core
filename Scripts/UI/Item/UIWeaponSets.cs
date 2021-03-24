@@ -13,12 +13,44 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             UpdateData(GameInstance.PlayingCharacter);
-            ClientInventoryActions.onResponseSwitchEquipWeaponSet += ResponseSwitchEquipWeaponSet;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
         private void OnDisable()
         {
-            ClientInventoryActions.onResponseSwitchEquipWeaponSet -= ResponseSwitchEquipWeaponSet;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+        }
+
+        protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnEquipWeaponSetChange(byte equipWeaponSet)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        public void UpdateOwningCharacterData()
+        {
+            if (GameInstance.PlayingCharacter == null) return;
+            UpdateData(GameInstance.PlayingCharacter);
         }
 
         public void ChangeWeaponSet(byte index)
@@ -29,11 +61,6 @@ namespace MultiplayerARPG
             }, ClientInventoryActions.ResponseSwitchEquipWeaponSet);
         }
 
-        public void ResponseSwitchEquipWeaponSet(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwitchEquipWeaponSetMessage response)
-        {
-            UpdateData(GameInstance.PlayingCharacter);
-        }
-
         public void UpdateData(IPlayerCharacterData playerCharacter)
         {
             byte equipWeaponSet = playerCharacter.EquipWeaponSet;
@@ -41,7 +68,7 @@ namespace MultiplayerARPG
             byte j = 0;
             for (byte i = 0; i < playerCharacter.SelectableWeaponSets.Count; ++i)
             {
-                if (i != equipWeaponSet)
+                if (i != equipWeaponSet && j < otherWeaponSets.Length)
                     otherWeaponSets[j++].SetData(this, i, playerCharacter.SelectableWeaponSets[i]);
             }
         }
