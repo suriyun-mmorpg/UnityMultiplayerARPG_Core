@@ -426,6 +426,10 @@ namespace MultiplayerARPG
                 WeaponAbility = null;
                 WeaponAbilityState = WeaponAbilityState.Deactivated;
             }
+            if (rightHandWeapon == null)
+                rightHandWeapon = GameInstance.Singleton.DefaultWeaponItem;
+            if (leftHandWeapon == null)
+                leftHandWeapon = GameInstance.Singleton.DefaultWeaponItem;
         }
 
         protected override void Update()
