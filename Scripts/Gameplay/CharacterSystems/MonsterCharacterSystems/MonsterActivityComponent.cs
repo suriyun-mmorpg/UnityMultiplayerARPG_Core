@@ -169,7 +169,6 @@ namespace MultiplayerARPG
             if (OverlappedEntity(tempTargetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
                 startedFollowEnemy = false;
-                Entity.StopMove();
                 // Lookat target then do something when it's in range
                 Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
                 if (lookAtDirection.sqrMagnitude > 0)
