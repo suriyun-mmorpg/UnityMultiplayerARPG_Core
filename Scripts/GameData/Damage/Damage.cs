@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee) })]
         public float hitDistance;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee) })]
-        [Range(10f, 360f)]
+        [Min(10f)]
         public float hitFov;
 
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile), nameof(DamageType.Raycast) })]
