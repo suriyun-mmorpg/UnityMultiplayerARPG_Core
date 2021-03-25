@@ -3,9 +3,9 @@ using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
-    public class DropItemDropHandler : MonoBehaviour, IDropHandler
+    public partial class NonEquipDropHandler : MonoBehaviour, IDropHandler
     {
-        private RectTransform dropRect;
+        protected RectTransform dropRect;
         public RectTransform DropRect
         {
             get
@@ -33,11 +33,12 @@ namespace MultiplayerARPG
                 switch (draggedItemUI.sourceLocation)
                 {
                     case UICharacterItemDragHandler.SourceLocation.EquipItems:
+                        draggedItemUI.uiCharacterItem.OnClickUnEquip();
                         break;
                     case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
-                        draggedItemUI.uiCharacterItem.OnClickDrop();
                         break;
                     case UICharacterItemDragHandler.SourceLocation.StorageItems:
+                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage();
                         break;
                 }
             }
