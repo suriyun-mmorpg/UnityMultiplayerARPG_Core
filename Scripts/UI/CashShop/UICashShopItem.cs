@@ -67,6 +67,7 @@ namespace MultiplayerARPG
                 uiTextSellPriceCash.text = string.Format(
                     LanguageManager.GetText(formatKeySellPriceCash),
                     Data == null ? 0.ToString("N0") : Data.sellPriceCash.ToString("N0"));
+                uiTextSellPriceCash.SetGameObjectActive(Data.sellPriceCash > 0);
             }
 
             if (uiTextSellPriceGold != null)
@@ -74,6 +75,7 @@ namespace MultiplayerARPG
                 uiTextSellPriceGold.text = string.Format(
                     LanguageManager.GetText(formatKeySellPriceGold),
                     Data == null ? 0.ToString("N0") : Data.sellPriceGold.ToString("N0"));
+                uiTextSellPriceGold.SetGameObjectActive(Data.sellPriceGold > 0);
             }
         }
 
