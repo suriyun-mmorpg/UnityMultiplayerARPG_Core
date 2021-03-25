@@ -92,7 +92,7 @@ namespace MultiplayerARPG
 
         private void FindCharactersCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseFindCharactersMessage response)
         {
-            ClientFriendActions.ResponseFindCharacters(responseHandler, responseCode, response).Forget();
+            ClientFriendActions.ResponseFindCharacters(responseHandler, responseCode, response);
             if (responseCode == AckResponseCode.Success)
                 UpdateFoundCharactersUIs(response.characters);
         }
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
 
         public void AddFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
         {
-            ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response).Forget();
+            ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response);
             if (responseCode == AckResponseCode.Success)
                 onFriendAdded.Invoke();
         }
