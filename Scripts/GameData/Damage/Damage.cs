@@ -364,7 +364,7 @@ namespace MultiplayerARPG
                             if (tempGameObject.layer == PhysicLayers.TransparentFX ||
                                 tempGameObject.layer == PhysicLayers.IgnoreRaycast ||
                                 tempGameObject.layer == PhysicLayers.Water)
-                                return;
+                                continue;
 
                             if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
