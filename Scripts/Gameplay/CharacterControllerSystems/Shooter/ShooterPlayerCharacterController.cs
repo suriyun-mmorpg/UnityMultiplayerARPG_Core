@@ -767,7 +767,6 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.enableAimAssistX = enableAimAssistX;
             CacheGameplayCameraControls.enableAimAssistY = enableAimAssistY;
             CacheGameplayCameraControls.aimAssistRadius = aimAssistRadius;
-            CacheGameplayCameraControls.aimAssistDistance = centerOriginToCharacterDistance + attackDistance;
             CacheGameplayCameraControls.aimAssistLayerMask = GetAimAssistLayerMask();
             CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
             CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
