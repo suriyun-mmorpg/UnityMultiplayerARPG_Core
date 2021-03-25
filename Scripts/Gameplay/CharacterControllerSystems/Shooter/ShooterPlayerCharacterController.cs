@@ -314,7 +314,7 @@ namespace MultiplayerARPG
         MovementState movementState;
         ExtraMovementState extraMovementState;
         ShooterControllerViewMode? viewModeBeforeDead;
-        bool isDoingAction;
+        bool updateAttackingCrosshair;
         bool mustReleaseFireKey;
         float buildYRotate;
 
@@ -402,7 +402,7 @@ namespace MultiplayerARPG
         private void SetupEquipWeapons(EquipWeapons equipWeapons)
         {
             CurrentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
-            UpdateCrosshair(CurrentCrosshairSetting, -CurrentCrosshairSetting.shrinkPerFrame);
+            UpdateCrosshair(CurrentCrosshairSetting, false, -CurrentCrosshairSetting.shrinkPerFrame);
 
             rightHandWeapon = equipWeapons.GetRightHandWeaponItem();
             leftHandWeapon = equipWeapons.GetLeftHandWeaponItem();
@@ -512,7 +512,6 @@ namespace MultiplayerARPG
             UpdateCrosshair();
 
             // Clear controlling states from last update
-            isDoingAction = false;
             movementState = MovementState.None;
             extraMovementState = ExtraMovementState.None;
             UpdateActivatedWeaponAbility(tempDeltaTime);
@@ -1150,25 +1149,27 @@ namespace MultiplayerARPG
 
         private void UpdateCrosshair()
         {
-            if (isDoingAction)
-            {
-                UpdateCrosshair(CurrentCrosshairSetting, CurrentCrosshairSetting.expandPerFrameWhileAttacking);
-            }
-            else if (movementState.HasFlag(MovementState.Forward) ||
+            bool isMoving = movementState.HasFlag(MovementState.Forward) ||
                 movementState.HasFlag(MovementState.Backward) ||
                 movementState.HasFlag(MovementState.Left) ||
                 movementState.HasFlag(MovementState.Right) ||
-                movementState.HasFlag(MovementState.IsJump))
+                movementState.HasFlag(MovementState.IsJump);
+            if (updateAttackingCrosshair)
             {
-                UpdateCrosshair(CurrentCrosshairSetting, CurrentCrosshairSetting.expandPerFrameWhileMoving);
+                UpdateCrosshair(CurrentCrosshairSetting, true, CurrentCrosshairSetting.expandPerFrameWhileAttacking);
+                updateAttackingCrosshair = false;
+            }
+            else if (isMoving)
+            {
+                UpdateCrosshair(CurrentCrosshairSetting, false, CurrentCrosshairSetting.expandPerFrameWhileMoving);
             }
             else
             {
-                UpdateCrosshair(CurrentCrosshairSetting, -CurrentCrosshairSetting.shrinkPerFrame);
+                UpdateCrosshair(CurrentCrosshairSetting, false, -CurrentCrosshairSetting.shrinkPerFrame);
             }
         }
 
-        private void UpdateCrosshair(CrosshairSetting setting, float power)
+        private void UpdateCrosshair(CrosshairSetting setting, bool isAttack, float power)
         {
             if (crosshairRect == null)
                 return;
@@ -1178,12 +1179,13 @@ namespace MultiplayerARPG
             if (!crosshairRect.gameObject)
                 return;
             // Change crosshair size by power
-            Vector3 sizeDelta = crosshairRect.sizeDelta;
+            Vector3 sizeDelta = CurrentCrosshairSize;
+            // Expanding
             sizeDelta.x += power;
             sizeDelta.y += power;
-            CurrentCrosshairSize = sizeDelta;
-            // Set crosshair size
-            crosshairRect.sizeDelta = new Vector2(Mathf.Clamp(CurrentCrosshairSize.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(CurrentCrosshairSize.y, setting.minSpread, setting.maxSpread));
+            if (!isAttack)
+                sizeDelta = new Vector2(Mathf.Clamp(sizeDelta.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(sizeDelta.y, setting.minSpread, setting.maxSpread));
+            crosshairRect.sizeDelta = CurrentCrosshairSize = sizeDelta;
         }
 
         private void UpdateRecoil()
@@ -1388,7 +1390,8 @@ namespace MultiplayerARPG
         public void Attack(bool isLeftHand)
         {
             // Set this to `TRUE` to update crosshair
-            isDoingAction = PlayerCharacterEntity.CallServerAttack(isLeftHand);
+            if (PlayerCharacterEntity.CallServerAttack(isLeftHand))
+                updateAttackingCrosshair = true;
         }
 
         public void WeaponCharge(bool isLeftHand)
@@ -1467,11 +1470,11 @@ namespace MultiplayerARPG
                 AimPosition skillAimPosition = AimPosition.Create(queueUsingSkill.aimPosition);
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    isDoingAction = PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, skillAimPosition);
+                    PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, skillAimPosition);
                 }
                 else
                 {
-                    isDoingAction = PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHand, skillAimPosition);
+                    PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHand, skillAimPosition);
                 }
             }
             ClearQueueUsingSkill();
