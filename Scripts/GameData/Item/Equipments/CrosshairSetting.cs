@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using UnityEngine.Serialization;
+
+namespace MultiplayerARPG
 {
     [System.Serializable]
     public struct CrosshairSetting
@@ -7,8 +9,11 @@
         public float expandPerFrameWhileMoving;
         public float expandPerFrameWhileAttacking;
         public float shrinkPerFrame;
+        public float shrinkPerFrameWhenAttacked;
         public float minSpread;
         public float maxSpread;
-        public float recoil;
+        public float recoilX;
+        [FormerlySerializedAs("recoil")]
+        public float recoilY;
     }
 }

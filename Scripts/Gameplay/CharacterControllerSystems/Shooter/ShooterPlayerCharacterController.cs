@@ -315,6 +315,7 @@ namespace MultiplayerARPG
         ExtraMovementState extraMovementState;
         ShooterControllerViewMode? viewModeBeforeDead;
         bool updateAttackingCrosshair;
+        bool updateAttackedCrosshair;
         bool mustReleaseFireKey;
         float buildYRotate;
 
@@ -1158,6 +1159,12 @@ namespace MultiplayerARPG
             {
                 UpdateCrosshair(CurrentCrosshairSetting, true, CurrentCrosshairSetting.expandPerFrameWhileAttacking);
                 updateAttackingCrosshair = false;
+                updateAttackedCrosshair = true;
+            }
+            else if (updateAttackedCrosshair)
+            {
+                UpdateCrosshair(CurrentCrosshairSetting, true, CurrentCrosshairSetting.shrinkPerFrameWhenAttacked);
+                updateAttackedCrosshair = false;
             }
             else if (isMoving)
             {
@@ -1190,29 +1197,47 @@ namespace MultiplayerARPG
 
         private void UpdateRecoil()
         {
+            float recoilX = 0f;
+            float recoilY = 0f;
             if (movementState.HasFlag(MovementState.Forward) ||
                 movementState.HasFlag(MovementState.Backward) ||
                 movementState.HasFlag(MovementState.Left) ||
                 movementState.HasFlag(MovementState.Right))
             {
                 if (movementState.HasFlag(MovementState.IsUnderWater))
-                    CacheGameplayCameraControls.XRotationVelocity += CurrentCrosshairSetting.recoil * recoilRateWhileSwimming;
+                {
+                    recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSwimming;
+                    recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSwimming;
+                }
                 else if (extraMovementState.HasFlag(ExtraMovementState.IsSprinting))
-                    CacheGameplayCameraControls.XRotationVelocity += CurrentCrosshairSetting.recoil * recoilRateWhileSprinting;
+                {
+                    recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSprinting;
+                    recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSprinting;
+                }
                 else
-                    CacheGameplayCameraControls.XRotationVelocity += CurrentCrosshairSetting.recoil * recoilRateWhileMoving;
+                {
+                    recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileMoving;
+                    recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileMoving;
+                }
             }
             else if (extraMovementState.HasFlag(ExtraMovementState.IsCrouching))
             {
-                CacheGameplayCameraControls.XRotationVelocity += CurrentCrosshairSetting.recoil * recoilRateWhileCrouching;
+                recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileCrouching;
+                recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileCrouching;
             }
             else if (extraMovementState.HasFlag(ExtraMovementState.IsCrawling))
             {
-                CacheGameplayCameraControls.XRotationVelocity += CurrentCrosshairSetting.recoil * recoilRateWhileCrawling;
+                recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileCrawling;
+                recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileCrawling;
             }
             else
             {
-                CacheGameplayCameraControls.XRotationVelocity += CurrentCrosshairSetting.recoil;
+                recoilX = CurrentCrosshairSetting.recoilX;
+                recoilY = CurrentCrosshairSetting.recoilY;
+            }
+            if (recoilX > 0f || recoilY > 0f)
+            {
+                CacheGameplayCameraControls.Recoil(recoilY, Random.Range(-recoilX, recoilX));
             }
         }
 
