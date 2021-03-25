@@ -106,6 +106,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
         {
+            ClientCashShopActions.ResponseCashShopInfo(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
 
             if (uiTextCash != null)
@@ -156,6 +157,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)
         {
+            ClientCashShopActions.ResponseCashShopBuy(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString()));
             RefreshCashShopInfo();

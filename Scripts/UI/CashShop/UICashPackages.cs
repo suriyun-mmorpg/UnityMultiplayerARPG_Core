@@ -112,6 +112,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
         {
+            ClientCashShopActions.ResponseCashPackageInfo(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
 
             if (uiTextCash != null)

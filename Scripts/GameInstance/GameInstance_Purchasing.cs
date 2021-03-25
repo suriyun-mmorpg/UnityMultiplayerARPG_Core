@@ -171,6 +171,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashPackageBuyValidation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageBuyValidationMessage response)
         {
+            ClientCashShopActions.ResponseCashPackageBuyValidation(requestHandler, responseCode, response);
             if (responseCode == AckResponseCode.Unimplemented)
             {
                 PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString()));
