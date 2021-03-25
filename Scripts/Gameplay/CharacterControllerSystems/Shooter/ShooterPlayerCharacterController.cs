@@ -355,7 +355,7 @@ namespace MultiplayerARPG
             characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraTransform);
             characterEntity.ModelManager.SetIsFps(ViewMode == ShooterControllerViewMode.Fps);
             CacheGameplayCameraControls.startYRotation = characterEntity.CurrentRotation.y;
-            UpdateCameraSettings();
+            UpdateViewMode();
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -467,14 +467,8 @@ namespace MultiplayerARPG
             }
 
             if (dirtyViewMode != viewMode)
-            {
-                dirtyViewMode = viewMode;
-                UpdateCameraSettings();
-                // Update camera zoom distance when change view mode only, to allow zoom controls
-                CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
-                CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
-                CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
-            }
+                UpdateViewMode();
+
             CacheGameplayCameraControls.targetOffset = CameraTargetOffset;
             CacheGameplayCameraControls.enableWallHitSpring = viewMode == ShooterControllerViewMode.Tps ? true : false;
             CacheGameplayCameraControls.target = ViewMode == ShooterControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
@@ -536,10 +530,10 @@ namespace MultiplayerARPG
             centerRay = CacheGameplayCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             centerOriginToCharacterDistance = Vector3.Distance(centerRay.origin, CacheTransform.position);
             cameraForward = CacheGameplayCameraTransform.forward;
-            cameraRight = CacheGameplayCameraTransform.right;
             cameraForward.y = 0f;
-            cameraRight.y = 0f;
             cameraForward.Normalize();
+            cameraRight = CacheGameplayCameraTransform.right;
+            cameraRight.y = 0f;
             cameraRight.Normalize();
 
             // Update look target and aim position
@@ -1539,6 +1533,16 @@ namespace MultiplayerARPG
         public bool GetSecondaryAttackButtonDown()
         {
             return InputManager.GetButtonDown("Fire2");
+        }
+
+        public void UpdateViewMode()
+        {
+            dirtyViewMode = viewMode;
+            UpdateCameraSettings();
+            // Update camera zoom distance when change view mode only, to allow zoom controls
+            CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
+            CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
+            CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
         }
 
         public void UpdateCameraSettings()
