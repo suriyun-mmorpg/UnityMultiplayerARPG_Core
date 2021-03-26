@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
@@ -7,6 +9,13 @@ namespace MultiplayerARPG
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
+
+        [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
+        [SerializeField]
+        protected float destroyDelay = 0f;
+        [SerializeField]
+        protected UnityEvent onItemsContainerDestroy;
+
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
 
         protected SyncListCharacterItem items = new SyncListCharacterItem();
@@ -15,10 +24,41 @@ namespace MultiplayerARPG
             get { return items; }
         }
 
+        // Private variables
+        protected bool isDestroyed;
+
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
             items.forOwnerOnly = false;
+        }
+
+        [AllRpc]
+        protected virtual void AllOnItemsContainerDestroy()
+        {
+            if (onItemsContainerDestroy != null)
+                onItemsContainerDestroy.Invoke();
+        }
+
+        public void CallAllOnItemDropDestroy()
+        {
+            RPC(AllOnItemsContainerDestroy);
+        }
+
+        public void PickedUp()
+        {
+            if (!IsServer)
+                return;
+            if (Items.Count > 0)
+                return;
+            if (isDestroyed)
+                return;
+            // Mark as destroyed
+            isDestroyed = true;
+            // Tell clients that the item drop destroy to play animation at client
+            CallAllOnItemDropDestroy();
+            // Destroy this entity
+            NetworkDestroy(destroyDelay);
         }
 
         public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems)

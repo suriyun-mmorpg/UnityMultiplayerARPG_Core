@@ -1,13 +1,13 @@
 ﻿using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class UIItemsContainer : UICharacterItems
     {
         public bool pickUpOnSelect;
+        private bool readyToPickUp;
 
         public ItemsContainerEntity TargetEntity { get; private set; }
 
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
         protected override void OnSelect(UICharacterItem ui)
         {
             base.OnSelect(ui);
-            if (pickUpOnSelect)
+            if (pickUpOnSelect && readyToPickUp)
                 OnClickPickUpSelectedItem();
         }
 
@@ -73,7 +73,8 @@ namespace MultiplayerARPG
 
         public void UpdateData(IList<CharacterItem> characterItems)
         {
-            int selectedIndex = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.IndexOfData : -1;
+            readyToPickUp = false;
+            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.Data.characterItem.id : string.Empty;
             CacheItemSelectionManager.Clear();
 
             if (characterItems == null || characterItems.Count == 0)
@@ -97,7 +98,7 @@ namespace MultiplayerARPG
                 if (dragHandler != null)
                     dragHandler.SetupForStorageItems(tempUI);
                 CacheItemSelectionManager.Add(tempUI);
-                if (selectedIndex == index)
+                if (selectedId.Equals(characterItem.id))
                     selectedUI = tempUI;
             });
             if (listEmptyObject != null)
@@ -115,6 +116,7 @@ namespace MultiplayerARPG
                 if (uiDialog != null)
                     uiDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
             }
+            readyToPickUp = true;
         }
     }
 }

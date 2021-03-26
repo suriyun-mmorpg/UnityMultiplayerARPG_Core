@@ -145,6 +145,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
             });
             itemsContainerEntity.Items.RemoveAt(index);
+            itemsContainerEntity.PickedUp();
             this.FillEmptySlots();
 #endif
         }

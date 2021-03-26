@@ -126,10 +126,9 @@ namespace MultiplayerARPG
             set { itemDropData.Value = value; }
         }
 
-        #region State
+        // Private variables
         protected bool isPickedUp;
         protected float dropTime;
-        #endregion
 
         public override void PrepareRelatesData()
         {
