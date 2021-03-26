@@ -2,84 +2,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class UIItemsContainer : UIBase
+    public class UIItemsContainer : UICharacterItems
     {
-        [Header("UI Elements")]
-        public GameObject listEmptyObject;
-        [FormerlySerializedAs("uiItemDialog")]
-        public UICharacterItem uiDialog;
-        public UICharacterItem uiPrefab;
-        public Transform uiContainer;
-
-        [Header("Other Settings")]
         public bool pickUpOnSelect;
-
-        private UIList cacheItemList;
-        public UIList CacheItemList
-        {
-            get
-            {
-                if (cacheItemList == null)
-                {
-                    cacheItemList = gameObject.AddComponent<UIList>();
-                    cacheItemList.uiPrefab = uiPrefab.gameObject;
-                    cacheItemList.uiContainer = uiContainer;
-                }
-                return cacheItemList;
-            }
-        }
-
-        private UICharacterItemSelectionManager cacheItemSelectionManager;
-        public UICharacterItemSelectionManager CacheItemSelectionManager
-        {
-            get
-            {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
-            }
-        }
 
         public ItemsContainerEntity TargetEntity { get; private set; }
 
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             if (TargetEntity != null)
                 TargetEntity.Items.onOperation += OnItemsOperation;
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelect);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelect);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselect);
-            if (uiDialog != null)
-                uiDialog.onHide.AddListener(OnDialogHide);
         }
 
-        protected virtual void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             if (TargetEntity != null)
                 TargetEntity.Items.onOperation -= OnItemsOperation;
-            // Hide
-            if (uiDialog != null)
-                uiDialog.onHide.RemoveListener(OnDialogHide);
-            CacheItemSelectionManager.DeselectSelectedUI();
         }
 
-        private void Update()
+        protected override void Update()
         {
-            if (TargetEntity == null || Vector3.Distance(GameInstance.PlayingCharacterEntity.CacheTransform.position, TargetEntity.CacheTransform.position) > GameInstance.Singleton.pickUpItemDistance)
+            base.Update();
+            if (TargetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(TargetEntity, GameInstance.Singleton.pickUpItemDistance))
                 Hide();
         }
 
         public void Show(ItemsContainerEntity targetEntity)
         {
-            if (targetEntity == null || Vector3.Distance(GameInstance.PlayingCharacterEntity.CacheTransform.position, targetEntity.CacheTransform.position) > GameInstance.Singleton.pickUpItemDistance)
-                return;
-            TargetEntity = targetEntity;
+            UpdateData(targetEntity);
             Show();
         }
 
@@ -93,31 +48,11 @@ namespace MultiplayerARPG
             UpdateData(TargetEntity.Items);
         }
 
-        protected void OnSelect(UICharacterItem ui)
+        protected override void OnSelect(UICharacterItem ui)
         {
-            if (ui.Data.characterItem.IsEmptySlot())
-            {
-                CacheItemSelectionManager.DeselectSelectedUI();
-                return;
-            }
-            if (uiDialog != null)
-            {
-                uiDialog.selectionManager = CacheItemSelectionManager;
-                uiDialog.Setup(ui.Data, GameInstance.PlayingCharacter, ui.IndexOfData);
-                uiDialog.Show();
-            }
+            base.OnSelect(ui);
             if (pickUpOnSelect)
                 OnClickPickUpSelectedItem();
-        }
-
-        protected void OnDeselect(UICharacterItem ui)
-        {
-            if (uiDialog != null)
-            {
-                uiDialog.onHide.RemoveListener(OnDialogHide);
-                uiDialog.Hide();
-                uiDialog.onHide.AddListener(OnDialogHide);
-            }
         }
 
         public void OnClickPickUpSelectedItem()
@@ -126,6 +61,14 @@ namespace MultiplayerARPG
             if (selectedIndex < 0)
                 return;
             GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(TargetEntity.ObjectId, selectedIndex);
+        }
+
+        public void UpdateData(ItemsContainerEntity targetEntity)
+        {
+            if (TargetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(TargetEntity, GameInstance.Singleton.pickUpItemDistance))
+                return;
+            TargetEntity = targetEntity;
+            UpdateData(TargetEntity.Items);
         }
 
         public void UpdateData(IList<CharacterItem> characterItems)
