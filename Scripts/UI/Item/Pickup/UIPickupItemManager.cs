@@ -17,6 +17,18 @@ namespace MultiplayerARPG
             ItemDropEntityDetector.detectingRadius = GameInstance.Singleton.pickUpItemDistance;
             ItemDropEntityDetector.findItemDrop = true;
             ItemDropEntityDetector.onUpdateList += OnUpdate;
+            if (uiList != null)
+            {
+                if (uiList.IsVisible())
+                    uiList.Hide();
+            }
+            if (signalObjects != null && signalObjects.Length > 0)
+            {
+                foreach (GameObject signalObject in signalObjects)
+                {
+                    signalObject.SetActive(false);
+                }
+            }
         }
 
         private void OnDestroy()
