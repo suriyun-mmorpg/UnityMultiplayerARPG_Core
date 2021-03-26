@@ -65,7 +65,7 @@ namespace MultiplayerARPG
 
         public void UpdateData(ItemsContainerEntity targetEntity)
         {
-            if (TargetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(TargetEntity, GameInstance.Singleton.pickUpItemDistance))
+            if (targetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(targetEntity, GameInstance.Singleton.pickUpItemDistance))
                 return;
             TargetEntity = targetEntity;
             UpdateData(TargetEntity.Items);
