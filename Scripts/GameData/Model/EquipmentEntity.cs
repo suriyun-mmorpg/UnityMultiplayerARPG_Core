@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         {
             equipmentRenderer = GetComponent<Renderer>();
             if (equipmentRenderer != null)
-                defaultMaterials = equipmentRenderer.materials;
+                defaultMaterials = equipmentRenderer.sharedMaterials;
             
             effects.Sort();
 
