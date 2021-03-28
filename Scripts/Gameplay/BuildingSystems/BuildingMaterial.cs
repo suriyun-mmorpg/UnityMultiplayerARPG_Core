@@ -25,9 +25,10 @@ namespace MultiplayerARPG
         public Color canBuildColor = Color.green;
         public Color cannotBuildColor = Color.red;
 
-        private Renderer meshRenderer;
-        private SpriteRenderer spriteRenderer;
-        private Tilemap tilemap;
+        [Header("Renderer Components")]
+        public Renderer meshRenderer;
+        public SpriteRenderer spriteRenderer;
+        public Tilemap tilemap;
 
         private State currentState;
         public State CurrentState
@@ -95,15 +96,18 @@ namespace MultiplayerARPG
             base.Awake();
             BuildingEntity = entity as BuildingEntity;
 
-            meshRenderer = GetComponent<MeshRenderer>();
+            if (meshRenderer == null)
+                meshRenderer = GetComponent<MeshRenderer>();
             if (meshRenderer != null)
                 defaultMaterials = meshRenderer.sharedMaterials;
 
-            spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
                 defaultColor = spriteRenderer.color;
 
-            tilemap = GetComponent<Tilemap>();
+            if (tilemap == null)
+                tilemap = GetComponent<Tilemap>();
             if (tilemap != null)
                 defaultColor = tilemap.color;
 
