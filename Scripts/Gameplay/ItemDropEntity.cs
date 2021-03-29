@@ -258,8 +258,7 @@ namespace MultiplayerARPG
 
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
-            if ((Looters == null ||
-                Looters.Contains(baseCharacterEntity.ObjectId) ||
+            if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.ObjectId) ||
                 Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration) &&
                 !isPickedUp)
                 return true;
