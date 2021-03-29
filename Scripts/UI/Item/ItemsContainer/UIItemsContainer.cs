@@ -98,7 +98,7 @@ namespace MultiplayerARPG
                 if (dragHandler != null)
                     dragHandler.SetupForStorageItems(tempUI);
                 CacheItemSelectionManager.Add(tempUI);
-                if (selectedId.Equals(characterItem.id))
+                if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
                     selectedUI = tempUI;
             });
             if (listEmptyObject != null)

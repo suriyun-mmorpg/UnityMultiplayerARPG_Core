@@ -121,7 +121,7 @@ namespace MultiplayerARPG
                 tempUi.Data = mailListEntry;
                 tempUi.Show();
                 CacheSelectionManager.Add(tempUi);
-                if (selectedId == mailListEntry.Id)
+                if (!string.IsNullOrEmpty(selectedId) && selectedId == mailListEntry.Id)
                     tempUi.OnClickSelect();
             });
             if (listEmptyObject != null)
