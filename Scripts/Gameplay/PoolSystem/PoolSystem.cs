@@ -71,7 +71,7 @@ namespace MultiplayerARPG
         }
 
         public static T GetInstance<T>(T prefab)
-            where T : class, IPoolDescriptor
+            where T : Object, IPoolDescriptor
         {
             if (prefab == null)
                 return null;
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         }
 
         public static T GetInstance<T>(T prefab, Vector3 position, Quaternion rotation)
-            where T : class, IPoolDescriptor
+            where T : Object, IPoolDescriptor
         {
             if (prefab == null)
                 return null;
@@ -113,7 +113,8 @@ namespace MultiplayerARPG
             return GetInstance(prefab, position, rotation);
         }
 
-        public static void PushBack(IPoolDescriptor instance)
+        public static void PushBack<T>(T instance)
+            where T : Object, IPoolDescriptor
         {
             if (instance == null)
             {
