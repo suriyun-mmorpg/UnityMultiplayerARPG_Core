@@ -67,14 +67,14 @@ namespace MultiplayerARPG
             if (equipWeaponSet >= playerCharacter.SelectableWeaponSets.Count)
                 return;
             currentWeaponSet.SetData(this, equipWeaponSet, playerCharacter.SelectableWeaponSets[equipWeaponSet]);
+            EquipWeapons tempEquipWeapons;
             byte j = 0;
-            for (byte i = 0; i < playerCharacter.SelectableWeaponSets.Count; ++i)
+            for (byte i = 0; i < GameInstance.Singleton.maxEquipWeaponSet; ++i)
             {
                 if (i != equipWeaponSet && j < otherWeaponSets.Length)
                 {
-                    if (i >= playerCharacter.SelectableWeaponSets.Count)
-                        return;
-                    otherWeaponSets[j].SetData(this, i, playerCharacter.SelectableWeaponSets[i]);
+                    tempEquipWeapons = i < playerCharacter.SelectableWeaponSets.Count ? playerCharacter.SelectableWeaponSets[i] : new EquipWeapons();
+                    otherWeaponSets[j].SetData(this, i, tempEquipWeapons);
                     ++j;
                 }
             }
