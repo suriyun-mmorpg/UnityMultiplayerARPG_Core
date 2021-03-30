@@ -35,7 +35,9 @@ namespace MultiplayerARPG
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
         private float lastClientSendInputs;
-
+        private float? targetYRotation;
+        private float yRotateLerpTime;
+        private float yRotateLerpDuration;
         private EntityMovementInput oldInput;
         private EntityMovementInput currentInput;
 
@@ -152,6 +154,25 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public override void EntityUpdate()
+        {
+            float deltaTime = Time.deltaTime;
+            if (targetYRotation.HasValue)
+            {
+                CacheNavMeshAgent.updateRotation = false;
+                yRotateLerpTime += deltaTime;
+                float lerpTimeRate = yRotateLerpTime / yRotateLerpDuration;
+                Vector3 eulerAngles = CacheTransform.eulerAngles;
+                eulerAngles.y = Mathf.LerpAngle(eulerAngles.y, targetYRotation.Value, lerpTimeRate);
+                CacheTransform.eulerAngles = eulerAngles;
+                if (lerpTimeRate >= 1f)
+                {
+                    CacheNavMeshAgent.updateRotation = true;
+                    targetYRotation = null;
+                }
+            }
+        }
+
         public override void EntityFixedUpdate()
         {
             bool isStationary = CacheNavMeshAgent.isStopped || CacheNavMeshAgent.remainingDistance <= CacheNavMeshAgent.stoppingDistance;
@@ -237,7 +258,9 @@ namespace MultiplayerARPG
                 }
                 else if (!IsOwnerClient)
                 {
-                    CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                    targetYRotation = yAngle;
+                    yRotateLerpTime = 0;
+                    yRotateLerpDuration = serverSyncTransformInterval;
                     if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
                     {
                         acceptedPosition = position;
@@ -294,9 +317,23 @@ namespace MultiplayerARPG
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
+                if (inputState.HasFlag(InputState.PositionChanged))
+                {
+                    SetMovePaths(position, inputState.HasFlag(InputState.IsKeyMovement));
+                }
                 if (inputState.HasFlag(InputState.RotationChanged))
-                    CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-                SetMovePaths(position, inputState.HasFlag(InputState.IsKeyMovement));
+                {
+                    if (IsClient)
+                    {
+                        targetYRotation = yAngle;
+                        yRotateLerpTime = 0;
+                        yRotateLerpDuration = clientSendInputsInterval;
+                    }
+                    else
+                    {
+                        CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                    }
+                }
             }
         }
 
