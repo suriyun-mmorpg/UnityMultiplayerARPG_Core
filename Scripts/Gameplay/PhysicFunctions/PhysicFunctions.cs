@@ -62,7 +62,10 @@ namespace MultiplayerARPG
 
         public int RaycastDown(Vector3 position, int layerMask, float distance = 100f, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            return PhysicUtils.SortedRaycastNonAlloc3D(position + (Vector3.up * distance * 0.5f), Vector3.down, raycasts, distance, layerMask, queryTriggerInteraction);
+            // Raycast to find hit floor
+            int hitCount = Physics.RaycastNonAlloc(position + (Vector3.up * distance * 0.5f), Vector3.down, raycasts, distance, layerMask, queryTriggerInteraction);
+            System.Array.Sort(raycasts, 0, hitCount, new PhysicUtils.RaycastHitComparerCustomOrigin(position));
+            return hitCount;
         }
 
         public bool GetRaycastIsTrigger(int index)
