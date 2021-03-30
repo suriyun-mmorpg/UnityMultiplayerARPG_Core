@@ -6,8 +6,8 @@ namespace MultiplayerARPG
 {
     public class AreaSkillControls
     {
-        public const float GROUND_DETECTION_DISTANCE = 100f;
-        public const int GROUND_DETECTION_RAYCAST_LENGTH = 64;
+        public const float GROUND_DETECTION_DISTANCE = 30f;
+        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
 
         public static bool IsMobile { get { return InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform; } }
 
@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = GameplayUtils.CursorWorldPosition(Camera.main, cursorPosition);
             position = GameplayUtils.ClampPosition(GameInstance.PlayingCharacterEntity.CacheTransform.position, position, castDistance);
-            position = PhysicUtils.FindGroundedPosition(position, GROUND_DETECTION_RAYCAST_LENGTH, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
+            position = PhysicUtils.FindGroundedPosition(position, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
             if (targetObject != null)
             {
                 targetObject.SetActive(true);
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = GameInstance.PlayingCharacterEntity.CacheTransform.position + (GameplayUtils.GetDirectionByAxes(Camera.main.transform, aimAxes.x, aimAxes.y) * castDistance);
-            position = PhysicUtils.FindGroundedPosition(position, GROUND_DETECTION_RAYCAST_LENGTH, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
+            position = PhysicUtils.FindGroundedPosition(position, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
             if (targetObject != null)
             {
                 targetObject.SetActive(true);

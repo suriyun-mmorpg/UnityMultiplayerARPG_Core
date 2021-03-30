@@ -11,8 +11,7 @@ namespace MultiplayerARPG
     public class ItemDropEntity : BaseGameEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
-        public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
-        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
+        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
         [Header("Placeholder Settings")]
         [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
         [SerializeField]

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
-using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -54,39 +54,35 @@ namespace MultiplayerARPG
 
         protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, short level)
         {
-            float colliderDetectionRadius = prefab.ColliderDetectionRadius;
-            Vector3 spawnPosition = GetRandomPosition();
-            Quaternion spawnRotation = GetRandomRotation();
-            Collider[] overlaps = Physics.OverlapSphere(spawnPosition, colliderDetectionRadius);
-            foreach (Collider overlap in overlaps)
+            Vector3 spawnPosition;
+            if (GetRandomPosition(out spawnPosition))
             {
-                if (overlap.gameObject.layer == CurrentGameInstance.characterLayer ||
-                    overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
-                    overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
-                    overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
+                Collider[] overlaps = Physics.OverlapSphere(spawnPosition, prefab.ColliderDetectionRadius);
+                foreach (Collider overlap in overlaps)
                 {
-                    // Don't spawn because it will hitting other entities
-                    pending.Add(new HarvestableSpawnPrefabData()
+                    if (overlap.gameObject.layer == CurrentGameInstance.characterLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                     {
-                        prefab = prefab,
-                        level = level,
-                        amount = 1
-                    });
-                    Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {pending.Count}");
-                    return null;
+                        // Don't spawn because it will hitting other entities
+                        pending.Add(new HarvestableSpawnPrefabData()
+                        {
+                            prefab = prefab,
+                            level = level,
+                            amount = 1
+                        });
+                        Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {pending.Count}");
+                        return null;
+                    }
                 }
-            }
-            GameObject spawnObj = Instantiate(prefab.gameObject, spawnPosition, spawnRotation);
-            HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
-            entity.gameObject.SetActive(false);
-            if (entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
-            {
+                Quaternion spawnRotation = GetRandomRotation();
+                GameObject spawnObj = Instantiate(prefab.gameObject, spawnPosition, spawnRotation);
+                HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }
-            // Destroy the entity (because it can't find ground position)
-            Destroy(entity.gameObject);
             pending.Add(new HarvestableSpawnPrefabData()
             {
                 prefab = prefab,

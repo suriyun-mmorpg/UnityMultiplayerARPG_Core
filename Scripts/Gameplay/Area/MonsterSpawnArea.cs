@@ -54,20 +54,31 @@ namespace MultiplayerARPG
 
         protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab, short level)
         {
-            Vector3 spawnPosition = GetRandomPosition();
-            Quaternion spawnRotation = GetRandomRotation();
-            GameObject spawnObj = Instantiate(prefab.gameObject, spawnPosition, spawnRotation);
-            BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
-            entity.gameObject.SetActive(false);
-            if (entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
+            Vector3 spawnPosition;
+            if (GetRandomPosition(out spawnPosition))
             {
+                Quaternion spawnRotation = GetRandomRotation();
+                GameObject spawnObj = Instantiate(prefab.gameObject, spawnPosition, spawnRotation);
+                BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
+                if (!entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
+                {
+                    // Destroy the entity (because it can't find ground position)
+                    Destroy(entity.gameObject);
+                    pending.Add(new MonsterSpawnPrefabData()
+                    {
+                        prefab = prefab,
+                        level = level,
+                        amount = 1
+                    });
+                    Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {pending.Count}");
+                    return null;
+                }
                 entity.Level = level;
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
+                entity.Teleport(spawnPosition, spawnRotation);
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }
-            // Destroy the entity (because it can't find ground position)
-            Destroy(entity.gameObject);
             pending.Add(new MonsterSpawnPrefabData()
             {
                 prefab = prefab,

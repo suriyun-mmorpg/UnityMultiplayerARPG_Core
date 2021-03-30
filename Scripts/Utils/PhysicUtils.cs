@@ -106,21 +106,39 @@ public static class PhysicUtils
         return count;
     }
 
-    public static Vector3 FindGroundedPosition(Vector3 origin, int raycastLength, float distance, int layerMask)
+    public static Vector3 FindGroundedPosition(Vector3 origin, int raycastLength, float distance, int layerMask, Transform exceptionObject = null)
     {
-        return FindGroundedPosition(origin, new RaycastHit[raycastLength], distance, layerMask);
+        return FindGroundedPosition(origin, new RaycastHit[raycastLength], distance, layerMask, exceptionObject);
     }
 
-    public static Vector3 FindGroundedPosition(Vector3 origin, RaycastHit[] results, float distance, int layerMask)
+    public static Vector3 FindGroundedPosition(Vector3 origin, RaycastHit[] results, float distance, int layerMask, Transform exceptionObject = null)
     {
+        Vector3 result;
+        FindGroundedPosition(origin, results, distance, layerMask, out result, exceptionObject);
+        return result;
+    }
+
+    public static bool FindGroundedPosition(Vector3 origin, RaycastHit[] results, float distance, int layerMask, out Vector3 result, Transform exceptionObject = null)
+    {
+        result = origin;
         // Raycast to find hit floor
         int hitCount = SortedRaycastNonAlloc3D(origin + (Vector3.up * distance * 0.5f), Vector3.down, results, distance, layerMask, QueryTriggerInteraction.Ignore);
         if (hitCount > 0)
         {
-            System.Array.Sort(results, 0, hitCount, new RaycastHitComparerWithOrigin(origin));
-            origin = results[0].point;
+            if (exceptionObject != null)
+            {
+                for (int i = 0; i < hitCount; ++i)
+                {
+                    if (results[i].transform.root == exceptionObject.root)
+                        continue;
+                    result = results[i].point;
+                    return true;
+                }
+            }
+            result = results[0].point;
+            return true;
         }
-        return origin;
+        return false;
     }
 
     /// <summary>
@@ -161,28 +179,6 @@ public static class PhysicUtils
         public int Compare(RaycastHit2D x, RaycastHit2D y)
         {
             return x.distance.CompareTo(y.distance);
-        }
-    }
-
-    /// <summary>
-    /// Sort ASC by distance from origin to impact point
-    /// </summary>
-    public struct RaycastHitComparerWithOrigin : IComparer<RaycastHit>, IComparer<RaycastHit2D>
-    {
-        private Vector3 origin;
-        public RaycastHitComparerWithOrigin(Vector3 origin)
-        {
-            this.origin = origin;
-        }
-
-        public int Compare(RaycastHit x, RaycastHit y)
-        {
-            return Vector3.Distance(origin, x.point).CompareTo(Vector3.Distance(origin, y.point));
-        }
-
-        public int Compare(RaycastHit2D x, RaycastHit2D y)
-        {
-            return Vector3.Distance(origin, x.point).CompareTo(Vector3.Distance(origin, y.point));
         }
     }
 }

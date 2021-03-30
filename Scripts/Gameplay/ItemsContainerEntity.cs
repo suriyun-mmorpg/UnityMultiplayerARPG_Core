@@ -8,7 +8,6 @@ namespace MultiplayerARPG
     public class ItemsContainerEntity : BaseGameEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
-        public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
 
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
         [SerializeField]
@@ -16,7 +15,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected UnityEvent onItemsContainerDestroy;
 
-        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
+        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
 
         protected SyncListCharacterItem items = new SyncListCharacterItem();
         public SyncListCharacterItem Items

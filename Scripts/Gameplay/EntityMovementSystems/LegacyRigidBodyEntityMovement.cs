@@ -9,6 +9,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CapsuleCollider))]
     public class LegacyRigidBodyEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
+        protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
+
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
@@ -234,24 +236,7 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            result = fromPosition;
-            float nearestDistance = float.MaxValue;
-            bool foundGround = false;
-            float tempDistance;
-            int foundCount = physicFunctions.RaycastDown(fromPosition, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), findDistance, QueryTriggerInteraction.Ignore);
-            for (int i = 0; i < foundCount; ++i)
-            {
-                if (physicFunctions.GetRaycastTransform(i).root == CacheTransform.root)
-                    continue;
-                tempDistance = Vector3.Distance(fromPosition, physicFunctions.GetRaycastPoint(i));
-                if (tempDistance < nearestDistance)
-                {
-                    result = physicFunctions.GetRaycastPoint(i);
-                    nearestDistance = tempDistance;
-                    foundGround = true;
-                }
-            }
-            return foundGround;
+            return PhysicUtils.FindGroundedPosition(fromPosition, findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
         }
 
         public override void EntityFixedUpdate()

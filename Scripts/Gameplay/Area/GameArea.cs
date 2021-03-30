@@ -11,9 +11,7 @@ namespace MultiplayerARPG
     public class GameArea : MonoBehaviour
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
-        public const float GROUND_DETECTION_Y_OFFSETS = 3f;
-        public const int FIND_GROUND_RAYCAST_HIT_SIZE = 10;
-        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[FIND_GROUND_RAYCAST_HIT_SIZE];
+        protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[10];
         public Color gizmosColor = Color.magenta;
         public GameAreaType type;
         [Header("Radius Area")]
@@ -25,9 +23,11 @@ namespace MultiplayerARPG
 
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
-        public Vector3 GetRandomPosition()
+        protected IPhysicFunctions physicFunctions;
+
+        public bool GetRandomPosition(out Vector3 randomedPosition)
         {
-            Vector3 randomedPosition = transform.position;
+            randomedPosition = transform.position;
 
             switch (GameInstance.Singleton.DimensionType)
             {
@@ -35,14 +35,13 @@ namespace MultiplayerARPG
                     switch (type)
                     {
                         case GameAreaType.Radius:
-                            randomedPosition += new Vector3(Random.Range(-1f, 1f) * randomRadius, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * randomRadius);
+                            randomedPosition += new Vector3(Random.Range(-1f, 1f) * randomRadius, 0f, Random.Range(-1f, 1f) * randomRadius);
                             break;
                         case GameAreaType.Square:
-                            randomedPosition += new Vector3(Random.Range(-0.5f, 0.5f) * squareSizeX, GROUND_DETECTION_Y_OFFSETS, Random.Range(-0.5f, 0.5f) * squareSizeZ);
+                            randomedPosition += new Vector3(Random.Range(-0.5f, 0.5f) * squareSizeX, 0f, Random.Range(-0.5f, 0.5f) * squareSizeZ);
                             break;
                     }
-                    randomedPosition = PhysicUtils.FindGroundedPosition(randomedPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GroundLayerMask);
-                    break;
+                    return FindGroundedPosition(randomedPosition, GROUND_DETECTION_DISTANCE, out randomedPosition);
                 case DimensionType.Dimension2D:
                     switch (type)
                     {
@@ -53,10 +52,9 @@ namespace MultiplayerARPG
                             randomedPosition += new Vector3(Random.Range(-0.5f, 0.5f) * squareSizeX, Random.Range(-0.5f, 0.5f) * squareSizeZ);
                             break;
                     }
-                    break;
+                    return true;
             }
-
-            return randomedPosition;
+            return false;
         }
 
         public Quaternion GetRandomRotation()
@@ -82,6 +80,11 @@ namespace MultiplayerARPG
             }
         }
 #endif
+
+        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        {
+            return PhysicUtils.FindGroundedPosition(fromPosition, findGroundRaycastHits, findDistance, GroundLayerMask, out result);
+        }
 
         public virtual int GroundLayerMask { get { return -1; } }
     }

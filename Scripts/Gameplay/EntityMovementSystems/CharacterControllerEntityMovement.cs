@@ -8,6 +8,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterController))]
     public class CharacterControllerEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
+        protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
+
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
@@ -103,6 +105,8 @@ namespace MultiplayerARPG
         private float tempCurrentMoveSpeed;
         private CollisionFlags collisionFlags;
         private float pauseMovementCountDown;
+        private bool previouslyGrounded;
+        private bool previouslyAirborne;
 
         public override void EntityAwake()
         {
@@ -237,24 +241,7 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            result = fromPosition;
-            float nearestDistance = float.MaxValue;
-            bool foundGround = false;
-            float tempDistance;
-            int foundCount = physicFunctions.RaycastDown(fromPosition, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), findDistance, QueryTriggerInteraction.Ignore);
-            for (int i = 0; i < foundCount; ++i)
-            {
-                if (physicFunctions.GetRaycastTransform(i).root == CacheTransform.root)
-                    continue;
-                tempDistance = Vector3.Distance(fromPosition, physicFunctions.GetRaycastPoint(i));
-                if (tempDistance < nearestDistance)
-                {
-                    result = physicFunctions.GetRaycastPoint(i);
-                    nearestDistance = tempDistance;
-                    foundGround = true;
-                }
-            }
-            return foundGround;
+            return PhysicUtils.FindGroundedPosition(fromPosition, findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
         }
 
         public override void EntityUpdate()
@@ -490,12 +477,13 @@ namespace MultiplayerARPG
                     currentInput = this.SetInputIsKeyMovement(currentInput, true);
                 }
             }
-            // Moves by velocity before airborne
-            if (isAirborne)
+            if (isGrounded && previouslyAirborne)
             {
-                if (doNotChangeVelocityWhileAirborne)
-                    tempMoveVelocity = velocityBeforeAirborne;
                 pauseMovementCountDown = landedPauseMovementDuration;
+            }
+            else if (isAirborne && doNotChangeVelocityWhileAirborne)
+            {
+                tempMoveVelocity = velocityBeforeAirborne;
             }
             else
             {
@@ -568,6 +556,8 @@ namespace MultiplayerARPG
             currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
             isJumping = false;
             acceptedJump = false;
+            previouslyGrounded = isGrounded;
+            previouslyAirborne = isAirborne;
         }
 
         private void UpdateRotation()
