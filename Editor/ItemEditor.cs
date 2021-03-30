@@ -36,6 +36,9 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.equipmentModels));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.subEquipmentModels));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.requirement));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.launchClip));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.reloadClip));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.emptyClip));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseStats));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseStatsRate));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseAttributes));
@@ -49,6 +52,8 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.damageAmount));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.harvestDamageAmount));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.moveSpeedRateWhileAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.moveSpeedRateWhileCharging));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.moveSpeedRateWhileReloading));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.ammoCapacity));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.weaponAbility));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.crosshairSetting));
