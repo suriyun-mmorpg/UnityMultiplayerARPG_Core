@@ -31,6 +31,16 @@ namespace MultiplayerARPG
         public TextWrapper textRecieveGold;
         public UICharacterCurrencies uiReceiveCurrencies;
         public UICharacterItems uiReceiveItems;
+        public InputFieldWrapper inputAmount;
+        [Tooltip("These objects will be activated while sell price cash currency is not 0.")]
+        public GameObject[] cashObjects;
+        [Tooltip("These objects will be activated while sell price gold currency is not 0.")]
+        public GameObject[] goldObjects;
+
+        public int BuyAmount
+        {
+            get { return inputAmount == null ? 1 : int.Parse(inputAmount.text); }
+        }
 
         protected override void UpdateData()
         {
@@ -77,6 +87,22 @@ namespace MultiplayerARPG
                     Data == null ? 0.ToString("N0") : Data.sellPriceGold.ToString("N0"));
                 uiTextSellPriceGold.SetGameObjectActive(Data.sellPriceGold > 0);
             }
+
+            if (cashObjects != null && cashObjects.Length > 0)
+            {
+                foreach (GameObject cashObject in cashObjects)
+                {
+                    cashObject.SetActive(Data.sellPriceCash > 0);
+                }
+            }
+
+            if (goldObjects != null && goldObjects.Length > 0)
+            {
+                foreach (GameObject goldObject in goldObjects)
+                {
+                    goldObject.SetActive(Data.sellPriceGold > 0);
+                }
+            }
         }
 
         IEnumerator LoadExternalIcon()
@@ -90,7 +116,13 @@ namespace MultiplayerARPG
         public void OnClickBuy()
         {
             if (uiCashShop != null)
-                uiCashShop.Buy(Data.DataId);
+                uiCashShop.Buy(Data.DataId, CashShopItemCurrencyType.CASH, BuyAmount);
+        }
+
+        public void OnClickBuyWithGold()
+        {
+            if (uiCashShop != null)
+                uiCashShop.Buy(Data.DataId, CashShopItemCurrencyType.GOLD, BuyAmount);
         }
     }
 }

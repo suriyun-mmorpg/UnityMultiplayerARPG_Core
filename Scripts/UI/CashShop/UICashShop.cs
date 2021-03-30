@@ -96,11 +96,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Buy(int dataId)
+        public void Buy(int dataId, CashShopItemCurrencyType currencyType, int amount)
         {
             GameInstance.ClientCashShopHandlers.RequestCashShopBuy(new RequestCashShopBuyMessage()
             {
                 dataId = dataId,
+                currencyType = currencyType,
+                amount = amount,
             }, ResponseCashShopBuy);
         }
 
