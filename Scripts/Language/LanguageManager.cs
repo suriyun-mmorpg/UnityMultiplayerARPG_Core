@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -22,6 +25,13 @@ namespace MultiplayerARPG
         public bool addNewLanguage;
         [InspectorButton(nameof(MigrateOldGameMessage))]
         public bool migrateOldGameMessage;
+
+        [Header("Set Message Tool")]
+        public string setMessageLanguageKey;
+        public string setMessageKey;
+        public string setMessageValue;
+        [InspectorButton(nameof(SetMessage))]
+        public bool setMessage;
 
         private void Awake()
         {
@@ -89,6 +99,7 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate Old Game Message")]
         public void MigrateOldGameMessage()
         {
+#if UNITY_EDITOR
             foreach (Language language in languageList)
             {
                 for (int i = 0; i < language.dataList.Count; ++i)
@@ -295,6 +306,49 @@ namespace MultiplayerARPG
                     language.dataList[i] = data;
                 }
             }
+            EditorUtility.SetDirty(this);
+#endif
+        }
+
+        [ContextMenu("Set Message")]
+        public void SetMessage()
+        {
+#if UNITY_EDITOR
+            if (string.IsNullOrEmpty(setMessageLanguageKey) || 
+                string.IsNullOrEmpty(setMessageKey))
+            {
+                Debug.LogError("Cannot set message, `setMessageLanguageKey` and `setMessageKey` must not empty");
+                return;
+            }
+            for (int i = 0; i < languageList.Count; ++i)
+            {
+                if (setMessageLanguageKey.Equals(languageList[i].languageKey))
+                {
+                    for (int j = 0; j < languageList[i].dataList.Count; ++j)
+                    {
+                        if (setMessageKey.Equals(languageList[i].dataList[j].key))
+                        {
+                            LanguageData data = languageList[i].dataList[j];
+                            data.value = setMessageValue;
+                            languageList[i].dataList[j] = data;
+                            Debug.Log($"Changed message {setMessageLanguageKey}.{setMessageKey} to {setMessageValue}");
+                            setMessageLanguageKey = setMessageKey = setMessageValue = string.Empty;
+                            EditorUtility.SetDirty(this);
+                            return;
+                        }
+                    }
+                    languageList[i].dataList.Add(new LanguageData()
+                    {
+                        key = setMessageKey,
+                        value = setMessageValue,
+                    });
+                    Debug.Log($"Added new message {setMessageLanguageKey}.{setMessageKey} to {setMessageValue}");
+                    setMessageLanguageKey = setMessageKey = setMessageValue = string.Empty;
+                    EditorUtility.SetDirty(this);
+                    return;
+                }
+            }
+#endif
         }
 
         public static void ChangeLanguage(string languageKey)
