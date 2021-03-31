@@ -442,7 +442,7 @@ namespace MultiplayerARPG
             }
 
             // Jumping 
-            if (acceptedJump || (isGrounded && !CacheOpenCharacterController.startedSlide && isJumping))
+            if (acceptedJump || (pauseMovementCountDown <= 0f && isGrounded && isJumping && !CacheOpenCharacterController.startedSlide))
             {
                 currentInput = this.SetInputJump(currentInput);
                 sendingJump = true;

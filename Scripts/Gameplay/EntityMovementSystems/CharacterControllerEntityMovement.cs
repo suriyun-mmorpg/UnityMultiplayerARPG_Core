@@ -403,7 +403,7 @@ namespace MultiplayerARPG
             }
 
             // Jumping 
-            if (acceptedJump || (isGrounded && isJumping))
+            if (acceptedJump || (pauseMovementCountDown <= 0f && isGrounded && isJumping))
             {
                 currentInput = this.SetInputJump(currentInput);
                 sendingJump = true;
