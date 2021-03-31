@@ -130,7 +130,6 @@ public static class PhysicUtils
         {
             if (exceptionObject != null && exceptionObject.root == allocHits[i].transform.root)
                 continue;
-            result = allocHits[i].point;
             tempDistance = Vector3.Distance(origin, allocHits[i].point);
             if (tempDistance < nearestDistance)
             {
