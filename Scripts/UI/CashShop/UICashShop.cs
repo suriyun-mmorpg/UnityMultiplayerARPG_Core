@@ -81,6 +81,7 @@ namespace MultiplayerARPG
             if (uiCashShopItemDialog != null && ui.Data != null)
             {
                 uiCashShopItemDialog.selectionManager = CacheCashShopSelectionManager;
+                uiCashShopItemDialog.uiCashShop = this;
                 uiCashShopItemDialog.Data = ui.Data;
                 uiCashShopItemDialog.Show();
             }
