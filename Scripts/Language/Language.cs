@@ -1219,7 +1219,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_ATTRIBUTE_REACHED_MAX_AMOUNT.ToString(), "Attribute reached max amount");
             Texts.Add(UITextKeys.UI_ERROR_SKILL_REACHED_MAX_LEVEL.ToString(), "Skill reached max level");
             // Success - UI Cash Shop
-            Texts.Add(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString(), "Success, let's check your inventory");
+            Texts.Add(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString(), "Cash shop item purchased");
             // UI Character Item
             Texts.Add(UITextKeys.UI_DROP_ITEM.ToString(), "Drop Item");
             Texts.Add(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
