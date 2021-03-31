@@ -14,9 +14,6 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         public bool onlyNewMails = false;
-        public float autoRefreshDuration = 5f;
-
-        private float refreshCountDown = 0f;
 
         private UIList cacheList;
         public UIList CacheList
@@ -63,13 +60,6 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected virtual void Update()
-        {
-            refreshCountDown -= Time.deltaTime;
-            if (refreshCountDown <= 0)
-                Refresh();
-        }
-
         protected void OnDialogHide()
         {
             CacheSelectionManager.DeselectSelectedUI();
@@ -99,7 +89,6 @@ namespace MultiplayerARPG
 
         public void Refresh()
         {
-            refreshCountDown = autoRefreshDuration;
             GameInstance.ClientMailHandlers.RequestMailList(new RequestMailListMessage()
             {
                 onlyNewMails = onlyNewMails,
