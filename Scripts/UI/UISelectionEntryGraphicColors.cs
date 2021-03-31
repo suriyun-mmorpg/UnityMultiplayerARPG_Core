@@ -51,4 +51,21 @@ public class UISelectionEntryGraphicColors : MonoBehaviour
         EditorUtility.SetDirty(this);
 #endif
     }
+
+    [ContextMenu("Swap default color and selected color")]
+    public void SwapDefaultColorAndSelectedColor()
+    {
+#if UNITY_EDITOR
+        for (int i = 0; i < settings.Length; ++i)
+        {
+            Setting setting = settings[i];
+            Color defaultColor = setting.defaultColor;
+            Color selectedColor = setting.selectedColor;
+            setting.defaultColor = selectedColor;
+            setting.selectedColor = defaultColor;
+            settings[i] = setting;
+        }
+        EditorUtility.SetDirty(this);
+#endif
+    }
 }
