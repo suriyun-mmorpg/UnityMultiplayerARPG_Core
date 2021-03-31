@@ -6,6 +6,12 @@ namespace MultiplayerARPG
     public partial class UICharacterItemDropHandler : MonoBehaviour, IDropHandler
     {
         public UICharacterItem uiCharacterItem;
+        public bool doNotUnEquipItem;
+        public bool doNotSwapOrMergeItem;
+        public bool doNotEquipItem;
+        public bool doNotMoveToStorage;
+        public bool doNotMoveFromStorage;
+        public bool doNotSwapOrMergeStorageItem;
 
         protected RectTransform dropRect;
         public RectTransform DropRect
@@ -65,6 +71,8 @@ namespace MultiplayerARPG
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
+                    if (doNotUnEquipItem)
+                        return;
                     // Unequip item
                     GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
                         draggedItemUI.uiCharacterItem.InventoryType,
@@ -86,6 +94,8 @@ namespace MultiplayerARPG
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
+                    if (doNotSwapOrMergeItem)
+                        return;
                     // Drop non equip item to non equip item
                     GameInstance.ClientInventoryHandlers.RequestSwapOrMergeItem(new RequestSwapOrMergeItemMessage()
                     {
@@ -96,10 +106,14 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                 case InventoryType.EquipWeaponRight:
                 case InventoryType.EquipWeaponLeft:
+                    if (doNotEquipItem)
+                        return;
                     // Drop non equip item to equip item
                     EquipItem(draggedItemUI);
                     break;
                 case InventoryType.StorageItems:
+                    if (doNotMoveToStorage)
+                        return;
                     // Drop non equip item to storage item
                     GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
                     {
@@ -122,6 +136,8 @@ namespace MultiplayerARPG
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
+                    if (doNotMoveFromStorage)
+                        return;
                     // Drop storage item to non equip item
                     GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
                     {
@@ -133,6 +149,8 @@ namespace MultiplayerARPG
                     }, ClientStorageActions.ResponseMoveItemFromStorage);
                     break;
                 case InventoryType.StorageItems:
+                    if (doNotSwapOrMergeStorageItem)
+                        return;
                     // Drop storage item to storage item
                     GameInstance.ClientStorageHandlers.RequestSwapOrMergeStorageItem(new RequestSwapOrMergeStorageItemMessage()
                     {
