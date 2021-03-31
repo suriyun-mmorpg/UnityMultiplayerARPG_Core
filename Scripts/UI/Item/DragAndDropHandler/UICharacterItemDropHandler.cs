@@ -12,6 +12,10 @@ namespace MultiplayerARPG
         public bool doNotMoveToStorage;
         public bool doNotMoveFromStorage;
         public bool doNotSwapOrMergeStorageItem;
+        [Tooltip("If this is `TRUE`, it will not swap or merge item which dragging from inventory to storage")]
+        public bool doNotSwapOrMergeWithStorageItem;
+        [Tooltip("If this is `TRUE`, it will not swap or merge item which dragging from storage to inventory")]
+        public bool doNotSwapOrMergeWithNonEquipItem;
 
         protected RectTransform dropRect;
         public RectTransform DropRect
@@ -115,14 +119,28 @@ namespace MultiplayerARPG
                     if (doNotMoveToStorage)
                         return;
                     // Drop non equip item to storage item
-                    GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
+                    if (doNotSwapOrMergeWithStorageItem)
                     {
-                        storageType = storageType,
-                        storageOwnerId = storageOwnerId,
-                        inventoryItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
-                        inventoryItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
-                        storageItemIndex = (short)uiCharacterItem.IndexOfData
-                    }, ClientStorageActions.ResponseMoveItemToStorage);
+                        GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
+                        {
+                            storageType = storageType,
+                            storageOwnerId = storageOwnerId,
+                            inventoryItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                            inventoryItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
+                            storageItemIndex = -1
+                        }, ClientStorageActions.ResponseMoveItemToStorage);
+                    }
+                    else
+                    {
+                        GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
+                        {
+                            storageType = storageType,
+                            storageOwnerId = storageOwnerId,
+                            inventoryItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                            inventoryItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
+                            storageItemIndex = (short)uiCharacterItem.IndexOfData
+                        }, ClientStorageActions.ResponseMoveItemToStorage);
+                    }
                     break;
             }
         }
@@ -139,14 +157,28 @@ namespace MultiplayerARPG
                     if (doNotMoveFromStorage)
                         return;
                     // Drop storage item to non equip item
-                    GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
+                    if (doNotSwapOrMergeWithNonEquipItem)
                     {
-                        storageType = storageType,
-                        storageOwnerId = storageOwnerId,
-                        storageItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
-                        storageItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
-                        inventoryItemIndex = (short)uiCharacterItem.IndexOfData
-                    }, ClientStorageActions.ResponseMoveItemFromStorage);
+                        GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
+                        {
+                            storageType = storageType,
+                            storageOwnerId = storageOwnerId,
+                            storageItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                            storageItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
+                            inventoryItemIndex = -1
+                        }, ClientStorageActions.ResponseMoveItemFromStorage);
+                    }
+                    else
+                    {
+                        GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
+                        {
+                            storageType = storageType,
+                            storageOwnerId = storageOwnerId,
+                            storageItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                            storageItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
+                            inventoryItemIndex = (short)uiCharacterItem.IndexOfData
+                        }, ClientStorageActions.ResponseMoveItemFromStorage);
+                    }
                     break;
                 case InventoryType.StorageItems:
                     if (doNotSwapOrMergeStorageItem)
