@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             {
                 if (cacheSelectionManager == null)
                     cacheSelectionManager = gameObject.GetOrAddComponent<UIMailListSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return cacheSelectionManager;
             }
         }
@@ -82,6 +82,8 @@ namespace MultiplayerARPG
                 uiDialog.uiMailList = this;
                 uiDialog.MailId = ui.Data.Id;
                 uiDialog.Show();
+                ui.Data.IsRead = true;
+                ui.ForceUpdate();
             }
         }
 
@@ -106,6 +108,7 @@ namespace MultiplayerARPG
 
         private void MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {
+            ClientMailActions.ResponseMailList(requestHandler, responseCode, response);
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();

@@ -59,6 +59,7 @@ namespace MultiplayerARPG
 
         private void ReadMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseReadMailMessage response)
         {
+            ClientMailActions.ResponseReadMail(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UpdateData(response.mail);
         }
@@ -73,6 +74,7 @@ namespace MultiplayerARPG
 
         private void ClaimMailItemsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimMailItemsMessage response)
         {
+            ClientMailActions.ResponseClaimMailItems(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_CLAIMED.ToString()));
             Hide();
@@ -90,6 +92,7 @@ namespace MultiplayerARPG
 
         private void DeleteMailCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteMailMessage response)
         {
+            ClientMailActions.ResponseDeleteMail(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_DELETED.ToString()));
             Hide();
@@ -172,9 +175,9 @@ namespace MultiplayerARPG
 
             if (textSentDate != null)
             {
-                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime();
+                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                 if (mail != null)
-                    dateTime = dateTime.AddSeconds(mail.SentTimestamp);
+                    dateTime = dateTime.AddSeconds(mail.SentTimestamp).ToLocalTime();
                 textSentDate.text = string.Format(
                     LanguageManager.GetText(formatSentDate),
                     dateTime.GetPrettyDate());
