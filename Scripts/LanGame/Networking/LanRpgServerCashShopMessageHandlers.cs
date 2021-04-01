@@ -66,12 +66,12 @@ namespace MultiplayerARPG
                     // Cannot find item
                     message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
                 }
-                else if (userCash < cashShopItem.sellPriceCash)
+                else if (request.currencyType == CashShopItemCurrencyType.CASH && userCash < cashShopItem.sellPriceCash)
                 {
                     // Not enough cash
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH;
                 }
-                else if (userGold < cashShopItem.sellPriceGold)
+                else if (request.currencyType == CashShopItemCurrencyType.GOLD && userGold < cashShopItem.sellPriceGold)
                 {
                     // Not enough gold
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
@@ -84,11 +84,17 @@ namespace MultiplayerARPG
                 else
                 {
                     // Decrease cash amount
-                    userCash -= cashShopItem.sellPriceCash;
-                    playerCharacter.UserCash = userCash;
+                    if (request.currencyType == CashShopItemCurrencyType.CASH)
+                    {
+                        userCash -= cashShopItem.sellPriceCash;
+                        playerCharacter.UserCash = userCash;
+                    }
                     // Decrease gold amount
-                    userGold -= cashShopItem.sellPriceGold;
-                    playerCharacter.UserGold = userGold;
+                    if (request.currencyType == CashShopItemCurrencyType.GOLD)
+                    {
+                        userGold -= cashShopItem.sellPriceGold;
+                        playerCharacter.UserGold = userGold;
+                    }
                     // Increase character gold
                     playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.receiveGold);
                     // Increase currencies
@@ -112,8 +118,6 @@ namespace MultiplayerARPG
                 {
                     message = message,
                     dataId = dataId,
-                    userCash = userCash,
-                    userGold = userGold,
                 });
             return default;
         }
