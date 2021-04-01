@@ -15,13 +15,22 @@ namespace MultiplayerARPG
 
         public void Refresh()
         {
+            if (GameInstance.ClientMailHandlers == null)
+            {
+                SetNotificationCount(0);
+                return;
+            }
             GameInstance.ClientMailHandlers.RequestMailNotification(MailNotificationCallback);
         }
 
         public void MailNotificationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailNotificationMessage response)
         {
             ClientMailActions.ResponseMailNotification(requestHandler, responseCode, response);
-            int count = response.notificationCount;
+            SetNotificationCount(response.notificationCount);
+        }
+
+        public void SetNotificationCount(int count)
+        {
             if (notificationObjects != null && notificationObjects.Length > 0)
             {
                 foreach (GameObject obj in notificationObjects)
