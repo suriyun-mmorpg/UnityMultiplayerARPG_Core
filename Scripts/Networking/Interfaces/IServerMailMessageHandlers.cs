@@ -27,5 +27,9 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestSendMail(
             RequestHandlerData requestHandler, RequestSendMailMessage request,
             RequestProceedResultDelegate<ResponseSendMailMessage> result);
+
+        UniTaskVoid HandleRequestMailNotification(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseMailNotificationMessage> result);
     }
 }

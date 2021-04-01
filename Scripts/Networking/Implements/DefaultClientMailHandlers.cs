@@ -36,5 +36,10 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.SendMail, data, responseDelegate: callback);
         }
+
+        public bool RequestMailNotification(ResponseDelegate<ResponseMailNotificationMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.MailNotification, new EmptyMessage(), responseDelegate: callback);
+        }
     }
 }

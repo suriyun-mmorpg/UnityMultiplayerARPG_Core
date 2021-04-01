@@ -99,5 +99,7 @@
         public const ushort Respawn = 172;
         // 1.63g
         public const ushort SetAimPosition = 173;
+        // 1.64
+        public const ushort MailNotification = 174;
     }
 }
