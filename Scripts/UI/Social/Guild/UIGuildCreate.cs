@@ -21,11 +21,12 @@ namespace MultiplayerARPG
             SocialSystemSetting systemSetting = GameInstance.Singleton.SocialSystemSetting;
             if (textRequireGold != null)
             {
+                int gold = owningCharacter.Gold.Increase(owningCharacter.UserGold);
                 textRequireGold.text = string.Format(
-                    owningCharacter.Gold >= systemSetting.CreateGuildRequiredGold ?
+                    gold >= systemSetting.CreateGuildRequiredGold ?
                         LanguageManager.GetText(formatKeyRequireGold) :
                         LanguageManager.GetText(formatKeyRequireGoldNotEnough),
-                    owningCharacter.Gold.ToString("N0"),
+                    gold.ToString("N0"),
                     systemSetting.CreateGuildRequiredGold.ToString("N0"));
             }
 
