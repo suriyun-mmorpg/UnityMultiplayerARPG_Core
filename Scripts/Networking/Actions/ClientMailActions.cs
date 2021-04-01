@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseClaimMailItemsMessage> onResponseClaimMailItems;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeleteMailMessage> onResponseDeleteMail;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendMailMessage> onResponseSendMail;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMailNotificationMessage> onResponseMailNotification;
 
         public static void ResponseMailList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {
@@ -42,6 +43,13 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseSendMail != null)
                 onResponseSendMail.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseMailNotification(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailNotificationMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseMailNotification != null)
+                onResponseMailNotification.Invoke(requestHandler, responseCode, response);
         }
     }
 }
