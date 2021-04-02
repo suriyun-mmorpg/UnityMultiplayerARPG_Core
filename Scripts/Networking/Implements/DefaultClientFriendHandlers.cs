@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             return Manager.ClientSendRequest(GameNetworkingConsts.GetFriends, EmptyMessage.Value, responseDelegate: callback);
         }
 
-        public bool RequestFindCharacters(RequestFindCharactersMessage data, ResponseDelegate<ResponseFindCharactersMessage> callback)
+        public bool RequestFindCharacters(RequestFindCharactersMessage data, ResponseDelegate<ResponseSocialCharacterListMessage> callback)
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.FindCharacters, data, responseDelegate: callback);
         }
@@ -44,6 +44,11 @@ namespace MultiplayerARPG
         public bool RequestDeclineFriendRequest(RequestDeclineFriendRequestMessage data, ResponseDelegate<ResponseDeclineFriendRequestMessage> callback)
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.DeclineFriendRequest, data, responseDelegate: callback);
+        }
+
+        public bool RequestGetFriendRequests(ResponseDelegate<ResponseGetFriendRequestsMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.GetFriendRequests, EmptyMessage.Value, responseDelegate: callback);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     {
         UniTaskVoid HandleRequestFindCharacters(
             RequestHandlerData requestHandler, RequestFindCharactersMessage request,
-            RequestProceedResultDelegate<ResponseFindCharactersMessage> result);
+            RequestProceedResultDelegate<ResponseSocialCharacterListMessage> result);
 
         UniTaskVoid HandleRequestGetFriends(
             RequestHandlerData requestHandler, EmptyMessage request,
@@ -35,5 +35,9 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestDeclineFriendRequest(
             RequestHandlerData requestHandler, RequestDeclineFriendRequestMessage request,
             RequestProceedResultDelegate<ResponseDeclineFriendRequestMessage> result);
+
+        UniTaskVoid HandleRequestGetFriendRequests(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseGetFriendRequestsMessage> result);
     }
 }

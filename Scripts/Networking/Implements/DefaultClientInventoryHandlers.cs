@@ -74,7 +74,7 @@ namespace MultiplayerARPG
 
         public bool RequestRepairEquipItems(ResponseDelegate<ResponseRepairEquipItemsMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.RepairEquipItems, new EmptyMessage(), responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.RepairEquipItems, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestSellItem(RequestSellItemMessage data, ResponseDelegate<ResponseSellItemMessage> callback)

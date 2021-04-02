@@ -15,6 +15,11 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildRoleMessage> onResponseChangeGuildRole;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeMemberGuildRoleMessage> onResponseChangeMemberGuildRole;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseGuildSkillLevelMessage> onResponseIncreaseGuildSkillLevel;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendGuildRequestMessage> onResponseSendGuildRequest;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptGuildRequestMessage> onResponseAcceptGuildRequest;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineGuildRequestMessage> onResponseDeclineGuildRequest;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildRequestsMessage> onResponseGetGuildRequests;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGuildListMessage> onResponseFindGuilds;
         public static System.Action<GuildInvitationData> onNotifyGuildInvitation;
         public static System.Action<GuildData> onNotifyGuildUpdated;
 
@@ -93,6 +98,41 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseIncreaseGuildSkillLevel != null)
                 onResponseIncreaseGuildSkillLevel.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseSendGuildRequest(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildRequestMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseSendGuildRequest != null)
+                onResponseSendGuildRequest.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseAcceptGuildRequest(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAcceptGuildRequestMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseAcceptGuildRequest != null)
+                onResponseAcceptGuildRequest.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseDeclineGuildRequest(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclineGuildRequestMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseDeclineGuildRequest != null)
+                onResponseDeclineGuildRequest.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseGetGuildRequests(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetGuildRequestsMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseGetGuildRequests != null)
+                onResponseGetGuildRequests.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseGuildList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGuildListMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseFindGuilds != null)
+                onResponseFindGuilds.Invoke(requestHandler, responseCode, response);
         }
 
         public static void NotifyGuildInvitation(GuildInvitationData invitation)

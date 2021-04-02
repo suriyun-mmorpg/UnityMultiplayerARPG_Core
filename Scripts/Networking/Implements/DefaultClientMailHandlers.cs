@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
         public bool RequestMailNotification(ResponseDelegate<ResponseMailNotificationMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.MailNotification, new EmptyMessage(), responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.MailNotification, EmptyMessage.Value, responseDelegate: callback);
         }
     }
 }

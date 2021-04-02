@@ -18,5 +18,7 @@ namespace MultiplayerARPG
         bool RequestSendGuildRequest(RequestSendGuildRequestMessage data, ResponseDelegate<ResponseSendGuildRequestMessage> callback);
         bool RequestAcceptGuildRequest(RequestAcceptGuildRequestMessage data, ResponseDelegate<ResponseAcceptGuildRequestMessage> callback);
         bool RequestDeclineGuildRequest(RequestDeclineGuildRequestMessage data, ResponseDelegate<ResponseDeclineGuildRequestMessage> callback);
+        bool RequestGetGuildRequests(ResponseDelegate<ResponseGetGuildRequestsMessage> callback);
+        bool RequestFindGuilds(RequestFindGuildsMessage data, ResponseDelegate<ResponseGuildListMessage> callback);
     }
 }

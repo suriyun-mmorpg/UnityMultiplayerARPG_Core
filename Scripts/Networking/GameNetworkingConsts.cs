@@ -101,5 +101,8 @@
         public const ushort SetAimPosition = 173;
         // 1.64
         public const ushort MailNotification = 174;
+        public const ushort GetFriendRequests = 175;
+        public const ushort GetGuildRequests = 176;
+        public const ushort FindGuilds = 177;
     }
 }

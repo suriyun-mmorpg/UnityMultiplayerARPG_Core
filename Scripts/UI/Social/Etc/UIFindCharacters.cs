@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             }, FindCharactersCallback);
         }
 
-        private void FindCharactersCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseFindCharactersMessage response)
+        private void FindCharactersCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSocialCharacterListMessage response)
         {
             ClientFriendActions.ResponseFindCharacters(responseHandler, responseCode, response);
             if (responseCode == AckResponseCode.Success)

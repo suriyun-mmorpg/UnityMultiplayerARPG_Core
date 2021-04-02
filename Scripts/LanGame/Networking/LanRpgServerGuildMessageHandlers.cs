@@ -396,5 +396,17 @@ namespace MultiplayerARPG
             result.Invoke(AckResponseCode.Unimplemented, new ResponseDeclineGuildRequestMessage());
             await UniTask.Yield();
         }
+
+        public async UniTaskVoid HandleRequestGetGuildRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result)
+        {
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseGetGuildRequestsMessage());
+            await UniTask.Yield();
+        }
+
+        public async UniTaskVoid HandleRequestFindGuilds(RequestHandlerData requestHandler, RequestFindGuildsMessage request, RequestProceedResultDelegate<ResponseGuildListMessage> result)
+        {
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseGuildListMessage());
+            await UniTask.Yield();
+        }
     }
 }

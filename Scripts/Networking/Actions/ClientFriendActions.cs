@@ -4,13 +4,17 @@ namespace MultiplayerARPG
 {
     public static class ClientFriendActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseFindCharactersMessage> onResponseFindCharacters;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSocialCharacterListMessage> onResponseFindCharacters;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendsMessage> onResponseGetFriends;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAddFriendMessage> onResponseAddFriend;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRemoveFriendMessage> onResponseRemoveFriend;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendFriendRequestMessage> onResponseSendFriendRequest;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptFriendRequestMessage> onResponseAcceptFriendRequest;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineFriendRequestMessage> onResponseDeclineFriendRequest;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendRequestsMessage> onResponseGetFriendRequests;
         public static System.Action<SocialCharacterData[]> onNotifyFriendsUpdated;
 
-        public static void ResponseFindCharacters(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindCharactersMessage response)
+        public static void ResponseFindCharacters(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSocialCharacterListMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseFindCharacters != null)
@@ -36,6 +40,34 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseRemoveFriend != null)
                 onResponseRemoveFriend.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseSendFriendRequest(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendFriendRequestMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseSendFriendRequest != null)
+                onResponseSendFriendRequest.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseAcceptFriendRequest(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAcceptFriendRequestMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseAcceptFriendRequest != null)
+                onResponseAcceptFriendRequest.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseDeclineFriendRequest(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclineFriendRequestMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseDeclineFriendRequest != null)
+                onResponseDeclineFriendRequest.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseGetFriendRequests(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetFriendRequestsMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseGetFriendRequests != null)
+                onResponseGetFriendRequests.Invoke(requestHandler, responseCode, response);
         }
 
         public static void NotifyFriendsUpdated(SocialCharacterData[] friends)

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public struct ResponseFindCharactersMessage : INetSerializable
+    public struct ResponseSocialCharacterListMessage : INetSerializable
     {
         public UITextKeys message;
         public SocialCharacterData[] characters;

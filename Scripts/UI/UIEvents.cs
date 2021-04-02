@@ -148,6 +148,14 @@ namespace MultiplayerARPG
     public class UIGuildSkillEvent : UnityEvent<UIGuildSkill> { }
     #endregion
 
+    #region Events for UI Guild List
+    [System.Serializable]
+    public class GuildListEntryEvent : UnityEvent<GuildListEntry> { }
+
+    [System.Serializable]
+    public class UIGuildListEntryEvent : UnityEvent<UIGuildListEntry> { }
+    #endregion
+
     #region Events for UI Faction
     [System.Serializable]
     public class FactionEvent : UnityEvent<Faction> { }

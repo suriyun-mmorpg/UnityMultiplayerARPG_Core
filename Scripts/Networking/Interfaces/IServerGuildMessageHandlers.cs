@@ -60,5 +60,13 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestDeclineGuildRequest(
             RequestHandlerData requestHandler, RequestDeclineGuildRequestMessage request,
             RequestProceedResultDelegate<ResponseDeclineGuildRequestMessage> result);
+
+        UniTaskVoid HandleRequestGetGuildRequests(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result);
+
+        UniTaskVoid HandleRequestFindGuilds(
+            RequestHandlerData requestHandler, RequestFindGuildsMessage request,
+            RequestProceedResultDelegate<ResponseGuildListMessage> result);
     }
 }
