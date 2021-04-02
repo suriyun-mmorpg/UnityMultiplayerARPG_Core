@@ -156,7 +156,7 @@ namespace MultiplayerARPG
         public string BuildTitle()
         {
             if (Data.receiveItems.Length > 0)
-                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ITEM_AMOUNT.ToString()), Data.receiveItems[0].item.Title, Data.receiveItems[0].amount);
+                return Data.receiveItems[0].item.Title;
             if (Data.receiveCurrencies.Length > 0)
                 return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
             if (Data.receiveGold > 0)
