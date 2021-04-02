@@ -45,11 +45,11 @@ namespace MultiplayerARPG
         public GameObject[] owningCharacterCannotKickObjects;
 
         [Header("Events")]
-        public UnityEvent onFriendAdded;
-        public UnityEvent onFriendRemoved;
-        public UnityEvent onFriendRequested;
-        public UnityEvent onFriendRequestAccepted;
-        public UnityEvent onFriendRequestDeclined;
+        public UnityEvent onFriendAdded = new UnityEvent();
+        public UnityEvent onFriendRemoved = new UnityEvent();
+        public UnityEvent onFriendRequested = new UnityEvent();
+        public UnityEvent onFriendRequestAccepted = new UnityEvent();
+        public UnityEvent onFriendRequestDeclined = new UnityEvent();
 
 
         protected int currentSocialId = 0;
