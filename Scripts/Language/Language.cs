@@ -236,8 +236,13 @@ namespace MultiplayerARPG
         UI_FRIEND_ADD_DESCRIPTION,
         UI_FRIEND_REMOVE,
         UI_FRIEND_REMOVE_DESCRIPTION,
+        UI_FRIEND_REQUEST,
+        UI_FRIEND_REQUEST_DESCRIPTION,
         UI_FRIEND_ADDED,
         UI_FRIEND_REMOVED,
+        UI_FRIEND_REQUESTED,
+        UI_FRIEND_REQUEST_ACCEPTED,
+        UI_FRIEND_REQUEST_DECLINED,
         // Item Amount Title
         UI_LABEL_UNLIMIT_WEIGHT,
         UI_LABEL_UNLIMIT_SLOT,
@@ -1275,8 +1280,13 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString(), "You want to add {0} to friend list?");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVE.ToString(), "Remove Friend");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString(), "You want to remove {0} from friend list?");
+            Texts.Add(UITextKeys.UI_FRIEND_REQUEST.ToString(), "Request Friend");
+            Texts.Add(UITextKeys.UI_FRIEND_REQUEST_DESCRIPTION.ToString(), "You want to request {0} to be friend?");
             Texts.Add(UITextKeys.UI_FRIEND_ADDED.ToString(), "The character was added to the friend list");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVED.ToString(), "The character was removed from the friend list");
+            Texts.Add(UITextKeys.UI_FRIEND_REQUESTED.ToString(), "Friend request were sent to the character");
+            Texts.Add(UITextKeys.UI_FRIEND_REQUEST_ACCEPTED.ToString(), "Friend request accepted");
+            Texts.Add(UITextKeys.UI_FRIEND_REQUEST_DECLINED.ToString(), "Friend request declined");
             // UI Password Dialogs
             Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString(), "Enter password");
             Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
