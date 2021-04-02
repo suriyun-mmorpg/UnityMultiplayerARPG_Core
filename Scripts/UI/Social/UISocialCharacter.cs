@@ -128,8 +128,8 @@ namespace MultiplayerARPG
         public void AddFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
         {
             ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response);
-            if (responseCode == AckResponseCode.Success)
-                onFriendAdded.Invoke();
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendAdded.Invoke();
         }
 
         public void OnClickRemoveFriend()
@@ -146,8 +146,8 @@ namespace MultiplayerARPG
         private void RemoveFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseRemoveFriendMessage response)
         {
             ClientFriendActions.ResponseRemoveFriend(responseHandler, responseCode, response);
-            if (responseCode == AckResponseCode.Success)
-                onFriendRemoved.Invoke();
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRemoved.Invoke();
         }
     }
 }
