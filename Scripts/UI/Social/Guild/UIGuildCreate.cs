@@ -52,8 +52,6 @@ namespace MultiplayerARPG
             inputFieldGuildName.interactable = true;
             ClientGuildActions.ResponseCreateGuild(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            if (responseCode != AckResponseCode.Success)
-                return;
             inputFieldGuildName.text = string.Empty;
             Hide();
         }

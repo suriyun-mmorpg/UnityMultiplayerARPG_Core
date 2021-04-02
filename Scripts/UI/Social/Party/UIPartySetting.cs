@@ -24,7 +24,13 @@ namespace MultiplayerARPG
             {
                 shareExp = toggleShareExp != null && toggleShareExp.isOn,
                 shareItem = toggleShareItem != null && toggleShareItem.isOn,
-            }, ClientPartyActions.ResponseChangePartySetting);
+            }, ChangePartySettingCallback);
+        }
+
+        private void ChangePartySettingCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangePartySettingMessage response)
+        {
+            ClientPartyActions.ResponseChangePartySetting(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             Hide();
         }
     }

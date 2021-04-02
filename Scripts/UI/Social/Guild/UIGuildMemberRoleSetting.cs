@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -62,7 +63,14 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers.RequestChangeMemberGuildRole(new RequestChangeMemberGuildRoleMessage()
             {
                 guildRole = (byte)dropdownRoles.value,
-            }, ClientGuildActions.ResponseChangeMemberGuildRole);
+                memberId = characterId,
+            }, ChangeMemberGuildRoleCallback);
+        }
+
+        private void ChangeMemberGuildRoleCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeMemberGuildRoleMessage response)
+        {
+            ClientGuildActions.ResponseChangeMemberGuildRole(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             Hide();
         }
     }

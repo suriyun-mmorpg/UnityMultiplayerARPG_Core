@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -335,8 +336,14 @@ namespace MultiplayerARPG
                 GameInstance.ClientGuildHandlers.RequestChangeGuildLeader(new RequestChangeGuildLeaderMessage()
                 {
                     memberId = guildMember.id,
-                }, ClientGuildActions.ResponseChangeGuildLeader);
+                }, ChangeGuildLeaderCallback);
             });
+        }
+
+        private void ChangeGuildLeaderCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildLeaderMessage response)
+        {
+            ClientGuildActions.ResponseChangeGuildLeader(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
         }
 
         public void OnClickSetRole()
@@ -392,16 +399,28 @@ namespace MultiplayerARPG
                 GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
                 {
                     memberId = guildMember.id,
-                }, ClientGuildActions.ResponseKickMemberFromGuild);
+                }, KickMemberFromGuildCallback);
             });
+        }
+
+        private void KickMemberFromGuildCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromGuildMessage response)
+        {
+            ClientGuildActions.ResponseKickMemberFromGuild(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
         }
 
         public void OnClickLeaveGuild()
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
-                GameInstance.ClientGuildHandlers.RequestLeaveGuild(ClientGuildActions.ResponseLeaveGuild);
+                GameInstance.ClientGuildHandlers.RequestLeaveGuild(LeaveGuildCallback);
             });
+        }
+
+        private void LeaveGuildCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseLeaveGuildMessage response)
+        {
+            ClientGuildActions.ResponseLeaveGuild(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
         }
 
         public override int GetSocialId()

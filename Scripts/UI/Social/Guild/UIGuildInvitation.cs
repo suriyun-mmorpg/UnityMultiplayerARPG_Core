@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -66,7 +67,13 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers.RequestAcceptGuildInvitation(new RequestAcceptGuildInvitationMessage()
             {
                 guildId = Data.GuildId,
-            }, ClientGuildActions.ResponseAcceptGuildInvitation);
+            }, AcceptGuildInvitationCallback);
+        }
+
+        private void AcceptGuildInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAcceptGuildInvitationMessage response)
+        {
+            ClientGuildActions.ResponseAcceptGuildInvitation(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             Hide();
         }
 
@@ -75,7 +82,14 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers.RequestDeclineGuildInvitation(new RequestDeclineGuildInvitationMessage()
             {
                 guildId = Data.GuildId,
-            }, ClientGuildActions.ResponseDeclineGuildInvitation);
+            }, DeclineGuildInvitationCallback);
+            Hide();
+        }
+
+        private void DeclineGuildInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclineGuildInvitationMessage response)
+        {
+            ClientGuildActions.ResponseDeclineGuildInvitation(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             Hide();
         }
     }

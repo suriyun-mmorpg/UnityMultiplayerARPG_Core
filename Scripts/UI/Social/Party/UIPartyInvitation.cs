@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -54,7 +55,13 @@ namespace MultiplayerARPG
             GameInstance.ClientPartyHandlers.RequestAcceptPartyInvitation(new RequestAcceptPartyInvitationMessage()
             {
                 partyId = Data.PartyId,
-            }, ClientPartyActions.ResponseAcceptPartyInvitation);
+            }, AcceptPartyInvitationCallback);
+        }
+
+        private void AcceptPartyInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAcceptPartyInvitationMessage response)
+        {
+            ClientPartyActions.ResponseAcceptPartyInvitation(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             Hide();
         }
 
@@ -63,7 +70,13 @@ namespace MultiplayerARPG
             GameInstance.ClientPartyHandlers.RequestDeclinePartyInvitation(new RequestDeclinePartyInvitationMessage()
             {
                 partyId = Data.PartyId,
-            }, ClientPartyActions.ResponseDeclinePartyInvitation);
+            }, DeclinePartyInvitationCallback);
+        }
+
+        private void DeclinePartyInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclinePartyInvitationMessage response)
+        {
+            ClientPartyActions.ResponseDeclinePartyInvitation(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             Hide();
         }
     }

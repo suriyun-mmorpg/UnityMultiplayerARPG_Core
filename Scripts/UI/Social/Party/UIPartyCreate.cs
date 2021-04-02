@@ -31,8 +31,6 @@ namespace MultiplayerARPG
         {
             ClientPartyActions.ResponseCreateParty(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            if (responseCode != AckResponseCode.Success)
-                return;
             Hide();
         }
     }

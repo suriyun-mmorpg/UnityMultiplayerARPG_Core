@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -57,7 +58,13 @@ namespace MultiplayerARPG
                 canInvite = toggleCanInvite != null && toggleCanInvite.isOn,
                 canKick = toggleCanKick != null && toggleCanKick.isOn,
                 shareExpPercentage = shareExpPercentage,
-            }, ClientGuildActions.ResponseChangeGuildRole);
+            }, ChangeGuildRoleCallback);
+        }
+
+        private void ChangeGuildRoleCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildRoleMessage response)
+        {
+            ClientGuildActions.ResponseChangeGuildRole(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             Hide();
         }
     }
