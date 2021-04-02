@@ -34,6 +34,9 @@ namespace MultiplayerARPG
         [Header("Events")]
         public UnityEvent onFriendAdded;
         public UnityEvent onFriendRemoved;
+        public UnityEvent onFriendRequested;
+        public UnityEvent onFriendRequestAccepted;
+        public UnityEvent onFriendRequestDeclined;
 
         protected override void Update()
         {
@@ -148,6 +151,54 @@ namespace MultiplayerARPG
             ClientFriendActions.ResponseRemoveFriend(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             onFriendRemoved.Invoke();
+        }
+
+        public void OnClickSendFriendRequest()
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.socialCharacter.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
+                {
+                    requesteeId = Data.socialCharacter.id,
+                }, SendFriendRequestCallback);
+            });
+        }
+
+        private void SendFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSendFriendRequestMessage response)
+        {
+            ClientFriendActions.ResponseSendFriendRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRequested.Invoke();
+        }
+
+        public void OnClickAcceptFriendRequest()
+        {
+            GameInstance.ClientFriendHandlers.RequestAcceptFriendRequest(new RequestAcceptFriendRequestMessage()
+            {
+                requesterId = Data.socialCharacter.id,
+            }, AcceptFriendRequestCallback);
+        }
+
+        private void AcceptFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAcceptFriendRequestMessage response)
+        {
+            ClientFriendActions.ResponseAcceptFriendRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRequestAccepted.Invoke();
+        }
+
+        public void OnClickDeclineFriendRequest()
+        {
+            GameInstance.ClientFriendHandlers.RequestDeclineFriendRequest(new RequestDeclineFriendRequestMessage()
+            {
+                requesterId = Data.socialCharacter.id,
+            }, DeclineFriendRequestCallback);
+        }
+
+        private void DeclineFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseDeclineFriendRequestMessage response)
+        {
+            ClientFriendActions.ResponseDeclineFriendRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRequestDeclined.Invoke();
         }
     }
 }
