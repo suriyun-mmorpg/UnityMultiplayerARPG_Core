@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public GameObject listEmptyObject;
         public InputFieldWrapper inputCharacterName;
         public UnityEvent onFriendAdded;
+        public UnityEvent onFriendRequested;
 
         protected override void OnEnable()
         {
@@ -115,6 +116,28 @@ namespace MultiplayerARPG
             ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             onFriendAdded.Invoke();
+        }
+
+        public void OnClickSendFriendRequest()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
+                {
+                    requesteeId = friend.id,
+                }, SendFriendRequestCallback);
+            });
+        }
+
+        private void SendFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSendFriendRequestMessage response)
+        {
+            ClientFriendActions.ResponseSendFriendRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRequested.Invoke();
         }
     }
 }
