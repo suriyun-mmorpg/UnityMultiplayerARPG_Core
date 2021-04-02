@@ -8,14 +8,12 @@ namespace MultiplayerARPG
         public int Id { get; set; }
         public string GuildName { get; set; }
         public short Level { get; set; }
-        public string LeaderName { get; set; }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Id);
             writer.Put(GuildName);
             writer.Put(Level);
-            writer.Put(LeaderName);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -23,7 +21,6 @@ namespace MultiplayerARPG
             Id = reader.GetInt();
             GuildName = reader.GetString();
             Level = reader.GetShort();
-            LeaderName = reader.GetString();
         }
     }
 }
