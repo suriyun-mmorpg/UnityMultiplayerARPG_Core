@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -39,10 +40,20 @@ namespace MultiplayerARPG
 
         public void OnClickCreate()
         {
+            inputFieldGuildName.interactable = false;
             GameInstance.ClientGuildHandlers.RequestCreateGuild(new RequestCreateGuildMessage()
             {
                 guildName = inputFieldGuildName.text,
-            }, ClientGuildActions.ResponseCreateGuild);
+            }, CreateGuildCallback);
+        }
+
+        private void CreateGuildCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCreateGuildMessage response)
+        {
+            ClientGuildActions.ResponseCreateGuild(requestHandler, responseCode, response);
+            inputFieldGuildName.interactable = true;
+            if (responseCode != AckResponseCode.Success)
+                return;
+            inputFieldGuildName.text = string.Empty;
             Hide();
         }
     }
