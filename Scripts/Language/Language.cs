@@ -129,6 +129,7 @@ namespace MultiplayerARPG
         UI_ERROR_JOINED_ANOTHER_PARTY,
         UI_ERROR_NOT_JOINED_PARTY,
         UI_ERROR_NOT_PARTY_LEADER,
+        UI_ERROR_ALREADY_IS_PARTY_LEADER,
         UI_ERROR_CHARACTER_JOINED_ANOTHER_PARTY,
         UI_ERROR_CHARACTER_NOT_JOINED_PARTY,
         UI_ERROR_PARTY_MEMBER_REACHED_LIMIT,
@@ -146,6 +147,8 @@ namespace MultiplayerARPG
         UI_ERROR_JOINED_ANOTHER_GUILD,
         UI_ERROR_NOT_JOINED_GUILD,
         UI_ERROR_NOT_GUILD_LEADER,
+        UI_ERROR_ALREADY_IS_GUILD_LEADER,
+        UI_ERROR_CANNOT_CHANGE_GUILD_LEADER_ROLE,
         UI_ERROR_CHARACTER_JOINED_ANOTHER_GUILD,
         UI_ERROR_CHARACTER_NOT_JOINED_GUILD,
         UI_ERROR_GUILD_MEMBER_REACHED_LIMIT,
@@ -1164,7 +1167,8 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_PARTY_LEADER.ToString(), "Cannot kick party leader");
             Texts.Add(UITextKeys.UI_ERROR_JOINED_ANOTHER_PARTY.ToString(), "Already joined another party");
             Texts.Add(UITextKeys.UI_ERROR_NOT_JOINED_PARTY.ToString(), "Not joined the party");
-            Texts.Add(UITextKeys.UI_ERROR_NOT_PARTY_LEADER.ToString(), "Not a party member");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_PARTY_LEADER.ToString(), "Not a party leader");
+            Texts.Add(UITextKeys.UI_ERROR_ALREADY_IS_PARTY_LEADER.ToString(), "You are already a leader");
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_JOINED_ANOTHER_PARTY.ToString(), "Character already joined another party");
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_PARTY.ToString(), "Character not joined the party");
             Texts.Add(UITextKeys.UI_ERROR_PARTY_MEMBER_REACHED_LIMIT.ToString(), "Party member reached limit");
@@ -1181,7 +1185,9 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_CANNOT_KICK_HIGHER_GUILD_MEMBER.ToString(), "Cannot kick higher guild member");
             Texts.Add(UITextKeys.UI_ERROR_JOINED_ANOTHER_GUILD.ToString(), "Already joined another guild");
             Texts.Add(UITextKeys.UI_ERROR_NOT_JOINED_GUILD.ToString(), "Not joined the guild");
-            Texts.Add(UITextKeys.UI_ERROR_NOT_GUILD_LEADER.ToString(), "Not a guild member");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_GUILD_LEADER.ToString(), "Not a guild leader");
+            Texts.Add(UITextKeys.UI_ERROR_ALREADY_IS_GUILD_LEADER.ToString(), "You are already a leader");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_CHANGE_GUILD_LEADER_ROLE.ToString(), "Cannot change guild leader's role");
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_JOINED_ANOTHER_GUILD.ToString(), "Character already joined another guild");
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_GUILD.ToString(), "Character not joined the guild");
             Texts.Add(UITextKeys.UI_ERROR_GUILD_MEMBER_REACHED_LIMIT.ToString(), "Guild member reached limit");

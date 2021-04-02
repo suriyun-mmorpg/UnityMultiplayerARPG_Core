@@ -41,6 +41,11 @@
                 gameMessage = UITextKeys.UI_ERROR_NOT_GUILD_LEADER;
                 return new ValidateGuildRequestResult(false, gameMessage);
             }
+            if (guild.IsLeader(memberId))
+            {
+                gameMessage = UITextKeys.UI_ERROR_ALREADY_IS_GUILD_LEADER;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
             if (!guild.ContainsMemberId(memberId))
             {
                 gameMessage = UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_GUILD;
@@ -108,7 +113,7 @@
             return new ValidateGuildRequestResult(true, gameMessage, guildId, guild);
         }
 
-        public static ValidateGuildRequestResult CanChangeGuildMemberRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter)
+        public static ValidateGuildRequestResult CanChangeGuildMemberRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, string memberId)
         {
             UITextKeys gameMessage;
             int guildId = playerCharacter.GuildId;
@@ -121,6 +126,16 @@
             if (!guild.IsLeader(playerCharacter.Id))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_GUILD_LEADER;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (guild.IsLeader(memberId))
+            {
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_CHANGE_GUILD_LEADER_ROLE;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (!guild.ContainsMemberId(memberId))
+            {
+                gameMessage = UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_GUILD;
                 return new ValidateGuildRequestResult(false, gameMessage);
             }
             gameMessage = UITextKeys.NONE;

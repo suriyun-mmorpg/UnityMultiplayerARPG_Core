@@ -16,26 +16,31 @@
 
         public static ValidatePartyRequestResult CanChangePartyLeader(this IServerPartyHandlers serverPartyHandlers, IPlayerCharacterData playerCharacter, string memberId)
         {
-            UITextKeys gameMessageType;
+            UITextKeys gameMessage;
             int partyId = playerCharacter.PartyId;
             PartyData party;
             if (partyId <= 0 || !serverPartyHandlers.TryGetParty(partyId, out party))
             {
-                gameMessageType = UITextKeys.UI_ERROR_NOT_JOINED_PARTY;
-                return new ValidatePartyRequestResult(false, gameMessageType);
+                gameMessage = UITextKeys.UI_ERROR_NOT_JOINED_PARTY;
+                return new ValidatePartyRequestResult(false, gameMessage);
             }
             if (!party.IsLeader(playerCharacter.Id))
             {
-                gameMessageType = UITextKeys.UI_ERROR_NOT_PARTY_LEADER;
-                return new ValidatePartyRequestResult(false, gameMessageType);
+                gameMessage = UITextKeys.UI_ERROR_NOT_PARTY_LEADER;
+                return new ValidatePartyRequestResult(false, gameMessage);
+            }
+            if (party.IsLeader(memberId))
+            {
+                gameMessage = UITextKeys.UI_ERROR_ALREADY_IS_PARTY_LEADER;
+                return new ValidatePartyRequestResult(false, gameMessage);
             }
             if (!party.ContainsMemberId(memberId))
             {
-                gameMessageType = UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_PARTY;
-                return new ValidatePartyRequestResult(false, gameMessageType);
+                gameMessage = UITextKeys.UI_ERROR_CHARACTER_NOT_JOINED_PARTY;
+                return new ValidatePartyRequestResult(false, gameMessage);
             }
-            gameMessageType = UITextKeys.NONE;
-            return new ValidatePartyRequestResult(true, gameMessageType, partyId, party);
+            gameMessage = UITextKeys.NONE;
+            return new ValidatePartyRequestResult(true, gameMessage, partyId, party);
         }
 
         public static ValidatePartyRequestResult CanChangePartySetting(this IServerPartyHandlers serverPartyHandlers, IPlayerCharacterData playerCharacter)

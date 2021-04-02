@@ -333,7 +333,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter);
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
