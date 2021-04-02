@@ -30,8 +30,8 @@ namespace MultiplayerARPG
         private void GetFriendsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetFriendsMessage response)
         {
             ClientFriendActions.ResponseGetFriends(responseHandler, responseCode, response);
-            if (responseCode == AckResponseCode.Success)
-                UpdateFriendsUIs(response.friends);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            UpdateFriendsUIs(response.friends);
         }
 
         private void UpdateFriendsUIs(SocialCharacterData[] friends)
@@ -111,8 +111,8 @@ namespace MultiplayerARPG
         private void RemoveFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseRemoveFriendMessage response)
         {
             ClientFriendActions.ResponseRemoveFriend(responseHandler, responseCode, response);
-            if (responseCode == AckResponseCode.Success)
-                onFriendRemoved.Invoke();
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRemoved.Invoke();
         }
     }
 }

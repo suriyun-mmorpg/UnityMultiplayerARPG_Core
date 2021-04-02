@@ -15,9 +15,7 @@ namespace MultiplayerARPG
             base.OnEnable();
             if (inputCharacterName)
                 inputCharacterName.text = string.Empty;
-            MemberSelectionManager.DeselectSelectedUI();
-            MemberSelectionManager.Clear();
-            MemberList.HideAll();
+            OnClickFindCharacters();
         }
 
         private void UpdateFoundCharactersUIs(SocialCharacterData[] foundCharacters)
@@ -115,8 +113,8 @@ namespace MultiplayerARPG
         public void AddFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
         {
             ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response);
-            if (responseCode == AckResponseCode.Success)
-                onFriendAdded.Invoke();
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendAdded.Invoke();
         }
     }
 }
