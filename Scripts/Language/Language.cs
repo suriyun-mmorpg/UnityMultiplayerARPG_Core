@@ -155,6 +155,8 @@ namespace MultiplayerARPG
         UI_ERROR_GUILD_ROLE_NOT_AVAILABLE,
         UI_ERROR_GUILD_SKILL_REACHED_MAX_LEVEL,
         UI_ERROR_NOT_ENOUGH_GUILD_SKILL_POINT,
+        UI_ERROR_CANNOT_ACCEPT_GUILD_REQUEST,
+        UI_ERROR_CANNOT_DECLINE_GUILD_REQUEST,
         // Game Data
         UI_UNKNOW_GAME_DATA_TITLE,
         UI_UNKNOW_GAME_DATA_DESCRIPTION,
@@ -226,6 +228,11 @@ namespace MultiplayerARPG
         UI_GUILD_KICK_MEMBER_DESCRIPTION,
         UI_GUILD_LEAVE,
         UI_GUILD_LEAVE_DESCRIPTION,
+        UI_GUILD_REQUEST,
+        UI_GUILD_REQUEST_DESCRIPTION,
+        UI_GUILD_REQUESTED,
+        UI_GUILD_REQUEST_ACCEPTED,
+        UI_GUILD_REQUEST_DECLINED,
         // UI Guild Role
         UI_GUILD_ROLE_CAN_INVITE,
         UI_GUILD_ROLE_CANNOT_INVITE,
@@ -1199,6 +1206,8 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_GUILD_ROLE_NOT_AVAILABLE.ToString(), "Guild role is not available");
             Texts.Add(UITextKeys.UI_ERROR_GUILD_SKILL_REACHED_MAX_LEVEL.ToString(), "Guild skill is reached max level");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_GUILD_SKILL_POINT.ToString(), "Not enough guild skill point");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_ACCEPT_GUILD_REQUEST.ToString(), "You're not allowed to accept guild request");
+            Texts.Add(UITextKeys.UI_ERROR_CANNOT_DECLINE_GUILD_REQUEST.ToString(), "You're not allowed to decline guild request");
             // Error - Game Data
             Texts.Add(UITextKeys.UI_UNKNOW_GAME_DATA_TITLE.ToString(), "Unknow");
             Texts.Add(UITextKeys.UI_UNKNOW_GAME_DATA_DESCRIPTION.ToString(), "N/A");
@@ -1270,6 +1279,11 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString(), "You sure you want to kick {0} from guild?");
             Texts.Add(UITextKeys.UI_GUILD_LEAVE.ToString(), "Leave Guild");
             Texts.Add(UITextKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString(), "You sure you want to leave guild?");
+            Texts.Add(UITextKeys.UI_GUILD_REQUEST.ToString(), "Guild Application");
+            Texts.Add(UITextKeys.UI_GUILD_REQUEST_DESCRIPTION.ToString(), "You want to request to join guild {0}?");
+            Texts.Add(UITextKeys.UI_GUILD_REQUESTED.ToString(), "Guild request were sent to the guild");
+            Texts.Add(UITextKeys.UI_GUILD_REQUEST_ACCEPTED.ToString(), "Guild request accepted");
+            Texts.Add(UITextKeys.UI_GUILD_REQUEST_DECLINED.ToString(), "Guild request accepted");
             // UI Guild Role
             Texts.Add(UITextKeys.UI_GUILD_ROLE_CAN_INVITE.ToString(), "Can invite");
             Texts.Add(UITextKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString(), "Cannot invite");
@@ -1280,7 +1294,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString(), "You want to add {0} to friend list?");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVE.ToString(), "Remove Friend");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString(), "You want to remove {0} from friend list?");
-            Texts.Add(UITextKeys.UI_FRIEND_REQUEST.ToString(), "Request Friend");
+            Texts.Add(UITextKeys.UI_FRIEND_REQUEST.ToString(), "Friend Request");
             Texts.Add(UITextKeys.UI_FRIEND_REQUEST_DESCRIPTION.ToString(), "You want to request {0} to be friend?");
             Texts.Add(UITextKeys.UI_FRIEND_ADDED.ToString(), "The character was added to the friend list");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVED.ToString(), "The character was removed from the friend list");
