@@ -95,14 +95,14 @@ namespace MultiplayerARPG
             {
                 uiTextTitle.text = string.Format(
                     LanguageManager.GetText(formatKeyTitle),
-                    Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+                    Data == null || string.IsNullOrEmpty(Data.Title) ? BuildTitle() : Data.Title);
             }
 
             if (uiTextDescription != null)
             {
                 uiTextDescription.text = string.Format(
                     LanguageManager.GetText(formatKeyDescription),
-                    Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
+                    Data == null || string.IsNullOrEmpty(Data.Description) ? BuildDescription() : Data.Description);
             }
 
             if (imageIcon != null)
@@ -151,6 +151,28 @@ namespace MultiplayerARPG
                     goldObject.SetActive(Data.sellPriceGold > 0);
                 }
             }
+        }
+
+        public string BuildTitle()
+        {
+            if (Data.receiveItems.Length > 0)
+                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ITEM_AMOUNT.ToString()), Data.receiveItems[0].item.Title, Data.receiveItems[0].amount);
+            if (Data.receiveCurrencies.Length > 0)
+                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
+            if (Data.receiveGold > 0)
+                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.receiveGold.ToString("N0"));
+            return LanguageManager.GetUnknowTitle();
+        }
+
+        public string BuildDescription()
+        {
+            if (Data.receiveItems.Length > 0)
+                return Data.receiveItems[0].item.Description;
+            if (Data.receiveCurrencies.Length > 0)
+                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
+            if (Data.receiveGold > 0)
+                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.receiveGold.ToString("N0"));
+            return LanguageManager.GetUnknowTitle();
         }
 
         IEnumerator LoadExternalIcon()
