@@ -23,6 +23,10 @@ namespace UtilsComponents
         private void Awake()
         {
             toggle = GetComponent<Toggle>();
+            foreach (Setting setting in settings)
+            {
+                setting.graphic.color = setting.defaultColor;
+            }
         }
 
         private void Update()
