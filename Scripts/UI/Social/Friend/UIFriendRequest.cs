@@ -39,13 +39,17 @@ namespace MultiplayerARPG
                 UISocialCharacterData friendEntity = new UISocialCharacterData();
                 friendEntity.socialCharacter = friend;
 
-                UISocialCharacter uiFriend = ui.GetComponent<UISocialCharacter>();
-                uiFriend.uiSocialGroup = this;
-                uiFriend.Data = friendEntity;
-                uiFriend.Show();
-                MemberSelectionManager.Add(uiFriend);
+                UISocialCharacter uiRequester = ui.GetComponent<UISocialCharacter>();
+                uiRequester.uiSocialGroup = this;
+                uiRequester.Data = friendEntity;
+                uiRequester.Show();
+                uiRequester.onFriendRequestAccepted.RemoveListener(Refresh);
+                uiRequester.onFriendRequestAccepted.AddListener(Refresh);
+                uiRequester.onFriendRequestDeclined.RemoveListener(Refresh);
+                uiRequester.onFriendRequestDeclined.AddListener(Refresh);
+                MemberSelectionManager.Add(uiRequester);
                 if (selectedIdx == index)
-                    uiFriend.OnClickSelect();
+                    uiRequester.OnClickSelect();
             });
             if (memberListEmptyObject != null)
                 memberListEmptyObject.SetActive(friends.Length == 0);
