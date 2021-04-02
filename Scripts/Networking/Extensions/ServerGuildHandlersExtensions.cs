@@ -142,6 +142,70 @@
             return new ValidateGuildRequestResult(true, gameMessage, guildId, guild);
         }
 
+        public static ValidateGuildRequestResult CanSendGuildRequest(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData requesterCharacter, int guildId)
+        {
+            UITextKeys gameMessage;
+            GuildData guild;
+            if (requesterCharacter.GuildId > 0)
+            {
+                gameMessage = UITextKeys.UI_ERROR_JOINED_ANOTHER_GUILD;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
+            {
+                gameMessage = UITextKeys.UI_ERROR_GUILD_NOT_FOUND;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            gameMessage = UITextKeys.NONE;
+            return new ValidateGuildRequestResult(true, gameMessage, guildId, guild);
+        }
+
+        public static ValidateGuildRequestResult CanAcceptGuildRequest(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData managerCharacter)
+        {
+            UITextKeys gameMessage;
+            GuildData guild;
+            if (managerCharacter.GuildId <= 0 || !serverGuildHandlers.TryGetGuild(managerCharacter.GuildId, out guild))
+            {
+                gameMessage = UITextKeys.UI_ERROR_GUILD_NOT_FOUND;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (!guild.CanInvite(managerCharacter.Id))
+            {
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_ACCEPT_GUILD_REQUEST;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (guild.CountMember() >= guild.MaxMember())
+            {
+                gameMessage = UITextKeys.UI_ERROR_GUILD_MEMBER_REACHED_LIMIT;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            gameMessage = UITextKeys.NONE;
+            return new ValidateGuildRequestResult(true, gameMessage, managerCharacter.GuildId, guild);
+        }
+
+        public static ValidateGuildRequestResult CanDeclineGuildRequest(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData managerCharacter)
+        {
+            UITextKeys gameMessage;
+            GuildData guild;
+            if (managerCharacter.GuildId <= 0 || !serverGuildHandlers.TryGetGuild(managerCharacter.GuildId, out guild))
+            {
+                gameMessage = UITextKeys.UI_ERROR_GUILD_NOT_FOUND;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (!guild.CanInvite(managerCharacter.Id))
+            {
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_DECLINE_GUILD_REQUEST;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (guild.CountMember() >= guild.MaxMember())
+            {
+                gameMessage = UITextKeys.UI_ERROR_GUILD_MEMBER_REACHED_LIMIT;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            gameMessage = UITextKeys.NONE;
+            return new ValidateGuildRequestResult(true, gameMessage, managerCharacter.GuildId, guild);
+        }
+
         public static ValidateGuildRequestResult CanSendGuildInvitation(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData inviterCharacter, IPlayerCharacterData inviteeCharacter)
         {
             UITextKeys gameMessage;

@@ -1,15 +1,9 @@
 ﻿using LiteNetLibManager;
-using UnityEngine;
-using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
     public class UIFriendRequest : UISocialGroup<UISocialCharacter>
     {
-        public GameObject listEmptyObject;
-        public UnityEvent onFriendRequestAccepted;
-        public UnityEvent onFriendRequestDeclined;
-
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -53,8 +47,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     uiFriend.OnClickSelect();
             });
-            if (listEmptyObject != null)
-                listEmptyObject.SetActive(friends.Length == 0);
+            if (memberListEmptyObject != null)
+                memberListEmptyObject.SetActive(friends.Length == 0);
         }
 
         public override bool CanKick(string characterId)
@@ -85,44 +79,6 @@ namespace MultiplayerARPG
         public override bool OwningCharacterIsLeader()
         {
             return false;
-        }
-
-        public void OnClickAcceptFriendRequest()
-        {
-            if (MemberSelectionManager.SelectedUI == null)
-                return;
-
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            GameInstance.ClientFriendHandlers.RequestAcceptFriendRequest(new RequestAcceptFriendRequestMessage()
-            {
-                requesterId = friend.id,
-            }, AcceptFriendRequestCallback);
-        }
-
-        private void AcceptFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAcceptFriendRequestMessage response)
-        {
-            ClientFriendActions.ResponseAcceptFriendRequest(responseHandler, responseCode, response);
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            onFriendRequestAccepted.Invoke();
-        }
-
-        public void OnClickDeclineFriendRequest()
-        {
-            if (MemberSelectionManager.SelectedUI == null)
-                return;
-
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            GameInstance.ClientFriendHandlers.RequestDeclineFriendRequest(new RequestDeclineFriendRequestMessage()
-            {
-                requesterId = friend.id,
-            }, DeclineFriendRequestCallback);
-        }
-
-        private void DeclineFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseDeclineFriendRequestMessage response)
-        {
-            ClientFriendActions.ResponseDeclineFriendRequest(responseHandler, responseCode, response);
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            onFriendRequestDeclined.Invoke();
         }
     }
 }

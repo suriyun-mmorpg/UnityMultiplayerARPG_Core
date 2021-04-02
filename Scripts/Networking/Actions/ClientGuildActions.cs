@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptGuildRequestMessage> onResponseAcceptGuildRequest;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineGuildRequestMessage> onResponseDeclineGuildRequest;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildRequestsMessage> onResponseGetGuildRequests;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGuildListMessage> onResponseFindGuilds;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseFindGuildsMessage> onResponseFindGuilds;
         public static System.Action<GuildInvitationData> onNotifyGuildInvitation;
         public static System.Action<GuildData> onNotifyGuildUpdated;
 
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                 onResponseGetGuildRequests.Invoke(requestHandler, responseCode, response);
         }
 
-        public static void ResponseGuildList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGuildListMessage response)
+        public static void ResponseGuildList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindGuildsMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseFindGuilds != null)

@@ -37,6 +37,8 @@ namespace MultiplayerARPG
         public UnityEvent onFriendRequested;
         public UnityEvent onFriendRequestAccepted;
         public UnityEvent onFriendRequestDeclined;
+        public UnityEvent onGuildRequestAccepted;
+        public UnityEvent onGuildRequestDeclined;
 
         protected override void Update()
         {
@@ -199,6 +201,36 @@ namespace MultiplayerARPG
             ClientFriendActions.ResponseDeclineFriendRequest(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             onFriendRequestDeclined.Invoke();
+        }
+
+        public void OnClickAcceptGuildRequest()
+        {
+            GameInstance.ClientGuildHandlers.RequestAcceptGuildRequest(new RequestAcceptGuildRequestMessage()
+            {
+                requesterId = Data.socialCharacter.id,
+            }, AcceptGuildRequestCallback);
+        }
+
+        private void AcceptGuildRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAcceptGuildRequestMessage response)
+        {
+            ClientGuildActions.ResponseAcceptGuildRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onGuildRequestAccepted.Invoke();
+        }
+
+        public void OnClickDeclineGuildRequest()
+        {
+            GameInstance.ClientGuildHandlers.RequestDeclineGuildRequest(new RequestDeclineGuildRequestMessage()
+            {
+                requesterId = Data.socialCharacter.id,
+            }, DeclineGuildRequestCallback);
+        }
+
+        private void DeclineGuildRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseDeclineGuildRequestMessage response)
+        {
+            ClientGuildActions.ResponseDeclineGuildRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onGuildRequestDeclined.Invoke();
         }
     }
 }

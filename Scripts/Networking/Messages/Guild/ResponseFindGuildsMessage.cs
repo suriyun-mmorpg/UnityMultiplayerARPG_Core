@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public struct ResponseGuildListMessage : INetSerializable
+    public struct ResponseFindGuildsMessage : INetSerializable
     {
         public UITextKeys message;
         public GuildListEntry[] guilds;

@@ -2,34 +2,27 @@
 
 namespace MultiplayerARPG
 {
-    public class UIFriend : UISocialGroup<UISocialCharacter>
+    public class UIGuildRequest : UISocialGroup<UISocialCharacter>
     {
         protected override void OnEnable()
         {
             base.OnEnable();
-            ClientFriendActions.onNotifyFriendsUpdated += UpdateFriendsUIs;
             Refresh();
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            ClientFriendActions.onNotifyFriendsUpdated -= UpdateFriendsUIs;
         }
 
         public void Refresh()
         {
-            GameInstance.ClientFriendHandlers.RequestGetFriends(GetFriendsCallback);
+            GameInstance.ClientGuildHandlers.RequestGetGuildRequests(GetGuildRequestsCallback);
         }
 
-        private void GetFriendsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetFriendsMessage response)
+        private void GetGuildRequestsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetGuildRequestsMessage response)
         {
-            ClientFriendActions.ResponseGetFriends(responseHandler, responseCode, response);
+            ClientGuildActions.ResponseGetGuildRequests(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            UpdateFriendsUIs(response.friends);
+            UpdateGuildRequestsUIs(response.guildRequests);
         }
 
-        private void UpdateFriendsUIs(SocialCharacterData[] friends)
+        private void UpdateGuildRequestsUIs(SocialCharacterData[] friends)
         {
             if (friends == null)
                 return;
@@ -46,13 +39,13 @@ namespace MultiplayerARPG
                 UISocialCharacterData friendEntity = new UISocialCharacterData();
                 friendEntity.socialCharacter = friend;
 
-                UISocialCharacter uiFriend = ui.GetComponent<UISocialCharacter>();
-                uiFriend.uiSocialGroup = this;
-                uiFriend.Data = friendEntity;
-                uiFriend.Show();
-                MemberSelectionManager.Add(uiFriend);
+                UISocialCharacter uiGuild = ui.GetComponent<UISocialCharacter>();
+                uiGuild.uiSocialGroup = this;
+                uiGuild.Data = friendEntity;
+                uiGuild.Show();
+                MemberSelectionManager.Add(uiGuild);
                 if (selectedIdx == index)
-                    uiFriend.OnClickSelect();
+                    uiGuild.OnClickSelect();
             });
             if (memberListEmptyObject != null)
                 memberListEmptyObject.SetActive(friends.Length == 0);

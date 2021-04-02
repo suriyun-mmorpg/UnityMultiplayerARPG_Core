@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public UIGuildListEntry uiDialog;
         public UIGuildListEntry uiPrefab;
         public Transform uiContainer;
+        public InputFieldWrapper inputGuildName;
 
         private UIList cacheList;
         public UIList CacheList
@@ -33,7 +34,7 @@ namespace MultiplayerARPG
             {
                 if (cacheSelectionManager == null)
                     cacheSelectionManager = gameObject.GetOrAddComponent<UIGuildListSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheSelectionManager;
             }
         }
@@ -46,7 +47,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnDialogHide);
-            Refresh();
+            OnClickFindGuilds();
         }
 
         protected virtual void OnDisable()
@@ -80,27 +81,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Refresh()
+        private void UpdateFoundGuildsUIs(GuildListEntry[] foundGuilds)
         {
-            GameInstance.ClientGuildHandlers.RequestFindGuilds(new RequestFindGuildsMessage()
-            {
-                guildName = string.Empty,
-            }, GuildListCallback);
-        }
+            if (foundGuilds == null)
+                return;
 
-        private void GuildListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGuildListMessage response)
-        {
-            ClientGuildActions.ResponseGuildList(requestHandler, responseCode, response);
             int selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
-            if (listEmptyObject != null)
-                listEmptyObject.SetActive(true);
-            if (responseCode == AckResponseCode.Unimplemented ||
-                responseCode == AckResponseCode.Timeout)
-                return;
+
             UIGuildListEntry tempUi;
-            CacheList.Generate(response.guilds, (index, guildListEntry, ui) =>
+            CacheList.Generate(foundGuilds, (index, guildListEntry, ui) =>
             {
                 tempUi = ui.GetComponent<UIGuildListEntry>();
                 tempUi.Data = guildListEntry;
@@ -110,7 +101,25 @@ namespace MultiplayerARPG
                     tempUi.OnClickSelect();
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(response.guilds.Length == 0);
+                listEmptyObject.SetActive(foundGuilds.Length == 0);
+        }
+
+        public void OnClickFindGuilds()
+        {
+            string guildName = string.Empty;
+            if (inputGuildName != null)
+                guildName = inputGuildName.text;
+            GameInstance.ClientGuildHandlers.RequestFindGuilds(new RequestFindGuildsMessage()
+            {
+                guildName = guildName,
+            }, GuildListCallback);
+        }
+
+        private void GuildListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindGuildsMessage response)
+        {
+            ClientGuildActions.ResponseGuildList(requestHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+                UpdateFoundGuildsUIs(response.guilds);
         }
     }
 }

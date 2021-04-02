@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             return Manager.ClientSendRequest(GameNetworkingConsts.GetGuildRequests, EmptyMessage.Value, responseDelegate: callback);
         }
 
-        public bool RequestFindGuilds(RequestFindGuildsMessage data, ResponseDelegate<ResponseGuildListMessage> callback)
+        public bool RequestFindGuilds(RequestFindGuildsMessage data, ResponseDelegate<ResponseFindGuildsMessage> callback)
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.FindGuilds, data, responseDelegate: callback);
         }

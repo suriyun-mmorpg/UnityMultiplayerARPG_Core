@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -22,6 +25,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyMemberAmountNoLimit = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT);
 
         [Header("UI Elements")]
+        [FormerlySerializedAs("listEmptyObject")]
+        public GameObject memberListEmptyObject;
         public T uiMemberDialog;
         public T uiMemberPrefab;
         public Transform uiMemberContainer;
@@ -38,6 +43,14 @@ namespace MultiplayerARPG
         public GameObject[] owningCharacterCanKickObjects;
         [Tooltip("These objects will be activated when owning character cannot kick")]
         public GameObject[] owningCharacterCannotKickObjects;
+
+        [Header("Events")]
+        public UnityEvent onFriendAdded;
+        public UnityEvent onFriendRemoved;
+        public UnityEvent onFriendRequested;
+        public UnityEvent onFriendRequestAccepted;
+        public UnityEvent onFriendRequestDeclined;
+
 
         protected int currentSocialId = 0;
         public int memberAmount { get; protected set; }
@@ -179,6 +192,110 @@ namespace MultiplayerARPG
                 uiMemberDialog.Hide();
                 uiMemberDialog.onHide.AddListener(OnMemberDialogHide);
             }
+        }
+
+        public void OnClickAddFriend()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
+                {
+                    friendId = friend.id,
+                }, AddFriendCallback);
+            });
+        }
+
+        public void AddFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
+        {
+            ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendAdded.Invoke();
+        }
+
+        public void OnClickRemoveFriend()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
+                {
+                    friendId = friend.id,
+                }, RemoveFriendCallback);
+            });
+        }
+
+        private void RemoveFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseRemoveFriendMessage response)
+        {
+            ClientFriendActions.ResponseRemoveFriend(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRemoved.Invoke();
+        }
+
+        public void OnClickSendFriendRequest()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
+                {
+                    requesteeId = friend.id,
+                }, SendFriendRequestCallback);
+            });
+        }
+
+        private void SendFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSendFriendRequestMessage response)
+        {
+            ClientFriendActions.ResponseSendFriendRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRequested.Invoke();
+        }
+
+        public void OnClickAcceptFriendRequest()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            GameInstance.ClientFriendHandlers.RequestAcceptFriendRequest(new RequestAcceptFriendRequestMessage()
+            {
+                requesterId = friend.id,
+            }, AcceptFriendRequestCallback);
+        }
+
+        private void AcceptFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAcceptFriendRequestMessage response)
+        {
+            ClientFriendActions.ResponseAcceptFriendRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRequestAccepted.Invoke();
+        }
+
+        public void OnClickDeclineFriendRequest()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            GameInstance.ClientFriendHandlers.RequestDeclineFriendRequest(new RequestDeclineFriendRequestMessage()
+            {
+                requesterId = friend.id,
+            }, DeclineFriendRequestCallback);
+        }
+
+        private void DeclineFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseDeclineFriendRequestMessage response)
+        {
+            ClientFriendActions.ResponseDeclineFriendRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onFriendRequestDeclined.Invoke();
         }
     }
 }

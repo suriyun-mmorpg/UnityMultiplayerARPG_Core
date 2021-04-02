@@ -1,15 +1,10 @@
 ﻿using LiteNetLibManager;
-using UnityEngine;
-using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
     public class UIFindCharacters : UISocialGroup<UISocialCharacter>
     {
-        public GameObject listEmptyObject;
         public InputFieldWrapper inputCharacterName;
-        public UnityEvent onFriendAdded;
-        public UnityEvent onFriendRequested;
 
         protected override void OnEnable()
         {
@@ -44,8 +39,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     uiFoundCharacter.OnClickSelect();
             });
-            if (listEmptyObject != null)
-                listEmptyObject.SetActive(foundCharacters.Length == 0);
+            if (memberListEmptyObject != null)
+                memberListEmptyObject.SetActive(foundCharacters.Length == 0);
         }
 
         public override bool CanKick(string characterId)
@@ -94,50 +89,6 @@ namespace MultiplayerARPG
             ClientFriendActions.ResponseFindCharacters(responseHandler, responseCode, response);
             if (responseCode == AckResponseCode.Success)
                 UpdateFoundCharactersUIs(response.characters);
-        }
-
-        public void OnClickAddFriend()
-        {
-            if (MemberSelectionManager.SelectedUI == null)
-                return;
-
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
-            {
-                GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
-                {
-                    friendId = friend.id,
-                }, AddFriendCallback);
-            });
-        }
-
-        public void AddFriendCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAddFriendMessage response)
-        {
-            ClientFriendActions.ResponseAddFriend(responseHandler, responseCode, response);
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            onFriendAdded.Invoke();
-        }
-
-        public void OnClickSendFriendRequest()
-        {
-            if (MemberSelectionManager.SelectedUI == null)
-                return;
-
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
-            {
-                GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
-                {
-                    requesteeId = friend.id,
-                }, SendFriendRequestCallback);
-            });
-        }
-
-        private void SendFriendRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSendFriendRequestMessage response)
-        {
-            ClientFriendActions.ResponseSendFriendRequest(responseHandler, responseCode, response);
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            onFriendRequested.Invoke();
         }
     }
 }
