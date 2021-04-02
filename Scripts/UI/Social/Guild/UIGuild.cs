@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Skill Point}")]
         public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_POINTS);
         [Tooltip("Format => {0} = {Message}")]
-        public UILocaleKeySetting formatKeyMessage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_LEADER);
+        public UILocaleKeySetting formatKeyMessage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public UIGuildRole uiRoleDialog;
