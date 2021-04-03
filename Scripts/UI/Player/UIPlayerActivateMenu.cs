@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -47,7 +48,14 @@ namespace MultiplayerARPG
             GameInstance.ClientPartyHandlers.RequestSendPartyInvitation(new RequestSendPartyInvitationMessage()
             {
                 inviteeId = Data.Id,
-            }, ClientPartyActions.ResponseSendPartyInvitation);
+            }, SendPartyInvitationCallback);
+        }
+
+        public void SendPartyInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
+        {
+            ClientPartyActions.ResponseSendPartyInvitation(requestHandler, responseCode, response);
+            if (!responseCode.ShowUnhandledResponseMessageDialog(response.message))
+                return;
             Hide();
         }
 
@@ -56,7 +64,14 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers.RequestSendGuildInvitation(new RequestSendGuildInvitationMessage()
             {
                 inviteeId = Data.Id,
-            }, ClientGuildActions.ResponseSendGuildInvitation);
+            }, SendGuildInvitationCallback);
+        }
+
+        public void SendGuildInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
+        {
+            ClientGuildActions.ResponseSendGuildInvitation(requestHandler, responseCode, response);
+            if (!responseCode.ShowUnhandledResponseMessageDialog(response.message))
+                return;
             Hide();
         }
     }
