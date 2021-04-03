@@ -17,8 +17,6 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public Transform rootTransform;
     public ScrollRectAllowing scrollRectAllowing;
-    [Tooltip("This will be used while `scrollRectAllowing` is not `None`")]
-    public float beginDragMinDelta = 15f;
     public ScrollRect scrollRect;
     public UnityEvent onStart = new UnityEvent();
     public UnityEvent onBeginDrag = new UnityEvent();
@@ -70,7 +68,7 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
         if (scrollRect != null)
         {
             if (scrollRectAllowing == ScrollRectAllowing.AllowVerticalScrolling &&
-                Mathf.Abs(eventData.delta.x) < beginDragMinDelta)
+                Mathf.Abs(eventData.delta.x) < Mathf.Abs(eventData.delta.y))
             {
                 IsScrolling = true;
                 scrollRect.SendMessage("OnBeginDrag", eventData);
@@ -78,7 +76,7 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
             }
 
             if (scrollRectAllowing == ScrollRectAllowing.AllowHorizontalScrolling &&
-                Mathf.Abs(eventData.delta.y) < beginDragMinDelta)
+                Mathf.Abs(eventData.delta.y) < Mathf.Abs(eventData.delta.x))
             {
                 IsScrolling = true;
                 scrollRect.SendMessage("OnBeginDrag", eventData);
