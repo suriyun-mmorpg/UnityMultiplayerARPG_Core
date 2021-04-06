@@ -31,7 +31,6 @@ namespace MultiplayerARPG
         }
 
         private long acceptedPositionTimestamp;
-        private Vector3 acceptedPosition;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
         private float lastClientSendInputs;
@@ -261,9 +260,8 @@ namespace MultiplayerARPG
                     targetYRotation = yAngle;
                     yRotateLerpTime = 0;
                     yRotateLerpDuration = serverSyncTransformInterval;
-                    if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
+                    if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > moveThreshold)
                     {
-                        acceptedPosition = position;
                         SetMovePaths(position, false);
                     }
                 }
@@ -357,9 +355,8 @@ namespace MultiplayerARPG
             {
                 acceptedPositionTimestamp = timestamp;
                 CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-                if (Vector3.Distance(position.GetXZ(), acceptedPosition.GetXZ()) > moveThreshold)
+                if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > moveThreshold)
                 {
-                    acceptedPosition = position;
                     if (!IsClient)
                     {
                         // If it's server only (not a host), set position follows the client immediately

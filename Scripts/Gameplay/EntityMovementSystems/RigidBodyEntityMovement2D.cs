@@ -34,7 +34,6 @@ namespace MultiplayerARPG
         private Vector2 tempCurrentPosition;
         private Quaternion lookRotation;
         private long acceptedPositionTimestamp;
-        private Vector3 acceptedPosition;
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
         private float lastClientSendInputs;
@@ -215,9 +214,8 @@ namespace MultiplayerARPG
                 }
                 else if (!IsOwnerClient)
                 {
-                    if (Vector2.Distance(position, acceptedPosition) > moveThreshold)
+                    if (Vector2.Distance(position, CacheTransform.position) > moveThreshold)
                     {
-                        acceptedPosition = position;
                         currentDestination = position;
                     }
                 }
@@ -288,9 +286,8 @@ namespace MultiplayerARPG
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
-                if (Vector2.Distance(position, acceptedPosition) > moveThreshold)
+                if (Vector2.Distance(position, CacheTransform.position) > moveThreshold)
                 {
-                    acceptedPosition = position;
                     if (!IsClient)
                     {
                         // If it's server only (not a host), set position follows the client immediately
