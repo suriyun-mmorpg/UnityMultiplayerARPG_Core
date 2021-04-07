@@ -109,6 +109,7 @@ namespace MultiplayerARPG
         /// This will be called on clients to display combat texts
         /// </summary>
         /// <param name="combatAmountType"></param>
+        /// <param name="damageSource"></param>
         /// <param name="dataId"></param>
         /// <param name="amount"></param>
         [AllRpc]
@@ -159,7 +160,6 @@ namespace MultiplayerARPG
                                 skill.GetDamageHitEffects() != null &&
                                 skill.GetDamageHitEffects().Length > 0)
                             {
-                                // Set hit effects from skill's hit effects
                                 effects = skill.GetDamageHitEffects();
                             }
                             break;
@@ -169,9 +169,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void CallAllAppendCombatAmount(CombatAmountType combatAmountType, DamageSource damageSource, int skillDataId, int amount)
+        public void CallAllAppendCombatAmount(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
         {
-            RPC(AllAppendCombatAmount, combatAmountType, damageSource, skillDataId, amount);
+            RPC(AllAppendCombatAmount, combatAmountType, damageSource, dataId, amount);
         }
 
         /// <summary>
