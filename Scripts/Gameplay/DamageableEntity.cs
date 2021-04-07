@@ -55,7 +55,62 @@ namespace MultiplayerARPG
                 opponentAimTransform = CombatTextTransform;
             HitBoxes = GetComponentsInChildren<DamageableHitBox>(true);
             if (HitBoxes == null || HitBoxes.Length == 0)
-                HitBoxes = new DamageableHitBox[] { gameObject.AddComponent<DamageableHitBox>() };
+                HitBoxes = CreateHitBoxes();
+        }
+
+        private DamageableHitBox[] CreateHitBoxes()
+        {
+            GameObject obj = new GameObject("_HitBoxes");
+            obj.transform.parent = CacheTransform;
+            // Get colliders to calculate bounds
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+            {
+                Collider[] colliders = GetComponents<Collider>();
+                Bounds bounds = default;
+                for (int i = 0; i < colliders.Length; ++i)
+                {
+                    if (i > 0)
+                    {
+                        bounds.Encapsulate(colliders[i].bounds);
+                    }
+                    else
+                    {
+                        bounds = colliders[i].bounds;
+                    }
+                }
+                BoxCollider newCollider = obj.AddComponent<BoxCollider>();
+                newCollider.center = bounds.center - CacheTransform.position;
+                newCollider.size = bounds.size;
+                newCollider.isTrigger = true;
+                obj.transform.localPosition = Vector3.zero;
+                obj.transform.localEulerAngles = Vector3.zero;
+                obj.transform.localScale = Vector3.one;
+                return new DamageableHitBox[] { obj.AddComponent<DamageableHitBox>() };
+            }
+            else
+            {
+                Collider2D[] colliders = GetComponents<Collider2D>();
+                Bounds bounds = default;
+                for (int i = 0; i < colliders.Length; ++i)
+                {
+                    if (i > 0)
+                    {
+                        bounds.Encapsulate(colliders[i].bounds);
+                    }
+                    else
+                    {
+                        bounds = colliders[i].bounds;
+                    }
+                }
+                BoxCollider2D newCollider = obj.AddComponent<BoxCollider2D>();
+                newCollider.offset = bounds.center - CacheTransform.position;
+                newCollider.size = bounds.size;
+                newCollider.isTrigger = true;
+                obj.transform.localPosition = Vector3.zero;
+                obj.transform.localEulerAngles = Vector3.zero;
+                obj.transform.localScale = Vector3.one;
+                return new DamageableHitBox[] { obj.AddComponent<DamageableHitBox>() };
+            }
         }
 
         /// <summary>
