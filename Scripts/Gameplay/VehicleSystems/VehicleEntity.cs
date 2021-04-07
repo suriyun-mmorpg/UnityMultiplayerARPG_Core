@@ -260,7 +260,7 @@ namespace MultiplayerARPG
 
         protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            combatAmountType = CombatAmountType.None;
+            combatAmountType = CombatAmountType.Miss;
             totalDamage = 0;
             if (!canBeAttacked)
                 return;
@@ -283,12 +283,11 @@ namespace MultiplayerARPG
             CurrentHp -= totalDamage;
         }
 
-        public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            base.ReceivedDamage(fromPosition, instigator, combatAmountType, damage, weapon, skill, skillLevel);
+            base.ReceivedDamage(fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
 
-            if (combatAmountType == CombatAmountType.Miss ||
-                combatAmountType == CombatAmountType.None)
+            if (combatAmountType == CombatAmountType.Miss)
                 return;
 
             // Do something when entity dead

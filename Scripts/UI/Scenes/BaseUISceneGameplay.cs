@@ -4,20 +4,6 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public enum CombatAmountType : byte
-    {
-        Miss,
-        NormalDamage,
-        CriticalDamage,
-        BlockedDamage,
-        HpRecovery,
-        MpRecovery,
-        StaminaRecovery,
-        FoodRecovery,
-        WaterRecovery,
-        None = 254,
-    }
-
     [DisallowMultipleComponent]
     public abstract class BaseUISceneGameplay : MonoBehaviour, IItemUIVisibilityManager
     {

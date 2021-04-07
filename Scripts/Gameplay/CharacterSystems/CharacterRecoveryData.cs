@@ -23,7 +23,7 @@
                 {
                     tempAmount = (int)recoveryingHp;
                     characterEntity.CurrentHp += tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.HpRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.HpRecovery, DamageSource.None, 0, tempAmount);
                     recoveryingHp -= tempAmount;
                 }
             }
@@ -37,7 +37,7 @@
                 {
                     tempAmount = (int)decreasingHp;
                     characterEntity.CurrentHp -= tempAmount;
-                    characterEntity.ReceivedDamage(characterEntity.CacheTransform.position, causer, CombatAmountType.NormalDamage, tempAmount, null, null, 0);
+                    characterEntity.ReceivedDamage(characterEntity.CacheTransform.position, causer, null, CombatAmountType.NormalDamage, tempAmount, null, null, 0);
                     decreasingHp -= tempAmount;
                 }
             }
@@ -51,7 +51,7 @@
                 {
                     tempAmount = (int)recoveryingMp;
                     characterEntity.CurrentMp += tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.MpRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.MpRecovery, DamageSource.None, 0, tempAmount);
                     recoveryingMp -= tempAmount;
                 }
             }
@@ -65,7 +65,7 @@
                 {
                     tempAmount = (int)decreasingMp;
                     characterEntity.CurrentMp -= tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.MpRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.MpRecovery, DamageSource.None, 0, tempAmount);
                     decreasingMp -= tempAmount;
                 }
             }
@@ -79,7 +79,7 @@
                 {
                     tempAmount = (int)recoveryingStamina;
                     characterEntity.CurrentStamina += tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.StaminaRecovery, DamageSource.None, 0, tempAmount);
                     recoveryingStamina -= tempAmount;
                 }
             }
@@ -93,7 +93,7 @@
                 {
                     tempAmount = (int)decreasingStamina;
                     characterEntity.CurrentStamina -= tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.StaminaRecovery, DamageSource.None, 0, tempAmount);
                     decreasingStamina -= tempAmount;
                 }
             }
@@ -107,7 +107,7 @@
                 {
                     tempAmount = (int)recoveryingFood;
                     characterEntity.CurrentFood += tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.FoodRecovery, DamageSource.None, 0, tempAmount);
                     recoveryingFood -= tempAmount;
                 }
             }
@@ -121,7 +121,7 @@
                 {
                     tempAmount = (int)decreasingFood;
                     characterEntity.CurrentFood -= tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.FoodRecovery, DamageSource.None, 0, tempAmount);
                     decreasingFood -= tempAmount;
                 }
             }
@@ -135,7 +135,7 @@
                 {
                     tempAmount = (int)recoveryingWater;
                     characterEntity.CurrentWater += tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.WaterRecovery, DamageSource.None, 0, tempAmount);
                     recoveryingWater -= tempAmount;
                 }
             }
@@ -149,7 +149,7 @@
                 {
                     tempAmount = (int)decreasingWater;
                     characterEntity.CurrentWater -= tempAmount;
-                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
+                    characterEntity.CallAllAppendCombatAmount(CombatAmountType.WaterRecovery, DamageSource.None, 0, tempAmount);
                     decreasingWater -= tempAmount;
                 }
             }

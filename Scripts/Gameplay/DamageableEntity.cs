@@ -41,10 +41,6 @@ namespace MultiplayerARPG
         public float HpRate { get { return (float)CurrentHp / (float)MaxHp; } }
         public DamageableHitBox[] HitBoxes { get; protected set; }
 
-        // Temp data
-        private GameEffect[] pendingHitEffects;
-        private bool playHitEffectsImmediately;
-
         public override void InitialRequiredComponents()
         {
             base.InitialRequiredComponents();
@@ -83,8 +79,6 @@ namespace MultiplayerARPG
                 newCollider.size = bounds.size;
                 newCollider.isTrigger = true;
                 obj.transform.localPosition = Vector3.zero;
-                obj.transform.localEulerAngles = Vector3.zero;
-                obj.transform.localScale = Vector3.one;
                 return new DamageableHitBox[] { obj.AddComponent<DamageableHitBox>() };
             }
             else
@@ -107,8 +101,6 @@ namespace MultiplayerARPG
                 newCollider.size = bounds.size;
                 newCollider.isTrigger = true;
                 obj.transform.localPosition = Vector3.zero;
-                obj.transform.localEulerAngles = Vector3.zero;
-                obj.transform.localScale = Vector3.one;
                 return new DamageableHitBox[] { obj.AddComponent<DamageableHitBox>() };
             }
         }
@@ -117,9 +109,10 @@ namespace MultiplayerARPG
         /// This will be called on clients to display combat texts
         /// </summary>
         /// <param name="combatAmountType"></param>
+        /// <param name="dataId"></param>
         /// <param name="amount"></param>
         [AllRpc]
-        protected void AllAppendCombatAmount(CombatAmountType combatAmountType, int amount)
+        protected void AllAppendCombatAmount(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
         {
             switch (combatAmountType)
             {
@@ -141,30 +134,44 @@ namespace MultiplayerARPG
                 return;
 
             BaseUISceneGameplay.Singleton.PrepareCombatText(this, combatAmountType, amount);
-            switch (combatAmountType)
+            if (combatAmountType == CombatAmountType.NormalDamage ||
+                combatAmountType == CombatAmountType.CriticalDamage ||
+                combatAmountType == CombatAmountType.BlockedDamage)
             {
-                case CombatAmountType.NormalDamage:
-                case CombatAmountType.CriticalDamage:
-                case CombatAmountType.BlockedDamage:
-                    if (pendingHitEffects == null || pendingHitEffects.Length == 0)
+                if (Model != null)
+                {
+                    // Find effects to instantiate
+                    GameEffect[] effects = CurrentGameInstance.DefaultDamageHitEffects;
+                    switch (damageSource)
                     {
-                        // Damage amount shown before hit effects prepared
-                        // So it will play hit effects immediately when PlayHitEffects() call later
-                        playHitEffectsImmediately = true;
+                        case DamageSource.Weapon:
+                            DamageElement damageElement;
+                            if (GameInstance.DamageElements.TryGetValue(dataId, out damageElement) &&
+                                damageElement.GetDamageHitEffects() != null &&
+                                damageElement.GetDamageHitEffects().Length > 0)
+                            {
+                                effects = damageElement.GetDamageHitEffects();
+                            }
+                            break;
+                        case DamageSource.Skill:
+                            BaseSkill skill;
+                            if (GameInstance.Skills.TryGetValue(dataId, out skill) &&
+                                skill.GetDamageHitEffects() != null &&
+                                skill.GetDamageHitEffects().Length > 0)
+                            {
+                                // Set hit effects from skill's hit effects
+                                effects = skill.GetDamageHitEffects();
+                            }
+                            break;
                     }
-                    else
-                    {
-                        if (Model != null)
-                            Model.InstantiateEffect(pendingHitEffects);
-                    }
-                    break;
+                    Model.InstantiateEffect(effects);
+                }
             }
-            pendingHitEffects = null;
         }
 
-        public void CallAllAppendCombatAmount(CombatAmountType combatAmountType, int amount)
+        public void CallAllAppendCombatAmount(CombatAmountType combatAmountType, DamageSource damageSource, int skillDataId, int amount)
         {
-            RPC(AllAppendCombatAmount, combatAmountType, amount);
+            RPC(AllAppendCombatAmount, combatAmountType, damageSource, skillDataId, amount);
         }
 
         /// <summary>
@@ -182,7 +189,7 @@ namespace MultiplayerARPG
             CombatAmountType combatAmountType;
             int totalDamage;
             ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, out combatAmountType, out totalDamage);
-            ReceivedDamage(fromPosition, instigator, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            ReceivedDamage(fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
         /// <summary>
@@ -219,17 +226,44 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="fromPosition">Where is attacker?</param>
         /// <param name="instigator">Who is attacking this?</param>
+        /// <param name="damageAmounts">Damage amount before total damage calculated</param>
         /// <param name="combatAmountType">Result damage type which receives from `ApplyReceiveDamage`</param>
-        /// <param name="damage">Result damage which receives from `ApplyReceiveDamage`</param>
+        /// <param name="totalDamage">Result damage which receives from `ApplyReceiveDamage`</param>
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
-        public virtual void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            CallAllAppendCombatAmount(combatAmountType, damage);
+            DamageSource damageSource = DamageSource.None;
+            int dataId = 0;
+            if (combatAmountType != CombatAmountType.Miss)
+            {
+                damageSource = skill == null ? DamageSource.Weapon : DamageSource.Skill;
+                switch (damageSource)
+                {
+                    case DamageSource.Weapon:
+                        if (damageAmounts != null)
+                        {
+                            foreach (DamageElement element in damageAmounts.Keys)
+                            {
+                                if (element != null && element != CurrentGameInstance.DefaultDamageElement &&
+                                    element.GetDamageHitEffects() != null && element.GetDamageHitEffects().Length > 0)
+                                {
+                                    dataId = element.DataId;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case DamageSource.Skill:
+                        dataId = skill.DataId;
+                        break;
+                }
+            }
+            CallAllAppendCombatAmount(combatAmountType, damageSource, dataId, totalDamage);
             IGameEntity attacker;
             if (onReceivedDamage != null && instigator.TryGetEntity(out attacker))
-                onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, damage, weapon, skill, skillLevel);
+                onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
@@ -253,42 +287,6 @@ namespace MultiplayerARPG
             }
 
             return true;
-        }
-
-        public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
-        {
-            if (!IsClient)
-                return;
-
-            GameEffect[] effects = CurrentGameInstance.DefaultDamageHitEffects;
-            if (skill != null && skill.GetDamageHitEffects() != null && skill.GetDamageHitEffects().Length > 0)
-            {
-                // Set hit effects from skill's hit effects
-                effects = skill.GetDamageHitEffects();
-            }
-            else
-            {
-                foreach (DamageElement element in damageElements)
-                {
-                    if (element.GetDamageHitEffects() == null ||
-                        element.GetDamageHitEffects().Length == 0)
-                        continue;
-                    effects = element.GetDamageHitEffects();
-                    break;
-                }
-            }
-            if (playHitEffectsImmediately)
-            {
-                // Play hit effects immediately because damage amount shown before client simulate hit
-                if (Model != null)
-                    Model.InstantiateEffect(effects);
-                playHitEffectsImmediately = false;
-            }
-            else
-            {
-                // Prepare hit effects to play when damage amount show
-                pendingHitEffects = effects;
-            }
         }
     }
 }

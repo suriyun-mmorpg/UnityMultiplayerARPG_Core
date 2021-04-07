@@ -266,8 +266,6 @@ namespace MultiplayerARPG
                         if (damageReceivingTarget != null)
                         {
                             // Pass all receive damage condition, then apply damages
-                            if (isClient)
-                                damageReceivingTarget.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
                                 damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
 
@@ -315,8 +313,6 @@ namespace MultiplayerARPG
                                 continue;
 
                             // Target receives damages
-                            if (isClient)
-                                tempDamageableHitBox.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
                                 tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
 
@@ -399,8 +395,6 @@ namespace MultiplayerARPG
                                 continue;
 
                             // Target receives damages
-                            if (isClient)
-                                tempDamageableHitBox.PlayHitEffects(damageAmounts.Keys, skill);
                             if (isServer)
                                 tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
 

@@ -253,7 +253,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, CombatAmountType damageAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType damageAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             // Attacker can be null when character buff's buff applier is null, So avoid it
             BaseCharacterEntity attackerCharacter;
@@ -270,17 +270,17 @@ namespace MultiplayerARPG
                 if (attackerCharacter != null)
                 {
                     ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
-                    receivedDamageRecord.totalReceivedDamage = damage;
+                    receivedDamageRecord.totalReceivedDamage = totalDamage;
                     if (receivedDamageRecords.ContainsKey(attackerCharacter))
                     {
                         receivedDamageRecord = receivedDamageRecords[attackerCharacter];
-                        receivedDamageRecord.totalReceivedDamage += damage;
+                        receivedDamageRecord.totalReceivedDamage += totalDamage;
                     }
                     receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
                     receivedDamageRecords[attackerCharacter] = receivedDamageRecord;
                 }
             }
-            base.ReceivedDamage(fromPosition, instigator, damageAmountType, damage, weapon, skill, skillLevel);
+            base.ReceivedDamage(fromPosition, instigator, damageAmounts, damageAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
         public override void GetAttackingData(

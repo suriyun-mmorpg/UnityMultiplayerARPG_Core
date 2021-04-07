@@ -34,11 +34,6 @@ namespace MultiplayerARPG
             return entity.CanReceiveDamageFrom(instigator);
         }
 
-        public virtual void PlayHitEffects(IEnumerable<DamageElement> damageElements, BaseSkill skill)
-        {
-            entity.PlayHitEffects(damageElements, skill);
-        }
-
         public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
