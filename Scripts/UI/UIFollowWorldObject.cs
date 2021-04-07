@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UIFollowWorldPosition))]
+[DefaultExecutionOrder(0)]
 public class UIFollowWorldObject : MonoBehaviour
 {
     [SerializeField]
@@ -13,7 +14,7 @@ public class UIFollowWorldObject : MonoBehaviour
         set
         {
             targetObject = value;
-            UpdatePosition();
+            CachePositionFollower.SetTargetPosition(targetObject.position);
         }
     }
 

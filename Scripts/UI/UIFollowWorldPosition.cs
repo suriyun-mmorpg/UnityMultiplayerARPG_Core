@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Jobs;
 
 [RequireComponent(typeof(RectTransform))]
+[DefaultExecutionOrder(1)]
 public class UIFollowWorldPosition : MonoBehaviour
 {
     public Camera targetCamera;
@@ -20,22 +21,23 @@ public class UIFollowWorldPosition : MonoBehaviour
 
     public RectTransform CacheTransform { get; private set; }
     public Transform CacheCameraTransform { get; private set; }
-
-    private bool SetupCamera()
+    public Camera TargetCamera
     {
-        if (targetCamera == null)
+        get
         {
-            targetCamera = Camera.main;
-            if (targetCamera != null)
-                CacheCameraTransform = targetCamera.transform;
+            if (targetCamera == null)
+            {
+                targetCamera = Camera.main;
+                if (targetCamera != null)
+                    CacheCameraTransform = targetCamera.transform;
+            }
+            return targetCamera;
         }
-        return targetCamera != null;
     }
 
     private void OnEnable()
     {
         CacheTransform = GetComponent<RectTransform>();
-        SetupCamera();
         followJobTransforms = new TransformAccessArray(new Transform[] { CacheTransform });
     }
 
@@ -47,9 +49,8 @@ public class UIFollowWorldPosition : MonoBehaviour
 
     private void Update()
     {
-        if (!SetupCamera())
+        if (TargetCamera == null)
             return;
-
         wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
     }
 
@@ -57,7 +58,6 @@ public class UIFollowWorldPosition : MonoBehaviour
     {
         if (!wantedPosition.HasValue)
             return;
-
         followJobHandle.Complete();
         followJob = new UIFollowWorldPositionJob()
         {
@@ -68,6 +68,15 @@ public class UIFollowWorldPosition : MonoBehaviour
         };
         followJobHandle = followJob.Schedule(followJobTransforms);
         JobHandle.ScheduleBatchedJobs();
+    }
+
+    public void SetTargetPosition(Vector3 targetPosition)
+    {
+        this.targetPosition = targetPosition;
+        if (TargetCamera == null)
+            return;
+        wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
+        CacheTransform.position = wantedPosition.Value;
     }
 }
 
