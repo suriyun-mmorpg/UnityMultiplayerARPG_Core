@@ -2,6 +2,7 @@
 using UnityEngine;
 using LiteNetLibManager;
 using UnityEngine.Events;
+using LiteNetLib;
 
 namespace MultiplayerARPG
 {
@@ -171,7 +172,7 @@ namespace MultiplayerARPG
 
         public void CallAllAppendCombatAmount(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
         {
-            RPC(AllAppendCombatAmount, combatAmountType, damageSource, dataId, amount);
+            RPC(AllAppendCombatAmount, 0, DeliveryMethod.Unreliable, combatAmountType, damageSource, dataId, amount);
         }
 
         /// <summary>
