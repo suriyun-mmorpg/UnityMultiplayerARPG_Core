@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseRemakeCharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations>
+    public abstract class BaseRemakeCharacterModel : BaseCharacterModel
     {
         // Clip name variables
         // Move
@@ -99,6 +99,16 @@ namespace MultiplayerARPG
         {
             PrepareMissingMovementAnimations();
             base.Awake();
+        }
+
+        public bool TryGetWeaponAnimations(int dataId, out WeaponAnimations anims)
+        {
+            return CacheAnimationsManager.SetAndTryGetCacheWeaponAnimations(CacheIdentity.HashAssetId, weaponAnimations, skillAnimations, dataId, out anims);
+        }
+
+        public bool TryGetSkillAnimations(int dataId, out SkillAnimations anims)
+        {
+            return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(CacheIdentity.HashAssetId, weaponAnimations, skillAnimations, dataId, out anims);
         }
 
         protected Coroutine StartedActionCoroutine(Coroutine coroutine)
@@ -381,7 +391,7 @@ namespace MultiplayerARPG
         public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
         {
             WeaponAnimations anims;
-            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.rightHandAttackAnimations != null)
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.rightHandAttackAnimations != null)
                 return anims.rightHandAttackAnimations;
             return defaultAnimations.rightHandAttackAnimations;
         }
@@ -389,7 +399,7 @@ namespace MultiplayerARPG
         public ActionAnimation[] GetLeftHandAttackAnimations(int dataId)
         {
             WeaponAnimations anims;
-            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.leftHandAttackAnimations != null)
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.leftHandAttackAnimations != null)
                 return anims.leftHandAttackAnimations;
             return defaultAnimations.leftHandAttackAnimations;
         }
@@ -397,7 +407,7 @@ namespace MultiplayerARPG
         public AnimationClip GetRightHandWeaponChargeClip(int dataId)
         {
             WeaponAnimations anims;
-            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.rightHandChargeClip != null)
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.rightHandChargeClip != null)
                 return anims.rightHandChargeClip;
             return defaultAnimations.rightHandChargeClip;
         }
@@ -405,7 +415,7 @@ namespace MultiplayerARPG
         public AnimationClip GetLeftHandWeaponChargeClip(int dataId)
         {
             WeaponAnimations anims;
-            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.leftHandChargeClip != null)
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.leftHandChargeClip != null)
                 return anims.leftHandChargeClip;
             return defaultAnimations.leftHandChargeClip;
         }
@@ -413,7 +423,7 @@ namespace MultiplayerARPG
         public AnimationClip GetSkillCastClip(int dataId)
         {
             SkillAnimations anims;
-            if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out anims) && anims.castClip != null)
+            if (TryGetSkillAnimations(dataId, out anims) && anims.castClip != null)
                 return anims.castClip;
             return defaultAnimations.skillCastClip;
         }
@@ -421,7 +431,7 @@ namespace MultiplayerARPG
         public bool IsSkillCastClipPlayingAllLayers(int dataId)
         {
             SkillAnimations anims;
-            if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out anims) && anims.castClip != null)
+            if (TryGetSkillAnimations(dataId, out anims) && anims.castClip != null)
                 return anims.playCastClipAllLayers;
             return defaultAnimations.playSkillCastClipAllLayers;
         }
@@ -429,7 +439,7 @@ namespace MultiplayerARPG
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
             SkillAnimations anims;
-            if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out anims) && anims.activateAnimation.clip != null)
+            if (TryGetSkillAnimations(dataId, out anims) && anims.activateAnimation.clip != null)
                 return anims.activateAnimation;
             return defaultAnimations.skillActivateAnimation;
         }
@@ -437,7 +447,7 @@ namespace MultiplayerARPG
         public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
             WeaponAnimations anims;
-            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.rightHandReloadAnimation.clip != null)
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.rightHandReloadAnimation.clip != null)
                 return anims.rightHandReloadAnimation;
             return defaultAnimations.rightHandReloadAnimation;
         }
@@ -445,7 +455,7 @@ namespace MultiplayerARPG
         public ActionAnimation GetLeftHandReloadAnimation(int dataId)
         {
             WeaponAnimations anims;
-            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out anims) && anims.leftHandReloadAnimation.clip != null)
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.leftHandReloadAnimation.clip != null)
                 return anims.leftHandReloadAnimation;
             return defaultAnimations.leftHandReloadAnimation;
         }
@@ -549,19 +559,10 @@ namespace MultiplayerARPG
 
         public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
-            if (!GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+            SkillAnimations anims;
+            if (!TryGetSkillAnimations(dataId, out anims))
                 return SkillActivateAnimationType.UseActivateAnimation;
-            return GetAnims().CacheSkillAnimations[dataId].activateAnimationType;
-        }
-
-        protected override WeaponAnimations[] GetWeaponAnims()
-        {
-            return weaponAnimations;
-        }
-
-        protected override SkillAnimations[] GetSkillAnims()
-        {
-            return skillAnimations;
+            return anims.activateAnimationType;
         }
 
 #if UNITY_EDITOR

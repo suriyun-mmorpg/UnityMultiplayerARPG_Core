@@ -520,7 +520,7 @@ namespace MultiplayerARPG
                 weaponItem = GameInstance.Singleton.DefaultWeaponItem;
 
             WeaponAnimations weaponAnimations;
-            GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
+            TryGetWeaponAnimations(weaponItem.WeaponType.DataId, out weaponAnimations);
 
             SetupClips(
                 // Move

@@ -510,7 +510,7 @@ namespace MultiplayerARPG
         protected void SetClipBasedOnWeaponType(WeaponType weaponType)
         {
             WeaponAnimations weaponAnimations;
-            GetAnims().CacheWeaponAnimations.TryGetValue(weaponType.DataId, out weaponAnimations);
+            TryGetWeaponAnimations(weaponType.DataId, out weaponAnimations);
 
             SetupClips(
                 // Move
