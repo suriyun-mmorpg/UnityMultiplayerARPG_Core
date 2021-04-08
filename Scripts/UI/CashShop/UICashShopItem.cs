@@ -107,7 +107,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = Data == null ? null : Data.icon;
+                Sprite iconSprite = Data == null || Data.icon == null ? BuildIcon() : Data.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
@@ -155,24 +155,42 @@ namespace MultiplayerARPG
 
         public string BuildTitle()
         {
-            if (Data.receiveItems.Length > 0)
-                return Data.receiveItems[0].item.Title;
-            if (Data.receiveCurrencies.Length > 0)
-                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
-            if (Data.receiveGold > 0)
-                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.receiveGold.ToString("N0"));
+            if (Data != null)
+            {
+                if (Data.receiveItems.Length > 0)
+                    return Data.receiveItems[0].item.Title;
+                if (Data.receiveCurrencies.Length > 0)
+                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
+                if (Data.receiveGold > 0)
+                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.receiveGold.ToString("N0"));
+            }
             return LanguageManager.GetUnknowTitle();
         }
 
         public string BuildDescription()
         {
-            if (Data.receiveItems.Length > 0)
-                return Data.receiveItems[0].item.Description;
-            if (Data.receiveCurrencies.Length > 0)
-                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
-            if (Data.receiveGold > 0)
-                return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.receiveGold.ToString("N0"));
+            if (Data != null)
+            {
+                if (Data.receiveItems.Length > 0)
+                    return Data.receiveItems[0].item.Description;
+                if (Data.receiveCurrencies.Length > 0)
+                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
+                if (Data.receiveGold > 0)
+                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.receiveGold.ToString("N0"));
+            }
             return LanguageManager.GetUnknowTitle();
+        }
+
+        public Sprite BuildIcon()
+        {
+            if (Data != null)
+            {
+                if (Data.receiveItems.Length > 0)
+                    return Data.receiveItems[0].item.icon;
+                if (Data.receiveCurrencies.Length > 0)
+                    return Data.receiveCurrencies[0].currency.icon;
+            }
+            return null;
         }
 
         IEnumerator LoadExternalIcon()
