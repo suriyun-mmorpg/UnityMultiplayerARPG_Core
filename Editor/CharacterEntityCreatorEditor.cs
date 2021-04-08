@@ -143,6 +143,15 @@ namespace MultiplayerARPG
                     bounds = meshes[i].bounds;
             }
 
+            var skinnedMeshes = newObject.GetComponentsInChildren<SkinnedMeshRenderer>();
+            for (int i = 0; i < skinnedMeshes.Length; ++i)
+            {
+                if (i > 0)
+                    bounds.Encapsulate(skinnedMeshes[i].bounds);
+                else
+                    bounds = skinnedMeshes[i].bounds;
+            }
+
             switch (entityMovementType)
             {
                 case EntityMovementType.CharacterController:
