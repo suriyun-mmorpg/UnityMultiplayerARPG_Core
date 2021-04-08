@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -33,6 +34,7 @@ namespace MultiplayerARPG
         public Transform MeleeDamageTransform
         {
             get { return meleeDamageTransform; }
+            set { meleeDamageTransform = value; }
         }
 
         [Tooltip("When character attack with range weapon, it will spawn missile damage entity from this transform")]
@@ -41,22 +43,27 @@ namespace MultiplayerARPG
         public Transform MissileDamageTransform
         {
             get { return missileDamageTransform; }
+            set { missileDamageTransform = value; }
         }
 
         [Tooltip("Character UI will instantiates to this transform")]
         [SerializeField]
-        private Transform characterUITransform;
-        public Transform CharacterUITransform
+        [FormerlySerializedAs("characterUITransform")]
+        private Transform characterUiTransform;
+        public Transform CharacterUiTransform
         {
-            get { return characterUITransform; }
+            get { return characterUiTransform; }
+            set { characterUiTransform = value; }
         }
 
         [Tooltip("Mini Map UI will instantiates to this transform")]
         [SerializeField]
-        private Transform miniMapUITransform;
-        public Transform MiniMapUITransform
+        [FormerlySerializedAs("miniMapUITransform")]
+        private Transform miniMapUiTransform;
+        public Transform MiniMapUiTransform
         {
-            get { return miniMapUITransform; }
+            get { return miniMapUiTransform; }
+            set { miniMapUiTransform = value; }
         }
 
 #if UNITY_EDITOR
@@ -73,6 +80,7 @@ namespace MultiplayerARPG
         public CharacterRace Race
         {
             get { return race; }
+            set { race = value; }
         }
 
         #region Protected data
@@ -127,10 +135,10 @@ namespace MultiplayerARPG
                 meleeDamageTransform = CacheTransform;
             if (missileDamageTransform == null)
                 missileDamageTransform = MeleeDamageTransform;
-            if (characterUITransform == null)
-                characterUITransform = CacheTransform;
-            if (miniMapUITransform == null)
-                miniMapUITransform = CacheTransform;
+            if (characterUiTransform == null)
+                characterUiTransform = CacheTransform;
+            if (miniMapUiTransform == null)
+                miniMapUiTransform = CacheTransform;
             ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
         }
 
@@ -357,7 +365,7 @@ namespace MultiplayerARPG
                 return;
             if (UICharacterEntity != null)
                 Destroy(UICharacterEntity.gameObject);
-            UICharacterEntity = Instantiate(prefab, CharacterUITransform);
+            UICharacterEntity = Instantiate(prefab, CharacterUiTransform);
             UICharacterEntity.transform.localPosition = Vector3.zero;
             UICharacterEntity.Data = this;
         }

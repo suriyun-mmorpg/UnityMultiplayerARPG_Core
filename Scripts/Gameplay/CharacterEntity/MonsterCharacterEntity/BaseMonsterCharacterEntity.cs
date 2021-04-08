@@ -71,16 +71,47 @@ namespace MultiplayerARPG
             }
         }
 
-        public SummonType SummonType { get { return (SummonType)summonType.Value; } protected set { summonType.Value = (byte)value; } }
-        public bool IsSummoned { get { return SummonType != SummonType.None; } }
+        public SummonType SummonType
+        {
+            get { return (SummonType)summonType.Value; }
+            protected set { summonType.Value = (byte)value; }
+        }
+
+        public bool IsSummoned
+        {
+            get { return SummonType != SummonType.None; }
+        }
+
         public GameSpawnArea<BaseMonsterCharacterEntity> SpawnArea { get; protected set; }
+
         public BaseMonsterCharacterEntity SpawnPrefab { get; protected set; }
+
         public short SpawnLevel { get; protected set; }
+
         public Vector3 SpawnPosition { get; protected set; }
-        public MonsterCharacter CharacterDatabase { get { return characterDatabase; } }
-        public override int DataId { get { return CharacterDatabase.DataId; } set { } }
-        public float DestroyDelay { get { return destroyDelay; } }
-        public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
+
+        public MonsterCharacter CharacterDatabase
+        {
+            get { return characterDatabase; }
+            set { characterDatabase = value; }
+        }
+
+        public override int DataId
+        {
+            get { return CharacterDatabase.DataId; }
+            set { }
+        }
+
+        public float DestroyDelay
+        {
+            get { return destroyDelay; }
+        }
+
+        public float DestroyRespawnDelay
+        {
+            get { return destroyRespawnDelay; }
+        }
+
         protected override bool UpdateEntityComponents
         {
             get
@@ -195,7 +226,7 @@ namespace MultiplayerARPG
                 foreach (GameObject obj in CurrentGameInstance.monsterCharacterMiniMapObjects)
                 {
                     if (obj == null) continue;
-                    Instantiate(obj, MiniMapUITransform.position, MiniMapUITransform.rotation, MiniMapUITransform);
+                    Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
                 }
             }
             // UI which show monster information

@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                     foreach (GameObject obj in CurrentGameInstance.owningCharacterMiniMapObjects)
                     {
                         if (obj == null) continue;
-                        Instantiate(obj, MiniMapUITransform.position, MiniMapUITransform.rotation, MiniMapUITransform);
+                        Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
                     }
                 }
                 if (CurrentGameInstance.owningCharacterUI != null)
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
                     foreach (GameObject obj in CurrentGameInstance.nonOwningCharacterMiniMapObjects)
                     {
                         if (obj == null) continue;
-                        Instantiate(obj, MiniMapUITransform.position, MiniMapUITransform.rotation, MiniMapUITransform);
+                        Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
                     }
                 }
                 if (CurrentGameInstance.nonOwningCharacterUI != null)

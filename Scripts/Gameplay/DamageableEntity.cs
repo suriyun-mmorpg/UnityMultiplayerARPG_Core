@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         public Transform CombatTextTransform
         {
             get { return combatTextTransform; }
+            set { combatTextTransform = value; }
         }
 
         [Tooltip("This is transform for other entities to aim to this entity")]
@@ -23,6 +24,7 @@ namespace MultiplayerARPG
         public Transform OpponentAimTransform
         {
             get { return opponentAimTransform; }
+            set { opponentAimTransform = value; }
         }
 
         [Header("Damageable Entity Events")]

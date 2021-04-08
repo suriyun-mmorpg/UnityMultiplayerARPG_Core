@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         public PlayerCharacter[] CharacterDatabases
         {
             get { return characterDatabases; }
+            set { characterDatabases = value; }
         }
 
         public BasePlayerCharacterController ControllerPrefab

@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         private BaseCharacterModel mainModel;
-        public BaseCharacterModel MainModel { get { return mainModel; } }
+        public BaseCharacterModel MainModel { get { return mainModel; } set { mainModel = value; } }
 
         [SerializeField]
         private BaseCharacterModel fpsModelPrefab;
