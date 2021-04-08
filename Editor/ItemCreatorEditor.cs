@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UtilsComponents;
+using UnityEditor.SceneManagement;
 
 namespace MultiplayerARPG
 {
@@ -11,6 +12,7 @@ namespace MultiplayerARPG
         private string fileName;
         private string id;
         private ItemType itemType;
+        private GameDatabase gameDatabase;
         private GameObject dropModel;
         private Vector3 dropModelOffsets;
         private Vector3 dropModelRotateOffsets;
@@ -24,10 +26,25 @@ namespace MultiplayerARPG
         private static Vector3 savedDropModelOffsets;
         private static Vector3 savedDropModelRotateOffsets;
 
-        [MenuItem("MMORPG KIT/Item Creator", false, 0)]
-        public static void CreateNewCharacter()
+        [MenuItem("MMORPG KIT/Item Creator", false, 1)]
+        public static void CreateNewItem()
         {
-            GetWindow<ItemCreatorEditor>();
+            bool gettingWindow;
+            if (EditorGlobalData.EditorScene.HasValue)
+            {
+                gettingWindow = true;
+                EditorSceneManager.CloseScene(EditorGlobalData.EditorScene.Value, true);
+                EditorGlobalData.EditorScene = null;
+            }
+            else
+            {
+                gettingWindow = EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
+            }
+            if (gettingWindow)
+            {
+                EditorGlobalData.EditorScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+                GetWindow<ItemCreatorEditor>();
+            }
         }
 
         private void OnGUI()
@@ -40,9 +57,12 @@ namespace MultiplayerARPG
             {
                 GUILayout.BeginVertical("box");
                 {
-                    fileName = EditorGUILayout.TextField("Filename: ", fileName);
-                    id = EditorGUILayout.TextField("ID: ", id);
-                    itemType = (ItemType)EditorGUILayout.EnumPopup("Item to create:", itemType);
+                    fileName = EditorGUILayout.TextField("Filename", fileName);
+                    id = EditorGUILayout.TextField("ID", id);
+                    itemType = (ItemType)EditorGUILayout.EnumPopup("Item to create", itemType);
+                    if (gameDatabase == null)
+                        EditorGUILayout.HelpBox("Select your game database which you want to add new item data, leave it `None` if you don't want to add item data to game database", MessageType.Info);
+                    gameDatabase = EditorGUILayout.ObjectField("Game database", dropModel, typeof(GameDatabase), true, GUILayout.ExpandWidth(true)) as GameDatabase;
                     if (dropModel == null)
                         EditorGUILayout.HelpBox("Select your FBX model which you want to use as drop model", MessageType.Info);
                     dropModel = EditorGUILayout.ObjectField("Drop Model", dropModel, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
@@ -276,9 +296,26 @@ namespace MultiplayerARPG
 
 
             var itemDataSavePath = path + "\\" + fileName + ".asset";
-            Debug.Log("Saving item data to " + dropModelSavePath);
+            Debug.Log("Saving item data to " + itemDataSavePath);
             AssetDatabase.DeleteAsset(itemDataSavePath);
             AssetDatabase.CreateAsset(newItemData, itemDataSavePath);
+
+            if (gameDatabase != null)
+            {
+                BaseItem savedItem = AssetDatabase.LoadAssetAtPath<BaseItem>(itemDataSavePath);
+                List<BaseItem> items = new List<BaseItem>(gameDatabase.items);
+                for (int i = items.Count - 1; i >= 0; --i)
+                {
+                    if (items[i].Id.Equals(savedItem.Id))
+                    {
+                        Debug.Log("Found old item data with the same ID " + i + ", old item data will be removed from the list in game database");
+                        items.RemoveAt(i);
+                    }
+                }
+                items.Add(savedItem);
+                gameDatabase.items = items.ToArray();
+                EditorUtility.SetDirty(gameDatabase);
+            }
         }
     }
 }
