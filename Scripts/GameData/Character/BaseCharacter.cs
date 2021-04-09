@@ -48,6 +48,9 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+            GameInstance.AddAttributes(Attributes);
+            GameInstance.AddDamageElements(Resistances);
+            GameInstance.AddDamageElements(Armors);
             GameInstance.AddSkills(CacheSkillLevels.Keys);
         }
     }

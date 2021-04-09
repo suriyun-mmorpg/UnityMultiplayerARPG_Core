@@ -234,6 +234,8 @@ namespace MultiplayerARPG
             GameInstance.AddPoolingObjects(damageHitEffects);
             GameInstance.AddPoolingObjects(GetBuff().effects);
             GameInstance.AddPoolingObjects(GetDebuff().effects);
+            GetBuff().PrepareRelatesData();
+            GetDebuff().PrepareRelatesData();
         }
 
         public GameEffect[] GetSkillCastEffect()

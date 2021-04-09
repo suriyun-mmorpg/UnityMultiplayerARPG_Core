@@ -35,5 +35,14 @@ namespace MultiplayerARPG
         public bool isHide;
         public bool muteFootstepSound;
         public GameEffect[] effects;
+
+        public void PrepareRelatesData()
+        {
+            GameInstance.AddAttributes(increaseAttributes);
+            GameInstance.AddAttributes(increaseAttributesRate);
+            GameInstance.AddDamageElements(increaseResistances);
+            GameInstance.AddDamageElements(increaseArmors);
+            GameInstance.AddDamageElements(increaseDamages);
+        }
     }
 }

@@ -1,5 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -81,6 +85,74 @@ namespace MultiplayerARPG
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
+
+            List<Attribute> tempAttributes = new List<Attribute>(GameInstance.Attributes.Values);
+            tempAttributes.Sort();
+            attributes = tempAttributes.ToArray();
+
+            List<Currency> tempCurrencies = new List<Currency>(GameInstance.Currencies.Values);
+            tempCurrencies.Sort();
+            currencies = tempCurrencies.ToArray();
+
+            List<DamageElement> tempDamageElements = new List<DamageElement>(GameInstance.DamageElements.Values);
+            tempDamageElements.Sort();
+            damageElements = tempDamageElements.ToArray();
+
+            List<BaseItem> tempItems = new List<BaseItem>(GameInstance.Items.Values);
+            tempItems.Sort();
+            items = tempItems.ToArray();
+
+            List<ItemCraftFormula> tempItemCraftFormulas = new List<ItemCraftFormula>(GameInstance.ItemCraftFormulas.Values);
+            tempItemCraftFormulas.Sort();
+            itemCraftFormulas = tempItemCraftFormulas.ToArray();
+
+            List<ArmorType> tempArmorTypes = new List<ArmorType>(GameInstance.ArmorTypes.Values);
+            tempArmorTypes.Sort();
+            armorTypes = tempArmorTypes.ToArray();
+
+            List<WeaponType> tempWeaponTypes = new List<WeaponType>(GameInstance.WeaponTypes.Values);
+            tempWeaponTypes.Sort();
+            weaponTypes = tempWeaponTypes.ToArray();
+
+            List<AmmoType> tempAmmoTypes = new List<AmmoType>(GameInstance.AmmoTypes.Values);
+            tempAmmoTypes.Sort();
+            ammoTypes = tempAmmoTypes.ToArray();
+
+            List<BaseSkill> tempSkills = new List<BaseSkill>(GameInstance.Skills.Values);
+            tempSkills.Sort();
+            skills = tempSkills.ToArray();
+
+            List<GuildSkill> tempGuildSkills = new List<GuildSkill>(GameInstance.GuildSkills.Values);
+            tempGuildSkills.Sort();
+            guildSkills = tempGuildSkills.ToArray();
+
+            List<PlayerCharacter> tempPlayerCharacters = new List<PlayerCharacter>(GameInstance.PlayerCharacters.Values);
+            tempPlayerCharacters.Sort();
+            playerCharacters = tempPlayerCharacters.ToArray();
+
+            List<MonsterCharacter> tempMonsterCharacters = new List<MonsterCharacter>(GameInstance.MonsterCharacters.Values);
+            tempMonsterCharacters.Sort();
+            monsterCharacters = tempMonsterCharacters.ToArray();
+
+            List<Harvestable> tempHarvestables = new List<Harvestable>(GameInstance.Harvestables.Values);
+            tempHarvestables.Sort();
+            harvestables = tempHarvestables.ToArray();
+
+            List<BaseMapInfo> tempMapInfos = new List<BaseMapInfo>(GameInstance.MapInfos.Values);
+            tempMapInfos.Sort();
+            mapInfos = tempMapInfos.ToArray();
+
+            List<Quest> tempQuests = new List<Quest>(GameInstance.Quests.Values);
+            tempQuests.Sort();
+            quests = tempQuests.ToArray();
+
+            List<Faction> tempFactions = new List<Faction>(GameInstance.Factions.Values);
+            tempFactions.Sort();
+            factions = tempFactions.ToArray();
+
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
+#endif
         }
     }
 }

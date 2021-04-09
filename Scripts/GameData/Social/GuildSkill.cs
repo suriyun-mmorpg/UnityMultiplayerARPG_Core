@@ -109,5 +109,11 @@ namespace MultiplayerARPG
                 duration = 0f;
             return duration;
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            buff.PrepareRelatesData();
+        }
     }
 }

@@ -712,6 +712,36 @@ namespace MultiplayerARPG
             AddManyGameData(Attributes, attributes);
         }
 
+        public static void AddAttributes(params AttributeAmount[] attributeAmounts)
+        {
+            AddAttributes((IEnumerable<AttributeAmount>)attributeAmounts);
+        }
+
+        public static void AddAttributes(IEnumerable<AttributeAmount> attributeAmounts)
+        {
+            if (attributeAmounts == null)
+                return;
+            foreach (AttributeAmount attributeAmount in attributeAmounts)
+            {
+                AddGameData(Attributes, attributeAmount.attribute);
+            }
+        }
+
+        public static void AddAttributes(params AttributeIncremental[] attributeIncrementals)
+        {
+            AddAttributes((IEnumerable<AttributeIncremental>)attributeIncrementals);
+        }
+
+        public static void AddAttributes(IEnumerable<AttributeIncremental> attributeIncrementals)
+        {
+            if (attributeIncrementals == null)
+                return;
+            foreach (AttributeIncremental attributeIncremental in attributeIncrementals)
+            {
+                AddGameData(Attributes, attributeIncremental.attribute);
+            }
+        }
+
         public static void AddCurrencies(params Currency[] currencies)
         {
             AddCurrencies((IEnumerable<Currency>)currencies);
@@ -999,6 +1029,36 @@ namespace MultiplayerARPG
             AddManyGameData(Factions, factions);
         }
 
+        public static void AddDamageElements(params ArmorAmount[] armorAmounts)
+        {
+            AddDamageElements((IEnumerable<ArmorAmount>)armorAmounts);
+        }
+
+        public static void AddDamageElements(IEnumerable<ArmorAmount> armorAmounts)
+        {
+            if (armorAmounts == null)
+                return;
+            foreach (ArmorAmount armorAmount in armorAmounts)
+            {
+                AddGameData(DamageElements, armorAmount.damageElement);
+            }
+        }
+
+        public static void AddDamageElements(params ArmorIncremental[] armorIncrementals)
+        {
+            AddDamageElements((IEnumerable<ArmorIncremental>)armorIncrementals);
+        }
+
+        public static void AddDamageElements(IEnumerable<ArmorIncremental> armorIncrementals)
+        {
+            if (armorIncrementals == null)
+                return;
+            foreach (ArmorIncremental armorIncremental in armorIncrementals)
+            {
+                AddGameData(DamageElements, armorIncremental.damageElement);
+            }
+        }
+
         public static void AddDamageElements(params DamageAmount[] damageAmounts)
         {
             AddDamageElements((IEnumerable<DamageAmount>)damageAmounts);
@@ -1037,6 +1097,36 @@ namespace MultiplayerARPG
         public static void AddDamageElements(IEnumerable<DamageElement> damageElements)
         {
             AddManyGameData(DamageElements, damageElements);
+        }
+
+        public static void AddDamageElements(params ResistanceAmount[] resistanceAmounts)
+        {
+            AddDamageElements((IEnumerable<ResistanceAmount>)resistanceAmounts);
+        }
+
+        public static void AddDamageElements(IEnumerable<ResistanceAmount> resistanceAmounts)
+        {
+            if (resistanceAmounts == null)
+                return;
+            foreach (ResistanceAmount resistanceAmount in resistanceAmounts)
+            {
+                AddGameData(DamageElements, resistanceAmount.damageElement);
+            }
+        }
+
+        public static void AddDamageElements(params ResistanceIncremental[] resistanceIncrementals)
+        {
+            AddDamageElements((IEnumerable<ResistanceIncremental>)resistanceIncrementals);
+        }
+
+        public static void AddDamageElements(IEnumerable<ResistanceIncremental> resistanceIncrementals)
+        {
+            if (resistanceIncrementals == null)
+                return;
+            foreach (ResistanceIncremental resistanceIncremental in resistanceIncrementals)
+            {
+                AddGameData(DamageElements, resistanceIncremental.damageElement);
+            }
         }
 
         public static void AddEquipmentSets(params EquipmentSet[] equipmentSets)

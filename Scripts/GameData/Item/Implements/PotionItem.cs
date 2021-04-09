@@ -47,5 +47,11 @@ namespace MultiplayerARPG
         {
 
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            Buff.PrepareRelatesData();
+        }
     }
 }

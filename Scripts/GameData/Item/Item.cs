@@ -457,6 +457,10 @@ namespace MultiplayerARPG
             GameInstance.AddBuildingEntities(buildingEntity);
             GameInstance.AddCharacterEntities(petEntity);
             GameInstance.AddVehicleEntities(mountEntity);
+            GameInstance.AddAttributes(increaseAttributes);
+            GameInstance.AddAttributes(increaseAttributesRate);
+            GameInstance.AddDamageElements(increaseResistances);
+            GameInstance.AddDamageElements(increaseArmors);
             GameInstance.AddDamageElements(increaseDamages);
             GameInstance.AddDamageElements(damageAmount);
             GameInstance.AddSkills(increaseSkillLevels);
@@ -467,6 +471,7 @@ namespace MultiplayerARPG
             GameInstance.AddArmorTypes(armorType);
             GameInstance.AddWeaponTypes(weaponType);
             GameInstance.AddAmmoTypes(ammoType);
+            buff.PrepareRelatesData();
         }
 
         public Item GenerateDefaultItem(WeaponType type)
