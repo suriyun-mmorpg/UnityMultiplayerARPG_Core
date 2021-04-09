@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void SendAddPartyMembersToMembers(this IServerGameMessageHandlers handlers, PartyData party, string characterId, string characterName, int dataId, short level)
+        public static void SendAddPartyMemberToMembers(this IServerGameMessageHandlers handlers, PartyData party, string characterId, string characterName, int dataId, short level)
         {
             if (party == null)
                 return;
@@ -176,7 +176,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void SendAddGuildMembersToMembers(this IServerGameMessageHandlers handlers, GuildData guild, string characterId, string characterName, int dataId, short level)
+        public static void SendAddGuildMemberToMembers(this IServerGameMessageHandlers handlers, GuildData guild, string characterId, string characterName, int dataId, short level)
         {
             if (guild == null)
                 return;
