@@ -122,7 +122,7 @@ namespace MultiplayerARPG
                 }
                 GUILayout.EndVertical();
 
-                if (dropModel != null && !string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(id))
+                if (!string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(id))
                 {
                     savedDropModelOffsets = dropModelOffsets;
                     savedDropModelRotateOffsets = dropModelRotateOffsets;
@@ -141,18 +141,21 @@ namespace MultiplayerARPG
             path = path.Substring(path.IndexOf("Assets"));
 
             // Create drop item
-            GameObject savedDropModel;
-            var newDropModelPlaceHolder = new GameObject(fileName + "_DropModel");
-            newDropModelPlaceHolder.AddComponent<PivotHighlighter>();
-            var newDropModel = Instantiate(dropModel, newDropModelPlaceHolder.transform);
-            newDropModel.transform.localPosition = dropModelOffsets;
-            newDropModel.transform.localEulerAngles = dropModelRotateOffsets;
-            newDropModel.transform.localScale = Vector3.one;
+            GameObject savedDropModel = null;
+            if (dropModel != null)
+            {
+                var newDropModelPlaceHolder = new GameObject(fileName + "_DropModel");
+                newDropModelPlaceHolder.AddComponent<PivotHighlighter>();
+                var newDropModel = Instantiate(dropModel, newDropModelPlaceHolder.transform);
+                newDropModel.transform.localPosition = dropModelOffsets;
+                newDropModel.transform.localEulerAngles = dropModelRotateOffsets;
+                newDropModel.transform.localScale = Vector3.one;
 
-            var dropModelSavePath = path + "\\" + fileName + "_DropModel.prefab";
-            Debug.Log("Saving drop model to " + dropModelSavePath);
-            AssetDatabase.DeleteAsset(dropModelSavePath);
-            savedDropModel = PrefabUtility.SaveAsPrefabAssetAndConnect(newDropModelPlaceHolder, dropModelSavePath, InteractionMode.AutomatedAction);
+                var dropModelSavePath = path + "\\" + fileName + "_DropModel.prefab";
+                Debug.Log("Saving drop model to " + dropModelSavePath);
+                AssetDatabase.DeleteAsset(dropModelSavePath);
+                savedDropModel = PrefabUtility.SaveAsPrefabAssetAndConnect(newDropModelPlaceHolder, dropModelSavePath, InteractionMode.AutomatedAction);
+            }
 
             // Create equip model
             GameObject savedEquipModelR = null;
@@ -166,7 +169,7 @@ namespace MultiplayerARPG
                 newMissileDamageTransform.transform.localScale = Vector3.one;
                 var newEntity = newEquipModelPlaceHolder.AddComponent<EquipmentEntity>();
                 newEntity.missileDamageTransform = newMissileDamageTransform.transform;
-                var newEquipModel = Instantiate(dropModel, newEquipModelPlaceHolder.transform);
+                var newEquipModel = Instantiate(equipModelR, newEquipModelPlaceHolder.transform);
                 newEquipModel.transform.localPosition = Vector3.zero;
                 newEquipModel.transform.localEulerAngles = Vector3.zero;
                 newEquipModel.transform.localScale = Vector3.one;
@@ -189,7 +192,7 @@ namespace MultiplayerARPG
                 newMissileDamageTransform.transform.localScale = Vector3.one;
                 var newEntity = newEquipModelPlaceHolder.AddComponent<EquipmentEntity>();
                 newEntity.missileDamageTransform = newMissileDamageTransform.transform;
-                var newEquipModel = Instantiate(dropModel, newEquipModelPlaceHolder.transform);
+                var newEquipModel = Instantiate(equipModelL, newEquipModelPlaceHolder.transform);
                 newEquipModel.transform.localPosition = Vector3.zero;
                 newEquipModel.transform.localEulerAngles = Vector3.zero;
                 newEquipModel.transform.localScale = Vector3.one;
@@ -246,8 +249,8 @@ namespace MultiplayerARPG
                 newItemData = Instantiate(copySource);
             }
             newItemData.id = id;
-
-            newItemData.DropModel = savedDropModel;
+            if (savedDropModel != null)
+                newItemData.DropModel = savedDropModel;
 
             if (savedEquipModelR != null && (itemType == ItemType.Armor || itemType == ItemType.Weapon || itemType == ItemType.Shield))
             {
