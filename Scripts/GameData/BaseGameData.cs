@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameData : ScriptableObject, IGameData
+    public abstract partial class BaseGameData : ScriptableObject, IGameData, IComparable
     {
         [Header("Game Data Configs")]
         [Tooltip("Game data ID, if this is empty it will uses file's name as ID")]
@@ -22,7 +23,7 @@ namespace MultiplayerARPG
         public LanguageData[] descriptions;
         public string category;
         public Sprite icon;
-        
+
         public virtual string Id
         {
             get { return string.IsNullOrEmpty(id) ? name : id; }
@@ -69,6 +70,18 @@ namespace MultiplayerARPG
         public virtual void PrepareRelatesData()
         {
 
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj == null)
+                return 1;
+
+            BaseGameData otherGameData = obj as BaseGameData;
+            if (otherGameData != null)
+                return Id.CompareTo(otherGameData.Id);
+            else
+                throw new ArgumentException("Object is not a BaseGameData");
         }
     }
 }
