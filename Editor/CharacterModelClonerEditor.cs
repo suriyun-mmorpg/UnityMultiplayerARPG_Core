@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         private BaseRemakeCharacterModel dstModel;
         private bool cloneEffectContainers;
         private bool cloneEquipmentContainers;
+        private bool cloneHitboxes;
         private bool cloneDefaultAnimations;
         private bool cloneWeaponAnimations;
         private bool cloneSkillAnimations;
@@ -48,11 +49,13 @@ namespace MultiplayerARPG
                     {
                         cloneEffectContainers = EditorGUILayout.Toggle("Clone Effect Containers", cloneEffectContainers);
                         cloneEquipmentContainers = EditorGUILayout.Toggle("Clone Equipment Containers", cloneEquipmentContainers);
+                        cloneHitboxes = EditorGUILayout.Toggle("Clone Hitboxes", cloneHitboxes);
                     }
                     else
                     {
                         cloneEffectContainers = false;
                         cloneEquipmentContainers = false;
+                        cloneHitboxes = false;
                     }
                     cloneDefaultAnimations = EditorGUILayout.Toggle("Clone Default Animations", cloneDefaultAnimations);
                     cloneWeaponAnimations = EditorGUILayout.Toggle("Clone Weapon Animations", cloneWeaponAnimations);
@@ -82,22 +85,24 @@ namespace MultiplayerARPG
                     bool isRootTransform;
                     HumanBodyBones bone;
                     Transform cloneSrc;
-                    FindBoneAndRootContainer(srcModel.transform.root, (srcModel as AnimatorCharacterModel).animator, srcModel.EquipmentContainers[i].transform, out isRootTransform, out bone, out cloneSrc);
+                    List<int> childIndexes;
+                    FindBoneAndRootContainer(srcModel.transform.root, (srcModel as AnimatorCharacterModel).animator, srcModel.EquipmentContainers[i].transform, out isRootTransform, out bone, out cloneSrc, out childIndexes);
                     if (cloneSrc != null)
                     {
                         if (isRootTransform)
                         {
                             newObj = Instantiate(cloneSrc.gameObject, dstModel.transform.root);
-                            newObj.transform.localPosition = cloneSrc.localPosition;
-                            newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
-                            newObj.transform.localRotation = cloneSrc.localRotation;
                         }
                         else
                         {
                             newObj = Instantiate(cloneSrc.gameObject, (dstModel as AnimatorCharacterModel).animator.GetBoneTransform(bone));
-                            newObj.transform.localPosition = cloneSrc.localPosition;
-                            newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
-                            newObj.transform.localRotation = cloneSrc.localRotation;
+                        }
+                        newObj.transform.localPosition = cloneSrc.localPosition;
+                        newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
+                        newObj.transform.localRotation = cloneSrc.localRotation;
+                        for (int j = 0; j < childIndexes.Count; ++j)
+                        {
+                            newObj = newObj.transform.GetChild(j).gameObject;
                         }
                     }
                     containers.Add(new EffectContainer()
@@ -117,22 +122,24 @@ namespace MultiplayerARPG
                     bool isRootTransform;
                     HumanBodyBones bone;
                     Transform cloneSrc;
-                    FindBoneAndRootContainer(srcModel.transform.root, (srcModel as AnimatorCharacterModel).animator, srcModel.EquipmentContainers[i].transform, out isRootTransform, out bone, out cloneSrc);
+                    List<int> childIndexes;
+                    FindBoneAndRootContainer(srcModel.transform.root, (srcModel as AnimatorCharacterModel).animator, srcModel.EquipmentContainers[i].transform, out isRootTransform, out bone, out cloneSrc, out childIndexes);
                     if (cloneSrc != null)
                     {
                         if (isRootTransform)
                         {
                             newObj = Instantiate(cloneSrc.gameObject, dstModel.transform.root);
-                            newObj.transform.localPosition = cloneSrc.localPosition;
-                            newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
-                            newObj.transform.localRotation = cloneSrc.localRotation;
                         }
                         else
                         {
                             newObj = Instantiate(cloneSrc.gameObject, (dstModel as AnimatorCharacterModel).animator.GetBoneTransform(bone));
-                            newObj.transform.localPosition = cloneSrc.localPosition;
-                            newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
-                            newObj.transform.localRotation = cloneSrc.localRotation;
+                        }
+                        newObj.transform.localPosition = cloneSrc.localPosition;
+                        newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
+                        newObj.transform.localRotation = cloneSrc.localRotation;
+                        for (int j = 0; j < childIndexes.Count; ++j)
+                        {
+                            newObj = newObj.transform.GetChild(j).gameObject;
                         }
                     }
                     containers.Add(new EquipmentContainer()
@@ -142,6 +149,32 @@ namespace MultiplayerARPG
                     });
                 }
                 dstModel.EquipmentContainers = containers.ToArray();
+            }
+            if (cloneHitboxes)
+            {
+                DamageableHitBox[] hitBoxes = srcModel.transform.root.GetComponentsInChildren<DamageableHitBox>(true);
+                for (int i = 0; i < hitBoxes.Length; ++i)
+                {
+                    GameObject newObj;
+                    bool isRootTransform;
+                    HumanBodyBones bone;
+                    Transform cloneSrc;
+                    FindBoneAndRootContainer(srcModel.transform.root, (srcModel as AnimatorCharacterModel).animator, hitBoxes[i].transform, out isRootTransform, out bone, out cloneSrc, out _);
+                    if (cloneSrc != null)
+                    {
+                        if (isRootTransform)
+                        {
+                            newObj = Instantiate(cloneSrc.gameObject, dstModel.transform.root);
+                        }
+                        else
+                        {
+                            newObj = Instantiate(cloneSrc.gameObject, (dstModel as AnimatorCharacterModel).animator.GetBoneTransform(bone));
+                        }
+                        newObj.transform.localPosition = cloneSrc.localPosition;
+                        newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
+                        newObj.transform.localRotation = cloneSrc.localRotation;
+                    }
+                }
             }
             if (cloneDefaultAnimations)
             {
@@ -157,11 +190,12 @@ namespace MultiplayerARPG
             }
         }
 
-        private void FindBoneAndRootContainer(Transform rootTransform, Animator srcAnimator, Transform srcTransform, out bool isRootTransform, out HumanBodyBones bone, out Transform cloneSrc)
+        private void FindBoneAndRootContainer(Transform rootTransform, Animator srcAnimator, Transform srcTransform, out bool isRootTransform, out HumanBodyBones bone, out Transform cloneSrc, out List<int> childIndexes)
         {
             isRootTransform = false;
             bone = HumanBodyBones.Hips;
             cloneSrc = null;
+            childIndexes = new List<int>();
             if (srcTransform == null)
                 return;
             cloneSrc = srcTransform;
@@ -175,6 +209,7 @@ namespace MultiplayerARPG
                         return;
                     }
                 }
+                childIndexes.Add(srcTransform.GetSiblingIndex());
                 srcTransform = srcTransform.parent;
                 cloneSrc = srcTransform;
             } while (srcTransform.parent != rootTransform);
