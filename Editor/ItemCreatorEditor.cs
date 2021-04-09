@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                     itemType = (ItemType)EditorGUILayout.EnumPopup("Item to create", itemType);
                     if (gameDatabase == null)
                         EditorGUILayout.HelpBox("Select your game database which you want to add new item data, leave it `None` if you don't want to add item data to game database", MessageType.Info);
-                    gameDatabase = EditorGUILayout.ObjectField("Game database", dropModel, typeof(GameDatabase), true, GUILayout.ExpandWidth(true)) as GameDatabase;
+                    gameDatabase = EditorGUILayout.ObjectField("Game database", gameDatabase, typeof(GameDatabase), true, GUILayout.ExpandWidth(true)) as GameDatabase;
                     if (dropModel == null)
                         EditorGUILayout.HelpBox("Select your FBX model which you want to use as drop model", MessageType.Info);
                     dropModel = EditorGUILayout.ObjectField("Drop Model", dropModel, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
