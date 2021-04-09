@@ -211,6 +211,12 @@ namespace MultiplayerARPG
                         {
                             savedData
                         };
+                        if (gameDatabase != null)
+                        {
+                            List<PlayerCharacter> list = new List<PlayerCharacter>(gameDatabase.playerCharacters);
+                            list.Add(savedData);
+                            gameDatabase.playerCharacters = list.ToArray();
+                        }
                     }
                     break;
                 case CharacterEntityType.MonsterCharacterEntity:
@@ -235,6 +241,12 @@ namespace MultiplayerARPG
                         AssetDatabase.CreateAsset(data, dataSavePath);
                         MonsterCharacter savedData = AssetDatabase.LoadAssetAtPath<MonsterCharacter>(dataSavePath);
                         monsterCharacterEntity.CharacterDatabase = savedData;
+                        if (gameDatabase != null)
+                        {
+                            List<MonsterCharacter> list = new List<MonsterCharacter>(gameDatabase.monsterCharacters);
+                            list.Add(savedData);
+                            gameDatabase.monsterCharacters = list.ToArray();
+                        }
                     }
                     break;
             }
