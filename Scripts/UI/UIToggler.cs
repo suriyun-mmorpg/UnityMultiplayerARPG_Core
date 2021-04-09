@@ -14,6 +14,8 @@ public class UIToggler : MonoBehaviour
 
     private void Update()
     {
+        if (GenericUtils.IsFocusInputField())
+            return;
         if (Input.GetKeyDown(keyCode) || InputManager.GetButtonDown(buttonName))
             ui.Toggle();
     }
