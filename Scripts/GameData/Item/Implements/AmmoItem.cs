@@ -31,5 +31,11 @@ namespace MultiplayerARPG
         {
             get { return increaseDamages; }
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddAmmoTypes(AmmoType);
+        }
     }
 }

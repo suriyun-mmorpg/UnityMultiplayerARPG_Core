@@ -51,5 +51,11 @@ namespace MultiplayerARPG
             requireAmmoType = null;
             return this;
         }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddAmmoTypes(RequireAmmoType);
+        }
     }
 }

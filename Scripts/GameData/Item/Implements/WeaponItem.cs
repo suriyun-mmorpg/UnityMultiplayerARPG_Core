@@ -157,6 +157,7 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             GameInstance.AddDamageElements(DamageAmount);
             GameInstance.AddPoolingWeaponLaunchEffects(OffHandEquipmentModels);
+            GameInstance.AddWeaponTypes(WeaponType);
         }
     }
 }

@@ -72,6 +72,9 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
         public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
+        public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
+        public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
+        public static readonly Dictionary<int, AmmoType> AmmoTypes = new Dictionary<int, AmmoType>();
         public static readonly Dictionary<int, BaseSkill> Skills = new Dictionary<int, BaseSkill>();
         public static readonly Dictionary<int, BaseNpcDialog> NpcDialogs = new Dictionary<int, BaseNpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
@@ -475,7 +478,17 @@ namespace MultiplayerARPG
                 IgnoreRaycastLayersValues.Add(layer.LayerIndex);
             }
 
-            // Load game data
+            ClearData();
+            this.InvokeInstanceDevExtMethods("Awake");
+        }
+
+        protected virtual void Start()
+        {
+            GameDatabase.LoadData(this);
+        }
+
+        public static void ClearData()
+        {
             Attributes.Clear();
             Currencies.Clear();
             Items.Clear();
@@ -497,13 +510,6 @@ namespace MultiplayerARPG
             MapNpcs.Clear();
             MapInfos.Clear();
             PoolingObjectPrefabs.Clear();
-
-            this.InvokeInstanceDevExtMethods("Awake");
-        }
-
-        protected virtual void Start()
-        {
-            GameDatabase.LoadData(this);
         }
 
         public void LoadedGameData()
@@ -804,6 +810,36 @@ namespace MultiplayerARPG
         public static void AddHarvestables(IEnumerable<Harvestable> harvestables)
         {
             AddManyGameData(Harvestables, harvestables);
+        }
+
+        public static void AddArmorTypes(params ArmorType[] armorTypes)
+        {
+            AddArmorTypes((IEnumerable<ArmorType>)armorTypes);
+        }
+
+        public static void AddArmorTypes(IEnumerable<ArmorType> armorTypes)
+        {
+            AddManyGameData(ArmorTypes, armorTypes);
+        }
+
+        public static void AddWeaponTypes(params WeaponType[] weaponTypes)
+        {
+            AddWeaponTypes((IEnumerable<WeaponType>)weaponTypes);
+        }
+
+        public static void AddWeaponTypes(IEnumerable<WeaponType> weaponTypes)
+        {
+            AddManyGameData(WeaponTypes, weaponTypes);
+        }
+
+        public static void AddAmmoTypes(params AmmoType[] ammoTypes)
+        {
+            AddAmmoTypes((IEnumerable<AmmoType>)ammoTypes);
+        }
+
+        public static void AddAmmoTypes(IEnumerable<AmmoType> ammoTypes)
+        {
+            AddManyGameData(AmmoTypes, ammoTypes);
         }
 
         public static void AddSkills(params SkillLevel[] skillLevels)

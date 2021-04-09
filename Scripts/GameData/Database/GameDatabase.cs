@@ -17,18 +17,6 @@ namespace MultiplayerARPG
         public VehicleEntity[] vehicleEntities;
 
         [Header("Game Data")]
-        public UnityHelpBox gameDataHelpBox = new UnityHelpBox("Only Attributes, Items, Guild Skills, Map Infos, Quests and Factions game data are required. Other game data can be loaded because they were referred by those game data.");
-        public Attribute[] attributes;
-        public Currency[] currencies;
-        public BaseItem[] items;
-        public ItemCraftFormula[] itemCraftFormulas;
-        public GuildSkill[] guildSkills;
-        public BaseMapInfo[] mapInfos;
-        public Quest[] quests;
-        public Faction[] factions;
-
-        // TODO: WIP game database editor
-        /*
         public Attribute[] attributes;
         public Currency[] currencies;
         public DamageElement[] damageElements;
@@ -39,24 +27,31 @@ namespace MultiplayerARPG
         public AmmoType[] ammoTypes;
         public BaseSkill[] skills;
         public GuildSkill[] guildSkills;
-        public BaseCharacter[] characters;
+        public PlayerCharacter[] playerCharacters;
+        public MonsterCharacter[] monsterCharacters;
         public Harvestable[] harvestables;
         public BaseMapInfo[] mapInfos;
-        public BaseNpcDialog[] npcDialogs;
         public Quest[] quests;
         public Faction[] factions;
-        */
 
         public override void LoadData(GameInstance gameInstance)
         {
-            GameInstance.AddAttributes(attributes);
-            GameInstance.AddCurrencies(currencies);
-            GameInstance.AddItems(items);
-            GameInstance.AddItemCraftFormulas(itemCraftFormulas);
-            GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
             GameInstance.AddVehicleEntities(vehicleEntities);
+            GameInstance.AddAttributes(attributes);
+            GameInstance.AddCurrencies(currencies);
+            GameInstance.AddDamageElements(damageElements);
+            GameInstance.AddItems(items);
+            GameInstance.AddItemCraftFormulas(itemCraftFormulas);
+            GameInstance.AddArmorTypes(armorTypes);
+            GameInstance.AddWeaponTypes(weaponTypes);
+            GameInstance.AddAmmoTypes(ammoTypes);
+            GameInstance.AddSkills(skills);
+            GameInstance.AddGuildSkills(guildSkills);
+            GameInstance.AddCharacters(playerCharacters);
+            GameInstance.AddCharacters(monsterCharacters);
+            GameInstance.AddHarvestables(harvestables);
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
@@ -66,8 +61,26 @@ namespace MultiplayerARPG
 
         public void LoadReferredData()
         {
-            // TODO: Users have to use this function to load and set referred data to game database
-            // then game database editor will be able to load and show them in game data finder.
+            GameInstance.ClearData();
+            GameInstance.AddCharacterEntities(playerCharacterEntities);
+            GameInstance.AddCharacterEntities(monsterCharacterEntities);
+            GameInstance.AddVehicleEntities(vehicleEntities);
+            GameInstance.AddAttributes(attributes);
+            GameInstance.AddCurrencies(currencies);
+            GameInstance.AddDamageElements(damageElements);
+            GameInstance.AddItems(items);
+            GameInstance.AddItemCraftFormulas(itemCraftFormulas);
+            GameInstance.AddArmorTypes(armorTypes);
+            GameInstance.AddWeaponTypes(weaponTypes);
+            GameInstance.AddAmmoTypes(ammoTypes);
+            GameInstance.AddSkills(skills);
+            GameInstance.AddGuildSkills(guildSkills);
+            GameInstance.AddCharacters(playerCharacters);
+            GameInstance.AddCharacters(monsterCharacters);
+            GameInstance.AddHarvestables(harvestables);
+            GameInstance.AddMapInfos(mapInfos);
+            GameInstance.AddQuests(quests);
+            GameInstance.AddFactions(factions);
         }
     }
 }
