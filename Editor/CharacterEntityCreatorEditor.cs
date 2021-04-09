@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         private CharacterEntityType characterEntityType;
         private CharacterModelType characterModelType;
         private EntityMovementType entityMovementType;
-        private GameObject characterModel;
+        private GameObject fbx;
 
         [MenuItem("MMORPG KIT/Character Entity Creator (3D)", false, 0)]
         public static void CreateNewCharacterEntity()
@@ -71,9 +71,9 @@ namespace MultiplayerARPG
                     characterEntityType = (CharacterEntityType)EditorGUILayout.EnumPopup("Character entity type", characterEntityType);
                     characterModelType = (CharacterModelType)EditorGUILayout.EnumPopup("Character model type", characterModelType);
                     entityMovementType = (EntityMovementType)EditorGUILayout.EnumPopup("Entity movement type", entityMovementType);
-                    if (characterModel == null)
+                    if (fbx == null)
                         EditorGUILayout.HelpBox("Select your FBX model which you want to create character entity", MessageType.Info);
-                    characterModel = EditorGUILayout.ObjectField("FBX", characterModel, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
+                    fbx = EditorGUILayout.ObjectField("FBX", fbx, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
                 }
                 GUILayout.EndVertical();
 
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
                 }
                 GUILayout.EndVertical();
 
-                if (characterModel != null && !string.IsNullOrEmpty(fileName))
+                if (fbx != null && !string.IsNullOrEmpty(fileName))
                 {
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button("Create", GUILayout.ExpandWidth(true), GUILayout.Height(40)))
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             var path = EditorUtility.SaveFolderPanel("Save data to folder", "Assets", "");
             path = path.Substring(path.IndexOf("Assets"));
 
-            var newObject = Instantiate(characterModel, Vector3.zero, Quaternion.identity);
+            var newObject = Instantiate(fbx, Vector3.zero, Quaternion.identity);
             var characterModelManager = newObject.AddComponent<CharacterModelManager>();
             newObject.AddComponent<CharacterRecoveryComponent>();
             newObject.AddComponent<CharacterSkillAndBuffComponent>();
