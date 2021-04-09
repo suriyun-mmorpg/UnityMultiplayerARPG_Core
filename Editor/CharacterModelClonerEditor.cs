@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -188,6 +187,7 @@ namespace MultiplayerARPG
             {
                 dstModel.skillAnimations = new List<SkillAnimations>(srcModel.skillAnimations).ToArray();
             }
+            EditorUtility.SetDirty(dstModel.gameObject);
         }
 
         private void FindBoneAndRootContainer(Transform rootTransform, Animator srcAnimator, Transform srcTransform, out bool isRootTransform, out HumanBodyBones bone, out Transform cloneSrc, out List<int> childIndexes)
