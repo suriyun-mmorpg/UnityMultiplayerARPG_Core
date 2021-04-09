@@ -34,6 +34,7 @@ namespace MultiplayerARPG
         private CharacterEntityType characterEntityType;
         private CharacterModelType characterModelType;
         private EntityMovementType entityMovementType;
+        private GameDatabase gameDatabase;
         private GameObject fbx;
 
         [MenuItem("MMORPG KIT/Character Entity Creator (3D)", false, 0)]
@@ -71,6 +72,9 @@ namespace MultiplayerARPG
                     characterEntityType = (CharacterEntityType)EditorGUILayout.EnumPopup("Character entity type", characterEntityType);
                     characterModelType = (CharacterModelType)EditorGUILayout.EnumPopup("Character model type", characterModelType);
                     entityMovementType = (EntityMovementType)EditorGUILayout.EnumPopup("Entity movement type", entityMovementType);
+                    if (gameDatabase == null)
+                        EditorGUILayout.HelpBox("Select your game database which you want to add new character data, leave it `None` if you don't want to add item data to game database", MessageType.Info);
+                    gameDatabase = EditorGUILayout.ObjectField("Game database", gameDatabase, typeof(GameDatabase), true, GUILayout.ExpandWidth(true)) as GameDatabase;
                     if (fbx == null)
                         EditorGUILayout.HelpBox("Select your FBX model which you want to create character entity", MessageType.Info);
                     fbx = EditorGUILayout.ObjectField("FBX", fbx, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
@@ -283,6 +287,25 @@ namespace MultiplayerARPG
                 Debug.Log("Saving character entity to " + savePath);
                 AssetDatabase.DeleteAsset(savePath);
                 PrefabUtility.SaveAsPrefabAssetAndConnect(baseCharacterEntity.gameObject, savePath, InteractionMode.AutomatedAction);
+
+                if (gameDatabase != null)
+                {
+                    GameObject savedObject = AssetDatabase.LoadAssetAtPath<GameObject>(savePath);
+                    BaseCharacterEntity savedEntity = savedObject.GetComponent<BaseCharacterEntity>();
+                    if (savedEntity is BasePlayerCharacterEntity)
+                    {
+                        List<BasePlayerCharacterEntity> list = new List<BasePlayerCharacterEntity>(gameDatabase.playerCharacterEntities);
+                        list.Add(savedEntity as BasePlayerCharacterEntity);
+                        gameDatabase.playerCharacterEntities = list.ToArray();
+                    }
+                    else if (savedEntity is BaseMonsterCharacterEntity)
+                    {
+                        List<BaseMonsterCharacterEntity> list = new List<BaseMonsterCharacterEntity>(gameDatabase.monsterCharacterEntities);
+                        list.Add(savedEntity as BaseMonsterCharacterEntity);
+                        gameDatabase.monsterCharacterEntities = list.ToArray();
+                    }
+                    EditorUtility.SetDirty(gameDatabase);
+                }
             }
         }
     }
