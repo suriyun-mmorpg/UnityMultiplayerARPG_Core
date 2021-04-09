@@ -100,9 +100,9 @@ namespace MultiplayerARPG
                         newObj.transform.localPosition = cloneSrc.localPosition;
                         newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
                         newObj.transform.localRotation = cloneSrc.localRotation;
-                        for (int j = 0; j < childIndexes.Count; ++j)
+                        for (int j = childIndexes.Count - 1; j >= 0; --j)
                         {
-                            newObj = newObj.transform.GetChild(j).gameObject;
+                            newObj = newObj.transform.GetChild(childIndexes[j]).gameObject;
                         }
                     }
                     containers.Add(new EffectContainer()
@@ -137,9 +137,9 @@ namespace MultiplayerARPG
                         newObj.transform.localPosition = cloneSrc.localPosition;
                         newObj.transform.localEulerAngles = cloneSrc.localEulerAngles;
                         newObj.transform.localRotation = cloneSrc.localRotation;
-                        for (int j = 0; j < childIndexes.Count; ++j)
+                        for (int j = childIndexes.Count - 1; j >= 0; --j)
                         {
-                            newObj = newObj.transform.GetChild(j).gameObject;
+                            newObj = newObj.transform.GetChild(childIndexes[j]).gameObject;
                         }
                     }
                     containers.Add(new EquipmentContainer()
