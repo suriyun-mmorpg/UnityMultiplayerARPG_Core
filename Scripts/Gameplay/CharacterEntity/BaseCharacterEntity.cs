@@ -529,9 +529,6 @@ namespace MultiplayerARPG
             // Interrupt casting skill when receive damage
             InterruptCastingSkill();
 
-            // Only TPS model will plays hit animation
-            CharacterModel.PlayHitAnimation();
-
             // Do something when character dead
             if (this.IsDead())
             {

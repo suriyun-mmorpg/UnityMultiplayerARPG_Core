@@ -167,6 +167,8 @@ namespace MultiplayerARPG
                             }
                             break;
                     }
+                    if (damageSource != DamageSource.None && Model is IHittableModel)
+                        (Model as IHittableModel).PlayHitAnimation();
                     Model.InstantiateEffect(effects);
                 }
             }
