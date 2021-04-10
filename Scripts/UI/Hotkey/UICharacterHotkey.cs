@@ -4,9 +4,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-#if USE_TEXT_MESH_PRO
-using TMPro;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -20,6 +17,7 @@ namespace MultiplayerARPG
         public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;
         public UICharacterSkill uiCharacterSkill;
         public UICharacterItem uiCharacterItem;
+        public GameObject[] placeHolders;
         public KeyCode key;
 
         [Header("Options")]
@@ -72,23 +70,20 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (Input.GetKeyDown(key))
+            if (placeHolders != null && placeHolders.Length > 0)
             {
-                bool canUse = true;
-                if (EventSystem.current.currentSelectedGameObject != null)
+                bool assigned = GetAssignedSkill(out _, out _) || GetAssignedItem(out _, out _, out _);
+                foreach (GameObject placeHolder in placeHolders)
                 {
-                    InputField field = EventSystem.current.currentSelectedGameObject.GetComponent<InputField>();
-                    if (field != null && field.isFocused)
-                        canUse = false;
-#if USE_TEXT_MESH_PRO
-                    TMP_InputField tmpField = EventSystem.current.currentSelectedGameObject.GetComponent<TMP_InputField>();
-                    if (tmpField != null && tmpField.isFocused)
-                        canUse = false;
-#endif
+                    placeHolder.SetActive(!assigned);
                 }
-                if (canUse)
-                    OnClickUse();
             }
+
+            if (GenericUtils.IsFocusInputField())
+                return;
+
+            if (Input.GetKeyDown(key))
+                OnClickUse();
         }
 
         public bool GetAssignedSkill(out BaseSkill skill, out short skillLevel)
