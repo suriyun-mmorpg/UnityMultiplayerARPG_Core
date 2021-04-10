@@ -689,7 +689,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(LogTag, "Client can't fill weapon sets");
                 return;
             }
-            while (data.SelectableWeaponSets.Count <= equipWeaponSet)
+            while (data.SelectableWeaponSets.Count < equipWeaponSet)
             {
                 data.SelectableWeaponSets.Add(new EquipWeapons());
             }
