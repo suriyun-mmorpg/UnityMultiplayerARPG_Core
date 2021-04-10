@@ -15,18 +15,30 @@ namespace MultiplayerARPG
 
             GuildSkill guildSkill;
             if (!GameInstance.GuildSkills.TryGetValue(dataId, out guildSkill) || guildSkill.GetSkillType() != GuildSkillType.Active)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_GUILD_SKILL_DATA);
                 return;
+            }
 
             GuildData guild;
             if (GuildId <= 0 || !GameInstance.ServerGuildHandlers.TryGetGuild(GuildId, out guild))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_JOINED_GUILD);
                 return;
+            }
 
             short level = guild.GetSkillLevel(dataId);
             if (level <= 0)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_SKILL_LEVEL_IS_ZERO);
                 return;
+            }
 
             if (this.IndexOfSkillUsage(dataId, SkillUsageType.GuildSkill) >= 0)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN);
                 return;
+            }
 
             // Apply guild skill
             CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.GuildSkill, dataId);

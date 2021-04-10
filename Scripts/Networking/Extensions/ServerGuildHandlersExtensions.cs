@@ -377,34 +377,5 @@
             gameMessage = UITextKeys.NONE;
             return new ValidateGuildRequestResult(true, gameMessage, guildId, guild);
         }
-
-        public static ValidateGuildRequestResult CanUseGuildSkill(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, int dataId)
-        {
-            UITextKeys gameMessage;
-            int guildId = playerCharacter.GuildId;
-            GuildData guild;
-            if (!GameInstance.GuildSkills.ContainsKey(dataId))
-            {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_GUILD_SKILL_DATA;
-                return new ValidateGuildRequestResult(false, gameMessage);
-            }
-            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
-            {
-                gameMessage = UITextKeys.UI_ERROR_NOT_JOINED_GUILD;
-                return new ValidateGuildRequestResult(false, gameMessage);
-            }
-            if (guild.GetSkillLevel(dataId) <= 0)
-            {
-                gameMessage = UITextKeys.UI_ERROR_SKILL_LEVEL_IS_ZERO;
-                return new ValidateGuildRequestResult(false, gameMessage);
-            }
-            if (playerCharacter.IndexOfSkillUsage(dataId, SkillUsageType.GuildSkill) >= 0)
-            {
-                gameMessage = UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN;
-                return new ValidateGuildRequestResult(false, gameMessage);
-            }
-            gameMessage = UITextKeys.NONE;
-            return new ValidateGuildRequestResult(true, gameMessage, guildId, guild);
-        }
     }
 }
