@@ -56,25 +56,41 @@ public class UIBase : MonoBehaviour
 
     public virtual void Show()
     {
+        if (IsVisible())
+            return;
         isAwaken = true;
         CacheComponents();
         if (!CacheRoot.activeSelf)
             CacheRoot.SetActive(true);
         if (onShow != null)
             onShow.Invoke();
+        OnShow();
         if (moveToLastSiblingOnShow)
             CacheRoot.transform.SetAsLastSibling();
         this.InvokeInstanceDevExtMethods("Show");
     }
 
+    public virtual void OnShow()
+    {
+
+    }
+
     public virtual void Hide()
     {
+        if (!IsVisible())
+            return;
         isAwaken = true;
         CacheComponents();
         CacheRoot.SetActive(false);
         if (onHide != null)
             onHide.Invoke();
+        OnHide();
         this.InvokeInstanceDevExtMethods("Hide");
+    }
+
+    public virtual void OnHide()
+    {
+
     }
 
     public void SetVisible(bool isVisible)
