@@ -1,11 +1,10 @@
 ﻿using LiteNetLibManager;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class PlayerCharacterCraftingComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
+    public class PlayerCharacterCraftingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
         [SerializeField]
         private int maxQueueSize = 5;

@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public class BaseGameEntityComponent<T> : MonoBehaviour, IGameEntityComponent
+    public abstract class BaseNetworkedGameEntityComponent<T> : LiteNetLibBehaviour, IGameEntityComponent
         where T : BaseGameEntity
     {
         private bool isFoundEntity;

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class RigidBodyEntityMovement2D : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         [Header("Movement Settings")]
         [Range(0.01f, 1f)]

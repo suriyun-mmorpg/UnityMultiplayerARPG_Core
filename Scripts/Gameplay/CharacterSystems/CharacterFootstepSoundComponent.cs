@@ -43,7 +43,6 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
-            base.EntityAwake();
             if (!Entity.IsClient)
             {
                 Enabled = false;

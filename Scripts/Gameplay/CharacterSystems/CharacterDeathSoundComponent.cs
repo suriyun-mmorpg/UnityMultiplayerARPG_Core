@@ -10,6 +10,24 @@ namespace MultiplayerARPG
         public float volume = 1f;
         private bool dirtyIsDead;
 
+        public override void EntityAwake()
+        {
+            if (!Entity.IsClient)
+            {
+                Enabled = false;
+                return;
+            }
+            if (audioSource == null)
+            {
+                GameObject audioSourceObject = new GameObject("_DeathAudioSource");
+                audioSourceObject.transform.parent = CacheTransform;
+                audioSourceObject.transform.localPosition = Vector3.zero;
+                audioSourceObject.transform.localRotation = Quaternion.identity;
+                audioSourceObject.transform.localScale = Vector3.one;
+                audioSource = audioSourceObject.AddComponent<AudioSource>();
+            }
+        }
+
         public override void EntityUpdate()
         {
             if (dirtyIsDead != Entity.IsDead())
@@ -22,9 +40,6 @@ namespace MultiplayerARPG
 
         public void PlaySound()
         {
-            if (audioSource == null)
-                return;
-
             audioSource.clip = soundData.GetRandomedAudioClip();
             audioSource.volume = volume;
             audioSource.Play();

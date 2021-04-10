@@ -38,7 +38,7 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            if (!IsServer || Entity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
+            if (!Entity.IsServer || Entity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
                 return;
 
             if (Entity.IsDead())

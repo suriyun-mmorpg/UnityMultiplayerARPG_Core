@@ -7,7 +7,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
-    public class LegacyRigidBodyEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class LegacyRigidBodyEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[25];
 

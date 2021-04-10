@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using StandardAssets.Characters.Physics;
 
 namespace MultiplayerARPG

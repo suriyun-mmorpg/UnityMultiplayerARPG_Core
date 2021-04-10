@@ -5,7 +5,7 @@ using UnityEngine.AI;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    public class NavMeshEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         [Header("Movement Settings")]
         [Tooltip("If calculated paths +1 higher than this value, it will stop moving. If this is 0 it will not applies")]

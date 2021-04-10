@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
     [RequireComponent(typeof(OpenCharacterController))]
-    public class RigidBodyEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class RigidBodyEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         /// <summary>
         /// Buffer to fix invalid teleport position

@@ -6,7 +6,7 @@ using UnityEngine.AI;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterController))]
-    public class CharacterControllerEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class CharacterControllerEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[25];
 
