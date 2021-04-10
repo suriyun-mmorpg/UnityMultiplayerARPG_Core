@@ -9,12 +9,15 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Gold Amount}")]
         public UILocaleKeySetting formatKeyUserGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
+        [Tooltip("Format => {0} = {Gold Amount}")]
+        public UILocaleKeySetting formatKeyTotalGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Cash Amount}")]
         public UILocaleKeySetting formatKeyUserCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
 
         [Header("UI Elements")]
         public TextWrapper uiTextUserGold;
         public TextWrapper uiTextUserCash;
+        public TextWrapper uiTextTotalGold;
 
         private void Update()
         {
@@ -24,6 +27,14 @@ namespace MultiplayerARPG
                 amount = GameInstance.PlayingCharacter == null ? 0 : GameInstance.PlayingCharacter.UserGold;
                 uiTextUserGold.text = string.Format(
                     LanguageManager.GetText(formatKeyUserGold),
+                    amount.ToString("N0"));
+            }
+
+            if (uiTextTotalGold != null)
+            {
+                amount = GameInstance.PlayingCharacter == null ? 0 : (GameInstance.PlayingCharacter.UserGold + GameInstance.PlayingCharacter.Gold);
+                uiTextTotalGold.text = string.Format(
+                    LanguageManager.GetText(formatKeyTotalGold),
                     amount.ToString("N0"));
             }
 
