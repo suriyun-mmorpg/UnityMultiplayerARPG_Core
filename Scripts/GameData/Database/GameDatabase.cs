@@ -139,7 +139,6 @@ namespace MultiplayerARPG
             harvestables = tempHarvestables.ToArray();
 
             List<BaseMapInfo> tempMapInfos = new List<BaseMapInfo>(GameInstance.MapInfos.Values);
-            tempMapInfos.Sort();
             mapInfos = tempMapInfos.ToArray();
 
             List<Quest> tempQuests = new List<Quest>(GameInstance.Quests.Values);
@@ -147,7 +146,6 @@ namespace MultiplayerARPG
             quests = tempQuests.ToArray();
 
             List<Faction> tempFactions = new List<Faction>(GameInstance.Factions.Values);
-            tempFactions.Sort();
             factions = tempFactions.ToArray();
 
 #if UNITY_EDITOR
