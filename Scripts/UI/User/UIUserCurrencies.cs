@@ -16,8 +16,8 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public TextWrapper uiTextUserGold;
-        public TextWrapper uiTextUserCash;
         public TextWrapper uiTextTotalGold;
+        public TextWrapper uiTextUserCash;
 
         private void Update()
         {
