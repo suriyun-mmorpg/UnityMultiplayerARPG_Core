@@ -64,9 +64,10 @@ namespace MultiplayerARPG
         public void UpdateData(IPlayerCharacterData playerCharacter)
         {
             byte equipWeaponSet = playerCharacter.EquipWeaponSet;
-            if (equipWeaponSet >= playerCharacter.SelectableWeaponSets.Count)
-                return;
-            currentWeaponSet.SetData(this, equipWeaponSet, playerCharacter.SelectableWeaponSets[equipWeaponSet]);
+            if (equipWeaponSet < playerCharacter.SelectableWeaponSets.Count)
+                currentWeaponSet.SetData(this, equipWeaponSet, playerCharacter.SelectableWeaponSets[equipWeaponSet]);
+            else
+                currentWeaponSet.SetData(this, equipWeaponSet, new EquipWeapons());
             EquipWeapons tempEquipWeapons;
             byte j = 0;
             for (byte i = 0; i < GameInstance.Singleton.maxEquipWeaponSet; ++i)
