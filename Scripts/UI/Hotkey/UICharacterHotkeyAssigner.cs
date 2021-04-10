@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public UICharacterItem uiCharacterItemPrefab;
         public Transform uiCharacterSkillContainer;
         public Transform uiCharacterItemContainer;
+        public bool autoHideIfNothingToAssign;
 
         private UIList cacheSkillList;
         public UIList CacheSkillList
@@ -83,7 +84,7 @@ namespace MultiplayerARPG
             base.Show();
         }
 
-        protected virtual void OnEnable()
+        public override void OnShow()
         {
             CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
             CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
@@ -92,6 +93,8 @@ namespace MultiplayerARPG
 
             CacheSkillList.doNotRemoveContainerChildren = true;
             CacheItemList.doNotRemoveContainerChildren = true;
+
+            int countAssignable = 0;
 
             // Setup skill list
             UICharacterSkill tempUiCharacterSkill;
@@ -110,6 +113,7 @@ namespace MultiplayerARPG
                     tempUiCharacterSkill.Setup(new UICharacterSkillData(tempCharacterSkill), GameInstance.PlayingCharacterEntity, tempIndexOfSkill);
                     tempUiCharacterSkill.Show();
                     CacheSkillSelectionManager.Add(tempUiCharacterSkill);
+                    ++countAssignable;
                 }
                 else
                 {
@@ -127,15 +131,19 @@ namespace MultiplayerARPG
                     tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), GameInstance.PlayingCharacterEntity, index);
                     tempUiCharacterItem.Show();
                     CacheItemSelectionManager.Add(tempUiCharacterItem);
+                    ++countAssignable;
                 }
                 else
                 {
                     tempUiCharacterItem.Hide();
                 }
             });
+
+            if (autoHideIfNothingToAssign && countAssignable == 0)
+                Hide();
         }
 
-        protected virtual void OnDisable()
+        public override void OnHide()
         {
             CacheSkillSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.DeselectSelectedUI();
