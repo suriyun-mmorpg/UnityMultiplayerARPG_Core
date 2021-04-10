@@ -779,7 +779,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.aimAssistLayerMask = GetAimAssistLayerMask();
             CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
             CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
-            CacheGameplayCameraControls.aimAssistAngleLessThan = 115f;
+            CacheGameplayCameraControls.aimAssistMaxAngleFromFollowingTarget = 115f;
             CacheGameplayCameraControls.AimAssistAvoidanceListener = this;
         }
 
