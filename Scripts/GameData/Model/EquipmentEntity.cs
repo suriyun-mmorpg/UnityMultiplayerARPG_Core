@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,10 +20,9 @@ namespace MultiplayerARPG
             if (equipmentRenderer != null)
                 defaultMaterials = equipmentRenderer.sharedMaterials;
             
-            effects.Sort();
-
             if (effects != null && effects.Count > 0)
             {
+                effects.Sort();
                 foreach (EquipmentEntityEffect effect in effects)
                 {
                     if (effect.effectObjects != null && effect.effectObjects.Length > 0)
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                         break;
                 }
                 // Apply materials
-                if (equipmentRenderer != null)
+                if (equipmentRenderer != null && usingEffect.materials != null && usingEffect.materials.Length > 0)
                     equipmentRenderer.materials = usingEffect.materials;
                 // Activate effect objects
                 if (usingEffect.effectObjects != null && usingEffect.effectObjects.Length > 0)
@@ -83,15 +83,15 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct EquipmentEntityEffect : IComparer<EquipmentEntityEffect>
+    public struct EquipmentEntityEffect : IComparable<EquipmentEntityEffect>
     {
         public int level;
         public Material[] materials;
         public GameObject[] effectObjects;
 
-        public int Compare(EquipmentEntityEffect x, EquipmentEntityEffect y)
+        public int CompareTo(EquipmentEntityEffect other)
         {
-            return x.level.CompareTo(y.level);
+            return level.CompareTo(other.level);
         }
     }
 }
