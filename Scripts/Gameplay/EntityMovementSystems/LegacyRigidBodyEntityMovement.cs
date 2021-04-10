@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CapsuleCollider))]
     public class LegacyRigidBodyEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
+        protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[25];
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -60,7 +60,6 @@ namespace MultiplayerARPG
         }
 
         // Movement codes
-        private PhysicFunctions physicFunctions;
         private bool isGrounded;
         private bool isUnderWater;
         private bool isJumping;
@@ -103,7 +102,6 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
-            physicFunctions = new PhysicFunctions(30);
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
             // Prepare rigidbody component
@@ -664,8 +662,11 @@ namespace MultiplayerARPG
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
-                    yRotation = yAngle;
-                    CacheTransform.position = position;
+                    if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
+                    {
+                        yRotation = yAngle;
+                        CacheTransform.position = position;
+                    }
                 }
                 else if (!IsOwnerClient)
                 {

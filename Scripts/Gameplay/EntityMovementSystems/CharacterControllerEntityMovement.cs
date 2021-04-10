@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterController))]
     public class CharacterControllerEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
+        protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[25];
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -642,8 +642,11 @@ namespace MultiplayerARPG
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
-                    yRotation = yAngle;
-                    CacheTransform.position = position;
+                    if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
+                    {
+                        yRotation = yAngle;
+                        CacheTransform.position = position;
+                    }
                 }
                 else if (!IsOwnerClient)
                 {

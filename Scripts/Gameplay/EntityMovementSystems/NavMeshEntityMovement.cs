@@ -252,8 +252,11 @@ namespace MultiplayerARPG
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
-                    CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-                    CacheNavMeshAgent.Warp(position);
+                    if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
+                    {
+                        CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                        CacheNavMeshAgent.Warp(position);
+                    }
                 }
                 else if (!IsOwnerClient)
                 {
