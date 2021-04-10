@@ -20,6 +20,13 @@ namespace MultiplayerARPG
             Hold
         }
 
+        public enum EmptyAmmoAutoReload
+        {
+            ReloadImmediately,
+            ReloadOnKeysReleased,
+            DoNotReload,
+        }
+
         [Header("Camera Controls Prefabs")]
         [SerializeField]
         private FollowCameraControls gameplayCameraPrefab;
@@ -29,6 +36,8 @@ namespace MultiplayerARPG
         [Header("Controller Settings")]
         [SerializeField]
         private ControllerMode mode;
+        [SerializeField]
+        private EmptyAmmoAutoReload emptyAmmoAutoReload;
         [SerializeField]
         private bool canSwitchViewMode;
         [SerializeField]
@@ -1099,13 +1108,24 @@ namespace MultiplayerARPG
                 mustReleaseFireKey = true;
             }
 
-            // Auto reload when ammo empty
-            if (!tempPressAttackRight && !tempPressAttackLeft && !reloadInput.IsPress &&
-                (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
-                PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoEmpty()))
+            // Reloading
+            if (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
+                PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoEmpty())
             {
-                // Reload ammo when empty and not press any keys
-                ReloadAmmo();
+                switch (emptyAmmoAutoReload)
+                {
+                    case EmptyAmmoAutoReload.ReloadImmediately:
+                        ReloadAmmo();
+                        break;
+                    case EmptyAmmoAutoReload.ReloadOnKeysReleased:
+                        // Auto reload when ammo empty
+                        if (!tempPressAttackRight && !tempPressAttackLeft && !reloadInput.IsPress)
+                        {
+                            // Reload ammo when empty and not press any keys
+                            ReloadAmmo();
+                        }
+                        break;
+                }
             }
 
             // Update look direction
