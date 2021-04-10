@@ -268,7 +268,7 @@ namespace MultiplayerARPG
             CallAllReceivedDamageFeedback(combatAmountType, damageSource, dataId, totalDamage);
             IGameEntity attacker;
             if (onReceivedDamage != null && instigator.TryGetEntity(out attacker))
-                onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, damageSource, dataId, totalDamage, weapon, skill, skillLevel);
+                onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
