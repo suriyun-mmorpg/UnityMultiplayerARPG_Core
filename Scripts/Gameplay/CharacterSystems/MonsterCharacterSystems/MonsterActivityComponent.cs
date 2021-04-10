@@ -34,6 +34,7 @@ namespace MultiplayerARPG
         protected short queueSkillLevel;
         protected bool alreadySetActionState;
         protected bool isLeftHandAttacking;
+        protected float lastSetDestinationTime;
 
         public override void EntityUpdate()
         {
@@ -169,6 +170,7 @@ namespace MultiplayerARPG
             if (OverlappedEntity(tempTargetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
                 startedFollowEnemy = false;
+                SetWanderDestination(CacheTransform.position);
                 // Lookat target then do something when it's in range
                 Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
                 if (lookAtDirection.sqrMagnitude > 0)
@@ -234,6 +236,10 @@ namespace MultiplayerARPG
 
         public void SetDestination(Vector3 destination, float distance)
         {
+            float time = Time.unscaledTime;
+            if (time - lastSetDestinationTime <= 0.1f)
+                return;
+            lastSetDestinationTime = time;
             Vector3 direction = (destination - Entity.MovementTransform.position).normalized;
             Vector3 position = destination - (direction * (distance - Entity.StoppingDistance));
             Entity.SetExtraMovement(ExtraMovementState.None);
@@ -242,6 +248,10 @@ namespace MultiplayerARPG
 
         public void SetWanderDestination(Vector3 destination)
         {
+            float time = Time.unscaledTime;
+            if (time - lastSetDestinationTime <= 0.1f)
+                return;
+            lastSetDestinationTime = time;
             Entity.SetExtraMovement(ExtraMovementState.IsWalking);
             Entity.PointClickMovement(destination);
         }
