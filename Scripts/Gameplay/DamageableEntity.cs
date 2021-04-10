@@ -109,14 +109,14 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// This will be called on clients to display combat texts
+        /// This will be called on clients to display combat texts, play hit effects, play hit animation
         /// </summary>
         /// <param name="combatAmountType"></param>
         /// <param name="damageSource"></param>
         /// <param name="dataId"></param>
         /// <param name="amount"></param>
         [AllRpc]
-        protected void AllAppendCombatAmount(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
+        protected void AllReceivedDamageFeedback(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
         {
             switch (combatAmountType)
             {
@@ -174,9 +174,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void CallAllAppendCombatAmount(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
+        public void CallAllReceivedDamageFeedback(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
         {
-            RPC(AllAppendCombatAmount, 0, DeliveryMethod.Unreliable, combatAmountType, damageSource, dataId, amount);
+            RPC(AllReceivedDamageFeedback, 0, DeliveryMethod.Unreliable, combatAmountType, damageSource, dataId, amount);
         }
 
         /// <summary>
@@ -265,10 +265,10 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            CallAllAppendCombatAmount(combatAmountType, damageSource, dataId, totalDamage);
+            CallAllReceivedDamageFeedback(combatAmountType, damageSource, dataId, totalDamage);
             IGameEntity attacker;
             if (onReceivedDamage != null && instigator.TryGetEntity(out attacker))
-                onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
+                onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, damageSource, dataId, totalDamage, weapon, skill, skillLevel);
         }
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)

@@ -17,7 +17,9 @@ namespace MultiplayerARPG
         Vector3 fromPosition,
         IGameEntity attacker,
         CombatAmountType combatAmountType,
-        int damage,
+        DamageSource damageSource,
+        int dataId,
+        int totalDamage,
         CharacterItem weapon,
         BaseSkill skill,
         short skillLevel);
