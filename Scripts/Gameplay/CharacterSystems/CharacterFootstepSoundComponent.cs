@@ -44,7 +44,21 @@ namespace MultiplayerARPG
         public override void EntityAwake()
         {
             base.EntityAwake();
+            if (!Entity.IsClient)
+            {
+                Enabled = false;
+                return;
+            }
             MigrateSettings();
+            if (audioSource == null)
+            {
+                GameObject audioSourceObject = new GameObject("_FootstepAudioSource");
+                audioSourceObject.transform.parent = CacheTransform;
+                audioSourceObject.transform.localPosition = Vector3.zero;
+                audioSourceObject.transform.localRotation = Quaternion.identity;
+                audioSourceObject.transform.localScale = Vector3.one;
+                audioSource = audioSourceObject.AddComponent<AudioSource>();
+            }
         }
 
 #if UNITY_EDITOR
@@ -58,8 +72,8 @@ namespace MultiplayerARPG
         private bool MigrateSettings()
         {
             if (soundData.randomAudioClips != null && soundData.randomAudioClips.Length > 0 &&
-                (moveFootstepSettings == null || 
-                moveFootstepSettings.soundData.randomAudioClips == null || 
+                (moveFootstepSettings == null ||
+                moveFootstepSettings.soundData.randomAudioClips == null ||
                 moveFootstepSettings.soundData.randomAudioClips.Length == 0))
             {
                 Logging.LogWarning(ToString(), "Migration run to setup old footstep settings to new footstep settings due to codes structure changes");
@@ -80,13 +94,6 @@ namespace MultiplayerARPG
 
         public override sealed void EntityUpdate()
         {
-            // Play sound on clients only
-            if (!IsClient || audioSource == null)
-            {
-                enabled = false;
-                return;
-            }
-
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 
             if (Entity.MovementState.HasFlag(MovementState.IsUnderWater))
@@ -134,9 +141,6 @@ namespace MultiplayerARPG
 
         public void PlaySound()
         {
-            if (audioSource == null)
-                return;
-
             // Don't play sound while muting footstep sound
             if (Entity.MuteFootstepSound)
                 return;
