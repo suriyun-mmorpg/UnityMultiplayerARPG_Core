@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public UIChatMessage uiChatMessagePrefab;
         public Transform uiChatMessageContainer;
         public ScrollRect scrollRect;
+        public bool clearPreviousChatMessageOnStart;
         
         public bool EnterChatFieldVisible { get; private set; }
 
@@ -50,13 +51,20 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            CacheList.Generate(ChatMessages, (index, message, ui) =>
+            if (clearPreviousChatMessageOnStart)
             {
-                UIChatMessage uiChatMessage = ui.GetComponent<UIChatMessage>();
-                uiChatMessage.uiChatHandler = this;
-                uiChatMessage.Data = message;
-                uiChatMessage.Show();
-            });
+                ChatMessages.Clear();
+            }
+            else
+            {
+                CacheList.Generate(ChatMessages, (index, message, ui) =>
+                {
+                    UIChatMessage uiChatMessage = ui.GetComponent<UIChatMessage>();
+                    uiChatMessage.uiChatHandler = this;
+                    uiChatMessage.Data = message;
+                    uiChatMessage.Show();
+                });
+            }
             StartCoroutine(VerticalScroll(0f));
             
             HideEnterChatField();
