@@ -41,7 +41,7 @@ namespace MultiplayerARPG
         private FootstepSettings currentFootstepSettings;
         private float delayCounter = 0f;
 
-        public override void EntityAwake()
+        public override void EntityStart()
         {
             if (!Entity.IsClient)
             {

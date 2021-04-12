@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public float volume = 1f;
         private bool dirtyIsDead;
 
-        public override void EntityAwake()
+        public override void EntityStart()
         {
             if (!Entity.IsClient)
             {
