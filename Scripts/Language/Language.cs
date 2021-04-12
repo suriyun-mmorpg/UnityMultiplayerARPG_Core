@@ -52,6 +52,7 @@ namespace MultiplayerARPG
         UI_ERROR_INVALID_USERNAME_OR_PASSWORD,
         UI_ERROR_INVALID_USER_TOKEN,
         UI_ERROR_ALREADY_LOGGED_IN,
+        UI_ERROR_ACCOUNT_LOGGED_IN_BY_OTHER,
         // Error - UI Register
         UI_ERROR_INVALID_CONFIRM_PASSWORD,
         UI_ERROR_USERNAME_TOO_SHORT,
@@ -1103,6 +1104,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD.ToString(), "Invalid username or password");
             Texts.Add(UITextKeys.UI_ERROR_INVALID_USER_TOKEN.ToString(), "Invalid user token");
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString(), "User already logged in");
+            Texts.Add(UITextKeys.UI_ERROR_ACCOUNT_LOGGED_IN_BY_OTHER.ToString(), "Your account was logged in by other");
             // Error - UI Register
             Texts.Add(UITextKeys.UI_ERROR_INVALID_CONFIRM_PASSWORD.ToString(), "Invalid confirm password");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString(), "Username is too short");
