@@ -91,6 +91,7 @@ namespace MultiplayerARPG
                 }
                 return cameraTargetTransform;
             }
+            set { cameraTargetTransform = value; }
         }
 
         [Tooltip("Transform for position which camera will look at and follow while playing in FPS view mode")]
@@ -99,6 +100,7 @@ namespace MultiplayerARPG
         public Transform FpsCameraTargetTransform
         {
             get { return fpsCameraTargetTransform; }
+            set { fpsCameraTargetTransform = value; }
         }
 
         [Header("Entity Movement Settings")]

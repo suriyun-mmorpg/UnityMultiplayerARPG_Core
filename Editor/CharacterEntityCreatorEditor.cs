@@ -253,6 +253,20 @@ namespace MultiplayerARPG
 
             if (baseCharacterEntity != null)
             {
+                var tpsCamTarget = new GameObject("_TpsCamTarget");
+                tpsCamTarget.transform.parent = baseCharacterEntity.transform;
+                tpsCamTarget.transform.localPosition = Vector3.zero;
+                tpsCamTarget.transform.localRotation = Quaternion.identity;
+                tpsCamTarget.transform.localScale = Vector3.one;
+                baseCharacterEntity.CameraTargetTransform = tpsCamTarget.transform;
+
+                var fpsCamTarget = new GameObject("_FpsCamTarget");
+                fpsCamTarget.transform.parent = baseCharacterEntity.transform;
+                fpsCamTarget.transform.localPosition = Vector3.zero;
+                fpsCamTarget.transform.localRotation = Quaternion.identity;
+                fpsCamTarget.transform.localScale = Vector3.one;
+                baseCharacterEntity.FpsCameraTargetTransform = fpsCamTarget.transform;
+
                 var combatTextObj = new GameObject("_CombatText");
                 combatTextObj.transform.parent = baseCharacterEntity.transform;
                 combatTextObj.transform.localPosition = Vector3.zero + (Vector3.up * bounds.size.y * 0.75f);
