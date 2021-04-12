@@ -1347,7 +1347,7 @@ namespace MultiplayerARPG
         #region Move From Storage Functions
         public void OnClickMoveFromStorage()
         {
-            OnClickMoveToStorage(-1);
+            OnClickMoveFromStorage(-1);
         }
 
         public void OnClickMoveFromStorage(short inventoryItemIndex)
