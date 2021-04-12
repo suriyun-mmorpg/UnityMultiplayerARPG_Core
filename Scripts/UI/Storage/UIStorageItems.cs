@@ -175,7 +175,7 @@ namespace MultiplayerARPG
                     uiDialog.Hide();
                 CacheItemList.HideAll();
                 if (listEmptyObject != null)
-                    listEmptyObject.SetActive(false);
+                    listEmptyObject.SetActive(true);
                 return;
             }
             int showingCount = 0;
