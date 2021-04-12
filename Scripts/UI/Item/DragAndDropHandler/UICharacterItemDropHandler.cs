@@ -121,25 +121,11 @@ namespace MultiplayerARPG
                     // Drop non equip item to storage item
                     if (doNotSwapOrMergeWithStorageItem)
                     {
-                        GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
-                        {
-                            storageType = storageType,
-                            storageOwnerId = storageOwnerId,
-                            inventoryItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
-                            inventoryItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
-                            storageItemIndex = -1
-                        }, ClientStorageActions.ResponseMoveItemToStorage);
+                        draggedItemUI.uiCharacterItem.OnClickMoveToStorage(-1);
                     }
                     else
                     {
-                        GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
-                        {
-                            storageType = storageType,
-                            storageOwnerId = storageOwnerId,
-                            inventoryItemIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
-                            inventoryItemAmount = draggedItemUI.uiCharacterItem.CharacterItem.amount,
-                            storageItemIndex = (short)uiCharacterItem.IndexOfData
-                        }, ClientStorageActions.ResponseMoveItemToStorage);
+                        draggedItemUI.uiCharacterItem.OnClickMoveToStorage((short)uiCharacterItem.IndexOfData);
                     }
                     break;
             }

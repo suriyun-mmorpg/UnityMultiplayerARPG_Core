@@ -1232,12 +1232,12 @@ namespace MultiplayerARPG
 
             if (CharacterItem.amount == 1)
             {
-                if (selectionManager != null)
-                    selectionManager.DeselectSelectedUI();
-                GameInstance.PlayingCharacterEntity.CallServerDropItem((short)IndexOfData, 1);
+                OnDropAmountConfirmed(1);
             }
             else
+            {
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DROP_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString()), OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+            }
         }
 
         private void OnDropAmountConfirmed(int amount)
@@ -1257,16 +1257,12 @@ namespace MultiplayerARPG
 
             if (CharacterItem.amount == 1)
             {
-                if (selectionManager != null)
-                    selectionManager.DeselectSelectedUI();
-                GameInstance.ClientInventoryHandlers.RequestSellItem(new RequestSellItemMessage()
-                {
-                    index = (short)IndexOfData,
-                    amount = 1,
-                }, ClientInventoryActions.ResponseSellItem);
+                OnSellItemAmountConfirmed(1);
             }
             else
+            {
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_SELL_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_SELL_ITEM_DESCRIPTION.ToString()), OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+            }
         }
 
         private void OnSellItemAmountConfirmed(int amount)
@@ -1290,12 +1286,12 @@ namespace MultiplayerARPG
 
             if (CharacterItem.amount == 1)
             {
-                if (selectionManager != null)
-                    selectionManager.DeselectSelectedUI();
-                GameInstance.PlayingCharacterEntity.CallServerSetDealingItem((short)IndexOfData, 1);
+                OnSetDealingItemAmountConfirmed(1);
             }
             else
+            {
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_OFFER_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_OFFER_ITEM_DESCRIPTION.ToString()), OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+            }
         }
 
         private void OnSetDealingItemAmountConfirmed(int amount)
@@ -1309,35 +1305,29 @@ namespace MultiplayerARPG
         #region Move To Storage Functions
         public void OnClickMoveToStorage()
         {
+            OnClickMoveToStorage(-1);
+        }
+
+        public void OnClickMoveToStorage(short storageItemIndex)
+        {
             // Only unequipped equipment can be moved to storage
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
             if (CharacterItem.amount == 1)
             {
-                if (selectionManager != null)
-                    selectionManager.DeselectSelectedUI();
-                StorageType storageType = GameInstance.OpenedStorageType;
-                string storageOwnerId = GameInstance.OpenedStorageOwnerId;
-                GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
-                {
-                    storageType = storageType,
-                    storageOwnerId = storageOwnerId,
-                    inventoryItemIndex = (short)IndexOfData,
-                    inventoryItemAmount = 1,
-                    storageItemIndex = -1,
-                }, ClientStorageActions.ResponseMoveItemToStorage);
+                OnClickMoveToStorageConfirmed(storageItemIndex, 1);
             }
             else
             {
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_TO_STORAGE.ToString()), LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString()), (amount) =>
                 {
-                    OnClickMoveToStorage(amount);
+                    OnClickMoveToStorageConfirmed(storageItemIndex, amount);
                 }, 1, CharacterItem.amount, CharacterItem.amount);
             }
         }
 
-        private void OnClickMoveToStorage(int amount)
+        private void OnClickMoveToStorageConfirmed(short storageItemIndex, int amount)
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
@@ -1349,7 +1339,7 @@ namespace MultiplayerARPG
                 storageOwnerId = storageOwnerId,
                 inventoryItemIndex = (short)IndexOfData,
                 inventoryItemAmount = (short)amount,
-                storageItemIndex = -1,
+                storageItemIndex = storageItemIndex,
             }, ClientStorageActions.ResponseMoveItemToStorage);
         }
         #endregion
@@ -1357,35 +1347,29 @@ namespace MultiplayerARPG
         #region Move From Storage Functions
         public void OnClickMoveFromStorage()
         {
+            OnClickMoveToStorage(-1);
+        }
+
+        public void OnClickMoveFromStorage(short inventoryItemIndex)
+        {
             // Only storage items can be moved from storage
             if (!IsOwningCharacter() || InventoryType != InventoryType.StorageItems)
                 return;
 
             if (CharacterItem.amount == 1)
             {
-                if (selectionManager != null)
-                    selectionManager.DeselectSelectedUI();
-                StorageType storageType = GameInstance.OpenedStorageType;
-                string storageOwnerId = GameInstance.OpenedStorageOwnerId;
-                GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
-                {
-                    storageType = storageType,
-                    storageOwnerId = storageOwnerId,
-                    storageItemIndex = (short)IndexOfData,
-                    storageItemAmount = 1,
-                    inventoryItemIndex = -1,
-                }, ClientStorageActions.ResponseMoveItemFromStorage);
+                OnClickMoveFromStorageConfirmed(inventoryItemIndex, 1);
             }
             else
             {
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString()), LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString()), (amount) =>
                 {
-                    OnClickMoveFromStorage(amount);
+                    OnClickMoveFromStorageConfirmed(inventoryItemIndex, amount);
                 }, 1, CharacterItem.amount, CharacterItem.amount);
             }
         }
 
-        private void OnClickMoveFromStorage(int amount)
+        private void OnClickMoveFromStorageConfirmed(short inventoryItemIndex, int amount)
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
@@ -1397,7 +1381,7 @@ namespace MultiplayerARPG
                 storageOwnerId = storageOwnerId,
                 storageItemIndex = (short)IndexOfData,
                 storageItemAmount = (short)amount,
-                inventoryItemIndex = -1,
+                inventoryItemIndex = inventoryItemIndex,
             }, ClientStorageActions.ResponseMoveItemFromStorage);
         }
         #endregion
@@ -1478,16 +1462,12 @@ namespace MultiplayerARPG
 
             if (CharacterItem.amount == 1)
             {
-                if (selectionManager != null)
-                    selectionManager.DeselectSelectedUI();
-                GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
-                {
-                    index = (short)IndexOfData,
-                    amount = 1,
-                }, ClientInventoryActions.ResponseDismantleItem);
+                OnDismantleItemAmountConfirmed(1);
             }
             else
+            {
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DISMANTLE_ITEM_DESCRIPTION.ToString()), OnDismantleItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+            }
         }
 
         private void OnDismantleItemAmountConfirmed(int amount)
