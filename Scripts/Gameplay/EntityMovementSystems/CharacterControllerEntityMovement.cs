@@ -536,12 +536,6 @@ namespace MultiplayerARPG
 
             Vector3 stickGroundMove = isGrounded && !isUnderWater ? Vector3.down * stickGroundForce * Time.deltaTime : Vector3.zero;
             collisionFlags = CacheCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime + stickGroundMove);
-            if ((collisionFlags & CollisionFlags.CollidedBelow) == CollisionFlags.CollidedBelow ||
-                (collisionFlags & CollisionFlags.CollidedAbove) == CollisionFlags.CollidedAbove)
-            {
-                // Hit something below or above, falling in next frame
-                tempVerticalVelocity = 0f;
-            }
 
             if (targetYRotation.HasValue)
             {

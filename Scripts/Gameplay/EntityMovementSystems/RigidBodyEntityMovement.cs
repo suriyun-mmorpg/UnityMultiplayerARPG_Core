@@ -574,12 +574,6 @@ namespace MultiplayerARPG
             }
 
             collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
-            if ((collisionFlags & CollisionFlags.CollidedBelow) == CollisionFlags.CollidedBelow ||
-                (collisionFlags & CollisionFlags.CollidedAbove) == CollisionFlags.CollidedAbove)
-            {
-                // Hit something below or above, falling in next frame
-                tempVerticalVelocity = 0f;
-            }
 
             if (targetYRotation.HasValue)
             {
