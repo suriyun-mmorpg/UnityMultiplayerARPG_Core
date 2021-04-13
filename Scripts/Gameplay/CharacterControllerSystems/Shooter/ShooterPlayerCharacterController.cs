@@ -504,6 +504,7 @@ namespace MultiplayerARPG
                 CacheGameplayCameraControls.updateRotationY = false;
                 CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
                 CacheGameplayCameraControls.updateZoom = !IsBlockController;
+                DestroyConstructingBuilding();
             }
             else
             {
