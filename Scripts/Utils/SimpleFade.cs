@@ -12,6 +12,7 @@ namespace UtilsComponents
             FadeIn,
             FadeOut,
         }
+        public float awakeAlpha = 1f;
         public FadeState currentFadeState = FadeState.None;
         public float fadeSpeed = 0.2f;
         private Texture2D blackTexture;
@@ -19,7 +20,7 @@ namespace UtilsComponents
 
         void Awake()
         {
-            alpha = 1;
+            alpha = awakeAlpha;
             blackTexture = new Texture2D(1, 1);
             blackTexture.SetPixel(0, 0, new Color(0, 0, 0, alpha));
             blackTexture.Apply();
