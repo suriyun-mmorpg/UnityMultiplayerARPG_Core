@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
+        public float stickGroundForce = 9.6f;
         [Tooltip("Delay before character change from grounded state to airborne")]
         public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
@@ -573,7 +574,8 @@ namespace MultiplayerARPG
                 }
             }
 
-            collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
+            Vector3 stickGroundMove = isGrounded && !isUnderWater ? Vector3.down * stickGroundForce * Time.deltaTime : Vector3.zero;
+            collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime + stickGroundMove);
 
             if (targetYRotation.HasValue)
             {
