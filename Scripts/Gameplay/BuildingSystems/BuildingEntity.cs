@@ -14,6 +14,10 @@ namespace MultiplayerARPG
 
         [Header("Building Data")]
         [SerializeField]
+        [Tooltip("If this is `TRUE` this building entity will be able to build on any surface but when constructing, if player point on building area it will place on building area")]
+        protected bool canBuildOnAnySurface;
+
+        [SerializeField]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
         protected string buildingType;
 
@@ -57,6 +61,11 @@ namespace MultiplayerARPG
         /// Use this as reference for area to build this object while in build mode
         /// </summary>
         public BuildingArea BuildingArea { get; set; }
+
+        /// <summary>
+        /// Use this as reference for hit ground state while in build mode
+        /// </summary>
+        public bool HitGround { get; set; }
 
         [Header("Save Data")]
         [SerializeField]
@@ -263,13 +272,20 @@ namespace MultiplayerARPG
                 children.Add(buildingEntity);
         }
 
+        public bool IsPositionInBuildDistance(Vector3 builderPosition, Vector3 placePosition)
+        {
+            return Vector3.Distance(builderPosition, placePosition) <= BuildDistance;
+        }
+
         public bool CanBuild()
         {
+            if (!IsPositionInBuildDistance(Builder.CacheTransform.position, CacheTransform.position))
+                return false;
+            if (canBuildOnAnySurface && HitGround)
+                return true;
             if (BuildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
                 return false;
             if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
-                return false;
-            if (Vector3.Distance(CacheTransform.position, Builder.CacheTransform.position) - BUILD_DISTANCE_BUFFER > BuildDistance)
                 return false;
             return BuildingTypes.Contains(BuildingArea.buildingType);
         }
