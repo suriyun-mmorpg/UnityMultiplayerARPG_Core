@@ -57,8 +57,6 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool showConfirmConstructionUI = false;
         [SerializeField]
-        private bool clampBuildPositionByBuildDistance = false;
-        [SerializeField]
         protected bool buildRotationSnap;
         [SerializeField]
         protected float buildRotateAngle = 45f;
@@ -1645,8 +1643,9 @@ namespace MultiplayerARPG
             bool hitGround;
             FindConstructingBuildingArea(centerRay, centerOriginToCharacterDistance + findTargetRaycastDistance, out hitGround);
             // Not hit ground, find ground to snap
-            if (!hitGround)
+            if (!hitGround || !ConstructingBuildingEntity.IsPositionInBuildDistance(CacheTransform.position, aimPosition))
             {
+                aimPosition = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.BuildDistance - BuildingEntity.BUILD_DISTANCE_BUFFER);
                 // Find nearest grounded position
                 FindConstructingBuildingArea(new Ray(aimPosition, Vector3.down), 100f, out _);
             }
@@ -1657,10 +1656,7 @@ namespace MultiplayerARPG
                 // Place the building on the ground when the building area is not snapping
                 // Or place it anywhere if there is no building area
                 // It's also no snapping build area, so set building rotation by camera look direction
-                if (!clampBuildPositionByBuildDistance)
-                    ConstructingBuildingEntity.Position = aimPosition;
-                else
-                    ConstructingBuildingEntity.Position = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.BuildDistance);
+                ConstructingBuildingEntity.Position = aimPosition;
                 // Rotate to camera
                 Vector3 direction = aimPosition - CacheGameplayCameraTransform.position;
                 direction.y = 0f;
@@ -1673,6 +1669,7 @@ namespace MultiplayerARPG
         private int FindConstructingBuildingArea(Ray ray, float distance, out bool hitGround)
         {
             hitGround = false;
+            ConstructingBuildingEntity.HitGround = hitGround;
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(ray.origin, ray.direction, raycasts, distance, CurrentGameInstance.GetBuildLayerMask());
             IGameEntity gameEntity;
             BuildingArea buildingArea;
@@ -1696,6 +1693,7 @@ namespace MultiplayerARPG
                         // Hit something and it is not part of constructing building entity, assume that it is ground
                         aimPosition = tempHitInfo.point;
                         hitGround = true;
+                        ConstructingBuildingEntity.HitGround = hitGround;
                         break;
                     }
                     continue;
@@ -1712,6 +1710,7 @@ namespace MultiplayerARPG
                 aimPosition = tempHitInfo.point;
                 hitGround = true;
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
+                ConstructingBuildingEntity.HitGround = hitGround;
                 break;
             }
             return tempCount;
