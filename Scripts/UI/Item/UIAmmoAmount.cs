@@ -12,14 +12,16 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRightHandCurrentAmmo;
         public TextWrapper uiTextRightHandReserveAmmo;
         public TextWrapper uiTextRightHandSumAmmo;
-        public GameObject rightHandNoRequireAmmoSymbol;
+        public GameObject[] rightHandRequireAmmoSymbols;
+        public GameObject[] rightHandNoRequireAmmoSymbols;
         public UIGageValue gageRightHandAmmo;
         [Header("Left Hand Ammo Amount")]
         public GameObject uiLeftHandAmmoRoot;
         public TextWrapper uiTextLeftHandCurrentAmmo;
         public TextWrapper uiTextLeftHandReserveAmmo;
         public TextWrapper uiTextLeftHandSumAmmo;
-        public GameObject leftHandNoRequireAmmoSymbol;
+        public GameObject[] leftHandRequireAmmoSymbols;
+        public GameObject[] leftHandNoRequireAmmoSymbols;
         public UIGageValue gageLeftHandAmmo;
 
         private void OnEnable()
@@ -70,11 +72,11 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandNoRequireAmmoSymbol, gageRightHandAmmo, character.EquipWeapons.rightHand);
-            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandNoRequireAmmoSymbol, gageLeftHandAmmo, character.EquipWeapons.leftHand);
+            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandRequireAmmoSymbols, rightHandNoRequireAmmoSymbols, gageRightHandAmmo, character.EquipWeapons.rightHand);
+            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandRequireAmmoSymbols, leftHandNoRequireAmmoSymbols, gageLeftHandAmmo, character.EquipWeapons.leftHand);
         }
 
-        private void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject noRequireAmmoSymbol, UIGageValue gageAmmo, CharacterItem characterItem)
+        private void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject[] requireAmmoSymbols, GameObject[] noRequireAmmoSymbols, UIGageValue gageAmmo, CharacterItem characterItem)
         {
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
             bool isActive = weaponItem != null && weaponItem.WeaponType.RequireAmmoType != null;
@@ -106,13 +108,27 @@ namespace MultiplayerARPG
                 textSumAmmo.text = (currentAmmo + reserveAmmo).ToString("N0");
             }
 
-            if (noRequireAmmoSymbol != null)
-                noRequireAmmoSymbol.SetActive(!isActive);
+            if (requireAmmoSymbols != null)
+            {
+                foreach (GameObject symbol in requireAmmoSymbols)
+                {
+                    symbol.SetActive(isActive);
+                }
+            }
+
+            if (noRequireAmmoSymbols != null)
+            {
+                foreach (GameObject symbol in noRequireAmmoSymbols)
+                {
+                    symbol.SetActive(!isActive);
+                }
+            }
 
             if (gageAmmo != null)
             {
-                gageAmmo.Update(currentAmmo, weaponItem.AmmoCapacity);
                 gageAmmo.SetVisible(isActive && weaponItem.AmmoCapacity > 1);
+                if (isActive)
+                    gageAmmo.Update(currentAmmo, weaponItem.AmmoCapacity);
             }
         }
     }

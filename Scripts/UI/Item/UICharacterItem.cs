@@ -111,7 +111,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextCurrentAmmo;
         public TextWrapper uiTextReserveAmmo;
         public TextWrapper uiTextSumAmmo;
-        public GameObject noRequireAmmoSymbol;
+        public GameObject[] requireAmmoSymbols;
+        public GameObject[] noRequireAmmoSymbols;
         public UIGageValue gageAmmo;
 
         [Header("Building - UI Elements")]
@@ -419,13 +420,26 @@ namespace MultiplayerARPG
                     uiTextSumAmmo.text = (currentAmmo + reserveAmmo).ToString("N0");
                 }
 
-                if (noRequireAmmoSymbol != null)
-                    noRequireAmmoSymbol.SetActive(false);
+                if (requireAmmoSymbols != null)
+                {
+                    foreach (GameObject symbol in requireAmmoSymbols)
+                    {
+                        symbol.SetActive(true);
+                    }
+                }
+
+                if (noRequireAmmoSymbols != null)
+                {
+                    foreach (GameObject symbol in noRequireAmmoSymbols)
+                    {
+                        symbol.SetActive(false);
+                    }
+                }
 
                 if (gageAmmo != null)
                 {
-                    gageAmmo.Update(currentAmmo, WeaponItem.AmmoCapacity);
                     gageAmmo.SetVisible(WeaponItem.AmmoCapacity > 1);
+                    gageAmmo.Update(currentAmmo, WeaponItem.AmmoCapacity);
                 }
             }
             else
@@ -439,8 +453,21 @@ namespace MultiplayerARPG
                 if (uiTextSumAmmo != null)
                     uiTextSumAmmo.SetGameObjectActive(false);
 
-                if (noRequireAmmoSymbol != null)
-                    noRequireAmmoSymbol.SetActive(true);
+                if (requireAmmoSymbols != null)
+                {
+                    foreach (GameObject symbol in requireAmmoSymbols)
+                    {
+                        symbol.SetActive(false);
+                    }
+                }
+
+                if (noRequireAmmoSymbols != null)
+                {
+                    foreach (GameObject symbol in noRequireAmmoSymbols)
+                    {
+                        symbol.SetActive(true);
+                    }
+                }
 
                 if (gageAmmo != null)
                     gageAmmo.SetVisible(false);
