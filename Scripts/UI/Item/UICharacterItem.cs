@@ -74,10 +74,6 @@ namespace MultiplayerARPG
         public TextWrapper uiTextStack;
         public TextWrapper uiTextDurability;
         public UIGageValue uiGageDurability;
-        public TextWrapper uiTextCurrentAmmo;
-        public TextWrapper uiTextReserveAmmo;
-        public TextWrapper uiTextSumAmmo;
-        public GameObject noRequireAmmoSymbol;
         public TextWrapper uiTextWeight;
         public TextWrapper uiTextExp;
         public UIGageValue uiGageExp;
@@ -110,6 +106,13 @@ namespace MultiplayerARPG
         [Header("Weapon - UI Elements")]
         [FormerlySerializedAs("uiDamageAmounts")]
         public UIDamageElementAmount uiDamageAmount;
+
+        [Header("Weapon Ammo - UI Elements")]
+        public TextWrapper uiTextCurrentAmmo;
+        public TextWrapper uiTextReserveAmmo;
+        public TextWrapper uiTextSumAmmo;
+        public GameObject noRequireAmmoSymbol;
+        public UIGageValue gageAmmo;
 
         [Header("Building - UI Elements")]
         public TextWrapper uiTextBuilding;
@@ -418,6 +421,12 @@ namespace MultiplayerARPG
 
                 if (noRequireAmmoSymbol != null)
                     noRequireAmmoSymbol.SetActive(false);
+
+                if (gageAmmo != null)
+                {
+                    gageAmmo.Update(currentAmmo, WeaponItem.AmmoCapacity);
+                    gageAmmo.SetVisible(WeaponItem.AmmoCapacity > 1);
+                }
             }
             else
             {
@@ -432,6 +441,9 @@ namespace MultiplayerARPG
 
                 if (noRequireAmmoSymbol != null)
                     noRequireAmmoSymbol.SetActive(true);
+
+                if (gageAmmo != null)
+                    gageAmmo.SetVisible(false);
             }
 
             if (uiTextWeight != null)

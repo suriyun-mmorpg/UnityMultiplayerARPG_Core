@@ -13,12 +13,14 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRightHandReserveAmmo;
         public TextWrapper uiTextRightHandSumAmmo;
         public GameObject rightHandNoRequireAmmoSymbol;
+        public UIGageValue gageRightHandAmmo;
         [Header("Left Hand Ammo Amount")]
         public GameObject uiLeftHandAmmoRoot;
         public TextWrapper uiTextLeftHandCurrentAmmo;
         public TextWrapper uiTextLeftHandReserveAmmo;
         public TextWrapper uiTextLeftHandSumAmmo;
         public GameObject leftHandNoRequireAmmoSymbol;
+        public UIGageValue gageLeftHandAmmo;
 
         private void OnEnable()
         {
@@ -68,11 +70,11 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandNoRequireAmmoSymbol, character.EquipWeapons.rightHand);
-            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandNoRequireAmmoSymbol, character.EquipWeapons.leftHand);
+            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandNoRequireAmmoSymbol, gageRightHandAmmo, character.EquipWeapons.rightHand);
+            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandNoRequireAmmoSymbol, gageLeftHandAmmo, character.EquipWeapons.leftHand);
         }
 
-        private void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject noRequireAmmoSymbol, CharacterItem characterItem)
+        private void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject noRequireAmmoSymbol, UIGageValue gageAmmo, CharacterItem characterItem)
         {
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
             bool isActive = weaponItem != null && weaponItem.WeaponType.RequireAmmoType != null;
@@ -106,6 +108,12 @@ namespace MultiplayerARPG
 
             if (noRequireAmmoSymbol != null)
                 noRequireAmmoSymbol.SetActive(!isActive);
+
+            if (gageAmmo != null)
+            {
+                gageAmmo.Update(currentAmmo, weaponItem.AmmoCapacity);
+                gageAmmo.SetVisible(isActive && weaponItem.AmmoCapacity > 1);
+            }
         }
     }
 }
