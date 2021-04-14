@@ -281,9 +281,11 @@ namespace MultiplayerARPG
         {
             if (!IsPositionInBuildDistance(Builder.CacheTransform.position, CacheTransform.position))
                 return false;
+            if (triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
+                return false;
             if (canBuildOnAnySurface && HitGround)
                 return true;
-            if (BuildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
+            if (BuildingArea == null)
                 return false;
             if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
                 return false;
