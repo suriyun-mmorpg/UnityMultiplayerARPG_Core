@@ -31,6 +31,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextCoolDownDuration;
         public TextWrapper uiTextCoolDownRemainsDuration;
         public Image imageCoolDownGage;
+        public GameObject[] countDownObjects;
+        public GameObject[] noCountDownObjects;
 
         [Header("Passive Bonus")]
         public TextWrapper uiTextIncreaseMaxMember;
@@ -55,6 +57,7 @@ namespace MultiplayerARPG
         public UIGuildSkill uiNextLevelSkill;
 
         protected float coolDownRemainsDuration;
+        protected bool dirtyIsCountDown;
 
         protected override void OnDisable()
         {
@@ -112,6 +115,26 @@ namespace MultiplayerARPG
             if (imageCoolDownGage != null)
             {
                 imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+            }
+
+            bool isCountDown = coolDownRemainsDuration > 0f;
+            if (dirtyIsCountDown != isCountDown)
+            {
+                dirtyIsCountDown = isCountDown;
+                if (countDownObjects != null)
+                {
+                    foreach (GameObject obj in countDownObjects)
+                    {
+                        obj.SetActive(isCountDown);
+                    }
+                }
+                if (noCountDownObjects != null)
+                {
+                    foreach (GameObject obj in noCountDownObjects)
+                    {
+                        obj.SetActive(!isCountDown);
+                    }
+                }
             }
         }
 
