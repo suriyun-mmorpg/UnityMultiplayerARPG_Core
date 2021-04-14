@@ -63,9 +63,9 @@ namespace MultiplayerARPG
         public BuildingArea BuildingArea { get; set; }
 
         /// <summary>
-        /// Use this as reference for hit ground state while in build mode
+        /// Use this as reference for hit surface state while in build mode
         /// </summary>
-        public bool HitGround { get; set; }
+        public bool HitSurface { get; set; }
 
         [Header("Save Data")]
         [SerializeField]
@@ -283,7 +283,7 @@ namespace MultiplayerARPG
                 return false;
             if (triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
                 return false;
-            if (canBuildOnAnySurface && HitGround)
+            if (canBuildOnAnySurface && HitSurface)
                 return true;
             if (BuildingArea == null)
                 return false;

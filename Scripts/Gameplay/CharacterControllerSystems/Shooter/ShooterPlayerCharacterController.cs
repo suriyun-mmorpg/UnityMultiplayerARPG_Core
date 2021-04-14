@@ -1670,7 +1670,7 @@ namespace MultiplayerARPG
         private int FindConstructingBuildingArea(Ray ray, float distance, out bool hitGround)
         {
             hitGround = false;
-            ConstructingBuildingEntity.HitGround = hitGround;
+            ConstructingBuildingEntity.HitSurface = hitGround;
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(ray.origin, ray.direction, raycasts, distance, CurrentGameInstance.GetBuildLayerMask());
             IGameEntity gameEntity;
             BuildingArea buildingArea;
@@ -1694,7 +1694,7 @@ namespace MultiplayerARPG
                         // Hit something and it is not part of constructing building entity, assume that it is ground
                         aimPosition = tempHitInfo.point;
                         hitGround = true;
-                        ConstructingBuildingEntity.HitGround = hitGround;
+                        ConstructingBuildingEntity.HitSurface = hitGround;
                         break;
                     }
                     continue;
@@ -1711,7 +1711,7 @@ namespace MultiplayerARPG
                 aimPosition = tempHitInfo.point;
                 hitGround = true;
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
-                ConstructingBuildingEntity.HitGround = hitGround;
+                ConstructingBuildingEntity.HitSurface = hitGround;
                 break;
             }
             return tempCount;
