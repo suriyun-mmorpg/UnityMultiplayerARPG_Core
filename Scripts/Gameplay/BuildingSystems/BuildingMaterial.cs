@@ -124,6 +124,9 @@ namespace MultiplayerARPG
 
             if (BuildingEntity.IsBuildMode)
             {
+                if (BuildingEntity.BuildingArea != null &&
+                    BuildingEntity.BuildingArea.transform.root == other.transform.root)
+                    return;
                 BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
                 BuildingEntity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
@@ -145,6 +148,9 @@ namespace MultiplayerARPG
 
             if (BuildingEntity.IsBuildMode)
             {
+                if (BuildingEntity.BuildingArea != null &&
+                    BuildingEntity.BuildingArea.transform.root == other.transform.root)
+                    return;
                 BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
                 BuildingEntity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
                 BuildingEntity.TriggerEnterTilemap(other.GetComponent<TilemapCollider2D>());
