@@ -12,9 +12,12 @@ namespace MultiplayerARPG
             get
             {
                 List<IPoolDescriptor> effects = new List<IPoolDescriptor>();
-                foreach (GameEffectPoolContainer container in poolingGameEffects)
+                if (poolingGameEffects != null && poolingGameEffects.Length > 0)
                 {
-                    effects.Add(container.prefab);
+                    foreach (GameEffectPoolContainer container in poolingGameEffects)
+                    {
+                        effects.Add(container.prefab);
+                    }
                 }
                 return effects;
             }
