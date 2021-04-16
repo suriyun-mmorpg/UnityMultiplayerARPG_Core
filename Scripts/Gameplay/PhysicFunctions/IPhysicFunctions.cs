@@ -24,6 +24,8 @@ namespace MultiplayerARPG
 
         Vector3 GetRaycastNormal(int index);
 
+        Bounds GetRaycastColliderBounds(int index);
+
         float GetRaycastDistance(int index);
 
         Transform GetRaycastTransform(int index);

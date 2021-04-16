@@ -83,6 +83,11 @@ namespace MultiplayerARPG
             return raycasts[index].normal;
         }
 
+        public Bounds GetRaycastColliderBounds(int index)
+        {
+            return raycasts[index].collider.bounds;
+        }
+
         public float GetRaycastDistance(int index)
         {
             return raycasts[index].distance;

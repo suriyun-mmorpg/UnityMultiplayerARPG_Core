@@ -117,10 +117,16 @@ namespace MultiplayerARPG
             BuildingEntity.RegisterMaterial(this);
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void OnTriggerStay(Collider other)
         {
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
+
+            if (GetComponent<Collider>().bounds.BoundsContainedRate(other.bounds) <= 0.025f)
+            {
+                OnTriggerExit(other);
+                return;
+            }
 
             if (BuildingEntity.IsBuildMode)
             {
@@ -141,10 +147,16 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerStay2D(Collider2D other)
         {
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
+
+            if (GetComponent<Collider2D>().bounds.BoundsContainedRate(other.bounds) <= 0.025f)
+            {
+                OnTriggerExit2D(other);
+                return;
+            }
 
             if (BuildingEntity.IsBuildMode)
             {

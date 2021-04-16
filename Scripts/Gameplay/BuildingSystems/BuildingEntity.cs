@@ -52,6 +52,7 @@ namespace MultiplayerARPG
         public UnityEvent onBuildingDestroy = new UnityEvent();
         public UnityEvent onBuildingConstruct = new UnityEvent();
 
+        public bool CanBuildOnAnySurface { get { return canBuildOnAnySurface; } }
         public List<string> BuildingTypes { get { return buildingTypes; } }
         public float BuildDistance { get { return buildDistance; } }
         public override int MaxHp { get { return maxHp; } }
@@ -280,16 +281,27 @@ namespace MultiplayerARPG
         public bool CanBuild()
         {
             if (!IsPositionInBuildDistance(Builder.CacheTransform.position, CacheTransform.position))
+            {
+                // Too far from buildiner?
                 return false;
+            }
             if (triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
+            {
+                // Triggered something?
                 return false;
-            if (canBuildOnAnySurface && HitSurface)
-                return true;
-            if (BuildingArea == null)
-                return false;
-            if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
-                return false;
-            return BuildingTypes.Contains(BuildingArea.buildingType);
+            }
+            if (BuildingArea != null)
+            {
+                // Must build on building area
+                if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
+                    return false;
+                return BuildingTypes.Contains(BuildingArea.buildingType);
+            }
+            else
+            {
+                // Can build on any surface and it hit surface?
+                return canBuildOnAnySurface && HitSurface;
+            }
         }
 
         protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)

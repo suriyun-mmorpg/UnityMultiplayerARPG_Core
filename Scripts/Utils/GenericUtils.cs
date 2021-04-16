@@ -290,6 +290,22 @@ public static class GenericUtils
         return new Vector3(position.x, 0, position.z);
     }
 
+    public static float BoundsContainedRate(this Bounds region, Bounds obj)
+    {
+        float total = 1f;
+
+        for (int i = 0; i < 3; i++)
+        {
+            float dist = obj.min[i] > region.center[i] ?
+                obj.max[i] - region.max[i] :
+                region.min[i] - obj.min[i];
+            if (dist > 0f)
+                total *= Mathf.Clamp01(1f - dist / obj.size[i]);
+        }
+
+        return total;
+    }
+
     public static string ToBonusString(this short value, string format = "N0")
     {
         return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);

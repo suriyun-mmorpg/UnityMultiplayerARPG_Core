@@ -281,9 +281,8 @@ namespace MultiplayerARPG
         // Entity detector
         NearbyEntityDetector warpPortalEntityDetector;
         // Temp physic variables
-        RaycastHit[] raycasts = new RaycastHit[512];
-        Collider[] overlapColliders = new Collider[512];
-        RaycastHit tempHitInfo;
+        RaycastHit[] raycasts = new RaycastHit[100];
+        Collider[] overlapColliders = new Collider[200];
         // Temp target
         BasePlayerCharacterEntity targetPlayer;
         NpcEntity targetNpc;
@@ -706,6 +705,7 @@ namespace MultiplayerARPG
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + attackDistance);
             // Raycast from camera position to center of screen
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.DefaultRaycastLayers);
+            RaycastHit tempHitInfo;
             float tempDistance;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
@@ -1641,14 +1641,13 @@ namespace MultiplayerARPG
             // Default aim position (aim to sky/space)
             aimPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + findTargetRaycastDistance);
             // Raycast from camera position to center of screen
-            bool hitGround;
-            FindConstructingBuildingArea(centerRay, centerOriginToCharacterDistance + findTargetRaycastDistance, out hitGround);
+            FindConstructingBuildingArea(centerRay, centerOriginToCharacterDistance + findTargetRaycastDistance);
             // Not hit ground, find ground to snap
-            if (!hitGround || !ConstructingBuildingEntity.IsPositionInBuildDistance(CacheTransform.position, aimPosition))
+            if (!ConstructingBuildingEntity.HitSurface || !ConstructingBuildingEntity.IsPositionInBuildDistance(CacheTransform.position, aimPosition))
             {
                 aimPosition = GameplayUtils.ClampPosition(CacheTransform.position, aimPosition, ConstructingBuildingEntity.BuildDistance - BuildingEntity.BUILD_DISTANCE_BUFFER);
                 // Find nearest grounded position
-                FindConstructingBuildingArea(new Ray(aimPosition, Vector3.down), 100f, out _);
+                FindConstructingBuildingArea(new Ray(aimPosition, Vector3.down), 100f);
             }
             // Place constructing building
             if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
@@ -1667,16 +1666,24 @@ namespace MultiplayerARPG
             return ConstructingBuildingEntity.Position;
         }
 
-        private int FindConstructingBuildingArea(Ray ray, float distance, out bool hitGround)
+        private int FindConstructingBuildingArea(Ray ray, float distance)
         {
-            hitGround = false;
-            ConstructingBuildingEntity.HitSurface = hitGround;
+            ConstructingBuildingEntity.BuildingArea = null;
+            ConstructingBuildingEntity.HitSurface = false;
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(ray.origin, ray.direction, raycasts, distance, CurrentGameInstance.GetBuildLayerMask());
-            IGameEntity gameEntity;
+            RaycastHit tempHitInfo;
+            BuildingEntity buildingEntity;
             BuildingArea buildingArea;
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
+                if (ConstructingBuildingEntity.CacheTransform.root == tempHitInfo.transform.root)
+                {
+                    // Hit collider which is part of constructing building entity, skip it
+                    continue;
+                }
+
+                aimPosition = tempHitInfo.point;
 
                 if (!IsInFront(tempHitInfo.point))
                 {
@@ -1684,36 +1691,38 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
-                if (buildingArea == null)
+                // Find ground position from upper position
+                Vector3 raycastOrigin = new Vector3(tempHitInfo.point.x, tempHitInfo.collider.bounds.center.y + tempHitInfo.collider.bounds.extents.y + 0.01f, tempHitInfo.point.z);
+                RaycastHit[] groundHits = Physics.RaycastAll(raycastOrigin, Vector3.down, tempHitInfo.collider.bounds.size.y + 0.01f, CurrentGameInstance.GetBuildLayerMask());
+                for (int j = 0; j < groundHits.Length; ++j)
                 {
-                    // Hit something but it is not building area
-                    gameEntity = tempHitInfo.transform.GetComponent<IGameEntity>();
-                    if (gameEntity == null || gameEntity.Entity != ConstructingBuildingEntity)
-                    {
-                        // Hit something and it is not part of constructing building entity, assume that it is ground
-                        aimPosition = tempHitInfo.point;
-                        hitGround = true;
-                        ConstructingBuildingEntity.HitSurface = hitGround;
-                        break;
-                    }
-                    continue;
+                    if (groundHits[j].transform == tempHitInfo.transform)
+                        aimPosition = groundHits[j].point;
                 }
 
-                if (buildingArea.IsPartOfBuildingEntity(ConstructingBuildingEntity) ||
-                    !ConstructingBuildingEntity.BuildingTypes.Contains(buildingArea.buildingType))
+                buildingEntity = tempHitInfo.transform.root.GetComponent<BuildingEntity>();
+                buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
+                if ((buildingArea == null || !ConstructingBuildingEntity.BuildingTypes.Contains(buildingArea.buildingType))
+                    && buildingEntity == null)
+                {
+                    // Hit surface which is not building area or building entity
+                    ConstructingBuildingEntity.BuildingArea = null;
+                    ConstructingBuildingEntity.HitSurface = true;
+                    break;
+                }
+
+                if (buildingArea == null || !ConstructingBuildingEntity.BuildingTypes.Contains(buildingArea.buildingType))
                 {
                     // Skip because this area is not allowed to build the building that you are going to build
                     continue;
                 }
 
                 // Found building area which can construct the building
-                aimPosition = tempHitInfo.point;
-                hitGround = true;
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
-                ConstructingBuildingEntity.HitSurface = hitGround;
+                ConstructingBuildingEntity.HitSurface = true;
                 break;
             }
+            ConstructingBuildingEntity.gameObject.SetActive(true);
             return tempCount;
         }
 
