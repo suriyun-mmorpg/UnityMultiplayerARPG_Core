@@ -41,5 +41,30 @@ namespace MultiplayerARPG
         public System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onSummonsOperation;
+
+        public void OnAttackRoutine(
+            bool isLeftHand,
+            CharacterItem weapon,
+            int hitIndex,
+            DamageInfo damageInfo,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            Vector3 aimPosition)
+        {
+            if (onAttackRoutine != null)
+                onAttackRoutine.Invoke(isLeftHand, weapon, hitIndex, damageInfo, damageAmounts, aimPosition);
+        }
+
+        public void OnUseSkillRoutine(
+            BaseSkill skill,
+            short level,
+            bool isLeftHand,
+            CharacterItem weapon,
+            int hitIndex,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            Vector3 aimPosition)
+        {
+            if (onUseSkillRoutine != null)
+                onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+        }
     }
 }

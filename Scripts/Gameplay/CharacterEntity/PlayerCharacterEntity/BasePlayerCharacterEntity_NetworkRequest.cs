@@ -35,49 +35,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool ValidateRequestUseSkillItem(short index, bool isLeftHand)
-        {
-            if (!CanUseItem())
-                return false;
-
-            float time = Time.unscaledTime;
-            if (time - lastActionTime < ACTION_DELAY)
-                return false;
-            lastActionTime = time;
-
-            if (index >= nonEquipItems.Count)
-                return false;
-
-            if (nonEquipItems[index].IsLock())
-                return false;
-
-            ISkillItem item = nonEquipItems[index].GetSkillItem();
-            if (item == null)
-                return false;
-
-            BaseSkill skill = item.UsingSkill;
-            short skillLevel = item.UsingSkillLevel;
-            if (skill == null)
-                return false;
-
-            UITextKeys gameMessage;
-            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessage, true))
-            {
-                QueueGameMessage(gameMessage);
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool CallServerUseSkillItem(short index, bool isLeftHand, AimPosition aimPosition)
-        {
-            if (!ValidateRequestUseSkillItem(index, isLeftHand))
-                return false;
-            RPC(ServerUseSkillItem, index, isLeftHand, aimPosition);
-            return true;
-        }
-
         public bool CallServerUseGuildSkill(int dataId)
         {
             if (this.IsDead())
