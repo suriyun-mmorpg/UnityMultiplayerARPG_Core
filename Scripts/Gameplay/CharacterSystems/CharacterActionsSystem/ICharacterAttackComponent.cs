@@ -7,5 +7,6 @@
 
         void CancelAttack();
         void ClearAttackStates();
+        void SimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data);
     }
 }

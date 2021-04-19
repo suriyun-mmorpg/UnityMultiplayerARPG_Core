@@ -75,53 +75,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallAllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
-        {
-            if (Entity.IsDead())
-                return false;
-            RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
-            return true;
-        }
-
-        public bool CallServerSkillCastingInterrupt()
-        {
-            if (Entity.IsDead())
-                return false;
-            RPC(ServerSkillCastingInterrupt, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
-            return true;
-        }
-
-        public bool CallAllOnSkillCastingInterrupt()
-        {
-            if (Entity.IsDead())
-                return false;
-            RPC(AllOnSkillCastingInterrupt, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
-            return true;
-        }
-
-        [AllRpc]
-        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
-        {
-            BaseSkill skill;
-            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
-            {
-                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, aimPosition).Forget();
-            }
-            else
-            {
-                Entity.ClearActionStates();
-            }
-        }
-
-        public void InterruptCastingSkill()
-        {
-            if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
-            {
-                IsCastingSkillInterrupted = true;
-                CallAllOnSkillCastingInterrupt();
-            }
-        }
-
         /// <summary>
         /// Is function will be called at server to order character to use skill
         /// </summary>
@@ -178,6 +131,45 @@ namespace MultiplayerARPG
 #endif
         }
 
+        public bool CallAllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
+        {
+            if (Entity.IsDead())
+                return false;
+            RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+            return true;
+        }
+
+        [AllRpc]
+        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
+        {
+            BaseSkill skill;
+            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
+            {
+                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, aimPosition).Forget();
+            }
+            else
+            {
+                Entity.ClearActionStates();
+            }
+        }
+
+        public void InterruptCastingSkill()
+        {
+            if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
+            {
+                IsCastingSkillInterrupted = true;
+                CallAllOnSkillCastingInterrupt();
+            }
+        }
+
+        public bool CallServerSkillCastingInterrupt()
+        {
+            if (Entity.IsDead())
+                return false;
+            RPC(ServerSkillCastingInterrupt, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+            return true;
+        }
+
         /// <summary>
         /// This will be called at server by owner client to stop playing skill casting
         /// </summary>
@@ -187,6 +179,14 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             InterruptCastingSkill();
 #endif
+        }
+
+        public bool CallAllOnSkillCastingInterrupt()
+        {
+            if (Entity.IsDead())
+                return false;
+            RPC(AllOnSkillCastingInterrupt, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+            return true;
         }
 
         /// <summary>
@@ -492,6 +492,20 @@ namespace MultiplayerARPG
             // Play animations
             CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, aimPosition);
 #endif
+        }
+
+        public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
+        {
+            if (Entity.IsDead())
+                return false;
+            RPC(AllSimulateLaunchDamageEntity, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+            return true;
+        }
+
+        [AllRpc]
+        protected void AllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
+        {
+            Entity.AttackComponent.SimulateLaunchDamageEntity(data);
         }
     }
 }

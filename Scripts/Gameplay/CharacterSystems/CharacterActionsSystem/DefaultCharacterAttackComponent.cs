@@ -312,6 +312,11 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
+            SimulateLaunchDamageEntity(data);
+        }
+
+        public void SimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
+        {
             if (IsServer)
                 return;
 
