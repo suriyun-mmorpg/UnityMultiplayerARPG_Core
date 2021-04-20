@@ -54,12 +54,14 @@ namespace MultiplayerARPG
         [Header("Action State Settings")]
         [Tooltip("Which layer in Animator controller that you use it to play action animations, You can set this when animator controller type is `Custom`")]
         public int actionStateLayer;
-        public string[] actionStateNames = new string[] { "Action", "Action" };
+        [Tooltip("Which layer in Animator controller that you use it to play full body action animations, You can set this when animator controller type is `Custom`")]
+        public int actionStateFullBodyLayer;
 
         [Header("Cast Skill State Settings")]
         [Tooltip("Which layer in Animator controller that you use it to play cast skill animations, You can set this when animator controller type is `Custom`")]
         public int castSkillStateLayer;
-        public string[] castSkillStateNames = new string[] { "CastSkill", "CastSkill" };
+        [Tooltip("Which layer in Animator controller that you use it to play full body cast skill animations, You can set this when animator controller type is `Custom`")]
+        public int castSkillStateFullBodyLayer;
 
 #if UNITY_EDITOR
         [Header("Animation Test Tool")]
@@ -73,8 +75,6 @@ namespace MultiplayerARPG
 
         public AnimatorOverrideController CacheAnimatorController { get; private set; }
         private Dictionary<string, AnimationClip> animationClipOverrides = new Dictionary<string, AnimationClip>();
-        private int[] actionStateNameHashes;
-        private int[] castSkillStateNameHashes;
         private bool isSetupComponent;
         private float idleAnimSpeedRate;
         private float moveAnimSpeedRate;
@@ -132,10 +132,15 @@ namespace MultiplayerARPG
                         castSkillStateLayer = 0;
                         hasChanges = true;
                     }
-                    if (hasChanges)
+                    if (actionStateFullBodyLayer != 0)
                     {
-                        actionStateNames = new string[] { "Action" };
-                        castSkillStateNames = new string[] { "CastSkill" };
+                        actionStateFullBodyLayer = 0;
+                        hasChanges = true;
+                    }
+                    if (castSkillStateFullBodyLayer != 0)
+                    {
+                        castSkillStateFullBodyLayer = 0;
+                        hasChanges = true;
                     }
                     break;
                 case AnimatorControllerType.Advance:
@@ -156,10 +161,15 @@ namespace MultiplayerARPG
                         castSkillStateLayer = 1;
                         hasChanges = true;
                     }
-                    if (hasChanges)
+                    if (actionStateFullBodyLayer != 2)
                     {
-                        actionStateNames = new string[] { "Action", "Action" };
-                        castSkillStateNames = new string[] { "CastSkill", "CastSkill" };
+                        actionStateFullBodyLayer = 2;
+                        hasChanges = true;
+                    }
+                    if (castSkillStateFullBodyLayer != 2)
+                    {
+                        castSkillStateFullBodyLayer = 2;
+                        hasChanges = true;
                     }
                     break;
             }
@@ -187,14 +197,6 @@ namespace MultiplayerARPG
             if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
                 animator.runtimeAnimatorController = CacheAnimatorController;
             // Setup action state name hashes
-            int indexCounter;
-            actionStateNameHashes = new int[actionStateNames.Length];
-            for (indexCounter = 0; indexCounter < actionStateNames.Length; ++indexCounter)
-                actionStateNameHashes[indexCounter] = Animator.StringToHash(actionStateNames[indexCounter]);
-            // Setup cast skill state name hashes
-            castSkillStateNameHashes = new int[castSkillStateNames.Length];
-            for (indexCounter = 0; indexCounter < castSkillStateNames.Length; ++indexCounter)
-                castSkillStateNameHashes[indexCounter] = Animator.StringToHash(castSkillStateNames[indexCounter]);
             SetDefaultAnimations();
         }
 
@@ -724,21 +726,15 @@ namespace MultiplayerARPG
             bool hasClip = tempActionAnimation.clip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
+                bool fullBodyLayer = tempActionAnimation.playClipFullBody;
                 CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
-                animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, tempActionAnimation.playClipAllLayers);
-                if (tempActionAnimation.playClipAllLayers)
-                {
-                    for (int i = 0; i < animator.layerCount; ++i)
-                    {
-                        animator.Play(actionStateNameHashes[i], i, 0f);
-                    }
-                }
+                animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, fullBodyLayer);
+                if (fullBodyLayer)
+                    animator.Play(0, actionStateFullBodyLayer, 0f);
                 else
-                {
-                    animator.Play(actionStateNameHashes[actionStateLayer], actionStateLayer, 0f);
-                }
+                    animator.Play(0, actionStateLayer, 0f);
             }
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
@@ -766,22 +762,15 @@ namespace MultiplayerARPG
             bool hasClip = castClip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
-                bool playAllLayers = IsSkillCastClipPlayingAllLayers(dataId);
+                bool fullBodyLayer = IsSkillCastClipPlayingFullBody(dataId);
                 CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, 1f);
                 animator.SetBool(ANIM_IS_CASTING_SKILL, true);
-                animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, playAllLayers);
-                if (playAllLayers)
-                {
-                    for (int i = 0; i < animator.layerCount; ++i)
-                    {
-                        animator.Play(castSkillStateNameHashes[i], i, 0f);
-                    }
-                }
+                animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, fullBodyLayer);
+                if (fullBodyLayer)
+                    animator.Play(0, castSkillStateFullBodyLayer, 0f);
                 else
-                {
-                    animator.Play(castSkillStateNameHashes[castSkillStateLayer], castSkillStateLayer, 0f);
-                }
+                    animator.Play(0, castSkillStateLayer, 0f);
             }
             // Waits by skill cast duration
             yield return new WaitForSecondsRealtime(duration);

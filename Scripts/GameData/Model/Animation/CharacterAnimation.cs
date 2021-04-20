@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -18,7 +19,9 @@ namespace MultiplayerARPG
     public struct ActionAnimation
     {
         public AnimationClip clip;
-        public bool playClipAllLayers;
+        [FormerlySerializedAs("playClipAllLayers")]
+        [Tooltip("If this is `True` it will plays clip in full body layer")]
+        public bool playClipFullBody;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float animSpeedRate;
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
@@ -292,7 +295,9 @@ namespace MultiplayerARPG
     {
         public BaseSkill skill;
         public AnimationClip castClip;
-        public bool playCastClipAllLayers;
+        [FormerlySerializedAs("playCastClipAllLayers")]
+        [Tooltip("If this is `True` it will plays clip in full body layer")]
+        public bool playCastClipFullBody;
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional(nameof(activateAnimationType), nameof(SkillActivateAnimationType.UseActivateAnimation))]
         public ActionAnimation activateAnimation;
@@ -490,7 +495,9 @@ namespace MultiplayerARPG
 
         [Header("Skill movements")]
         public AnimationClip skillCastClip;
-        public bool playSkillCastClipAllLayers;
+        [FormerlySerializedAs("playSkillCastClipAllLayers")]
+        [Tooltip("If this is `True` it will plays clip in full body layer")]
+        public bool playSkillCastClipFullBody;
         public ActionAnimation skillActivateAnimation;
     }
 }
