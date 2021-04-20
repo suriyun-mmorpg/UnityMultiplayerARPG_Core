@@ -154,6 +154,10 @@ namespace MultiplayerARPG
             if (miniMapUiTransform == null)
                 miniMapUiTransform = CacheTransform;
             ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
+            AttackComponent = gameObject.GetOrAddComponent<ICharacterAttackComponent, DefaultCharacterAttackComponent>();
+            UseSkillComponent = gameObject.GetOrAddComponent<ICharacterUseSkillComponent, DefaultCharacterUseSkillComponent>();
+            ReloadComponent = gameObject.GetOrAddComponent<ICharacterReloadComponent, DefaultCharacterReloadComponent>();
+            ChargeComponent = gameObject.GetOrAddComponent<ICharacterChargeComponent, DefaultCharacterChargeComponent>();
         }
 
         protected override void EntityAwake()
