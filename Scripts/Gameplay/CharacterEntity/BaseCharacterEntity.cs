@@ -544,6 +544,41 @@ namespace MultiplayerARPG
         #endregion
 
         #region Attack / Skill / Weapon / Damage
+        public bool Attack(bool isLeftHand)
+        {
+            return AttackComponent.Attack(isLeftHand);
+        }
+
+        public bool UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
+        {
+            return UseSkillComponent.UseSkill(dataId, isLeftHand, aimPosition);
+        }
+
+        public bool UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
+        {
+            return UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, aimPosition);
+        }
+
+        public void InterruptCastingSkill()
+        {
+            UseSkillComponent.InterruptCastingSkill();
+        }
+
+        public bool StartCharge(bool isLeftHand)
+        {
+            return ChargeComponent.StartCharge(isLeftHand);
+        }
+
+        public bool StopCharge()
+        {
+            return ChargeComponent.StopCharge();
+        }
+
+        public bool Reload(bool isLeftHand)
+        {
+            return ReloadComponent.Reload(isLeftHand);
+        }
+
         public bool UpdateLastActionTime()
         {
             float time = Time.unscaledTime;

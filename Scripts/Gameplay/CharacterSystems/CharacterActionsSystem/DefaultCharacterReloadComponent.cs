@@ -189,5 +189,10 @@ namespace MultiplayerARPG
                 reloadCancellationTokenSources.RemoveAt(i);
             }
         }
+
+        public bool Reload(bool isLeftHand)
+        {
+            return CallServerReload(isLeftHand);
+        }
     }
 }

@@ -88,5 +88,15 @@ namespace MultiplayerARPG
             // TODO: If there is charge power, stop it. But there is no charge power yet so just stop playing animation
             CallAllStopChargeAnimation();
         }
+
+        public bool StartCharge(bool isLeftHand)
+        {
+            return CallServerStartWeaponCharge(isLeftHand);
+        }
+
+        public bool StopCharge()
+        {
+            return CallServerStopWeaponCharge();
+        }
     }
 }

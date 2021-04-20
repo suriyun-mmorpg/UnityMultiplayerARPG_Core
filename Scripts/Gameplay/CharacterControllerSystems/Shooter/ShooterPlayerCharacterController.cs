@@ -675,7 +675,7 @@ namespace MultiplayerARPG
                 }
 
                 attacking = tempPressAttackRight || tempPressAttackLeft;
-                if (attacking && !PlayerCharacterEntity.IsAttackingOrUsingSkill)
+                if (attacking && !PlayerCharacterEntity.IsAttacking && !PlayerCharacterEntity.IsUsingSkill)
                 {
                     // Priority is right > left
                     isLeftHandAttacking = !tempPressAttackRight && tempPressAttackLeft;
@@ -1161,9 +1161,9 @@ namespace MultiplayerARPG
                 WeaponAbility.ForceDeactivated();
             // Reload ammo at server
             if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
-                PlayerCharacterEntity.CallServerReload(false);
+                PlayerCharacterEntity.Reload(false);
             else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
-                PlayerCharacterEntity.CallServerReload(true);
+                PlayerCharacterEntity.Reload(true);
         }
 
         private void UpdateCrosshair()
@@ -1433,13 +1433,13 @@ namespace MultiplayerARPG
         public void Attack(bool isLeftHand)
         {
             // Set this to `TRUE` to update crosshair
-            if (PlayerCharacterEntity.CallServerAttack(isLeftHand))
+            if (PlayerCharacterEntity.Attack(isLeftHand))
                 updateAttackingCrosshair = true;
         }
 
         public void WeaponCharge(bool isLeftHand)
         {
-            PlayerCharacterEntity.CallServerStartWeaponCharge(isLeftHand);
+            PlayerCharacterEntity.StartCharge(isLeftHand);
         }
 
         public void ActivateWeaponAbility()
@@ -1513,11 +1513,11 @@ namespace MultiplayerARPG
                 AimPosition skillAimPosition = AimPosition.Create(queueUsingSkill.aimPosition);
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    PlayerCharacterEntity.CallServerUseSkillItem(queueUsingSkill.itemIndex, isLeftHand, skillAimPosition);
+                    PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHand, skillAimPosition);
                 }
                 else
                 {
-                    PlayerCharacterEntity.CallServerUseSkill(queueUsingSkill.skill.DataId, isLeftHand, skillAimPosition);
+                    PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHand, skillAimPosition);
                 }
             }
             ClearQueueUsingSkill();

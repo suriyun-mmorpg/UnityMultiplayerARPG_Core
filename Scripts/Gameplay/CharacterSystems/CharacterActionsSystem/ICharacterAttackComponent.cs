@@ -8,5 +8,6 @@
         void CancelAttack();
         void ClearAttackStates();
         void SimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data);
+        bool Attack(bool isLeftHand);
     }
 }

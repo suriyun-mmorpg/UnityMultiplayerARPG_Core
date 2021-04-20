@@ -158,9 +158,9 @@ namespace MultiplayerARPG
         {
             // Reload ammo at server
             if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
-                PlayerCharacterEntity.CallServerReload(false);
+                PlayerCharacterEntity.Reload(false);
             else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
-                PlayerCharacterEntity.CallServerReload(true);
+                PlayerCharacterEntity.Reload(true);
         }
 
         public virtual void UpdatePointClickInput()
@@ -342,7 +342,7 @@ namespace MultiplayerARPG
                     if (PlayerCharacterEntity.IsPlayingActionAnimation())
                     {
                         if (pointClickInterruptCastingSkill)
-                            PlayerCharacterEntity.CallServerSkillCastingInterrupt();
+                            PlayerCharacterEntity.InterruptCastingSkill();
                     }
                     else
                     {

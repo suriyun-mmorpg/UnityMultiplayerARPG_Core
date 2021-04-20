@@ -155,18 +155,23 @@ namespace MultiplayerARPG
 
         public void InterruptCastingSkill()
         {
+            if (!IsServer)
+            {
+                CallServerInterruptCastingSkill();
+                return;
+            }
             if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
             {
                 IsCastingSkillInterrupted = true;
-                CallAllOnSkillCastingInterrupt();
+                CallAllOnInterruptCastingSkill();
             }
         }
 
-        public bool CallServerSkillCastingInterrupt()
+        public bool CallServerInterruptCastingSkill()
         {
             if (Entity.IsDead())
                 return false;
-            RPC(ServerSkillCastingInterrupt, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+            RPC(ServerInterruptCastingSkill, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
 
@@ -174,18 +179,18 @@ namespace MultiplayerARPG
         /// This will be called at server by owner client to stop playing skill casting
         /// </summary>
         [ServerRpc]
-        protected virtual void ServerSkillCastingInterrupt()
+        protected virtual void ServerInterruptCastingSkill()
         {
 #if !CLIENT_BUILD
             InterruptCastingSkill();
 #endif
         }
 
-        public bool CallAllOnSkillCastingInterrupt()
+        public bool CallAllOnInterruptCastingSkill()
         {
             if (Entity.IsDead())
                 return false;
-            RPC(AllOnSkillCastingInterrupt, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+            RPC(AllOnInterruptCastingSkill, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
 
@@ -193,7 +198,7 @@ namespace MultiplayerARPG
         /// This will be called at clients to stop playing skill casting
         /// </summary>
         [AllRpc]
-        protected virtual void AllOnSkillCastingInterrupt()
+        protected virtual void AllOnInterruptCastingSkill()
         {
             IsCastingSkillInterrupted = true;
             IsUsingSkill = false;
@@ -506,6 +511,16 @@ namespace MultiplayerARPG
         protected void AllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
             Entity.AttackComponent.SimulateLaunchDamageEntity(data);
+        }
+
+        public bool UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
+        {
+            return CallServerUseSkill (dataId, isLeftHand, aimPosition);
+        }
+
+        public bool UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
+        {
+            return CallServerUseSkillItem (itemIndex, isLeftHand, aimPosition);
         }
     }
 }

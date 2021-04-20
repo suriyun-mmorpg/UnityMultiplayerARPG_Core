@@ -6,5 +6,7 @@
         float MoveSpeedRateWhileCharging { get; }
 
         void ClearChargeStates();
+        bool StartCharge(bool isLeftHand);
+        bool StopCharge();
     }
 }
