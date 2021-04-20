@@ -15,15 +15,12 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)state);
+            writer.Put(randomSeed);
             if (state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
                 writer.PutPackedInt(skillDataId);
                 writer.PutPackedShort(skillLevel);
                 writer.PutPackedInt(hitIndex);
-            }
-            else
-            {
-                writer.Put(randomSeed);
             }
             writer.PutVector3(aimPosition);
         }
@@ -31,15 +28,12 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             state = (SimulateLaunchDamageEntityState)reader.GetByte();
+            randomSeed = reader.GetByte();
             if (state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
                 skillDataId = reader.GetPackedInt();
                 skillLevel = reader.GetPackedShort();
                 hitIndex = reader.GetPackedInt();
-            }
-            else
-            {
-                randomSeed = reader.GetByte();
             }
             aimPosition = reader.GetVector3();
         }

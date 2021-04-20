@@ -259,9 +259,9 @@ namespace MultiplayerARPG
             return base.GetMoveSpeed();
         }
 
-        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            base.ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, out combatAmountType, out totalDamage);
+            base.ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
 
             BaseCharacterEntity attackerCharacter;
             if (instigator.TryGetEntity(out attackerCharacter))

@@ -6,60 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        [AllRpc]
-        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
-        {
-            AttackRoutine(isLeftHand, animationIndex).Forget();
-        }
-
-        [AllRpc]
-        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
-        {
-            BaseSkill skill;
-            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
-            {
-                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, aimPosition).Forget();
-            }
-            else
-            {
-                ClearActionStates();
-            }
-        }
-
-        [AllRpc]
-        protected void AllPlayChargeAnimation(bool isLeftHand)
-        {
-            // Get weapon type data
-            IWeaponItem weaponItem = this.GetAvailableWeapon(ref isLeftHand).GetWeaponItem();
-            int weaponTypeDataId = weaponItem.WeaponType.DataId;
-            // Play animation
-            if (CharacterModel && CharacterModel.gameObject.activeSelf)
-                CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
-            if (FpsModel && FpsModel.gameObject.activeSelf)
-                FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
-            // Set weapon charging state
-            MoveSpeedRateWhileCharging = this.GetMoveSpeedRateWhileCharging(weaponItem);
-            IsCharging = true;
-        }
-
-        [AllRpc]
-        protected void AllStopChargeAnimation()
-        {
-            // Play animation
-            if (CharacterModel && CharacterModel.gameObject.activeSelf)
-                CharacterModel.StopWeaponChargeAnimation();
-            if (FpsModel && FpsModel.gameObject.activeSelf)
-                FpsModel.StopWeaponChargeAnimation();
-            // Set weapon charging state
-            IsCharging = false;
-        }
-
-        [AllRpc]
-        protected void AllPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
-        {
-            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
-        }
-
         /// <summary>
         /// This will be called at server to order character to pickup selected item
         /// </summary>
@@ -200,9 +146,9 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClient)
             {
-                CancelReload();
-                CancelAttack();
-                CancelSkill();
+                ReloadComponent.CancelReload();
+                AttackComponent.CancelAttack();
+                UseSkillComponent.CancelSkill();
                 ClearActionStates();
             }
             if (onDead != null)

@@ -155,8 +155,10 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="skill"></param>
         /// <param name="skillLevel"></param>
+        /// <param name="randomSeed"></param>
         /// <param name="aimPosition"></param>
         /// <param name="stagger"></param>
+        /// <param name="hitObjectIds"></param>
         public void LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,
@@ -164,9 +166,12 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             short skillLevel,
+            int randomSeed,
             Vector3 aimPosition,
-            Vector3 stagger)
+            Vector3 stagger,
+            out HashSet<DamageHitObjectInfo> hitObjectIds)
         {
+            hitObjectIds = new HashSet<DamageHitObjectInfo>();
             if (attacker == null)
                 return;
 
@@ -179,8 +184,10 @@ namespace MultiplayerARPG
                     damageAmounts,
                     skill,
                     skillLevel,
+                    randomSeed,
                     aimPosition,
-                    stagger);
+                    stagger,
+                    out hitObjectIds);
                 return;
             }
 
@@ -208,7 +215,6 @@ namespace MultiplayerARPG
 
             bool hasImpactEffects = impactEffects != null;
             GameObject tempGameObject;
-            HashSet<uint> hitObjectIds = new HashSet<uint>();
             switch (damageType)
             {
                 case DamageType.Melee:
@@ -238,12 +244,16 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
+                            {
+                                ObjectId = tempDamageableHitBox.GetObjectId(),
+                            };
+                            if (hitObjectIds.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
+                            hitObjectIds.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
@@ -267,7 +277,7 @@ namespace MultiplayerARPG
                         {
                             // Pass all receive damage condition, then apply damages
                             if (isServer)
-                                damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
+                                damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)
@@ -299,12 +309,16 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
+                            {
+                                ObjectId = tempDamageableHitBox.GetObjectId(),
+                            };
+                            if (hitObjectIds.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
+                            hitObjectIds.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
@@ -314,7 +328,7 @@ namespace MultiplayerARPG
 
                             // Target receives damages
                             if (isServer)
-                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)
@@ -382,12 +396,16 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
+                            {
+                                ObjectId = tempDamageableHitBox.GetObjectId(),
+                            };
+                            if (hitObjectIds.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
+                            hitObjectIds.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
@@ -396,7 +414,7 @@ namespace MultiplayerARPG
 
                             // Target receives damages
                             if (isServer)
-                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)

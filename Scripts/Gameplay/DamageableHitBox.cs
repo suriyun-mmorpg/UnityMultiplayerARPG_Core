@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             return entity.CanReceiveDamageFrom(instigator);
         }
 
-        public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
         {
             if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
                 return;
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
             {
                 damageAmounts[key] = damageAmounts[key] * damageRate;
             }
-            entity.ApplyDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
+            entity.ApplyDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
         }
 
         public virtual void PrepareRelatesData()

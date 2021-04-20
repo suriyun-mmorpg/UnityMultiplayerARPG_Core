@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
+        public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition, int randomSeed)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -120,8 +120,10 @@ namespace MultiplayerARPG
                     damageAmounts,
                     this,
                     skillLevel,
+                    randomSeed,
                     aimPosition,
-                    Vector3.zero);
+                    Vector3.zero,
+                    out _);
             }
         }
 

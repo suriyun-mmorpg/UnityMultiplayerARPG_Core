@@ -188,12 +188,13 @@ namespace MultiplayerARPG
         /// <param name="weapon"></param>
         /// <param name="skill"></param>
         /// <param name="skillLevel"></param>
-        internal void ApplyDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        /// <param name="randomSeed"></param>
+        internal void ApplyDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
         {
             ReceivingDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
             CombatAmountType combatAmountType;
             int totalDamage;
-            ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, out combatAmountType, out totalDamage);
+            ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
             ReceivedDamage(fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
@@ -222,9 +223,10 @@ namespace MultiplayerARPG
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
+        /// <param name="randomSeed">Random seed for damage randoming</param>
         /// <param name="combatAmountType">Result damage type</param>
         /// <param name="totalDamage">Result damage</param>
-        protected abstract void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage);
+        protected abstract void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage);
 
         /// <summary>
         /// This function will be called after applied receive damage

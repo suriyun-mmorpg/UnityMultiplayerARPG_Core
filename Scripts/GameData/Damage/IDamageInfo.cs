@@ -12,8 +12,10 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             short skillLevel,
+            int randomSeed,
             Vector3 aimPosition,
-            Vector3 stagger);
+            Vector3 stagger,
+            out HashSet<DamageHitObjectInfo> hitObjectIds);
         Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
         Transform GetDamageEffectTransform(BaseCharacterEntity attacker, bool isLeftHand);
         float GetDistance();

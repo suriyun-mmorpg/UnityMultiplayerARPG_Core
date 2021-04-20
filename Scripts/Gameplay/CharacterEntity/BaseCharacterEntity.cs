@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 using LiteNetLibManager;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,6 +15,8 @@ namespace MultiplayerARPG
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData
     {
         public const float ACTION_DELAY = 0.1f;
+        public const byte ACTION_TO_SERVER_DATA_CHANNEL = 1;
+        public const byte ACTION_TO_CLIENT_DATA_CHANNEL = 1;
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float MOUNT_DELAY = 1f;
@@ -85,18 +88,29 @@ namespace MultiplayerARPG
 
         #region Protected data
         public UICharacterEntity UICharacterEntity { get; protected set; }
-        public BaseSkill UsingSkill { get; protected set; }
-        public short UsingSkillLevel { get; protected set; }
-        public AnimActionType AnimActionType { get; protected set; }
-        public int AnimActionDataId { get; protected set; }
-        public short ReloadingAmmoAmount { get; protected set; }
-        public bool IsReloading { get; protected set; }
-        public float MoveSpeedRateWhileReloading { get; protected set; }
-        public bool IsCharging { get; protected set; }
-        public float MoveSpeedRateWhileCharging { get; protected set; }
-        public bool IsAttackingOrUsingSkill { get; protected set; }
-        public float MoveSpeedRateWhileAttackingOrUsingSkill { get; protected set; }
+        public ICharacterAttackComponent AttackComponent { get; protected set; }
+        public ICharacterUseSkillComponent UseSkillComponent { get; protected set; }
+        public ICharacterReloadComponent ReloadComponent { get; protected set; }
+        public ICharacterChargeComponent ChargeComponent { get; protected set; }
+        public AnimActionType AnimActionType { get; set; }
+        public int AnimActionDataId { get; set; }
+        public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
+        public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
+        public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
+        public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
+        public BaseSkill UsingSkill { get { return UseSkillComponent.UsingSkill; } }
+        public short UsingSkillLevel { get { return UseSkillComponent.UsingSkillLevel; } }
+        public bool IsCastingSkillCanBeInterrupted { get { return UseSkillComponent.IsCastingSkillCanBeInterrupted; } }
+        public bool IsCastingSkillInterrupted { get { return UseSkillComponent.IsCastingSkillInterrupted; } }
+        public float CastingSkillDuration { get { return UseSkillComponent.CastingSkillDuration; } }
+        public float CastingSkillCountDown { get { return UseSkillComponent.CastingSkillCountDown; } }
+        public short ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
+        public bool IsReloading { get { return ReloadComponent.IsReloading; } }
+        public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
+        public bool IsCharging { get { return ChargeComponent.IsCharging; } }
+        public float MoveSpeedRateWhileCharging { get { return ChargeComponent.MoveSpeedRateWhileCharging; } }
         public float RespawnGroundedCheckCountDown { get; protected set; }
+
         protected float lastMountTime;
         protected float lastActionTime;
         protected float pushGameMessageCountDown;
@@ -140,6 +154,10 @@ namespace MultiplayerARPG
             if (miniMapUiTransform == null)
                 miniMapUiTransform = CacheTransform;
             ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
+            AttackComponent = gameObject.GetOrAddComponent<ICharacterAttackComponent, DefaultCharacterAttackComponent>();
+            UseSkillComponent = gameObject.GetOrAddComponent<ICharacterUseSkillComponent, DefaultCharacterUseSkillComponent>();
+            ReloadComponent = gameObject.GetOrAddComponent<ICharacterReloadComponent, DefaultCharacterReloadComponent>();
+            ChargeComponent = gameObject.GetOrAddComponent<ICharacterChargeComponent, DefaultCharacterChargeComponent>();
         }
 
         protected override void EntityAwake()
@@ -156,46 +174,7 @@ namespace MultiplayerARPG
                 AttackPhysicFunctions = new PhysicFunctions2D(512);
                 FindPhysicFunctions = new PhysicFunctions2D(512);
             }
-            ClearActionStates();
             isRecaching = true;
-        }
-
-        protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
-        {
-            ClearActionStates();
-            AnimActionType = animActionType;
-            AnimActionDataId = animActionDataId;
-            IsAttackingOrUsingSkill = true;
-        }
-
-        protected virtual void SetUseSkillActionStates(AnimActionType animActionType, int animActionDataId, BaseSkill usingSkill, short usingSkillLevel)
-        {
-            ClearActionStates();
-            AnimActionType = animActionType;
-            AnimActionDataId = animActionDataId;
-            UsingSkill = usingSkill;
-            UsingSkillLevel = usingSkillLevel;
-            IsAttackingOrUsingSkill = true;
-        }
-
-        protected virtual void SetReloadActionStates(AnimActionType animActionType, short reloadingAmmoAmount)
-        {
-            ClearActionStates();
-            AnimActionType = animActionType;
-            ReloadingAmmoAmount = reloadingAmmoAmount;
-            IsReloading = true;
-        }
-
-        protected virtual void ClearActionStates()
-        {
-            AnimActionType = AnimActionType.None;
-            AnimActionDataId = 0;
-            UsingSkill = null;
-            UsingSkillLevel = 0;
-            ReloadingAmmoAmount = 0;
-            IsAttackingOrUsingSkill = false;
-            IsReloading = false;
-            IsCharging = false;
         }
 
         protected override void OnValidate()
@@ -292,12 +271,7 @@ namespace MultiplayerARPG
 
             // Clear data when character dead
             if (this.IsDead())
-            {
-                // Clear action states when character dead
-                ClearActionStates();
-                InterruptCastingSkill();
                 ExitVehicle();
-            }
 
             // Enable movement or not
             if (Movement.Enabled != tempEnableMovement)
@@ -312,9 +286,6 @@ namespace MultiplayerARPG
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicle.seatIndex);
             // Update current model
             model = ModelManager.ActiveModel;
-            // Update casting skill count down, will show gage at clients
-            if (CastingSkillCountDown > 0)
-                CastingSkillCountDown -= deltaTime;
             // Set character model hide state
             ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
             // Update model animations
@@ -456,10 +427,8 @@ namespace MultiplayerARPG
                 }
             }
         }
-        #endregion
 
-        #region Helpers
-        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
             bool isCritical = false;
             bool isBlocked = false;
@@ -490,7 +459,7 @@ namespace MultiplayerARPG
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
                 damageAmount = damageAmounts[damageElement];
-                calculatingDamage = damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors, damageAmount.Random());
+                calculatingDamage = damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors, damageAmount.Random(randomSeed));
                 if (calculatingDamage > 0f)
                     calculatingTotalDamage += calculatingDamage;
             }
@@ -527,15 +496,14 @@ namespace MultiplayerARPG
                 return;
 
             // Interrupt casting skill when receive damage
-            InterruptCastingSkill();
+            UseSkillComponent.InterruptCastingSkill();
 
             // Do something when character dead
             if (this.IsDead())
             {
-                // Cancel actions
-                CancelReload();
-                CancelAttack();
-                CancelSkill();
+                AttackComponent.CancelAttack();
+                UseSkillComponent.CancelSkill();
+                ReloadComponent.CancelReload();
 
                 // Call killed function, this should be called only once when dead
                 ValidateRecovery(instigator);
@@ -579,7 +547,217 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Weapons / Damage
+        #region Attack / Skill / Weapon / Damage
+        public bool Attack(bool isLeftHand)
+        {
+            return AttackComponent.Attack(isLeftHand);
+        }
+
+        public bool UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
+        {
+            return UseSkillComponent.UseSkill(dataId, isLeftHand, aimPosition);
+        }
+
+        public bool UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
+        {
+            return UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, aimPosition);
+        }
+
+        public void InterruptCastingSkill()
+        {
+            UseSkillComponent.InterruptCastingSkill();
+        }
+
+        public bool StartCharge(bool isLeftHand)
+        {
+            return ChargeComponent.StartCharge(isLeftHand);
+        }
+
+        public bool StopCharge()
+        {
+            return ChargeComponent.StopCharge();
+        }
+
+        public bool Reload(bool isLeftHand)
+        {
+            return ReloadComponent.Reload(isLeftHand);
+        }
+
+        public bool UpdateLastActionTime()
+        {
+            float time = Time.unscaledTime;
+            if (time - lastActionTime < ACTION_DELAY)
+                return false;
+            lastActionTime = time;
+            return true;
+        }
+
+        public void ClearActionStates()
+        {
+            AttackComponent.ClearAttackStates();
+            UseSkillComponent.ClearUseSkillStates();
+            ReloadComponent.ClearReloadStates();
+            ChargeComponent.ClearChargeStates();
+        }
+
+        public Vector3 GetDefaultAttackAimPosition(ref bool isLeftHand)
+        {
+            return GetDefaultAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand);
+        }
+
+        public Vector3 GetDefaultAttackAimPosition(DamageInfo damageInfo, bool isLeftHand)
+        {
+            // No aim position set, set aim position to forward direction
+            BaseGameEntity targetEntity = GetTargetEntity();
+            if (targetEntity)
+            {
+                if (targetEntity is DamageableEntity)
+                {
+                    return (targetEntity as DamageableEntity).OpponentAimTransform.position;
+                }
+                else
+                {
+                    return targetEntity.CacheTransform.position;
+                }
+            }
+            return damageInfo.GetDamageTransform(this, isLeftHand).position + CacheTransform.forward * damageInfo.GetDistance();
+        }
+
+        public virtual void GetReloadingData(
+            ref bool isLeftHand,
+            out AnimActionType animActionType,
+            out int animationDataId,
+            out CharacterItem weapon)
+        {
+            weapon = this.GetAvailableWeapon(ref isLeftHand);
+            // Assign data id
+            animationDataId = weapon.GetWeaponItem().WeaponType.DataId;
+            // Assign animation action type
+            animActionType = !isLeftHand ? AnimActionType.ReloadRightHand : AnimActionType.ReloadLeftHand;
+        }
+
+        public virtual void GetAttackingData(
+            ref bool isLeftHand,
+            out AnimActionType animActionType,
+            out int animationDataId,
+            out CharacterItem weapon)
+        {
+            weapon = this.GetAvailableWeapon(ref isLeftHand);
+            // Assign data id
+            animationDataId = weapon.GetWeaponItem().WeaponType.DataId;
+            // Assign animation action type
+            animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
+        }
+
+        public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamagesWithBuffs(CharacterItem weapon)
+        {
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+            // Calculate all damages
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetWeaponDamages(weapon));
+            // Sum damage with buffs
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetCaches().IncreaseDamages);
+
+            return damageAmounts;
+        }
+
+        public bool ValidateAmmo(CharacterItem weapon, short amount = 1)
+        {
+            // Avoid null data
+            if (weapon == null)
+                return true;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem.WeaponType.RequireAmmoType != null)
+            {
+                if (weaponItem.AmmoCapacity <= 0)
+                {
+                    // Ammo capacity is 0 so reduce ammo from inventory
+                    if (this.CountAmmos(weaponItem.WeaponType.RequireAmmoType) < amount)
+                        return false;
+                }
+                else
+                {
+                    // Ammo capacity more than 0 reduce loaded ammo
+                    if (weapon.ammo < amount)
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        public void ReduceAmmo(CharacterItem weapon, bool isLeftHand, out IAmmoItem ammoItem, out short ammoLevel, short amount = 1)
+        {
+            ammoItem = null;
+            ammoLevel = 1;
+
+            // Avoid null data
+            if (weapon == null)
+                return;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem.AmmoCapacity <= 0)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                Dictionary<CharacterItem, short> decreaseAmmoItems;
+                if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out decreaseAmmoItems))
+                {
+                    this.FillEmptySlots();
+                    CharacterItem ammoCharacterItem = decreaseAmmoItems.FirstOrDefault().Key;
+                    ammoItem = ammoCharacterItem.GetAmmoItem();
+                    ammoLevel = ammoCharacterItem.level;
+                }
+            }
+            else
+            {
+                // Ammo capacity >= `amount` reduce loaded ammo
+                if (weapon.ammo >= amount)
+                {
+                    weapon.ammo -= amount;
+                    EquipWeapons equipWeapons = EquipWeapons;
+                    if (isLeftHand)
+                        equipWeapons.leftHand = weapon;
+                    else
+                        equipWeapons.rightHand = weapon;
+                    EquipWeapons = equipWeapons;
+                }
+            }
+        }
+
+        public virtual void GetUsingSkillData(
+            BaseSkill skill,
+            ref bool isLeftHand,
+            out AnimActionType animActionType,
+            out int animationDataId,
+            out CharacterItem weapon)
+        {
+            // Initialize data
+            animActionType = AnimActionType.None;
+            animationDataId = 0;
+            weapon = this.GetAvailableWeapon(ref isLeftHand);
+            // Prepare skill data
+            if (skill == null)
+                return;
+            // Prepare weapon data
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            // Get activate animation type which defined at character model
+            SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
+            // Prepare animation
+            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack())
+            {
+                // Assign data id
+                animationDataId = weaponItem.WeaponType.DataId;
+                // Assign animation action type
+                animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
+            }
+            else if (useSkillActivateAnimationType == SkillActivateAnimationType.UseActivateAnimation)
+            {
+                // Assign data id
+                animationDataId = skill.DataId;
+                // Assign animation action type
+                animActionType = !isLeftHand ? AnimActionType.SkillRightHand : AnimActionType.SkillLeftHand;
+            }
+        }
+
         public virtual CrosshairSetting GetCrosshairSetting()
         {
             IWeaponItem rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
@@ -674,7 +852,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanDoActions()
         {
-            return !this.IsDead() && !IsAttackingOrUsingSkill && !IsReloading && !IsPlayingActionAnimation();
+            return !this.IsDead() && !IsAttacking && !IsUsingSkill && !IsReloading && !IsPlayingActionAnimation();
         }
 
         public float GetAttackSpeed()
@@ -690,9 +868,13 @@ namespace MultiplayerARPG
         {
             float moveSpeed = this.GetCaches().MoveSpeed;
 
-            if (IsAttackingOrUsingSkill)
+            if (IsAttacking)
             {
-                moveSpeed *= MoveSpeedRateWhileAttackingOrUsingSkill;
+                moveSpeed *= MoveSpeedRateWhileAttacking;
+            }
+            else if (IsUsingSkill)
+            {
+                moveSpeed *= MoveSpeedRateWhileUsingSkill;
             }
             else if (IsReloading)
             {
