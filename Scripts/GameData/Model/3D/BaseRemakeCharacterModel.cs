@@ -428,12 +428,12 @@ namespace MultiplayerARPG
             return defaultAnimations.skillCastClip;
         }
 
-        public bool IsSkillCastClipPlayingFullBody(int dataId)
+        public bool IsSkillCastClipPlayingAllLayers(int dataId)
         {
             SkillAnimations anims;
             if (TryGetSkillAnimations(dataId, out anims) && anims.castClip != null)
-                return anims.playCastClipFullBody;
-            return defaultAnimations.playSkillCastClipFullBody;
+                return anims.playCastClipAllLayers;
+            return defaultAnimations.playSkillCastClipAllLayers;
         }
 
         public ActionAnimation GetSkillActivateAnimation(int dataId)
