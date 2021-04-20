@@ -288,9 +288,9 @@ namespace MultiplayerARPG
             for (int i = 0; i < fireSpread + 1; ++i)
             {
                 stagger = new Vector3();
-                randomSeed = unchecked(randomSeed += (i * 4));
+                randomSeed = unchecked(randomSeed += (i + 1) * 4);
                 stagger.x = GenericUtils.RandomFloat(randomSeed, -fireStagger.x, fireStagger.x);
-                randomSeed = unchecked(randomSeed += (i * 4));
+                randomSeed = unchecked(randomSeed += (i + 1) * 4);
                 stagger.y = GenericUtils.RandomFloat(randomSeed, -fireStagger.y, fireStagger.y);
                 damageInfo.LaunchDamageEntity(
                     Entity,
