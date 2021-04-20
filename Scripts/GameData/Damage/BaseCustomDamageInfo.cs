@@ -13,7 +13,8 @@ namespace MultiplayerARPG
             BaseSkill skill,
             short skillLevel,
             Vector3 aimPosition,
-            Vector3 stagger);
+            Vector3 stagger,
+            out HashSet<DamageHitObjectInfo> hitObjectIds);
         public abstract Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract Transform GetDamageEffectTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract float GetDistance();

@@ -297,7 +297,8 @@ namespace MultiplayerARPG
                     null,
                     0,
                     aimPosition,
-                    stagger);
+                    stagger,
+                    out _);
             }
         }
 

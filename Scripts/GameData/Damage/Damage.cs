@@ -165,8 +165,10 @@ namespace MultiplayerARPG
             BaseSkill skill,
             short skillLevel,
             Vector3 aimPosition,
-            Vector3 stagger)
+            Vector3 stagger,
+            out HashSet<DamageHitObjectInfo> hitObjectIds)
         {
+            hitObjectIds = new HashSet<DamageHitObjectInfo>();
             if (attacker == null)
                 return;
 
@@ -180,7 +182,8 @@ namespace MultiplayerARPG
                     skill,
                     skillLevel,
                     aimPosition,
-                    stagger);
+                    stagger,
+                    out hitObjectIds);
                 return;
             }
 
@@ -208,7 +211,6 @@ namespace MultiplayerARPG
 
             bool hasImpactEffects = impactEffects != null;
             GameObject tempGameObject;
-            HashSet<uint> hitObjectIds = new HashSet<uint>();
             switch (damageType)
             {
                 case DamageType.Melee:
@@ -238,12 +240,16 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
+                            {
+                                ObjectId = tempDamageableHitBox.GetObjectId(),
+                            };
+                            if (hitObjectIds.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
+                            hitObjectIds.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
@@ -299,12 +305,16 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
+                            {
+                                ObjectId = tempDamageableHitBox.GetObjectId(),
+                            };
+                            if (hitObjectIds.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
+                            hitObjectIds.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
@@ -382,12 +392,16 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            if (hitObjectIds.Contains(tempDamageableHitBox.GetObjectId()))
+                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
+                            {
+                                ObjectId = tempDamageableHitBox.GetObjectId(),
+                            };
+                            if (hitObjectIds.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(tempDamageableHitBox.GetObjectId());
+                            hitObjectIds.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||

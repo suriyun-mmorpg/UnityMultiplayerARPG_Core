@@ -121,7 +121,8 @@ namespace MultiplayerARPG
                     this,
                     skillLevel,
                     aimPosition,
-                    Vector3.zero);
+                    Vector3.zero,
+                    out _);
             }
         }
 
