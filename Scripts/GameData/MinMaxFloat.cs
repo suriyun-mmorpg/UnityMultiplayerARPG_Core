@@ -54,6 +54,6 @@ public struct MinMaxFloat
 
     public float Random(int seed)
     {
-        return (float)(new System.Random(seed).NextDouble() * (max - min) + min);
+        return GenericUtils.RandomFloat(seed, min, max);
     }
 }
