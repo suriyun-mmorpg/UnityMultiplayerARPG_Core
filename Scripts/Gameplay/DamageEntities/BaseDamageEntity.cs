@@ -80,7 +80,7 @@ namespace MultiplayerARPG
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(instigator))
                 return;
             if (IsServer)
-                target.ReceiveDamage(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
+                target.ReceiveDamage(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
         }
 
         public override void InitPrefab()

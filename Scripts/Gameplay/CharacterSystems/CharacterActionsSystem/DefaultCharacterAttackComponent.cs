@@ -296,6 +296,7 @@ namespace MultiplayerARPG
                     damageAmounts,
                     null,
                     0,
+                    randomSeed,
                     aimPosition,
                     stagger,
                     out _);
@@ -329,7 +330,7 @@ namespace MultiplayerARPG
                 {
                     CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                     Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.aimPosition);
+                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.aimPosition, data.randomSeed);
                 }
             }
             else

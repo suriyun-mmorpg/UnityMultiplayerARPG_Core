@@ -155,8 +155,10 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="skill"></param>
         /// <param name="skillLevel"></param>
+        /// <param name="randomSeed"></param>
         /// <param name="aimPosition"></param>
         /// <param name="stagger"></param>
+        /// <param name="hitObjectIds"></param>
         public void LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,
@@ -164,6 +166,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             short skillLevel,
+            int randomSeed,
             Vector3 aimPosition,
             Vector3 stagger,
             out HashSet<DamageHitObjectInfo> hitObjectIds)
@@ -181,6 +184,7 @@ namespace MultiplayerARPG
                     damageAmounts,
                     skill,
                     skillLevel,
+                    randomSeed,
                     aimPosition,
                     stagger,
                     out hitObjectIds);
@@ -273,7 +277,7 @@ namespace MultiplayerARPG
                         {
                             // Pass all receive damage condition, then apply damages
                             if (isServer)
-                                damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
+                                damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)
@@ -324,7 +328,7 @@ namespace MultiplayerARPG
 
                             // Target receives damages
                             if (isServer)
-                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)
@@ -410,7 +414,7 @@ namespace MultiplayerARPG
 
                             // Target receives damages
                             if (isServer)
-                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel);
+                                tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)

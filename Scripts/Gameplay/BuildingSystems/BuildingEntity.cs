@@ -304,7 +304,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
             // Calculate damages
             float calculatingTotalDamage = 0f;
@@ -313,9 +313,9 @@ namespace MultiplayerARPG
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
                 damageAmount = damageAmounts[damageElement];
-                calculatingDamage = damageAmount.Random();
+                calculatingDamage = damageAmount.Random(randomSeed);
                 if (calculatingDamage > 0f)
-                    calculatingTotalDamage += damageAmount.Random();
+                    calculatingTotalDamage += damageAmount.Random(randomSeed);
             }
 
             // Apply damages

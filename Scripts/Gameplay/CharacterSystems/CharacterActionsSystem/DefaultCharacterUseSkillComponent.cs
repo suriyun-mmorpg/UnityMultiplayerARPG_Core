@@ -345,11 +345,13 @@ namespace MultiplayerARPG
                     // Apply skill buffs, summons and attack damages
                     if (IsServer)
                     {
-                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+                        int randomSeed = Random.Range(0, 255);
+                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition, randomSeed);
                         SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                         if (isLeftHand)
                             simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
                         simulateData.state |= SimulateLaunchDamageEntityState.IsSkill;
+                        simulateData.randomSeed = (byte)randomSeed;
                         simulateData.skillDataId = skill.DataId;
                         simulateData.skillLevel = skillLevel;
                         simulateData.hitIndex = hitIndex;

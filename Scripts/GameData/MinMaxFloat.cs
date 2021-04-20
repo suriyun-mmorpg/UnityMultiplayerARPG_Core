@@ -52,8 +52,8 @@ public struct MinMaxFloat
         return result;
     }
 
-    public float Random()
+    public float Random(int seed)
     {
-        return UnityEngine.Random.Range(min, max);
+        return (float)(new System.Random(seed).NextDouble() * (max - min) + min);
     }
 }

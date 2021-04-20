@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             RPC(AllOnHarvestableDestroy);
         }
 
-        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
             BaseCharacterEntity attackerCharacter;
             instigator.TryGetEntity(out attackerCharacter);
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             if (harvestable.CacheHarvestEffectivenesses.TryGetValue(weaponItem.WeaponType, out harvestEffectiveness) &&
                 harvestable.CacheHarvestItems.TryGetValue(weaponItem.WeaponType, out itemRandomizer))
             {
-                calculatingTotalDamage = weaponItem.HarvestDamageAmount.GetAmount(weapon.level).Random() * harvestEffectiveness.damageEffectiveness;
+                calculatingTotalDamage = weaponItem.HarvestDamageAmount.GetAmount(weapon.level).Random(randomSeed) * harvestEffectiveness.damageEffectiveness;
                 ItemDropByWeight receivingItem = itemRandomizer.TakeOne();
                 int itemDataId = receivingItem.item.DataId;
                 short itemAmount = (short)(receivingItem.amountPerDamage * calculatingTotalDamage);
