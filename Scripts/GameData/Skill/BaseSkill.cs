@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -165,14 +166,14 @@ namespace MultiplayerARPG
             {
                 if (!alreadySetAvailableWeaponsText)
                 {
-                    string str = string.Empty;
+                    StringBuilder str = new StringBuilder();
                     foreach (WeaponType availableWeapon in CacheAvailableWeapons)
                     {
-                        if (!string.IsNullOrEmpty(str))
-                            str += "/";
-                        str += availableWeapon.Title;
+                        if (str.Length > 0)
+                            str.Append('/');
+                        str.Append(availableWeapon.Title);
                     }
-                    availableWeaponsText = str;
+                    availableWeaponsText = str.ToString();
                     alreadySetAvailableWeaponsText = true;
                 }
                 return availableWeaponsText;
@@ -189,14 +190,14 @@ namespace MultiplayerARPG
             {
                 if (!alreadySetAvailableArmorsText)
                 {
-                    string str = string.Empty;
+                    StringBuilder str = new StringBuilder();
                     foreach (ArmorType requireArmor in availableArmors)
                     {
-                        if (!string.IsNullOrEmpty(str))
-                            str += "/";
-                        str += requireArmor.Title;
+                        if (str.Length > 0)
+                            str.Append('/');
+                        str.Append(requireArmor.Title);
                     }
-                    availableArmorsText = str;
+                    availableArmorsText = str.ToString();
                     alreadySetAvailableArmorsText = true;
                 }
                 return availableArmorsText;
@@ -213,14 +214,14 @@ namespace MultiplayerARPG
             {
                 if (!alreadySetAvailableVehiclesText)
                 {
-                    string str = string.Empty;
+                    StringBuilder str = new StringBuilder();
                     foreach (VehicleType requireVehicle in availableVehicles)
                     {
-                        if (!string.IsNullOrEmpty(str))
-                            str += "/";
-                        str += requireVehicle.Title;
+                        if (str.Length > 0)
+                            str.Append('/');
+                        str.Append(requireVehicle.Title);
                     }
-                    availableVehiclesText = str;
+                    availableVehiclesText = str.ToString();
                     alreadySetAvailableVehiclesText = true;
                 }
                 return availableVehiclesText;
