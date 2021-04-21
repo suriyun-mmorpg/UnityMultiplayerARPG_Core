@@ -158,7 +158,7 @@ namespace MultiplayerARPG
         /// <param name="randomSeed"></param>
         /// <param name="aimPosition"></param>
         /// <param name="stagger"></param>
-        /// <param name="hitObjectIds"></param>
+        /// <param name="damageHitObjectInfos"></param>
         public void LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,
@@ -169,9 +169,9 @@ namespace MultiplayerARPG
             int randomSeed,
             Vector3 aimPosition,
             Vector3 stagger,
-            out HashSet<DamageHitObjectInfo> hitObjectIds)
+            out HashSet<DamageHitObjectInfo> damageHitObjectInfos)
         {
-            hitObjectIds = new HashSet<DamageHitObjectInfo>();
+            damageHitObjectInfos = new HashSet<DamageHitObjectInfo>();
             if (attacker == null)
                 return;
 
@@ -188,7 +188,7 @@ namespace MultiplayerARPG
                     randomSeed,
                     aimPosition,
                     stagger,
-                    out hitObjectIds);
+                    out damageHitObjectInfos);
                 // Trigger attacker's on launch damage entity event
                 attacker.OnLaunchDamageEntity(
                     isLeftHand,
@@ -199,7 +199,7 @@ namespace MultiplayerARPG
                     randomSeed,
                     aimPosition,
                     stagger,
-                    hitObjectIds);
+                    damageHitObjectInfos);
                 // Then break the function because launch damage entity functionality done by custom damage info class
                 return;
             }
@@ -251,7 +251,7 @@ namespace MultiplayerARPG
                                 randomSeed,
                                 aimPosition,
                                 stagger,
-                                hitObjectIds);
+                                damageHitObjectInfos);
                             // Then break the function because it can't find hitting objects
                             return;
                         }
@@ -274,13 +274,14 @@ namespace MultiplayerARPG
                             DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
                             {
                                 ObjectId = tempDamageableHitBox.GetObjectId(),
+                                HitBoxIndex = tempDamageableHitBox.Index,
                             };
-                            if (hitObjectIds.Contains(damageHitObjectInfo))
+                            if (damageHitObjectInfos.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(damageHitObjectInfo);
+                            damageHitObjectInfos.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
@@ -330,7 +331,7 @@ namespace MultiplayerARPG
                                 randomSeed,
                                 aimPosition,
                                 stagger,
-                                hitObjectIds);
+                                damageHitObjectInfos);
                             // Then break the function because it can't find hitting objects
                             return;
                         }
@@ -353,13 +354,14 @@ namespace MultiplayerARPG
                             DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
                             {
                                 ObjectId = tempDamageableHitBox.GetObjectId(),
+                                HitBoxIndex = tempDamageableHitBox.Index,
                             };
-                            if (hitObjectIds.Contains(damageHitObjectInfo))
+                            if (damageHitObjectInfos.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(damageHitObjectInfo);
+                            damageHitObjectInfos.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
@@ -440,13 +442,14 @@ namespace MultiplayerARPG
                             DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
                             {
                                 ObjectId = tempDamageableHitBox.GetObjectId(),
+                                HitBoxIndex = tempDamageableHitBox.Index,
                             };
-                            if (hitObjectIds.Contains(damageHitObjectInfo))
+                            if (damageHitObjectInfos.Contains(damageHitObjectInfo))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            hitObjectIds.Add(damageHitObjectInfo);
+                            damageHitObjectInfos.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() ||
@@ -493,7 +496,7 @@ namespace MultiplayerARPG
                 randomSeed,
                 aimPosition,
                 stagger,
-                hitObjectIds);
+                damageHitObjectInfos);
         }
 
         public void PrepareRelatesData()
