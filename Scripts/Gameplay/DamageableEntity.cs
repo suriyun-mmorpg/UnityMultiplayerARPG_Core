@@ -61,6 +61,11 @@ namespace MultiplayerARPG
             {
                 HitBoxes[i].Setup(this, i);
             }
+        }
+
+        protected override void EntityStart()
+        {
+            base.EntityStart();
             // Add to lag compensation manager
             CurrentGameManager.LagCompensationManager.AddHitBoxes(ObjectId, HitBoxes);
         }
