@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Setup(DamageableEntity entity, int index)
+        public virtual void Setup(DamageableEntity entity, int index)
         {
             this.entity = entity;
             Index = index;

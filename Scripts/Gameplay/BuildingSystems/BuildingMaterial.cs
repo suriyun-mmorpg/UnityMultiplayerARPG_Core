@@ -94,7 +94,6 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            BuildingEntity = entity as BuildingEntity;
 
             if (meshRenderer == null)
                 meshRenderer = GetComponent<MeshRenderer>();
@@ -114,6 +113,12 @@ namespace MultiplayerARPG
             CurrentState = State.Unknow;
             CurrentState = State.Default;
 
+        }
+
+        public override void Setup(DamageableEntity entity, int index)
+        {
+            base.Setup(entity, index);
+            BuildingEntity = entity as BuildingEntity;
             BuildingEntity.RegisterMaterial(this);
         }
 
