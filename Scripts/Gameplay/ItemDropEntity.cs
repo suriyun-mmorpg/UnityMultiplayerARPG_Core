@@ -276,7 +276,7 @@ namespace MultiplayerARPG
             CallAllOnItemDropDestroy();
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay).Forget();
+                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
             // Destroy this entity

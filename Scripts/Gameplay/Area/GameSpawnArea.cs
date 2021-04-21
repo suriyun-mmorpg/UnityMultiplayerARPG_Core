@@ -48,7 +48,7 @@ namespace MultiplayerARPG
                         Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab.name}, Amount: {pendingEntry.amount}.");
                         for (int i = 0; i < pendingEntry.amount; ++i)
                         {
-                            Spawn(pendingEntry.prefab, pendingEntry.level, 0).Forget();
+                            Spawn(pendingEntry.prefab, pendingEntry.level, 0);
                         }
                     }
                     pending.Clear();
@@ -80,13 +80,18 @@ namespace MultiplayerARPG
         {
             for (int i = 0; i < amount; ++i)
             {
-                Spawn(prefab, level, 0).Forget();
+                Spawn(prefab, level, 0);
             }
         }
 
-        public virtual async UniTaskVoid Spawn(T prefab, short level, float delay)
+        public virtual Coroutine Spawn(T prefab, short level, float delay)
         {
-            await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
+            return StartCoroutine(SpawnRoutine(prefab, level, delay));
+        }
+
+        IEnumerator SpawnRoutine(T prefab, short level, float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
             SpawnInternal(prefab, level);
         }
 
