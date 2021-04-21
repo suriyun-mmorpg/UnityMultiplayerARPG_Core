@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public Transform OpponentAimTransform { get { return entity.OpponentAimTransform; } }
         public BaseGameEntity Entity { get { return entity.Entity; } }
         public LiteNetLibIdentity Identity { get { return entity.Identity; } }
+        public int Index { get; set; }
 
         protected virtual void Awake()
         {

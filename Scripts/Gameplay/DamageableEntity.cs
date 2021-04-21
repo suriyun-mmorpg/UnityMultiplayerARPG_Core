@@ -52,9 +52,15 @@ namespace MultiplayerARPG
                 combatTextTransform = CacheTransform;
             if (opponentAimTransform == null)
                 opponentAimTransform = CombatTextTransform;
+            // Prepare hitboxes
             HitBoxes = GetComponentsInChildren<DamageableHitBox>(true);
             if (HitBoxes == null || HitBoxes.Length == 0)
                 HitBoxes = CreateHitBoxes();
+            // Assign index to hitboxes
+            for (int i = 0; i < HitBoxes.Length; ++i)
+            {
+                HitBoxes[i].Index = i;
+            }
         }
 
         private DamageableHitBox[] CreateHitBoxes()
