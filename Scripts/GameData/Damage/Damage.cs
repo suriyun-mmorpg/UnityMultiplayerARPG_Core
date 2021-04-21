@@ -238,7 +238,9 @@ namespace MultiplayerARPG
                         DamageableEntity selectedTarget = null;
                         bool hasSelectedTarget = attacker.TryGetTargetEntity(out selectedTarget);
                         // If hit only selected target, find selected character (only 1 character) to apply damage
+                        BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId);
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
+                        BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                         if (tempOverlapSize == 0)
                         {
                             // Trigger attacker's on launch damage entity event
@@ -318,7 +320,9 @@ namespace MultiplayerARPG
                     else
                     {
                         // If not hit only selected target, find characters within hit fov to applies damages
+                        BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId);
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
+                        BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                         if (tempOverlapSize == 0)
                         {
                             // Trigger attacker's on launch damage entity event
@@ -399,7 +403,9 @@ namespace MultiplayerARPG
                 case DamageType.Raycast:
                     float minDistance = missileDistance;
                     // Just raycast to any entity to apply damage
+                    BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId);
                     int tempRaycastSize = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, Physics.DefaultRaycastLayers);
+                    BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                     if (tempRaycastSize > 0)
                     {
                         // Sort index
