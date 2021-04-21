@@ -51,6 +51,8 @@ namespace MultiplayerARPG
         protected IClientBankHandlers ClientBankHandlers { get; set; }
         protected IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
         protected IClientGameMessageHandlers ClientGameMessageHandlers { get; set; }
+        // Others
+        public ILagCompensationManager LagCompensationManager { get; protected set; }
 
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
@@ -82,6 +84,7 @@ namespace MultiplayerARPG
             Singleton = this;
             doNotEnterGameOnConnect = false;
             doNotDestroyOnSceneChanges = true;
+            LagCompensationManager = gameObject.GetOrAddComponent<ILagCompensationManager, DefaultLagCompensationManager>();
             base.Awake();
         }
 

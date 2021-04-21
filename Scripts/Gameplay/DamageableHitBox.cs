@@ -9,8 +9,6 @@ namespace MultiplayerARPG
 {
     public class DamageableHitBox : MonoBehaviour, IDamageableEntity
     {
-        public const int MAX_HISTORY_SIZE = 16;
-
         [System.Serializable]
         struct TransformHistory
         {
@@ -114,7 +112,7 @@ namespace MultiplayerARPG
 
         public void AddTransformHistory()
         {
-            if (histories.Count == MAX_HISTORY_SIZE)
+            if (histories.Count == BaseGameNetworkManager.Singleton.LagCompensationManager.MaxHistorySize)
                 histories.RemoveAt(0);
             histories.Add(new TransformHistory()
             {

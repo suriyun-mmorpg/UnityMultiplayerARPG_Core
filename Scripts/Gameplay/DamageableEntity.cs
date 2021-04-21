@@ -61,6 +61,8 @@ namespace MultiplayerARPG
             {
                 HitBoxes[i].Setup(this, i);
             }
+            // Add to lag compensation manager
+            CurrentGameManager.LagCompensationManager.AddHitBoxes(ObjectId, HitBoxes);
         }
 
         private DamageableHitBox[] CreateHitBoxes()
@@ -112,6 +114,12 @@ namespace MultiplayerARPG
                 obj.transform.localPosition = Vector3.zero;
                 return new DamageableHitBox[] { obj.AddComponent<DamageableHitBox>() };
             }
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            CurrentGameManager.LagCompensationManager.RemoveHitBoxes(ObjectId);
         }
 
         /// <summary>
@@ -300,36 +308,6 @@ namespace MultiplayerARPG
             }
 
             return true;
-        }
-
-        protected override void EntityLateUpdate()
-        {
-            base.EntityLateUpdate();
-            if (IsServer)
-            {
-                for (int i = 0; i < HitBoxes.Length; ++i)
-                {
-                    HitBoxes[i].AddTransformHistory();
-                }
-            }
-        }
-
-        public void SimulateHitBoxes(long connectionId, System.Action action)
-        {
-            if (!IsServer || !CurrentGameManager.ContainsPlayer(connectionId))
-                return;
-            long rtt = CurrentGameManager.GetPlayer(connectionId).Rtt;
-            if (rtt <= 0)
-                return;
-            for (int i = 0; i < HitBoxes.Length; ++i)
-            {
-                HitBoxes[i].Reverse(rtt);
-            }
-            action.Invoke();
-            for (int i = 0; i < HitBoxes.Length; ++i)
-            {
-                HitBoxes[i].ResetTransform();
-            }
         }
     }
 }
