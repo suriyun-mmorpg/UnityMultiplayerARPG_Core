@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     public class DamageableHitBox : MonoBehaviour, IDamageableEntity
     {
         [System.Serializable]
-        struct TransformHistory
+        public struct TransformHistory
         {
             public long Time { get; set; }
             public Vector3 Position { get; set; }
@@ -27,24 +27,17 @@ namespace MultiplayerARPG
         public LiteNetLibIdentity Identity { get { return entity.Identity; } }
         public int Index { get; private set; }
 
-        private Vector3 positionBeforeReverse;
-        private Quaternion rotationBeforeReverse;
-        private readonly List<TransformHistory> histories = new List<TransformHistory>();
-
-        protected virtual void Awake()
-        {
-            if (entity == null)
-                entity = GetComponentInParent<DamageableEntity>();
-            if (entity != null)
-            {
-                gameObject.tag = entity.GetGameObject().tag;
-                gameObject.layer = entity.GetGameObject().layer;
-            }
-        }
+        private Vector3 defaultLocalPosition;
+        private Quaternion defaultLocalRotation;
+        private List<TransformHistory> histories = new List<TransformHistory>();
 
         public virtual void Setup(DamageableEntity entity, int index)
         {
             this.entity = entity;
+            gameObject.tag = entity.gameObject.tag;
+            gameObject.layer = entity.gameObject.layer;
+            defaultLocalPosition = transform.localPosition;
+            defaultLocalRotation = transform.localRotation;
             Index = index;
         }
 
@@ -77,9 +70,6 @@ namespace MultiplayerARPG
 
         internal void Reverse(long duration)
         {
-            positionBeforeReverse = transform.position;
-            rotationBeforeReverse = transform.rotation;
-
             long currentTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long reversedTime = currentTime - duration;
 
@@ -106,8 +96,8 @@ namespace MultiplayerARPG
 
         internal void ResetTransform()
         {
-            transform.position = positionBeforeReverse;
-            transform.rotation = rotationBeforeReverse;
+            transform.localPosition = defaultLocalPosition;
+            transform.localRotation = defaultLocalRotation;
         }
 
         public void AddTransformHistory()

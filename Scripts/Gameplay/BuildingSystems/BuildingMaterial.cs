@@ -91,9 +91,11 @@ namespace MultiplayerARPG
 
         public BuildingEntity BuildingEntity { get; private set; }
 
-        protected override void Awake()
+        public override void Setup(DamageableEntity entity, int index)
         {
-            base.Awake();
+            base.Setup(entity, index);
+            BuildingEntity = entity as BuildingEntity;
+            BuildingEntity.RegisterMaterial(this);
 
             if (meshRenderer == null)
                 meshRenderer = GetComponent<MeshRenderer>();
@@ -112,14 +114,6 @@ namespace MultiplayerARPG
 
             CurrentState = State.Unknow;
             CurrentState = State.Default;
-
-        }
-
-        public override void Setup(DamageableEntity entity, int index)
-        {
-            base.Setup(entity, index);
-            BuildingEntity = entity as BuildingEntity;
-            BuildingEntity.RegisterMaterial(this);
         }
 
         private void OnTriggerStay(Collider other)
