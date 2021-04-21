@@ -284,15 +284,15 @@ namespace MultiplayerARPG
         #endregion
 
         #region Events
-        public event GenericDelegate onStart;
-        public event GenericDelegate onEnable;
-        public event GenericDelegate onDisable;
-        public event GenericDelegate onUpdate;
-        public event GenericDelegate onLateUpdate;
-        public event GenericDelegate onFixedUpdate;
-        public event GenericDelegate onSetup;
-        public event GenericDelegate onSetupNetElements;
-        public event GenericDelegate onSetOwnerClient;
+        public event System.Action onStart;
+        public event System.Action onEnable;
+        public event System.Action onDisable;
+        public event System.Action onUpdate;
+        public event System.Action onLateUpdate;
+        public event System.Action onFixedUpdate;
+        public event System.Action onSetup;
+        public event System.Action onSetupNetElements;
+        public event System.Action onSetOwnerClient;
         public event NetworkDestroyDelegate onNetworkDestroy;
         #endregion
 

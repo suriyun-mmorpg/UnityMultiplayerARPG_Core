@@ -14,33 +14,32 @@ namespace MultiplayerARPG
         public UnityEvent onDead = new UnityEvent();
         public UnityEvent onRespawn = new UnityEvent();
         public UnityEvent onLevelUp = new UnityEvent();
-        // Attack functions
+        // Action events
         public event AttackRoutineDelegate onAttackRoutine;
-        // Use skill functions
         public event UseSkillRoutineDelegate onUseSkillRoutine;
-        // Apply buff functions
+        public event LaunchDamageEntityDelegate onLaunchDamageEntity;
         public event ApplyBuffDelegate onApplyBuff;
         // Sync variables
-        public System.Action<string> onIdChange;
-        public System.Action<string> onCharacterNameChange;
-        public System.Action<short> onLevelChange;
-        public System.Action<int> onExpChange;
-        public System.Action<int> onCurrentHpChange;
-        public System.Action<int> onCurrentMpChange;
-        public System.Action<int> onCurrentFoodChange;
-        public System.Action<int> onCurrentWaterChange;
-        public System.Action<byte> onEquipWeaponSetChange;
-        public System.Action<byte> onPitchChange;
-        public System.Action<uint> onTargetEntityIdChange;
+        public event System.Action<string> onIdChange;
+        public event System.Action<string> onCharacterNameChange;
+        public event System.Action<short> onLevelChange;
+        public event System.Action<int> onExpChange;
+        public event System.Action<int> onCurrentHpChange;
+        public event System.Action<int> onCurrentMpChange;
+        public event System.Action<int> onCurrentFoodChange;
+        public event System.Action<int> onCurrentWaterChange;
+        public event System.Action<byte> onEquipWeaponSetChange;
+        public event System.Action<byte> onPitchChange;
+        public event System.Action<uint> onTargetEntityIdChange;
         // Sync lists
-        public System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onSummonsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onSummonsOperation;
 
         public void OnAttackRoutine(
             bool isLeftHand,
@@ -65,6 +64,30 @@ namespace MultiplayerARPG
         {
             if (onUseSkillRoutine != null)
                 onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+        }
+
+        public void OnLaunchDamageEntity(
+            bool isLeftHand,
+            CharacterItem weapon,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            BaseSkill skill,
+            short skillLevel,
+            int randomSeed,
+            Vector3 aimPosition,
+            Vector3 stagger,
+            HashSet<DamageHitObjectInfo> hitObjectIds)
+        {
+            if (onLaunchDamageEntity != null)
+                onLaunchDamageEntity.Invoke(isLeftHand, weapon, damageAmounts, skill, skillLevel, randomSeed, aimPosition, stagger, hitObjectIds);
+        }
+
+        public void OnApplyBuff(
+            int dataId,
+            BuffType type,
+            short level)
+        {
+            if (onApplyBuff != null)
+                onApplyBuff.Invoke(dataId, type, level);
         }
     }
 }

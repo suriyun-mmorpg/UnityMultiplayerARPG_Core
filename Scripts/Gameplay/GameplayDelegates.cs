@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public delegate void GenericDelegate();
     public delegate void NetworkDestroyDelegate(
         byte reasons);
     public delegate void ReceiveDamageDelegate(
@@ -36,6 +35,16 @@ namespace MultiplayerARPG
         int hitIndex,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         Vector3 aimPosition);
+    public delegate void LaunchDamageEntityDelegate(
+        bool isLeftHand,
+        CharacterItem weapon,
+        Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+        BaseSkill skill,
+        short skillLevel,
+        int randomSeed,
+        Vector3 aimPosition,
+        Vector3 stagger,
+        HashSet<DamageHitObjectInfo> hitObjectIds);
     public delegate void ApplyBuffDelegate(
         int dataId,
         BuffType type,

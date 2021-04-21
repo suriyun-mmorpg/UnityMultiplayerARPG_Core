@@ -177,6 +177,7 @@ namespace MultiplayerARPG
 
             if (damageType == DamageType.Custom)
             {
+                // Launch damage entity by custom class
                 customDamageInfo.LaunchDamageEntity(
                     attacker,
                     isLeftHand,
@@ -188,6 +189,18 @@ namespace MultiplayerARPG
                     aimPosition,
                     stagger,
                     out hitObjectIds);
+                // Trigger attacker's on launch damage entity event
+                attacker.OnLaunchDamageEntity(
+                    isLeftHand,
+                    weapon,
+                    damageAmounts,
+                    skill,
+                    skillLevel,
+                    randomSeed,
+                    aimPosition,
+                    stagger,
+                    hitObjectIds);
+                // Then break the function because launch damage entity functionality done by custom damage info class
                 return;
             }
 
@@ -227,7 +240,21 @@ namespace MultiplayerARPG
                         // If hit only selected target, find selected character (only 1 character) to apply damage
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         if (tempOverlapSize == 0)
+                        {
+                            // Trigger attacker's on launch damage entity event
+                            attacker.OnLaunchDamageEntity(
+                                isLeftHand,
+                                weapon,
+                                damageAmounts,
+                                skill,
+                                skillLevel,
+                                randomSeed,
+                                aimPosition,
+                                stagger,
+                                hitObjectIds);
+                            // Then break the function because it can't find hitting objects
                             return;
+                        }
 
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
@@ -292,7 +319,21 @@ namespace MultiplayerARPG
                         // If not hit only selected target, find characters within hit fov to applies damages
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         if (tempOverlapSize == 0)
+                        {
+                            // Trigger attacker's on launch damage entity event
+                            attacker.OnLaunchDamageEntity(
+                                isLeftHand,
+                                weapon,
+                                damageAmounts,
+                                skill,
+                                skillLevel,
+                                randomSeed,
+                                aimPosition,
+                                stagger,
+                                hitObjectIds);
+                            // Then break the function because it can't find hitting objects
                             return;
+                        }
 
                         // Find characters that receiving damages
                         for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
@@ -441,6 +482,18 @@ namespace MultiplayerARPG
                     }
                     break;
             }
+
+            // Trigger attacker's on launch damage entity event
+            attacker.OnLaunchDamageEntity(
+                isLeftHand,
+                weapon,
+                damageAmounts,
+                skill,
+                skillLevel,
+                randomSeed,
+                aimPosition,
+                stagger,
+                hitObjectIds);
         }
 
         public void PrepareRelatesData()

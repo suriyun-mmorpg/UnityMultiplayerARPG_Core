@@ -72,8 +72,7 @@ namespace MultiplayerARPG
                 ValidateRecovery(buffApplier);
             }
 
-            if (onApplyBuff != null)
-                onApplyBuff.Invoke(dataId, type, level);
+            OnApplyBuff(dataId, type, level);
         }
     }
 }
