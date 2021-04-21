@@ -317,26 +317,11 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            SimulateLaunchDamageEntity(data);
-        }
-
-        public void SimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
-        {
             if (IsServer)
                 return;
 
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
-            if (data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
-            {
-                BaseSkill skill = data.GetSkill();
-                if (skill != null)
-                {
-                    CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
-                    Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.aimPosition, data.randomSeed);
-                }
-            }
-            else
+            if (!data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
                 CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                 DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
