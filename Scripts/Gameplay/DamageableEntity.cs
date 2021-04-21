@@ -27,6 +27,9 @@ namespace MultiplayerARPG
             set { opponentAimTransform = value; }
         }
 
+        [SerializeField]
+        protected bool isStaticHitBoxes;
+
         [Header("Damageable Entity Events")]
         public UnityEvent onNormalDamageHit = new UnityEvent();
         public UnityEvent onCriticalDamageHit = new UnityEvent();
@@ -67,7 +70,8 @@ namespace MultiplayerARPG
         {
             base.EntityStart();
             // Add to lag compensation manager
-            CurrentGameManager.LagCompensationManager.AddHitBoxes(ObjectId, HitBoxes);
+            if (!isStaticHitBoxes)
+                CurrentGameManager.LagCompensationManager.AddHitBoxes(ObjectId, HitBoxes);
         }
 
         private DamageableHitBox[] CreateHitBoxes()

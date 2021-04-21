@@ -161,6 +161,7 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.buildingTag;
             gameObject.layer = CurrentGameInstance.buildingLayer;
+            isStaticHitBoxes = true;
             isDestroyed = false;
 
             if (buildingTypes == null)

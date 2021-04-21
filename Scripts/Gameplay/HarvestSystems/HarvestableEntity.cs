@@ -57,6 +57,7 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.harvestableTag;
             gameObject.layer = CurrentGameInstance.harvestableLayer;
+            isStaticHitBoxes = true;
             isDestroyed = false;
         }
 
