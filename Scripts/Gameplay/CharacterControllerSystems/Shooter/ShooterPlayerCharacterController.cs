@@ -358,7 +358,7 @@ namespace MultiplayerARPG
             SetupEquipWeapons(characterEntity.EquipWeapons);
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
-            characterEntity.onAttackRoutine += OnAttackRoutine;
+            characterEntity.onLaunchDamageEntity += OnLaunchDamageEntity;
             characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraTransform);
             characterEntity.ModelManager.SetIsFps(ViewMode == ShooterControllerViewMode.Fps);
             CacheGameplayCameraControls.startYRotation = characterEntity.CurrentRotation.y;
@@ -380,7 +380,7 @@ namespace MultiplayerARPG
 
             characterEntity.onEquipWeaponSetChange -= SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation -= SetupEquipWeapons;
-            characterEntity.onAttackRoutine -= OnAttackRoutine;
+            characterEntity.onLaunchDamageEntity -= OnLaunchDamageEntity;
         }
 
         protected override void OnDestroy()
@@ -1215,8 +1215,8 @@ namespace MultiplayerARPG
 
         private void UpdateRecoil()
         {
-            float recoilX = 0f;
-            float recoilY = 0f;
+            float recoilX;
+            float recoilY;
             if (movementState.HasFlag(MovementState.Forward) ||
                 movementState.HasFlag(MovementState.Backward) ||
                 movementState.HasFlag(MovementState.Left) ||
@@ -1259,7 +1259,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnAttackRoutine(bool isLeftHand, CharacterItem weapon, int hitIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition)
+        private void OnLaunchDamageEntity(bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel, int randomSeed, Vector3 aimPosition, Vector3 stagger, HashSet<DamageHitObjectInfo> hitObjectIds)
         {
             UpdateRecoil();
         }
