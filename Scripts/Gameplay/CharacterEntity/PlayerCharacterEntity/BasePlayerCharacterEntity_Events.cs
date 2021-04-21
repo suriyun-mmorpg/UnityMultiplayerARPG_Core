@@ -1,7 +1,4 @@
 ﻿using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -9,34 +6,34 @@ namespace MultiplayerARPG
     {
         // Note: You may use `Awake` dev extension to setup an events and `OnDestroy` to desetup an events
         // Npc dialog events
-        public System.Action<int> onShowNpcDialog;
-        public System.Action onShowNpcRefineItem;
-        public System.Action onShowNpcDismantleItem;
-        public System.Action onShowNpcRepairItem;
+        public event System.Action<int> onShowNpcDialog;
+        public event System.Action onShowNpcRefineItem;
+        public event System.Action onShowNpcDismantleItem;
+        public event System.Action onShowNpcRepairItem;
         // Dealing dialog events
-        public System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
-        public System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
-        public System.Action<DealingState> onUpdateDealingState;
-        public System.Action<DealingState> onUpdateAnotherDealingState;
-        public System.Action<int> onUpdateDealingGold;
-        public System.Action<int> onUpdateAnotherDealingGold;
-        public System.Action<DealingCharacterItems> onUpdateDealingItems;
-        public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
+        public event System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
+        public event System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
+        public event System.Action<DealingState> onUpdateDealingState;
+        public event System.Action<DealingState> onUpdateAnotherDealingState;
+        public event System.Action<int> onUpdateDealingGold;
+        public event System.Action<int> onUpdateAnotherDealingGold;
+        public event System.Action<DealingCharacterItems> onUpdateDealingItems;
+        public event System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
         // Sync variables
-        public System.Action<int> onDataIdChange;
-        public System.Action<int> onFactionIdChange;
-        public System.Action<short> onStatPointChange;
-        public System.Action<short> onSkillPointChange;
-        public System.Action<int> onGoldChange;
-        public System.Action<int> onUserGoldChange;
-        public System.Action<int> onUserCashChange;
-        public System.Action<int> onPartyIdChange;
-        public System.Action<int> onGuildIdChange;
-        public System.Action<bool> onIsWarpingChange;
+        public event System.Action<int> onDataIdChange;
+        public event System.Action<int> onFactionIdChange;
+        public event System.Action<short> onStatPointChange;
+        public event System.Action<short> onSkillPointChange;
+        public event System.Action<int> onGoldChange;
+        public event System.Action<int> onUserGoldChange;
+        public event System.Action<int> onUserCashChange;
+        public event System.Action<int> onPartyIdChange;
+        public event System.Action<int> onGuildIdChange;
+        public event System.Action<bool> onIsWarpingChange;
         // Sync lists
-        public System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onCurrenciesOperation;
-        public System.Action<CharacterItem[]> onStorageItemsChange;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onCurrenciesOperation;
+        public event System.Action<CharacterItem[]> onStorageItemsChange;
     }
 }
