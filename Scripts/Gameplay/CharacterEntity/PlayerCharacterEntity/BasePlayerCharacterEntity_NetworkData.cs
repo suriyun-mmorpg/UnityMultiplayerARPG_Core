@@ -48,7 +48,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Data Sending State
-        protected float lastClientSendAimPosition;
+        protected float clientSendAimPositionCountDown;
         #endregion
 
         #region Dealing System

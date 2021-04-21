@@ -104,17 +104,17 @@ namespace MultiplayerARPG
         protected override void EntityFixedUpdate()
         {
             Profiler.BeginSample("BasePlayerCharacterEntity - FixedUpdate");
-            float currentTime = Time.fixedTime;
             base.EntityFixedUpdate();
             if (IsOwnerClient && !this.IsDead())
             {
-                if (currentTime - lastClientSendAimPosition > clientSendAimPositionInterval)
+                clientSendAimPositionCountDown -= Time.unscaledDeltaTime;
+                if (clientSendAimPositionCountDown <= 0f)
                 {
                     ClientSendPacket(ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.Sequenced, GameNetworkingConsts.SetAimPosition, (writer) =>
                     {
                         writer.PutVector3(AimPosition);
                     });
-                    lastClientSendAimPosition = currentTime;
+                    clientSendAimPositionCountDown = clientSendAimPositionInterval;
                 }
             }
             Profiler.EndSample();
