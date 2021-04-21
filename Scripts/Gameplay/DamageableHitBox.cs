@@ -9,15 +9,29 @@ namespace MultiplayerARPG
 {
     public class DamageableHitBox : MonoBehaviour, IDamageableEntity
     {
-        [SerializeField]
-        protected DamageableEntity entity;
+        public const int MAX_HISTORY_SIZE = 16;
+
+        [System.Serializable]
+        struct TransformHistory
+        {
+            public long Time { get; set; }
+            public Vector3 Position { get; set; }
+            public Quaternion Rotation { get; set; }
+        }
+
         [SerializeField]
         protected float damageRate = 1f;
+
+        private DamageableEntity entity;
+        public BaseGameEntity Entity { get { return entity.Entity; } }
         public int CurrentHp { get { return entity.CurrentHp; } set { entity.CurrentHp = value; } }
         public Transform OpponentAimTransform { get { return entity.OpponentAimTransform; } }
-        public BaseGameEntity Entity { get { return entity.Entity; } }
         public LiteNetLibIdentity Identity { get { return entity.Identity; } }
-        public int Index { get; set; }
+        public int Index { get; private set; }
+
+        private Vector3 positionBeforeReverse;
+        private Quaternion rotationBeforeReverse;
+        private readonly List<TransformHistory> histories = new List<TransformHistory>();
 
         protected virtual void Awake()
         {
@@ -28,6 +42,12 @@ namespace MultiplayerARPG
                 gameObject.tag = entity.GetGameObject().tag;
                 gameObject.layer = entity.GetGameObject().layer;
             }
+        }
+
+        public void Setup(DamageableEntity entity, int index)
+        {
+            this.entity = entity;
+            Index = index;
         }
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
@@ -55,6 +75,53 @@ namespace MultiplayerARPG
         public EntityInfo GetInfo()
         {
             return entity.GetInfo();
+        }
+
+        internal void Reverse(long duration)
+        {
+            positionBeforeReverse = transform.position;
+            rotationBeforeReverse = transform.rotation;
+
+            long currentTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
+            long reversedTime = currentTime - duration;
+
+            TransformHistory beforeReversedData = default;
+            TransformHistory afterReversedData = default;
+            for (int i = 0; i < histories.Count; ++i)
+            {
+                if (beforeReversedData.Time <= reversedTime && histories[i].Time >= reversedTime)
+                {
+                    afterReversedData = histories[i];
+                    break;
+                }
+                else
+                {
+                    beforeReversedData = histories[i];
+                }
+            }
+            long durationBetweenReversedTime = afterReversedData.Time - beforeReversedData.Time;
+            long durationToCurrentTime = currentTime - beforeReversedData.Time;
+            float lerpProgress = (float)durationToCurrentTime / (float)durationBetweenReversedTime;
+            transform.position = Vector3.Lerp(beforeReversedData.Position, afterReversedData.Position, lerpProgress);
+            transform.rotation = Quaternion.Slerp(beforeReversedData.Rotation, afterReversedData.Rotation, lerpProgress);
+        }
+
+        internal void ResetTransform()
+        {
+            transform.position = positionBeforeReverse;
+            transform.rotation = rotationBeforeReverse;
+        }
+
+        public void AddTransformHistory()
+        {
+            if (histories.Count == MAX_HISTORY_SIZE)
+                histories.RemoveAt(0);
+            histories.Add(new TransformHistory()
+            {
+                Time = BaseGameNetworkManager.Singleton.ServerTimestamp,
+                Position = transform.position,
+                Rotation = transform.rotation,
+            });
         }
 
 #if UNITY_EDITOR

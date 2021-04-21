@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             // Assign index to hitboxes
             for (int i = 0; i < HitBoxes.Length; ++i)
             {
-                HitBoxes[i].Index = i;
+                HitBoxes[i].Setup(this, i);
             }
         }
 
@@ -292,7 +292,7 @@ namespace MultiplayerARPG
                 // If attacker is unknow entity, can receive damages
                 return true;
             }
-            
+
             if (instigator.isInSafeArea)
             {
                 // If attacker is in safe area, it will not receives damages
@@ -300,6 +300,36 @@ namespace MultiplayerARPG
             }
 
             return true;
+        }
+
+        protected override void EntityLateUpdate()
+        {
+            base.EntityLateUpdate();
+            if (IsServer)
+            {
+                for (int i = 0; i < HitBoxes.Length; ++i)
+                {
+                    HitBoxes[i].AddTransformHistory();
+                }
+            }
+        }
+
+        public void SimulateHitBoxes(long connectionId, System.Action action)
+        {
+            if (!IsServer || !CurrentGameManager.ContainsPlayer(connectionId))
+                return;
+            long rtt = CurrentGameManager.GetPlayer(connectionId).Rtt;
+            if (rtt <= 0)
+                return;
+            for (int i = 0; i < HitBoxes.Length; ++i)
+            {
+                HitBoxes[i].Reverse(rtt);
+            }
+            action.Invoke();
+            for (int i = 0; i < HitBoxes.Length; ++i)
+            {
+                HitBoxes[i].ResetTransform();
+            }
         }
     }
 }
