@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -65,7 +66,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                string tempAllText = string.Empty;
+                StringBuilder tempAllText = new StringBuilder();
                 Currency tempCurrency;
                 int tempCurrentAmount;
                 int tempTargetAmount;
@@ -117,9 +118,9 @@ namespace MultiplayerARPG
                     if (dataEntry.Value != 0)
                     {
                         // Add new line if text is not empty
-                        if (!string.IsNullOrEmpty(tempAllText))
-                            tempAllText += "\n";
-                        tempAllText += tempAmountText;
+                        if (tempAllText.Length > 0)
+                            tempAllText.Append('\n');
+                        tempAllText.Append(tempAmountText);
                     }
                     // Set current currency text to UI
                     if (CacheTextAmounts.TryGetValue(tempCurrency, out tempComponentPair))
@@ -132,8 +133,8 @@ namespace MultiplayerARPG
 
                 if (uiTextAllAmounts != null)
                 {
-                    uiTextAllAmounts.SetGameObjectActive(!string.IsNullOrEmpty(tempAllText));
-                    uiTextAllAmounts.text = tempAllText;
+                    uiTextAllAmounts.SetGameObjectActive(tempAllText.Length > 0);
+                    uiTextAllAmounts.text = tempAllText.ToString();
                 }
             }
         }

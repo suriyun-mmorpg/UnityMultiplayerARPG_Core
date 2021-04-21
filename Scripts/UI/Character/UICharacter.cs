@@ -1,5 +1,6 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -395,13 +396,13 @@ namespace MultiplayerARPG
 
             if (uiTextWeaponDamages != null)
             {
-                string textDamages = "";
+                StringBuilder textDamages = new StringBuilder();
                 if (rightHandWeapon != null)
                 {
                     MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
-                    if (!string.IsNullOrEmpty(textDamages))
-                        textDamages += "\n";
-                    textDamages += string.Format(
+                    if (textDamages.Length > 0)
+                        textDamages.Append('\n');
+                    textDamages.AppendFormat(
                         LanguageManager.GetText(formatKeyWeaponDamage),
                         sumDamages.min.ToString("N0"),
                         sumDamages.max.ToString("N0"));
@@ -409,9 +410,9 @@ namespace MultiplayerARPG
                 if (leftHandWeapon != null)
                 {
                     MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
-                    if (!string.IsNullOrEmpty(textDamages))
-                        textDamages += "\n";
-                    textDamages += string.Format(
+                    if (textDamages.Length > 0)
+                        textDamages.Append('\n');
+                    textDamages.AppendFormat(
                         LanguageManager.GetText(formatKeyWeaponDamage),
                         sumDamages.min.ToString("N0"),
                         sumDamages.max.ToString("N0"));
@@ -420,12 +421,12 @@ namespace MultiplayerARPG
                 {
                     IWeaponItem defaultWeaponItem = GameInstance.Singleton.DefaultWeaponItem;
                     KeyValuePair<DamageElement, MinMaxFloat> damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
-                    textDamages = string.Format(
+                    textDamages.AppendFormat(
                         LanguageManager.GetText(formatKeyWeaponDamage),
                         damageAmount.Value.min.ToString("N0"),
                         damageAmount.Value.max.ToString("N0"));
                 }
-                uiTextWeaponDamages.text = textDamages;
+                uiTextWeaponDamages.text = textDamages.ToString();
             }
 
             if (uiRightHandDamages != null)

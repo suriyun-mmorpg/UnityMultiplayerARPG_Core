@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -55,7 +56,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                string tempAllText = string.Empty;
+                StringBuilder tempAllText = new StringBuilder();
                 DamageElement tempElement;
                 float tempInfliction;
                 string tempAmountText;
@@ -78,9 +79,9 @@ namespace MultiplayerARPG
                     if (dataEntry.Value != 0)
                     {
                         // Add new line if text is not empty
-                        if (!string.IsNullOrEmpty(tempAllText))
-                            tempAllText += "\n";
-                        tempAllText += tempAmountText;
+                        if (tempAllText.Length > 0)
+                            tempAllText.Append('\n');
+                        tempAllText.Append(tempAmountText);
                     }
                     // Set current elemental damage infliction text to UI
                     if (CacheTextInflictions.TryGetValue(dataEntry.Key, out tempComponentPair))
@@ -93,8 +94,8 @@ namespace MultiplayerARPG
 
                 if (uiTextAllInflictions != null)
                 {
-                    uiTextAllInflictions.SetGameObjectActive(!string.IsNullOrEmpty(tempAllText));
-                    uiTextAllInflictions.text = tempAllText;
+                    uiTextAllInflictions.SetGameObjectActive(tempAllText.Length > 0);
+                    uiTextAllInflictions.text = tempAllText.ToString();
                 }
             }
         }

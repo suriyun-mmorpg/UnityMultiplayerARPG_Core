@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -85,7 +86,7 @@ namespace MultiplayerARPG
 
         public string GetEquipmentBonusText(EquipmentBonus equipmentBonus)
         {
-            string result = string.Empty;
+            StringBuilder result = new StringBuilder();
 
             string statsText = CharacterStats.GetText(
                 equipmentBonus.stats,
@@ -128,13 +129,13 @@ namespace MultiplayerARPG
                 formatKeyWaterRateStats);
 
             if (!string.IsNullOrEmpty(statsText))
-                result += statsText;
+                result.Append(statsText);
 
             if (!string.IsNullOrEmpty(statsRateText))
             {
-                if (!string.IsNullOrEmpty(result))
-                    result += "\n";
-                result += statsRateText;
+                if (result.Length > 0)
+                    result.Append('\n');
+                result.Append(statsRateText);
             }
 
             // Attributes
@@ -142,9 +143,9 @@ namespace MultiplayerARPG
             {
                 if (entry.attribute == null || entry.amount == 0)
                     continue;
-                if (!string.IsNullOrEmpty(result))
-                    result += "\n";
-                result += string.Format(
+                if (result.Length > 0)
+                    result.Append('\n');
+                result.AppendFormat(
                     LanguageManager.GetText(formatKeyAttributeAmount),
                     entry.attribute.Title,
                     entry.amount.ToBonusString());
@@ -153,9 +154,9 @@ namespace MultiplayerARPG
             {
                 if (entry.attribute == null || entry.amount == 0)
                     continue;
-                if (!string.IsNullOrEmpty(result))
-                    result += "\n";
-                result += string.Format(
+                if (result.Length > 0)
+                    result.Append('\n');
+                result.AppendFormat(
                     LanguageManager.GetText(formatKeyAttributeAmountRate),
                     entry.attribute.Title,
                     (entry.amount * 100).ToBonusString());
@@ -167,10 +168,10 @@ namespace MultiplayerARPG
             {
                 if (entry.amount == 0)
                     continue;
-                if (!string.IsNullOrEmpty(result))
-                    result += "\n";
+                if (result.Length > 0)
+                    result.Append('\n');
                 tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
-                result += string.Format(
+                result.AppendFormat(
                     LanguageManager.GetText(formatKeyResistanceAmount),
                     tempElement.Title,
                     (entry.amount * 100).ToBonusString());
@@ -181,10 +182,10 @@ namespace MultiplayerARPG
             {
                 if (entry.amount.min == 0 && entry.amount.max == 0)
                     continue;
-                if (!string.IsNullOrEmpty(result))
-                    result += "\n";
+                if (result.Length > 0)
+                    result.Append('\n');
                 tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
-                result += string.Format(
+                result.AppendFormat(
                     LanguageManager.GetText(formatKeyDamageAmount),
                     tempElement.Title,
                     entry.amount.min.ToBonusString(),
@@ -196,10 +197,10 @@ namespace MultiplayerARPG
             {
                 if (entry.amount == 0)
                     continue;
-                if (!string.IsNullOrEmpty(result))
-                    result += "\n";
+                if (result.Length > 0)
+                    result.Append('\n');
                 tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
-                result += string.Format(
+                result.AppendFormat(
                     LanguageManager.GetText(formatKeyArmorAmount),
                     tempElement.Title,
                     entry.amount.ToBonusString());
@@ -210,15 +211,15 @@ namespace MultiplayerARPG
             {
                 if (entry.skill == null || entry.level == 0)
                     continue;
-                if (!string.IsNullOrEmpty(result))
-                    result += "\n";
-                result += string.Format(
+                if (result.Length > 0)
+                    result.Append('\n');
+                result.AppendFormat(
                     LanguageManager.GetText(formatKeySkillLevel),
                     entry.skill.Title,
                     entry.level.ToBonusString());
             }
 
-            return result;
+            return result.ToString();
         }
     }
 }

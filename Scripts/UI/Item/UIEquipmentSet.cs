@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -14,7 +15,7 @@ namespace MultiplayerARPG
         
         protected override void UpdateData()
         {
-            string allBonusText = string.Empty;
+            StringBuilder allBonusText = new StringBuilder();
             int effectCount = 1;
             string tempText;
             foreach (EquipmentBonus effect in Data.equipmentSet.effects)
@@ -22,9 +23,9 @@ namespace MultiplayerARPG
                 tempText = GetEquipmentBonusText(effect);
                 if (!string.IsNullOrEmpty(tempText))
                 {
-                    if (!string.IsNullOrEmpty(allBonusText))
-                        allBonusText += "\n";
-                    allBonusText += string.Format(
+                    if (allBonusText.Length > 0)
+                        allBonusText.Append('\n');
+                    allBonusText.AppendFormat(
                         effectCount <= Data.equippedCount ?
                             LanguageManager.GetText(formatKeyAppliedEffect) :
                             LanguageManager.GetText(formatKeyUnappliedEffect),
@@ -36,11 +37,11 @@ namespace MultiplayerARPG
 
             if (uiTextAllBonus != null)
             {
-                uiTextAllBonus.SetGameObjectActive(!string.IsNullOrEmpty(allBonusText));
+                uiTextAllBonus.SetGameObjectActive(allBonusText.Length > 0);
                 uiTextAllBonus.text = string.Format(
                     LanguageManager.GetText(formatKeySet),
                     Data.equipmentSet.Title,
-                    allBonusText);
+                    allBonusText.ToString());
             }
         }
     }

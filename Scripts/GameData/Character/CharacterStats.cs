@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -135,7 +136,7 @@ namespace MultiplayerARPG
             TextWrapper uiTextFood = null,
             TextWrapper uiTextWater = null)
         {
-            string statsString = string.Empty;
+            StringBuilder statsString = new StringBuilder();
             string statsStringPart;
             string tempValue;
 
@@ -149,9 +150,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.hp != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextHp != null)
                 uiTextHp.text = statsStringPart;
@@ -166,9 +167,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.mp != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextMp != null)
                 uiTextMp.text = statsStringPart;
@@ -183,9 +184,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.accuracy != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextAccuracy != null)
                 uiTextAccuracy.text = statsStringPart;
@@ -200,9 +201,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.evasion != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextEvasion != null)
                 uiTextEvasion.text = statsStringPart;
@@ -217,9 +218,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.criRate != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextCriRate != null)
                 uiTextCriRate.text = statsStringPart;
@@ -234,9 +235,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.criDmgRate != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextCriDmgRate != null)
                 uiTextCriDmgRate.text = statsStringPart;
@@ -251,9 +252,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.blockRate != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextBlockRate != null)
                 uiTextBlockRate.text = statsStringPart;
@@ -268,9 +269,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.blockDmgRate != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextBlockDmgRate != null)
                 uiTextBlockDmgRate.text = statsStringPart;
@@ -285,9 +286,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.weightLimit != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextWeightLimit != null)
                 uiTextWeightLimit.text = statsStringPart;
@@ -302,9 +303,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.slotLimit != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextSlotLimit != null)
                 uiTextSlotLimit.text = statsStringPart;
@@ -319,9 +320,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.moveSpeed != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextMoveSpeed != null)
                 uiTextMoveSpeed.text = statsStringPart;
@@ -336,9 +337,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.atkSpeed != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextAtkSpeed != null)
                 uiTextAtkSpeed.text = statsStringPart;
@@ -353,9 +354,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.stamina != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextStamina != null)
                 uiTextStamina.text = statsStringPart;
@@ -370,9 +371,9 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.food != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextFood != null)
                 uiTextFood.text = statsStringPart;
@@ -387,14 +388,14 @@ namespace MultiplayerARPG
                 tempValue);
             if (data.water != 0)
             {
-                if (!string.IsNullOrEmpty(statsString))
-                    statsString += "\n";
-                statsString += statsStringPart;
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
             }
             if (uiTextWater != null)
                 uiTextWater.text = statsStringPart;
 
-            return statsString;
+            return statsString.ToString();
         }
     }
 

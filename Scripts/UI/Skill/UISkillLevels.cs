@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -65,7 +66,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                string tempAllText = string.Empty;
+                StringBuilder tempAllText = new StringBuilder();
                 BaseSkill tempSkill;
                 short tempCurrentLevel;
                 short tempTargetLevel;
@@ -113,9 +114,9 @@ namespace MultiplayerARPG
                     if (dataEntry.Value != 0)
                     {
                         // Add new line if text is not empty
-                        if (!string.IsNullOrEmpty(tempAllText))
-                            tempAllText += "\n";
-                        tempAllText += tempLevelText;
+                        if (tempAllText.Length > 0)
+                            tempAllText.Append('\n');
+                        tempAllText.Append(tempLevelText);
                     }
                     // Set current skill text to UI
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempComponentPair))
@@ -128,8 +129,8 @@ namespace MultiplayerARPG
 
                 if (uiTextAllLevels != null)
                 {
-                    uiTextAllLevels.SetGameObjectActive(!string.IsNullOrEmpty(tempAllText));
-                    uiTextAllLevels.text = tempAllText;
+                    uiTextAllLevels.SetGameObjectActive(tempAllText.Length > 0);
+                    uiTextAllLevels.text = tempAllText.ToString();
                 }
             }
         }

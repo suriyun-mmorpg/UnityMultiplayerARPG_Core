@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -13,7 +14,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            string allBonusText = string.Empty;
+            StringBuilder allBonusText = new StringBuilder();
             BaseItem tempItem;
             string tempText;
             for (int i = 0; i < Data.maxSocket; ++i)
@@ -21,9 +22,9 @@ namespace MultiplayerARPG
                 if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
                 {
                     tempText = GetEquipmentBonusText((tempItem as ISocketEnhancerItem).SocketEnhanceEffect);
-                    if (!string.IsNullOrEmpty(allBonusText))
-                        allBonusText += "\n";
-                    allBonusText += string.Format(
+                    if (allBonusText.Length > 0)
+                        allBonusText.Append('\n');
+                    allBonusText.AppendFormat(
                         LanguageManager.GetText(formatKeySocketFilled),
                         i + 1,
                         tempItem.Title,
@@ -31,9 +32,9 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(allBonusText))
-                        allBonusText += "\n";
-                    allBonusText += string.Format(
+                    if (allBonusText.Length > 0)
+                        allBonusText.Append('\n');
+                    allBonusText.AppendFormat(
                         LanguageManager.GetText(formatKeySocketEmpty),
                         i + 1);
                 }
@@ -41,8 +42,8 @@ namespace MultiplayerARPG
 
             if (uiTextAllBonus != null)
             {
-                uiTextAllBonus.SetGameObjectActive(!string.IsNullOrEmpty(allBonusText));
-                uiTextAllBonus.text = allBonusText;
+                uiTextAllBonus.SetGameObjectActive(allBonusText.Length > 0);
+                uiTextAllBonus.text = allBonusText.ToString();
             }
         }
     }
