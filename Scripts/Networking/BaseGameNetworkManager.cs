@@ -76,7 +76,7 @@ namespace MultiplayerARPG
 
         public override uint PacketVersion()
         {
-            return 17;
+            return 18;
         }
 
         protected override void Awake()
@@ -85,6 +85,20 @@ namespace MultiplayerARPG
             doNotEnterGameOnConnect = false;
             doNotDestroyOnSceneChanges = true;
             LagCompensationManager = gameObject.GetOrAddComponent<ILagCompensationManager, DefaultLagCompensationManager>();
+            // Get attached grid manager or add it if not existed
+            GridManager gridManager = gameObject.GetOrAddComponent<GridManager>((obj) =>
+            {
+                // Set default generate grid mode when grid manager added
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                    obj.generateGridMode = GridManager.EGenerateGridMode.Collider3D;
+                else
+                    obj.generateGridMode = GridManager.EGenerateGridMode.Collider2D;
+            });
+            // Make sure that grid manager -> axis mode set correctly for current dimension type
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                gridManager.axisMode = GridManager.EAxisMode.XZ;
+            else
+                gridManager.axisMode = GridManager.EAxisMode.XY;
             base.Awake();
         }
 
@@ -647,20 +661,6 @@ namespace MultiplayerARPG
             }
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
-            // Get attached grid manager or add it if not existed
-            GridManager gridManager = gameObject.GetOrAddComponent<GridManager>((obj) =>
-            {
-                // Set default generate grid mode when grid manager added
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                    obj.generateGridMode = GridManager.EGenerateGridMode.Collider3D;
-                else
-                    obj.generateGridMode = GridManager.EGenerateGridMode.Collider2D;
-            });
-            // Make sure that grid manager -> axis mode set correctly for current dimension type
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                gridManager.axisMode = GridManager.EAxisMode.XZ;
-            else
-                gridManager.axisMode = GridManager.EAxisMode.XY;
             this.InvokeInstanceDevExtMethods("InitPrefabs");
         }
 
