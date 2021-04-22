@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController, IAimAssistAvoidanceListener
     {
+        public const byte PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD = 3;
+
         public enum ControllerMode
         {
             Adventure,
@@ -324,6 +326,7 @@ namespace MultiplayerARPG
         bool updateAttackedCrosshair;
         bool mustReleaseFireKey;
         float buildYRotate;
+        byte pauseFireInputFrames;
 
         protected override void Awake()
         {
@@ -441,6 +444,9 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
+            if (pauseFireInputFrames > 0)
+                --pauseFireInputFrames;
+
             if (PlayerCharacterEntity == null || !PlayerCharacterEntity.IsOwnerClient)
                 return;
 
@@ -503,7 +509,6 @@ namespace MultiplayerARPG
                 CacheGameplayCameraControls.updateRotationY = false;
                 CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
                 CacheGameplayCameraControls.updateZoom = !IsBlockController;
-                DestroyConstructingBuilding();
             }
             else
             {
@@ -1432,6 +1437,8 @@ namespace MultiplayerARPG
 
         public void Attack(bool isLeftHand)
         {
+            if (pauseFireInputFrames > 0)
+                return;
             // Set this to `TRUE` to update crosshair
             if (PlayerCharacterEntity.Attack(isLeftHand))
                 updateAttackingCrosshair = true;
@@ -1439,6 +1446,8 @@ namespace MultiplayerARPG
 
         public void WeaponCharge(bool isLeftHand)
         {
+            if (pauseFireInputFrames > 0)
+                return;
             PlayerCharacterEntity.StartCharge(isLeftHand);
         }
 
@@ -1508,6 +1517,8 @@ namespace MultiplayerARPG
 
         public void UseSkill(bool isLeftHand)
         {
+            if (pauseFireInputFrames > 0)
+                return;
             if (queueUsingSkill.skill != null)
             {
                 AimPosition skillAimPosition = AimPosition.Create(queueUsingSkill.aimPosition);
@@ -1722,7 +1733,6 @@ namespace MultiplayerARPG
                 ConstructingBuildingEntity.HitSurface = true;
                 break;
             }
-            ConstructingBuildingEntity.gameObject.SetActive(true);
             return tempCount;
         }
 
@@ -1730,6 +1740,12 @@ namespace MultiplayerARPG
         {
             if (isCancel)
                 CancelBuild();
+        }
+
+        public override void ConfirmBuild()
+        {
+            base.ConfirmBuild();
+            pauseFireInputFrames = PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD;
         }
     }
 }
