@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         Mobile
     } // TODO: Add console mode
 
+    [DefaultExecutionOrder(-999)]
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
 #else
