@@ -85,20 +85,16 @@ namespace MultiplayerARPG
             doNotEnterGameOnConnect = false;
             doNotDestroyOnSceneChanges = true;
             LagCompensationManager = gameObject.GetOrAddComponent<ILagCompensationManager, DefaultLagCompensationManager>();
-            // Get attached grid manager or add it if not existed
-            GridManager gridManager = gameObject.GetOrAddComponent<GridManager>((obj) =>
+            // Get attached grid manager
+            GridManager gridManager = gameObject.GetComponent<GridManager>();
+            if (gridManager != null)
             {
-                // Set default generate grid mode when grid manager added
+                // Make sure that grid manager -> axis mode set correctly for current dimension type
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                    obj.generateGridMode = GridManager.EGenerateGridMode.Collider3D;
+                    gridManager.axisMode = GridManager.EAxisMode.XZ;
                 else
-                    obj.generateGridMode = GridManager.EGenerateGridMode.Collider2D;
-            });
-            // Make sure that grid manager -> axis mode set correctly for current dimension type
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                gridManager.axisMode = GridManager.EAxisMode.XZ;
-            else
-                gridManager.axisMode = GridManager.EAxisMode.XY;
+                    gridManager.axisMode = GridManager.EAxisMode.XY;
+            }
             base.Awake();
         }
 
