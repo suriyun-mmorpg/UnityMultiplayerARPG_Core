@@ -20,11 +20,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float damageRate = 1f;
 
-        private DamageableEntity entity;
-        public BaseGameEntity Entity { get { return entity.Entity; } }
-        public int CurrentHp { get { return entity.CurrentHp; } set { entity.CurrentHp = value; } }
-        public Transform OpponentAimTransform { get { return entity.OpponentAimTransform; } }
-        public LiteNetLibIdentity Identity { get { return entity.Identity; } }
+        public DamageableEntity DamageableEntity { get; private set; }
+        public BaseGameEntity Entity { get { return DamageableEntity.Entity; } }
+        public int CurrentHp { get { return DamageableEntity.CurrentHp; } set { DamageableEntity.CurrentHp = value; } }
+        public Transform OpponentAimTransform { get { return DamageableEntity.OpponentAimTransform; } }
+        public LiteNetLibIdentity Identity { get { return DamageableEntity.Identity; } }
         public int Index { get; private set; }
 
         private Vector3 defaultLocalPosition;
@@ -33,7 +33,7 @@ namespace MultiplayerARPG
 
         public virtual void Setup(DamageableEntity entity, int index)
         {
-            this.entity = entity;
+            DamageableEntity = entity;
             gameObject.tag = entity.gameObject.tag;
             gameObject.layer = entity.gameObject.layer;
             defaultLocalPosition = transform.localPosition;
@@ -43,19 +43,19 @@ namespace MultiplayerARPG
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
         {
-            return entity.CanReceiveDamageFrom(instigator);
+            return DamageableEntity.CanReceiveDamageFrom(instigator);
         }
 
         public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
         {
-            if (!entity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
+            if (!DamageableEntity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
                 return;
             List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
             foreach (DamageElement key in keys)
             {
                 damageAmounts[key] = damageAmounts[key] * damageRate;
             }
-            entity.ApplyDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+            DamageableEntity.ApplyDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
         }
 
         public virtual void PrepareRelatesData()
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
 
         public EntityInfo GetInfo()
         {
-            return entity.GetInfo();
+            return DamageableEntity.GetInfo();
         }
 
         internal void Reverse(long duration)
