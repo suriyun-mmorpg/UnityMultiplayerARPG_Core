@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -119,7 +118,8 @@ namespace MultiplayerARPG
     public struct AnimatorSkillAnimations2D : ISkillAnims
     {
         public BaseSkill skill;
-        public AnimatorCharacterAnimation2D castAnimation;
+        [FormerlySerializedAs("castAnimation")]
+        public AnimatorCharacterAnimation2D castClip;
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional(nameof(activateAnimationType), nameof(SkillActivateAnimationType.UseActivateAnimation))]
         public AnimatorActionAnimation2D activateAnimation;

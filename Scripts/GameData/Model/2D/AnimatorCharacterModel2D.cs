@@ -2,7 +2,6 @@
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
-using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -106,6 +105,12 @@ namespace MultiplayerARPG
         [Tooltip("You can set this when animator controller type is `Custom`")]
         public RuntimeAnimatorController animatorController;
 
+        [Header("Action State Settings")]
+        public string actionStateName = "Action";
+
+        [Header("Cast Skill State Settings")]
+        public string castSkillStateName = "CastSkill";
+
 #if UNITY_EDITOR
         [Header("Animation Test Tool")]
         public AnimActionType testAnimActionType;
@@ -118,8 +123,10 @@ namespace MultiplayerARPG
         public AnimatorOverrideController CacheAnimatorController { get; private set; }
         public DirectionType2D DirectionType2D { get { return GameplayUtils.GetDirectionTypeByVector2(direction2D); } }
 
-        // Private state validater
+        private Coroutine actionCoroutine;
         private bool isSetupComponent;
+        private int actionStateNameHash;
+        private int castSkillStateNameHash;
 
         protected override void Awake()
         {
@@ -135,6 +142,19 @@ namespace MultiplayerARPG
         public bool TryGetSkillAnimations(int dataId, out AnimatorSkillAnimations2D anims)
         {
             return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(CacheIdentity.HashAssetId, weaponAnimations2D, skillAnimations2D, dataId, out anims);
+        }
+
+        protected Coroutine StartedActionCoroutine(Coroutine coroutine)
+        {
+            StopActionCoroutine();
+            actionCoroutine = coroutine;
+            return actionCoroutine;
+        }
+
+        protected void StopActionCoroutine()
+        {
+            if (actionCoroutine != null)
+                StopCoroutine(actionCoroutine);
         }
 
         protected override void OnValidate()
@@ -194,6 +214,10 @@ namespace MultiplayerARPG
             // Use override controller as animator
             if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
                 animator.runtimeAnimatorController = CacheAnimatorController;
+            // Setup action state name hashes
+            actionStateNameHash = Animator.StringToHash(actionStateName);
+            // Setup cast skill state name hashes
+            castSkillStateNameHash = Animator.StringToHash(castSkillStateName);
             SetDefaultAnimations();
         }
 
@@ -273,11 +297,8 @@ namespace MultiplayerARPG
             // Set animator parameters
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);
-            if (moveSpeed > 0)
-            {
-                animator.SetFloat(ANIM_DIRECTION_X, direction2D.x);
-                animator.SetFloat(ANIM_DIRECTION_Y, direction2D.y);
-            }
+            animator.SetFloat(ANIM_DIRECTION_X, direction2D.x);
+            animator.SetFloat(ANIM_DIRECTION_Y, direction2D.y);
             animator.SetBool(ANIM_IS_DEAD, isDead);
         }
 
@@ -325,7 +346,7 @@ namespace MultiplayerARPG
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
-            return StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
+            return StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
         }
 
         private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
@@ -341,12 +362,11 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_ACTION_DOWN_RIGHT] = animation2D.downRight;
             CacheAnimatorController[CLIP_ACTION_UP_LEFT] = animation2D.upLeft;
             CacheAnimatorController[CLIP_ACTION_UP_RIGHT] = animation2D.upRight;
-            yield return 0;
             AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
             AudioManager.PlaySfxClipAtAudioSource(animation2D.GetRandomAudioClip(), genericAudioSource);
             animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
             animator.SetBool(ANIM_DO_ACTION, true);
-            animator.Play(0, 0, 0f);
+            animator.Play(actionStateNameHash, 0, 0f);
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(clip.length / playSpeedMultiplier);
             animator.SetBool(ANIM_DO_ACTION, false);
@@ -356,7 +376,7 @@ namespace MultiplayerARPG
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)
         {
-            return StartCoroutine(PlaySkillCastClip_Animator(dataId, duration));
+            return StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
         }
 
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
@@ -366,7 +386,7 @@ namespace MultiplayerARPG
             if (!TryGetSkillAnimations(dataId, out skillAnimations2D))
                 animation2D = defaultSkillActivateAnimation2D;
             else
-                animation2D = skillAnimations2D.castAnimation;
+                animation2D = skillAnimations2D.castClip;
 
             if (animation2D != null)
             {
@@ -379,9 +399,8 @@ namespace MultiplayerARPG
                 CacheAnimatorController[CLIP_CAST_SKILL_DOWN_RIGHT] = animation2D.downRight;
                 CacheAnimatorController[CLIP_CAST_SKILL_UP_LEFT] = animation2D.upLeft;
                 CacheAnimatorController[CLIP_CAST_SKILL_UP_RIGHT] = animation2D.upRight;
-                yield return 0;
                 animator.SetBool(ANIM_IS_CASTING_SKILL, true);
-                animator.Play(0, 0, 0f);
+                animator.Play(castSkillStateNameHash, 0, 0f);
                 yield return new WaitForSecondsRealtime(duration);
                 animator.SetBool(ANIM_IS_CASTING_SKILL, false);
             }
@@ -564,7 +583,7 @@ namespace MultiplayerARPG
             if (!TryGetSkillAnimations(testCastSkillAnimDataId, out skillAnimations2D))
                 animation2D = defaultSkillActivateAnimation2D;
             else
-                animation2D = skillAnimations2D.castAnimation;
+                animation2D = skillAnimations2D.castClip;
             CacheAnimatorController[CLIP_CAST_SKILL_DOWN] = animation2D.down;
             CacheAnimatorController[CLIP_CAST_SKILL_UP] = animation2D.up;
             CacheAnimatorController[CLIP_CAST_SKILL_LEFT] = animation2D.left;
