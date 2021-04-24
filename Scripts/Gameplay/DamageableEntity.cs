@@ -55,6 +55,11 @@ namespace MultiplayerARPG
                 combatTextTransform = CacheTransform;
             if (opponentAimTransform == null)
                 opponentAimTransform = CombatTextTransform;
+        }
+
+        protected override void EntityStart()
+        {
+            base.EntityStart();
             // Prepare hitboxes
             HitBoxes = GetComponentsInChildren<DamageableHitBox>(true);
             if (HitBoxes == null || HitBoxes.Length == 0)
@@ -64,11 +69,6 @@ namespace MultiplayerARPG
             {
                 HitBoxes[i].Setup(this, i);
             }
-        }
-
-        protected override void EntityStart()
-        {
-            base.EntityStart();
             // Add to lag compensation manager
             if (!isStaticHitBoxes)
                 CurrentGameManager.LagCompensationManager.AddHitBoxes(ObjectId, HitBoxes);
@@ -76,11 +76,11 @@ namespace MultiplayerARPG
 
         private DamageableHitBox[] CreateHitBoxes()
         {
-            GameObject obj = new GameObject("_HitBoxes");
-            obj.transform.parent = CacheTransform;
             // Get colliders to calculate bounds
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
+                GameObject obj = new GameObject("_HitBoxes");
+                obj.transform.parent = CacheTransform;
                 Collider[] colliders = GetComponents<Collider>();
                 Bounds bounds = default;
                 for (int i = 0; i < colliders.Length; ++i)
@@ -99,10 +99,13 @@ namespace MultiplayerARPG
                 newCollider.size = bounds.size;
                 newCollider.isTrigger = true;
                 obj.transform.localPosition = Vector3.zero;
+                obj.layer = gameObject.layer;
                 return new DamageableHitBox[] { obj.AddComponent<DamageableHitBox>() };
             }
             else
             {
+                GameObject obj = new GameObject("_HitBoxes");
+                obj.transform.parent = CacheTransform;
                 Collider2D[] colliders = GetComponents<Collider2D>();
                 Bounds bounds = default;
                 for (int i = 0; i < colliders.Length; ++i)
@@ -121,6 +124,7 @@ namespace MultiplayerARPG
                 newCollider.size = bounds.size;
                 newCollider.isTrigger = true;
                 obj.transform.localPosition = Vector3.zero;
+                obj.layer = gameObject.layer;
                 return new DamageableHitBox[] { obj.AddComponent<DamageableHitBox>() };
             }
         }
