@@ -57,6 +57,7 @@ namespace MultiplayerARPG
                 audioSourceObject.transform.localRotation = Quaternion.identity;
                 audioSourceObject.transform.localScale = Vector3.one;
                 audioSource = audioSourceObject.AddComponent<AudioSource>();
+                audioSource.spatialBlend = 1f;
             }
         }
 

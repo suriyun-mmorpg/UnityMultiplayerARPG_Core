@@ -126,7 +126,12 @@ namespace MultiplayerARPG
         {
             CacheTransform = transform;
             if (genericAudioSource == null)
-                genericAudioSource = gameObject.GetOrAddComponent<AudioSource>();
+            {
+                genericAudioSource = gameObject.GetOrAddComponent<AudioSource>((obj) =>
+                {
+                    obj.spatialBlend = 1f;
+                });
+            }
         }
 
         protected virtual void OnValidate() { }

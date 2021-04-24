@@ -102,6 +102,8 @@ namespace MultiplayerARPG
         public AnimationClip idleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float idleAnimSpeedRate;
+
+        [Header("Movements while standing (move)")]
         public bool showMoveClipSettings;
         [BoolShowConditional(nameof(showMoveClipSettings), true)]
         public AnimationClip moveClip;
@@ -306,6 +308,8 @@ namespace MultiplayerARPG
         public AnimationClip idleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float idleAnimSpeedRate;
+
+        [Header("Movements while standing (move)")]
         public bool showMoveClipSettings;
         [BoolShowConditional(nameof(showMoveClipSettings), true)]
         public AnimationClip moveClip;
