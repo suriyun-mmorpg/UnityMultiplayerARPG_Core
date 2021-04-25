@@ -55,6 +55,7 @@ namespace MultiplayerARPG
         public bool CanBuildOnAnySurface { get { return canBuildOnAnySurface; } }
         public List<string> BuildingTypes { get { return buildingTypes; } }
         public float BuildDistance { get { return buildDistance; } }
+        public float BuildYRotation { get; set; }
         public override int MaxHp { get { return maxHp; } }
         public float LifeTime { get { return lifeTime; } }
 
@@ -182,6 +183,13 @@ namespace MultiplayerARPG
                 {
                     CacheTransform.position = BuildingArea.transform.position;
                     CacheTransform.rotation = BuildingArea.transform.rotation;
+                    if (BuildingArea.allowRotateInSocket)
+                    {
+                        CacheTransform.localEulerAngles = new Vector3(
+                            CacheTransform.localEulerAngles.x,
+                            CacheTransform.localEulerAngles.y + BuildYRotation,
+                            CacheTransform.localEulerAngles.z);
+                    }
                 }
                 bool canBuild = CanBuild();
                 foreach (BuildingMaterial buildingMaterial in buildingMaterials)

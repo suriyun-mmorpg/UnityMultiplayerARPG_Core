@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public BuildingEntity entity;
         public string buildingType;
         public bool snapBuildingObject;
+        public bool allowRotateInSocket;
 
         private void Start()
         {

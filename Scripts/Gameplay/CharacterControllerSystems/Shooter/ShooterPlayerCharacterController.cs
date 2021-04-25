@@ -1646,6 +1646,7 @@ namespace MultiplayerARPG
                     // Rotate by set angles
                     buildingAngles.y = buildYRotate;
                 }
+                ConstructingBuildingEntity.BuildYRotation = buildYRotate;
             }
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
