@@ -262,7 +262,7 @@ namespace MultiplayerARPG
                         for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
                             tempGameObject = attacker.AttackPhysicFunctions.GetOverlapObject(tempLoopCounter);
-                            // Skip unhittable entities
+
                             if (tempGameObject.GetComponent<IUnHittable>() != null)
                                 continue;
 
