@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public class UICraftingQueueItems : UIBase
     {
+        [Header("UI Elements")]
+        public GameObject listEmptyObject;
         public UICraftingQueueItem uiDialog;
         public UICraftingQueueItem uiPrefab;
         public Transform uiContainer;
@@ -106,6 +108,8 @@ namespace MultiplayerARPG
                 if (selectedIdx == index)
                     tempUiCraftingItem.OnClickSelect();
             });
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(GameInstance.PlayingCharacterEntity.Crafting.QueueItems.Count == 0);
         }
     }
 }

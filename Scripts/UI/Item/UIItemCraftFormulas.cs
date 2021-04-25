@@ -6,6 +6,9 @@ namespace MultiplayerARPG
 {
     public class UIItemCraftFormulas : UIBase
     {
+        [Header("Filter")]
+        public List<string> filterCategories;
+
         [Header("UI Elements")]
         public GameObject listEmptyObject;
         public UIItemCraftFormula uiDialog;
@@ -88,18 +91,30 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
-            UIItemCraftFormula tempUiItemCraftFormula;
+            int showingCount = 0;
+            UIItemCraftFormula tempUI;
             CacheItemList.Generate(GameInstance.ItemCraftFormulas.Values, (index, formula, ui) =>
             {
-                tempUiItemCraftFormula = ui.GetComponent<UIItemCraftFormula>();
-                tempUiItemCraftFormula.Data = formula;
-                tempUiItemCraftFormula.Show();
-                CacheItemSelectionManager.Add(tempUiItemCraftFormula);
-                if (selectedIdx == index)
-                    tempUiItemCraftFormula.OnClickSelect();
+                tempUI = ui.GetComponent<UIItemCraftFormula>();
+                if (string.IsNullOrEmpty(formula.category) ||
+                    filterCategories == null || filterCategories.Count == 0 ||
+                    filterCategories.Contains(formula.category))
+                {
+                    tempUI.Data = formula;
+                    tempUI.Show();
+                    CacheItemSelectionManager.Add(tempUI);
+                    if (selectedIdx == index)
+                        tempUI.OnClickSelect();
+                    showingCount++;
+                }
+                else
+                {
+                    // Hide because formula's category not matches in the filter list
+                    tempUI.Hide();
+                }
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(GameInstance.ItemCraftFormulas.Count == 0);
+                listEmptyObject.SetActive(showingCount == 0);
         }
     }
 }
