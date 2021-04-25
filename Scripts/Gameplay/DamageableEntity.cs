@@ -43,6 +43,7 @@ namespace MultiplayerARPG
         protected SyncFieldInt currentHp = new SyncFieldInt();
 
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
+        public bool IsInSafeArea { get; set; }
         public abstract int MaxHp { get; }
         public float HpRate { get { return (float)CurrentHp / (float)MaxHp; } }
         public DamageableHitBox[] HitBoxes { get; protected set; }

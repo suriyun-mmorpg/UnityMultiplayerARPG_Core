@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -23,7 +21,7 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
-            BaseGameEntity gameEntity = other.GetComponent<BaseGameEntity>();
+            IDamageableEntity gameEntity = other.GetComponent<IDamageableEntity>();
             if (gameEntity == null)
                 return;
 
@@ -42,7 +40,7 @@ namespace MultiplayerARPG
 
         private void TriggerExit(GameObject other)
         {
-            BaseGameEntity gameEntity = other.GetComponent<BaseGameEntity>();
+            IDamageableEntity gameEntity = other.GetComponent<IDamageableEntity>();
             if (gameEntity == null)
                 return;
 

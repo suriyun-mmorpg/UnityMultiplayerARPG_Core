@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -7,6 +6,7 @@ namespace MultiplayerARPG
     {
         int CurrentHp { get; set; }
         Transform OpponentAimTransform { get; }
+        bool IsInSafeArea { get; set; }
         bool CanReceiveDamageFrom(EntityInfo instigator);
     }
 }

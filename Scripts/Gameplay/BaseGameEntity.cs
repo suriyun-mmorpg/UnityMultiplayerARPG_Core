@@ -278,11 +278,6 @@ namespace MultiplayerARPG
         protected IGameEntityComponent[] EntityComponents { get; private set; }
         protected virtual bool UpdateEntityComponents { get { return true; } }
 
-        #region Enter Area States
-        // This will be TRUE when this character enter to safe area
-        public bool IsInSafeArea { get; set; }
-        #endregion
-
         #region Events
         public event System.Action onStart;
         public event System.Action onEnable;

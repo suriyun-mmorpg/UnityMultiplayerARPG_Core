@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         public DamageableEntity DamageableEntity { get; private set; }
         public BaseGameEntity Entity { get { return DamageableEntity.Entity; } }
         public int CurrentHp { get { return DamageableEntity.CurrentHp; } set { DamageableEntity.CurrentHp = value; } }
+        public bool IsInSafeArea { get { return DamageableEntity.IsInSafeArea; } set { DamageableEntity.IsInSafeArea = value; } }
         public Transform OpponentAimTransform { get { return DamageableEntity.OpponentAimTransform; } }
         public LiteNetLibIdentity Identity { get { return DamageableEntity.Identity; } }
         public int Index { get; private set; }
