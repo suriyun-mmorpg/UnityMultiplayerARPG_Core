@@ -787,7 +787,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.AimAssistAvoidanceListener = this;
         }
 
-        protected virtual bool AvoidAimAssist(RaycastHit hitInfo)
+        public virtual bool AvoidAimAssist(RaycastHit hitInfo)
         {
             IGameEntity entity = hitInfo.collider.GetComponent<IGameEntity>();
             if (entity != null && entity.Entity != null && entity.Entity != PlayerCharacterEntity)
