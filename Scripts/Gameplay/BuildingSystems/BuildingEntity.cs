@@ -151,6 +151,7 @@ namespace MultiplayerARPG
         private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
         private readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
         private readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
+        private readonly List<NoConstructionArea> triggerNoConstructionAreas = new List<NoConstructionArea>();
         private readonly List<BuildingEntity> children = new List<BuildingEntity>();
         private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
         private bool parentFound;
@@ -286,7 +287,7 @@ namespace MultiplayerARPG
                 // Too far from buildiner?
                 return false;
             }
-            if (triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0)
+            if (triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0 || triggerNoConstructionAreas.Count > 0)
             {
                 // Triggered something?
                 return false;
@@ -427,6 +428,19 @@ namespace MultiplayerARPG
         {
             if (tilemapCollider != null)
                 triggerTilemaps.Remove(tilemapCollider);
+        }
+
+        public void TriggerEnterNoConstructionArea(NoConstructionArea noConstructionArea)
+        {
+            if (noConstructionArea != null &&
+                !triggerNoConstructionAreas.Contains(noConstructionArea))
+                triggerNoConstructionAreas.Add(noConstructionArea);
+        }
+
+        public void TriggerExitNoConstructionArea(NoConstructionArea noConstructionArea)
+        {
+            if (noConstructionArea != null)
+                triggerNoConstructionAreas.Remove(noConstructionArea);
         }
 
         public override void OnNetworkDestroy(byte reasons)

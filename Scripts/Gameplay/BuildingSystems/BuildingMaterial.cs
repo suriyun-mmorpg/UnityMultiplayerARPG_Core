@@ -90,12 +90,16 @@ namespace MultiplayerARPG
         }
 
         public BuildingEntity BuildingEntity { get; private set; }
+        public Collider CacheCollider { get; private set; }
+        public Collider2D CacheCollider2D { get; private set; }
 
         public override void Setup(DamageableEntity entity, int index)
         {
             base.Setup(entity, index);
             BuildingEntity = entity as BuildingEntity;
             BuildingEntity.RegisterMaterial(this);
+            CacheCollider = GetComponent<Collider>();
+            CacheCollider2D = GetComponent<Collider2D>();
 
             if (meshRenderer == null)
                 meshRenderer = GetComponent<MeshRenderer>();
@@ -121,9 +125,10 @@ namespace MultiplayerARPG
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
 
-            if (GetComponent<Collider>().bounds.BoundsContainedRate(other.bounds) <= 0.025f)
+            BuildingMaterial material = other.GetComponent<BuildingMaterial>();
+            if (material != null && CacheCollider.bounds.BoundsContainedRate(other.bounds) <= 0.025f)
             {
-                OnTriggerExit(other);
+                BuildingEntity.TriggerExitBuildingMaterial(material);
                 return;
             }
 
@@ -132,8 +137,9 @@ namespace MultiplayerARPG
                 if (BuildingEntity.BuildingArea != null &&
                     BuildingEntity.BuildingArea.transform.root == other.transform.root)
                     return;
+                BuildingEntity.TriggerEnterBuildingMaterial(material);
                 BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
-                BuildingEntity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                BuildingEntity.TriggerEnterNoConstructionArea(other.GetComponent<NoConstructionArea>());
             }
         }
 
@@ -143,6 +149,7 @@ namespace MultiplayerARPG
             {
                 BuildingEntity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
                 BuildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                BuildingEntity.TriggerExitNoConstructionArea(other.GetComponent<NoConstructionArea>());
             }
         }
 
@@ -151,9 +158,10 @@ namespace MultiplayerARPG
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
 
-            if (GetComponent<Collider2D>().bounds.BoundsContainedRate(other.bounds) <= 0.025f)
+            BuildingMaterial material = other.GetComponent<BuildingMaterial>();
+            if (material != null && CacheCollider2D.bounds.BoundsContainedRate(other.bounds) <= 0.025f)
             {
-                OnTriggerExit2D(other);
+                BuildingEntity.TriggerExitBuildingMaterial(material);
                 return;
             }
 
@@ -162,9 +170,10 @@ namespace MultiplayerARPG
                 if (BuildingEntity.BuildingArea != null &&
                     BuildingEntity.BuildingArea.transform.root == other.transform.root)
                     return;
+                BuildingEntity.TriggerEnterBuildingMaterial(material);
                 BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
-                BuildingEntity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
                 BuildingEntity.TriggerEnterTilemap(other.GetComponent<TilemapCollider2D>());
+                BuildingEntity.TriggerEnterNoConstructionArea(other.GetComponent<NoConstructionArea>());
             }
         }
 
@@ -175,6 +184,7 @@ namespace MultiplayerARPG
                 BuildingEntity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
                 BuildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
                 BuildingEntity.TriggerExitTilemap(other.GetComponent<TilemapCollider2D>());
+                BuildingEntity.TriggerExitNoConstructionArea(other.GetComponent<NoConstructionArea>());
             }
         }
 
