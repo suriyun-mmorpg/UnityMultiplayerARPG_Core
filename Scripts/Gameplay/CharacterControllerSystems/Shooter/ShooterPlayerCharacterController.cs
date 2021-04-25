@@ -31,33 +31,33 @@ namespace MultiplayerARPG
 
         [Header("Camera Controls Prefabs")]
         [SerializeField]
-        private FollowCameraControls gameplayCameraPrefab;
+        protected FollowCameraControls gameplayCameraPrefab;
         [SerializeField]
-        private FollowCameraControls minimapCameraPrefab;
+        protected FollowCameraControls minimapCameraPrefab;
 
         [Header("Controller Settings")]
         [SerializeField]
-        private ControllerMode mode;
+        protected ControllerMode mode;
         [SerializeField]
-        private EmptyAmmoAutoReload emptyAmmoAutoReload;
+        protected EmptyAmmoAutoReload emptyAmmoAutoReload;
         [SerializeField]
-        private bool canSwitchViewMode;
+        protected bool canSwitchViewMode;
         [SerializeField]
-        private ShooterControllerViewMode viewMode;
+        protected ShooterControllerViewMode viewMode;
         [SerializeField]
-        private ExtraMoveActiveMode sprintActiveMode;
+        protected ExtraMoveActiveMode sprintActiveMode;
         [SerializeField]
-        private ExtraMoveActiveMode crouchActiveMode;
+        protected ExtraMoveActiveMode crouchActiveMode;
         [SerializeField]
-        private ExtraMoveActiveMode crawlActiveMode;
+        protected ExtraMoveActiveMode crawlActiveMode;
         [SerializeField]
-        private bool unToggleCrouchWhenJump;
+        protected bool unToggleCrouchWhenJump;
         [SerializeField]
-        private bool unToggleCrawlWhenJump;
+        protected bool unToggleCrawlWhenJump;
         [SerializeField]
-        private float findTargetRaycastDistance = 16f;
+        protected float findTargetRaycastDistance = 16f;
         [SerializeField]
-        private bool showConfirmConstructionUI = false;
+        protected bool showConfirmConstructionUI = false;
         [SerializeField]
         protected bool buildRotationSnap;
         [SerializeField]
@@ -65,107 +65,107 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float buildRotateSpeed = 200f;
         [SerializeField]
-        private RectTransform crosshairRect;
+        protected RectTransform crosshairRect;
 
         [Header("TPS Settings")]
         [SerializeField]
-        private float tpsZoomDistance = 3f;
+        protected float tpsZoomDistance = 3f;
         [SerializeField]
-        private float tpsMinZoomDistance = 3f;
+        protected float tpsMinZoomDistance = 3f;
         [SerializeField]
-        private float tpsMaxZoomDistance = 3f;
+        protected float tpsMaxZoomDistance = 3f;
         [SerializeField]
-        private Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
+        protected Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
         [SerializeField]
-        private Vector3 tpsTargetOffsetWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
+        protected Vector3 tpsTargetOffsetWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
         [SerializeField]
-        private Vector3 tpsTargetOffsetWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
+        protected Vector3 tpsTargetOffsetWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
         [SerializeField]
-        private float tpsFov = 60f;
+        protected float tpsFov = 60f;
         [SerializeField]
-        private float tpsNearClipPlane = 0.3f;
+        protected float tpsNearClipPlane = 0.3f;
         [SerializeField]
-        private float tpsFarClipPlane = 1000f;
+        protected float tpsFarClipPlane = 1000f;
         [SerializeField]
-        private bool turnForwardWhileDoingAction = true;
+        protected bool turnForwardWhileDoingAction = true;
         [SerializeField]
-        private float stoppedPlayingAttackOrUseSkillAnimationDelay = 0.5f;
-        [SerializeField]
-        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        private float turnSpeed = 0f;
+        protected float stoppedPlayingAttackOrUseSkillAnimationDelay = 0.5f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        private float turnSpeedWhileSprinting = 0f;
+        protected float turnSpeed = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        private float turnSpeedWhileCrouching = 0f;
+        protected float turnSpeedWhileSprinting = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        private float turnSpeedWileCrawling = 0f;
+        protected float turnSpeedWhileCrouching = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        private float turnSpeedWileSwimming = 0f;
+        protected float turnSpeedWileCrawling = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        private float turnSpeedWileDoingAction = 0f;
+        protected float turnSpeedWileSwimming = 0f;
+        [SerializeField]
+        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
+        protected float turnSpeedWileDoingAction = 0f;
 
         [Header("FPS Settings")]
         [SerializeField]
-        private float fpsZoomDistance = 0f;
+        protected float fpsZoomDistance = 0f;
         [SerializeField]
-        private Vector3 fpsTargetOffset = new Vector3(0f, 0f, 0f);
+        protected Vector3 fpsTargetOffset = new Vector3(0f, 0f, 0f);
         [SerializeField]
-        private float fpsFov = 40f;
+        protected float fpsFov = 40f;
         [SerializeField]
-        private float fpsNearClipPlane = 0.01f;
+        protected float fpsNearClipPlane = 0.01f;
         [SerializeField]
-        private float fpsFarClipPlane = 1000f;
+        protected float fpsFarClipPlane = 1000f;
 
         [Header("Aim Assist Settings")]
         [SerializeField]
-        private bool enableAimAssist = false;
+        protected bool enableAimAssist = false;
         [SerializeField]
-        private bool enableAimAssistX = false;
+        protected bool enableAimAssistX = false;
         [SerializeField]
-        private bool enableAimAssistY = true;
+        protected bool enableAimAssistY = true;
         [SerializeField]
-        private bool aimAssistOnFireOnly = true;
+        protected bool aimAssistOnFireOnly = true;
         [SerializeField]
-        private float aimAssistRadius = 0.5f;
+        protected float aimAssistRadius = 0.5f;
         [SerializeField]
-        private float aimAssistXSpeed = 20f;
+        protected float aimAssistXSpeed = 20f;
         [SerializeField]
-        private float aimAssistYSpeed = 20f;
+        protected float aimAssistYSpeed = 20f;
         [SerializeField]
-        private bool aimAssistCharacter = true;
+        protected bool aimAssistCharacter = true;
         [SerializeField]
-        private bool aimAssistBuilding = false;
+        protected bool aimAssistBuilding = false;
         [SerializeField]
-        private bool aimAssistHarvestable = false;
+        protected bool aimAssistHarvestable = false;
 
         [Header("Recoil Settings")]
         [SerializeField]
-        private float recoilRateWhileMoving = 1.5f;
+        protected float recoilRateWhileMoving = 1.5f;
         [SerializeField]
-        private float recoilRateWhileSprinting = 2f;
+        protected float recoilRateWhileSprinting = 2f;
         [SerializeField]
-        private float recoilRateWhileCrouching = 0.5f;
+        protected float recoilRateWhileCrouching = 0.5f;
         [SerializeField]
-        private float recoilRateWhileCrawling = 0.5f;
+        protected float recoilRateWhileCrawling = 0.5f;
         [SerializeField]
-        private float recoilRateWhileSwimming = 0.5f;
+        protected float recoilRateWhileSwimming = 0.5f;
 
-        public bool IsBlockController { get; private set; }
-        public FollowCameraControls CacheGameplayCameraControls { get; private set; }
-        public FollowCameraControls CacheMinimapCameraControls { get; private set; }
+        public bool IsBlockController { get; protected set; }
+        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
+        public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
         public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
         public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
         public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
         public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
-        public Vector2 CurrentCrosshairSize { get; private set; }
-        public CrosshairSetting CurrentCrosshairSetting { get; private set; }
-        public BaseWeaponAbility WeaponAbility { get; private set; }
-        public WeaponAbilityState WeaponAbilityState { get; private set; }
+        public Vector2 CurrentCrosshairSize { get; protected set; }
+        public CrosshairSetting CurrentCrosshairSetting { get; protected set; }
+        public BaseWeaponAbility WeaponAbility { get; protected set; }
+        public WeaponAbilityState WeaponAbilityState { get; protected set; }
 
         public ControllerMode Mode
         {
@@ -273,60 +273,60 @@ namespace MultiplayerARPG
         }
 
         // Input data
-        InputStateManager activateInput;
-        InputStateManager pickupItemInput;
-        InputStateManager reloadInput;
-        InputStateManager exitVehicleInput;
-        InputStateManager switchEquipWeaponSetInput;
-        float lastPlayingAttackOrUseSkillAnimationTime;
-        bool updatingInputs;
+        protected InputStateManager activateInput;
+        protected InputStateManager pickupItemInput;
+        protected InputStateManager reloadInput;
+        protected InputStateManager exitVehicleInput;
+        protected InputStateManager switchEquipWeaponSetInput;
+        protected float lastPlayingAttackOrUseSkillAnimationTime;
+        protected bool updatingInputs;
         // Entity detector
-        NearbyEntityDetector warpPortalEntityDetector;
+        protected NearbyEntityDetector warpPortalEntityDetector;
         // Temp physic variables
-        RaycastHit[] raycasts = new RaycastHit[100];
-        Collider[] overlapColliders = new Collider[200];
+        protected RaycastHit[] raycasts = new RaycastHit[100];
+        protected Collider[] overlapColliders = new Collider[200];
         // Temp target
-        BasePlayerCharacterEntity targetPlayer;
-        NpcEntity targetNpc;
-        BuildingEntity targetBuilding;
-        VehicleEntity targetVehicle;
-        WarpPortalEntity targetWarpPortal;
-        ItemsContainerEntity targetItemsContainer;
+        protected BasePlayerCharacterEntity targetPlayer;
+        protected NpcEntity targetNpc;
+        protected BuildingEntity targetBuilding;
+        protected VehicleEntity targetVehicle;
+        protected WarpPortalEntity targetWarpPortal;
+        protected ItemsContainerEntity targetItemsContainer;
         // Temp data
-        IGameEntity tempGameEntity;
-        Ray centerRay;
-        float centerOriginToCharacterDistance;
-        Vector3 moveDirection;
-        Vector3 cameraForward;
-        Vector3 cameraRight;
-        float inputV;
-        float inputH;
-        Vector2 normalizedInput;
-        Vector3 moveLookDirection;
-        Vector3 targetLookDirection;
-        float tempDeltaTime;
-        bool tempPressAttackRight;
-        bool tempPressAttackLeft;
-        bool tempPressWeaponAbility;
-        bool isLeftHandAttacking;
-        float pitch;
-        Vector3 aimPosition;
-        Vector3 aimDirection;
-        bool toggleSprintOn;
-        bool toggleCrouchOn;
-        bool toggleCrawlOn;
+        protected IGameEntity tempGameEntity;
+        protected Ray centerRay;
+        protected float centerOriginToCharacterDistance;
+        protected Vector3 moveDirection;
+        protected Vector3 cameraForward;
+        protected Vector3 cameraRight;
+        protected float inputV;
+        protected float inputH;
+        protected Vector2 normalizedInput;
+        protected Vector3 moveLookDirection;
+        protected Vector3 targetLookDirection;
+        protected float tempDeltaTime;
+        protected bool tempPressAttackRight;
+        protected bool tempPressAttackLeft;
+        protected bool tempPressWeaponAbility;
+        protected bool isLeftHandAttacking;
+        protected float pitch;
+        protected Vector3 aimPosition;
+        protected Vector3 aimDirection;
+        protected bool toggleSprintOn;
+        protected bool toggleCrouchOn;
+        protected bool toggleCrawlOn;
         // Controlling states
-        ShooterControllerViewMode dirtyViewMode;
-        IWeaponItem rightHandWeapon;
-        IWeaponItem leftHandWeapon;
-        MovementState movementState;
-        ExtraMovementState extraMovementState;
-        ShooterControllerViewMode? viewModeBeforeDead;
-        bool updateAttackingCrosshair;
-        bool updateAttackedCrosshair;
-        bool mustReleaseFireKey;
-        float buildYRotate;
-        byte pauseFireInputFrames;
+        protected ShooterControllerViewMode dirtyViewMode;
+        protected IWeaponItem rightHandWeapon;
+        protected IWeaponItem leftHandWeapon;
+        protected MovementState movementState;
+        protected ExtraMovementState extraMovementState;
+        protected ShooterControllerViewMode? viewModeBeforeDead;
+        protected bool updateAttackingCrosshair;
+        protected bool updateAttackedCrosshair;
+        protected bool mustReleaseFireKey;
+        protected float buildYRotate;
+        protected byte pauseFireInputFrames;
 
         protected override void Awake()
         {
@@ -399,17 +399,17 @@ namespace MultiplayerARPG
             Cursor.visible = true;
         }
 
-        private void SetupEquipWeapons(byte equipWeaponSet)
+        protected void SetupEquipWeapons(byte equipWeaponSet)
         {
             SetupEquipWeapons(PlayerCharacterEntity.EquipWeapons);
         }
 
-        private void SetupEquipWeapons(LiteNetLibManager.LiteNetLibSyncList.Operation operation, int index)
+        protected void SetupEquipWeapons(LiteNetLibManager.LiteNetLibSyncList.Operation operation, int index)
         {
             SetupEquipWeapons(PlayerCharacterEntity.EquipWeapons);
         }
 
-        private void SetupEquipWeapons(EquipWeapons equipWeapons)
+        protected virtual void SetupEquipWeapons(EquipWeapons equipWeapons)
         {
             CurrentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
             UpdateCrosshair(CurrentCrosshairSetting, false, -CurrentCrosshairSetting.shrinkPerFrame);
@@ -623,7 +623,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void LateUpdate()
+        protected virtual void LateUpdate()
         {
             if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsUnderWater))
             {
@@ -640,7 +640,7 @@ namespace MultiplayerARPG
             switchEquipWeaponSetInput.OnLateUpdate();
         }
 
-        private bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
+        protected bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
         {
             switch (activeMode)
             {
@@ -655,7 +655,7 @@ namespace MultiplayerARPG
             return state;
         }
 
-        private void UpdateTarget_BattleMode()
+        protected virtual void UpdateTarget_BattleMode()
         {
             // Prepare raycast distance / fov
             float attackDistance = 0f;
@@ -787,7 +787,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.AimAssistAvoidanceListener = this;
         }
 
-        public bool AvoidAimAssist(RaycastHit hitInfo)
+        protected virtual bool AvoidAimAssist(RaycastHit hitInfo)
         {
             IGameEntity entity = hitInfo.collider.GetComponent<IGameEntity>();
             if (entity != null && entity.Entity != null && entity.Entity != PlayerCharacterEntity)
@@ -798,7 +798,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        private int GetAimAssistLayerMask()
+        protected virtual int GetAimAssistLayerMask()
         {
             int layerMask = 0;
             if (aimAssistCharacter)
@@ -810,13 +810,13 @@ namespace MultiplayerARPG
             return layerMask;
         }
 
-        private void UpdateTarget_BuildMode()
+        protected virtual void UpdateTarget_BuildMode()
         {
             // Disable aim assist while constucting the building
             CacheGameplayCameraControls.enableAimAssist = false;
         }
 
-        private void UpdateMovementInputs()
+        protected virtual void UpdateMovementInputs()
         {
             pitch = CacheGameplayCameraTransform.eulerAngles.x;
 
@@ -869,7 +869,7 @@ namespace MultiplayerARPG
             moveDirection.Normalize();
         }
 
-        private async UniTaskVoid UpdateInputs_BattleMode()
+        protected virtual async UniTaskVoid UpdateInputs_BattleMode()
         {
             updatingInputs = true;
             FireType rightHandFireType = FireType.SingleFire;
@@ -1080,7 +1080,7 @@ namespace MultiplayerARPG
             {
                 anyKeyPressed = true;
                 // Reload ammo when press the button
-                ReloadAmmo();
+                Reload();
             }
 
             if (exitVehicleInput.IsPress && !activatingEntityOrDoAction)
@@ -1119,14 +1119,14 @@ namespace MultiplayerARPG
                 switch (emptyAmmoAutoReload)
                 {
                     case EmptyAmmoAutoReload.ReloadImmediately:
-                        ReloadAmmo();
+                        Reload();
                         break;
                     case EmptyAmmoAutoReload.ReloadOnKeysReleased:
                         // Auto reload when ammo empty
                         if (!tempPressAttackRight && !tempPressAttackLeft && !reloadInput.IsPress)
                         {
                             // Reload ammo when empty and not press any keys
-                            ReloadAmmo();
+                            Reload();
                         }
                         break;
                 }
@@ -1153,25 +1153,14 @@ namespace MultiplayerARPG
             updatingInputs = false;
         }
 
-        private async UniTaskVoid UpdateInputs_BuildMode()
+        protected virtual async UniTaskVoid UpdateInputs_BuildMode()
         {
             SetTargetLookDirectionWhileMoving();
             updatingInputs = false;
             await UniTask.Yield();
         }
 
-        private void ReloadAmmo()
-        {
-            if (WeaponAbility != null && WeaponAbility.ShouldDeactivateWhenReload)
-                WeaponAbility.ForceDeactivated();
-            // Reload ammo at server
-            if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
-                PlayerCharacterEntity.Reload(false);
-            else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
-                PlayerCharacterEntity.Reload(true);
-        }
-
-        private void UpdateCrosshair()
+        protected virtual void UpdateCrosshair()
         {
             bool isMoving = movementState.HasFlag(MovementState.Forward) ||
                 movementState.HasFlag(MovementState.Backward) ||
@@ -1199,7 +1188,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateCrosshair(CrosshairSetting setting, bool isAttack, float power)
+        protected virtual void UpdateCrosshair(CrosshairSetting setting, bool isAttack, float power)
         {
             if (crosshairRect == null)
                 return;
@@ -1218,7 +1207,7 @@ namespace MultiplayerARPG
             crosshairRect.sizeDelta = CurrentCrosshairSize = sizeDelta;
         }
 
-        private void UpdateRecoil()
+        protected virtual void UpdateRecoil()
         {
             float recoilX;
             float recoilY;
@@ -1264,7 +1253,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnLaunchDamageEntity(bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel, int randomSeed, Vector3 aimPosition, Vector3 stagger, HashSet<DamageHitObjectInfo> hitObjectIds)
+        protected void OnLaunchDamageEntity(bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel, int randomSeed, Vector3 aimPosition, Vector3 stagger, HashSet<DamageHitObjectInfo> hitObjectIds)
         {
             UpdateRecoil();
         }
@@ -1273,7 +1262,7 @@ namespace MultiplayerARPG
         /// Return true if it's turned forwarding
         /// </summary>
         /// <returns></returns>
-        private bool SetTargetLookDirectionWhileDoingAction()
+        protected virtual bool SetTargetLookDirectionWhileDoingAction()
         {
             switch (ViewMode)
             {
@@ -1302,7 +1291,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        private void SetTargetLookDirectionWhileMoving()
+        protected virtual void SetTargetLookDirectionWhileMoving()
         {
             switch (ViewMode)
             {
@@ -1332,7 +1321,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateLookAtTarget()
+        protected virtual void UpdateLookAtTarget()
         {
             // Turn character to look direction immediately
             PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(targetLookDirection));
@@ -1352,7 +1341,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UseSkill(string id, Vector3? aimPosition)
+        protected virtual void UseSkill(string id, Vector3? aimPosition)
         {
             BaseSkill skill;
             short skillLevel;
@@ -1362,7 +1351,7 @@ namespace MultiplayerARPG
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
 
-        private void UseItem(string id, Vector3? aimPosition)
+        protected virtual void UseItem(string id, Vector3? aimPosition)
         {
             int itemIndex;
             BaseItem item;
@@ -1435,7 +1424,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Attack(bool isLeftHand)
+        public virtual void Attack(bool isLeftHand)
         {
             if (pauseFireInputFrames > 0)
                 return;
@@ -1444,14 +1433,25 @@ namespace MultiplayerARPG
                 updateAttackingCrosshair = true;
         }
 
-        public void WeaponCharge(bool isLeftHand)
+        public virtual void WeaponCharge(bool isLeftHand)
         {
             if (pauseFireInputFrames > 0)
                 return;
             PlayerCharacterEntity.StartCharge(isLeftHand);
         }
 
-        public void ActivateWeaponAbility()
+        public virtual void Reload()
+        {
+            if (WeaponAbility != null && WeaponAbility.ShouldDeactivateWhenReload)
+                WeaponAbility.ForceDeactivated();
+            // Reload ammo at server
+            if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
+                PlayerCharacterEntity.Reload(false);
+            else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
+                PlayerCharacterEntity.Reload(true);
+        }
+
+        public virtual void ActivateWeaponAbility()
         {
             if (WeaponAbility == null)
                 return;
@@ -1464,7 +1464,7 @@ namespace MultiplayerARPG
             WeaponAbilityState = WeaponAbilityState.Activating;
         }
 
-        private void UpdateActivatedWeaponAbility(float deltaTime)
+        protected virtual void UpdateActivatedWeaponAbility(float deltaTime)
         {
             if (WeaponAbility == null)
                 return;
@@ -1476,7 +1476,7 @@ namespace MultiplayerARPG
             WeaponAbilityState = WeaponAbility.UpdateActivation(WeaponAbilityState, deltaTime);
         }
 
-        private void DeactivateWeaponAbility()
+        protected virtual void DeactivateWeaponAbility()
         {
             if (WeaponAbility == null)
                 return;
@@ -1489,7 +1489,7 @@ namespace MultiplayerARPG
             WeaponAbilityState = WeaponAbilityState.Deactivating;
         }
 
-        public void HoldActivate()
+        public virtual void HoldActivate()
         {
             if (targetBuilding != null)
             {
@@ -1498,7 +1498,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Activate()
+        public virtual void Activate()
         {
             // Priority Player -> Npc -> Buildings
             if (targetPlayer != null)
@@ -1515,7 +1515,7 @@ namespace MultiplayerARPG
                 ShowItemsContainerDialog(targetItemsContainer);
         }
 
-        public void UseSkill(bool isLeftHand)
+        public virtual void UseSkill(bool isLeftHand)
         {
             if (pauseFireInputFrames > 0)
                 return;
@@ -1562,37 +1562,37 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool GetPrimaryAttackButton()
+        public virtual bool GetPrimaryAttackButton()
         {
             return InputManager.GetButton("Fire1") || InputManager.GetButton("Attack");
         }
 
-        public bool GetSecondaryAttackButton()
+        public virtual bool GetSecondaryAttackButton()
         {
             return InputManager.GetButton("Fire2");
         }
 
-        public bool GetPrimaryAttackButtonUp()
+        public virtual bool GetPrimaryAttackButtonUp()
         {
             return InputManager.GetButtonUp("Fire1") || InputManager.GetButtonUp("Attack");
         }
 
-        public bool GetSecondaryAttackButtonUp()
+        public virtual bool GetSecondaryAttackButtonUp()
         {
             return InputManager.GetButtonUp("Fire2");
         }
 
-        public bool GetPrimaryAttackButtonDown()
+        public virtual bool GetPrimaryAttackButtonDown()
         {
             return InputManager.GetButtonDown("Fire1") || InputManager.GetButtonDown("Attack");
         }
 
-        public bool GetSecondaryAttackButtonDown()
+        public virtual bool GetSecondaryAttackButtonDown()
         {
             return InputManager.GetButtonDown("Fire2");
         }
 
-        public void UpdateViewMode()
+        public virtual void UpdateViewMode()
         {
             dirtyViewMode = viewMode;
             UpdateCameraSettings();
@@ -1602,7 +1602,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
         }
 
-        public void UpdateCameraSettings()
+        public virtual void UpdateCameraSettings()
         {
             CacheGameplayCamera.fieldOfView = CameraFov;
             CacheGameplayCamera.nearClipPlane = CameraNearClipPlane;
@@ -1610,7 +1610,7 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.ModelManager.SetIsFps(viewMode == ShooterControllerViewMode.Fps);
         }
 
-        public bool IsInFront(Vector3 position)
+        public virtual bool IsInFront(Vector3 position)
         {
             return Vector3.Angle(cameraForward, position - CacheTransform.position) < 115f;
         }
@@ -1678,7 +1678,7 @@ namespace MultiplayerARPG
             return ConstructingBuildingEntity.Position;
         }
 
-        private int FindConstructingBuildingArea(Ray ray, float distance)
+        protected int FindConstructingBuildingArea(Ray ray, float distance)
         {
             ConstructingBuildingEntity.BuildingArea = null;
             ConstructingBuildingEntity.HitSurface = false;
