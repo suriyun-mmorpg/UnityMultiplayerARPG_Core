@@ -8,6 +8,6 @@
 
         void CancelReload();
         void ClearReloadStates();
-        bool Reload(bool isLeftHand);
+        void Reload(bool isLeftHand);
     }
 }

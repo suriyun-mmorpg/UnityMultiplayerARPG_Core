@@ -7,6 +7,6 @@
 
         void CancelAttack();
         void ClearAttackStates();
-        bool Attack(bool isLeftHand);
+        void Attack(bool isLeftHand);
     }
 }

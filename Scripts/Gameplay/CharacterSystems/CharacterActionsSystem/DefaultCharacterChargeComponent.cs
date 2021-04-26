@@ -89,14 +89,14 @@ namespace MultiplayerARPG
             CallAllStopChargeAnimation();
         }
 
-        public bool StartCharge(bool isLeftHand)
+        public void StartCharge(bool isLeftHand)
         {
-            return CallServerStartWeaponCharge(isLeftHand);
+            CallServerStartWeaponCharge(isLeftHand);
         }
 
-        public bool StopCharge()
+        public void StopCharge()
         {
-            return CallServerStopWeaponCharge();
+            CallServerStopWeaponCharge();
         }
     }
 }

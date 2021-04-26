@@ -30,12 +30,6 @@ namespace MultiplayerARPG
 
         public bool CallServerReload(bool isLeftHand)
         {
-            if (!Entity.CanDoActions())
-                return false;
-            if (!isLeftHand && Entity.EquipWeapons.rightHand.IsAmmoFull())
-                return false;
-            if (isLeftHand && Entity.EquipWeapons.leftHand.IsAmmoFull())
-                return false;
             RPC(ServerReload, isLeftHand);
             return true;
         }
@@ -190,9 +184,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool Reload(bool isLeftHand)
+        public void Reload(bool isLeftHand)
         {
-            return CallServerReload(isLeftHand);
+            CallServerReload(isLeftHand);
         }
     }
 }

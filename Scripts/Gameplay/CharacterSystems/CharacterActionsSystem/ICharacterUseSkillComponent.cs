@@ -14,7 +14,7 @@
         void InterruptCastingSkill();
         void CancelSkill();
         void ClearUseSkillStates();
-        bool UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition);
-        bool UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition);
+        void UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition);
+        void UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition);
     }
 }

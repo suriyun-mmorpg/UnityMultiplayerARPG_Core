@@ -548,19 +548,121 @@ namespace MultiplayerARPG
         #endregion
 
         #region Attack / Skill / Weapon / Damage
+        public bool ValidateAttack(bool isLeftHand)
+        {
+            if (!CanAttack())
+                return false;
+
+            if (!UpdateLastActionTime())
+                return false;
+
+            CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (!ValidateAmmo(weapon))
+            {
+                QueueGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
+                if (weaponItem != null)
+                    AudioManager.PlaySfxClipAtAudioSource(weaponItem.EmptyClip, CharacterModel.GenericAudioSource);
+                return false;
+            }
+            return true;
+        }
+
+        public bool ValidateUseSKill(int dataId, bool isLeftHand)
+        {
+            if (!CanUseSkill())
+                return false;
+
+            if (!UpdateLastActionTime())
+                return false;
+
+            BaseSkill skill;
+            short skillLevel;
+            if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
+                !this.GetCaches().Skills.TryGetValue(skill, out skillLevel))
+                return false;
+
+            UITextKeys gameMessage;
+            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessage))
+            {
+                QueueGameMessage(gameMessage);
+                return false;
+            }
+            return true;
+        }
+
+        public bool ValidateUseSkillItem(short index, bool isLeftHand)
+        {
+            if (!CanUseItem())
+                return false;
+
+            if (!UpdateLastActionTime())
+                return false;
+
+            if (index >= NonEquipItems.Count)
+                return false;
+
+            if (NonEquipItems[index].IsLock())
+                return false;
+
+            ISkillItem item = NonEquipItems[index].GetSkillItem();
+            if (item == null)
+                return false;
+
+            BaseSkill skill = item.UsingSkill;
+            short skillLevel = item.UsingSkillLevel;
+            if (skill == null)
+                return false;
+
+            UITextKeys gameMessage;
+            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessage, true))
+            {
+                QueueGameMessage(gameMessage);
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool ValidateReload(bool isLeftHand)
+        {
+            if (!CanDoActions())
+                return false;
+            if (!isLeftHand && EquipWeapons.rightHand.IsAmmoFull())
+                return false;
+            if (isLeftHand && EquipWeapons.leftHand.IsAmmoFull())
+                return false;
+            return true;
+        }
+
         public bool Attack(bool isLeftHand)
         {
-            return AttackComponent.Attack(isLeftHand);
+            if (ValidateAttack(isLeftHand))
+            {
+                AttackComponent.Attack(isLeftHand);
+                return true;
+            }
+            return false;
         }
 
         public bool UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
         {
-            return UseSkillComponent.UseSkill(dataId, isLeftHand, aimPosition);
+            if (ValidateUseSKill(dataId, isLeftHand))
+            {
+                UseSkillComponent.UseSkill(dataId, isLeftHand, aimPosition);
+                return true;
+            }
+            return false;
         }
 
         public bool UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
         {
-            return UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, aimPosition);
+            if (ValidateUseSkillItem(itemIndex, isLeftHand))
+            {
+                UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, aimPosition);
+                return true;
+            }
+            return false;
         }
 
         public void InterruptCastingSkill()
@@ -570,17 +672,28 @@ namespace MultiplayerARPG
 
         public bool StartCharge(bool isLeftHand)
         {
-            return ChargeComponent.StartCharge(isLeftHand);
+            if (ValidateAttack(isLeftHand))
+            {
+                ChargeComponent.StartCharge(isLeftHand);
+                return true;
+            }
+            return false;
         }
 
         public bool StopCharge()
         {
-            return ChargeComponent.StopCharge();
+            ChargeComponent.StopCharge();
+            return true;
         }
 
         public bool Reload(bool isLeftHand)
         {
-            return ReloadComponent.Reload(isLeftHand);
+            if (ValidateReload(isLeftHand))
+            {
+                ReloadComponent.Reload(isLeftHand);
+                return true;
+            }
+            return false;
         }
 
         public bool UpdateLastActionTime()
