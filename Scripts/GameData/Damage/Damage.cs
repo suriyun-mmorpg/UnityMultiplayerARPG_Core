@@ -167,7 +167,7 @@ namespace MultiplayerARPG
             BaseSkill skill,
             short skillLevel,
             int randomSeed,
-            Vector3 aimPosition,
+            AimPosition aimPosition,
             Vector3 stagger,
             out HashSet<DamageHitObjectInfo> damageHitObjectInfos)
         {

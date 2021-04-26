@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        public override AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
             short skillLevel = (short)data[0];
             if (BasePlayerCharacterController.Singleton is ShooterPlayerCharacterController)

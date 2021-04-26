@@ -10,10 +10,11 @@ namespace MultiplayerARPG
         public AreaBuffEntity areaBuffEntity;
         public Buff buff;
 
-        public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition, int randomSeed)
+        public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed)
         {
             // Spawn area entity
-            PoolSystem.GetInstance(areaBuffEntity, aimPosition, GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser))
+            // Aim position type always is `Position`
+            PoolSystem.GetInstance(areaBuffEntity, aimPosition.position, GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser))
                 .Setup(skillUser, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
         }
 

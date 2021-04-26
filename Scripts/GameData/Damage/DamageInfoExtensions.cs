@@ -4,19 +4,29 @@ namespace MultiplayerARPG
 {
     public static class DamageInfoExtensions
     {
-        public static void GetDamagePositionAndRotation(this IDamageInfo damageInfo, BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        public static void GetDamagePositionAndRotation(this IDamageInfo damageInfo, BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, AimPosition aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
-            Transform damageTransform = forEffect ? damageInfo.GetDamageEffectTransform(attacker, isLeftHand) : damageInfo.GetDamageTransform(attacker, isLeftHand);
-            position = damageTransform.position;
-            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
+            if (aimPosition.type == AimPositionType.Direction)
             {
-                GetDamageRotation2D(attacker.Direction2D, out rotation);
-                direction = attacker.Direction2D;
+                position = aimPosition.position;
+                direction = aimPosition.direction;
+                rotation = Quaternion.LookRotation(direction);
             }
             else
             {
-                GetDamageRotation3D(position, aimPosition, stagger, out rotation);
-                direction = rotation * Vector3.forward;
+                // NOTE: Allow aim position type `None` here, may change it later
+                Transform damageTransform = forEffect ? damageInfo.GetDamageEffectTransform(attacker, isLeftHand) : damageInfo.GetDamageTransform(attacker, isLeftHand);
+                position = damageTransform.position;
+                if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
+                {
+                    GetDamageRotation2D(attacker.Direction2D, out rotation);
+                    direction = attacker.Direction2D;
+                }
+                else
+                {
+                    GetDamageRotation3D(position, aimPosition.position, stagger, out rotation);
+                    direction = rotation * Vector3.forward;
+                }
             }
         }
 

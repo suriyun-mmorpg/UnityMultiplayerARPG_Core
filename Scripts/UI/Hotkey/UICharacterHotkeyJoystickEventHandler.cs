@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         private bool hotkeyCancel;
         public bool Interactable { get { return UICharacterHotkey.IsAssigned(); } }
         public bool IsDragging { get; private set; }
-        public Vector3? AimPosition { get; private set; }
+        public AimPosition AimPosition { get; private set; }
 
         private void Start()
         {

@@ -191,7 +191,7 @@ namespace MultiplayerARPG
                     }
                 }
 
-                Entity.AimPosition = Entity.GetDefaultAttackAimPosition(ref isLeftHandAttacking);
+                Entity.AimPosition = Entity.GetAttackAimPosition(ref isLeftHandAttacking);
                 if (Entity.IsPlayingActionAnimation())
                     return true;
 
@@ -200,8 +200,8 @@ namespace MultiplayerARPG
                     // Use skill when there is queue skill or randomed skill that can be used
                     Entity.UseSkill(queueSkill.DataId, false, new AimPosition()
                     {
-                        hasValue = true,
-                        value = tempTargetEnemy.OpponentAimTransform.position,
+                        type = AimPositionType.Position,
+                        position = tempTargetEnemy.OpponentAimTransform.position,
                     });
                 }
                 else

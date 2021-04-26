@@ -101,25 +101,6 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        protected override void EntityFixedUpdate()
-        {
-            Profiler.BeginSample("BasePlayerCharacterEntity - FixedUpdate");
-            base.EntityFixedUpdate();
-            if (IsOwnerClient && !this.IsDead())
-            {
-                clientSendAimPositionCountDown -= Time.unscaledDeltaTime;
-                if (clientSendAimPositionCountDown <= 0f)
-                {
-                    ClientSendPacket(ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.Sequenced, GameNetworkingConsts.SetAimPosition, (writer) =>
-                    {
-                        writer.PutVector3(AimPosition);
-                    });
-                    clientSendAimPositionCountDown = clientSendAimPositionInterval;
-                }
-            }
-            Profiler.EndSample();
-        }
-
         public override void Killed(EntityInfo lastAttacker)
         {
             // Dead time

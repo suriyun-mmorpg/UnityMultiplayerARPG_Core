@@ -11,21 +11,21 @@ namespace MultiplayerARPG
 
         public static bool IsMobile { get { return InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform; } }
 
-        public static Vector3? UpdateAimControls(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
+        public static AimPosition UpdateAimControls(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
         {
             if (IsMobile)
                 return UpdateAimControls_Mobile(aimAxes, skill, skillLevel, targetObject);
             return UpdateAimControls_PC(Input.mousePosition, skill, skillLevel, targetObject);
         }
 
-        public static Vector3? UpdateAimControls_Shooter(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
+        public static AimPosition UpdateAimControls_Shooter(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
         {
             if (IsMobile)
                 return UpdateAimControls_Mobile(aimAxes, skill, skillLevel, targetObject);
             return UpdateAimControls_PC(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f), skill, skillLevel, targetObject);
         }
 
-        public static Vector3? UpdateAimControls_PC(Vector3 cursorPosition, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
+        public static AimPosition UpdateAimControls_PC(Vector3 cursorPosition, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = GameplayUtils.CursorWorldPosition(Camera.main, cursorPosition);
@@ -36,10 +36,10 @@ namespace MultiplayerARPG
                 targetObject.SetActive(true);
                 targetObject.transform.position = position;
             }
-            return position;
+            return AimPosition.CreatePosition(position);
         }
 
-        public static Vector3? UpdateAimControls_Mobile(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
+        public static AimPosition UpdateAimControls_Mobile(Vector2 aimAxes, BaseAreaSkill skill, short skillLevel, GameObject targetObject)
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = GameInstance.PlayingCharacterEntity.CacheTransform.position + (GameplayUtils.GetDirectionByAxes(Camera.main.transform, aimAxes.x, aimAxes.y) * castDistance);
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                 targetObject.SetActive(true);
                 targetObject.transform.position = position;
             }
-            return position;
+            return AimPosition.CreatePosition(position);
         }
     }
 }

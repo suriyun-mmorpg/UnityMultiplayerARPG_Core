@@ -5,32 +5,45 @@ namespace MultiplayerARPG
 {
     public struct AimPosition : INetSerializable
     {
-        public bool hasValue;
-        public Vector3 value;
+        public AimPositionType type;
+        public Vector3 position;
+        public DirectionVector3 direction;
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(hasValue);
-            if (hasValue)
-                writer.PutVector3(value);
+            writer.Put((byte)type);
+            if (type != AimPositionType.None)
+                writer.PutVector3(position);
+            if (type == AimPositionType.Direction)
+                direction.Serialize(writer);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            hasValue = reader.GetBool();
-            if (hasValue)
-                value = reader.GetVector3();
+            type = (AimPositionType)reader.GetByte();
+            if (type != AimPositionType.None)
+                position = reader.GetVector3();
+            if (type == AimPositionType.Direction)
+                direction.Deserialize(reader);
         }
 
-        public static AimPosition Create(Vector3? vector3)
+        public static AimPosition CreatePosition(Vector3 position)
         {
-            AimPosition aimPosition = new AimPosition();
-            aimPosition.hasValue = vector3.HasValue;
-            if (aimPosition.hasValue)
+            return new AimPosition()
             {
-                aimPosition.value = vector3.Value;
-            }
-            return aimPosition;
+                type = AimPositionType.Position,
+                position = position,
+            };
+        }
+
+        public static AimPosition CreateDirection(Vector3 position, Vector3 direction)
+        {
+            return new AimPosition()
+            {
+                type = AimPositionType.Direction,
+                position = position,
+                direction = direction,
+            };
         }
     }
 }

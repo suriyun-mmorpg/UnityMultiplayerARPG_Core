@@ -35,7 +35,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
             return BasePlayerCharacterController.Singleton.UpdateBuildAimControls(aimAxes, BuildingEntity);
         }

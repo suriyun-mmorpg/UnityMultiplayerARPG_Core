@@ -333,9 +333,9 @@ namespace MultiplayerARPG
                     }
 
                     // Get aim position by character's forward
-                    Vector3 aimPosition;
-                    if (skill.HasCustomAimControls() && skillAimPosition.hasValue)
-                        aimPosition = skillAimPosition.value;
+                    AimPosition aimPosition;
+                    if (skill.HasCustomAimControls() && skillAimPosition.type == AimPositionType.Position)
+                        aimPosition = skillAimPosition;
                     else
                         aimPosition = Entity.AimPosition;
 

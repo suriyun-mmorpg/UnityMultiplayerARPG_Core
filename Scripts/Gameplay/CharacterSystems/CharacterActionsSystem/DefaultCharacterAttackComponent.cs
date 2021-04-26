@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +14,28 @@ namespace MultiplayerARPG
         protected List<CancellationTokenSource> attackCancellationTokenSources = new List<CancellationTokenSource>();
         public bool IsAttacking { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
+        [SerializeField]
+        [Range(0.00825f, 0.1f)]
+        protected float clientSendAimPositionInterval = 0.05f;
+
+        private float clientSendAimPositionCountDown;
+
+        public override void EntityFixedUpdate()
+        {
+            base.EntityFixedUpdate();
+            if (IsOwnerClient && !Entity.IsDead())
+            {
+                clientSendAimPositionCountDown -= Time.unscaledDeltaTime;
+                if (clientSendAimPositionCountDown <= 0f)
+                {
+                    ClientSendPacket(BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.Sequenced, GameNetworkingConsts.SetAimPosition, (writer) =>
+                    {
+                        writer.PutValue(Entity.AimPosition);
+                    });
+                    clientSendAimPositionCountDown = clientSendAimPositionInterval;
+                }
+            }
+        }
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
@@ -262,7 +285,7 @@ namespace MultiplayerARPG
             Entity.ClearActionStates();
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Vector3 aimPosition, int randomSeed)
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed)
         {
             if (IsServer)
             {

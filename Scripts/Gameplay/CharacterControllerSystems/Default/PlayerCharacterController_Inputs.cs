@@ -508,15 +508,14 @@ namespace MultiplayerARPG
             destination = null;
             BaseSkill skill = queueUsingSkill.skill;
             short skillLevel = queueUsingSkill.level;
-            Vector3? aimPosition = queueUsingSkill.aimPosition;
             BaseCharacterEntity targetEntity;
             // Point click mode always lock on target
             bool wasdLockAttackTarget = this.wasdLockAttackTarget || controllerMode == PlayerCharacterControllerMode.PointClick;
 
-            if (skill.HasCustomAimControls())
+            if (skill.HasCustomAimControls() && queueUsingSkill.aimPosition.type == AimPositionType.Position)
             {
                 // Target not required, use skill immediately
-                TurnCharacterToPosition(aimPosition.Value);
+                TurnCharacterToPosition(queueUsingSkill.aimPosition.position);
                 RequestUsePendingSkill();
                 isFollowingTarget = false;
                 return;
@@ -849,7 +848,7 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
         }
 
-        public override void UseHotkey(HotkeyType type, string relateId, Vector3? aimPosition)
+        public override void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition)
         {
             ClearQueueUsingSkill();
             switch (type)
@@ -863,7 +862,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UseSkill(string id, Vector3? aimPosition)
+        protected void UseSkill(string id, AimPosition aimPosition)
         {
             BaseSkill skill;
             short skillLevel;
@@ -873,7 +872,7 @@ namespace MultiplayerARPG
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
 
-        protected void UseItem(string id, Vector3? aimPosition)
+        protected void UseItem(string id, AimPosition aimPosition)
         {
             int itemIndex;
             BaseItem item;
@@ -938,7 +937,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override Vector3? UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab)
+        public override AimPosition UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab)
         {
             // Instantiate constructing building
             if (ConstructingBuildingEntity == null)
@@ -977,7 +976,7 @@ namespace MultiplayerARPG
                 FindAndSetBuildingAreaByAxes(aimAxes);
             else
                 FindAndSetBuildingAreaByMousePosition();
-            return ConstructingBuildingEntity.Position;
+            return AimPosition.CreatePosition(ConstructingBuildingEntity.Position);
         }
 
         public override void FinishBuildAimControls(bool isCancel)

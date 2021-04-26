@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             int hitIndex,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-            Vector3 aimPosition)
+            AimPosition aimPosition)
         {
             if (onAttackRoutine != null)
                 onAttackRoutine.Invoke(isLeftHand, weapon, hitIndex, damageInfo, damageAmounts, aimPosition);
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-            Vector3 aimPosition)
+            AimPosition aimPosition)
         {
             if (onUseSkillRoutine != null)
                 onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
             BaseSkill skill,
             short skillLevel,
             int randomSeed,
-            Vector3 aimPosition,
+            AimPosition aimPosition,
             Vector3 stagger,
             HashSet<DamageHitObjectInfo> hitObjectIds)
         {

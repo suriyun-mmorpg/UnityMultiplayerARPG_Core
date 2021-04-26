@@ -510,7 +510,7 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity gameEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity))
-                gameEntity.AimPosition = messageHandler.Reader.GetVector3();
+                gameEntity.AimPosition = messageHandler.Reader.GetValue<AimPosition>();
         }
 
         protected ChatMessage FillChatChannelId(ChatMessage message)

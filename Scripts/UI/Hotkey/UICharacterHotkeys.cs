@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         public MobileMovementJoystick hotkeyAimJoyStickPrefab;
         public RectTransform hotkeyCancelArea;
         public static UICharacterHotkey UsingHotkey { get; private set; }
-        public static Vector3? HotkeyAimPosition { get; private set; }
+        public static AimPosition HotkeyAimPosition { get; private set; }
         private static UICharacterHotkey otherHotkey;
         /// <summary>
         /// The hotkey which will be used by other components
@@ -208,7 +208,7 @@ namespace MultiplayerARPG
             {
                 UsingHotkey.FinishAimControls(true);
                 UsingHotkey = null;
-                HotkeyAimPosition = null;
+                HotkeyAimPosition = default;
             }
             UsingHotkey = hotkey;
         }
@@ -260,7 +260,7 @@ namespace MultiplayerARPG
             }
 
             UsingHotkey = null;
-            HotkeyAimPosition = null;
+            HotkeyAimPosition = default;
         }
 
         public void RegisterHotkeyJoystick(IHotkeyJoystickEventHandler hotkeyJoystick)

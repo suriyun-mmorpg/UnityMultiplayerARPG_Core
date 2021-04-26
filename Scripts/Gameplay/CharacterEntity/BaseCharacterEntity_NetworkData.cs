@@ -84,19 +84,7 @@ namespace MultiplayerARPG
                 pitch.Value = (byte)(value / 360f * 100);
             }
         }
-        private Vector3 aimPosition;
-        public Vector3 AimPosition
-        {
-            get
-            {
-                return aimPosition;
-            }
-            set
-            {
-                if (IsServer || IsOwnerClient)
-                    aimPosition = value;
-            }
-        }
+        public AimPosition AimPosition { get; set; }
 
         public IList<EquipWeapons> SelectableWeaponSets
         {

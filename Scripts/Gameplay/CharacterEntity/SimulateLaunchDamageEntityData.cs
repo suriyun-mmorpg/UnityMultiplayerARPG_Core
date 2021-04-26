@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public short skillLevel;
         public byte randomSeed;
         public int hitIndex;
-        public Vector3 aimPosition;
+        public AimPosition aimPosition;
 
         public void Serialize(NetDataWriter writer)
         {
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
                 writer.PutPackedShort(skillLevel);
                 writer.PutPackedInt(hitIndex);
             }
-            writer.PutVector3(aimPosition);
+            writer.PutValue(aimPosition);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
                 skillLevel = reader.GetPackedShort();
                 hitIndex = reader.GetPackedInt();
             }
-            aimPosition = reader.GetVector3();
+            aimPosition = reader.GetValue<AimPosition>();
         }
 
         public BaseSkill GetSkill()

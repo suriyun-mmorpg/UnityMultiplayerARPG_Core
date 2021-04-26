@@ -7,11 +7,11 @@ namespace MultiplayerARPG
     {
         public struct UsingSkillData
         {
-            public Vector3? aimPosition;
+            public AimPosition aimPosition;
             public BaseSkill skill;
             public short level;
             public short itemIndex;
-            public UsingSkillData(Vector3? aimPosition, BaseSkill skill, short level, short itemIndex)
+            public UsingSkillData(AimPosition aimPosition, BaseSkill skill, short level, short itemIndex)
             {
                 this.aimPosition = aimPosition;
                 this.skill = skill;
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
                 this.itemIndex = itemIndex;
             }
 
-            public UsingSkillData(Vector3? aimPosition, BaseSkill skill, short level)
+            public UsingSkillData(AimPosition aimPosition, BaseSkill skill, short level)
             {
                 this.aimPosition = aimPosition;
                 this.skill = skill;
@@ -303,12 +303,12 @@ namespace MultiplayerARPG
                 onActivateBuilding.Invoke(buildingEntity);
         }
 
-        public void SetQueueUsingSkill(Vector3? aimPosition, BaseSkill skill, short level)
+        public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, short level)
         {
             queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
         }
 
-        public void SetQueueUsingSkill(Vector3? aimPosition, BaseSkill skill, short level, short itemIndex)
+        public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, short level, short itemIndex)
         {
             queueUsingSkill = new UsingSkillData(aimPosition, skill, level, itemIndex);
         }
@@ -316,14 +316,14 @@ namespace MultiplayerARPG
         public void ClearQueueUsingSkill()
         {
             queueUsingSkill = new UsingSkillData();
-            queueUsingSkill.aimPosition = null;
+            queueUsingSkill.aimPosition = default;
             queueUsingSkill.skill = null;
             queueUsingSkill.level = 0;
             queueUsingSkill.itemIndex = -1;
         }
 
-        public abstract void UseHotkey(HotkeyType type, string relateId, Vector3? aimPosition);
-        public abstract Vector3? UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab);
+        public abstract void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition);
+        public abstract AimPosition UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab);
         public abstract void FinishBuildAimControls(bool isCancel);
     }
 }

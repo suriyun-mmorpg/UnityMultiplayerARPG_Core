@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             return UsingSkill.HasCustomAimControls();
         }
 
-        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
             return UsingSkill.UpdateAimControls(aimAxes, UsingSkillLevel);
         }

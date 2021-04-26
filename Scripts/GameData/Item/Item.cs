@@ -616,22 +616,22 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
             switch (itemType)
             {
                 case LegacyItemType.Potion:
-                    return null;
+                    return default;
                 case LegacyItemType.Building:
                     return BasePlayerCharacterController.Singleton.UpdateBuildAimControls(aimAxes, BuildingEntity);
                 case LegacyItemType.Pet:
-                    return null;
+                    return default;
                 case LegacyItemType.Mount:
-                    return null;
+                    return default;
                 case LegacyItemType.Skill:
                     return UsingSkill.UpdateAimControls(aimAxes, UsingSkillLevel);
             }
-            return null;
+            return default;
         }
 
         public void FinishAimControls(bool isCancel)

@@ -600,27 +600,40 @@ namespace MultiplayerARPG
             ChargeComponent.ClearChargeStates();
         }
 
-        public Vector3 GetDefaultAttackAimPosition(ref bool isLeftHand)
+        public AimPosition GetAttackAimPosition(ref bool isLeftHand)
         {
-            return GetDefaultAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand);
+            return GetAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand);
         }
 
-        public Vector3 GetDefaultAttackAimPosition(DamageInfo damageInfo, bool isLeftHand)
+        public AimPosition GetAttackAimPosition(ref bool isLeftHand, Vector3 targetPosition)
         {
-            // No aim position set, set aim position to forward direction
+            return GetAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand, targetPosition);
+        }
+
+        public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand)
+        {
+            Vector3 position = damageInfo.GetDamageTransform(this, isLeftHand).position;
+            Vector3 direction = CacheTransform.forward;
             BaseGameEntity targetEntity = GetTargetEntity();
             if (targetEntity)
             {
                 if (targetEntity is DamageableEntity)
                 {
-                    return (targetEntity as DamageableEntity).OpponentAimTransform.position;
+                    direction = (position - (targetEntity as DamageableEntity).OpponentAimTransform.position).normalized;
                 }
                 else
                 {
-                    return targetEntity.CacheTransform.position;
+                    direction = (position - targetEntity.CacheTransform.position).normalized;
                 }
             }
-            return damageInfo.GetDamageTransform(this, isLeftHand).position + CacheTransform.forward * damageInfo.GetDistance();
+            return AimPosition.CreateDirection(position, direction);
+        }
+
+        public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand, Vector3 targetPosition)
+        {
+            Vector3 position = damageInfo.GetDamageTransform(this, isLeftHand).position;
+            Vector3 direction = (targetPosition - position).normalized;
+            return AimPosition.CreateDirection(position, direction);
         }
 
         public virtual void GetReloadingData(

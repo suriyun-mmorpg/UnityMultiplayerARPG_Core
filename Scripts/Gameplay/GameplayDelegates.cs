@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         int hitIndex,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-        Vector3 aimPosition);
+        AimPosition aimPosition);
     public delegate void UseSkillRoutineDelegate(
         BaseSkill skill,
         short level,
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         CharacterItem weapon,
         int hitIndex,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-        Vector3 aimPosition);
+        AimPosition aimPosition);
     public delegate void LaunchDamageEntityDelegate(
         bool isLeftHand,
         CharacterItem weapon,
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         BaseSkill skill,
         short skillLevel,
         int randomSeed,
-        Vector3 aimPosition,
+        AimPosition aimPosition,
         Vector3 stagger,
         HashSet<DamageHitObjectInfo> hitObjectIds);
     public delegate void ApplyBuffDelegate(

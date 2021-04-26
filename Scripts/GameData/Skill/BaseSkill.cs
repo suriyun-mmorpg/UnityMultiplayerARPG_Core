@@ -300,7 +300,7 @@ namespace MultiplayerARPG
         public virtual bool RequiredTarget() { return false; }
         public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel) { return false; }
         public virtual bool HasCustomAimControls() { return false; }
-        public virtual Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data) { return null; }
+        public virtual AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data) { return default; }
         public virtual void FinishAimControls(bool isCancel) { }
         public virtual short GetUseAmmoAmount() { return 0; }
         public virtual Buff GetBuff() { return new Buff(); }
@@ -386,7 +386,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-            Vector3 aimPosition,
+            AimPosition aimPosition,
             int randomSeed);
 
         /// <summary>
@@ -407,7 +407,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
-            Vector3 aimPosition)
+            AimPosition aimPosition)
         {
             return false;
         }

@@ -1,13 +1,11 @@
-﻿using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public interface IHotkeyJoystickEventHandler
     {
         UICharacterHotkey UICharacterHotkey { get; }
         bool Interactable { get; }
         bool IsDragging { get; }
-        Vector3? AimPosition { get; }
+        AimPosition AimPosition { get; }
         void UpdateEvent();
     }
 }

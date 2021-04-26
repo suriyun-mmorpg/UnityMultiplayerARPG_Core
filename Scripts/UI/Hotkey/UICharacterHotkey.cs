@@ -207,7 +207,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public Vector3? UpdateAimControls(Vector2 axes)
+        public AimPosition UpdateAimControls(Vector2 axes)
         {
             if (usingItem != null &&
                 usingItem.HasCustomAimControls())
@@ -220,7 +220,7 @@ namespace MultiplayerARPG
             {
                 return usingSkill.UpdateAimControls(axes, usingSkillLevel);
             }
-            return null;
+            return default;
         }
 
         public void FinishAimControls(bool isCancel)
@@ -261,7 +261,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                Use(null);
+                Use(default);
             }
         }
 
@@ -281,7 +281,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void Use(Vector3? aimPosition)
+        public void Use(AimPosition aimPosition)
         {
             if (BasePlayerCharacterController.Singleton != null && Data != null)
                 BasePlayerCharacterController.Singleton.UseHotkey(Data.type, Data.relateId, aimPosition);

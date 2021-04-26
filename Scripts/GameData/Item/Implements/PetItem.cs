@@ -51,9 +51,9 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public Vector3? UpdateAimControls(Vector2 aimAxes, params object[] data)
+        public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            return null;
+            return default;
         }
 
         public void FinishAimControls(bool isCancel)

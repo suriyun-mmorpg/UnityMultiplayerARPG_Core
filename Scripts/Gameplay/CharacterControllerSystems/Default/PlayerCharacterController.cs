@@ -225,7 +225,7 @@ namespace MultiplayerARPG
 
             UpdateInput();
             UpdateFollowTarget();
-            PlayerCharacterEntity.AimPosition = PlayerCharacterEntity.GetDefaultAttackAimPosition(ref isLeftHandAttacking);
+            PlayerCharacterEntity.AimPosition = PlayerCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking);
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
@@ -372,15 +372,14 @@ namespace MultiplayerARPG
                 !PlayerCharacterEntity.IsAttacking &&
                 !PlayerCharacterEntity.IsUsingSkill)
             {
-                AimPosition aimPosition = AimPosition.Create(queueUsingSkill.aimPosition);
                 bool canUseSkill;
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    canUseSkill = PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, aimPosition);
+                    canUseSkill = PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, queueUsingSkill.aimPosition);
                 }
                 else
                 {
-                    canUseSkill = PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, aimPosition);
+                    canUseSkill = PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, queueUsingSkill.aimPosition);
                 }
                 if (canUseSkill)
                 {
