@@ -21,7 +21,15 @@ namespace MultiplayerARPG
         protected float damageRate = 1f;
 
         public DamageableEntity DamageableEntity { get; private set; }
-        public BaseGameEntity Entity { get { return DamageableEntity.Entity; } }
+        public BaseGameEntity Entity
+        {
+            get
+            {
+                if (isSetup)
+                    return DamageableEntity.Entity;
+                return null;
+            }
+        }
         public int CurrentHp
         {
             get
@@ -46,8 +54,24 @@ namespace MultiplayerARPG
                     DamageableEntity.IsInSafeArea = value;
             }
         }
-        public Transform OpponentAimTransform { get { return DamageableEntity.OpponentAimTransform; } }
-        public LiteNetLibIdentity Identity { get { return DamageableEntity.Identity; } }
+        public Transform OpponentAimTransform
+        {
+            get
+            {
+                if (isSetup)
+                    return DamageableEntity.OpponentAimTransform;
+                return null;
+            }
+        }
+        public LiteNetLibIdentity Identity
+        {
+            get
+            {
+                if (isSetup)
+                    return DamageableEntity.Identity;
+                return null;
+            }
+        }
         public int Index { get; private set; }
 
         private bool isSetup;
