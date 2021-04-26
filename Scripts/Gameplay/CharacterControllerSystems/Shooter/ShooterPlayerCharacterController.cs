@@ -812,7 +812,7 @@ namespace MultiplayerARPG
             CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
             PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
             // Update aim assist
-            CacheGameplayCameraControls.enableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly);
+            CacheGameplayCameraControls.enableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly) && !(SelectedEntity is IDamageableEntity);
             CacheGameplayCameraControls.enableAimAssistX = enableAimAssistX;
             CacheGameplayCameraControls.enableAimAssistY = enableAimAssistY;
             CacheGameplayCameraControls.aimAssistRadius = aimAssistRadius;
