@@ -637,6 +637,8 @@ namespace MultiplayerARPG
 
         public bool Attack(bool isLeftHand)
         {
+            if (!IsOwnerClientOrOwnedByServer)
+                return false;
             if (ValidateAttack(isLeftHand))
             {
                 AttackComponent.Attack(isLeftHand);
@@ -647,6 +649,8 @@ namespace MultiplayerARPG
 
         public bool UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
         {
+            if (!IsOwnerClientOrOwnedByServer)
+                return false;
             if (ValidateUseSKill(dataId, isLeftHand))
             {
                 UseSkillComponent.UseSkill(dataId, isLeftHand, aimPosition);
@@ -657,6 +661,8 @@ namespace MultiplayerARPG
 
         public bool UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
         {
+            if (!IsOwnerClientOrOwnedByServer)
+                return false;
             if (ValidateUseSkillItem(itemIndex, isLeftHand))
             {
                 UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, aimPosition);
@@ -672,6 +678,8 @@ namespace MultiplayerARPG
 
         public bool StartCharge(bool isLeftHand)
         {
+            if (!IsOwnerClientOrOwnedByServer)
+                return false;
             if (ValidateAttack(isLeftHand))
             {
                 ChargeComponent.StartCharge(isLeftHand);
@@ -682,12 +690,16 @@ namespace MultiplayerARPG
 
         public bool StopCharge()
         {
+            if (!IsOwnerClientOrOwnedByServer)
+                return false;
             ChargeComponent.StopCharge();
             return true;
         }
 
         public bool Reload(bool isLeftHand)
         {
+            if (!IsOwnerClientOrOwnedByServer)
+                return false;
             if (ValidateReload(isLeftHand))
             {
                 ReloadComponent.Reload(isLeftHand);

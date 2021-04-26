@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
-using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,28 +13,6 @@ namespace MultiplayerARPG
         protected List<CancellationTokenSource> attackCancellationTokenSources = new List<CancellationTokenSource>();
         public bool IsAttacking { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
-        [SerializeField]
-        [Range(0.00825f, 0.1f)]
-        protected float clientSendAimPositionInterval = 0.05f;
-
-        private float clientSendAimPositionCountDown;
-
-        public override void EntityFixedUpdate()
-        {
-            base.EntityFixedUpdate();
-            if (IsOwnerClient && !Entity.IsDead())
-            {
-                clientSendAimPositionCountDown -= Time.unscaledDeltaTime;
-                if (clientSendAimPositionCountDown <= 0f)
-                {
-                    ClientSendPacket(BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.Sequenced, GameNetworkingConsts.SetAimPosition, (writer) =>
-                    {
-                        writer.PutValue(Entity.AimPosition);
-                    });
-                    clientSendAimPositionCountDown = clientSendAimPositionInterval;
-                }
-            }
-        }
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
@@ -50,84 +27,8 @@ namespace MultiplayerARPG
             IsAttacking = false;
         }
 
-        public bool ValidateRequestAttack(bool isLeftHand)
-        {
-            if (!Entity.CanAttack())
-                return false;
-
-            if (!Entity.UpdateLastActionTime())
-                return false;
-
-            CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (!Entity.ValidateAmmo(weapon))
-            {
-                Entity.QueueGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
-                // Play empty sfx
-                if (weaponItem != null)
-                    AudioManager.PlaySfxClipAtAudioSource(weaponItem.EmptyClip, Entity.CharacterModel.GenericAudioSource);
-                return false;
-            }
-            return true;
-        }
-
-        public bool CallServerAttack(bool isLeftHand)
-        {
-            if (!ValidateRequestAttack(isLeftHand))
-                return false;
-            RPC(ServerAttack, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
-            return true;
-        }
-
-        /// <summary>
-        /// Is function will be called at server to order character to attack
-        /// </summary>
-        [ServerRpc]
-        protected virtual void ServerAttack(bool isLeftHand)
-        {
-#if !CLIENT_BUILD
-            if (!Entity.CanAttack())
-                return;
-
-            // Prepare requires data and get weapon data
-            AnimActionType animActionType;
-            int animaActionDataId;
-            CharacterItem weapon;
-            Entity.GetAttackingData(
-                ref isLeftHand,
-                out animActionType,
-                out animaActionDataId,
-                out weapon);
-
-            // Prepare requires data and get animation data
-            int animationIndex;
-            float animSpeedRate;
-            float[] triggerDurations;
-            float totalDuration;
-            Entity.GetRandomAnimationData(
-                animActionType,
-                animaActionDataId,
-                out animationIndex,
-                out animSpeedRate,
-                out triggerDurations,
-                out totalDuration);
-
-            // Validate ammo
-            if (!Entity.ValidateAmmo(weapon))
-                return;
-
-            // Start attack routine
-            IsAttacking = true;
-
-            // Play animations
-            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex);
-#endif
-        }
-
         public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllPlayAttackAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex);
             return true;
         }
@@ -135,6 +36,8 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
+            if (IsOwnerClientOrOwnedByServer)
+                return;
             AttackRoutine(isLeftHand, animationIndex).Forget();
         }
 
@@ -144,7 +47,7 @@ namespace MultiplayerARPG
             CancellationTokenSource attackCancellationTokenSource = new CancellationTokenSource();
             attackCancellationTokenSources.Add(attackCancellationTokenSource);
 
-            // Prepare requires data and get weapon data
+            // Prepare required data and get weapon data
             AnimActionType animActionType;
             int animActionDataId;
             CharacterItem weapon;
@@ -154,7 +57,7 @@ namespace MultiplayerARPG
                 out animActionDataId,
                 out weapon);
 
-            // Prepare requires data and get animation data
+            // Prepare required data and get animation data
             float animSpeedRate;
             float[] triggerDurations;
             float totalDuration;
@@ -169,7 +72,7 @@ namespace MultiplayerARPG
             // Set doing action state at clients and server
             SetAttackActionStates(animActionType, animActionDataId);
 
-            // Prepare requires data and get damages data
+            // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
@@ -231,7 +134,7 @@ namespace MultiplayerARPG
                         Entity.OnAttackRoutine(isLeftHand, weapon, hitIndex, damageInfo, damageAmounts, Entity.AimPosition);
 
                         // Apply attack damages
-                        if (IsServer)
+                        if (IsOwnerClientOrOwnedByServer)
                         {
                             int randomSeed = Random.Range(0, 255);
                             ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, randomSeed);
@@ -331,8 +234,6 @@ namespace MultiplayerARPG
 
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllSimulateLaunchDamageEntity, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             return true;
         }
@@ -340,7 +241,7 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            if (IsServer)
+            if (IsOwnerClientOrOwnedByServer)
                 return;
 
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
@@ -363,9 +264,35 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool Attack(bool isLeftHand)
+        public void Attack(bool isLeftHand)
         {
-            return CallServerAttack(isLeftHand);
+            // Prepare required data and get weapon data
+            AnimActionType animActionType;
+            int animaActionDataId;
+            Entity.GetAttackingData(
+                ref isLeftHand,
+                out animActionType,
+                out animaActionDataId,
+                out _);
+
+            // Prepare required data and get animation data
+            int animationIndex;
+            Entity.GetRandomAnimationData(
+                animActionType,
+                animaActionDataId,
+                out animationIndex,
+                out _,
+                out _,
+                out _);
+
+            // Start attack routine
+            IsAttacking = true;
+
+            // Play attack animation at owning client immediately
+            AttackRoutine(isLeftHand, (byte)animationIndex).Forget();
+
+            // Broadcast attack animation playing
+            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex);
         }
     }
 }

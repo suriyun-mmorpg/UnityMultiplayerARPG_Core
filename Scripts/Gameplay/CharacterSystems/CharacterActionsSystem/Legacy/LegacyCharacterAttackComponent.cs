@@ -103,8 +103,6 @@ namespace MultiplayerARPG
 
         public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllPlayAttackAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex);
             return true;
         }
@@ -308,8 +306,6 @@ namespace MultiplayerARPG
 
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllSimulateLaunchDamageEntity, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             return true;
         }

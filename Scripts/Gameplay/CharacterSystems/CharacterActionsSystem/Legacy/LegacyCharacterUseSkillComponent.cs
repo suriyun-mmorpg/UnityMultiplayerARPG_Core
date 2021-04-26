@@ -108,8 +108,6 @@ namespace MultiplayerARPG
 
         public bool CallAllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
             return true;
         }
@@ -144,8 +142,6 @@ namespace MultiplayerARPG
 
         public bool CallServerInterruptCastingSkill()
         {
-            if (Entity.IsDead())
-                return false;
             RPC(ServerInterruptCastingSkill, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
@@ -163,8 +159,6 @@ namespace MultiplayerARPG
 
         public bool CallAllOnInterruptCastingSkill()
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllOnInterruptCastingSkill, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
@@ -443,8 +437,6 @@ namespace MultiplayerARPG
 
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllSimulateLaunchDamageEntity, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             return true;
         }

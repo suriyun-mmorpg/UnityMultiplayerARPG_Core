@@ -44,33 +44,8 @@ namespace MultiplayerARPG
             IsUsingSkill = false;
         }
 
-        public bool ValidateRequestUseSKill(int dataId, bool isLeftHand)
-        {
-            if (!Entity.CanUseSkill())
-                return false;
-
-            if (!Entity.UpdateLastActionTime())
-                return false;
-
-            BaseSkill skill;
-            short skillLevel;
-            if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
-                !Entity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
-                return false;
-
-            UITextKeys gameMessage;
-            if (!skill.CanUse(Entity, skillLevel, isLeftHand, out gameMessage))
-            {
-                Entity.QueueGameMessage(gameMessage);
-                return false;
-            }
-            return true;
-        }
-
         public bool CallServerUseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
         {
-            if (!ValidateRequestUseSKill(dataId, isLeftHand))
-                return false;
             RPC(ServerUseSkill, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, dataId, isLeftHand, aimPosition);
             return true;
         }
@@ -85,9 +60,6 @@ namespace MultiplayerARPG
         protected void ServerUseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
-            if (!Entity.CanUseSkill())
-                return;
-
             BaseSkill skill;
             short skillLevel;
             if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
@@ -98,7 +70,7 @@ namespace MultiplayerARPG
             if (!skill.CanUse(Entity, skillLevel, isLeftHand, out _))
                 return;
 
-            // Prepare requires data and get skill data
+            // Prepare required data and get skill data
             AnimActionType animActionType;
             int animatonDataId;
             CharacterItem weapon;
@@ -113,7 +85,7 @@ namespace MultiplayerARPG
             if (skill.IsAttack() && !Entity.ValidateAmmo(weapon))
                 return;
 
-            // Prepare requires data and get animation data
+            // Prepare required data and get animation data
             int animationIndex;
             Entity.GetRandomAnimationData(
                 animActionType,
@@ -131,10 +103,76 @@ namespace MultiplayerARPG
 #endif
         }
 
+        public bool CallServerUseSkillItem(short index, bool isLeftHand, AimPosition aimPosition)
+        {
+            RPC(ServerUseSkillItem, index, isLeftHand, aimPosition);
+            return true;
+        }
+
+        /// <summary>
+        /// This function will be called at server to order character to use item
+        /// </summary>
+        /// <param name="itemIndex"></param>
+        /// <param name="aimPosition"></param>
+        [ServerRpc]
+        protected void ServerUseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
+        {
+#if !CLIENT_BUILD
+            if (itemIndex >= Entity.NonEquipItems.Count)
+                return;
+
+            // Get item from inventory
+            CharacterItem characterItem = Entity.NonEquipItems[itemIndex];
+            if (characterItem.IsLock())
+                return;
+
+            // Get item data
+            ISkillItem item = characterItem.GetSkillItem();
+
+            // Validate mp amount, skill level
+            if (!item.UsingSkill.CanUse(Entity, item.UsingSkillLevel, isLeftHand, out _, true))
+                return;
+
+            // Prepare required data and get skill data
+            AnimActionType animActionType;
+            int animActionDataId;
+            CharacterItem weapon;
+            Entity.GetUsingSkillData(
+                item.UsingSkill,
+                ref isLeftHand,
+                out animActionType,
+                out animActionDataId,
+                out weapon);
+
+            // Validate ammo
+            if (item.UsingSkill.IsAttack() && !Entity.ValidateAmmo(weapon))
+                return;
+
+            // Prepare required data and get animation data
+            int animationIndex;
+            Entity.GetRandomAnimationData(
+                animActionType,
+                animActionDataId,
+                out animationIndex,
+                out _,
+                out _,
+                out _);
+
+            // Validate skill item
+            if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
+                return;
+            Entity.FillEmptySlots();
+
+            // Start use skill routine
+            IsUsingSkill = true;
+
+            // Play animations
+            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, aimPosition);
+#endif
+        }
+
         public bool CallAllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
             return true;
         }
@@ -169,8 +207,6 @@ namespace MultiplayerARPG
 
         public bool CallServerInterruptCastingSkill()
         {
-            if (Entity.IsDead())
-                return false;
             RPC(ServerInterruptCastingSkill, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
@@ -188,8 +224,6 @@ namespace MultiplayerARPG
 
         public bool CallAllOnInterruptCastingSkill()
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllOnInterruptCastingSkill, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             return true;
         }
@@ -224,7 +258,7 @@ namespace MultiplayerARPG
             CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
             skillCancellationTokenSources.Add(skillCancellationTokenSource);
 
-            // Prepare requires data and get skill data
+            // Prepare required data and get skill data
             AnimActionType animActionType;
             int animActionDataId;
             CharacterItem weapon;
@@ -235,7 +269,7 @@ namespace MultiplayerARPG
                 out animActionDataId,
                 out weapon);
 
-            // Prepare requires data and get animation data
+            // Prepare required data and get animation data
             float animSpeedRate;
             float[] triggerDurations;
             float totalDuration;
@@ -258,7 +292,7 @@ namespace MultiplayerARPG
                 Entity.SkillUsages.Add(newSkillUsage);
             }
 
-            // Prepare requires data and get damages data
+            // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, skillLevel, isLeftHand);
 
@@ -343,7 +377,7 @@ namespace MultiplayerARPG
                     Entity.OnUseSkillRoutine(skill, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
 
                     // Apply skill buffs, summons and attack damages
-                    if (IsServer)
+                    if (IsOwnerClientOrOwnedByServer)
                     {
                         int randomSeed = Random.Range(0, 255);
                         skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition, randomSeed);
@@ -395,116 +429,8 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool ValidateRequestUseSkillItem(short index, bool isLeftHand)
-        {
-            if (!Entity.CanUseItem())
-                return false;
-
-            if (!Entity.UpdateLastActionTime())
-                return false;
-
-            if (index >= Entity.NonEquipItems.Count)
-                return false;
-
-            if (Entity.NonEquipItems[index].IsLock())
-                return false;
-
-            ISkillItem item = Entity.NonEquipItems[index].GetSkillItem();
-            if (item == null)
-                return false;
-
-            BaseSkill skill = item.UsingSkill;
-            short skillLevel = item.UsingSkillLevel;
-            if (skill == null)
-                return false;
-
-            UITextKeys gameMessage;
-            if (!skill.CanUse(Entity, skillLevel, isLeftHand, out gameMessage, true))
-            {
-                Entity.QueueGameMessage(gameMessage);
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool CallServerUseSkillItem(short index, bool isLeftHand, AimPosition aimPosition)
-        {
-            if (!ValidateRequestUseSkillItem(index, isLeftHand))
-                return false;
-            RPC(ServerUseSkillItem, index, isLeftHand, aimPosition);
-            return true;
-        }
-
-        /// <summary>
-        /// This function will be called at server to order character to use item
-        /// </summary>
-        /// <param name="itemIndex"></param>
-        /// <param name="aimPosition"></param>
-        [ServerRpc]
-        protected void ServerUseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
-        {
-#if !CLIENT_BUILD
-            if (!Entity.CanUseItem() || !Entity.CanUseSkill())
-                return;
-
-            if (itemIndex >= Entity.NonEquipItems.Count)
-                return;
-
-            CharacterItem characterItem = Entity.NonEquipItems[itemIndex];
-            if (characterItem.IsLock())
-                return;
-
-            ISkillItem item = characterItem.GetSkillItem();
-            if (!Entity.CanUseItem() || !Entity.CanUseSkill() || item == null || item.UsingSkill == null)
-                return;
-
-            // Validate mp amount, skill level
-            if (!item.UsingSkill.CanUse(Entity, item.UsingSkillLevel, isLeftHand, out _, true))
-                return;
-
-            // Prepare requires data and get skill data
-            AnimActionType animActionType;
-            int animActionDataId;
-            CharacterItem weapon;
-            Entity.GetUsingSkillData(
-                item.UsingSkill,
-                ref isLeftHand,
-                out animActionType,
-                out animActionDataId,
-                out weapon);
-
-            // Validate ammo
-            if (item.UsingSkill.IsAttack() && !Entity.ValidateAmmo(weapon))
-                return;
-
-            // Prepare requires data and get animation data
-            int animationIndex;
-            Entity.GetRandomAnimationData(
-                animActionType,
-                animActionDataId,
-                out animationIndex,
-                out _,
-                out _,
-                out _);
-
-            // Validate skill item
-            if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
-                return;
-            Entity.FillEmptySlots();
-
-            // Start use skill routine
-            IsUsingSkill = true;
-
-            // Play animations
-            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, aimPosition);
-#endif
-        }
-
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            if (Entity.IsDead())
-                return false;
             RPC(AllSimulateLaunchDamageEntity, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             return true;
         }
@@ -512,7 +438,7 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            if (IsServer)
+            if (IsOwnerClientOrOwnedByServer)
                 return;
 
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
@@ -528,14 +454,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
+        public void UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
         {
-            return CallServerUseSkill (dataId, isLeftHand, aimPosition);
+            CallServerUseSkill(dataId, isLeftHand, aimPosition);
         }
 
-        public bool UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
+        public void UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
         {
-            return CallServerUseSkillItem (itemIndex, isLeftHand, aimPosition);
+            CallServerUseSkillItem(itemIndex, isLeftHand, aimPosition);
         }
     }
 }
