@@ -744,11 +744,11 @@ namespace MultiplayerARPG
             {
                 if (targetEntity is DamageableEntity)
                 {
-                    direction = (position - (targetEntity as DamageableEntity).OpponentAimTransform.position).normalized;
+                    direction = ((targetEntity as DamageableEntity).OpponentAimTransform.position - position).normalized;
                 }
                 else
                 {
-                    direction = (position - targetEntity.CacheTransform.position).normalized;
+                    direction = (targetEntity.CacheTransform.position - position).normalized;
                 }
             }
             return AimPosition.CreateDirection(position, direction);
