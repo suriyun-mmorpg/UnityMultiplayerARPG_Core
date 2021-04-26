@@ -22,18 +22,42 @@ namespace MultiplayerARPG
 
         public DamageableEntity DamageableEntity { get; private set; }
         public BaseGameEntity Entity { get { return DamageableEntity.Entity; } }
-        public int CurrentHp { get { return DamageableEntity.CurrentHp; } set { DamageableEntity.CurrentHp = value; } }
-        public bool IsInSafeArea { get { return DamageableEntity.IsInSafeArea; } set { DamageableEntity.IsInSafeArea = value; } }
+        public int CurrentHp
+        {
+            get
+            {
+                return !isSetup ? 0 : DamageableEntity.CurrentHp;
+            }
+            set
+            {
+                if (isSetup)
+                    DamageableEntity.CurrentHp = value;
+            }
+        }
+        public bool IsInSafeArea
+        {
+            get
+            {
+                return !isSetup ? false : DamageableEntity.IsInSafeArea;
+            }
+            set
+            {
+                if (isSetup)
+                    DamageableEntity.IsInSafeArea = value;
+            }
+        }
         public Transform OpponentAimTransform { get { return DamageableEntity.OpponentAimTransform; } }
         public LiteNetLibIdentity Identity { get { return DamageableEntity.Identity; } }
         public int Index { get; private set; }
 
+        private bool isSetup;
         private Vector3 defaultLocalPosition;
         private Quaternion defaultLocalRotation;
         private List<TransformHistory> histories = new List<TransformHistory>();
 
         public virtual void Setup(DamageableEntity entity, int index)
         {
+            isSetup = true;
             DamageableEntity = entity;
             gameObject.tag = entity.gameObject.tag;
             gameObject.layer = entity.gameObject.layer;
