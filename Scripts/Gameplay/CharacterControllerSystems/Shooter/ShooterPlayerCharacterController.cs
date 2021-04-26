@@ -705,16 +705,25 @@ namespace MultiplayerARPG
                     attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
                 }
             }
-            // Temporary disable colliders
-            // Default aim position (aim to sky/space)
-            aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + attackDistance);
-            // Raycast from camera position to center of screen
-            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, findTargetRaycastDistance, Physics.DefaultRaycastLayers);
+            // Temporary variables
             RaycastHit tempHitInfo;
             float tempDistance;
+            // Default aim position (aim to sky/space)
+            aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + attackDistance);
+            // Aim to damageable hit boxes (higher priority than other entities)
+            // Raycast from camera position to center of screen
+            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, centerOriginToCharacterDistance + attackDistance, Physics.DefaultRaycastLayers);
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
+
+                if (tempHitInfo.transform.gameObject.layer == PhysicLayers.TransparentFX ||
+                    tempHitInfo.transform.gameObject.layer == PhysicLayers.IgnoreRaycast ||
+                    tempHitInfo.transform.gameObject.layer == PhysicLayers.Water)
+                {
+                    // Skip some layers
+                    continue;
+                }
 
                 if (tempHitInfo.collider.GetComponent<IUnHittable>() != null)
                 {
@@ -722,9 +731,8 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                // Get distance between character and raycast hit point
-                tempDistance = Vector3.Distance(CacheTransform.position, tempHitInfo.point);
-                tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
+                // Get damageable hit box component from hit target
+                tempGameEntity = tempHitInfo.collider.GetComponent<DamageableHitBox>();
 
                 if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.Entity.IsHide() ||
                     tempGameEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
@@ -733,41 +741,69 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                if (tempGameEntity is IDamageableEntity)
-                {
-                    // Entity isn't in front of character, so it's not the target
-                    if (turnForwardWhileDoingAction && !IsInFront(tempHitInfo.point))
-                        continue;
+                // Entity isn't in front of character, so it's not the target
+                if (turnForwardWhileDoingAction && !IsInFront(tempHitInfo.point))
+                    continue;
 
-                    // Skip dead entity while attacking (to allow to use resurrect skills)
-                    if (attacking && (tempGameEntity as IDamageableEntity).IsDead())
-                        continue;
+                // Skip dead entity while attacking (to allow to use resurrect skills)
+                if (attacking && (tempGameEntity as DamageableHitBox).IsDead())
+                    continue;
 
-                    // Entity is in front of character, so this is target
-                    aimTargetPosition = tempHitInfo.point;
-                    SelectedEntity = tempGameEntity.Entity;
-                    break;
-                }
-                // Find item drop entity
-                if (tempGameEntity.Entity is ItemDropEntity &&
-                    tempDistance <= CurrentGameInstance.pickUpItemDistance)
+                // Entity is in front of character, so this is target
+                aimTargetPosition = tempHitInfo.point;
+                SelectedEntity = tempGameEntity.Entity;
+                break;
+            }
+
+            // Aim to activateable entities if it can't find attacking target
+            if (SelectedEntity == null)
+            {
+                // Default aim position (aim to sky/space)
+                aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + findTargetRaycastDistance);
+                // Raycast from camera position to center of screen
+                tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, centerOriginToCharacterDistance + findTargetRaycastDistance, CurrentGameInstance.GetTargetLayerMask());
+                for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
-                    // Entity is in front of character, so this is target
-                    if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
-                        aimTargetPosition = tempHitInfo.point;
-                    SelectedEntity = tempGameEntity.Entity;
-                    break;
-                }
-                // Find activatable entity (NPC/Building/Mount/Etc)
-                if (tempDistance <= CurrentGameInstance.conversationDistance)
-                {
-                    // Entity is in front of character, so this is target
-                    if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
-                        aimTargetPosition = tempHitInfo.point;
-                    SelectedEntity = tempGameEntity.Entity;
-                    break;
+                    tempHitInfo = raycasts[tempCounter];
+                    if (tempHitInfo.collider.GetComponent<IUnHittable>() != null)
+                    {
+                        // Don't aim to unhittable objects
+                        continue;
+                    }
+
+                    // Get distance between character and raycast hit point
+                    tempDistance = Vector3.Distance(CacheTransform.position, tempHitInfo.point);
+                    tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
+
+                    if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.Entity.IsHide() ||
+                        tempGameEntity.GetObjectId() == PlayerCharacterEntity.ObjectId)
+                    {
+                        // Skip empty game entity / hiddeing entity / controlling player's entity
+                        continue;
+                    }
+
+                    // Find item drop entity
+                    if (tempGameEntity.Entity is ItemDropEntity &&
+                        tempDistance <= CurrentGameInstance.pickUpItemDistance)
+                    {
+                        // Entity is in front of character, so this is target
+                        if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
+                            aimTargetPosition = tempHitInfo.point;
+                        SelectedEntity = tempGameEntity.Entity;
+                        break;
+                    }
+                    // Find activatable entity (NPC/Building/Mount/Etc)
+                    if (tempDistance <= CurrentGameInstance.conversationDistance)
+                    {
+                        // Entity is in front of character, so this is target
+                        if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
+                            aimTargetPosition = tempHitInfo.point;
+                        SelectedEntity = tempGameEntity.Entity;
+                        break;
+                    }
                 }
             }
+
             // Calculate aim direction
             turnDirection = aimTargetPosition - CacheTransform.position;
             turnDirection.y = 0f;
