@@ -29,9 +29,13 @@ namespace MultiplayerARPG
 
         protected Vector2? currentDestination;
 
-        private float tempMoveDirectionMagnitude;
         private Vector2 tempMoveDirection;
         private Vector2 tempCurrentPosition;
+        private Vector2 tempPredictPosition;
+        private float tempSqrMagnitude;
+        private float tempPredictSqrMagnitude;
+        private float tempTargetDistance;
+        private float tempCurrentMoveSpeed;
         private Quaternion lookRotation;
         private long acceptedPositionTimestamp;
         private float lastServerSyncTransform;
@@ -129,8 +133,15 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public override void EntityUpdate()
+        {
+            if (pauseDirectionChangingFrames > 0)
+                --pauseDirectionChangingFrames;
+        }
+
         public override void EntityFixedUpdate()
         {
+            float deltaTime = Time.fixedDeltaTime;
             tempMoveDirection = Vector2.zero;
             if (currentDestination.HasValue)
             {
@@ -138,17 +149,27 @@ namespace MultiplayerARPG
                 tempCurrentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
                 tempMoveDirection = (currentDestination.Value - tempCurrentPosition).normalized;
                 if (Vector2.Distance(currentDestination.Value, tempCurrentPosition) < StoppingDistance)
+                {
                     StopMove();
+                    tempMoveDirection = Vector2.zero;
+                }
             }
             if (Entity.CanMove())
             {
-                tempMoveDirectionMagnitude = tempMoveDirection.magnitude;
-                if (tempMoveDirectionMagnitude > 0f)
+                if (tempMoveDirection.sqrMagnitude > 0f)
                 {
-                    if (tempMoveDirectionMagnitude > 1)
-                        tempMoveDirection = tempMoveDirection.normalized;
+                    tempCurrentMoveSpeed = Entity.GetMoveSpeed();
+                    tempSqrMagnitude = (currentDestination.Value - tempCurrentPosition).sqrMagnitude;
+                    tempPredictPosition = tempCurrentPosition + (tempMoveDirection * tempCurrentMoveSpeed * deltaTime);
+                    tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
+                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                    // rigidbody will reaching target and character is moving pass it,
+                    // so adjust move speed by distance and time (with physic formula: v=s/t)
+                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                     Entity.SetDirection2D(tempMoveDirection);
-                    CacheRigidbody2D.velocity = tempMoveDirection * Entity.GetMoveSpeed();
+                    CacheRigidbody2D.velocity = tempMoveDirection * tempCurrentMoveSpeed;
                 }
                 else
                 {
