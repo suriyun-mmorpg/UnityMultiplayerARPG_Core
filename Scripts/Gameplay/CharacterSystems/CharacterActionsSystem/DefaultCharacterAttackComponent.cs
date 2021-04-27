@@ -85,11 +85,11 @@ namespace MultiplayerARPG
             try
             {
                 // Animations will plays on clients only
+                // Play animation
+                if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                    Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
                 if (IsClient)
                 {
-                    // Play animation
-                    if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                        Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                         Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
                 }

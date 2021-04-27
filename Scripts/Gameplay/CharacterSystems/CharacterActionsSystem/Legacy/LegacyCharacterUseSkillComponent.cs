@@ -256,11 +256,11 @@ namespace MultiplayerARPG
 
                 if (CastingSkillDuration > 0f)
                 {
-                    // Play special effect
+                    // Play cast animation
+                    if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                        Entity.CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                     if (IsClient)
                     {
-                        if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                            Entity.CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                             Entity.FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                     }
@@ -269,10 +269,10 @@ namespace MultiplayerARPG
                 }
 
                 // Animations will plays on clients only
+                if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                    Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
                 if (IsClient)
                 {
-                    if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                        Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                         Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
                 }
