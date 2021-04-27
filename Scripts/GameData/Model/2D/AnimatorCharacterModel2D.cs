@@ -297,6 +297,17 @@ namespace MultiplayerARPG
             // Set animator parameters
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);
+            // Fix stutter turning
+            if (controllerType == AnimatorControllerType.FourDirections)
+            {
+                if (Mathf.Abs(Mathf.Abs(direction2D.x) - Mathf.Abs(direction2D.y)) < 0.01f)
+                {
+                    // Up, Down is higher priority
+                    Vector2 applyDirection2D = direction2D;
+                    applyDirection2D.x = 0;
+                    direction2D = applyDirection2D.normalized;
+                }
+            }
             animator.SetFloat(ANIM_DIRECTION_X, direction2D.x);
             animator.SetFloat(ANIM_DIRECTION_Y, direction2D.y);
             animator.SetBool(ANIM_IS_DEAD, isDead);
