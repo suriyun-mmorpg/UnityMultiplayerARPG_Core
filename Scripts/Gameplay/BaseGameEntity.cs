@@ -186,7 +186,7 @@ namespace MultiplayerARPG
             {
                 if (PassengingVehicleEntity != null)
                     return PassengingVehicleEntity.Entity.MovementState;
-                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                if (IsOwnerClient)
                     return LocalMovementState;
                 return (MovementState)movementState.Value;
             }
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
             {
                 if (PassengingVehicleEntity != null)
                     return PassengingVehicleEntity.Entity.ExtraMovementState;
-                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                if (IsOwnerClient)
                     return LocalExtraMovementState;
                 return (ExtraMovementState)extraMovementState.Value;
             }
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
             {
                 if (PassengingVehicleEntity != null)
                     return PassengingVehicleEntity.Entity.Direction2D;
-                if (IsOwnerClient && MovementSecure == MovementSecure.NotSecure)
+                if (IsOwnerClient)
                     return LocalDirection2D;
                 return direction2D.Value;
             }
@@ -654,18 +654,7 @@ namespace MultiplayerARPG
         protected void ServerSetMovement(MovementState movementState)
         {
 #if !CLIENT_BUILD
-            switch (MovementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    SetMovement(movementState);
-                    break;
-                default:
-                    // This net function called by owning client while movement secure is not secure
-                    // So just set movement state at server to sync this state to every clients
-                    // following owner clinet's state
-                    MovementState = movementState;
-                    break;
-            }
+            MovementState = movementState;
 #endif
         }
 
@@ -673,18 +662,7 @@ namespace MultiplayerARPG
         protected void ServerSetExtraMovement(ExtraMovementState extraMovementState)
         {
 #if !CLIENT_BUILD
-            switch (MovementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    SetExtraMovement(extraMovementState);
-                    break;
-                default:
-                    // This net function called by owning client while movement secure is not secure
-                    // So just set extra movement state at server to sync this state to every clients
-                    // following owner clinet's state
-                    ExtraMovementState = extraMovementState;
-                    break;
-            }
+            ExtraMovementState = extraMovementState;
 #endif
         }
 
@@ -692,7 +670,6 @@ namespace MultiplayerARPG
         protected void ServerUpdateDirection2D(DirectionVector2 direction)
         {
 #if !CLIENT_BUILD
-            // Set data at server and sync to clients later
             Direction2D = direction;
 #endif
         }
@@ -834,15 +811,13 @@ namespace MultiplayerARPG
             // Set local movement state which will be used by owner client
             LocalMovementState = movementState;
 
-            if (MovementSecure == MovementSecure.ServerAuthoritative)
+            if (IsServer)
             {
-                if (IsServer)
-                    MovementState = movementState;
-                else if (IsOwnerClient)
-                    RPC(ServerSetMovement, 0, DeliveryMethod.Sequenced, movementState);
+                MovementState = movementState;
+                return;
             }
 
-            if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
+            if (IsOwnerClient)
                 RPC(ServerSetMovement, 0, DeliveryMethod.Sequenced, movementState);
         }
 
@@ -877,17 +852,16 @@ namespace MultiplayerARPG
                 }
             }
 
+            // Set local extra movement state which will be used by owner client
             LocalExtraMovementState = extraMovementState;
 
-            if (MovementSecure == MovementSecure.ServerAuthoritative)
+            if (IsServer)
             {
-                if (IsServer)
-                    ExtraMovementState = extraMovementState;
-                else if (IsOwnerClient)
-                    RPC(ServerSetExtraMovement, 0, DeliveryMethod.Sequenced, extraMovementState);
+                ExtraMovementState = extraMovementState;
+                return;
             }
 
-            if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
+            if (IsOwnerClient)
                 RPC(ServerSetExtraMovement, 0, DeliveryMethod.Sequenced, extraMovementState);
         }
 
@@ -896,10 +870,13 @@ namespace MultiplayerARPG
             // Set local movement state which will be used by owner client
             LocalDirection2D = direction;
 
-            if (MovementSecure == MovementSecure.ServerAuthoritative && IsServer)
+            if (IsServer)
+            {
                 Direction2D = direction;
+                return;
+            }
 
-            if (MovementSecure == MovementSecure.NotSecure && IsOwnerClient)
+            if (IsOwnerClient)
                 RPC(ServerUpdateDirection2D, 0, DeliveryMethod.Sequenced, new DirectionVector2(LocalDirection2D));
         }
 
