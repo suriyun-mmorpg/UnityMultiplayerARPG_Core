@@ -744,11 +744,11 @@ namespace MultiplayerARPG
             {
                 if (targetEntity is DamageableEntity)
                 {
-                    direction = ((targetEntity as DamageableEntity).OpponentAimTransform.position - position).normalized;
+                    return GetAttackAimPosition(position, (targetEntity as DamageableEntity).OpponentAimTransform.position);
                 }
                 else
                 {
-                    direction = (targetEntity.CacheTransform.position - position).normalized;
+                    return GetAttackAimPosition(position, targetEntity.CacheTransform.position);
                 }
             }
             return AimPosition.CreateDirection(position, direction);
@@ -756,9 +756,17 @@ namespace MultiplayerARPG
 
         public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand, Vector3 targetPosition)
         {
-            Vector3 position = damageInfo.GetDamageTransform(this, isLeftHand).position;
-            Vector3 direction = (targetPosition - position).normalized;
-            return AimPosition.CreateDirection(position, direction);
+            return GetAttackAimPosition(damageInfo.GetDamageTransform(this, isLeftHand).position, targetPosition);
+        }
+
+        public AimPosition GetAttackAimPosition(Vector3 position, Vector3 targetPosition)
+        {
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+            {
+                Vector3 direction = (targetPosition - position).normalized;
+                return AimPosition.CreateDirection(position, direction);
+            }
+            return AimPosition.CreatePosition(targetPosition);
         }
 
         public virtual void GetReloadingData(
