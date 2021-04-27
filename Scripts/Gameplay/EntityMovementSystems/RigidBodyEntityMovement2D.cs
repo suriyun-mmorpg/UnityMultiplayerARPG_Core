@@ -133,12 +133,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void EntityUpdate()
-        {
-            if (pauseDirectionChangingFrames > 0)
-                --pauseDirectionChangingFrames;
-        }
-
         public override void EntityFixedUpdate()
         {
             float deltaTime = Time.fixedDeltaTime;
