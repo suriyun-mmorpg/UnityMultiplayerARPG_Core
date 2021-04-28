@@ -254,7 +254,7 @@ namespace MultiplayerARPG
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float fallAnimSpeedRate;
 
-        [Header("Lnaded")]
+        [Header("Landed")]
         public AnimationClip landedClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float landedAnimSpeedRate;
