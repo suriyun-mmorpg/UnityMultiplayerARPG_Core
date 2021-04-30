@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     public class DefaultLagCompensationManager : MonoBehaviour, ILagCompensationManager
     {
         private readonly Dictionary<uint, DamageableHitBox[]> HitBoxes = new Dictionary<uint, DamageableHitBox[]>();
-        public float snapShotInterval = 1f;
+        public float snapShotInterval = 0.06f;
         public int maxHistorySize = 16;
         public int MaxHistorySize { get { return maxHistorySize; } }
 
