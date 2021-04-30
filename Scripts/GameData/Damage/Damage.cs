@@ -169,7 +169,8 @@ namespace MultiplayerARPG
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            out HashSet<DamageHitObjectInfo> damageHitObjectInfos)
+            out HashSet<DamageHitObjectInfo> damageHitObjectInfos,
+            long? time)
         {
             damageHitObjectInfos = new HashSet<DamageHitObjectInfo>();
             if (attacker == null)
@@ -188,7 +189,8 @@ namespace MultiplayerARPG
                     randomSeed,
                     aimPosition,
                     stagger,
-                    out damageHitObjectInfos);
+                    out damageHitObjectInfos,
+                    time);
                 // Trigger attacker's on launch damage entity event
                 attacker.OnLaunchDamageEntity(
                     isLeftHand,
@@ -238,7 +240,10 @@ namespace MultiplayerARPG
                         DamageableEntity selectedTarget = null;
                         bool hasSelectedTarget = attacker.TryGetTargetEntity(out selectedTarget);
                         // If hit only selected target, find selected character (only 1 character) to apply damage
-                        BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId);
+                        if (time.HasValue)
+                            BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId, time.Value);
+                        else
+                            BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByRtt(attacker.ConnectionId);
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                         if (tempOverlapSize == 0)
@@ -320,7 +325,10 @@ namespace MultiplayerARPG
                     else
                     {
                         // If not hit only selected target, find characters within hit fov to applies damages
-                        BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId);
+                        if (time.HasValue)
+                            BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId, time.Value);
+                        else
+                            BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByRtt(attacker.ConnectionId);
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                         if (tempOverlapSize == 0)
@@ -403,7 +411,10 @@ namespace MultiplayerARPG
                 case DamageType.Raycast:
                     float minDistance = missileDistance;
                     // Just raycast to any entity to apply damage
-                    BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId);
+                    if (time.HasValue)
+                        BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId, time.Value);
+                    else
+                        BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByRtt(attacker.ConnectionId);
                     int tempRaycastSize = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, Physics.DefaultRaycastLayers);
                     BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                     if (tempRaycastSize > 0)

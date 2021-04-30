@@ -15,7 +15,8 @@ namespace MultiplayerARPG
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            out HashSet<DamageHitObjectInfo> damageHitObjectInfos);
+            out HashSet<DamageHitObjectInfo> damageHitObjectInfos,
+            long? time);
         public abstract Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract Transform GetDamageEffectTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract float GetDistance();
