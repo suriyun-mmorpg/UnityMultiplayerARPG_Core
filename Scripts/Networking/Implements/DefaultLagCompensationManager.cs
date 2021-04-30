@@ -9,11 +9,12 @@ namespace MultiplayerARPG
     public class DefaultLagCompensationManager : MonoBehaviour, ILagCompensationManager
     {
         private readonly Dictionary<uint, DamageableHitBox[]> HitBoxes = new Dictionary<uint, DamageableHitBox[]>();
-
+        public float snapShotInterval = 1f;
         public int maxHistorySize = 16;
         public int MaxHistorySize { get { return maxHistorySize; } }
 
         private readonly List<DamageableHitBox> hitBoxes = new List<DamageableHitBox>();
+        private float snapShotCountDown = 0f;
 
         public bool AddHitBoxes(uint objectId, DamageableHitBox[] hitBoxes)
         {
@@ -28,23 +29,43 @@ namespace MultiplayerARPG
             return HitBoxes.Remove(objectId);
         }
 
-        public bool SimulateHitBoxes(long connectionId, Action action)
+        public bool SimulateHitBoxes(long connectionId, long targetTime, Action action)
         {
-            if (action == null || !BeginSimlateHitBoxes(connectionId))
+            if (action == null || !BeginSimlateHitBoxes(connectionId, targetTime))
                 return false;
             action.Invoke();
             EndSimulateHitBoxes();
             return true;
         }
 
-        public bool BeginSimlateHitBoxes(long connectionId)
+        public bool SimulateHitBoxesByRtt(long connectionId, Action action)
+        {
+            if (action == null || !BeginSimlateHitBoxesByRtt(connectionId))
+                return false;
+            action.Invoke();
+            EndSimulateHitBoxes();
+            return true;
+        }
+
+        public bool BeginSimlateHitBoxes(long connectionId, long targetTime)
         {
             if (!BaseGameNetworkManager.Singleton.IsServer || !BaseGameNetworkManager.Singleton.ContainsPlayer(connectionId))
                 return false;
             LiteNetLibPlayer player = BaseGameNetworkManager.Singleton.GetPlayer(connectionId);
-            long rtt = player.Rtt;
-            if (rtt <= 0)
+            return InternalBeginSimlateHitBoxes(player, targetTime);
+        }
+
+        public bool BeginSimlateHitBoxesByRtt(long connectionId)
+        {
+            if (!BaseGameNetworkManager.Singleton.IsServer || !BaseGameNetworkManager.Singleton.ContainsPlayer(connectionId))
                 return false;
+            LiteNetLibPlayer player = BaseGameNetworkManager.Singleton.GetPlayer(connectionId);
+            long targetTime = BaseGameNetworkManager.Singleton.ServerTimestamp - player.Rtt;
+            return InternalBeginSimlateHitBoxes(player, targetTime);
+        }
+
+        private bool InternalBeginSimlateHitBoxes(LiteNetLibPlayer player, long targetTime)
+        {
             hitBoxes.Clear();
             foreach (uint subscribingObjectId in player.GetSubscribingObjectIds())
             {
@@ -54,7 +75,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < hitBoxes.Count; ++i)
             {
                 if (hitBoxes[i] != null)
-                    hitBoxes[i].Reverse(rtt);
+                    hitBoxes[i].Rewind(targetTime);
             }
             return true;
         }
@@ -64,14 +85,18 @@ namespace MultiplayerARPG
             for (int i = 0; i < hitBoxes.Count; ++i)
             {
                 if (hitBoxes[i] != null)
-                    hitBoxes[i].ResetTransform();
+                    hitBoxes[i].Restore();
             }
         }
 
-        private void LateUpdate()
+        private void FixedUpdate()
         {
             if (!BaseGameNetworkManager.Singleton.IsServer)
                 return;
+            snapShotCountDown -= Time.fixedDeltaTime;
+            if (snapShotCountDown > 0)
+                return;
+            snapShotCountDown = snapShotInterval;
             foreach (DamageableHitBox[] hitBoxesArray in HitBoxes.Values)
             {
                 foreach (DamageableHitBox hitBox in hitBoxesArray)

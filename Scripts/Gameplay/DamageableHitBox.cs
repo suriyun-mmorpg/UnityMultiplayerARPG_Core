@@ -117,16 +117,15 @@ namespace MultiplayerARPG
             return DamageableEntity.GetInfo();
         }
 
-        internal void Reverse(long duration)
+        internal void Rewind(long rewindTime)
         {
             long currentTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
-            long reversedTime = currentTime - duration;
 
             TransformHistory beforeReversedData = default;
             TransformHistory afterReversedData = default;
             for (int i = 0; i < histories.Count; ++i)
             {
-                if (beforeReversedData.Time <= reversedTime && histories[i].Time >= reversedTime)
+                if (beforeReversedData.Time <= rewindTime && histories[i].Time >= rewindTime)
                 {
                     afterReversedData = histories[i];
                     break;
@@ -143,7 +142,7 @@ namespace MultiplayerARPG
             transform.rotation = Quaternion.Slerp(beforeReversedData.Rotation, afterReversedData.Rotation, lerpProgress);
         }
 
-        internal void ResetTransform()
+        internal void Restore()
         {
             transform.localPosition = defaultLocalPosition;
             transform.localRotation = defaultLocalRotation;
