@@ -72,10 +72,11 @@ namespace MultiplayerARPG
                 if (HitBoxes.ContainsKey(subscribingObjectId))
                     hitBoxes.AddRange(HitBoxes[subscribingObjectId]);
             }
+            long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
             for (int i = 0; i < hitBoxes.Count; ++i)
             {
                 if (hitBoxes[i] != null)
-                    hitBoxes[i].Rewind(targetTime);
+                    hitBoxes[i].Rewind(time, targetTime);
             }
             return true;
         }
@@ -97,11 +98,12 @@ namespace MultiplayerARPG
             if (snapShotCountDown > 0)
                 return;
             snapShotCountDown = snapShotInterval;
+            long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
             foreach (DamageableHitBox[] hitBoxesArray in HitBoxes.Values)
             {
                 foreach (DamageableHitBox hitBox in hitBoxesArray)
                 {
-                    hitBox.AddTransformHistory();
+                    hitBox.AddTransformHistory(time);
                 }
             }
         }

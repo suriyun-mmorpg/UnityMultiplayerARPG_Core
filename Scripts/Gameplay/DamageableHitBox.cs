@@ -173,29 +173,36 @@ namespace MultiplayerARPG
             return DamageableEntity.GetInfo();
         }
 
-        internal void Rewind(long rewindTime)
+        internal void Rewind(long currentTime, long rewindTime)
         {
-            long currentTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
-
-            TransformHistory beforeReversedData = default;
-            TransformHistory afterReversedData = default;
+            TransformHistory beforeRewind = default;
+            TransformHistory afterRewind = default;
             for (int i = 0; i < histories.Count; ++i)
             {
-                if (beforeReversedData.Time <= rewindTime && histories[i].Time >= rewindTime)
+                if (beforeRewind.Time > 0 && beforeRewind.Time <= rewindTime && histories[i].Time >= rewindTime)
                 {
-                    afterReversedData = histories[i];
+                    afterRewind = histories[i];
                     break;
                 }
                 else
                 {
-                    beforeReversedData = histories[i];
+                    beforeRewind = histories[i];
+                }
+                if (histories.Count - 1 == i)
+                {
+                    afterRewind = new TransformHistory()
+                    {
+                        Position = transform.position,
+                        Rotation = transform.rotation,
+                        Time = currentTime,
+                    };
                 }
             }
-            long durationBetweenReversedTime = afterReversedData.Time - beforeReversedData.Time;
-            long durationToCurrentTime = currentTime - beforeReversedData.Time;
-            float lerpProgress = (float)durationToCurrentTime / (float)durationBetweenReversedTime;
-            transform.position = Vector3.Lerp(beforeReversedData.Position, afterReversedData.Position, lerpProgress);
-            transform.rotation = Quaternion.Slerp(beforeReversedData.Rotation, afterReversedData.Rotation, lerpProgress);
+            long durationToCurrentTime = currentTime - beforeRewind.Time;
+            long durationBetweenRewindTime = afterRewind.Time - beforeRewind.Time;
+            float lerpProgress = (float)durationBetweenRewindTime / (float)durationToCurrentTime;
+            transform.position = Vector3.Lerp(beforeRewind.Position, afterRewind.Position, lerpProgress);
+            transform.rotation = Quaternion.Slerp(beforeRewind.Rotation, afterRewind.Rotation, lerpProgress);
 #if UNITY_EDITOR
             debugRewindPosition = transform.position;
             debugRewindRotation = transform.rotation;
@@ -208,13 +215,13 @@ namespace MultiplayerARPG
             transform.localRotation = defaultLocalRotation;
         }
 
-        public void AddTransformHistory()
+        public void AddTransformHistory(long time)
         {
             if (histories.Count == BaseGameNetworkManager.Singleton.LagCompensationManager.MaxHistorySize)
                 histories.RemoveAt(0);
             histories.Add(new TransformHistory()
             {
-                Time = BaseGameNetworkManager.Singleton.ServerTimestamp,
+                Time = time,
                 Position = transform.position,
                 Rotation = transform.rotation,
             });
