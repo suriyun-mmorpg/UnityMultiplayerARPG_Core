@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             }
             else if (debugCollider2D)
             {
-                debugRewindCenter = debugCollider.bounds.center - transform.position;
+                debugRewindCenter = debugCollider2D.bounds.center - transform.position;
                 debugRewindSize = debugCollider2D.bounds.size;
             }
         }
