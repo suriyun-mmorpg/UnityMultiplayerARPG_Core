@@ -380,7 +380,8 @@ namespace MultiplayerARPG
                     if (IsOwnerClientOrOwnedByServer)
                     {
                         int randomSeed = Random.Range(0, 255);
-                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition, randomSeed);
+                        long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
+                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition, randomSeed, time);
                         SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                         if (isLeftHand)
                             simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
@@ -449,7 +450,7 @@ namespace MultiplayerARPG
                 {
                     CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                     Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.aimPosition, data.randomSeed);
+                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.aimPosition, data.randomSeed, data.time);
                 }
             }
         }

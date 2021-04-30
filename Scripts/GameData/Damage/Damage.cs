@@ -159,6 +159,7 @@ namespace MultiplayerARPG
         /// <param name="aimPosition"></param>
         /// <param name="stagger"></param>
         /// <param name="damageHitObjectInfos"></param>
+        /// <param name="time"></param>
         public void LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,

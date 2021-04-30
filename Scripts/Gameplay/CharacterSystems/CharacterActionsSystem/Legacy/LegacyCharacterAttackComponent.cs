@@ -300,7 +300,8 @@ namespace MultiplayerARPG
                     randomSeed,
                     aimPosition,
                     stagger,
-                    out _);
+                    out _,
+                    null);
             }
         }
 

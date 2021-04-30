@@ -1,5 +1,4 @@
 ﻿using LiteNetLib.Utils;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -11,6 +10,7 @@ namespace MultiplayerARPG
         public byte randomSeed;
         public int hitIndex;
         public AimPosition aimPosition;
+        public long time;
 
         public void Serialize(NetDataWriter writer)
         {
@@ -23,6 +23,7 @@ namespace MultiplayerARPG
                 writer.PutPackedInt(hitIndex);
             }
             writer.PutValue(aimPosition);
+            writer.PutPackedLong(time);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -36,6 +37,7 @@ namespace MultiplayerARPG
                 hitIndex = reader.GetPackedInt();
             }
             aimPosition = reader.GetValue<AimPosition>();
+            time = reader.GetPackedLong();
         }
 
         public BaseSkill GetSkill()

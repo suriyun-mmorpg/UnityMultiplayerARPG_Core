@@ -378,6 +378,7 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="aimPosition"></param>
         /// <param name="randomSeed"></param>
+        /// <param name="time"></param>
         /// <returns></returns>
         public abstract void ApplySkill(
             BaseCharacterEntity skillUser,
@@ -387,7 +388,8 @@ namespace MultiplayerARPG
             int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             AimPosition aimPosition,
-            int randomSeed);
+            int randomSeed,
+            long? time);
 
         /// <summary>
         /// Return TRUE if this will override default attack function
