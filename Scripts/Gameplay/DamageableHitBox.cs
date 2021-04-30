@@ -81,8 +81,8 @@ namespace MultiplayerARPG
 
 #if UNITY_EDITOR
         [Header("Rewind Debugging")]
-        public Color debugHistoryColor = new Color(0, 1, 0, 0.04f);
-        public Color debugRewindColor = new Color(0, 0, 1, 0.04f);
+        public Color debugHistoryColor = new Color(0, 1, 0, 0.25f);
+        public Color debugRewindColor = new Color(0, 0, 1, 0.5f);
         private Vector3? debugRewindPosition;
         private Quaternion? debugRewindRotation;
         private Vector3? debugRewindCenter;
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
                     Matrix4x4 transformMatrix = Matrix4x4.TRS(debugRewindPosition.Value + debugRewindCenter.Value, debugRewindRotation.Value, debugRewindSize.Value);
                     Gizmos.color = debugRewindColor;
                     Gizmos.matrix = transformMatrix;
-                    Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+                    Gizmos.DrawCube(Vector3.zero, Vector3.one);
                 }
                 Gizmos.matrix = oldGizmosMatrix;
             }
