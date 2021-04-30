@@ -14,7 +14,7 @@ namespace MultiplayerARPG
 
         [Header("Building Data")]
         [SerializeField]
-        [Tooltip("If this is `TRUE` this building entity will be able to build on any surface but when constructing, if player point on building area it will place on building area")]
+        [Tooltip("If this is `TRUE` this building entity will be able to build on any surface. But when constructing, if player aimming on building area it will place on building area")]
         protected bool canBuildOnAnySurface;
 
         [SerializeField]
