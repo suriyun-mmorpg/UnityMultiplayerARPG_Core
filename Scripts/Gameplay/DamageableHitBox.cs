@@ -198,9 +198,9 @@ namespace MultiplayerARPG
                     };
                 }
             }
-            long durationToCurrentTime = currentTime - beforeRewind.Time;
+            long durationToRewindTime = rewindTime - beforeRewind.Time;
             long durationBetweenRewindTime = afterRewind.Time - beforeRewind.Time;
-            float lerpProgress = (float)durationBetweenRewindTime / (float)durationToCurrentTime;
+            float lerpProgress = (float)durationToRewindTime / (float)durationBetweenRewindTime;
             transform.position = Vector3.Lerp(beforeRewind.Position, afterRewind.Position, lerpProgress);
             transform.rotation = Quaternion.Slerp(beforeRewind.Rotation, afterRewind.Rotation, lerpProgress);
 #if UNITY_EDITOR
