@@ -40,6 +40,8 @@ namespace MultiplayerARPG
         public bool isDebuff;
         public Buff debuff;
         public short useAmmoAmount = 1;
+        public HarvestType harvestType;
+        public IncrementalMinMaxFloat harvestDamageAmount;
 
         [Header("Buffs")]
         public SkillBuffType skillBuffType;
@@ -293,6 +295,16 @@ namespace MultiplayerARPG
         public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel)
         {
             return increaseDamageAmountsWithBuffs;
+        }
+
+        public override HarvestType GetHarvestType()
+        {
+            return harvestType;
+        }
+
+        public override IncrementalMinMaxFloat GetHarvestDamageAmount()
+        {
+            return harvestDamageAmount;
         }
 
         protected float GetEffectivenessDamage(ICharacterData skillUser)

@@ -103,15 +103,43 @@ namespace MultiplayerARPG
             BaseCharacterEntity attackerCharacter;
             instigator.TryGetEntity(out attackerCharacter);
 
-            // Apply damages
+            // Apply damages, won't apply skill damage
             float calculatingTotalDamage = 0f;
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
-            HarvestEffectiveness harvestEffectiveness;
-            WeightedRandomizer<ItemDropByWeight> itemRandomizer;
-            if (harvestable.CacheHarvestEffectivenesses.TryGetValue(weaponItem.WeaponType, out harvestEffectiveness) &&
-                harvestable.CacheHarvestItems.TryGetValue(weaponItem.WeaponType, out itemRandomizer))
+            // Harvest type is based on weapon by default
+            HarvestType skillHarvestType = HarvestType.BasedOnWeapon;
+            if (skill != null && skillLevel > 0)
             {
-                calculatingTotalDamage = weaponItem.HarvestDamageAmount.GetAmount(weapon.level).Random(randomSeed) * harvestEffectiveness.damageEffectiveness;
+                skillHarvestType = skill.GetHarvestType();
+            }
+            // Get randomizer and random damage
+            WeightedRandomizer<ItemDropByWeight> itemRandomizer = null;
+            switch (skillHarvestType)
+            {
+                case HarvestType.BasedOnWeapon:
+                    {
+                        IWeaponItem weaponItem = weapon.GetWeaponItem();
+                        HarvestEffectiveness harvestEffectiveness;
+                        if (harvestable.CacheHarvestEffectivenesses.TryGetValue(weaponItem.WeaponType, out harvestEffectiveness) &&
+                            harvestable.CacheHarvestItems.TryGetValue(weaponItem.WeaponType, out itemRandomizer))
+                        {
+                            calculatingTotalDamage = weaponItem.HarvestDamageAmount.GetAmount(weapon.level).Random(randomSeed) * harvestEffectiveness.damageEffectiveness;
+                        }
+                    }
+                    break;
+                case HarvestType.BasedOnSkill:
+                    {
+                        SkillHarvestEffectiveness skillHarvestEffectiveness;
+                        if (harvestable.CacheSkillHarvestEffectivenesses.TryGetValue(skill, out skillHarvestEffectiveness) &&
+                            harvestable.CacheSkillHarvestItems.TryGetValue(skill, out itemRandomizer))
+                        {
+                            calculatingTotalDamage = skill.GetHarvestDamageAmount().GetAmount(skillLevel).Random(randomSeed) * skillHarvestEffectiveness.damageEffectiveness;
+                        }
+                    }
+                    break;
+            }
+            // If found randomizer, random dropping items
+            if (skillHarvestType != HarvestType.None && itemRandomizer != null)
+            {
                 ItemDropByWeight receivingItem = itemRandomizer.TakeOne();
                 int itemDataId = receivingItem.item.DataId;
                 short itemAmount = (short)(receivingItem.amountPerDamage * calculatingTotalDamage);
@@ -138,7 +166,6 @@ namespace MultiplayerARPG
                 if (droppingToGround)
                     ItemDropEntity.DropItem(this, CharacterItem.Create(itemDataId, 1, itemAmount), new uint[0]);
             }
-
             // Apply damages
             combatAmountType = CombatAmountType.NormalDamage;
             totalDamage = (int)calculatingTotalDamage;

@@ -9,6 +9,7 @@ namespace MultiplayerARPG
     {
         [Header("Harvestable Configs")]
         public HarvestEffectiveness[] harvestEffectivenesses;
+        public SkillHarvestEffectiveness[] skillHarvestEffectivenesses;
         [Tooltip("Ex. if this is 10 when damage to harvestable entity = 2, character will receives 20 exp")]
         public int expPerDamage;
 
@@ -34,6 +35,28 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
+        private Dictionary<BaseSkill, SkillHarvestEffectiveness> cacheSkillHarvestEffectivenesses;
+        public Dictionary<BaseSkill, SkillHarvestEffectiveness> CacheSkillHarvestEffectivenesses
+        {
+            get
+            {
+                InitCaches();
+                return cacheSkillHarvestEffectivenesses;
+            }
+        }
+
+        [System.NonSerialized]
+        private Dictionary<BaseSkill, WeightedRandomizer<ItemDropByWeight>> cacheSkillHarvestItems;
+        public Dictionary<BaseSkill, WeightedRandomizer<ItemDropByWeight>> CacheSkillHarvestItems
+        {
+            get
+            {
+                InitCaches();
+                return cacheSkillHarvestItems;
+            }
+        }
+
         private void InitCaches()
         {
             if (cacheHarvestEffectivenesses == null || cacheHarvestItems == null)
@@ -56,6 +79,26 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            if (cacheSkillHarvestEffectivenesses == null || cacheSkillHarvestItems == null)
+            {
+                cacheSkillHarvestEffectivenesses = new Dictionary<BaseSkill, SkillHarvestEffectiveness>();
+                cacheSkillHarvestItems = new Dictionary<BaseSkill, WeightedRandomizer<ItemDropByWeight>>();
+                foreach (SkillHarvestEffectiveness skillHarvestEffectiveness in skillHarvestEffectivenesses)
+                {
+                    if (skillHarvestEffectiveness.skill != null && skillHarvestEffectiveness.damageEffectiveness > 0)
+                    {
+                        cacheSkillHarvestEffectivenesses[skillHarvestEffectiveness.skill] = skillHarvestEffectiveness;
+                        Dictionary<ItemDropByWeight, int> harvestItems = new Dictionary<ItemDropByWeight, int>();
+                        foreach (ItemDropByWeight item in skillHarvestEffectiveness.items)
+                        {
+                            if (item.item == null || item.amountPerDamage <= 0 || item.randomWeight <= 0)
+                                continue;
+                            harvestItems[item] = item.randomWeight;
+                        }
+                        cacheSkillHarvestItems[skillHarvestEffectiveness.skill] = WeightedRandomizer.From(harvestItems);
+                    }
+                }
+            }
         }
 
         public override void PrepareRelatesData()
@@ -68,6 +111,13 @@ namespace MultiplayerARPG
                     GameInstance.AddItems(harvestEffectiveness.items);
                 }
             }
+            if (skillHarvestEffectivenesses != null && skillHarvestEffectivenesses.Length > 0)
+            {
+                foreach (SkillHarvestEffectiveness skillHarvestEffectiveness in skillHarvestEffectivenesses)
+                {
+                    GameInstance.AddSkills(skillHarvestEffectiveness.skill);
+                }
+            }
         }
     }
 
@@ -75,6 +125,17 @@ namespace MultiplayerARPG
     public struct HarvestEffectiveness
     {
         public WeaponType weaponType;
+        [Tooltip("This will multiply with harvest damage amount")]
+        [Range(0.1f, 5f)]
+        public float damageEffectiveness;
+        [ArrayElementTitle("item")]
+        public ItemDropByWeight[] items;
+    }
+
+    [System.Serializable]
+    public struct SkillHarvestEffectiveness
+    {
+        public BaseSkill skill;
         [Tooltip("This will multiply with harvest damage amount")]
         [Range(0.1f, 5f)]
         public float damageEffectiveness;

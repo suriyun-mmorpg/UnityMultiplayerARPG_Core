@@ -299,6 +299,8 @@ namespace MultiplayerARPG
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
         public virtual bool RequiredTarget() { return false; }
         public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel) { return false; }
+        public virtual HarvestType GetHarvestType() { return HarvestType.None; }
+        public virtual IncrementalMinMaxFloat GetHarvestDamageAmount() { return new IncrementalMinMaxFloat(); }
         public virtual bool HasCustomAimControls() { return false; }
         public virtual AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data) { return default; }
         public virtual void FinishAimControls(bool isCancel) { }
