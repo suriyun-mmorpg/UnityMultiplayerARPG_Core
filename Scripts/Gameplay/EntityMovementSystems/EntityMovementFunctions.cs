@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableSequenced, GameNetworkingConsts.MovementInput, (writer) =>
+            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
             {
                 writer.PutPackedInt((int)inputState);
                 writer.PutPackedInt((int)movementState);
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.StopMove, (writer) =>
+            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.StopMove, (writer) =>
             {
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Jump, (writer) =>
+            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Jump, (writer) =>
             {
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.Unreliable, GameNetworkingConsts.MovementInput, (writer) =>
+            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
             {
                 writer.PutVector2(position);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
