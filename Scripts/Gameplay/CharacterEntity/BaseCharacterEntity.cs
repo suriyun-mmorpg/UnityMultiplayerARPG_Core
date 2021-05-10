@@ -290,15 +290,15 @@ namespace MultiplayerARPG
             // Set character model hide state
             ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
             // Update model animations
+            // Update is dead state
+            CharacterModel.SetIsDead(this.IsDead());
+            // Update move speed multiplier
+            CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+            // Update movement animation
+            CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D);
+            // Update FPS model
             if (IsClient)
             {
-                // Update is dead state
-                CharacterModel.SetIsDead(this.IsDead());
-                // Update move speed multiplier
-                CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                // Update movement animation
-                CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D);
-                // Update FPS model
                 if (FpsModel && FpsModel.gameObject.activeSelf)
                 {
                     // Update is dead state
