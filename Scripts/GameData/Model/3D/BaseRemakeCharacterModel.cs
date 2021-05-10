@@ -103,12 +103,12 @@ namespace MultiplayerARPG
 
         public bool TryGetWeaponAnimations(int dataId, out WeaponAnimations anims)
         {
-            return CacheAnimationsManager.SetAndTryGetCacheWeaponAnimations(CacheIdentity.HashAssetId, weaponAnimations, skillAnimations, dataId, out anims);
+            return CacheAnimationsManager.SetAndTryGetCacheWeaponAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
         }
 
         public bool TryGetSkillAnimations(int dataId, out SkillAnimations anims)
         {
-            return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(CacheIdentity.HashAssetId, weaponAnimations, skillAnimations, dataId, out anims);
+            return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
         }
 
         protected Coroutine StartedActionCoroutine(Coroutine coroutine)

@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(1)]
     public partial class GameEntityModel : MonoBehaviour
     {
         [System.Flags]
@@ -80,23 +80,6 @@ namespace MultiplayerARPG
 #endif
 
         public Transform CacheTransform { get; private set; }
-
-        private bool isFoundIdentity;
-        private LiteNetLibIdentity cacheIdentity;
-        public LiteNetLibIdentity CacheIdentity
-        {
-            get
-            {
-                if (!isFoundIdentity)
-                {
-                    cacheIdentity = GetComponent<LiteNetLibIdentity>();
-                    if (cacheIdentity == null)
-                        cacheIdentity = GetComponentInParent<LiteNetLibIdentity>();
-                    isFoundIdentity = cacheIdentity != null;
-                }
-                return cacheIdentity;
-            }
-        }
 
         private Dictionary<string, EffectContainer> cacheEffectContainers = null;
         /// <summary>

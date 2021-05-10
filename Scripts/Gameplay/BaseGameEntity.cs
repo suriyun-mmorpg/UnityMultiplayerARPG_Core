@@ -9,6 +9,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(LiteNetLibIdentity))]
+    [DefaultExecutionOrder(0)]
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
         public const float GROUND_DETECTION_DISTANCE = 30f;

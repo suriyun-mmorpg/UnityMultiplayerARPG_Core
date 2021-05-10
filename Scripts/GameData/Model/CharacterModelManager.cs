@@ -2,6 +2,7 @@
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
+using System.Text;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,7 +10,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class CharacterModelManager : BaseGameEntityComponent<BaseCharacterEntity>
+    public class CharacterModelManager : BaseGameEntityComponent<BaseGameEntity>
     {
         public const byte HIDE_SETTER_ENTITY = 0;
         public const byte HIDE_SETTER_CONTROLLER = 1;
@@ -32,24 +33,9 @@ namespace MultiplayerARPG
         [SerializeField]
         private VehicleCharacterModel[] vehicleModels;
 
-        private Dictionary<int, VehicleCharacterModel> cacheVehicleModels;
-        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels
-        {
-            get
-            {
-                if (cacheVehicleModels == null)
-                {
-                    cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
-                    foreach (VehicleCharacterModel vehicleModel in vehicleModels)
-                    {
-                        if (vehicleModel.vehicleType == null) continue;
-                        cacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
-                    }
-                }
-                return cacheVehicleModels;
-            }
-        }
+        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels { get; private set; }
 
+        private bool isSetupModels;
         private bool isSetupActiveModel;
         private BaseCharacterModel activeModel;
         public BaseCharacterModel ActiveModel
@@ -58,9 +44,8 @@ namespace MultiplayerARPG
             {
                 if (!isSetupActiveModel)
                 {
-                    // Check for main model
-                    if (mainModel == null)
-                        mainModel = GetComponent<BaseCharacterModel>();
+                    // Setup models (assign ID)
+                    SetupModels();
                     // Clear active model to make sure it will initialize correctly
                     activeModel = null;
                     SwitchModel(MainModel);
@@ -90,7 +75,16 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
+            SetupModels();
+        }
+
+        private void SetupModels()
+        {
+            if (isSetupModels)
+                return;
             SetupMainModel();
+            SetupVehicleModels();
+            isSetupModels = true;
         }
 
         private void OnValidate()
@@ -103,15 +97,44 @@ namespace MultiplayerARPG
 
         private bool SetupMainModel()
         {
-            bool hasChanges = false;
             if (!mainModel)
             {
                 mainModel = GetComponent<BaseCharacterModel>();
-                if (!mainModel)
+                if (mainModel)
+                {
+                    mainModel.Id = new StringBuilder(Entity.Identity.AssetId).Append(0).Append(0).ToString();
+                    return true;
+                }
+                else
+                {
                     Logging.LogError(ToString(), "Can't find main model");
-                hasChanges = mainModel;
+                    return false;
+                }
             }
-            return hasChanges;
+            else
+            {
+                mainModel.Id = new StringBuilder(Entity.Identity.AssetId).Append(0).Append(0).ToString();
+            }
+            return false;
+        }
+
+        private bool SetupVehicleModels()
+        {
+            if (CacheVehicleModels == null)
+            {
+                CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
+                foreach (VehicleCharacterModel vehicleModel in vehicleModels)
+                {
+                    if (!vehicleModel.vehicleType) continue;
+                    for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
+                    {
+                        vehicleModel.modelsForEachSeats[i].Id = new StringBuilder(Entity.Identity.AssetId).Append(vehicleModel.vehicleType.Id).Append(i).ToString();
+                    }
+                    CacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
+                }
+                return true;
+            }
+            return false;
         }
 
         public void UpdatePassengingVehicle(VehicleType vehicleType, byte seatIndex)

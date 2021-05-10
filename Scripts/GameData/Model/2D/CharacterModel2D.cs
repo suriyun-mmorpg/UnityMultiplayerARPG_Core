@@ -69,12 +69,12 @@ namespace MultiplayerARPG
 
         public bool TryGetWeaponAnimations(int dataId, out WeaponAnimations2D anims)
         {
-            return CacheAnimationsManager.SetAndTryGetCacheWeaponAnimations(CacheIdentity.HashAssetId, weaponAnimations2D, skillAnimations2D, dataId, out anims);
+            return CacheAnimationsManager.SetAndTryGetCacheWeaponAnimations(Id, weaponAnimations2D, skillAnimations2D, dataId, out anims);
         }
 
         public bool TryGetSkillAnimations(int dataId, out SkillAnimations2D anims)
         {
-            return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(CacheIdentity.HashAssetId, weaponAnimations2D, skillAnimations2D, dataId, out anims);
+            return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(Id, weaponAnimations2D, skillAnimations2D, dataId, out anims);
         }
 
         void EditorUpdate()

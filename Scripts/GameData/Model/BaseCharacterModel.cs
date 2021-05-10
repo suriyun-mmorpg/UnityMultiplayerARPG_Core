@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public bool IsMainModel { get { return !ModelManager || ModelManager.MainModel == this; } }
         public bool IsFpsModel { get { return !ModelManager || ModelManager.FpsModel == this; } }
         public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
+        public string Id { get; set; }
 
         [Header("Equipment Containers")]
         [SerializeField]
