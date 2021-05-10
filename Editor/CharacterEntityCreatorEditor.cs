@@ -179,6 +179,7 @@ namespace MultiplayerARPG
                     capsuleCollider.center = Vector3.zero + (Vector3.up * capsuleCollider.height * 0.5f);
                     var openCharacterController = newObject.AddComponent<OpenCharacterController>();
                     openCharacterController.SetRadiusHeightAndCenter(capsuleCollider.radius, capsuleCollider.height, capsuleCollider.center, false, false);
+                    newObject.AddComponent<RigidBodyEntityMovement>();
                     break;
             }
 
