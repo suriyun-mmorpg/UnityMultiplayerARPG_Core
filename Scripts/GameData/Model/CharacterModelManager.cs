@@ -123,14 +123,17 @@ namespace MultiplayerARPG
             if (CacheVehicleModels == null)
             {
                 CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
-                foreach (VehicleCharacterModel vehicleModel in vehicleModels)
+                if (vehicleModels != null)
                 {
-                    if (!vehicleModel.vehicleType) continue;
-                    for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
+                    foreach (VehicleCharacterModel vehicleModel in vehicleModels)
                     {
-                        vehicleModel.modelsForEachSeats[i].Id = new StringBuilder(Entity.Identity.AssetId).Append(vehicleModel.vehicleType.Id).Append(i).ToString();
+                        if (!vehicleModel.vehicleType) continue;
+                        for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
+                        {
+                            vehicleModel.modelsForEachSeats[i].Id = new StringBuilder(Entity.Identity.AssetId).Append(vehicleModel.vehicleType.Id).Append(i).ToString();
+                        }
+                        CacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
                     }
-                    CacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
                 }
                 return true;
             }
