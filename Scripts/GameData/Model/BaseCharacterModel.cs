@@ -16,6 +16,12 @@ namespace MultiplayerARPG
         public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
         public string Id { get; set; }
 
+        [Header("Model Switching Settings")]
+        [SerializeField]
+        protected GameObject[] activateObjectsWhenSwitchModel;
+        [SerializeField]
+        protected GameObject[] deactivateObjectsWhenSwitchModel;
+
         [Header("Equipment Containers")]
         [SerializeField]
         protected EquipmentContainer[] equipmentContainers;
@@ -147,6 +153,50 @@ namespace MultiplayerARPG
             }
         }
 
+        private void UpdateObjectsWhenSwitch()
+        {
+            if (activateObjectsWhenSwitchModel != null &&
+                activateObjectsWhenSwitchModel.Length > 0)
+            {
+                foreach (GameObject obj in activateObjectsWhenSwitchModel)
+                {
+                    if (!obj.activeSelf)
+                        obj.SetActive(true);
+                }
+            }
+            if (deactivateObjectsWhenSwitchModel != null &&
+                deactivateObjectsWhenSwitchModel.Length > 0)
+            {
+                foreach (GameObject obj in deactivateObjectsWhenSwitchModel)
+                {
+                    if (obj.activeSelf)
+                        obj.SetActive(false);
+                }
+            }
+        }
+
+        private void RevertObjectsWhenSwitch()
+        {
+            if (activateObjectsWhenSwitchModel != null &&
+                activateObjectsWhenSwitchModel.Length > 0)
+            {
+                foreach (GameObject obj in activateObjectsWhenSwitchModel)
+                {
+                    if (obj.activeSelf)
+                        obj.SetActive(false);
+                }
+            }
+            if (deactivateObjectsWhenSwitchModel != null &&
+                deactivateObjectsWhenSwitchModel.Length > 0)
+            {
+                foreach (GameObject obj in deactivateObjectsWhenSwitchModel)
+                {
+                    if (!obj.activeSelf)
+                        obj.SetActive(true);
+                }
+            }
+        }
+
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
             if (ModelManager && !IsMainOrFpsModel)
@@ -160,6 +210,7 @@ namespace MultiplayerARPG
 
             if (previousModel != null)
             {
+                previousModel.RevertObjectsWhenSwitch();
                 previousModel.CopyCacheDataTo(
                     cacheModels,
                     cacheEffects,
@@ -178,6 +229,8 @@ namespace MultiplayerARPG
                 SetEquipItems(equipItems);
                 SetBuffs(buffs);
             }
+
+            UpdateObjectsWhenSwitch();
         }
 
 #if UNITY_EDITOR
