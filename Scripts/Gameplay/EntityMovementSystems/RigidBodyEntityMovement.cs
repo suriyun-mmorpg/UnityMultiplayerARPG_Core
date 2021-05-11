@@ -42,6 +42,7 @@ namespace MultiplayerARPG
         public bool useRootMotionForJump;
         public bool useRootMotionForFall;
         public bool useRootMotionWhileNotMoving;
+        public bool useRootMotionUnderWater;
 
         [Header("Networking Settings")]
         public float moveThreshold = 0.01f;
@@ -197,6 +198,8 @@ namespace MultiplayerARPG
             if (Entity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForMovement)
                 CacheAnimator.ApplyBuiltinRootMotion();
             if (!Entity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForAirMovement)
+                CacheAnimator.ApplyBuiltinRootMotion();
+            if (Entity.MovementState.HasFlag(MovementState.IsUnderWater) && useRootMotionUnderWater)
                 CacheAnimator.ApplyBuiltinRootMotion();
         }
 
@@ -558,6 +561,15 @@ namespace MultiplayerARPG
             {
                 // Update velocity while not under water
                 tempMoveVelocity.y = tempVerticalVelocity;
+            }
+
+            // Don't applies velocity while using root motion
+            if ((isGrounded && useRootMotionForMovement) ||
+                (isAirborne && useRootMotionForAirMovement) ||
+                (isUnderWater && useRootMotionUnderWater))
+            {
+                tempMoveVelocity.x = 0;
+                tempMoveVelocity.z = 0;
             }
 
             platformMotion = Vector3.zero;
