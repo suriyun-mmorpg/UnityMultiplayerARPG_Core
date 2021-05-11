@@ -10,6 +10,10 @@ namespace MultiplayerARPG
         [Header("Levelling/Stat/Skill")]
         public short increaseStatPointEachLevel = 5;
         public short increaseSkillPointEachLevel = 1;
+        [Tooltip("If this > `0`, it will increase stat point until character reached max level. If it's `20`, it will increase stat point until character reached level `20`")]
+        public short increaseStatPointsUntilReachedLevel = 0;
+        [Tooltip("If this > `0`, it will increase skill point until character reached max level. If it's `20`, it will increase skill point until character reached level `20`")]
+        public short increaseSkillPointsUntilReachedLevel = 0;
         [Range(0f, 100f)]
         public float expLostPercentageWhenDeath = 2f;
         [Header("Stamina/Sprint")]
@@ -363,9 +367,13 @@ namespace MultiplayerARPG
                     {
                         try
                         {
-                            checked
+                            if (increaseStatPointsUntilReachedLevel == 0 ||
+                                increaseStatPointsUntilReachedLevel < character.Level + 1)
                             {
-                                playerCharacter.StatPoint += increaseStatPointEachLevel;
+                                checked
+                                {
+                                    playerCharacter.StatPoint += increaseStatPointEachLevel;
+                                }
                             }
                         }
                         catch (System.OverflowException)
@@ -375,9 +383,13 @@ namespace MultiplayerARPG
 
                         try
                         {
-                            checked
+                            if (increaseSkillPointsUntilReachedLevel == 0 ||
+                                increaseSkillPointsUntilReachedLevel < character.Level + 1)
                             {
-                                playerCharacter.SkillPoint += increaseSkillPointEachLevel;
+                                checked
+                                {
+                                    playerCharacter.SkillPoint += increaseSkillPointEachLevel;
+                                }
                             }
                         }
                         catch (System.OverflowException)
