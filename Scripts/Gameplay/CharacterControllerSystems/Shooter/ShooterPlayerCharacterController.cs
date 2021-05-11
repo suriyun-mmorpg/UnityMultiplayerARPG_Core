@@ -1315,7 +1315,7 @@ namespace MultiplayerARPG
                         Quaternion targetRot = Quaternion.LookRotation(doActionLookDirection);
                         currentRot = Quaternion.Slerp(currentRot, targetRot, turnSpeedWileDoingAction * Time.deltaTime);
                         targetLookDirection = currentRot * Vector3.forward;
-                        return Quaternion.Angle(currentRot, targetRot) <= 1f;
+                        return Quaternion.Angle(currentRot, targetRot) <= 15f;
                     }
                     else
                     {
