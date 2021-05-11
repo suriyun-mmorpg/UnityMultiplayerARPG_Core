@@ -16,6 +16,8 @@ namespace MultiplayerARPG
             ShowOnBool("IsMainOrFpsModel", true, "setEffectContainersBySetters");
             ShowOnBool("IsMainOrFpsModel", true, "equipmentContainers");
             ShowOnBool("IsMainOrFpsModel", true, "setEquipmentContainersBySetters");
+            ShowOnBool("IsMainOrFpsModel", true, "deactivateInstantiatedObjects");
+            ShowOnBool("IsMainOrFpsModel", true, "activateInstantiatedObject");
         }
     }
 }
