@@ -316,5 +316,23 @@ namespace MultiplayerARPG
             RPC(ServerUnlockBuilding, objectId);
             return true;
         }
+
+        public bool CallServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, short amount)
+        {
+            RPC(ServerAppendCraftingQueueItem, sourceObjectId, dataId, amount);
+            return true;
+        }
+
+        public bool CallServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, short amount)
+        {
+            RPC(ServerChangeCraftingQueueItem, sourceObjectId, indexOfData, amount);
+            return true;
+        }
+
+        public bool CallServerCancelCraftingQueueItem(uint sourceObjectId, int indexOfData)
+        {
+            RPC(ServerCancelCraftingQueueItem, sourceObjectId, indexOfData);
+            return true;
+        }
     }
 }

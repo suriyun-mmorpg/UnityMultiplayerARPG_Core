@@ -5,6 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(100)]
     public class UICraftingQueueItems : UIBase
     {
         [Header("UI Elements")]
@@ -12,6 +13,9 @@ namespace MultiplayerARPG
         public UICraftingQueueItem uiDialog;
         public UICraftingQueueItem uiPrefab;
         public Transform uiContainer;
+        public UIItemCraftFormulas uiFormulas;
+
+        public ICraftingQueueSource Source { get; set; }
 
         private UIList cacheItemList;
         public UIList CacheItemList
@@ -47,9 +51,18 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCraftingItem);
             CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCraftingItem);
             if (uiDialog != null)
+            {
                 uiDialog.onHide.AddListener(OnItemDialogHide);
-            if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.Crafting.QueueItems.onOperation += OnCraftingQueueItemsOperation;
+                uiDialog.Manager = this;
+            }
+            if (Source == null && GameInstance.PlayingCharacterEntity)
+                Source = GameInstance.PlayingCharacterEntity.Crafting;
+            if (Source != null)
+            {
+                Source.QueueItems.onOperation += OnCraftingQueueItemsOperation;
+                uiFormulas.Source = Source;
+                uiFormulas.Show();
+            }
             UpdateData();
         }
 
@@ -58,8 +71,11 @@ namespace MultiplayerARPG
             if (uiDialog != null)
                 uiDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
-            if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.Crafting.QueueItems.onOperation -= OnCraftingQueueItemsOperation;
+            if (Source != null)
+            {
+                Source.QueueItems.onOperation -= OnCraftingQueueItemsOperation;
+                Source = null;
+            }
         }
 
         protected void OnItemDialogHide()
@@ -98,15 +114,16 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
-            UICraftingQueueItem tempUiCraftingItem;
+            UICraftingQueueItem tempUI;
             CacheItemList.Generate(GameInstance.PlayingCharacterEntity.Crafting.QueueItems, (index, craftingItem, ui) =>
             {
-                tempUiCraftingItem = ui.GetComponent<UICraftingQueueItem>();
-                tempUiCraftingItem.Setup(craftingItem, GameInstance.PlayingCharacterEntity, index);
-                tempUiCraftingItem.Show();
-                CacheItemSelectionManager.Add(tempUiCraftingItem);
+                tempUI = ui.GetComponent<UICraftingQueueItem>();
+                tempUI.Manager = this;
+                tempUI.Setup(craftingItem, GameInstance.PlayingCharacterEntity, index);
+                tempUI.Show();
+                CacheItemSelectionManager.Add(tempUI);
                 if (selectedIdx == index)
-                    tempUiCraftingItem.OnClickSelect();
+                    tempUI.OnClickSelect();
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(GameInstance.PlayingCharacterEntity.Crafting.QueueItems.Count == 0);

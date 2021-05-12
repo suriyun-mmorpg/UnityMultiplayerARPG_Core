@@ -20,5 +20,7 @@ namespace MultiplayerARPG
         {
             get { return craftDuration; }
         }
+
+        public int SourceId { get; set; }
     }
 }

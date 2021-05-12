@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(101)]
     public class UIItemCraftFormulas : UIBase
     {
         [Header("Filter")]
@@ -14,6 +16,8 @@ namespace MultiplayerARPG
         public UIItemCraftFormula uiDialog;
         public UIItemCraftFormula uiPrefab;
         public Transform uiContainer;
+
+        public ICraftingQueueSource Source { get; set; }
 
         private UIList cacheItemList;
         public UIList CacheItemList
@@ -49,7 +53,10 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectItemCraftFormula);
             CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectItemCraftFormula);
             if (uiDialog != null)
+            {
                 uiDialog.onHide.AddListener(OnItemDialogHide);
+                uiDialog.Manager = this;
+            }
             UpdateData();
         }
 
@@ -91,15 +98,17 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
+            int sourceId = Source == null ? 0 : Source.SourceId;
             int showingCount = 0;
             UIItemCraftFormula tempUI;
-            CacheItemList.Generate(GameInstance.ItemCraftFormulas.Values, (index, formula, ui) =>
+            CacheItemList.Generate(GameInstance.ItemCraftFormulas.Values.Where(o => o.SourceId == sourceId), (index, formula, ui) =>
             {
                 tempUI = ui.GetComponent<UIItemCraftFormula>();
                 if (string.IsNullOrEmpty(formula.category) ||
                     filterCategories == null || filterCategories.Count == 0 ||
                     filterCategories.Contains(formula.category))
                 {
+                    tempUI.Manager = this;
                     tempUI.Data = formula;
                     tempUI.Show();
                     CacheItemSelectionManager.Add(tempUI);

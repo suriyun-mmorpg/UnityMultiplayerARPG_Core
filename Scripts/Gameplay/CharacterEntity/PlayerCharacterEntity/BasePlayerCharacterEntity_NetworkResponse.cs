@@ -688,5 +688,44 @@ namespace MultiplayerARPG
             ClearDealingData();
             DealingCharacter = null;
         }
+
+        [ServerRpc]
+        protected void ServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, short amount)
+        {
+            if (sourceObjectId == ObjectId)
+            {
+                Crafting.AppendCraftingQueueItem(ObjectId, dataId, amount);
+            }
+            else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
+            {
+                source.AppendCraftingQueueItem(ObjectId, dataId, amount);
+            }
+        }
+
+        [ServerRpc]
+        protected void ServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, short amount)
+        {
+            if (sourceObjectId == ObjectId)
+            {
+                Crafting.ChangeCraftingQueueItem(ObjectId, indexOfData, amount);
+            }
+            else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
+            {
+                source.ChangeCraftingQueueItem(ObjectId, indexOfData, amount);
+            }
+        }
+
+        [ServerRpc]
+        protected void ServerCancelCraftingQueueItem(uint sourceObjectId, int indexOfData)
+        {
+            if (sourceObjectId == ObjectId)
+            {
+                Crafting.CancelCraftingQueueItem(ObjectId, indexOfData);
+            }
+            else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
+            {
+                source.CancelCraftingQueueItem(ObjectId, indexOfData);
+            }
+        }
     }
 }
