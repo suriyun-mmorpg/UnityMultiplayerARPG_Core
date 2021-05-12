@@ -125,21 +125,20 @@ namespace MultiplayerARPG
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
 
-            BuildingMaterial material = other.GetComponent<BuildingMaterial>();
-            if (material != null && CacheCollider.bounds.BoundsContainedRate(other.bounds) <= 0.025f)
-            {
-                BuildingEntity.TriggerExitBuildingMaterial(material);
-                return;
-            }
-
             if (BuildingEntity.IsBuildMode)
             {
+                BuildingMaterial material = other.GetComponent<BuildingMaterial>();
+                if (material != null && CacheCollider.bounds.BoundsContainedRate(other.bounds) <= 0.025f)
+                {
+                    BuildingEntity.TriggerExitBuildingMaterial(material);
+                    return;
+                }
+                BuildingEntity.TriggerEnterNoConstructionArea(other.GetComponent<NoConstructionArea>());
                 if (BuildingEntity.BuildingArea != null &&
                     BuildingEntity.BuildingArea.transform.root == other.transform.root)
                     return;
                 BuildingEntity.TriggerEnterBuildingMaterial(material);
                 BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
-                BuildingEntity.TriggerEnterNoConstructionArea(other.GetComponent<NoConstructionArea>());
             }
         }
 
@@ -158,22 +157,21 @@ namespace MultiplayerARPG
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
 
-            BuildingMaterial material = other.GetComponent<BuildingMaterial>();
-            if (material != null && CacheCollider2D.bounds.BoundsContainedRate(other.bounds) <= 0.025f)
-            {
-                BuildingEntity.TriggerExitBuildingMaterial(material);
-                return;
-            }
-
             if (BuildingEntity.IsBuildMode)
             {
+                BuildingMaterial material = other.GetComponent<BuildingMaterial>();
+                if (material != null && CacheCollider2D.bounds.BoundsContainedRate(other.bounds) <= 0.025f)
+                {
+                    BuildingEntity.TriggerExitBuildingMaterial(material);
+                    return;
+                }
+                BuildingEntity.TriggerEnterNoConstructionArea(other.GetComponent<NoConstructionArea>());
                 if (BuildingEntity.BuildingArea != null &&
                     BuildingEntity.BuildingArea.transform.root == other.transform.root)
                     return;
                 BuildingEntity.TriggerEnterBuildingMaterial(material);
                 BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
                 BuildingEntity.TriggerEnterTilemap(other.GetComponent<TilemapCollider2D>());
-                BuildingEntity.TriggerEnterNoConstructionArea(other.GetComponent<NoConstructionArea>());
             }
         }
 
@@ -190,7 +188,7 @@ namespace MultiplayerARPG
 
         public bool ValidateTriggerLayer(GameObject gameObject)
         {
-            return !(gameObject.layer == PhysicLayers.TransparentFX || gameObject.layer == PhysicLayers.IgnoreRaycast);
+            return gameObject.layer != PhysicLayers.TransparentFX;
         }
     }
 }
