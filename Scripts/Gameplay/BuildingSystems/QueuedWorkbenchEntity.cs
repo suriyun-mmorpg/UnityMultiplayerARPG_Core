@@ -27,7 +27,7 @@ namespace MultiplayerARPG
                     {
                         if (itemCraftFormula.ItemCraft.CraftingItem == null)
                             continue;
-                        cacheItemCraftFormulas[itemCraftFormula.ItemCraft.CraftingItem.DataId] = itemCraftFormula;
+                        cacheItemCraftFormulas[itemCraftFormula.DataId] = itemCraftFormula;
                     }
                 }
                 return cacheItemCraftFormulas;
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
         public override sealed void OnSetup()
         {
             base.OnSetup();
-            queueItems.forOwnerOnly = true;
+            queueItems.forOwnerOnly = false;
         }
 
         protected override void EntityUpdate()
@@ -76,11 +76,11 @@ namespace MultiplayerARPG
                 List<BaseItem> items = new List<BaseItem>();
                 foreach (ItemCraftFormula itemCraftFormula in CacheItemCraftFormulas.Values)
                 {
-                    itemCraftFormula.SourceId = SourceId;
                     items.Add(itemCraftFormula.ItemCraft.CraftingItem);
                     items.AddRange(itemCraftFormula.ItemCraft.CacheCraftRequirements.Keys);
                 }
                 GameInstance.AddItems(items);
+                GameInstance.AddItemCraftFormulas(SourceId, CacheItemCraftFormulas.Values);
             }
         }
     }

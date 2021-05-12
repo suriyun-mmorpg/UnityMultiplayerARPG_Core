@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             GameInstance.AddCurrencies(currencies);
             GameInstance.AddDamageElements(damageElements);
             GameInstance.AddItems(items);
-            GameInstance.AddItemCraftFormulas(itemCraftFormulas);
+            GameInstance.AddItemCraftFormulas(0, itemCraftFormulas);
             GameInstance.AddArmorTypes(armorTypes);
             GameInstance.AddWeaponTypes(weaponTypes);
             GameInstance.AddAmmoTypes(ammoTypes);
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
             GameInstance.AddCurrencies(currencies);
             GameInstance.AddDamageElements(damageElements);
             GameInstance.AddItems(items);
-            GameInstance.AddItemCraftFormulas(itemCraftFormulas);
+            GameInstance.AddItemCraftFormulas(0, itemCraftFormulas);
             GameInstance.AddArmorTypes(armorTypes);
             GameInstance.AddWeaponTypes(weaponTypes);
             GameInstance.AddAmmoTypes(ammoTypes);

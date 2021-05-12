@@ -823,13 +823,17 @@ namespace MultiplayerARPG
             AddManyGameData(Items, items);
         }
 
-        public static void AddItemCraftFormulas(params ItemCraftFormula[] itemCraftFormulas)
+        public static void AddItemCraftFormulas(int sourceId, params ItemCraftFormula[] itemCraftFormulas)
         {
-            AddItemCraftFormulas((IEnumerable<ItemCraftFormula>)itemCraftFormulas);
+            AddItemCraftFormulas(sourceId, (IEnumerable<ItemCraftFormula>)itemCraftFormulas);
         }
 
-        public static void AddItemCraftFormulas(IEnumerable<ItemCraftFormula> itemCraftFormulas)
+        public static void AddItemCraftFormulas(int sourceId, IEnumerable<ItemCraftFormula> itemCraftFormulas)
         {
+            foreach (ItemCraftFormula formula in itemCraftFormulas)
+            {
+                formula.SourceId = sourceId;
+            }
             AddManyGameData(ItemCraftFormulas, itemCraftFormulas);
         }
 

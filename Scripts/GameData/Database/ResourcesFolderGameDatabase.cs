@@ -29,7 +29,7 @@ namespace MultiplayerARPG
 
             GameInstance.AddAttributes(attributes);
             GameInstance.AddItems(items);
-            GameInstance.AddItemCraftFormulas(itemCraftFormulas);
+            GameInstance.AddItemCraftFormulas(0, itemCraftFormulas);
             GameInstance.AddSkills(skills);
             GameInstance.AddNpcDialogs(npcDialogs);
             GameInstance.AddQuests(quests);
