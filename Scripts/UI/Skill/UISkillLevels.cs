@@ -26,6 +26,7 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         public DisplayType displayType;
+        public bool includeEquipmentsForCurrentLevels;
         public bool isBonus;
         public bool inactiveIfLevelZero;
 
@@ -66,6 +67,12 @@ namespace MultiplayerARPG
             }
             else
             {
+                // Prepare attribute data
+                IPlayerCharacterData character = GameInstance.PlayingCharacter;
+                Dictionary<BaseSkill, short> currentSkillLevels = new Dictionary<BaseSkill, short>();
+                if (character != null)
+                    currentSkillLevels = character.GetSkills(includeEquipmentsForCurrentLevels);
+                // In-loop temp data
                 StringBuilder tempAllText = new StringBuilder();
                 BaseSkill tempSkill;
                 short tempCurrentLevel;
@@ -84,9 +91,8 @@ namespace MultiplayerARPG
                     string tempCurrentValue;
                     string tempTargetValue;
                     // Get skill level from character
-                    if (GameInstance.PlayingCharacter != null)
-                        GameInstance.PlayingCharacter.GetCaches().Skills.TryGetValue(tempSkill, out tempCurrentLevel);
-                    // Use difference format by option 
+                    currentSkillLevels.TryGetValue(tempSkill, out tempCurrentLevel);
+                    // Use difference format by option
                     switch (displayType)
                     {
                         case DisplayType.Requirement:

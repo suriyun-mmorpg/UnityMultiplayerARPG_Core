@@ -42,6 +42,9 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRequireAttributeAmounts.displayType = UIAttributeAmounts.DisplayType.Requirement;
+                    uiRequireAttributeAmounts.includeEquipmentsForCurrentAmounts = false;
+                    uiRequireAttributeAmounts.includeBuffsForCurrentAmounts = false;
+                    uiRequireAttributeAmounts.includeSkillsForCurrentAmounts = true;
                     uiRequireAttributeAmounts.isBonus = false;
                     uiRequireAttributeAmounts.Show();
                     uiRequireAttributeAmounts.Data = skill.CacheRequireAttributeAmounts;
@@ -57,6 +60,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRequireSkillLevels.displayType = UISkillLevels.DisplayType.Requirement;
+                    uiRequireSkillLevels.includeEquipmentsForCurrentLevels = false;
                     uiRequireSkillLevels.isBonus = false;
                     uiRequireSkillLevels.Show();
                     uiRequireSkillLevels.Data = skill.CacheRequireSkillLevels;

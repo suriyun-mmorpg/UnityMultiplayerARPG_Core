@@ -234,30 +234,29 @@ namespace MultiplayerARPG
             if (!item.IsEquipment() || character == null)
                 return false;
 
-            // Check is it pass attribute requirement or not
-            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(true, false, null);
-            Dictionary<Attribute, float> requireAttributeAmounts = item.RequireAttributeAmounts;
-            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
+            if (character.Level < item.Requirement.level)
             {
-                if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
-                    attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
-                {
-                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
-                    return false;
-                }
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
+                return false;
             }
 
-            // Check another requirements
             if (item.Requirement.character != null && item.Requirement.character != character.GetDatabase())
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
                 return false;
             }
 
-            if (character.Level < item.Requirement.level)
+            // Check is it pass attribute requirement or not
+            Dictionary<Attribute, float> currentAttributeAmounts = character.GetAttributes(true, false, character.GetSkills(true));
+            Dictionary<Attribute, float> requireAttributeAmounts = item.RequireAttributeAmounts;
+            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
             {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
-                return false;
+                if (!currentAttributeAmounts.ContainsKey(requireAttributeAmount.Key) ||
+                    currentAttributeAmounts[requireAttributeAmount.Key] < requireAttributeAmount.Value)
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                    return false;
+                }
             }
 
             return true;

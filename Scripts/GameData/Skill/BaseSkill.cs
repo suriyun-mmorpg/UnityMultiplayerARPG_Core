@@ -422,36 +422,6 @@ namespace MultiplayerARPG
             if (character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(this))
                 return false;
 
-            // Check is it pass attribute requirement or not
-            Dictionary<Attribute, float> attributeAmountsDict = character.GetAttributes(false, false, null);
-            Dictionary<Attribute, float> requireAttributeAmounts = CacheRequireAttributeAmounts;
-            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
-            {
-                if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
-                    attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
-                {
-                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
-                    return false;
-                }
-            }
-            // Check is it pass skill level requirement or not
-            Dictionary<BaseSkill, int> skillLevelsDict = new Dictionary<BaseSkill, int>();
-            foreach (CharacterSkill learnedSkill in character.Skills)
-            {
-                if (learnedSkill.GetSkill() == null)
-                    continue;
-                skillLevelsDict[learnedSkill.GetSkill()] = learnedSkill.level;
-            }
-            foreach (BaseSkill requireSkill in CacheRequireSkillLevels.Keys)
-            {
-                if (!skillLevelsDict.ContainsKey(requireSkill) ||
-                    skillLevelsDict[requireSkill] < CacheRequireSkillLevels[requireSkill])
-                {
-                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS;
-                    return false;
-                }
-            }
-
             if (character.Level < GetRequireCharacterLevel(level))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
@@ -468,6 +438,31 @@ namespace MultiplayerARPG
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_POINT;
                 return false;
+            }
+
+            // Check is it pass skill level requirement or not
+            Dictionary<BaseSkill, short> currentSkillLevels = character.GetSkills(false);
+            foreach (BaseSkill requireSkill in CacheRequireSkillLevels.Keys)
+            {
+                if (!currentSkillLevels.ContainsKey(requireSkill) ||
+                    currentSkillLevels[requireSkill] < CacheRequireSkillLevels[requireSkill])
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS;
+                    return false;
+                }
+            }
+
+            // Check is it pass attribute requirement or not
+            Dictionary<Attribute, float> currentAttributeAmounts = character.GetAttributes(false, false, currentSkillLevels);
+            Dictionary<Attribute, float> requireAttributeAmounts = CacheRequireAttributeAmounts;
+            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
+            {
+                if (!currentAttributeAmounts.ContainsKey(requireAttributeAmount.Key) ||
+                    currentAttributeAmounts[requireAttributeAmount.Key] < requireAttributeAmount.Value)
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                    return false;
+                }
             }
 
             return true;

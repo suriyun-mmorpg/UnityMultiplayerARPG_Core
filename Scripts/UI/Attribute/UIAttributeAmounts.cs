@@ -29,6 +29,9 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         public DisplayType displayType;
+        public bool includeEquipmentsForCurrentAmounts;
+        public bool includeBuffsForCurrentAmounts;
+        public bool includeSkillsForCurrentAmounts;
         public bool isBonus;
         public bool inactiveIfAmountZero;
 
@@ -69,6 +72,12 @@ namespace MultiplayerARPG
             }
             else
             {
+                // Prepare attribute data
+                IPlayerCharacterData character = GameInstance.PlayingCharacter;
+                Dictionary<Attribute, float> currentAttributeAmounts = new Dictionary<Attribute, float>();
+                if (character != null)
+                    currentAttributeAmounts = character.GetAttributes(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts ? character.GetSkills(includeEquipmentsForCurrentAmounts) : null);
+                // In-loop temp data
                 StringBuilder tempAllText = new StringBuilder();
                 Attribute tempAttribute;
                 float tempCurrentAmount;
@@ -86,10 +95,9 @@ namespace MultiplayerARPG
                     tempAttribute = dataEntry.Key;
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
-                    // Get attribute amount from character
-                    if (GameInstance.PlayingCharacter != null)
-                        GameInstance.PlayingCharacter.GetCaches().Attributes.TryGetValue(tempAttribute, out tempCurrentAmount);
-                    // Use difference format by option 
+                    // Get attribute amount
+                    currentAttributeAmounts.TryGetValue(tempAttribute, out tempCurrentAmount);
+                    // Use difference format by option
                     switch (displayType)
                     {
                         case DisplayType.Rate:
