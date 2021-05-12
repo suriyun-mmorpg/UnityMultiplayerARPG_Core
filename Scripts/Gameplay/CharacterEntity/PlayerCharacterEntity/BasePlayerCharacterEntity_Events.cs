@@ -22,8 +22,8 @@ namespace MultiplayerARPG
         // Sync variables
         public event System.Action<int> onDataIdChange;
         public event System.Action<int> onFactionIdChange;
-        public event System.Action<short> onStatPointChange;
-        public event System.Action<short> onSkillPointChange;
+        public event System.Action<float> onStatPointChange;
+        public event System.Action<float> onSkillPointChange;
         public event System.Action<int> onGoldChange;
         public event System.Action<int> onUserGoldChange;
         public event System.Action<int> onUserCashChange;

@@ -16,11 +16,11 @@ namespace MultiplayerARPG
         /// <summary>
         /// Stat point which uses for increase attribute amount
         /// </summary>
-        short StatPoint { get; set; }
+        float StatPoint { get; set; }
         /// <summary>
         /// Skill point which uses for increase skill level
         /// </summary>
-        short SkillPoint { get; set; }
+        float SkillPoint { get; set; }
         /// <summary>
         /// Gold which uses for buy things
         /// </summary>

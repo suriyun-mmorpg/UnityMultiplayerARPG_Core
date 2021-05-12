@@ -14,9 +14,9 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt factionId = new SyncFieldInt();
         [SerializeField]
-        protected SyncFieldShort statPoint = new SyncFieldShort();
+        protected SyncFieldFloat statPoint = new SyncFieldFloat();
         [SerializeField]
-        protected SyncFieldShort skillPoint = new SyncFieldShort();
+        protected SyncFieldFloat skillPoint = new SyncFieldFloat();
         [SerializeField]
         protected SyncFieldInt gold = new SyncFieldInt();
         [SerializeField]
@@ -106,8 +106,8 @@ namespace MultiplayerARPG
         #region Fields/Interface/Getter/Setter implementation
         public override int DataId { get { return dataId.Value; } set { dataId.Value = value; } }
         public int FactionId { get { return factionId.Value; } set { factionId.Value = value; } }
-        public short StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
-        public short SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
+        public float StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
+        public float SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
         public int UserGold { get { return userGold.Value; } set { userGold.Value = value; } }
         public int UserCash { get { return userCash.Value; } set { userCash.Value = value; } }
@@ -204,13 +204,13 @@ namespace MultiplayerARPG
                 onFactionIdChange.Invoke(factionId);
         }
 
-        protected virtual void OnStatPointChange(bool isInitial, short statPoint)
+        protected virtual void OnStatPointChange(bool isInitial, float statPoint)
         {
             if (onStatPointChange != null)
                 onStatPointChange.Invoke(statPoint);
         }
 
-        protected virtual void OnSkillPointChange(bool isInitial, short skillPoint)
+        protected virtual void OnSkillPointChange(bool isInitial, float skillPoint)
         {
             if (onSkillPointChange != null)
                 onSkillPointChange.Invoke(skillPoint);

@@ -109,18 +109,18 @@ namespace MultiplayerARPG
                 if (commandKey.Equals(StatPoint))
                 {
                     receiver = sender;
-                    short amount;
+                    int amount;
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        short.TryParse(data[1], out amount) &&
+                        int.TryParse(data[1], out amount) &&
                         amount >= 0)
                         playerCharacter.StatPoint = amount;
                 }
                 if (commandKey.Equals(SkillPoint))
                 {
                     receiver = sender;
-                    short amount;
+                    int amount;
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        short.TryParse(data[1], out amount) &&
+                        int.TryParse(data[1], out amount) &&
                         amount >= 0)
                         playerCharacter.SkillPoint = amount;
                 }

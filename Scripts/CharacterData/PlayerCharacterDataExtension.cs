@@ -75,7 +75,7 @@ namespace MultiplayerARPG
             if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out database))
                 return character;
             // Validating character attributes
-            short returningStatPoint = 0;
+            int returningStatPoint = 0;
             HashSet<int> validAttributeIds = new HashSet<int>();
             IList<CharacterAttribute> characterAttributes = character.Attributes;
             for (int i = characterAttributes.Count - 1; i >= 0; --i)
@@ -105,7 +105,7 @@ namespace MultiplayerARPG
                 character.Attributes.Add(characterAttribute);
             }
             // Validating character skills
-            short returningSkillPoint = 0;
+            int returningSkillPoint = 0;
             HashSet<int> validSkillIds = new HashSet<int>();
             IList<CharacterSkill> characterSkills = character.Skills;
             for (int i = characterSkills.Count - 1; i >= 0; --i)
@@ -402,8 +402,8 @@ namespace MultiplayerARPG
             writer.PutPackedInt(characterData.CurrentStamina);
             writer.PutPackedInt(characterData.CurrentFood);
             writer.PutPackedInt(characterData.CurrentWater);
-            writer.PutPackedShort(characterData.StatPoint);
-            writer.PutPackedShort(characterData.SkillPoint);
+            writer.Put(characterData.StatPoint);
+            writer.Put(characterData.SkillPoint);
             writer.PutPackedInt(characterData.Gold);
             writer.PutPackedInt(characterData.UserGold);
             writer.PutPackedInt(characterData.UserCash);
@@ -572,8 +572,8 @@ namespace MultiplayerARPG
             characterData.CurrentStamina = reader.GetPackedInt();
             characterData.CurrentFood = reader.GetPackedInt();
             characterData.CurrentWater = reader.GetPackedInt();
-            characterData.StatPoint = reader.GetPackedShort();
-            characterData.SkillPoint = reader.GetPackedShort();
+            characterData.StatPoint = reader.GetFloat();
+            characterData.SkillPoint = reader.GetFloat();
             characterData.Gold = reader.GetPackedInt();
             characterData.UserGold = reader.GetPackedInt();
             characterData.UserCash = reader.GetPackedInt();
@@ -827,7 +827,7 @@ namespace MultiplayerARPG
                     return false;
             }
 
-            short countStatPoint = 0;
+            int countStatPoint = 0;
             CharacterAttribute characterAttribute;
             for (int i = 0; i < characterData.Attributes.Count; ++i)
             {

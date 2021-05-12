@@ -79,8 +79,8 @@ namespace MultiplayerARPG
             data.NonEquipItems = info.GetListValue<CharacterItem>("nonEquipItems");
             data.Summons = info.GetListValue<CharacterSummon>("summons");
             // Player Character
-            data.StatPoint = info.GetInt16("statPoint");
-            data.SkillPoint = info.GetInt16("skillPoint");
+            data.StatPoint = info.GetSingle("statPoint");
+            data.SkillPoint = info.GetSingle("skillPoint");
             data.Gold = info.GetInt32("gold");
             // TODO: Backward compatible, this will be removed in future version
             try

@@ -13,8 +13,8 @@ namespace MultiplayerARPG
 
         public string UserId { get; set; }
         public int FactionId { get; set; }
-        public short StatPoint { get; set; }
-        public short SkillPoint { get; set; }
+        public float StatPoint { get; set; }
+        public float SkillPoint { get; set; }
         public int Gold { get; set; }
         public int UserGold { get; set; }
         public int UserCash { get; set; }
