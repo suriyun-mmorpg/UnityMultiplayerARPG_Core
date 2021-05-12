@@ -158,6 +158,7 @@ namespace MultiplayerARPG
         public abstract void ShowItemsContainerDialog(ItemsContainerEntity itemsContainerEntity);
         public abstract void HideItemsContainerDialog();
         public abstract void ShowWorkbenchDialog(WorkbenchEntity workbenchEntity);
+        public abstract void ShowCraftingQueueItemsDialog(ICraftingQueueSource source);
         public abstract void OnControllerSetup(BasePlayerCharacterEntity characterEntity);
         public abstract void OnControllerDesetup(BasePlayerCharacterEntity characterEntity);
     }

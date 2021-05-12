@@ -50,6 +50,8 @@ namespace MultiplayerARPG
         public UICurrentBuilding uiCurrentStorage;
         [Tooltip("If this UI was not set, it will use the same object with `uiCurrentBuilding`")]
         public UICurrentBuilding uiCurrentWorkbench;
+        [Tooltip("If this UI was not set, it will use the same object with `uiCurrentBuilding`")]
+        public UICurrentBuilding uiCurrentQueuedWorkbench;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIPlayerActivateMenu uiPlayerActivateMenu;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
@@ -70,6 +72,8 @@ namespace MultiplayerARPG
         public UICampfireItems uiBuildingCampfireItems;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIItemCrafts uiBuildingCraftItems;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
+        public UICraftingQueueItems uiCraftingQueueItems;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIItemsContainer uiItemsContainer;
         public UIBase uiIsWarping;
@@ -122,7 +126,9 @@ namespace MultiplayerARPG
                 uiCurrentStorage = uiCurrentBuilding;
             if (uiCurrentWorkbench == null)
                 uiCurrentWorkbench = uiCurrentBuilding;
-            if (uiCurrentWorkbench == null)
+            if (uiCurrentQueuedWorkbench == null)
+                uiCurrentQueuedWorkbench = uiCurrentBuilding;
+            if (uiPlayerActivateMenu == null)
                 uiPlayerActivateMenu = gameObject.GetComponentInChildren<UIPlayerActivateMenu>(true);
             if (uiDealingRequest == null)
                 uiDealingRequest = gameObject.GetComponentInChildren<UIDealingRequest>(true);
@@ -142,6 +148,8 @@ namespace MultiplayerARPG
                 uiBuildingCampfireItems = gameObject.GetComponentInChildren<UICampfireItems>(true);
             if (uiBuildingCraftItems == null)
                 uiBuildingCraftItems = gameObject.GetComponentInChildren<UIItemCrafts>(true);
+            if (uiCraftingQueueItems == null)
+                uiCraftingQueueItems = gameObject.GetComponentInChildren<UICraftingQueueItems>(true);
             if (uiItemsContainer == null)
                 uiItemsContainer = gameObject.GetComponentInChildren<UIItemsContainer>(true);
 
@@ -494,6 +502,11 @@ namespace MultiplayerARPG
                 if (!uiCurrentWorkbench.IsVisible())
                     uiCurrentWorkbench.Show();
             }
+            else if (buildingEntity is QueuedWorkbenchEntity)
+            {
+                if (!uiCurrentQueuedWorkbench.IsVisible())
+                    uiCurrentQueuedWorkbench.Show();
+            }
             else
             {
                 if (!uiCurrentBuilding.IsVisible())
@@ -511,6 +524,8 @@ namespace MultiplayerARPG
                 uiCurrentStorage.Hide();
             if (uiCurrentWorkbench.IsVisible())
                 uiCurrentWorkbench.Hide();
+            if (uiCurrentQueuedWorkbench.IsVisible())
+                uiCurrentQueuedWorkbench.Hide();
             if (uiCurrentBuilding.IsVisible())
                 uiCurrentBuilding.Hide();
             if (onHideCurrentBuildingDialog != null)
@@ -685,6 +700,14 @@ namespace MultiplayerARPG
                 return;
             uiBuildingCraftItems.Show(CrafterType.Workbench, workbenchEntity);
             AddNpcDialog(uiBuildingCraftItems);
+        }
+
+        public override void ShowCraftingQueueItemsDialog(ICraftingQueueSource source)
+        {
+            if (uiCraftingQueueItems == null)
+                return;
+            uiCraftingQueueItems.Show(source);
+            AddNpcDialog(uiCraftingQueueItems);
         }
 
         protected void AddNpcDialog(UIBase npcDialog)

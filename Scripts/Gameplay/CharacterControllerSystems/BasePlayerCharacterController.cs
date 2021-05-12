@@ -297,6 +297,11 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.ShowWorkbenchDialog(buildingEntity as WorkbenchEntity);
             }
 
+            if (buildingEntity is QueuedWorkbenchEntity)
+            {
+                CacheUISceneGameplay.ShowCraftingQueueItemsDialog(buildingEntity as QueuedWorkbenchEntity);
+            }
+
             // Action when activate building for custom buildings
             // Can add event by `Awake` dev extension.
             if (onActivateBuilding != null)
