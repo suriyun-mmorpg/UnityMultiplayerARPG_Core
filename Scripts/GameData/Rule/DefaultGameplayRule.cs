@@ -8,8 +8,8 @@ namespace MultiplayerARPG
     public partial class DefaultGameplayRule : BaseGameplayRule
     {
         [Header("Levelling/Stat/Skill")]
-        public short increaseStatPointEachLevel = 5;
-        public short increaseSkillPointEachLevel = 1;
+        public float increaseStatPointEachLevel = 5;
+        public float increaseSkillPointEachLevel = 1;
         [Tooltip("If this > `0`, it will increase stat point until character reached max level. If it's `20`, it will increase stat point until character reached level `20`")]
         public short increaseStatPointsUntilReachedLevel = 0;
         [Tooltip("If this > `0`, it will increase skill point until character reached max level. If it's `20`, it will increase skill point until character reached level `20`")]
@@ -368,7 +368,7 @@ namespace MultiplayerARPG
                         try
                         {
                             if (increaseStatPointsUntilReachedLevel == 0 ||
-                                increaseStatPointsUntilReachedLevel < character.Level + 1)
+                                character.Level + 1 < increaseStatPointsUntilReachedLevel)
                             {
                                 checked
                                 {
@@ -378,13 +378,13 @@ namespace MultiplayerARPG
                         }
                         catch (System.OverflowException)
                         {
-                            playerCharacter.StatPoint = short.MaxValue;
+                            playerCharacter.StatPoint = float.MaxValue;
                         }
 
                         try
                         {
                             if (increaseSkillPointsUntilReachedLevel == 0 ||
-                                increaseSkillPointsUntilReachedLevel < character.Level + 1)
+                                character.Level + 1 < increaseSkillPointsUntilReachedLevel)
                             {
                                 checked
                                 {
@@ -394,7 +394,7 @@ namespace MultiplayerARPG
                         }
                         catch (System.OverflowException)
                         {
-                            playerCharacter.SkillPoint = short.MaxValue;
+                            playerCharacter.SkillPoint = float.MaxValue;
                         }
                     }
                     isLevelUp = true;
