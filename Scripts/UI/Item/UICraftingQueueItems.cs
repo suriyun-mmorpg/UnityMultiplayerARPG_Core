@@ -44,6 +44,12 @@ namespace MultiplayerARPG
             }
         }
 
+        public void Show(ICraftingQueueSource source)
+        {
+            Source = source;
+            Show();
+        }
+
         protected virtual void OnEnable()
         {
             CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCraftingItem);
@@ -116,7 +122,7 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.Clear();
 
             UICraftingQueueItem tempUI;
-            CacheItemList.Generate(GameInstance.PlayingCharacterEntity.Crafting.QueueItems, (index, craftingItem, ui) =>
+            CacheItemList.Generate(Source.QueueItems, (index, craftingItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICraftingQueueItem>();
                 tempUI.CraftingQueueManager = this;
