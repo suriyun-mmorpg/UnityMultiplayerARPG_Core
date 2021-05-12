@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public UIItemCraftFormula uiPrefab;
         public Transform uiContainer;
 
-        public ICraftingQueueSource Source { get; set; }
+        public UICraftingQueueItems CraftingQueueManager { get; set; }
 
         private UIList cacheItemList;
         public UIList CacheItemList
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.onHide.AddListener(OnItemDialogHide);
-                uiDialog.Manager = this;
+                uiDialog.CraftFormulaManager = this;
             }
             UpdateData();
         }
@@ -98,7 +98,7 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.DeselectSelectedUI();
             CacheItemSelectionManager.Clear();
 
-            int sourceId = Source == null ? 0 : Source.SourceId;
+            int sourceId = CraftingQueueManager != null && CraftingQueueManager.Source != null ? CraftingQueueManager.Source.SourceId : 0;
             int showingCount = 0;
             UIItemCraftFormula tempUI;
             CacheItemList.Generate(GameInstance.ItemCraftFormulas.Values.Where(o => o.SourceId == sourceId), (index, formula, ui) =>
@@ -108,7 +108,7 @@ namespace MultiplayerARPG
                     filterCategories == null || filterCategories.Count == 0 ||
                     filterCategories.Contains(formula.category))
                 {
-                    tempUI.Manager = this;
+                    tempUI.CraftFormulaManager = this;
                     tempUI.Data = formula;
                     tempUI.Show();
                     CacheItemSelectionManager.Add(tempUI);

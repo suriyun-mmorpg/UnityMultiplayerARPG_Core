@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public UIItemCraft uiItemCraft;
         public InputFieldWrapper inputAmount;
 
-        public UICraftingQueueItems Manager { get; set; }
+        public UICraftingQueueItems CraftingQueueManager { get; set; }
 
         protected float craftRemainsDuration;
 
@@ -115,12 +115,12 @@ namespace MultiplayerARPG
             short amount;
             if (inputAmount == null || !short.TryParse(inputAmount.text, out amount))
                 amount = 1;
-            GameInstance.PlayingCharacterEntity.CallServerChangeCraftingQueueItem(Manager.Source.ObjectId, IndexOfData, amount);
+            GameInstance.PlayingCharacterEntity.CallServerChangeCraftingQueueItem(CraftingQueueManager.Source.ObjectId, IndexOfData, amount);
         }
 
         public void OnClickCancel()
         {
-            GameInstance.PlayingCharacterEntity.CallServerCancelCraftingQueueItem(Manager.Source.ObjectId, IndexOfData);
+            GameInstance.PlayingCharacterEntity.CallServerCancelCraftingQueueItem(CraftingQueueManager.Source.ObjectId, IndexOfData);
         }
     }
 }

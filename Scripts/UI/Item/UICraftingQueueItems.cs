@@ -53,16 +53,17 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.onHide.AddListener(OnItemDialogHide);
-                uiDialog.Manager = this;
+                uiDialog.CraftingQueueManager = this;
+            }
+            if (uiFormulas != null)
+            {
+                uiFormulas.CraftingQueueManager = this;
+                uiFormulas.Show();
             }
             if (Source == null && GameInstance.PlayingCharacterEntity)
                 Source = GameInstance.PlayingCharacterEntity.Crafting;
             if (Source != null)
-            {
                 Source.QueueItems.onOperation += OnCraftingQueueItemsOperation;
-                uiFormulas.Source = Source;
-                uiFormulas.Show();
-            }
             UpdateData();
         }
 
@@ -118,7 +119,7 @@ namespace MultiplayerARPG
             CacheItemList.Generate(GameInstance.PlayingCharacterEntity.Crafting.QueueItems, (index, craftingItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICraftingQueueItem>();
-                tempUI.Manager = this;
+                tempUI.CraftingQueueManager = this;
                 tempUI.Setup(craftingItem, GameInstance.PlayingCharacterEntity, index);
                 tempUI.Show();
                 CacheItemSelectionManager.Add(tempUI);
