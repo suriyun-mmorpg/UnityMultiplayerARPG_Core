@@ -66,6 +66,10 @@ namespace MultiplayerARPG
                     if (!hitAimmingObject)
                         continue;
                 }
+                else
+                {
+                    ConstructingBuildingEntity.Position = tempVector3;
+                }
 
                 buildingEntity = tempTransform.root.GetComponent<BuildingEntity>();
                 buildingArea = tempTransform.GetComponent<BuildingArea>();
