@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         public abstract void DecreaseCurrenciesWhenRemoveEnhancer(IPlayerCharacterData character);
         public abstract bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
         public abstract void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
-        public abstract Reward MakeMonsterReward(MonsterCharacter monster);
+        public abstract Reward MakeMonsterReward(MonsterCharacter monster, short level);
         public abstract Reward MakeQuestReward(Quest quest);
         public abstract float GetRecoveryUpdateDuration();
         public abstract void ApplyFallDamage(BaseCharacterEntity character, Vector3 lastGroundedPosition);

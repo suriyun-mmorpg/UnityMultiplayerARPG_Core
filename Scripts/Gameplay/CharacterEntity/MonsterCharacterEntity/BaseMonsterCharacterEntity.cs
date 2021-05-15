@@ -385,7 +385,7 @@ namespace MultiplayerARPG
             if (IsSummoned)
                 return;
 
-            Reward reward = CurrentGameplayRule.MakeMonsterReward(CharacterDatabase);
+            Reward reward = CurrentGameplayRule.MakeMonsterReward(CharacterDatabase, Level);
             // Temp data which will be in-use in loop
             BaseCharacterEntity tempCharacterEntity;
             BasePlayerCharacterEntity tempPlayerCharacterEntity;

@@ -689,11 +689,11 @@ namespace MultiplayerARPG
             character.Gold -= setting.CreateGuildRequiredGold;
         }
 
-        public override Reward MakeMonsterReward(MonsterCharacter monster)
+        public override Reward MakeMonsterReward(MonsterCharacter monster, short level)
         {
             Reward result = new Reward();
-            result.exp = monster.RandomExp();
-            result.gold = monster.RandomGold();
+            result.exp = monster.RandomExp(level);
+            result.gold = monster.RandomGold(level);
             return result;
         }
 

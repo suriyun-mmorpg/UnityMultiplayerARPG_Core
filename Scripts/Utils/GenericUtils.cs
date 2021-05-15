@@ -356,6 +356,11 @@ public static class GenericUtils
         return (float)(new System.Random(seed).NextDouble() * (max - min) + min);
     }
 
+    public static int RandomInt(int seed, int min, int max)
+    {
+        return new System.Random(seed).Next(min, max);
+    }
+
     public static string GetPrettyDate(this System.DateTime d,
         string textNow = "Just now",
         string textAMinuteAgo = "1 Minute ago",

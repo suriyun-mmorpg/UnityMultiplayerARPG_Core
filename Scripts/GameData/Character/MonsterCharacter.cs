@@ -23,7 +23,7 @@ namespace MultiplayerARPG
     {
         [Header("Monster Data")]
         [SerializeField]
-        [Tooltip("This will be used to adjust stats. If this value is 100, it means current stats which set to this character data it is stats for character level 100, it will be used to adjust stats for character level 1.")]
+        [Tooltip("This will be used to adjust stats. If this value is 100, it means current stats which set to this character data is stats for character level 100, it will be used to adjust stats for character level 1.")]
         private short defaultLevel = 1;
         public short DefaultLevel { get { return defaultLevel; } }
         [SerializeField]
@@ -84,14 +84,22 @@ namespace MultiplayerARPG
 
 
         [Header("Killing Rewards")]
+        [HideInInspector]
         [SerializeField]
         private int randomExpMin;
+        [HideInInspector]
         [SerializeField]
         private int randomExpMax;
         [SerializeField]
+        private IncrementalMinMaxInt randomExp;
+        [HideInInspector]
+        [SerializeField]
         private int randomGoldMin;
+        [HideInInspector]
         [SerializeField]
         private int randomGoldMax;
+        [SerializeField]
+        private IncrementalMinMaxInt randomGold;
         [Tooltip("Max kind of items that will be dropped in ground")]
         [SerializeField]
         private byte maxDropItems = 5;
@@ -113,6 +121,10 @@ namespace MultiplayerARPG
         private ArmorIncremental[] adjustArmors;
         [System.NonSerialized]
         private DamageIncremental? adjustDamageAmount;
+        [System.NonSerialized]
+        private IncrementalMinMaxInt? adjustRandomExp;
+        [System.NonSerialized]
+        private IncrementalMinMaxInt? adjustRandomGold;
 
         [System.NonSerialized]
         private List<ItemDrop> cacheRandomItems;
@@ -330,24 +342,64 @@ namespace MultiplayerARPG
             }
         }
 
-        private readonly List<MonsterSkill> tempRandomSkills = new List<MonsterSkill>();
-
-        public virtual int RandomExp()
+        public IncrementalMinMaxInt AdjustedRandomExp
         {
-            int min = randomExpMin;
-            int max = randomExpMax;
-            if (min > max)
-                min = max;
-            return Random.Range(min, max);
+            get
+            {
+                // Adjust base stats by default level
+                if (defaultLevel <= 1)
+                {
+                    return randomExp;
+                }
+                else
+                {
+                    if (!adjustRandomExp.HasValue)
+                    {
+                        adjustRandomExp = new IncrementalMinMaxInt()
+                        {
+                            baseAmount = randomExp.baseAmount + (randomExp.amountIncreaseEachLevel * -(defaultLevel - 1)),
+                            amountIncreaseEachLevel = randomExp.amountIncreaseEachLevel,
+                        };
+                    }
+                    return adjustRandomExp.Value;
+                }
+            }
         }
 
-        public virtual int RandomGold()
+        public IncrementalMinMaxInt AdjustedRandomGold
         {
-            int min = randomGoldMin;
-            int max = randomGoldMax;
-            if (min > max)
-                min = max;
-            return Random.Range(min, max);
+            get
+            {
+                // Adjust base stats by default level
+                if (defaultLevel <= 1)
+                {
+                    return randomGold;
+                }
+                else
+                {
+                    if (!adjustRandomGold.HasValue)
+                    {
+                        adjustRandomGold = new IncrementalMinMaxInt()
+                        {
+                            baseAmount = randomGold.baseAmount + (randomGold.amountIncreaseEachLevel * -(defaultLevel - 1)),
+                            amountIncreaseEachLevel = randomGold.amountIncreaseEachLevel,
+                        };
+                    }
+                    return adjustRandomGold.Value;
+                }
+            }
+        }
+
+        private readonly List<MonsterSkill> tempRandomSkills = new List<MonsterSkill>();
+
+        public virtual int RandomExp(short level)
+        {
+            return AdjustedRandomExp.GetAmount(level).Random();
+        }
+
+        public virtual int RandomGold(short level)
+        {
+            return AdjustedRandomGold.GetAmount(level).Random();
         }
 
         public virtual void RandomItems(System.Action<BaseItem, short> onRandomItem)
@@ -416,6 +468,47 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             DamageInfo.PrepareRelatesData();
             GameInstance.AddItems(CacheRandomItems);
+        }
+
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            if (randomExpMin != 0 ||
+                randomExpMax != 0)
+            {
+                hasChanges = true;
+                if (randomExp.baseAmount.min != 0 &&
+                    randomExp.baseAmount.max != 0 &&
+                    randomExp.amountIncreaseEachLevel.min != 0 &&
+                    randomExp.amountIncreaseEachLevel.max != 0)
+                {
+                    IncrementalMinMaxInt result = randomExp;
+                    result.baseAmount.min = randomExpMin;
+                    result.baseAmount.max = randomExpMax;
+                    randomExp = result;
+                }
+                randomExpMin = 0;
+                randomExpMax = 0;
+            }
+            if (randomGoldMin != 0 ||
+                randomGoldMax != 0)
+            {
+                hasChanges = true;
+                if (randomGold.baseAmount.min != 0 &&
+                    randomGold.baseAmount.max != 0 &&
+                    randomGold.amountIncreaseEachLevel.min != 0 &&
+                    randomGold.amountIncreaseEachLevel.max != 0)
+                {
+                    IncrementalMinMaxInt result = randomGold;
+                    result.baseAmount.min = randomGoldMin;
+                    result.baseAmount.max = randomGoldMax;
+                    randomGold = result;
+                    Debug.LogError(randomGold.baseAmount.min + " " + randomGold.baseAmount.max);
+                }
+                randomGoldMin = 0;
+                randomGoldMax = 0;
+            }
+            return hasChanges;
         }
     }
 }

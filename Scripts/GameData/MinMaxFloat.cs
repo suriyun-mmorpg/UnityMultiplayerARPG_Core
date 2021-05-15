@@ -56,4 +56,9 @@ public struct MinMaxFloat
     {
         return GenericUtils.RandomFloat(seed, min, max);
     }
+
+    public float Random()
+    {
+        return UnityEngine.Random.Range(min, max);
+    }
 }
