@@ -477,10 +477,10 @@ namespace MultiplayerARPG
                 randomExpMax != 0)
             {
                 hasChanges = true;
-                if (randomExp.baseAmount.min != 0 &&
-                    randomExp.baseAmount.max != 0 &&
-                    randomExp.amountIncreaseEachLevel.min != 0 &&
-                    randomExp.amountIncreaseEachLevel.max != 0)
+                if (randomExp.baseAmount.min == 0 &&
+                    randomExp.baseAmount.max == 0 &&
+                    randomExp.amountIncreaseEachLevel.min == 0 &&
+                    randomExp.amountIncreaseEachLevel.max == 0)
                 {
                     IncrementalMinMaxInt result = randomExp;
                     result.baseAmount.min = randomExpMin;
@@ -494,16 +494,15 @@ namespace MultiplayerARPG
                 randomGoldMax != 0)
             {
                 hasChanges = true;
-                if (randomGold.baseAmount.min != 0 &&
-                    randomGold.baseAmount.max != 0 &&
-                    randomGold.amountIncreaseEachLevel.min != 0 &&
-                    randomGold.amountIncreaseEachLevel.max != 0)
+                if (randomGold.baseAmount.min == 0 &&
+                    randomGold.baseAmount.max == 0 &&
+                    randomGold.amountIncreaseEachLevel.min == 0 &&
+                    randomGold.amountIncreaseEachLevel.max == 0)
                 {
                     IncrementalMinMaxInt result = randomGold;
                     result.baseAmount.min = randomGoldMin;
                     result.baseAmount.max = randomGoldMax;
                     randomGold = result;
-                    Debug.LogError(randomGold.baseAmount.min + " " + randomGold.baseAmount.max);
                 }
                 randomGoldMin = 0;
                 randomGoldMax = 0;
