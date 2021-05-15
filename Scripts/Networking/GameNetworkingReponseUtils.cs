@@ -1,5 +1,4 @@
 ﻿using LiteNetLibManager;
-using System;
 
 namespace MultiplayerARPG
 {
@@ -20,6 +19,28 @@ namespace MultiplayerARPG
                     return true;
             }
             return false;
+        }
+
+        public static ChatMessage FillChannelId(this ChatMessage message)
+        {
+            IPlayerCharacterData playerCharacter;
+            if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
+            {
+                if (!string.IsNullOrEmpty(message.sender) &&
+                    GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                {
+                    switch (message.channel)
+                    {
+                        case ChatChannel.Party:
+                            message.channelId = playerCharacter.PartyId;
+                            break;
+                        case ChatChannel.Guild:
+                            message.channelId = playerCharacter.GuildId;
+                            break;
+                    }
+                }
+            }
+            return message;
         }
     }
 }

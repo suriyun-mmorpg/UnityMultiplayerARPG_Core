@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -8,6 +6,6 @@ namespace MultiplayerARPG
     {
         public abstract bool IsGMCommand(string chatMessage, out string command);
         public abstract bool CanUseGMCommand(BasePlayerCharacterEntity characterEntity, string command);
-        public abstract void HandleGMCommand(BaseGameNetworkManager manager, string sender, string chatMessage);
+        public abstract void HandleGMCommand(string sender, string chatMessage);
     }
 }

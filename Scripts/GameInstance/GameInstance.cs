@@ -46,6 +46,7 @@ namespace MultiplayerARPG
         public static IClientFriendHandlers ClientFriendHandlers { get; set; }
         public static IClientBankHandlers ClientBankHandlers { get; set; }
         public static IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
+        public static IClientChatHandlers ClientChatHandlers { get; set; }
         public static IServerMailHandlers ServerMailHandlers { get; set; }
         public static IServerUserHandlers ServerUserHandlers { get; set; }
         public static IServerBuildingHandlers ServerBuildingHandlers { get; set; }
@@ -54,6 +55,7 @@ namespace MultiplayerARPG
         public static IServerStorageHandlers ServerStorageHandlers { get; set; }
         public static IServerPartyHandlers ServerPartyHandlers { get; set; }
         public static IServerGuildHandlers ServerGuildHandlers { get; set; }
+        public static IServerChatHandlers ServerChatHandlers { get; set; }
         public static IItemUIVisibilityManager ItemUIVisibilityManager { get; set; }
         public static string UserId { get; set; }
         public static string UserToken { get; set; }

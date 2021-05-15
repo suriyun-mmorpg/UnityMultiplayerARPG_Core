@@ -179,7 +179,13 @@ namespace MultiplayerARPG
                     EnterChatMessage = trimText.Substring(0, cmd.Length + 1); // +1 for space
                 }
             }
-            BaseGameNetworkManager.Singleton.EnterChat(channel, message, sender, receiver);
+            GameInstance.ClientChatHandlers.SendChatMessage(new ChatMessage()
+            {
+                channel = channel,
+                message = message,
+                sender = sender,
+                receiver = receiver,
+            });
             HideEnterChatField();
         }
 

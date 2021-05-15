@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public class DefaultGMCommands : BaseGMCommands
     {
@@ -86,7 +82,7 @@ namespace MultiplayerARPG
             return characterEntity != null && characterEntity.UserLevel > 0;
         }
 
-        public override void HandleGMCommand(BaseGameNetworkManager manager, string sender, string chatMessage)
+        public override void HandleGMCommand(string sender, string chatMessage)
         {
             if (string.IsNullOrEmpty(chatMessage))
                 return;

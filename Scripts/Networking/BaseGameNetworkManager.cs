@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         protected IServerStorageHandlers ServerStorageHandlers { get; set; }
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
         protected IServerGuildHandlers ServerGuildHandlers { get; set; }
+        protected IServerChatHandlers ServerChatHandlers { get; set; }
         // Server Message Handlers
         protected IServerCashShopMessageHandlers ServerCashShopMessageHandlers { get; set; }
         protected IServerMailMessageHandlers ServerMailMessageHandlers { get; set; }
@@ -50,6 +51,7 @@ namespace MultiplayerARPG
         protected IClientFriendHandlers ClientFriendHandlers { get; set; }
         protected IClientBankHandlers ClientBankHandlers { get; set; }
         protected IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
+        protected IClientChatHandlers ClientChatHandlers { get; set; }
         protected IClientGameMessageHandlers ClientGameMessageHandlers { get; set; }
         // Others
         public ILagCompensationManager LagCompensationManager { get; protected set; }
@@ -320,6 +322,7 @@ namespace MultiplayerARPG
             GameInstance.ServerStorageHandlers = ServerStorageHandlers;
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;
+            GameInstance.ServerChatHandlers = ServerChatHandlers;
             CurrentGameInstance.DayNightTimeUpdater.InitTimeOfDay(this);
         }
 
@@ -349,6 +352,7 @@ namespace MultiplayerARPG
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
             GameInstance.ClientBankHandlers = ClientBankHandlers;
             GameInstance.ClientOnlineCharacterHandlers = ClientOnlineCharacterHandlers;
+            GameInstance.ClientChatHandlers = ClientChatHandlers;
         }
 
         public override void OnStopClient()
@@ -475,7 +479,7 @@ namespace MultiplayerARPG
 
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
         {
-            ReadChatMessage(FillChatChannelId(messageHandler.ReadMessage<ChatMessage>()));
+            ServerChatHandlers.OnChatMessage(messageHandler.ReadMessage<ChatMessage>().FillChannelId());
         }
 
         protected void HandleMovementInputAtServer(MessageHandlerData messageHandler)
@@ -513,118 +517,6 @@ namespace MultiplayerARPG
                 gameEntity.AimPosition = messageHandler.Reader.GetValue<AimPosition>();
         }
 
-        protected ChatMessage FillChatChannelId(ChatMessage message)
-        {
-            IPlayerCharacterData playerCharacter;
-            if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
-            {
-                if (!string.IsNullOrEmpty(message.sender) &&
-                    ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
-                {
-                    switch (message.channel)
-                    {
-                        case ChatChannel.Party:
-                            message.channelId = playerCharacter.PartyId;
-                            break;
-                        case ChatChannel.Guild:
-                            message.channelId = playerCharacter.GuildId;
-                            break;
-                    }
-                }
-            }
-            return message;
-        }
-
-        protected virtual void ReadChatMessage(ChatMessage message)
-        {
-            BasePlayerCharacterEntity playerCharacter;
-            switch (message.channel)
-            {
-                case ChatChannel.Local:
-                    if (!string.IsNullOrEmpty(message.sender) &&
-                        ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
-                    {
-                        string gmCommand;
-                        if (CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
-                            CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacter, gmCommand))
-                        {
-                            // If it's gm command and sender's user level > 0, handle gm commands
-                            CurrentGameInstance.GMCommands.HandleGMCommand(this, message.sender, message.message);
-                        }
-                        else
-                        {
-                            // Send messages to nearby characters
-                            List<BasePlayerCharacterEntity> receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(CurrentGameInstance.localChatDistance, false, true, true, true);
-                            foreach (BasePlayerCharacterEntity receiver in receivers)
-                            {
-                                ServerSendPacket(receiver.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                            }
-                            // Send messages to sender
-                            ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                        }
-                    }
-                    break;
-                case ChatChannel.Global:
-                    if (!string.IsNullOrEmpty(message.sender))
-                    {
-                        // Send message to all clients
-                        ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                    }
-                    break;
-                case ChatChannel.Whisper:
-                    if (!string.IsNullOrEmpty(message.sender) &&
-                        ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
-                    {
-                        // If found sender send whisper message to sender
-                        ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                    }
-                    if (!string.IsNullOrEmpty(message.receiver) &&
-                        ServerUserHandlers.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
-                    {
-                        // If found receiver send whisper message to receiver
-                        ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                    }
-                    break;
-                case ChatChannel.Party:
-                    PartyData party;
-                    if (ServerPartyHandlers.TryGetParty(message.channelId, out party))
-                    {
-                        foreach (string memberId in party.GetMemberIds())
-                        {
-                            if (ServerUserHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
-                                ContainsConnectionId(playerCharacter.ConnectionId))
-                            {
-                                // If party member is online, send party message to the member
-                                ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                            }
-                        }
-                    }
-                    break;
-                case ChatChannel.Guild:
-                    GuildData guild;
-                    if (ServerGuildHandlers.TryGetGuild(message.channelId, out guild))
-                    {
-                        foreach (string memberId in guild.GetMemberIds())
-                        {
-                            if (ServerUserHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
-                                ContainsConnectionId(playerCharacter.ConnectionId))
-                            {
-                                // If guild member is online, send guild message to the member
-                                ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                            }
-                        }
-                    }
-                    break;
-                case ChatChannel.System:
-                    if (CanSendSystemAnnounce(message.sender))
-                    {
-                        // Send message to all clients
-                        ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                    }
-                    break;
-            }
-        }
-
         public virtual void InitPrefabs()
         {
             Assets.offlineScene.SceneName = CurrentGameInstance.HomeSceneName;
@@ -658,19 +550,6 @@ namespace MultiplayerARPG
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
             this.InvokeInstanceDevExtMethods("InitPrefabs");
-        }
-
-        public virtual void EnterChat(ChatChannel channel, string message, string senderName, string receiverName)
-        {
-            if (!IsClientConnected)
-                return;
-            // Send chat message to server
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.channel = channel;
-            chatMessage.message = message;
-            chatMessage.sender = senderName;
-            chatMessage.receiver = receiverName;
-            ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, chatMessage);
         }
 
         public void Quit()
@@ -1001,16 +880,6 @@ namespace MultiplayerARPG
                 isReadyToInstantiateObjects = true;
             }
             return true;
-        }
-
-        public bool CanSendSystemAnnounce(string sender)
-        {
-            // TODO: Don't use fixed user level
-            BasePlayerCharacterEntity playerCharacter;
-            return (!string.IsNullOrEmpty(sender) &&
-                    ServerUserHandlers.TryGetPlayerCharacterByName(sender, out playerCharacter) &&
-                    playerCharacter.UserLevel > 0) ||
-                    CHAT_SYSTEM_ANNOUNCER_SENDER.Equals(sender);
         }
 
         public void SendSystemAnnounce(string message)
