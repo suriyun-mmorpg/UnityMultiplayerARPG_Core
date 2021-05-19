@@ -22,7 +22,6 @@ namespace MultiplayerARPG
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
-        public short useAmmoAmount;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
 
@@ -40,14 +39,12 @@ namespace MultiplayerARPG
         public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
         {
             // Reduce Ammo, Bow area skill may required arrow :)
-            if (skillUser.IsServer && GetUseAmmoAmount() > 0)
+            if (skillUser.IsServer)
             {
                 // Increase damage with ammo damage
-                IAmmoItem ammoItem;
-                short ammoLevel;
-                skillUser.ReduceAmmo(weapon, isLeftHand, out ammoItem, out ammoLevel, GetUseAmmoAmount());
-                if (ammoItem != null)
-                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, ammoItem.GetIncreaseDamages(ammoLevel));
+                Dictionary<DamageElement, MinMaxFloat> increaseDamages;
+                if (DecreaseAmmos(skillUser, out increaseDamages))
+                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
             }
             // Spawn area entity
             // Aim position type always is `Position`
@@ -117,11 +114,6 @@ namespace MultiplayerARPG
             if (!IsDebuff())
                 return default(Buff);
             return debuff;
-        }
-
-        public override short GetUseAmmoAmount()
-        {
-            return useAmmoAmount;
         }
 
         public override void PrepareRelatesData()

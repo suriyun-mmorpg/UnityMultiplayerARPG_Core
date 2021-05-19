@@ -110,7 +110,7 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SOCKET_ENCHANER;
                 return false;
             }
-            character.DecreaseItems(enhancerId, 1, GameInstance.Singleton.IsLimitInventorySlot);
+            character.DecreaseItems(enhancerId, 1);
             character.FillEmptySlots();
             enhancingItem.Sockets[socketIndex] = enhancerId;
             onEnhanceSocket.Invoke(enhancingItem);

@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                 switch (task.taskType)
                 {
                     case QuestTaskType.CollectItem:
-                        this.DecreaseItems(task.itemAmount.item.DataId, task.itemAmount.amount, CurrentGameInstance.IsLimitInventorySlot);
+                        this.DecreaseItems(task.itemAmount.item.DataId, task.itemAmount.amount);
                         break;
                 }
             }

@@ -1054,21 +1054,26 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, bool isLimitInventorySlot, out Dictionary<int, short> decreaseItems)
+        public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, out Dictionary<int, short> decreaseItems)
         {
-            return data.NonEquipItems.DecreaseItems(dataId, amount, isLimitInventorySlot, out decreaseItems);
+            if (data.NonEquipItems.DecreaseItems(dataId, amount, GameInstance.Singleton.IsLimitInventorySlot, out decreaseItems))
+                return true;
+            return false;
         }
 
-        public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, bool isLimitInventorySlot)
+        public static bool DecreaseItems(this ICharacterData data, int dataId, short amount)
         {
-            return DecreaseItems(data, dataId, amount, isLimitInventorySlot, out _);
+            return DecreaseItems(data, dataId, amount, out _);
         }
         #endregion
 
         #region Ammo Functions
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount, out Dictionary<CharacterItem, short> decreaseItems)
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, out Dictionary<CharacterItem, short> decreaseItems)
         {
+            increaseDamages = null;
             decreaseItems = new Dictionary<CharacterItem, short>();
+            if (ammoType == null || amount <= 0)
+                return false;
             Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
             CharacterItem nonEquipItem;
             short tempDecresingAmount;
@@ -1077,6 +1082,8 @@ namespace MultiplayerARPG
                 nonEquipItem = data.NonEquipItems[i];
                 if (nonEquipItem.GetAmmoItem() != null && nonEquipItem.GetAmmoItem().AmmoType == ammoType)
                 {
+                    if (increaseDamages == null)
+                        increaseDamages = nonEquipItem.GetAmmoItem().GetIncreaseDamages(nonEquipItem.level);
                     if (amount - nonEquipItem.amount > 0)
                         tempDecresingAmount = nonEquipItem.amount;
                     else
@@ -1097,9 +1104,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount)
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
         {
-            return DecreaseAmmos(data, ammoType, amount, out _);
+            return DecreaseAmmos(data, ammoType, amount, out increaseDamages, out _);
         }
         #endregion
 
@@ -1181,8 +1188,7 @@ namespace MultiplayerARPG
             if (data != null && data.NonEquipItems.Count > 0)
             {
                 IAmmoItem ammoItem;
-                IList<CharacterItem> nonEquipItems = data.NonEquipItems;
-                foreach (CharacterItem nonEquipItem in nonEquipItems)
+                foreach (CharacterItem nonEquipItem in data.NonEquipItems)
                 {
                     ammoItem = nonEquipItem.GetAmmoItem();
                     if (ammoItem != null && ammoType == ammoItem.AmmoType)

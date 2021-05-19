@@ -139,7 +139,7 @@ namespace MultiplayerARPG
                 foreach (ItemAmount requireItem in refineLevel.RequireItems)
                 {
                     if (requireItem.item != null && requireItem.amount > 0)
-                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount, GameInstance.Singleton.IsLimitInventorySlot);
+                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
                 }
                 character.FillEmptySlots();
             }

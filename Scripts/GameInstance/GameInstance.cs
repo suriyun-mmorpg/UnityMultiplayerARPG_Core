@@ -70,6 +70,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
+        public static readonly Dictionary<int, Dictionary<int, BaseItem>> ItemsByAmmoType = new Dictionary<int, Dictionary<int, BaseItem>>();
         public static readonly Dictionary<int, ItemCraftFormula> ItemCraftFormulas = new Dictionary<int, ItemCraftFormula>();
         public static readonly Dictionary<int, Harvestable> Harvestables = new Dictionary<int, Harvestable>();
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
@@ -495,6 +496,7 @@ namespace MultiplayerARPG
             Attributes.Clear();
             Currencies.Clear();
             Items.Clear();
+            ItemsByAmmoType.Clear();
             ItemCraftFormulas.Clear();
             Characters.Clear();
             PlayerCharacters.Clear();
@@ -518,6 +520,17 @@ namespace MultiplayerARPG
         public void LoadedGameData()
         {
             this.InvokeInstanceDevExtMethods("LoadedGameData");
+            // Add ammo items to dictionary
+            foreach (BaseItem item in Items.Values)
+            {
+                if (item.IsAmmo())
+                {
+                    IAmmoItem ammoItem = item as IAmmoItem;
+                    if (!ItemsByAmmoType.ContainsKey(ammoItem.AmmoType.DataId))
+                        ItemsByAmmoType.Add(ammoItem.AmmoType.DataId, new Dictionary<int, BaseItem>());
+                    ItemsByAmmoType[ammoItem.AmmoType.DataId][item.DataId] = item;
+                }
+            }
 
             // Add required default game data
             AddItems(new BaseItem[] {
@@ -781,7 +794,7 @@ namespace MultiplayerARPG
                 return;
             foreach (ItemAmount itemAmount in itemAmounts)
             {
-                AddGameData(Items, itemAmount.item);
+                AddItems(itemAmount.item);
             }
         }
 
@@ -796,7 +809,7 @@ namespace MultiplayerARPG
                 return;
             foreach (ItemDrop itemDrop in itemDrops)
             {
-                AddGameData(Items, itemDrop.item);
+                AddItems(itemDrop.item);
             }
         }
 
@@ -811,7 +824,7 @@ namespace MultiplayerARPG
                 return;
             foreach (ItemDropByWeight itemDrop in itemDrops)
             {
-                AddGameData(Items, itemDrop.item);
+                AddItems(itemDrop.item);
             }
         }
 
@@ -1242,7 +1255,7 @@ namespace MultiplayerARPG
                 return;
             foreach (IPoolDescriptor poolingObject in poolingObjects)
             {
-                if (poolingObject == null || PoolingObjectPrefabs.Contains(poolingObject))
+                if ((poolingObject as Object) == null || PoolingObjectPrefabs.Contains(poolingObject))
                     continue;
                 PoolingObjectPrefabs.Add(poolingObject);
             }

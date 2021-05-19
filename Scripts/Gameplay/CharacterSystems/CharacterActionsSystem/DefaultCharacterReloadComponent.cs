@@ -147,8 +147,7 @@ namespace MultiplayerARPG
                     // Prepare data
                     short triggerReloadAmmoAmount = (short)(ReloadingAmmoAmount / triggerDurations.Length);
                     EquipWeapons equipWeapons = Entity.EquipWeapons;
-                    Dictionary<CharacterItem, short> decreaseItems;
-                    if (IsServer && Entity.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out decreaseItems))
+                    if (IsServer && Entity.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out _))
                     {
                         Entity.FillEmptySlots();
                         weapon.ammo += triggerReloadAmmoAmount;

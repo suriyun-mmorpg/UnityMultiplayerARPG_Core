@@ -184,6 +184,26 @@ namespace MultiplayerARPG
             }
             return targetDictionary;
         }
+
+        /// <summary>
+        /// Combine ammo type amounts dictionary
+        /// </summary>
+        /// <param name="targetDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<AmmoType, short> CombineAmmoTypes(Dictionary<AmmoType, short> targetDictionary, KeyValuePair<AmmoType, short> newEntry)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<AmmoType, short>();
+            if (newEntry.Key != null)
+            {
+                if (!targetDictionary.ContainsKey(newEntry.Key))
+                    targetDictionary[newEntry.Key] = newEntry.Value;
+                else
+                    targetDictionary[newEntry.Key] += newEntry.Value;
+            }
+            return targetDictionary;
+        }
         #endregion
 
         #region Combine Dictionary with Dictionary functions
@@ -548,6 +568,18 @@ namespace MultiplayerARPG
                 return new KeyValuePair<BaseItem, short>();
             return new KeyValuePair<BaseItem, short>(source.item, source.amount);
         }
+
+        /// <summary>
+        /// Make ammo type - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static KeyValuePair<AmmoType, short> MakeAmmoType(AmmoTypeAmount source)
+        {
+            if (source.ammoType == null)
+                return new KeyValuePair<AmmoType, short>();
+            return new KeyValuePair<AmmoType, short>(source.ammoType, source.amount);
+        }
         #endregion
 
         #region Combine Dictionary functions
@@ -872,6 +904,28 @@ namespace MultiplayerARPG
                 {
                     pair = MakeItem(sourceAmount);
                     targetDictionary = CombineItems(targetDictionary, pair);
+                }
+            }
+            return targetDictionary;
+        }
+
+        /// <summary>
+        /// Combine ammo type amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="targetDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<AmmoType, short> CombineAmmoTypes(AmmoTypeAmount[] sourceAmounts, Dictionary<AmmoType, short> targetDictionary)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<AmmoType, short>();
+            if (sourceAmounts != null && sourceAmounts.Length > 0)
+            {
+                KeyValuePair<AmmoType, short> pair;
+                foreach (AmmoTypeAmount sourceAmount in sourceAmounts)
+                {
+                    pair = MakeAmmoType(sourceAmount);
+                    targetDictionary = CombineAmmoTypes(targetDictionary, pair);
                 }
             }
             return targetDictionary;
