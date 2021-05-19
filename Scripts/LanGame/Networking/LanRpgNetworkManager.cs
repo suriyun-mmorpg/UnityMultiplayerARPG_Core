@@ -115,6 +115,17 @@ namespace MultiplayerARPG
             SaveSystem.OnServerStart();
         }
 
+        protected override void HandleServerSceneChange(MessageHandlerData messageHandler)
+        {
+            BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
+            if (!IsServer && IsClientConnected && owningCharacter != null)
+            {
+                SaveSystem.SaveCharacter(owningCharacter);
+                SaveSystem.OnSceneChanging();
+            }
+            base.HandleServerSceneChange(messageHandler);
+        }
+
         protected override async UniTask PreSpawnEntities()
         {
             await SaveSystem.PreSpawnEntities(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
@@ -331,6 +342,7 @@ namespace MultiplayerARPG
                         selectedCharacter.CurrentRotation = rotation;
                     SaveSystem.SaveCharacter(selectedCharacter);
                 }
+                SaveSystem.OnSceneChanging();
                 // Unregister all players characters to register later after map changed
                 foreach (LiteNetLibPlayer player in GetPlayers())
                 {

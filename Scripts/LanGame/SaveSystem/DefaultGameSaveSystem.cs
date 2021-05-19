@@ -25,14 +25,12 @@ namespace MultiplayerARPG
             {
                 // Load and Spawn buildings
                 worldSaveData.LoadPersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
-                await UniTask.Yield();
                 foreach (BuildingSaveData building in worldSaveData.buildings)
                 {
                     BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
                 }
                 // Load storage data
                 storageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
-                await UniTask.Yield();
                 StorageId storageId;
                 foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
                 {
@@ -43,6 +41,7 @@ namespace MultiplayerARPG
                 }
             }
             isReadyToSave = true;
+            await UniTask.Yield();
         }
 
         public override void SaveCharacter(IPlayerCharacterData playerCharacterData)
@@ -101,6 +100,11 @@ namespace MultiplayerARPG
                 });
             }
             worldSaveData.SavePersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
+        }
+
+        public override void OnSceneChanging()
+        {
+            isReadyToSave = false;
         }
     }
 }

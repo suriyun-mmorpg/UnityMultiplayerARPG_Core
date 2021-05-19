@@ -13,5 +13,6 @@ namespace MultiplayerARPG
         public abstract void SaveStorage(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems);
         public abstract void SaveCharacter(IPlayerCharacterData playerCharacterData);
         public abstract List<PlayerCharacterData> LoadCharacters();
+        public abstract void OnSceneChanging();
     }
 }
