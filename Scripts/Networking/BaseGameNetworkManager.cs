@@ -612,6 +612,16 @@ namespace MultiplayerARPG
             SpawnEntities().Forget();
         }
 
+        public override void ServerSceneChange(string sceneName)
+        {
+            if (!IsServer)
+                return;
+            readyToInstantiateObjectsStates.Clear();
+            isReadyToInstantiateObjects = false;
+            isReadyToInstantiatePlayers = false;
+            base.ServerSceneChange(sceneName);
+        }
+
         protected virtual async UniTaskVoid SpawnEntities()
         {
             while (!IsReadyToInstantiateObjects())
