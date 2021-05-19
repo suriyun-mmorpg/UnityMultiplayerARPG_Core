@@ -57,10 +57,9 @@ namespace MultiplayerARPG
         public ItemAmount[] requireItems;
         [Tooltip("If `Require Ammo Type` is `Based On Weapon` it will decrease ammo based on ammo type which set to the weapon, amount to decrease ammo can be set to `Require Ammo Amount`. If weapon has no require ammo, it will not able to use skill. If `Require Ammo Type` is `Based On Skill`, it will decrease ammo based on `Require Ammos` setting")]
         public RequireAmmoType requireAmmoType;
-        [StringShowConditional(nameof(requireAmmoType), nameof(RequireAmmoType.BasedOnWeapon))]
         [FormerlySerializedAs("useAmmoAmount")]
+        [Tooltip("It will be used while `Require Ammo Type` is `Based On Weapon` to decrease ammo")]
         public short requireAmmoAmount;
-        [StringShowConditional(nameof(requireAmmoType), nameof(RequireAmmoType.BasedOnSkill))]
         [Tooltip("If this list is empty it won't decrease ammo items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]
         public AmmoTypeAmount[] requireAmmos;
 
