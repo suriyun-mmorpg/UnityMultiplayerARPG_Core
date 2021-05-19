@@ -43,7 +43,7 @@ namespace MultiplayerARPG
             {
                 // Increase damage with ammo damage
                 Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                if (DecreaseAmmos(skillUser, out increaseDamages))
+                if (DecreaseAmmos(skillUser, isLeftHand, out increaseDamages))
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
             }
             // Spawn area entity

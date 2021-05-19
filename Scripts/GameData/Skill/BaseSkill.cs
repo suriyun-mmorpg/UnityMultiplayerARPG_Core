@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -54,6 +55,12 @@ namespace MultiplayerARPG
         [Header("Requirements to Use")]
         [Tooltip("If this list is empty it won't decrease items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]
         public ItemAmount[] requireItems;
+        [Tooltip("If `Require Ammo Type` is `Based On Weapon` it will decrease ammo based on ammo type which set to the weapon, amount to decrease ammo can be set to `Require Ammo Amount`. If weapon has no require ammo, it will not able to use skill. If `Require Ammo Type` is `Based On Skill`, it will decrease ammo based on `Require Ammos` setting")]
+        public RequireAmmoType requireAmmoType;
+        [StringShowConditional(nameof(requireAmmoType), nameof(RequireAmmoType.BasedOnWeapon))]
+        [FormerlySerializedAs("useAmmoAmount")]
+        public short requireAmmoAmount;
+        [StringShowConditional(nameof(requireAmmoType), nameof(RequireAmmoType.BasedOnSkill))]
         [Tooltip("If this list is empty it won't decrease ammo items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]
         public AmmoTypeAmount[] requireAmmos;
 
@@ -617,7 +624,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!HasEnoughAmmos(character, out _, out _))
+            if (!HasEnoughAmmos(character, isLeftHand, out _, out _))
             {
                 gameMessage = UITextKeys.UI_ERROR_NO_AMMO;
                 return false;
@@ -632,7 +639,7 @@ namespace MultiplayerARPG
         /// <param name="character"></param>
         /// <param name="itemDataId"></param>
         /// <returns></returns>
-        protected bool HasEnoughItems(ICharacterData character, out int itemDataId, out short amount)
+        protected bool HasEnoughItems(BaseCharacterEntity character, out int itemDataId, out short amount)
         {
             itemDataId = 0;
             amount = 0;
@@ -654,47 +661,69 @@ namespace MultiplayerARPG
         /// Find one which has enough amount from require ammos
         /// </summary>
         /// <param name="character"></param>
+        /// <param name="isLeftHand"></param>
         /// <param name="ammoType"></param>
+        /// <param name="amount"></param>
         /// <returns></returns>
-        protected bool HasEnoughAmmos(ICharacterData character, out AmmoType ammoType, out short amount)
+        protected bool HasEnoughAmmos(BaseCharacterEntity character, bool isLeftHand, out AmmoType ammoType, out short amount)
         {
             ammoType = null;
             amount = 0;
-            if (requireAmmos == null || requireAmmos.Length == 0)
-                return true;
-            foreach (AmmoTypeAmount requireAmmo in requireAmmos)
+            switch (requireAmmoType)
             {
-                if (character.CountAmmos(requireAmmo.ammoType) >= requireAmmo.amount)
-                {
-                    ammoType = requireAmmo.ammoType;
-                    amount = requireAmmo.amount;
-                    return true;
-                }
+                case RequireAmmoType.BasedOnWeapon:
+                    return character.ValidateAmmo(character.GetAvailableWeapon(ref isLeftHand), requireAmmoAmount, false);
+                case RequireAmmoType.BasedOnSkill:
+                    if (requireAmmos == null || requireAmmos.Length == 0)
+                        return true;
+                    foreach (AmmoTypeAmount requireAmmo in requireAmmos)
+                    {
+                        if (character.CountAmmos(requireAmmo.ammoType) >= requireAmmo.amount)
+                        {
+                            ammoType = requireAmmo.ammoType;
+                            amount = requireAmmo.amount;
+                            return true;
+                        }
+                    }
+                    return false;
             }
-            return false;
+            return true;
         }
 
-        protected bool DecreaseItems(ICharacterData character)
+        protected bool DecreaseItems(BasePlayerCharacterEntity character)
         {
             int itemDataId;
             short amount;
             if (HasEnoughItems(character, out itemDataId, out amount) && itemDataId != 0)
             {
                 if (character.DecreaseItems(itemDataId, amount))
+                {
                     character.FillEmptySlots();
+                    return true;
+                }
             }
             return false;
         }
 
-        protected bool DecreaseAmmos(ICharacterData character, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
+        protected bool DecreaseAmmos(BaseCharacterEntity character, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
         {
             increaseDamages = null;
             AmmoType ammoType;
             short amount;
-            if (HasEnoughAmmos(character, out ammoType, out amount))
+            switch (requireAmmoType)
             {
-                if (character.DecreaseAmmos(ammoType, amount, out increaseDamages))
-                    character.FillEmptySlots();
+                case RequireAmmoType.BasedOnWeapon:
+                    return character.DecreaseAmmos(character.GetAvailableWeapon(ref isLeftHand), isLeftHand, requireAmmoAmount, out increaseDamages, false);
+                case RequireAmmoType.BasedOnSkill:
+                    if (HasEnoughAmmos(character, isLeftHand, out ammoType, out amount))
+                    {
+                        if (character.DecreaseAmmos(ammoType, amount, out increaseDamages))
+                        {
+                            character.FillEmptySlots();
+                            return true;
+                        }
+                    }
+                    return false;
             }
             return false;
         }

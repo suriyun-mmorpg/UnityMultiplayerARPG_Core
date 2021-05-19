@@ -196,7 +196,7 @@ namespace MultiplayerARPG
             {
                 // Increase damage with ammo damage
                 Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                Entity.DecreaseAmmo(weapon, isLeftHand, 1, out increaseDamages);
+                Entity.DecreaseAmmos(weapon, isLeftHand, 1, out increaseDamages);
                 if (increaseDamages != null)
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
             }

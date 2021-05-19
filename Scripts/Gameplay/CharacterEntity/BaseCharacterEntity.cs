@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 using LiteNetLibManager;
-using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -559,7 +558,7 @@ namespace MultiplayerARPG
 
             CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (!ValidateAmmo(weapon))
+            if (!ValidateAmmo(weapon, 1))
             {
                 QueueGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
                 if (weaponItem != null)
@@ -807,11 +806,11 @@ namespace MultiplayerARPG
             return damageAmounts;
         }
 
-        public bool ValidateAmmo(CharacterItem weapon, short amount = 1)
+        public bool ValidateAmmo(CharacterItem weapon, short amount, bool validIfNoRequireAmmoType = true)
         {
             // Avoid null data
             if (weapon == null)
-                return true;
+                return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             if (weaponItem.WeaponType.RequireAmmoType != null)
@@ -828,39 +827,53 @@ namespace MultiplayerARPG
                     if (weapon.ammo < amount)
                         return false;
                 }
+                return true;
             }
-            return true;
+
+            return validIfNoRequireAmmoType;
         }
 
-        public void DecreaseAmmo(CharacterItem weapon, bool isLeftHand, short amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
+        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, short amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
         {
             increaseDamages = null;
 
             // Avoid null data
             if (weapon == null)
-                return;
+                return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.AmmoCapacity <= 0)
+            if (weaponItem.WeaponType.RequireAmmoType != null)
             {
-                // Ammo capacity is 0 so reduce ammo from inventory
-                if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out increaseDamages))
-                    this.FillEmptySlots();
-            }
-            else
-            {
-                // Ammo capacity >= `amount` reduce loaded ammo
-                if (weapon.ammo >= amount)
+                if (weaponItem.AmmoCapacity <= 0)
                 {
-                    weapon.ammo -= amount;
-                    EquipWeapons equipWeapons = EquipWeapons;
-                    if (isLeftHand)
-                        equipWeapons.leftHand = weapon;
-                    else
-                        equipWeapons.rightHand = weapon;
-                    EquipWeapons = equipWeapons;
+                    // Ammo capacity is 0 so reduce ammo from inventory
+                    if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out increaseDamages))
+                    {
+                        this.FillEmptySlots();
+                        return true;
+                    }
+                    // Not enough ammo
+                    return false;
+                }
+                else
+                {
+                    // Ammo capacity >= `amount` reduce loaded ammo
+                    if (weapon.ammo >= amount)
+                    {
+                        weapon.ammo -= amount;
+                        EquipWeapons equipWeapons = EquipWeapons;
+                        if (isLeftHand)
+                            equipWeapons.leftHand = weapon;
+                        else
+                            equipWeapons.rightHand = weapon;
+                        EquipWeapons = equipWeapons;
+                        return true;
+                    }
+                    // Not enough ammo
+                    return false;
                 }
             }
+            return validIfNoRequireAmmoType;
         }
 
         public virtual void GetUsingSkillData(

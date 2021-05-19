@@ -81,10 +81,6 @@ namespace MultiplayerARPG
                 out animatonDataId,
                 out weapon);
 
-            // Validate ammo
-            if (skill.IsAttack() && !Entity.ValidateAmmo(weapon))
-                return;
-
             // Prepare required data and get animation data
             int animationIndex;
             Entity.GetRandomAnimationData(
@@ -143,10 +139,6 @@ namespace MultiplayerARPG
                 out animActionType,
                 out animActionDataId,
                 out weapon);
-
-            // Validate ammo
-            if (item.UsingSkill.IsAttack() && !Entity.ValidateAmmo(weapon))
-                return;
 
             // Prepare required data and get animation data
             int animationIndex;
