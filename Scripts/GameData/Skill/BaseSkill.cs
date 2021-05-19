@@ -13,12 +13,12 @@ namespace MultiplayerARPG
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while using this skill")]
         public float moveSpeedRateWhileUsingSkill = 0f;
-        
+
         [Header("Casting Effects")]
         public GameEffect[] skillCastEffects;
         public IncrementalFloat castDuration;
         public bool canBeInterruptedWhileCasting;
-        
+
         [Header("Casted Effects")]
         public GameEffect[] damageHitEffects;
 
@@ -50,6 +50,12 @@ namespace MultiplayerARPG
 
         [Header("Requirements to Levelup")]
         public SkillRequirement requirement;
+
+        [Header("Requirements to Use")]
+        [Tooltip("If this list is empty it won't decrease items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]
+        public ItemAmount[] requireItems;
+        [Tooltip("If this list is empty it won't decrease ammo items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]
+        public AmmoTypeAmount[] requireAmmos;
 
         public virtual string TypeTitle
         {
@@ -304,7 +310,6 @@ namespace MultiplayerARPG
         public virtual bool HasCustomAimControls() { return false; }
         public virtual AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data) { return default; }
         public virtual void FinishAimControls(bool isCancel) { }
-        public virtual short GetUseAmmoAmount() { return 0; }
         public virtual Buff GetBuff() { return new Buff(); }
         public virtual Buff GetDebuff() { return new Buff(); }
         public virtual SkillSummon GetSummon() { return new SkillSummon(); }
@@ -516,7 +521,7 @@ namespace MultiplayerARPG
                             {
                                 available = true;
                             }
-                            else if (rightWeaponItem == null && leftWeaponItem == null && 
+                            else if (rightWeaponItem == null && leftWeaponItem == null &&
                                 CacheAvailableWeapons.Contains(GameInstance.Singleton.DefaultWeaponItem.WeaponType))
                             {
                                 available = true;
@@ -606,14 +611,92 @@ namespace MultiplayerARPG
                 }
             }
 
-            CharacterItem weapon = character.GetAvailableWeapon(ref isLeftHand);
-            if (IsAttack() && GetUseAmmoAmount() > 0 && !character.ValidateAmmo(weapon, GetUseAmmoAmount()))
+            if (!HasEnoughItems(character, out _, out _))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                return false;
+            }
+
+            if (!HasEnoughAmmos(character, out _, out _))
             {
                 gameMessage = UITextKeys.UI_ERROR_NO_AMMO;
                 return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Find one which has enough amount from require items
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="itemDataId"></param>
+        /// <returns></returns>
+        protected bool HasEnoughItems(ICharacterData character, out int itemDataId, out short amount)
+        {
+            itemDataId = 0;
+            amount = 0;
+            if (requireItems == null || requireItems.Length == 0)
+                return true;
+            foreach (ItemAmount requireItem in requireItems)
+            {
+                if (character.CountNonEquipItems(requireItem.item.DataId) >= requireItem.amount)
+                {
+                    itemDataId = requireItem.item.DataId;
+                    amount = requireItem.amount;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Find one which has enough amount from require ammos
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="ammoType"></param>
+        /// <returns></returns>
+        protected bool HasEnoughAmmos(ICharacterData character, out AmmoType ammoType, out short amount)
+        {
+            ammoType = null;
+            amount = 0;
+            if (requireAmmos == null || requireAmmos.Length == 0)
+                return true;
+            foreach (AmmoTypeAmount requireAmmo in requireAmmos)
+            {
+                if (character.CountAmmos(requireAmmo.ammoType) >= requireAmmo.amount)
+                {
+                    ammoType = requireAmmo.ammoType;
+                    amount = requireAmmo.amount;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected bool DecreaseItems(ICharacterData character)
+        {
+            int itemDataId;
+            short amount;
+            if (HasEnoughItems(character, out itemDataId, out amount) && itemDataId != 0)
+            {
+                if (character.DecreaseItems(itemDataId, amount))
+                    character.FillEmptySlots();
+            }
+            return false;
+        }
+
+        protected bool DecreaseAmmos(ICharacterData character, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
+        {
+            increaseDamages = null;
+            AmmoType ammoType;
+            short amount;
+            if (HasEnoughAmmos(character, out ammoType, out amount))
+            {
+                if (character.DecreaseAmmos(ammoType, amount, out increaseDamages))
+                    character.FillEmptySlots();
+            }
+            return false;
         }
 
         public virtual Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)

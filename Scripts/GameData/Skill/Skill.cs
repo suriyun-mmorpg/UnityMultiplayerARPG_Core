@@ -39,7 +39,6 @@ namespace MultiplayerARPG
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
-        public short useAmmoAmount = 1;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
 
@@ -104,14 +103,12 @@ namespace MultiplayerARPG
             // Apply attack skill
             if (IsAttack())
             {
-                if (skillUser.IsServer && GetUseAmmoAmount() > 0)
+                if (skillUser.IsServer)
                 {
                     // Increase damage with ammo damage
-                    IAmmoItem ammoItem;
-                    short ammoLevel;
-                    skillUser.ReduceAmmo(weapon, isLeftHand, out ammoItem, out ammoLevel, GetUseAmmoAmount());
-                    if (ammoItem != null)
-                        damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, ammoItem.GetIncreaseDamages(ammoLevel));
+                    Dictionary<DamageElement, MinMaxFloat> increaseDamages;
+                    if (DecreaseAmmos(skillUser, out increaseDamages))
+                        damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
                 }
 
                 // Launch damage entity to apply damage to other characters
@@ -354,11 +351,6 @@ namespace MultiplayerARPG
             GameInstance.AddItems(itemCraft.CraftingItem);
             GameInstance.AddItems(itemCraft.CacheCraftRequirements.Keys);
             damageInfo.PrepareRelatesData();
-        }
-
-        public override short GetUseAmmoAmount()
-        {
-            return useAmmoAmount;
         }
 
         public override Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
