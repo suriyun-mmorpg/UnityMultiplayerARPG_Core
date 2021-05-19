@@ -45,7 +45,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (!cacheEntity)
+                if (!cacheEntity && BaseGameNetworkManager.Singleton)
                     BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out cacheEntity);
                 return cacheEntity;
             }
