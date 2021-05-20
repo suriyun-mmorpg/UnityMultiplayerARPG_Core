@@ -33,7 +33,8 @@ namespace MultiplayerARPG
             BuildingArea buildingArea;
             Transform tempTransform;
             Bounds tempColliderBounds;
-            Vector3 tempVector3;
+            Vector3 tempRaycastPoint;
+            Vector3 snappedPosition = GetBuildingPlacePosition(ConstructingBuildingEntity.Position);
             for (int tempCounter = 0; tempCounter < count; ++tempCounter)
             {
                 tempTransform = physicFunctions.GetRaycastTransform(tempCounter);
@@ -43,22 +44,23 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                tempVector3 = physicFunctions.GetRaycastPoint(tempCounter);
-                tempVector3 = GetBuildingPlacePosition(tempVector3);
+                tempRaycastPoint = physicFunctions.GetRaycastPoint(tempCounter);
+                snappedPosition = GetBuildingPlacePosition(tempRaycastPoint);
                 tempColliderBounds = physicFunctions.GetRaycastColliderBounds(tempCounter);
 
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 {
                     // Find ground position from upper position
                     bool hitAimmingObject = false;
-                    Vector3 raycastOrigin = new Vector3(tempVector3.x, tempColliderBounds.center.y + tempColliderBounds.extents.y + 0.01f, tempVector3.z);
+                    Vector3 raycastOrigin = new Vector3(tempRaycastPoint.x, tempColliderBounds.center.y + tempColliderBounds.extents.y + 0.01f, tempRaycastPoint.z);
                     RaycastHit[] groundHits = Physics.RaycastAll(raycastOrigin, Vector3.down, tempColliderBounds.size.y + 0.01f, CurrentGameInstance.GetBuildLayerMask());
                     for (int j = 0; j < groundHits.Length; ++j)
                     {
                         if (groundHits[j].transform == tempTransform)
                         {
-                            tempVector3 = groundHits[j].point;
-                            ConstructingBuildingEntity.Position = tempVector3;
+                            tempRaycastPoint = groundHits[j].point;
+                            snappedPosition = GetBuildingPlacePosition(tempRaycastPoint);
+                            ConstructingBuildingEntity.Position = GetBuildingPlacePosition(snappedPosition);
                             hitAimmingObject = true;
                             break;
                         }
@@ -68,7 +70,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    ConstructingBuildingEntity.Position = tempVector3;
+                    ConstructingBuildingEntity.Position = GetBuildingPlacePosition(snappedPosition);
                 }
 
                 buildingEntity = tempTransform.root.GetComponent<BuildingEntity>();
@@ -92,6 +94,7 @@ namespace MultiplayerARPG
                 ConstructingBuildingEntity.HitSurface = true;
                 return true;
             }
+            ConstructingBuildingEntity.Position = GetBuildingPlacePosition(snappedPosition);
             return false;
         }
     }
