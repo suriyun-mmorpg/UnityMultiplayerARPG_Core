@@ -181,6 +181,7 @@ namespace MultiplayerARPG
             CharacterSkill tempCharacterSkill;
             BaseSkill tempSkill;
             int tempIndexOfSkill;
+            short tempSkillLevel;
             // Combine skills from database (skill that can level up) with increased skill and equipment skill
             CacheSkillList.Generate(character.GetCaches().Skills, (index, skillLevel, ui) =>
             {
@@ -194,10 +195,11 @@ namespace MultiplayerARPG
                     {
                         tempSkill = skillLevel.Key;
                         tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
-                            // Set character skill data
-                            tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
-                            // Set UI data
-                            tempUI.Setup(new UICharacterSkillData(tempCharacterSkill), character, tempIndexOfSkill);
+                        tempSkillLevel = (short)(tempIndexOfSkill >= 0 ? character.Skills[tempIndexOfSkill].level : 0);
+                        // Set character skill data
+                        tempCharacterSkill =  CharacterSkill.Create(tempSkill, tempSkillLevel);
+                        // Set UI data
+                        tempUI.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), character, tempIndexOfSkill);
                         tempUI.Show();
                         UICharacterSkillDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterSkillDragHandler>();
                         if (dragHandler != null)
@@ -209,14 +211,14 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                            // Hide because skill's type not matches in the filter list
-                            tempUI.Hide();
+                        // Hide because skill's type not matches in the filter list
+                        tempUI.Hide();
                     }
                 }
                 else
                 {
-                        // Hide because skill's category not matches in the filter list
-                        tempUI.Hide();
+                    // Hide because skill's category not matches in the filter list
+                    tempUI.Hide();
                 }
             });
             if (listEmptyObject != null)
