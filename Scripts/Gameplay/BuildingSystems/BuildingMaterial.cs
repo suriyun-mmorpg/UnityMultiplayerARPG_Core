@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Tilemaps;
 
 namespace MultiplayerARPG
@@ -92,6 +91,7 @@ namespace MultiplayerARPG
         public BuildingEntity BuildingEntity { get; private set; }
         public Collider CacheCollider { get; private set; }
         public Collider2D CacheCollider2D { get; private set; }
+        public NavMeshObstacle CacheNavMeshObstacle { get; private set; }
 
         public override void Setup(DamageableEntity entity, int index)
         {
@@ -100,6 +100,7 @@ namespace MultiplayerARPG
             BuildingEntity.RegisterMaterial(this);
             CacheCollider = GetComponent<Collider>();
             CacheCollider2D = GetComponent<Collider2D>();
+            CacheNavMeshObstacle = GetComponent<NavMeshObstacle>();
 
             if (meshRenderer == null)
                 meshRenderer = GetComponent<MeshRenderer>();
@@ -118,6 +119,15 @@ namespace MultiplayerARPG
 
             CurrentState = State.Unknow;
             CurrentState = State.Default;
+        }
+
+        private void Update()
+        {
+            if (BuildingEntity.IsBuildMode)
+            {
+                if (CacheNavMeshObstacle != null)
+                    CacheNavMeshObstacle.enabled = false;
+            }
         }
 
         private void OnTriggerStay(Collider other)

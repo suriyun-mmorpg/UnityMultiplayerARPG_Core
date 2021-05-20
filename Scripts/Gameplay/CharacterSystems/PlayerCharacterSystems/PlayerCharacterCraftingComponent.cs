@@ -29,8 +29,6 @@ namespace MultiplayerARPG
 
         public int SourceId { get { return 0; } }
 
-        public Vector3 Position { get { return Entity.CacheTransform.position; } }
-
         public override sealed void OnSetup()
         {
             base.OnSetup();
@@ -40,7 +38,7 @@ namespace MultiplayerARPG
         public override sealed void EntityUpdate()
         {
             base.EntityUpdate();
-            this.UpdateQueue(0f);
+            this.UpdateQueue(0f, CacheTransform.position);
         }
     }
 }

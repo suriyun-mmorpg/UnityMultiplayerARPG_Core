@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public interface ICraftingQueueSource
     {
@@ -10,6 +8,5 @@ namespace MultiplayerARPG
         float TimeCounter { get; set; }
         int SourceId { get; }
         uint ObjectId { get; }
-        Vector3 Position { get; }
     }
 }
