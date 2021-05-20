@@ -248,7 +248,6 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            UpdateMovement(Time.deltaTime);
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
                 tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
@@ -262,6 +261,7 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
+            UpdateMovement(Time.fixedDeltaTime);
             SyncTransform();
         }
 
