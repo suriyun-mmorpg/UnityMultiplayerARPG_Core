@@ -495,12 +495,15 @@ namespace MultiplayerARPG
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                 tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * tempCurrentMoveSpeed * deltaTime);
                 tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
-                // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
-                // rigidbody will reaching target and character is moving pass it,
-                // so adjust move speed by distance and time (with physic formula: v=s/t)
-                if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                    tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                if (tempInputDirection.sqrMagnitude <= 0f)
+                {
+                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                    // rigidbody will reaching target and character is moving pass it,
+                    // so adjust move speed by distance and time (with physic formula: v=s/t)
+                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                }
                 tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
                 velocityBeforeAirborne = tempMoveVelocity;
                 // Set inputs
@@ -545,12 +548,15 @@ namespace MultiplayerARPG
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                     tempPredictPosition = tempCurrentPosition + (Vector3.up * tempMoveDirection.y * tempCurrentMoveSpeed * deltaTime);
                     tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
-                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
-                    // rigidbody will reaching target and character is moving pass it,
-                    // so adjust move speed by distance and time (with physic formula: v=s/t)
-                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                    if (tempInputDirection.sqrMagnitude <= 0f)
+                    {
+                        // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                        // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                        // rigidbody will reaching target and character is moving pass it,
+                        // so adjust move speed by distance and time (with physic formula: v=s/t)
+                        if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                            tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                    }
                     // Swim up or dive down to surface
                     tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
                     if (!HasNavPaths)
