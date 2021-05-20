@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public static class CraftingQueueSourceExtension
     {
-        public static void UpdateQueue(this ICraftingQueueSource source)
+        public static void UpdateQueue(this ICraftingQueueSource source, float maxDistance)
         {
             if (!source.CanCraft)
             {
@@ -25,6 +25,13 @@ namespace MultiplayerARPG
             if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.crafterId, out crafter))
             {
                 // Crafter may left the game
+                source.QueueItems.RemoveAt(0);
+                return;
+            }
+
+            if (maxDistance > 0 && Vector3.Distance(crafter.CacheTransform.position, source.Position) > maxDistance)
+            {
+                // Crafter too far from crafting source
                 source.QueueItems.RemoveAt(0);
                 return;
             }

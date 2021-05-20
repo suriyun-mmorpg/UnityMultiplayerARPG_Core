@@ -12,6 +12,8 @@ namespace MultiplayerARPG
         private ItemCraftFormula[] itemCraftFormulas;
         [SerializeField]
         private int maxQueueSize = 5;
+        [SerializeField]
+        private float craftingDistance = 1f;
         private SyncListCraftingQueueItem queueItems = new SyncListCraftingQueueItem();
         public override bool Activatable { get { return true; } }
 
@@ -65,7 +67,7 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            this.UpdateQueue();
+            this.UpdateQueue(craftingDistance);
         }
 
         public override void PrepareRelatesData()
