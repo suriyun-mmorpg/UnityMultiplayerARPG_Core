@@ -92,6 +92,7 @@ namespace MultiplayerARPG
         public Collider CacheCollider { get; private set; }
         public Collider2D CacheCollider2D { get; private set; }
         public NavMeshObstacle CacheNavMeshObstacle { get; private set; }
+        private bool dirtyIsBuildMode;
 
         public override void Setup(DamageableEntity entity, int index)
         {
@@ -123,10 +124,11 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (BuildingEntity.IsBuildMode)
+            if (BuildingEntity.IsBuildMode != dirtyIsBuildMode)
             {
+                dirtyIsBuildMode = BuildingEntity.IsBuildMode;
                 if (CacheNavMeshObstacle != null)
-                    CacheNavMeshObstacle.enabled = false;
+                    CacheNavMeshObstacle.enabled = !BuildingEntity.IsBuildMode;
             }
         }
 
