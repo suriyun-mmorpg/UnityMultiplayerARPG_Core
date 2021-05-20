@@ -495,7 +495,7 @@ namespace MultiplayerARPG
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                 tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * tempCurrentMoveSpeed * deltaTime);
                 tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                if (tempInputDirection.sqrMagnitude <= 0f)
+                if (HasNavPaths)
                 {
                     // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
@@ -548,7 +548,7 @@ namespace MultiplayerARPG
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                     tempPredictPosition = tempCurrentPosition + (Vector3.up * tempMoveDirection.y * tempCurrentMoveSpeed * deltaTime);
                     tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                    if (tempInputDirection.sqrMagnitude <= 0f)
+                    if (HasNavPaths)
                     {
                         // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
                         // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
