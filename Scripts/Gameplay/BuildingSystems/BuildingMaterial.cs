@@ -30,6 +30,8 @@ namespace MultiplayerARPG
         public Tilemap tilemap;
 
         [Header("Build Mode Settings")]
+        [Range(0.1f, 1f)]
+        [Tooltip("It will be used to reduce collider's bounds when find other intersecting building materials")]
         public float boundsSizeRateWhilePlacing = 0.9f;
 
         private State currentState;
