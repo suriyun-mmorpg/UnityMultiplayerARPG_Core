@@ -393,7 +393,55 @@ namespace MultiplayerARPG
         /// <param name="randomSeed"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        public abstract void ApplySkill(
+        public void ApplySkill(
+            BaseCharacterEntity skillUser,
+            short skillLevel,
+            bool isLeftHand,
+            CharacterItem weapon,
+            int hitIndex,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            AimPosition aimPosition,
+            int randomSeed,
+            long? time)
+        {
+            if (skillUser.IsServer)
+            {
+                // Not enough items
+                if (!DecreaseItems(skillUser))
+                    return;
+                // Increase damage with ammo damage
+                Dictionary<DamageElement, MinMaxFloat> increaseDamages;
+                if (!DecreaseAmmos(skillUser, isLeftHand, out increaseDamages))
+                    return;
+                if (increaseDamages != null && increaseDamages.Count > 0)
+                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
+            }
+            ApplySkillImplement(
+                skillUser,
+                skillLevel,
+                isLeftHand,
+                weapon,
+                hitIndex,
+                damageAmounts,
+                aimPosition,
+                randomSeed,
+                time);
+        }
+
+        /// <summary>
+        /// Apply skill
+        /// </summary>
+        /// <param name="skillUser"></param>
+        /// <param name="skillLevel"></param>
+        /// <param name="isLeftHand"></param>
+        /// <param name="weapon"></param>
+        /// <param name="hitIndex"></param>
+        /// <param name="damageAmounts"></param>
+        /// <param name="aimPosition"></param>
+        /// <param name="randomSeed"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
             short skillLevel,
             bool isLeftHand,
@@ -689,12 +737,17 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected bool DecreaseItems(BasePlayerCharacterEntity character)
+        protected bool DecreaseItems(BaseCharacterEntity character)
         {
             int itemDataId;
             short amount;
-            if (HasEnoughItems(character, out itemDataId, out amount) && itemDataId != 0)
+            if (HasEnoughItems(character, out itemDataId, out amount))
             {
+                if (itemDataId == 0 || amount == 0)
+                {
+                    // No required items, don't decrease items
+                    return true;
+                }
                 if (character.DecreaseItems(itemDataId, amount))
                 {
                     character.FillEmptySlots();
@@ -716,6 +769,11 @@ namespace MultiplayerARPG
                 case RequireAmmoType.BasedOnSkill:
                     if (HasEnoughAmmos(character, isLeftHand, out ammoType, out amount))
                     {
+                        if (ammoType == null || amount == 0)
+                        {
+                            // No required ammos, don't decrease ammos
+                            return true;
+                        }
                         if (character.DecreaseAmmos(ammoType, amount, out increaseDamages))
                         {
                             character.FillEmptySlots();

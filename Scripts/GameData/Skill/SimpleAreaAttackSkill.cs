@@ -36,16 +36,8 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
+        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
         {
-            // Reduce Ammo, Bow area skill may required arrow :)
-            if (skillUser.IsServer)
-            {
-                // Increase damage with ammo damage
-                Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                if (DecreaseAmmos(skillUser, isLeftHand, out increaseDamages))
-                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
-            }
             // Spawn area entity
             // Aim position type always is `Position`
             PoolSystem.GetInstance(areaDamageEntity, aimPosition.position, GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser))

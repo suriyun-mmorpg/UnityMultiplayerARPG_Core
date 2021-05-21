@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ApplySkill(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
+        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -103,14 +103,6 @@ namespace MultiplayerARPG
             // Apply attack skill
             if (IsAttack())
             {
-                if (skillUser.IsServer)
-                {
-                    // Increase damage with ammo damage
-                    Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                    if (DecreaseAmmos(skillUser, isLeftHand, out increaseDamages))
-                        damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
-                }
-
                 // Launch damage entity to apply damage to other characters
                 GetDamageInfo(skillUser, isLeftHand).LaunchDamageEntity(
                     skillUser,
