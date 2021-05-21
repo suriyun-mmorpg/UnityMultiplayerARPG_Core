@@ -290,20 +290,144 @@ public static class GenericUtils
         return new Vector3(position.x, 0, position.z);
     }
 
-    public static float BoundsContainedRate(this Bounds region, Bounds obj)
+    public static bool IsPointInBox(Vector3 center, Vector3 half, Vector3 dirX, Vector3 dirY, Vector3 dirZ, Vector3 point)
     {
-        float total = 1f;
+        Vector3 d = point - center;
+        return Mathf.Abs(Vector3.Dot(d, dirX)) <= half.x &&
+            Mathf.Abs(Vector3.Dot(d, dirY)) <= half.y &&
+            Mathf.Abs(Vector3.Dot(d, dirZ)) <= half.z;
+    }
 
-        for (int i = 0; i < 3; i++)
+    public static bool ColliderIntersect(this Collider source, Collider dest, float sourceSizeRate = 1f)
+    {
+        Vector3 sourceSize;
+        Vector3[] sourcePoints;
+        source.GetActualSizeBoundsPoints(out sourceSize, out sourcePoints);
+        Vector3 sourceCenter = (sourcePoints[0] + sourcePoints[7]) * 0.5f;
+        Vector3 sourceHalf = sourceSize * sourceSizeRate * 0.5f;
+        Collider[] results = Physics.OverlapBox(sourceCenter, sourceHalf, source.transform.rotation, LayerMask.GetMask(LayerMask.LayerToName(dest.gameObject.layer)), QueryTriggerInteraction.Collide);
+        for (int i = 0; i < results.Length; ++i)
         {
-            float dist = obj.min[i] > region.center[i] ?
-                obj.max[i] - region.max[i] :
-                region.min[i] - obj.min[i];
-            if (dist > 0f)
-                total *= Mathf.Clamp01(1f - dist / obj.size[i]);
+            if (results[i] == dest)
+                return true;
+        }
+        return false;
+    }
+
+    public static bool ColliderIntersect(this Collider2D source, Collider2D dest, float sourceSizeRate = 1f)
+    {
+        Vector3 sourceSize;
+        Vector3[] sourcePoints;
+        source.GetActualSizeBoundsPoints(out sourceSize, out sourcePoints);
+        Vector3 sourceCenter = (sourcePoints[0] + sourcePoints[7]) * 0.5f;
+        Vector3 sourceHalf = sourceSize * sourceSizeRate * 0.5f;
+        Collider2D[] results = Physics2D.OverlapBoxAll(sourceCenter, sourceHalf, source.transform.eulerAngles.z, LayerMask.GetMask(LayerMask.LayerToName(dest.gameObject.layer)));
+        for (int i = 0; i < results.Length; ++i)
+        {
+            if (results[i] == dest)
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Get OBB size and points
+    /// </summary>
+    /// <param name="collider"></param>
+    /// <param name="size"></param>
+    /// <param name="points"></param>
+    public static void GetActualSizeBoundsPoints(this Collider collider, out Vector3 size, out Vector3[] points)
+    {
+        points = new Vector3[8];
+        Vector3[] sourcePoints = new Vector3[8];
+        Transform transform = collider.transform;
+
+        // Store original rotation
+        Quaternion originalRotation = transform.rotation;
+
+        // Reset rotation
+        transform.rotation = Quaternion.identity;
+
+        // Get object bounds from unrotated object
+        Bounds bounds = collider.bounds;
+        size = bounds.size;
+
+        // Get the unrotated points
+        sourcePoints[0] = new Vector3(bounds.min.x, bounds.min.y, bounds.min.z) - transform.position; // Bot left near
+        sourcePoints[1] = new Vector3(bounds.max.x, bounds.min.y, bounds.min.z) - transform.position; // Bot right near
+        sourcePoints[2] = new Vector3(bounds.min.x, bounds.max.y, bounds.min.z) - transform.position; // Top left near
+        sourcePoints[3] = new Vector3(bounds.max.x, bounds.max.y, bounds.min.z) - transform.position; // Top right near
+        sourcePoints[4] = new Vector3(bounds.min.x, bounds.min.y, bounds.max.z) - transform.position; // Bot left far
+        sourcePoints[5] = new Vector3(bounds.max.x, bounds.min.y, bounds.max.z) - transform.position; // Bot right far
+        sourcePoints[6] = new Vector3(bounds.min.x, bounds.max.y, bounds.max.z) - transform.position; // Top left far
+        sourcePoints[7] = new Vector3(bounds.max.x, bounds.max.y, bounds.max.z) - transform.position; // Top right far
+
+        // Apply scaling
+        for (int i = 0; i < sourcePoints.Length; i++)
+        {
+            sourcePoints[i] = new Vector3(sourcePoints[i].x / transform.localScale.x,
+                sourcePoints[i].y / transform.localScale.y,
+                sourcePoints[i].z / transform.localScale.z);
         }
 
-        return total;
+        // Restore rotation
+        transform.rotation = originalRotation;
+
+        // Transform points from local to world space
+        for (int i = 0; i < points.Length; i++)
+        {
+            points[i] = transform.TransformPoint(sourcePoints[i]);
+        }
+    }
+
+    /// <summary>
+    /// Get OBB size and points
+    /// </summary>
+    /// <param name="collider"></param>
+    /// <param name="size"></param>
+    /// <param name="points"></param>
+    public static void GetActualSizeBoundsPoints(this Collider2D collider, out Vector3 size, out Vector3[] points)
+    {
+        points = new Vector3[8];
+        Vector3[] sourcePoints = new Vector3[8];
+        Transform transform = collider.transform;
+
+        // Store original rotation
+        Quaternion originalRotation = transform.rotation;
+
+        // Reset rotation
+        transform.rotation = Quaternion.identity;
+
+        // Get object bounds from unrotated object
+        Bounds bounds = collider.bounds;
+        size = bounds.size;
+
+        // Get the unrotated points
+        sourcePoints[0] = new Vector3(bounds.min.x, bounds.min.y, bounds.min.z) - transform.position; // Bot left near
+        sourcePoints[1] = new Vector3(bounds.max.x, bounds.min.y, bounds.min.z) - transform.position; // Bot right near
+        sourcePoints[2] = new Vector3(bounds.min.x, bounds.max.y, bounds.min.z) - transform.position; // Top left near
+        sourcePoints[3] = new Vector3(bounds.max.x, bounds.max.y, bounds.min.z) - transform.position; // Top right near
+        sourcePoints[4] = new Vector3(bounds.min.x, bounds.min.y, bounds.max.z) - transform.position; // Bot left far
+        sourcePoints[5] = new Vector3(bounds.max.x, bounds.min.y, bounds.max.z) - transform.position; // Bot right far
+        sourcePoints[6] = new Vector3(bounds.min.x, bounds.max.y, bounds.max.z) - transform.position; // Top left far
+        sourcePoints[7] = new Vector3(bounds.max.x, bounds.max.y, bounds.max.z) - transform.position; // Top right far
+
+        // Apply scaling
+        for (int i = 0; i < sourcePoints.Length; i++)
+        {
+            sourcePoints[i] = new Vector3(sourcePoints[i].x / transform.localScale.x,
+                sourcePoints[i].y / transform.localScale.y,
+                sourcePoints[i].z / transform.localScale.z);
+        }
+
+        // Restore rotation
+        transform.rotation = originalRotation;
+
+        // Transform points from local to world space
+        for (int i = 0; i < points.Length; i++)
+        {
+            points[i] = transform.TransformPoint(sourcePoints[i]);
+        }
     }
 
     public static string ToBonusString(this short value, string format = "N0")

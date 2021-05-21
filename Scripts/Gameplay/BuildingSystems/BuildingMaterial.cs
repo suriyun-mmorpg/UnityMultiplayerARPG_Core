@@ -29,6 +29,9 @@ namespace MultiplayerARPG
         public SpriteRenderer spriteRenderer;
         public Tilemap tilemap;
 
+        [Header("Build Mode Settings")]
+        public float boundsSizeRateWhilePlacing = 0.9f;
+
         private State currentState;
         public State CurrentState
         {
@@ -140,7 +143,7 @@ namespace MultiplayerARPG
             if (BuildingEntity.IsBuildMode)
             {
                 BuildingMaterial material = other.GetComponent<BuildingMaterial>();
-                if (material != null && CacheCollider.bounds.BoundsContainedRate(other.bounds) <= 0.025f)
+                if (material != null && !CacheCollider.ColliderIntersect(other, boundsSizeRateWhilePlacing))
                 {
                     BuildingEntity.TriggerExitBuildingMaterial(material);
                     return;
@@ -150,7 +153,12 @@ namespace MultiplayerARPG
                     BuildingEntity.BuildingArea.transform.root == other.transform.root)
                     return;
                 BuildingEntity.TriggerEnterBuildingMaterial(material);
-                BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
+                if (material == null)
+                {
+                    IGameEntity gameEntity = other.GetComponent<IGameEntity>();
+                    if (gameEntity != null)
+                        BuildingEntity.TriggerEnterEntity(gameEntity.Entity);
+                }
             }
         }
 
@@ -158,8 +166,14 @@ namespace MultiplayerARPG
         {
             if (BuildingEntity.IsBuildMode)
             {
-                BuildingEntity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
-                BuildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                BuildingMaterial material = other.GetComponent<BuildingMaterial>();
+                BuildingEntity.TriggerExitBuildingMaterial(material);
+                if (material == null)
+                {
+                    IGameEntity gameEntity = other.GetComponent<IGameEntity>();
+                    if (gameEntity != null)
+                        BuildingEntity.TriggerExitEntity(gameEntity.Entity);
+                }
                 BuildingEntity.TriggerExitNoConstructionArea(other.GetComponent<NoConstructionArea>());
             }
         }
@@ -172,7 +186,7 @@ namespace MultiplayerARPG
             if (BuildingEntity.IsBuildMode)
             {
                 BuildingMaterial material = other.GetComponent<BuildingMaterial>();
-                if (material != null && CacheCollider2D.bounds.BoundsContainedRate(other.bounds) <= 0.025f)
+                if (material != null && !CacheCollider2D.ColliderIntersect(other, boundsSizeRateWhilePlacing))
                 {
                     BuildingEntity.TriggerExitBuildingMaterial(material);
                     return;
@@ -182,7 +196,12 @@ namespace MultiplayerARPG
                     BuildingEntity.BuildingArea.transform.root == other.transform.root)
                     return;
                 BuildingEntity.TriggerEnterBuildingMaterial(material);
-                BuildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
+                if (material == null)
+                {
+                    IGameEntity gameEntity = other.GetComponent<IGameEntity>();
+                    if (gameEntity != null)
+                        BuildingEntity.TriggerEnterEntity(gameEntity.Entity);
+                }
                 BuildingEntity.TriggerEnterTilemap(other.GetComponent<TilemapCollider2D>());
             }
         }
@@ -191,10 +210,16 @@ namespace MultiplayerARPG
         {
             if (BuildingEntity.IsBuildMode)
             {
-                BuildingEntity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
-                BuildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
-                BuildingEntity.TriggerExitTilemap(other.GetComponent<TilemapCollider2D>());
+                BuildingMaterial material = other.GetComponent<BuildingMaterial>();
+                BuildingEntity.TriggerExitBuildingMaterial(material);
+                if (material == null)
+                {
+                    IGameEntity gameEntity = other.GetComponent<IGameEntity>();
+                    if (gameEntity != null)
+                        BuildingEntity.TriggerExitEntity(gameEntity.Entity);
+                }
                 BuildingEntity.TriggerExitNoConstructionArea(other.GetComponent<NoConstructionArea>());
+                BuildingEntity.TriggerExitTilemap(other.GetComponent<TilemapCollider2D>());
             }
         }
 
