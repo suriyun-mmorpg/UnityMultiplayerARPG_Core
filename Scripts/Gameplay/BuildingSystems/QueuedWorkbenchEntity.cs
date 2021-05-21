@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private int maxQueueSize = 5;
         [SerializeField]
+        [Tooltip("If this is > 0 it will limit distance to craft an items with this workbench entity by its value")]
         private float craftingDistance = 5f;
         private SyncListCraftingQueueItem queueItems = new SyncListCraftingQueueItem();
         public override bool Activatable { get { return true; } }
