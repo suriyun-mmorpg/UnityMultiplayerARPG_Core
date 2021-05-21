@@ -782,7 +782,7 @@ namespace MultiplayerARPG
                     }
                     return false;
             }
-            return false;
+            return true;
         }
 
         public virtual Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
