@@ -105,14 +105,14 @@ namespace MultiplayerARPG
             path = path.Substring(path.IndexOf("Assets"));
 
             var newObject = Instantiate(fbx, Vector3.zero, Quaternion.identity);
-            var characterModelManager = newObject.AddComponent<CharacterModelManager>();
             newObject.AddComponent<CharacterRecoveryComponent>();
             newObject.AddComponent<CharacterSkillAndBuffComponent>();
 
+            BaseCharacterModel characterModel = null;
             switch (characterModelType)
             {
                 case CharacterModelType.AnimatorCharacterModel:
-                    var animatorCharacterModel = newObject.AddComponent<AnimatorCharacterModel>();
+                    characterModel = newObject.AddComponent<AnimatorCharacterModel>();
                     var animator = newObject.GetComponentInChildren<Animator>();
                     if (animator == null)
                     {
@@ -120,11 +120,10 @@ namespace MultiplayerARPG
                         DestroyImmediate(newObject);
                         return;
                     }
-                    animatorCharacterModel.animator = animator;
-                    characterModelManager.MainModel = animatorCharacterModel;
+                    (characterModel as AnimatorCharacterModel).animator = animator;
                     break;
                 case CharacterModelType.AnimationCharacterModel:
-                    var animationCharacterModel = newObject.AddComponent<AnimationCharacterModel>();
+                    characterModel = newObject.AddComponent<AnimationCharacterModel>();
                     var animation = newObject.GetComponentInChildren<Animation>();
                     if (animation == null)
                     {
@@ -132,10 +131,12 @@ namespace MultiplayerARPG
                         DestroyImmediate(newObject);
                         return;
                     }
-                    animationCharacterModel.legacyAnimation = animation;
-                    characterModelManager.MainModel = animationCharacterModel;
+                    (characterModel as AnimationCharacterModel).legacyAnimation = animation;
                     break;
             }
+
+            var characterModelManager = newObject.AddComponent<CharacterModelManager>();
+            characterModelManager.MainModel = characterModel;
 
             Bounds bounds = default;
             var meshes = newObject.GetComponentsInChildren<MeshRenderer>();
