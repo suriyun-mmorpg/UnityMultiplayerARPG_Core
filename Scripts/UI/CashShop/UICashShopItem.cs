@@ -18,6 +18,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeySellPriceCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
         [Tooltip("Format => {0} = {Sell Price}")]
         public UILocaleKeySetting formatKeySellPriceGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
+        [Tooltip("Format => {0} = {Gold Amount}")]
+        public UILocaleKeySetting formatKeyReceiveGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_GOLD);
 
         [Header("UI Elements")]
         public UICashShop uiCashShop;
@@ -28,9 +30,10 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiTextSellPrice")]
         public TextWrapper uiTextSellPriceCash;
         public TextWrapper uiTextSellPriceGold;
-        public TextWrapper textRecieveGold;
-        public UICharacterCurrencies uiReceiveCurrencies;
-        public UICharacterItems uiReceiveItems;
+        [FormerlySerializedAs("textRecieveGold")]
+        public TextWrapper uiTextRecieveGold;
+        public UICurrencyAmounts uiReceiveCurrencies;
+        public UIItemAmounts uiReceiveItems;
         public InputFieldWrapper inputAmount;
         [Tooltip("These objects will be activated while sell price cash currency is not 0.")]
         public GameObject[] cashObjects;
@@ -134,6 +137,23 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeySellPriceGold),
                     Data == null ? 0.ToString("N0") : (Data.sellPriceGold * BuyAmount).ToString("N0"));
                 uiTextSellPriceGold.SetGameObjectActive(Data.sellPriceGold > 0);
+            }
+
+            if (uiTextRecieveGold != null)
+            {
+                uiTextRecieveGold.text = string.Format(
+                    LanguageManager.GetText(formatKeyReceiveGold),
+                    Data == null ? 0.ToString("N0") : Data.receiveGold.ToString("N0"));
+            }
+
+            if (uiReceiveCurrencies != null)
+            {
+                uiReceiveCurrencies.Data = Data == null ? null : GameDataHelpers.CombineCurrencies(Data.receiveCurrencies, null);
+            }
+
+            if (uiReceiveItems != null)
+            {
+                uiReceiveItems.Data = Data == null ? null : GameDataHelpers.CombineItems(Data.receiveItems, null);
             }
 
             if (cashObjects != null && cashObjects.Length > 0)

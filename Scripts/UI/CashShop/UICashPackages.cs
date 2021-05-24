@@ -18,30 +18,30 @@ namespace MultiplayerARPG
         public Transform uiCashPackageContainer;
         public TextWrapper uiTextCash;
 
-        private UIList cacheCashPackageList;
-        public UIList CacheCashPackageList
+        private UIList cacheList;
+        public UIList CacheList
         {
             get
             {
-                if (cacheCashPackageList == null)
+                if (cacheList == null)
                 {
-                    cacheCashPackageList = gameObject.AddComponent<UIList>();
-                    cacheCashPackageList.uiPrefab = uiCashPackagePrefab.gameObject;
-                    cacheCashPackageList.uiContainer = uiCashPackageContainer;
+                    cacheList = gameObject.AddComponent<UIList>();
+                    cacheList.uiPrefab = uiCashPackagePrefab.gameObject;
+                    cacheList.uiContainer = uiCashPackageContainer;
                 }
-                return cacheCashPackageList;
+                return cacheList;
             }
         }
 
-        private UICashPackageSelectionManager cacheCashPackageSelectionManager;
-        public UICashPackageSelectionManager CacheCashPackageSelectionManager
+        private UICashPackageSelectionManager cacheSelectionManager;
+        public UICashPackageSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheCashPackageSelectionManager == null)
-                    cacheCashPackageSelectionManager = gameObject.GetOrAddComponent<UICashPackageSelectionManager>();
-                cacheCashPackageSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheCashPackageSelectionManager;
+                if (cacheSelectionManager == null)
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UICashPackageSelectionManager>();
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSelectionManager;
             }
         }
 
@@ -53,10 +53,10 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            CacheCashPackageSelectionManager.eventOnSelect.RemoveListener(OnSelectCashPackage);
-            CacheCashPackageSelectionManager.eventOnSelect.AddListener(OnSelectCashPackage);
-            CacheCashPackageSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashPackage);
-            CacheCashPackageSelectionManager.eventOnDeselect.AddListener(OnDeselectCashPackage);
+            CacheSelectionManager.eventOnSelect.RemoveListener(OnSelectCashPackage);
+            CacheSelectionManager.eventOnSelect.AddListener(OnSelectCashPackage);
+            CacheSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashPackage);
+            CacheSelectionManager.eventOnDeselect.AddListener(OnDeselectCashPackage);
             if (uiCashPackageDialog != null)
                 uiCashPackageDialog.onHide.AddListener(OnCashPackageDialogHide);
             RefreshCashPackageInfo();
@@ -66,19 +66,19 @@ namespace MultiplayerARPG
         {
             if (uiCashPackageDialog != null)
                 uiCashPackageDialog.onHide.RemoveListener(OnCashPackageDialogHide);
-            CacheCashPackageSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnCashPackageDialogHide()
         {
-            CacheCashPackageSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectCashPackage(UICashPackage ui)
         {
             if (uiCashPackageDialog != null && ui.Data != null)
             {
-                uiCashPackageDialog.selectionManager = CacheCashPackageSelectionManager;
+                uiCashPackageDialog.selectionManager = CacheSelectionManager;
                 uiCashPackageDialog.Data = ui.Data;
                 uiCashPackageDialog.Show();
             }
@@ -132,18 +132,18 @@ namespace MultiplayerARPG
                 }
             }
 
-            int selectedIdx = CacheCashPackageSelectionManager.SelectedUI != null ? CacheCashPackageSelectionManager.IndexOf(CacheCashPackageSelectionManager.SelectedUI) : -1;
-            CacheCashPackageSelectionManager.DeselectSelectedUI();
-            CacheCashPackageSelectionManager.Clear();
+            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            CacheSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.Clear();
 
             UICashPackage tempUiCashPackage;
-            CacheCashPackageList.Generate(cashPackages, (index, cashShopItem, ui) =>
+            CacheList.Generate(cashPackages, (index, cashShopItem, ui) =>
             {
                 tempUiCashPackage = ui.GetComponent<UICashPackage>();
                 tempUiCashPackage.uiCashPackages = this;
                 tempUiCashPackage.Data = cashShopItem;
                 tempUiCashPackage.Show();
-                CacheCashPackageSelectionManager.Add(tempUiCashPackage);
+                CacheSelectionManager.Add(tempUiCashPackage);
                 if (selectedIdx == index)
                     tempUiCashPackage.OnClickSelect();
             });
