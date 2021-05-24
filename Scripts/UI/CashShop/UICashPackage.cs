@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -15,7 +16,8 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Sell Price}")]
         public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
         [Tooltip("Format => {0} = {Cash Amount}")]
-        public UILocaleKeySetting formatKeyRewardCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_CASH);
+        [FormerlySerializedAs("formatKeyRewardCash")]
+        public UILocaleKeySetting formatKeyCashAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_CASH);
 
         [Header("UI Elements")]
         public UICashPackages uiCashPackages;
@@ -67,7 +69,7 @@ namespace MultiplayerARPG
             if (uiTextCashAmount != null)
             {
                 uiTextCashAmount.text = string.Format(
-                    LanguageManager.GetText(formatKeyRewardCash),
+                    LanguageManager.GetText(formatKeyCashAmount),
                     Data == null ? 0.ToString("N0") : Data.cashAmount.ToString("N0"));
             }
         }

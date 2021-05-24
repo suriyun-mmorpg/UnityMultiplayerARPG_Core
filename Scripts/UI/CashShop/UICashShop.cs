@@ -20,30 +20,30 @@ namespace MultiplayerARPG
         public Transform uiCashShopItemContainer;
         public TextWrapper uiTextCash;
 
-        private UIList cacheCashShopList;
-        public UIList CacheCashShopList
+        private UIList cacheList;
+        public UIList CacheList
         {
             get
             {
-                if (cacheCashShopList == null)
+                if (cacheList == null)
                 {
-                    cacheCashShopList = gameObject.AddComponent<UIList>();
-                    cacheCashShopList.uiPrefab = uiCashShopItemPrefab.gameObject;
-                    cacheCashShopList.uiContainer = uiCashShopItemContainer;
+                    cacheList = gameObject.AddComponent<UIList>();
+                    cacheList.uiPrefab = uiCashShopItemPrefab.gameObject;
+                    cacheList.uiContainer = uiCashShopItemContainer;
                 }
-                return cacheCashShopList;
+                return cacheList;
             }
         }
 
-        private UICashShopSelectionManager cacheCashShopSelectionManager;
-        public UICashShopSelectionManager CacheCashShopSelectionManager
+        private UICashShopSelectionManager cacheSelectionManager;
+        public UICashShopSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheCashShopSelectionManager == null)
-                    cacheCashShopSelectionManager = gameObject.GetOrAddComponent<UICashShopSelectionManager>();
-                cacheCashShopSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheCashShopSelectionManager;
+                if (cacheSelectionManager == null)
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UICashShopSelectionManager>();
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSelectionManager;
             }
         }
 
@@ -55,10 +55,10 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            CacheCashShopSelectionManager.eventOnSelect.RemoveListener(OnSelectCashShopItem);
-            CacheCashShopSelectionManager.eventOnSelect.AddListener(OnSelectCashShopItem);
-            CacheCashShopSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashShopItem);
-            CacheCashShopSelectionManager.eventOnDeselect.AddListener(OnDeselectCashShopItem);
+            CacheSelectionManager.eventOnSelect.RemoveListener(OnSelectCashShopItem);
+            CacheSelectionManager.eventOnSelect.AddListener(OnSelectCashShopItem);
+            CacheSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashShopItem);
+            CacheSelectionManager.eventOnDeselect.AddListener(OnDeselectCashShopItem);
             if (uiCashShopItemDialog != null)
                 uiCashShopItemDialog.onHide.AddListener(OnCashShopItemDialogHide);
             RefreshCashShopInfo();
@@ -68,19 +68,19 @@ namespace MultiplayerARPG
         {
             if (uiCashShopItemDialog != null)
                 uiCashShopItemDialog.onHide.RemoveListener(OnCashShopItemDialogHide);
-            CacheCashShopSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnCashShopItemDialogHide()
         {
-            CacheCashShopSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectCashShopItem(UICashShopItem ui)
         {
             if (uiCashShopItemDialog != null && ui.Data != null)
             {
-                uiCashShopItemDialog.selectionManager = CacheCashShopSelectionManager;
+                uiCashShopItemDialog.selectionManager = CacheSelectionManager;
                 uiCashShopItemDialog.uiCashShop = this;
                 uiCashShopItemDialog.Data = ui.Data;
                 uiCashShopItemDialog.Show();
@@ -127,12 +127,12 @@ namespace MultiplayerARPG
                     cashShopItems.Add(cashShopItem);
             }
 
-            int selectedIdx = CacheCashShopSelectionManager.SelectedUI != null ? CacheCashShopSelectionManager.IndexOf(CacheCashShopSelectionManager.SelectedUI) : -1;
-            CacheCashShopSelectionManager.Clear();
+            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            CacheSelectionManager.Clear();
 
             int showingCount = 0;
             UICashShopItem tempUI;
-            CacheCashShopList.Generate(cashShopItems, (index, cashShopItem, ui) =>
+            CacheList.Generate(cashShopItems, (index, cashShopItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICashShopItem>();
                 if (cashShopItem == null ||
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
                     tempUI.uiCashShop = this;
                     tempUI.Data = cashShopItem;
                     tempUI.Show();
-                    CacheCashShopSelectionManager.Add(tempUI);
+                    CacheSelectionManager.Add(tempUI);
                     if (selectedIdx == index)
                         tempUI.OnClickSelect();
                     showingCount++;
