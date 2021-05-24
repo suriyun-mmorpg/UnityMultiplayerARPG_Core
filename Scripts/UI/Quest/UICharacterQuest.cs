@@ -116,14 +116,14 @@ namespace MultiplayerARPG
             {
                 uiTextRewardExp.text = string.Format(
                     LanguageManager.GetText(formatKeyRewardExp),
-                    Quest == null ? 0.ToString("N0") : Quest.rewardExp.ToString("N0"));
+                    Quest == null ? "0" : Quest.rewardExp.ToString("N0"));
             }
 
             if (uiTextRewardGold != null)
             {
                 uiTextRewardGold.text = string.Format(
                     LanguageManager.GetText(formatKeyRewardGold),
-                    Quest == null ? 0.ToString("N0") : Quest.rewardGold.ToString("N0"));
+                    Quest == null ? "0" : Quest.rewardGold.ToString("N0"));
             }
 
             if (Quest != null && showRewardItemList)

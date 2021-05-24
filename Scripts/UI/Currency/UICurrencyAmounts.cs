@@ -147,13 +147,13 @@ namespace MultiplayerARPG
                     componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
                         componentPair.currency.title,
-                        0f.ToString("N0"), 0f.ToString("N0"));
+                        "0", "0");
                     break;
                 case DisplayType.Simple:
                     componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
                         componentPair.currency.title,
-                        isBonus ? 0f.ToBonusString("N0") : 0f.ToString("N0"));
+                        isBonus ? 0f.ToBonusString("N0") : "0");
                     break;
             }
             if (componentPair.imageIcon != null)

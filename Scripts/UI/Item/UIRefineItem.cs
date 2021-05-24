@@ -127,8 +127,8 @@ namespace MultiplayerARPG
                 {
                     uiTextRequireGold.text = string.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
-                        0.ToString("N0"),
-                        0.ToString("N0"));
+                        "0",
+                        "0");
                 }
                 else
                 {

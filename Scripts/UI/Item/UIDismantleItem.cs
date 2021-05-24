@@ -88,7 +88,7 @@ namespace MultiplayerARPG
                 {
                     uiTextReturnGold.text = string.Format(
                             LanguageManager.GetText(formatKeyReturnGold),
-                            0.ToString("N0"));
+                            "0");
                 }
                 else
                 {

@@ -73,14 +73,14 @@ namespace MultiplayerARPG
                 {
                     uiTextSellPriceCash.text = string.Format(
                         LanguageManager.GetText(formatKeySellPriceCash),
-                        Data == null ? 0.ToString("N0") : (Data.sellPriceCash * BuyAmount).ToString("N0"));
+                        Data == null ? "0" : (Data.sellPriceCash * BuyAmount).ToString("N0"));
                 }
 
                 if (uiTextSellPriceGold != null)
                 {
                     uiTextSellPriceGold.text = string.Format(
                         LanguageManager.GetText(formatKeySellPriceGold),
-                        Data == null ? 0.ToString("N0") : (Data.sellPriceGold * BuyAmount).ToString("N0"));
+                        Data == null ? "0" : (Data.sellPriceGold * BuyAmount).ToString("N0"));
                 }
 
                 inputAmount.onValueChanged.RemoveAllListeners();
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
             {
                 uiTextSellPriceCash.text = string.Format(
                     LanguageManager.GetText(formatKeySellPriceCash),
-                    Data == null ? 0.ToString("N0") : (Data.sellPriceCash * BuyAmount).ToString("N0"));
+                    Data == null ? "0" : (Data.sellPriceCash * BuyAmount).ToString("N0"));
                 uiTextSellPriceCash.SetGameObjectActive(Data.sellPriceCash > 0);
             }
 
@@ -135,7 +135,7 @@ namespace MultiplayerARPG
             {
                 uiTextSellPriceGold.text = string.Format(
                     LanguageManager.GetText(formatKeySellPriceGold),
-                    Data == null ? 0.ToString("N0") : (Data.sellPriceGold * BuyAmount).ToString("N0"));
+                    Data == null ? "0" : (Data.sellPriceGold * BuyAmount).ToString("N0"));
                 uiTextSellPriceGold.SetGameObjectActive(Data.sellPriceGold > 0);
             }
 
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
             {
                 uiTextRecieveGold.text = string.Format(
                     LanguageManager.GetText(formatKeyReceiveGold),
-                    Data == null ? 0.ToString("N0") : Data.receiveGold.ToString("N0"));
+                    Data == null ? "0" : Data.receiveGold.ToString("N0"));
             }
 
             if (uiReceiveCurrencies != null)

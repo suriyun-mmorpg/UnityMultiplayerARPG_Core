@@ -108,7 +108,7 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeyInfliction) :
                     LanguageManager.GetText(formatKeyInflictionAsElemental),
                 tempElement.Title,
-                0.ToString("N0"));
+                "0");
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.icon;
             if (inactiveIfAmountZero && componentPair.root != null)

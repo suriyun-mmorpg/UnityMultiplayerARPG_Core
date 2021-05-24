@@ -329,21 +329,21 @@ namespace MultiplayerARPG
             {
                 uiTextStatPoint.text = string.Format(
                     LanguageManager.GetText(formatKeyStatPoint),
-                    playerCharacter == null ? 0.ToString("N0") : playerCharacter.StatPoint.ToString("N0"));
+                    playerCharacter == null ? "0" : playerCharacter.StatPoint.ToString("N0"));
             }
 
             if (uiTextSkillPoint != null)
             {
                 uiTextSkillPoint.text = string.Format(
                     LanguageManager.GetText(formatKeySkillPoint),
-                    playerCharacter == null ? 0.ToString("N0") : playerCharacter.SkillPoint.ToString("N0"));
+                    playerCharacter == null ? "0" : playerCharacter.SkillPoint.ToString("N0"));
             }
 
             if (uiTextGold != null)
             {
                 uiTextGold.text = string.Format(
                     LanguageManager.GetText(formatKeyGold),
-                    playerCharacter == null ? 0.ToString("N0") : playerCharacter.Gold.ToString("N0"));
+                    playerCharacter == null ? "0" : playerCharacter.Gold.ToString("N0"));
             }
 
             BaseCharacter character = Data == null ? null : Data.GetDatabase();

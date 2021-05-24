@@ -50,8 +50,8 @@ namespace MultiplayerARPG
             {
                 uiTextSumDamage.text = string.Format(
                     LanguageManager.GetText(formatKeySumDamage),
-                    isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
-                    0.ToString("N0"));
+                    isBonus ? 0.ToBonusString("N0") : "0",
+                    "0");
             }
             foreach (UIDamageElementTextPair entry in CacheTextDamages.Values)
             {
@@ -136,8 +136,8 @@ namespace MultiplayerARPG
             componentPair.uiText.text = string.Format(
                 LanguageManager.GetText(formatKeyDamage),
                 tempElement.Title,
-                isBonus ? 0.ToBonusString("N0") : 0.ToString("N0"),
-                0.ToString("N0"));
+                isBonus ? 0.ToBonusString("N0") : "0",
+                "0");
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.icon;
             if (inactiveIfAmountZero && componentPair.root != null)

@@ -124,8 +124,8 @@ namespace MultiplayerARPG
             componentPair.uiText.text = string.Format(
                 LanguageManager.GetText(formatKeyAmount),
                 componentPair.item.Title,
-                0.ToString("N0"),
-                0.ToString("N0"));
+                "0",
+                "0");
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = componentPair.item.icon;
             if (inactiveIfAmountZero && componentPair.root != null)

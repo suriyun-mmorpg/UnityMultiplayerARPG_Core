@@ -55,8 +55,8 @@ namespace MultiplayerARPG
                 {
                     uiTextRemoveRequireGold.text = string.Format(
                         LanguageManager.GetText(formatKeyRemoveRequireGold),
-                        0.ToString("N0"),
-                        0.ToString("N0"));
+                        "0",
+                        "0");
                 }
                 else
                 {

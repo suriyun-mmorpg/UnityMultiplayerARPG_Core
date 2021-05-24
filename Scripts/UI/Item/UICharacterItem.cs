@@ -345,7 +345,7 @@ namespace MultiplayerARPG
             {
                 uiTextSellPrice.text = string.Format(
                     LanguageManager.GetText(formatKeySellPrice),
-                    Item == null ? 0.ToString("N0") : Item.SellPrice.ToString("N0"));
+                    Item == null ? "0" : Item.SellPrice.ToString("N0"));
             }
 
             if (uiTextStack != null)
@@ -355,8 +355,8 @@ namespace MultiplayerARPG
                 {
                     stackString = string.Format(
                         LanguageManager.GetText(formatKeyStack),
-                        0.ToString("N0"),
-                        0.ToString("N0"));
+                        "0",
+                        "0");
                 }
                 else
                 {
