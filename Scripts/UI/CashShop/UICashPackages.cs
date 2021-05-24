@@ -11,6 +11,9 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Cash Amount}")]
         public UILocaleKeySetting formatKeyCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
 
+        [Header("Filter")]
+        public List<string> filterCategories;
+
         [Header("UI Elements")]
         public GameObject listEmptyObject;
         [FormerlySerializedAs("uiCashPackageDialog")]
@@ -125,13 +128,13 @@ namespace MultiplayerARPG
                     response.cash.ToString("N0"));
             }
 
-            List<CashPackage> cashPackages = new List<CashPackage>();
+            List<CashPackage> list = new List<CashPackage>();
             foreach (int cashPackageId in response.cashPackageIds)
             {
                 CashPackage cashPackage;
                 if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))
                 {
-                    cashPackages.Add(cashPackage);
+                    list.Add(cashPackage);
                 }
             }
 
@@ -139,19 +142,32 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            UICashPackage tempUiCashPackage;
-            CacheList.Generate(cashPackages, (index, cashShopItem, ui) =>
+            int showingCount = 0;
+            UICashPackage tempUI;
+            CacheList.Generate(list, (index, data, ui) =>
             {
-                tempUiCashPackage = ui.GetComponent<UICashPackage>();
-                tempUiCashPackage.uiCashPackages = this;
-                tempUiCashPackage.Data = cashShopItem;
-                tempUiCashPackage.Show();
-                CacheSelectionManager.Add(tempUiCashPackage);
-                if (selectedIdx == index)
-                    tempUiCashPackage.OnClickSelect();
+                tempUI = ui.GetComponent<UICashPackage>();
+                if (data == null ||
+                    string.IsNullOrEmpty(data.category) ||
+                    filterCategories == null || filterCategories.Count == 0 ||
+                    filterCategories.Contains(data.category))
+                {
+                    tempUI.uiCashPackages = this;
+                    tempUI.Data = data;
+                    tempUI.Show();
+                    CacheSelectionManager.Add(tempUI);
+                    if (selectedIdx == index)
+                        tempUI.OnClickSelect();
+                    showingCount++;
+                }
+                else
+                {
+                    // Hide because item's category not matches in the filter list
+                    tempUI.Hide();
+                }
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(cashPackages.Count == 0);
+                listEmptyObject.SetActive(showingCount == 0);
         }
     }
 }

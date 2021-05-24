@@ -123,29 +123,30 @@ namespace MultiplayerARPG
                     response.cash.ToString("N0"));
             }
 
-            List<CashShopItem> cashShopItems = new List<CashShopItem>();
+            List<CashShopItem> list = new List<CashShopItem>();
             foreach (int cashShopItemId in response.cashShopItemIds)
             {
                 CashShopItem cashShopItem;
                 if (GameInstance.CashShopItems.TryGetValue(cashShopItemId, out cashShopItem))
-                    cashShopItems.Add(cashShopItem);
+                    list.Add(cashShopItem);
             }
 
             int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             int showingCount = 0;
             UICashShopItem tempUI;
-            CacheList.Generate(cashShopItems, (index, cashShopItem, ui) =>
+            CacheList.Generate(list, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICashShopItem>();
-                if (cashShopItem == null ||
-                    string.IsNullOrEmpty(cashShopItem.category) ||
+                if (data == null ||
+                    string.IsNullOrEmpty(data.category) ||
                     filterCategories == null || filterCategories.Count == 0 ||
-                    filterCategories.Contains(cashShopItem.category))
+                    filterCategories.Contains(data.category))
                 {
                     tempUI.uiCashShop = this;
-                    tempUI.Data = cashShopItem;
+                    tempUI.Data = data;
                     tempUI.Show();
                     CacheSelectionManager.Add(tempUI);
                     if (selectedIdx == index)
@@ -159,7 +160,7 @@ namespace MultiplayerARPG
                 }
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(cashShopItems.Count == 0);
+                listEmptyObject.SetActive(showingCount == 0);
         }
 
         private void ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)
