@@ -15,6 +15,10 @@ public class TextWrapper : MonoBehaviour
     {
         get
         {
+            if (unityText != null) return unityText.text;
+#if USE_TEXT_MESH_PRO
+            if (textMeshText != null) return textMeshText.text;
+#endif
             return _textValue;
         }
 

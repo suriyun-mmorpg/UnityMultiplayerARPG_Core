@@ -16,6 +16,10 @@ public class InputFieldWrapper : MonoBehaviour
     {
         get
         {
+            if (unityInputField != null) return unityInputField.text;
+#if USE_TEXT_MESH_PRO
+            if (textMeshInputField != null) return textMeshInputField.text;
+#endif
             return _textValue;
         }
 
