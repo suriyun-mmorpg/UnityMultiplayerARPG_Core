@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class UISocialCharacter : UISelectionEntry<UISocialCharacterData>
+    public partial class UISocialCharacter : UISelectionEntry<UISocialCharacterData>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]
