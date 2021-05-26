@@ -11,19 +11,17 @@ public class InputFieldWrapper : MonoBehaviour
 #if USE_TEXT_MESH_PRO
     public TMP_InputField textMeshInputField;
 #endif
+    private string _textValue;
     public virtual string text
     {
         get
         {
-            if (unityInputField != null) return unityInputField.text;
-#if USE_TEXT_MESH_PRO
-            if (textMeshInputField != null) return textMeshInputField.text;
-#endif
-            return string.Empty;
+            return _textValue;
         }
 
         set
         {
+            _textValue = value;
             if (unityInputField != null) unityInputField.text = value;
 #if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) textMeshInputField.text = value;
@@ -291,6 +289,7 @@ public class InputFieldWrapper : MonoBehaviour
 #if USE_TEXT_MESH_PRO
         if (textMeshInputField == null) textMeshInputField = GetComponent<TMP_InputField>();
 #endif
+        text = _textValue;
     }
 
     public void SetGameObjectActive(bool isActive)

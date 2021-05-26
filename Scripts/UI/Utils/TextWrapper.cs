@@ -10,19 +10,17 @@ public class TextWrapper : MonoBehaviour
 #if USE_TEXT_MESH_PRO
     public TextMeshProUGUI textMeshText;
 #endif
+    private string _textValue;
     public virtual string text
     {
         get
         {
-            if (unityText != null) return unityText.text;
-#if USE_TEXT_MESH_PRO
-            if (textMeshText != null) return textMeshText.text;
-#endif
-            return string.Empty;
+            return _textValue;
         }
 
         set
         {
+            _textValue = value;
             if (unityText != null) unityText.text = value;
 #if USE_TEXT_MESH_PRO
             if (textMeshText != null) textMeshText.text = value;
@@ -56,6 +54,7 @@ public class TextWrapper : MonoBehaviour
 #if USE_TEXT_MESH_PRO
         if (textMeshText == null) textMeshText = GetComponent<TextMeshProUGUI>();
 #endif
+        text = _textValue;
     }
 
     public void SetGameObjectActive(bool isActive)
