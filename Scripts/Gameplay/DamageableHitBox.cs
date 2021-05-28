@@ -74,10 +74,10 @@ namespace MultiplayerARPG
         }
         public int Index { get; private set; }
 
-        private bool isSetup;
-        private Vector3 defaultLocalPosition;
-        private Quaternion defaultLocalRotation;
-        private List<TransformHistory> histories = new List<TransformHistory>();
+        protected bool isSetup;
+        protected Vector3 defaultLocalPosition;
+        protected Quaternion defaultLocalRotation;
+        protected List<TransformHistory> histories = new List<TransformHistory>();
 
 #if UNITY_EDITOR
         [Header("Rewind Debugging")]

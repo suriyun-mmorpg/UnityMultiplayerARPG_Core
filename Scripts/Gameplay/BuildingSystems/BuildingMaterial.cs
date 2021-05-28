@@ -139,6 +139,9 @@ namespace MultiplayerARPG
 
         private void OnTriggerStay(Collider other)
         {
+            if (!isSetup)
+                return;
+
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
 
@@ -166,6 +169,9 @@ namespace MultiplayerARPG
 
         private void OnTriggerExit(Collider other)
         {
+            if (!isSetup)
+                return;
+
             if (BuildingEntity.IsBuildMode)
             {
                 BuildingMaterial material = other.GetComponent<BuildingMaterial>();
@@ -182,6 +188,9 @@ namespace MultiplayerARPG
 
         private void OnTriggerStay2D(Collider2D other)
         {
+            if (!isSetup)
+                return;
+
             if (!ValidateTriggerLayer(other.gameObject))
                 return;
 
@@ -210,6 +219,9 @@ namespace MultiplayerARPG
 
         private void OnTriggerExit2D(Collider2D other)
         {
+            if (!isSetup)
+                return;
+
             if (BuildingEntity.IsBuildMode)
             {
                 BuildingMaterial material = other.GetComponent<BuildingMaterial>();
