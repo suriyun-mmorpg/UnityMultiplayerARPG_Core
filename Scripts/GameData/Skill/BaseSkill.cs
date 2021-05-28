@@ -389,6 +389,7 @@ namespace MultiplayerARPG
         /// <param name="weapon"></param>
         /// <param name="hitIndex"></param>
         /// <param name="damageAmounts"></param>
+        /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         /// <param name="randomSeed"></param>
         /// <param name="time"></param>
@@ -400,6 +401,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            uint targetObjectId,
             AimPosition aimPosition,
             int randomSeed,
             long? time)
@@ -423,6 +425,7 @@ namespace MultiplayerARPG
                 weapon,
                 hitIndex,
                 damageAmounts,
+                targetObjectId,
                 aimPosition,
                 randomSeed,
                 time);
@@ -437,6 +440,7 @@ namespace MultiplayerARPG
         /// <param name="weapon"></param>
         /// <param name="hitIndex"></param>
         /// <param name="damageAmounts"></param>
+        /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         /// <param name="randomSeed"></param>
         /// <param name="time"></param>
@@ -448,6 +452,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            uint targetObjectId,
             AimPosition aimPosition,
             int randomSeed,
             long? time);
@@ -527,7 +532,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out UITextKeys gameMessage, bool isItem = false)
+        public virtual bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
         {
             gameMessage = UITextKeys.NONE;
             if (character == null)
@@ -653,7 +658,7 @@ namespace MultiplayerARPG
             if (RequiredTarget())
             {
                 BaseCharacterEntity targetEntity;
-                if (!character.TryGetTargetEntity(out targetEntity))
+                if (!character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity))
                 {
                     gameMessage = UITextKeys.UI_ERROR_NO_SKILL_TARGET;
                     return false;

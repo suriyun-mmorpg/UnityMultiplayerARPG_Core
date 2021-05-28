@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
+        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed, long? time)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             // Apply buff, summons at server only
             if (skillUser.IsServer)
             {
-                ApplySkillBuff(skillUser, skillLevel);
+                ApplySkillBuff(skillUser, skillLevel, targetObjectId);
                 ApplySkillSummon(skillUser, skillLevel);
                 ApplySkillMount(skillUser, skillLevel);
             }
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ApplySkillBuff(BaseCharacterEntity skillUser, short skillLevel)
+        protected void ApplySkillBuff(BaseCharacterEntity skillUser, short skillLevel, uint targetObjectId)
         {
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
@@ -149,7 +149,7 @@ namespace MultiplayerARPG
                     break;
                 case SkillBuffType.BuffToTarget:
                     BaseCharacterEntity targetEntity;
-                    if (!skillUser.TryGetTargetEntity(out targetEntity))
+                    if (!skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity))
                         targetEntity = skillUser;
                     if (!targetEntity.IsDead())
                         targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
@@ -352,9 +352,9 @@ namespace MultiplayerARPG
             return base.GetApplyTransform(skillUser, isLeftHand);
         }
 
-        public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out UITextKeys gameMessage, bool isItem = false)
+        public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
         {
-            bool canUse = base.CanUse(character, level, isLeftHand, out gameMessage, isItem);
+            bool canUse = base.CanUse(character, level, isLeftHand, targetObjectId, out gameMessage, isItem);
             if (!canUse && gameMessage == UITextKeys.UI_ERROR_NO_SKILL_TARGET)
             {
                 // Still allow to use skill but it's going to set applies target to skill user

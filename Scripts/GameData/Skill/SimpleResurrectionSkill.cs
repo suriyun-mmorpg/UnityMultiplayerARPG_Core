@@ -23,11 +23,11 @@ namespace MultiplayerARPG
         public IncrementalFloat buffDistance;
         public Buff buff;
 
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
+        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed, long? time)
         {
             // Resurrect target
             BasePlayerCharacterEntity targetEntity;
-            if (!skillUser.TryGetTargetEntity(out targetEntity) || !targetEntity.IsDead())
+            if (!skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) || !targetEntity.IsDead())
                 return;
             
             targetEntity.CurrentHp = Mathf.CeilToInt(targetEntity.GetCaches().MaxHp * resurrectHpRate);
@@ -95,15 +95,15 @@ namespace MultiplayerARPG
             return buff;
         }
 
-        public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, out UITextKeys gameMessage, bool isItem = false)
+        public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
         {
-            if (!base.CanUse(character, level, isLeftHand, out gameMessage, isItem))
+            if (!base.CanUse(character, level, isLeftHand, targetObjectId, out gameMessage, isItem))
                 return false;
             
             BasePlayerCharacterEntity targetEntity;
-            if (!character.TryGetTargetEntity(out targetEntity) || !targetEntity.IsDead())
+            if (!character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) || !targetEntity.IsDead())
                 return false;
-            
+
             return true;
         }
     }

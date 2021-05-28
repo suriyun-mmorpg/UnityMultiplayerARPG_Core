@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public short skillLevel;
         public byte randomSeed;
         public int hitIndex;
+        public uint targetObjectId;
         public AimPosition aimPosition;
         public long time;
 
@@ -21,6 +22,7 @@ namespace MultiplayerARPG
                 writer.PutPackedInt(skillDataId);
                 writer.PutPackedShort(skillLevel);
                 writer.PutPackedInt(hitIndex);
+                writer.PutPackedUInt(targetObjectId);
             }
             writer.PutValue(aimPosition);
             writer.PutPackedLong(time);
@@ -35,6 +37,7 @@ namespace MultiplayerARPG
                 skillDataId = reader.GetPackedInt();
                 skillLevel = reader.GetPackedShort();
                 hitIndex = reader.GetPackedInt();
+                targetObjectId = reader.GetPackedUInt();
             }
             aimPosition = reader.GetValue<AimPosition>();
             time = reader.GetPackedLong();

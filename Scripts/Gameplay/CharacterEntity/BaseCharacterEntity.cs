@@ -568,7 +568,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool ValidateUseSKill(int dataId, bool isLeftHand)
+        public bool ValidateUseSkill(int dataId, bool isLeftHand, uint targetObjectId)
         {
             if (!CanUseSkill())
                 return false;
@@ -583,7 +583,7 @@ namespace MultiplayerARPG
                 return false;
 
             UITextKeys gameMessage;
-            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessage))
+            if (!skill.CanUse(this, skillLevel, isLeftHand, targetObjectId, out gameMessage))
             {
                 QueueGameMessage(gameMessage);
                 return false;
@@ -591,7 +591,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool ValidateUseSkillItem(short index, bool isLeftHand)
+        public bool ValidateUseSkillItem(short index, bool isLeftHand, uint targetObjectId)
         {
             if (!CanUseItem())
                 return false;
@@ -615,7 +615,7 @@ namespace MultiplayerARPG
                 return false;
 
             UITextKeys gameMessage;
-            if (!skill.CanUse(this, skillLevel, isLeftHand, out gameMessage, true))
+            if (!skill.CanUse(this, skillLevel, isLeftHand, targetObjectId, out gameMessage, true))
             {
                 QueueGameMessage(gameMessage);
                 return false;
@@ -647,25 +647,25 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
+        public bool UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
-            if (ValidateUseSKill(dataId, isLeftHand))
+            if (ValidateUseSkill(dataId, isLeftHand, targetObjectId))
             {
-                UseSkillComponent.UseSkill(dataId, isLeftHand, aimPosition);
+                UseSkillComponent.UseSkill(dataId, isLeftHand, targetObjectId, aimPosition);
                 return true;
             }
             return false;
         }
 
-        public bool UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
+        public bool UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
-            if (ValidateUseSkillItem(itemIndex, isLeftHand))
+            if (ValidateUseSkillItem(itemIndex, isLeftHand, targetObjectId))
             {
-                UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, aimPosition);
+                UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, targetObjectId, aimPosition);
                 return true;
             }
             return false;

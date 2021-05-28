@@ -198,7 +198,7 @@ namespace MultiplayerARPG
                 if (queueSkill != null && Entity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) < 0)
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
-                    Entity.UseSkill(queueSkill.DataId, false, new AimPosition()
+                    Entity.UseSkill(queueSkill.DataId, false, 0, new AimPosition()
                     {
                         type = AimPositionType.Position,
                         position = tempTargetEnemy.OpponentAimTransform.position,

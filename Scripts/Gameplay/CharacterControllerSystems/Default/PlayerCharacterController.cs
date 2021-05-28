@@ -372,18 +372,19 @@ namespace MultiplayerARPG
                 !PlayerCharacterEntity.IsAttacking &&
                 !PlayerCharacterEntity.IsUsingSkill)
             {
-                bool canUseSkill;
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    canUseSkill = PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, queueUsingSkill.aimPosition);
+                    if (PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, SelectedEntityObjectId, queueUsingSkill.aimPosition))
+                    {
+                        isLeftHandAttacking = !isLeftHandAttacking;
+                    }
                 }
                 else
                 {
-                    canUseSkill = PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, queueUsingSkill.aimPosition);
-                }
-                if (canUseSkill)
-                {
-                    isLeftHandAttacking = !isLeftHandAttacking;
+                    if (PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, SelectedEntityObjectId, queueUsingSkill.aimPosition))
+                    {
+                        isLeftHandAttacking = !isLeftHandAttacking;
+                    }
                 }
                 ClearQueueUsingSkill();
             }

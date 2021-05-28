@@ -34,6 +34,7 @@ namespace MultiplayerARPG
         CharacterItem weapon,
         int hitIndex,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+        uint targetObjectId,
         AimPosition aimPosition);
     public delegate void LaunchDamageEntityDelegate(
         bool isLeftHand,

@@ -1559,11 +1559,11 @@ namespace MultiplayerARPG
             {
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHand, queueUsingSkill.aimPosition);
+                    PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHand, SelectedEntityObjectId, queueUsingSkill.aimPosition);
                 }
                 else
                 {
-                    PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHand, queueUsingSkill.aimPosition);
+                    PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHand, SelectedEntityObjectId, queueUsingSkill.aimPosition);
                 }
             }
             ClearQueueUsingSkill();

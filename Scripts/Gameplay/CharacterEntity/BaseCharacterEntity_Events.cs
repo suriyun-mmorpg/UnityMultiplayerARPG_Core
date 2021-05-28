@@ -60,10 +60,11 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int hitIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            uint targetObjectId,
             AimPosition aimPosition)
         {
             if (onUseSkillRoutine != null)
-                onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+                onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition);
         }
 
         public void OnLaunchDamageEntity(

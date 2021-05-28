@@ -44,9 +44,9 @@ namespace MultiplayerARPG
             IsUsingSkill = false;
         }
 
-        public bool CallServerUseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
+        public bool CallServerUseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            RPC(ServerUseSkill, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, dataId, isLeftHand, aimPosition);
+            RPC(ServerUseSkill, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, dataId, isLeftHand, targetObjectId, aimPosition);
             return true;
         }
 
@@ -55,9 +55,10 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="dataId"></param>
         /// <param name="isLeftHand"></param>
+        /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         [ServerRpc]
-        protected void ServerUseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
+        protected void ServerUseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
             BaseSkill skill;
@@ -67,7 +68,7 @@ namespace MultiplayerARPG
                 return;
 
             // Validate mp amount, skill level, 
-            if (!skill.CanUse(Entity, skillLevel, isLeftHand, out _))
+            if (!skill.CanUse(Entity, skillLevel, isLeftHand, targetObjectId, out _))
                 return;
 
             // Prepare required data and get skill data
@@ -95,13 +96,13 @@ namespace MultiplayerARPG
             IsUsingSkill = true;
 
             // Play animations
-            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, aimPosition);
+            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, targetObjectId, aimPosition);
 #endif
         }
 
-        public bool CallServerUseSkillItem(short index, bool isLeftHand, AimPosition aimPosition)
+        public bool CallServerUseSkillItem(short index, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            RPC(ServerUseSkillItem, index, isLeftHand, aimPosition);
+            RPC(ServerUseSkillItem, index, isLeftHand, targetObjectId, aimPosition);
             return true;
         }
 
@@ -109,9 +110,11 @@ namespace MultiplayerARPG
         /// This function will be called at server to order character to use item
         /// </summary>
         /// <param name="itemIndex"></param>
+        /// <param name="isLeftHand"></param>
+        /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         [ServerRpc]
-        protected void ServerUseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
+        protected void ServerUseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
             if (itemIndex >= Entity.NonEquipItems.Count)
@@ -126,7 +129,7 @@ namespace MultiplayerARPG
             ISkillItem item = characterItem.GetSkillItem();
 
             // Validate mp amount, skill level
-            if (!item.UsingSkill.CanUse(Entity, item.UsingSkillLevel, isLeftHand, out _, true))
+            if (!item.UsingSkill.CanUse(Entity, item.UsingSkillLevel, isLeftHand, targetObjectId, out _, true))
                 return;
 
             // Prepare required data and get skill data
@@ -159,23 +162,23 @@ namespace MultiplayerARPG
             IsUsingSkill = true;
 
             // Play animations
-            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, aimPosition);
+            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, targetObjectId, aimPosition);
 #endif
         }
 
-        public bool CallAllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
+        public bool CallAllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
         {
-            RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, skillDataId, skillLevel, aimPosition);
+            RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, skillDataId, skillLevel, targetObjectId, aimPosition);
             return true;
         }
 
         [AllRpc]
-        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, AimPosition aimPosition)
+        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
         {
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
             {
-                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, aimPosition).Forget();
+                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, targetObjectId, aimPosition).Forget();
             }
             else
             {
@@ -244,7 +247,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async UniTaskVoid UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, AimPosition skillAimPosition)
+        protected async UniTaskVoid UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, uint targetObjectId, AimPosition skillAimPosition)
         {
             // Prepare cancellation
             CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
@@ -366,14 +369,14 @@ namespace MultiplayerARPG
                         aimPosition = Entity.AimPosition;
 
                     // Trigger skill event
-                    Entity.OnUseSkillRoutine(skill, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition);
+                    Entity.OnUseSkillRoutine(skill, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition);
 
                     // Apply skill buffs, summons and attack damages
                     if (IsOwnerClientOrOwnedByServer)
                     {
                         int randomSeed = Random.Range(0, 255);
                         long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
-                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, aimPosition, randomSeed, time);
+                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition, randomSeed, time);
                         SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                         if (isLeftHand)
                             simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
@@ -382,6 +385,7 @@ namespace MultiplayerARPG
                         simulateData.skillDataId = skill.DataId;
                         simulateData.skillLevel = skillLevel;
                         simulateData.hitIndex = hitIndex;
+                        simulateData.targetObjectId = targetObjectId;
                         simulateData.aimPosition = aimPosition;
                         CallAllSimulateLaunchDamageEntity(simulateData);
                     }
@@ -442,19 +446,19 @@ namespace MultiplayerARPG
                 {
                     CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                     Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.aimPosition, data.randomSeed, data.time);
+                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, data.randomSeed, data.time);
                 }
             }
         }
 
-        public void UseSkill(int dataId, bool isLeftHand, AimPosition aimPosition)
+        public void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            CallServerUseSkill(dataId, isLeftHand, aimPosition);
+            CallServerUseSkill(dataId, isLeftHand, targetObjectId, aimPosition);
         }
 
-        public void UseSkillItem(short itemIndex, bool isLeftHand, AimPosition aimPosition)
+        public void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            CallServerUseSkillItem(itemIndex, isLeftHand, aimPosition);
+            CallServerUseSkillItem(itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
     }
 }
