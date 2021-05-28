@@ -319,18 +319,24 @@ namespace MultiplayerARPG
 
         public bool CallServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, short amount)
         {
+            if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
+                return false;
             RPC(ServerAppendCraftingQueueItem, sourceObjectId, dataId, amount);
             return true;
         }
 
         public bool CallServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, short amount)
         {
+            if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
+                return false;
             RPC(ServerChangeCraftingQueueItem, sourceObjectId, indexOfData, amount);
             return true;
         }
 
         public bool CallServerCancelCraftingQueueItem(uint sourceObjectId, int indexOfData)
         {
+            if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
+                return false;
             RPC(ServerCancelCraftingQueueItem, sourceObjectId, indexOfData);
             return true;
         }
