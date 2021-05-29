@@ -207,6 +207,8 @@ namespace MultiplayerARPG
 
         protected void ShowConstructBuildingDialog()
         {
+            if (!ConstructingBuildingEntity.CanBuild())
+                return;
             CacheUISceneGameplay.ShowConstructBuildingDialog(ConstructingBuildingEntity);
         }
 
