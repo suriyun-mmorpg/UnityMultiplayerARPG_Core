@@ -60,9 +60,6 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
-            short storageItemIndex = request.storageItemIndex;
-            short amount = request.storageItemAmount;
-            short inventoryIndex = request.inventoryItemIndex;
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -81,10 +78,22 @@ namespace MultiplayerARPG
                 return;
             }
             List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
+            if (request.storageItemIndex < 0 || request.storageItemIndex >= storageItemList.Count ||
+                request.storageItemAmount <= 0 || request.storageItemAmount > storageItemList[request.storageItemIndex].amount)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS,
+                });
+                return;
+            }
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
+            short storageItemIndex = request.storageItemIndex;
+            short amount = request.storageItemAmount;
+            short inventoryIndex = request.inventoryItemIndex;
             // Prepare item data
             CharacterItem movingItem = storageItemList[storageItemIndex].Clone(true);
             IArmorItem equippingArmorItem = movingItem.GetArmorItem();
@@ -112,12 +121,31 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Swapping
                 CharacterItem storageItem = storageItemList[storageItemIndex];
                 CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryIndex];
-
-                storageItemList[storageItemIndex] = nonEquipItem;
-                playerCharacter.NonEquipItems[inventoryIndex] = storageItem;
+                if (nonEquipItem.IsEmptySlot())
+                {
+                    // Add to inventory or merge
+                    bool isOverwhelming = playerCharacter.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
+                    if (isOverwhelming)
+                    {
+                        result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
+                        {
+                            message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
+                        });
+                        return;
+                    }
+                    // Increase to inventory
+                    playerCharacter.NonEquipItems[inventoryIndex] = movingItem;
+                    // Decrease from storage
+                    storageItemList.DecreaseItemsByIndex(storageItemIndex, amount, isLimitSlot);
+                }
+                else
+                {
+                    // Swapping
+                    storageItemList[storageItemIndex] = nonEquipItem;
+                    playerCharacter.NonEquipItems[inventoryIndex] = storageItem;
+                }
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             playerCharacter.FillEmptySlots();
@@ -131,9 +159,6 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestMoveItemToStorage(RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemToStorageMessage> result)
         {
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
-            short inventoryIndex = request.inventoryItemIndex;
-            short amount = request.inventoryItemAmount;
-            short storageItemIndex = request.storageItemIndex;
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -151,6 +176,15 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+            if (request.inventoryItemIndex < 0 || request.inventoryItemIndex >= playerCharacter.NonEquipItems.Count ||
+                request.inventoryItemAmount <= 0 || request.inventoryItemAmount > playerCharacter.NonEquipItems[request.inventoryItemIndex].amount)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS,
+                });
+                return;
+            }
             List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
@@ -158,6 +192,9 @@ namespace MultiplayerARPG
             bool isLimitSlot = storage.slotLimit > 0;
             short weightLimit = storage.weightLimit;
             short slotLimit = storage.slotLimit;
+            short inventoryIndex = request.inventoryItemIndex;
+            short amount = request.inventoryItemAmount;
+            short storageItemIndex = request.storageItemIndex;
             // Prepare item data
             CharacterItem movingItem = playerCharacter.NonEquipItems[inventoryIndex].Clone(true);
             movingItem.amount = amount;
@@ -184,12 +221,33 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Swapping
                 CharacterItem storageItem = storageItemList[storageItemIndex];
                 CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryIndex];
-
-                storageItemList[storageItemIndex] = nonEquipItem;
-                playerCharacter.NonEquipItems[inventoryIndex] = storageItem;
+                if (storageItem.IsEmptySlot())
+                {
+                    // Add to storage or merge
+                    bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                        movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
+                        storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
+                    if (isOverwhelming)
+                    {
+                        result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
+                        {
+                            message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
+                        });
+                        return;
+                    }
+                    // Increase to storage
+                    storageItemList[storageItemIndex] = movingItem;
+                    // Decrease from inventory
+                    playerCharacter.DecreaseItemsByIndex(inventoryIndex, amount);
+                }
+                else
+                {
+                    // Swapping
+                    storageItemList[storageItemIndex] = nonEquipItem;
+                    playerCharacter.NonEquipItems[inventoryIndex] = storageItem;
+                }
             }
             playerCharacter.FillEmptySlots();
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
