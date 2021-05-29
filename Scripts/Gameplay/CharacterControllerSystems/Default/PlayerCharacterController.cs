@@ -301,12 +301,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool TryGetTargetCharacter(out BaseCharacterEntity character)
-        {
-            character = null;
-            return PlayerCharacterEntity.TryGetTargetEntity(out character);
-        }
-
         public void GetAttackDistanceAndFov(bool isLeftHand, out float attackDistance, out float attackFov)
         {
             attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHand);
