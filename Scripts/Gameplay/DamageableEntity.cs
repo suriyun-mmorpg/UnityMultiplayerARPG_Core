@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             // Assign index to hitboxes
             for (int i = 0; i < HitBoxes.Length; ++i)
             {
-                HitBoxes[i].Setup(this, i);
+                HitBoxes[i].Setup(i);
             }
             // Add to lag compensation manager
             if (!isStaticHitBoxes)

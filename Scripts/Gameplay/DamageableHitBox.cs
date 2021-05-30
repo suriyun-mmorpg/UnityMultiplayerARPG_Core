@@ -25,51 +25,43 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (isSetup)
-                    return DamageableEntity.Entity;
-                return null;
+                return DamageableEntity.Entity;
             }
         }
         public int CurrentHp
         {
             get
             {
-                return !isSetup ? 0 : DamageableEntity.CurrentHp;
+                return DamageableEntity.CurrentHp;
             }
             set
             {
-                if (isSetup)
-                    DamageableEntity.CurrentHp = value;
+                DamageableEntity.CurrentHp = value;
             }
         }
         public bool IsInSafeArea
         {
             get
             {
-                return !isSetup ? false : DamageableEntity.IsInSafeArea;
+                return DamageableEntity.IsInSafeArea;
             }
             set
             {
-                if (isSetup)
-                    DamageableEntity.IsInSafeArea = value;
+                DamageableEntity.IsInSafeArea = value;
             }
         }
         public Transform OpponentAimTransform
         {
             get
             {
-                if (isSetup)
-                    return DamageableEntity.OpponentAimTransform;
-                return null;
+                return DamageableEntity.OpponentAimTransform;
             }
         }
         public LiteNetLibIdentity Identity
         {
             get
             {
-                if (isSetup)
-                    return DamageableEntity.Identity;
-                return null;
+                return DamageableEntity.Identity;
             }
         }
         public int Index { get; private set; }
@@ -89,9 +81,10 @@ namespace MultiplayerARPG
         private Vector3? debugRewindSize;
 #endif
 
-#if UNITY_EDITOR
         private void Awake()
         {
+            DamageableEntity = GetComponentInParent<DamageableEntity>();
+#if UNITY_EDITOR
             Collider debugCollider = GetComponent<Collider>();
             Collider2D debugCollider2D = GetComponent<Collider2D>();
             if (debugCollider)
@@ -104,15 +97,14 @@ namespace MultiplayerARPG
                 debugRewindCenter = debugCollider2D.bounds.center - transform.position;
                 debugRewindSize = debugCollider2D.bounds.size;
             }
-        }
 #endif
+        }
 
-        public virtual void Setup(DamageableEntity entity, int index)
+        public virtual void Setup(int index)
         {
             isSetup = true;
-            DamageableEntity = entity;
-            gameObject.tag = entity.gameObject.tag;
-            gameObject.layer = entity.gameObject.layer;
+            gameObject.tag = DamageableEntity.gameObject.tag;
+            gameObject.layer = DamageableEntity.gameObject.layer;
             defaultLocalPosition = transform.localPosition;
             defaultLocalRotation = transform.localRotation;
             Index = index;

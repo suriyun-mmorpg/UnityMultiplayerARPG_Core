@@ -91,6 +91,12 @@ namespace MultiplayerARPG
             SortNearestEntity(itemsContainers);
         }
 
+        public void ClearExcludeColliders()
+        {
+            excludeColliders.Clear();
+            excludeCollider2Ds.Clear();
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             if (excludeColliders.Contains(other))
@@ -247,9 +253,21 @@ namespace MultiplayerARPG
             bool findWithAdvanceOptions = true)
         {
             player = null;
+            monster = null;
+            npc = null;
+            itemDrop = null;
+            building = null;
+            vehicle = null;
+            warpPortal = null;
+            itemsContainer = null;
+
+            IGameEntity gameEntity = other.GetComponent<IGameEntity>();
+            if (gameEntity == null)
+                return;
+
             if (findPlayer)
             {
-                player = other.GetComponent<BasePlayerCharacterEntity>();
+                player = gameEntity.Entity as BasePlayerCharacterEntity;
                 if (player == GameInstance.PlayingCharacterEntity)
                     player = null;
                 if (findWithAdvanceOptions)
@@ -261,10 +279,9 @@ namespace MultiplayerARPG
                 }
             }
 
-            monster = null;
             if (findMonster)
             {
-                monster = other.GetComponent<BaseMonsterCharacterEntity>();
+                monster = gameEntity.Entity as BaseMonsterCharacterEntity;
                 if (findWithAdvanceOptions)
                 {
                     if (findOnlyAliveMonsters && monster != null && monster.IsDead())
@@ -274,20 +291,15 @@ namespace MultiplayerARPG
                 }
             }
 
-            npc = null;
             if (findNpc)
-                npc = other.GetComponent<NpcEntity>();
+                npc = gameEntity.Entity as NpcEntity;
 
-            itemDrop = null;
             if (findItemDrop)
-                itemDrop = other.GetComponent<ItemDropEntity>();
+                itemDrop = gameEntity.Entity as ItemDropEntity;
 
-            building = null;
             if (findBuilding)
             {
-                BuildingMaterial buildingMaterial = other.GetComponent<BuildingMaterial>();
-                if (buildingMaterial != null)
-                    building = buildingMaterial.BuildingEntity;
+                building = gameEntity.Entity as BuildingEntity;
                 if (findWithAdvanceOptions)
                 {
                     if (findOnlyAliveBuildings && building != null && building.IsDead())
@@ -297,17 +309,14 @@ namespace MultiplayerARPG
                 }
             }
 
-            vehicle = null;
             if (findVehicle)
-                vehicle = other.GetComponent<VehicleEntity>();
+                vehicle = gameEntity.Entity as VehicleEntity;
 
-            warpPortal = null;
             if (findWarpPortal)
-                warpPortal = other.GetComponent<WarpPortalEntity>();
+                warpPortal = gameEntity.Entity as WarpPortalEntity;
 
-            itemsContainer = null;
             if (findItemsContainer)
-                itemsContainer = other.GetComponent<ItemsContainerEntity>();
+                itemsContainer = gameEntity.Entity as ItemsContainerEntity;
         }
 
         private void SortNearestEntity<T>(List<T> entities) where T : BaseGameEntity

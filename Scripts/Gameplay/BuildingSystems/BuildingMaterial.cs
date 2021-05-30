@@ -99,10 +99,10 @@ namespace MultiplayerARPG
         public NavMeshObstacle CacheNavMeshObstacle { get; private set; }
         private bool dirtyIsBuildMode;
 
-        public override void Setup(DamageableEntity entity, int index)
+        public override void Setup(int index)
         {
-            base.Setup(entity, index);
-            BuildingEntity = entity as BuildingEntity;
+            base.Setup(index);
+            BuildingEntity = DamageableEntity as BuildingEntity;
             BuildingEntity.RegisterMaterial(this);
             CacheCollider = GetComponent<Collider>();
             CacheCollider2D = GetComponent<Collider2D>();
