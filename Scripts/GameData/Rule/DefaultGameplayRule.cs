@@ -184,19 +184,19 @@ namespace MultiplayerARPG
         {
             if (IsHungry(character))
                 return 0;
-            return character.GetCaches().MaxHp * hpRecoveryRatePerSeconds;
+            return (character.GetCaches().MaxHp * hpRecoveryRatePerSeconds) + character.GetCaches().Stats.hpRecovery;
         }
 
         public override float GetRecoveryMpPerSeconds(BaseCharacterEntity character)
         {
             if (IsThirsty(character))
                 return 0;
-            return character.GetCaches().MaxMp * mpRecoveryRatePerSeconds;
+            return (character.GetCaches().MaxMp * mpRecoveryRatePerSeconds) + character.GetCaches().Stats.mpRecovery;
         }
 
         public override float GetRecoveryStaminaPerSeconds(BaseCharacterEntity character)
         {
-            return staminaRecoveryPerSeconds;
+            return staminaRecoveryPerSeconds + character.GetCaches().Stats.staminaRecovery;
         }
 
         public override float GetDecreasingHpPerSeconds(BaseCharacterEntity character)
@@ -490,9 +490,20 @@ namespace MultiplayerARPG
             float decreaseShieldDurability;
             float decreaseArmorDurability;
             GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
-            // Decrease Weapon Durability
             if (attacker != null)
+            {
+                // Decrease Weapon Durability
                 DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
+                CharacterStats stats = attacker.GetCaches().Stats;
+                // Hp Leeching, don't decrease damage receiver's Hp again
+                attacker.CurrentHp += Mathf.CeilToInt(damage * stats.hpLeechRate);
+                // Mp Leeching
+                attacker.CurrentMp += Mathf.CeilToInt(damage * stats.mpLeechRate);
+                damageReceiver.CurrentMp -= Mathf.CeilToInt(damage * stats.mpLeechRate);
+                // Stamina Leeching
+                attacker.CurrentStamina += Mathf.CeilToInt(damage * stats.staminaLeechRate);
+                damageReceiver.CurrentStamina -= Mathf.CeilToInt(damage * stats.staminaLeechRate);
+            }
             // Decrease Shield Durability
             DecreaseEquipShieldsDurability(damageReceiver, decreaseShieldDurability);
             // Decrease Armor Durability
@@ -505,9 +516,11 @@ namespace MultiplayerARPG
             float decreaseShieldDurability;
             float decreaseArmorDurability;
             GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
-            // Decrease Weapon Durability
             if (attacker != null)
+            {
+                // Decrease Weapon Durability
                 DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
+            }
         }
 
         private void GetDecreaseDurabilityAmount(CombatAmountType combatAmountType, out float decreaseWeaponDurability, out float decreaseShieldDurability, out float decreaseArmorDurability)
