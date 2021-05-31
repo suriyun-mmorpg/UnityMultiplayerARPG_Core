@@ -264,7 +264,7 @@ namespace MultiplayerARPG
             base.ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
 
             BaseCharacterEntity attackerCharacter;
-            if (instigator.TryGetEntity(out attackerCharacter))
+            if (instigator != null && instigator.TryGetEntity(out attackerCharacter))
             {
                 // If character is not dead, try to attack
                 if (!this.IsDead())
@@ -286,9 +286,9 @@ namespace MultiplayerARPG
 
         public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType damageAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            // Attacker can be null when character buff's buff applier is null, So avoid it
+            // Attacker can be null when character buff's buff applier is null. So, avoid it
             BaseCharacterEntity attackerCharacter;
-            if (instigator.TryGetEntity(out attackerCharacter))
+            if (instigator != null && instigator.TryGetEntity(out attackerCharacter))
             {
 
                 // If summoned by someone, summoner is attacker

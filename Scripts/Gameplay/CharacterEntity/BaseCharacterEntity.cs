@@ -433,8 +433,8 @@ namespace MultiplayerARPG
             bool isCritical = false;
             bool isBlocked = false;
 
-            BaseCharacterEntity attackerCharacter;
-            if (instigator.TryGetEntity(out attackerCharacter))
+            BaseCharacterEntity attackerCharacter = null;
+            if (instigator != null && instigator.TryGetEntity(out attackerCharacter))
             {
                 // Notify enemy spotted when received damage from enemy
                 NotifyEnemySpottedToAllies(attackerCharacter);
@@ -488,9 +488,10 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             base.ReceivedDamage(fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
-            BaseCharacterEntity attackerCharacter;
-            if (instigator.TryGetEntity(out attackerCharacter))
-                CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            BaseCharacterEntity attackerCharacter = null;
+            if (instigator != null)
+                instigator.TryGetEntity(out attackerCharacter);
+            CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel);
 
             if (combatAmountType == CombatAmountType.Miss)
                 return;

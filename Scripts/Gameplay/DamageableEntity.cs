@@ -309,7 +309,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (string.IsNullOrEmpty(instigator.id))
+            if (instigator == null || string.IsNullOrEmpty(instigator.id))
             {
                 // If attacker is unknow entity, can receive damages
                 return true;

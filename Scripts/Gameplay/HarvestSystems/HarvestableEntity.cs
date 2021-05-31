@@ -175,9 +175,10 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             base.ReceivedDamage(fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
-            BaseCharacterEntity attackerCharacter;
-            if (instigator.TryGetEntity(out attackerCharacter))
-                CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            BaseCharacterEntity attackerCharacter = null;
+            if (instigator != null)
+                instigator.TryGetEntity(out attackerCharacter);
+            CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel);
 
             if (combatAmountType == CombatAmountType.Miss)
                 return;
