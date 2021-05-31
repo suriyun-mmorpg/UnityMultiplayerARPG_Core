@@ -160,6 +160,9 @@ namespace MultiplayerARPG
                         // Causer is the entity whom applied buffs to this entity
                         Entity.ValidateRecovery(buff.BuffApplier);
                     }
+                    // Don't update next buffs if character dead
+                    if (Entity.IsDead())
+                        break;
                 }
                 updatingTime = 0;
             }

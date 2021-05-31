@@ -37,7 +37,7 @@
                 {
                     tempAmount = (int)decreasingHp;
                     characterEntity.CurrentHp -= tempAmount;
-                    characterEntity.ReceivedDamage(characterEntity.CacheTransform.position, causer, null, CombatAmountType.NormalDamage, tempAmount, null, null, 0);
+                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.NormalDamage, DamageSource.None, 0, tempAmount);
                     decreasingHp -= tempAmount;
                 }
             }
@@ -155,21 +155,6 @@
             }
             else
                 decreasingWater = 0;
-
-            if (characterEntity.CurrentHp <= 0)
-                characterEntity.CurrentHp = 0;
-
-            if (characterEntity.CurrentMp <= 0)
-                characterEntity.CurrentMp = 0;
-
-            if (characterEntity.CurrentStamina <= 0)
-                characterEntity.CurrentStamina = 0;
-
-            if (characterEntity.CurrentFood <= 0)
-                characterEntity.CurrentFood = 0;
-
-            if (characterEntity.CurrentWater <= 0)
-                characterEntity.CurrentWater = 0;
 
             return this;
         }
