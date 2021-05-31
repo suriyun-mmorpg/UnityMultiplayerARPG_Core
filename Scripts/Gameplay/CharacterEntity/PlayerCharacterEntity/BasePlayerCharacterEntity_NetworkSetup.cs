@@ -107,7 +107,7 @@ namespace MultiplayerARPG
                 if (CurrentGameInstance.owningCharacterUI != null)
                     InstantiateUI(CurrentGameInstance.owningCharacterUI);
             }
-            else
+            else if (IsClient)
             {
                 if (CurrentGameInstance.nonOwningCharacterMiniMapObjects != null && CurrentGameInstance.nonOwningCharacterMiniMapObjects.Length > 0)
                 {

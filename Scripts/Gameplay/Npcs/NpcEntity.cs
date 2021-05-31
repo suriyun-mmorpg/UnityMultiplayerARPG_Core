@@ -104,21 +104,27 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
 
-            // Setup relates elements
-            if (CurrentGameInstance.npcMiniMapObjects != null && CurrentGameInstance.npcMiniMapObjects.Length > 0)
+            if (IsClient)
             {
-                foreach (GameObject obj in CurrentGameInstance.npcMiniMapObjects)
+                // Setup relates elements
+                if (CurrentGameInstance.npcMiniMapObjects != null && CurrentGameInstance.npcMiniMapObjects.Length > 0)
                 {
-                    if (obj == null) continue;
-                    Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
+                    foreach (GameObject obj in CurrentGameInstance.npcMiniMapObjects)
+                    {
+                        if (obj == null) continue;
+                        Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
+                    }
                 }
+
+                if (CurrentGameInstance.npcUI != null)
+                    InstantiateUI(CurrentGameInstance.npcUI);
+
+                if (CurrentGameInstance.npcQuestIndicator != null)
+                    InstantiateQuestIndicator(CurrentGameInstance.npcQuestIndicator);
             }
 
-            if (CurrentGameInstance.npcUI != null)
-                InstantiateUI(CurrentGameInstance.npcUI);
-
-            if (CurrentGameInstance.npcQuestIndicator != null)
-                InstantiateQuestIndicator(CurrentGameInstance.npcQuestIndicator);
+            // Set movement state to be on ground by default
+            MovementState = MovementState.IsGrounded;
         }
 
         public void InstantiateUI(UINpcEntity prefab)
