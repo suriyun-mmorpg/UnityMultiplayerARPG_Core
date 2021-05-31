@@ -11,7 +11,16 @@ namespace MultiplayerARPG
         public static readonly CharacterStats Empty = new CharacterStats();
         [Header("Default Stats")]
         public float hp;
+        public float hpRecovery;
+        public float hpLeechRate;
         public float mp;
+        public float mpRecovery;
+        public float mpLeechRate;
+        public float stamina;
+        public float staminaRecovery;
+        public float staminaLeechRate;
+        public float food;
+        public float water;
         public float accuracy;
         public float evasion;
         public float criRate;
@@ -22,14 +31,20 @@ namespace MultiplayerARPG
         public float atkSpeed;
         public float weightLimit;
         public float slotLimit;
-        public float stamina;
-        public float food;
-        public float water;
 
         public CharacterStats Add(CharacterStats b)
         {
             hp = hp + b.hp;
+            hpRecovery = hpRecovery + b.hpRecovery;
+            hpLeechRate = hpLeechRate + b.hpLeechRate;
             mp = mp + b.mp;
+            mpRecovery = mpRecovery + b.mpRecovery;
+            mpLeechRate = mpLeechRate + b.mpLeechRate;
+            stamina = stamina + b.stamina;
+            staminaRecovery = staminaRecovery + b.staminaRecovery;
+            staminaLeechRate = staminaLeechRate + b.staminaLeechRate;
+            food = food + b.food;
+            water = water + b.water;
             accuracy = accuracy + b.accuracy;
             evasion = evasion + b.evasion;
             criRate = criRate + b.criRate;
@@ -40,16 +55,22 @@ namespace MultiplayerARPG
             atkSpeed = atkSpeed + b.atkSpeed;
             weightLimit = weightLimit + b.weightLimit;
             slotLimit = slotLimit + b.slotLimit;
-            stamina = stamina + b.stamina;
-            food = food + b.food;
-            water = water + b.water;
             return this.InvokeInstanceDevExtMethodsLoopItself("Add", b);
         }
 
         public CharacterStats Multiply(float multiplier)
         {
             hp = hp * multiplier;
+            hpRecovery = hpRecovery * multiplier;
+            hpLeechRate = hpLeechRate * multiplier;
             mp = mp * multiplier;
+            mpRecovery = mpRecovery * multiplier;
+            mpLeechRate = mpLeechRate * multiplier;
+            stamina = stamina * multiplier;
+            staminaRecovery = staminaRecovery * multiplier;
+            staminaLeechRate = staminaLeechRate * multiplier;
+            food = food * multiplier;
+            water = water * multiplier;
             accuracy = accuracy * multiplier;
             evasion = evasion * multiplier;
             criRate = criRate * multiplier;
@@ -60,16 +81,22 @@ namespace MultiplayerARPG
             atkSpeed = atkSpeed * multiplier;
             weightLimit = weightLimit * multiplier;
             slotLimit = slotLimit * multiplier;
-            stamina = stamina * multiplier;
-            food = food * multiplier;
-            water = water * multiplier;
             return this.InvokeInstanceDevExtMethodsLoopItself("Multiply", multiplier);
         }
 
         public CharacterStats MultiplyStats(CharacterStats b)
         {
             hp = hp * b.hp;
+            hpRecovery = hpRecovery * b.hpRecovery;
+            hpLeechRate = hpLeechRate * b.hpLeechRate;
             mp = mp * b.mp;
+            mpRecovery = mpRecovery * b.mpRecovery;
+            mpLeechRate = mpLeechRate * b.mpLeechRate;
+            stamina = stamina * b.stamina;
+            staminaRecovery = staminaRecovery * b.staminaRecovery;
+            staminaLeechRate = staminaLeechRate * b.staminaLeechRate;
+            food = food * b.food;
+            water = water * b.water;
             accuracy = accuracy * b.accuracy;
             evasion = evasion * b.evasion;
             criRate = criRate * b.criRate;
@@ -80,9 +107,6 @@ namespace MultiplayerARPG
             atkSpeed = atkSpeed * b.atkSpeed;
             weightLimit = weightLimit * b.weightLimit;
             slotLimit = slotLimit * b.slotLimit;
-            stamina = stamina * b.stamina;
-            food = food * b.food;
-            water = water * b.water;
             return this.InvokeInstanceDevExtMethodsLoopItself("MultiplyStats", b);
         }
 
@@ -106,7 +130,16 @@ namespace MultiplayerARPG
             bool isRate,
             bool isBonus,
             string hpStatsFormat,
+            string hpRecoveryStatsFormat,
+            string hpLeechRateStatsFormat,
             string mpStatsFormat,
+            string mpRecoveryStatsFormat,
+            string mpLeechRateStatsFormat,
+            string staminaStatsFormat,
+            string staminaRecoveryStatsFormat,
+            string staminaLeechRateStatsFormat,
+            string foodStatsFormat,
+            string waterStatsFormat,
             string accuracyStatsFormat,
             string evasionStatsFormat,
             string criRateStatsFormat,
@@ -117,11 +150,17 @@ namespace MultiplayerARPG
             string atkSpeedStatsFormat,
             string weightLimitStatsFormat,
             string slotLimitStatsFormat,
-            string staminaStatsFormat,
-            string foodStatsFormat,
-            string waterStatsFormat,
             TextWrapper uiTextHp = null,
+            TextWrapper uiTextHpRecovery = null,
+            TextWrapper uiTextHpLeechRate = null,
             TextWrapper uiTextMp = null,
+            TextWrapper uiTextMpRecovery = null,
+            TextWrapper uiTextMpLeechRate = null,
+            TextWrapper uiTextStamina = null,
+            TextWrapper uiTextStaminaRecovery = null,
+            TextWrapper uiTextStaminaLeechRate = null,
+            TextWrapper uiTextFood = null,
+            TextWrapper uiTextWater = null,
             TextWrapper uiTextAccuracy = null,
             TextWrapper uiTextEvasion = null,
             TextWrapper uiTextCriRate = null,
@@ -131,10 +170,7 @@ namespace MultiplayerARPG
             TextWrapper uiTextMoveSpeed = null,
             TextWrapper uiTextAtkSpeed = null,
             TextWrapper uiTextWeightLimit = null,
-            TextWrapper uiTextSlotLimit = null,
-            TextWrapper uiTextStamina = null,
-            TextWrapper uiTextFood = null,
-            TextWrapper uiTextWater = null)
+            TextWrapper uiTextSlotLimit = null)
         {
             StringBuilder statsString = new StringBuilder();
             string statsStringPart;
@@ -157,6 +193,40 @@ namespace MultiplayerARPG
             if (uiTextHp != null)
                 uiTextHp.text = statsStringPart;
 
+            // Hp Recovery
+            if (isBonus)
+                tempValue = isRate ? (data.hpRecovery * 100).ToBonusString("N2") : data.hpRecovery.ToBonusString("N0");
+            else
+                tempValue = isRate ? (data.hpRecovery * 100).ToString("N2") : data.hpRecovery.ToString("N0");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(hpRecoveryStatsFormat),
+                tempValue);
+            if (data.hpRecovery != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextHpRecovery != null)
+                uiTextHpRecovery.text = statsStringPart;
+
+            // Hp Leech Rate
+            if (isBonus)
+                tempValue = isRate ? (data.hpLeechRate * 10000).ToBonusString("N2") : (data.hpLeechRate * 100).ToBonusString("N2");
+            else
+                tempValue = isRate ? (data.hpLeechRate * 10000).ToString("N2") : (data.hpLeechRate * 100).ToString("N2");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(hpLeechRateStatsFormat),
+                tempValue);
+            if (data.hpLeechRate != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextHpLeechRate != null)
+                uiTextHpLeechRate.text = statsStringPart;
+
             // Mp
             if (isBonus)
                 tempValue = isRate ? (data.mp * 100).ToBonusString("N2") : data.mp.ToBonusString("N0");
@@ -173,6 +243,125 @@ namespace MultiplayerARPG
             }
             if (uiTextMp != null)
                 uiTextMp.text = statsStringPart;
+
+            // Mp Recovery
+            if (isBonus)
+                tempValue = isRate ? (data.mpRecovery * 100).ToBonusString("N2") : data.mpRecovery.ToBonusString("N0");
+            else
+                tempValue = isRate ? (data.mpRecovery * 100).ToString("N2") : data.mpRecovery.ToString("N0");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(mpRecoveryStatsFormat),
+                tempValue);
+            if (data.mpRecovery != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextMpRecovery != null)
+                uiTextMpRecovery.text = statsStringPart;
+
+            // Mp Leech Rate
+            if (isBonus)
+                tempValue = isRate ? (data.mpLeechRate * 10000).ToBonusString("N2") : (data.mpLeechRate * 100).ToBonusString("N2");
+            else
+                tempValue = isRate ? (data.mpLeechRate * 10000).ToString("N2") : (data.mpLeechRate * 100).ToString("N2");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(mpLeechRateStatsFormat),
+                tempValue);
+            if (data.mpLeechRate != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextMpLeechRate != null)
+                uiTextMpLeechRate.text = statsStringPart;
+
+            // Stamina
+            if (isBonus)
+                tempValue = isRate ? (data.stamina * 100).ToBonusString("N2") : data.stamina.ToBonusString("N0");
+            else
+                tempValue = isRate ? (data.stamina * 100).ToString("N2") : data.stamina.ToString("N0");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(staminaStatsFormat),
+                tempValue);
+            if (data.stamina != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextStamina != null)
+                uiTextStamina.text = statsStringPart;
+
+            // Stamina Recovery
+            if (isBonus)
+                tempValue = isRate ? (data.staminaRecovery * 100).ToBonusString("N2") : data.staminaRecovery.ToBonusString("N0");
+            else
+                tempValue = isRate ? (data.staminaRecovery * 100).ToString("N2") : data.staminaRecovery.ToString("N0");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(staminaRecoveryStatsFormat),
+                tempValue);
+            if (data.staminaRecovery != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextStaminaRecovery != null)
+                uiTextStaminaRecovery.text = statsStringPart;
+
+            // Stamina Leech Rate
+            if (isBonus)
+                tempValue = isRate ? (data.staminaLeechRate * 10000).ToBonusString("N2") : (data.staminaLeechRate * 100).ToBonusString("N2");
+            else
+                tempValue = isRate ? (data.staminaLeechRate * 10000).ToString("N2") : (data.staminaLeechRate * 100).ToString("N2");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(staminaLeechRateStatsFormat),
+                tempValue);
+            if (data.staminaLeechRate != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextStaminaLeechRate != null)
+                uiTextStaminaLeechRate.text = statsStringPart;
+
+            // Food
+            if (isBonus)
+                tempValue = isRate ? (data.food * 100).ToBonusString("N2") : data.food.ToBonusString("N0");
+            else
+                tempValue = isRate ? (data.food * 100).ToString("N2") : data.food.ToString("N0");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(foodStatsFormat),
+                tempValue);
+            if (data.food != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextFood != null)
+                uiTextFood.text = statsStringPart;
+
+            // Water
+            if (isBonus)
+                tempValue = isRate ? (data.water * 100).ToBonusString("N2") : data.water.ToBonusString("N0");
+            else
+                tempValue = isRate ? (data.water * 100).ToString("N2") : data.water.ToString("N0");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(waterStatsFormat),
+                tempValue);
+            if (data.water != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextWater != null)
+                uiTextWater.text = statsStringPart;
 
             // Accuracy
             if (isBonus)
@@ -343,57 +532,6 @@ namespace MultiplayerARPG
             }
             if (uiTextAtkSpeed != null)
                 uiTextAtkSpeed.text = statsStringPart;
-
-            // Stamina
-            if (isBonus)
-                tempValue = isRate ? (data.stamina * 100).ToBonusString("N2") : data.stamina.ToBonusString("N0");
-            else
-                tempValue = isRate ? (data.stamina * 100).ToString("N2") : data.stamina.ToString("N0");
-            statsStringPart = string.Format(
-                LanguageManager.GetText(staminaStatsFormat),
-                tempValue);
-            if (data.stamina != 0)
-            {
-                if (statsString.Length > 0)
-                    statsString.Append('\n');
-                statsString.Append(statsStringPart);
-            }
-            if (uiTextStamina != null)
-                uiTextStamina.text = statsStringPart;
-
-            // Food
-            if (isBonus)
-                tempValue = isRate ? (data.food * 100).ToBonusString("N2") : data.food.ToBonusString("N0");
-            else
-                tempValue = isRate ? (data.food * 100).ToString("N2") : data.food.ToString("N0");
-            statsStringPart = string.Format(
-                LanguageManager.GetText(foodStatsFormat),
-                tempValue);
-            if (data.food != 0)
-            {
-                if (statsString.Length > 0)
-                    statsString.Append('\n');
-                statsString.Append(statsStringPart);
-            }
-            if (uiTextFood != null)
-                uiTextFood.text = statsStringPart;
-
-            // Water
-            if (isBonus)
-                tempValue = isRate ? (data.water * 100).ToBonusString("N2") : data.water.ToBonusString("N0");
-            else
-                tempValue = isRate ? (data.water * 100).ToString("N2") : data.water.ToString("N0");
-            statsStringPart = string.Format(
-                LanguageManager.GetText(waterStatsFormat),
-                tempValue);
-            if (data.water != 0)
-            {
-                if (statsString.Length > 0)
-                    statsString.Append('\n');
-                statsString.Append(statsStringPart);
-            }
-            if (uiTextWater != null)
-                uiTextWater.text = statsStringPart;
 
             return statsString.ToString();
         }

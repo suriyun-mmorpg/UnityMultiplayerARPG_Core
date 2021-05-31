@@ -907,6 +907,55 @@ namespace MultiplayerARPG
         /// Format => {0} = {Currency Title}, {1} = {Amount}
         /// </summary>
         UI_FORMAT_NOTIFY_REWARD_CURRENCY,
+        // 1.65f New Formats
+        /// <summary>
+        /// Format => {0} = {Amount}
+        /// </summary>
+        UI_FORMAT_HP_RECOVERY,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_HP_LEECH_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount}
+        /// </summary>
+        UI_FORMAT_MP_RECOVERY,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_MP_LEECH_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount}
+        /// </summary>
+        UI_FORMAT_STAMINA_RECOVERY,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_STAMINA_LEECH_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_HP_RECOVERY_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 10000}
+        /// </summary>
+        UI_FORMAT_HP_LEECH_RATE_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_MP_RECOVERY_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 10000}
+        /// </summary>
+        UI_FORMAT_MP_LEECH_RATE_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_STAMINA_RECOVERY_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 10000}
+        /// </summary>
+        UI_FORMAT_STAMINA_LEECH_RATE_RATE,
     }
 
     public static class DefaultLocale
@@ -1373,6 +1422,19 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_CURRENT_CURRENCY_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString(), "{0}: {1}");
             Texts.Add(UIFormatKeys.UI_FORMAT_REWARD_CURRENCY.ToString(), "Reward {0}: {1}");
+            // Format - 1.65f - New stats
+            Texts.Add(UIFormatKeys.UI_FORMAT_HP_RECOVERY.ToString(), "Hp Recovery: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_HP_LEECH_RATE.ToString(), "Hp Leech Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_MP_RECOVERY.ToString(), "Mp Recovery: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_MP_LEECH_RATE.ToString(), "Mp Leech Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_STAMINA_RECOVERY.ToString(), "Stamina Recovery: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_STAMINA_LEECH_RATE.ToString(), "Stamina Leech Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_HP_RECOVERY_RATE.ToString(), "Hp Recovery Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_HP_LEECH_RATE_RATE.ToString(), "% of Hp Leech Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_MP_RECOVERY_RATE.ToString(), "Mp Recovery Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_MP_LEECH_RATE_RATE.ToString(), "% of Mp Leech Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_STAMINA_RECOVERY_RATE.ToString(), "Stamina Recovery Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_STAMINA_LEECH_RATE_RATE.ToString(), "% of Stamina Leech Rate: {0}%");
         }
     }
 
