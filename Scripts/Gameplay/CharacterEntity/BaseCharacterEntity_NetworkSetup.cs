@@ -17,6 +17,8 @@ namespace MultiplayerARPG
             level.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             exp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             exp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            isImmune.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isImmune.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentHp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentHp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentMp.deliveryMethod = DeliveryMethod.ReliableOrdered;
@@ -49,6 +51,7 @@ namespace MultiplayerARPG
             id.onChange += OnIdChange;
             level.onChange += OnLevelChange;
             exp.onChange += OnExpChange;
+            isImmune.onChange += OnIsImmuneChange;
             currentHp.onChange += OnCurrentHpChange;
             currentMp.onChange += OnCurrentMpChange;
             currentFood.onChange += OnCurrentFoodChange;
@@ -74,6 +77,7 @@ namespace MultiplayerARPG
             id.onChange -= OnIdChange;
             level.onChange -= OnLevelChange;
             exp.onChange -= OnExpChange;
+            isImmune.onChange -= OnIsImmuneChange;
             currentHp.onChange -= OnCurrentHpChange;
             currentMp.onChange -= OnCurrentMpChange;
             currentFood.onChange -= OnCurrentFoodChange;

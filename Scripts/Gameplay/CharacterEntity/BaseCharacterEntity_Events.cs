@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public event System.Action<string> onCharacterNameChange;
         public event System.Action<short> onLevelChange;
         public event System.Action<int> onExpChange;
+        public event System.Action<bool> onIsImmuneChange;
         public event System.Action<int> onCurrentHpChange;
         public event System.Action<int> onCurrentMpChange;
         public event System.Action<int> onCurrentFoodChange;

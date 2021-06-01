@@ -40,8 +40,11 @@ namespace MultiplayerARPG
 
         [Header("Damageable Sync Fields")]
         [SerializeField]
+        protected SyncFieldBool isImmune = new SyncFieldBool();
+        [SerializeField]
         protected SyncFieldInt currentHp = new SyncFieldInt();
 
+        public virtual bool IsImmune { get { return isImmune.Value; } set { isImmune.Value = value; } }
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public bool IsInSafeArea { get; set; }
         public abstract int MaxHp { get; }
@@ -303,7 +306,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
         {
-            if (IsInSafeArea)
+            if (IsInSafeArea || IsImmune)
             {
                 // If this entity is in safe area it will not receives damages
                 return false;

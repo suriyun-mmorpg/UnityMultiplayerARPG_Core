@@ -243,6 +243,17 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Override this to do stuffs when is immune changes
+        /// </summary>
+        /// <param name="isInitial"></param>
+        /// <param name="isImmune"></param>
+        protected virtual void OnIsImmuneChange(bool isInitial, bool isImmune)
+        {
+            if (onIsImmuneChange != null)
+                onIsImmuneChange.Invoke(isImmune);
+        }
+
+        /// <summary>
         /// Override this to do stuffs when current hp changes
         /// </summary>
         /// <param name="currentHp"></param>
