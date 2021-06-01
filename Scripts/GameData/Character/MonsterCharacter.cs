@@ -82,7 +82,6 @@ namespace MultiplayerARPG
         private float moveSpeedRateWhileAttacking = 0f;
         public float MoveSpeedRateWhileAttacking { get { return moveSpeedRateWhileAttacking; } }
 
-
         [Header("Killing Rewards")]
         [HideInInspector]
         [SerializeField]
@@ -110,6 +109,11 @@ namespace MultiplayerARPG
         public CurrencyRandomAmount[] randomCurrencies;
         [SerializeField]
         private ItemDropTable itemDropTable;
+
+        [Header("Summoner Buffs")]
+        [SerializeField]
+        private Buff summonerBuff;
+        public Buff SummonerBuff { get { return summonerBuff; } }
 
         [System.NonSerialized]
         private CharacterStatsIncremental? adjustStats;

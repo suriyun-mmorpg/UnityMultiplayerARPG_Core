@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -38,6 +39,22 @@ namespace MultiplayerARPG
         private BaseItem cachePetItem;
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cachePrefab;
+        [System.NonSerialized]
+        private Buff cacheSummonerBuff;
+        [System.NonSerialized]
+        private CharacterStats cacheIncreaseStats;
+        [System.NonSerialized]
+        private CharacterStats cacheIncreaseStatsRate;
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> cacheIncreaseAttributes;
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> cacheIncreaseAttributesRate;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, float> cacheIncreaseResistances;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, float> cacheIncreaseArmors;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
 
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cacheEntity;
@@ -59,6 +76,14 @@ namespace MultiplayerARPG
                 cacheSkill = null;
                 cachePetItem = null;
                 cachePrefab = null;
+                cacheSummonerBuff = default(Buff);
+                cacheIncreaseStats = new CharacterStats();
+                cacheIncreaseStatsRate = new CharacterStats();
+                cacheIncreaseAttributes = null;
+                cacheIncreaseAttributesRate = null;
+                cacheIncreaseResistances = null;
+                cacheIncreaseArmors = null;
+                cacheIncreaseDamages = null;
                 switch (type)
                 {
                     case SummonType.Skill:
@@ -69,6 +94,18 @@ namespace MultiplayerARPG
                         if (GameInstance.Items.TryGetValue(dataId, out cachePetItem) && cachePetItem is IPetItem)
                             cachePrefab = (cachePetItem as IPetItem).PetEntity;
                         break;
+                }
+                if (cachePrefab != null && cachePrefab.CharacterDatabase != null)
+                {
+                    MonsterCharacter database = cachePrefab.CharacterDatabase;
+                    cacheSummonerBuff = database.SummonerBuff;
+                    cacheIncreaseStats = cacheSummonerBuff.GetIncreaseStats(level);
+                    cacheIncreaseStatsRate = cacheSummonerBuff.GetIncreaseStatsRate(level);
+                    cacheIncreaseAttributes = cacheSummonerBuff.GetIncreaseAttributes(level);
+                    cacheIncreaseAttributesRate = cacheSummonerBuff.GetIncreaseAttributesRate(level);
+                    cacheIncreaseResistances = cacheSummonerBuff.GetIncreaseResistances(level);
+                    cacheIncreaseArmors = cacheSummonerBuff.GetIncreaseArmors(level);
+                    cacheIncreaseDamages = cacheSummonerBuff.GetIncreaseDamages(level);
                 }
             }
         }
@@ -132,6 +169,48 @@ namespace MultiplayerARPG
 
             if (CacheEntity)
                 CacheEntity.UnSummon();
+        }
+
+        public CharacterStats GetIncreaseStats()
+        {
+            MakeCache();
+            return cacheIncreaseStats;
+        }
+
+        public CharacterStats GetIncreaseStatsRate()
+        {
+            MakeCache();
+            return cacheIncreaseStatsRate;
+        }
+
+        public Dictionary<Attribute, float> GetIncreaseAttributes()
+        {
+            MakeCache();
+            return cacheIncreaseAttributes;
+        }
+
+        public Dictionary<Attribute, float> GetIncreaseAttributesRate()
+        {
+            MakeCache();
+            return cacheIncreaseAttributesRate;
+        }
+
+        public Dictionary<DamageElement, float> GetIncreaseResistances()
+        {
+            MakeCache();
+            return cacheIncreaseResistances;
+        }
+
+        public Dictionary<DamageElement, float> GetIncreaseArmors()
+        {
+            MakeCache();
+            return cacheIncreaseArmors;
+        }
+
+        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
+        {
+            MakeCache();
+            return cacheIncreaseDamages;
         }
 
         public bool ShouldRemove()

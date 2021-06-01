@@ -175,6 +175,12 @@ namespace MultiplayerARPG
                 // Increase with rates
                 result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
             }
+            foreach (CharacterSummon summon in data.Summons)
+            {
+                result = GameDataHelpers.CombineAttributes(result, summon.GetIncreaseAttributes());
+                // Increase with rates
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), summon.GetIncreaseAttributesRate()));
+            }
             return result;
         }
 
@@ -321,6 +327,10 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineResistances(result, buff.GetIncreaseResistances());
             }
+            foreach (CharacterSummon summon in data.Summons)
+            {
+                result = GameDataHelpers.CombineResistances(result, summon.GetIncreaseResistances());
+            }
             return result;
         }
 
@@ -408,6 +418,10 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineArmors(result, buff.GetIncreaseArmors());
             }
+            foreach (CharacterSummon summon in data.Summons)
+            {
+                result = GameDataHelpers.CombineArmors(result, summon.GetIncreaseArmors());
+            }
             return result;
         }
 
@@ -479,6 +493,10 @@ namespace MultiplayerARPG
             foreach (CharacterBuff buff in data.Buffs)
             {
                 result = GameDataHelpers.CombineDamages(result, buff.GetIncreaseDamages());
+            }
+            foreach (CharacterSummon summon in data.Summons)
+            {
+                result = GameDataHelpers.CombineDamages(result, summon.GetIncreaseDamages());
             }
             return result;
         }
@@ -587,6 +605,14 @@ namespace MultiplayerARPG
                 // Increase with rates
                 result += baseStats * buff.GetIncreaseStatsRate();
                 result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
+            }
+            foreach (CharacterSummon summon in data.Summons)
+            {
+                result += summon.GetIncreaseStats();
+                result += GameDataHelpers.GetStatsFromAttributes(summon.GetIncreaseAttributes());
+                // Increase with rates
+                result += baseStats * summon.GetIncreaseStatsRate();
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), summon.GetIncreaseAttributesRate()));
             }
             return result;
         }
