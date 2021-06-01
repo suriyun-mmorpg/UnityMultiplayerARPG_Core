@@ -82,7 +82,7 @@ namespace MultiplayerARPG
                     onTypeIsSkill.Invoke();
                     tempSummonData = Data.GetSkill();
                     break;
-                case SummonType.Pet:
+                case SummonType.PetItem:
                     onTypeIsPet.Invoke();
                     tempSummonData = Data.GetPetItem();
                     break;
@@ -159,7 +159,7 @@ namespace MultiplayerARPG
 
         public void OnClickUnSummon()
         {
-            if (CharacterSummon.type == SummonType.Pet)
+            if (CharacterSummon.type == SummonType.PetItem)
                 GameInstance.PlayingCharacterEntity.CallServerUnSummon(CharacterSummon.objectId);
         }
     }

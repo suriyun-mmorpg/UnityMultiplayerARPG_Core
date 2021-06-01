@@ -543,13 +543,13 @@ namespace MultiplayerARPG
             for (int i = 0; i < character.Summons.Count; ++i)
             {
                 tempSummon = character.Summons[i];
-                if (tempSummon.type != SummonType.Pet)
+                if (tempSummon.type != SummonType.PetItem)
                     continue;
                 character.Summons.RemoveAt(i);
                 tempSummon.UnSummon(character);
             }
             // Summon new pet
-            CharacterSummon newSummon = CharacterSummon.Create(SummonType.Pet, DataId);
+            CharacterSummon newSummon = CharacterSummon.Create(SummonType.PetItem, DataId);
             newSummon.Summon(character, level, 0f, exp);
             character.Summons.Add(newSummon);
         }

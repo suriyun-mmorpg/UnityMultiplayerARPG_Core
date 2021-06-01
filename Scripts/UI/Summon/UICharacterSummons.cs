@@ -122,7 +122,7 @@ namespace MultiplayerARPG
                         case SummonType.Skill:
                             stackingSkillSummons.Add(characterSummon.dataId, tempUiCharacterSummon);
                             break;
-                        case SummonType.Pet:
+                        case SummonType.PetItem:
                             ui.transform.SetAsFirstSibling();
                             break;
                     }

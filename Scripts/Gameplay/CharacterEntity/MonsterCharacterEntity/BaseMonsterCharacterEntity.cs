@@ -509,7 +509,7 @@ namespace MultiplayerARPG
                         if (!givenRewardExp)
                         {
                             // Will give reward when it was not given
-                            int petIndex = tempPlayerCharacterEntity.IndexOfSummon(SummonType.Pet);
+                            int petIndex = tempPlayerCharacterEntity.IndexOfSummon(SummonType.PetItem);
                             if (petIndex >= 0)
                             {
                                 tempMonsterCharacterEntity = tempPlayerCharacterEntity.Summons[petIndex].CacheEntity;

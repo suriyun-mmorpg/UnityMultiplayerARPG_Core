@@ -327,7 +327,7 @@ namespace MultiplayerARPG
         {
             rewardedExp = 0;
             if ((character is BaseMonsterCharacterEntity) &&
-                (character as BaseMonsterCharacterEntity).SummonType != SummonType.Pet)
+                (character as BaseMonsterCharacterEntity).SummonType != SummonType.PetItem)
             {
                 // If it's monster and not pet, do not increase exp
                 return false;

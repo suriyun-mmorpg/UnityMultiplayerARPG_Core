@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         None,
         Skill,
-        Pet,
+        PetItem,
     }
 
     [System.Serializable]
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                         if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill))
                             cachePrefab = cacheSkill.GetSummon().MonsterEntity;
                         break;
-                    case SummonType.Pet:
+                    case SummonType.PetItem:
                         if (GameInstance.Items.TryGetValue(dataId, out cachePetItem) && cachePetItem is IPetItem)
                             cachePrefab = (cachePetItem as IPetItem).PetEntity;
                         break;
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
 
         public void UnSummon(BaseCharacterEntity summoner)
         {
-            if (type == SummonType.Pet)
+            if (type == SummonType.PetItem)
             {
                 CharacterItem newItem = CharacterItem.Create(dataId, Level, 1);
                 newItem.exp = Exp;
