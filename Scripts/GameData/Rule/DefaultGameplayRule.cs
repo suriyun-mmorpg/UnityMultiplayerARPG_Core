@@ -496,13 +496,30 @@ namespace MultiplayerARPG
                 DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
                 CharacterStats stats = attacker.GetCaches().Stats;
                 // Hp Leeching, don't decrease damage receiver's Hp again
-                attacker.CurrentHp += Mathf.CeilToInt(damage * stats.hpLeechRate);
+                int leechAmount = Mathf.CeilToInt(damage * stats.hpLeechRate);
+                if (leechAmount != 0)
+                {
+                    attacker.CurrentHp += leechAmount;
+                    attacker.CurrentHp = Mathf.Clamp(attacker.CurrentHp, 0, attacker.MaxHp);
+                }
                 // Mp Leeching
-                attacker.CurrentMp += Mathf.CeilToInt(damage * stats.mpLeechRate);
-                damageReceiver.CurrentMp -= Mathf.CeilToInt(damage * stats.mpLeechRate);
+                leechAmount = Mathf.CeilToInt(damage * stats.mpLeechRate);
+                if (leechAmount != 0)
+                {
+                    attacker.CurrentMp += leechAmount;
+                    attacker.CurrentMp = Mathf.Clamp(attacker.CurrentMp, 0, attacker.MaxMp);
+                    damageReceiver.CurrentMp -= leechAmount;
+                    damageReceiver.CurrentMp = Mathf.Clamp(damageReceiver.CurrentMp, 0, damageReceiver.MaxMp);
+                }
                 // Stamina Leeching
-                attacker.CurrentStamina += Mathf.CeilToInt(damage * stats.staminaLeechRate);
-                damageReceiver.CurrentStamina -= Mathf.CeilToInt(damage * stats.staminaLeechRate);
+                leechAmount = Mathf.CeilToInt(damage * stats.staminaLeechRate);
+                if (leechAmount != 0)
+                {
+                    attacker.CurrentStamina += leechAmount;
+                    attacker.CurrentStamina = Mathf.Clamp(attacker.CurrentStamina, 0, attacker.MaxStamina);
+                    damageReceiver.CurrentStamina -= leechAmount;
+                    damageReceiver.CurrentStamina = Mathf.Clamp(damageReceiver.CurrentStamina, 0, damageReceiver.MaxStamina);
+                }
             }
             // Decrease Shield Durability
             DecreaseEquipShieldsDurability(damageReceiver, decreaseShieldDurability);
