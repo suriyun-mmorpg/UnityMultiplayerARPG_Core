@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.Profiling;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public class UINpcEntity : UIBaseGameEntity<NpcEntity> { }
 }
