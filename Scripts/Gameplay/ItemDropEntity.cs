@@ -16,13 +16,6 @@ namespace MultiplayerARPG
         [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
         [SerializeField]
         protected Transform modelContainer;
-        [Header("Place On Scene Settings")]
-        [Tooltip("The title which will be used with item drop entity which placed into the scene (not drops from characters)")]
-        [SerializeField]
-        protected string itemTitle;
-        [Tooltip("Item titles by language keys")]
-        [SerializeField]
-        protected LanguageData[] itemTitles;
         [Header("Respawn Settings")]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
         [SerializeField]
@@ -90,21 +83,15 @@ namespace MultiplayerARPG
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
-        public string ItemTitle
-        {
-            get { return Language.GetText(itemTitles, itemTitle); }
-        }
-
-        public override string Title
+        public override string EntityTitle
         {
             get
             {
                 BaseItem item;
                 if (ItemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(ItemDropData.dataId, out item))
                     return item.Title;
-                return ItemTitle;
+                return base.EntityTitle;
             }
-            set { }
         }
 
         public Transform CacheModelContainer

@@ -33,7 +33,14 @@ namespace MultiplayerARPG
         [Header("Events")]
         public UnityEvent onHarvestableDestroy = new UnityEvent();
 
-        public override string Title { get { return harvestable.Title; } set { } }
+        public override string EntityTitle
+        {
+            get
+            {
+                string title = base.EntityTitle;
+                return !string.IsNullOrEmpty(title) ? title : harvestable.Title;
+            }
+        }
         public override int MaxHp { get { return maxHp; } }
         public float ColliderDetectionRadius { get { return colliderDetectionRadius; } }
         public GameSpawnArea<HarvestableEntity> SpawnArea { get; protected set; }

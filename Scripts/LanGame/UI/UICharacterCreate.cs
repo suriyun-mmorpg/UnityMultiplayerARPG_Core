@@ -190,7 +190,7 @@ namespace MultiplayerARPG
                 // Prepare data
                 BaseCharacter playerCharacter = characterEntity.CharacterDatabases[0];
                 PlayerCharacterData playerCharacterData = new PlayerCharacterData();
-                playerCharacterData.SetNewPlayerCharacterData(characterEntity.CharacterTitle, playerCharacter.DataId, characterEntity.EntityId);
+                playerCharacterData.SetNewPlayerCharacterData(characterEntity.EntityTitle, playerCharacter.DataId, characterEntity.EntityId);
                 // Hide all model, the first one will be shown later
                 BaseCharacterModel characterModel = playerCharacterData.InstantiateModel(characterModelContainer);
                 CharacterModelByEntityId[playerCharacterData.EntityId] = characterModel;

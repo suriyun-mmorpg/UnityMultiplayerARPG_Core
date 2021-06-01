@@ -54,18 +54,36 @@ namespace MultiplayerARPG
         [Header("Game Entity Sync Fields")]
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
-        public virtual string Title
+        public string Title
         {
-            get { return syncTitle.Value; }
+            get { return !string.IsNullOrEmpty(syncTitle.Value) ? syncTitle.Value : EntityTitle; }
             set { syncTitle.Value = value; }
         }
 
         [SerializeField]
         protected SyncFieldString syncTitleB = new SyncFieldString();
-        public virtual string TitleB
+        public string TitleB
         {
             get { return syncTitleB.Value; }
             set { syncTitleB.Value = value; }
+        }
+
+        [Header("Title Settings")]
+        [Tooltip("This title will be used while `syncTitle` is empty.")]
+        [FormerlySerializedAs("characterTitle")]
+        [FormerlySerializedAs("itemTitle")]
+        [SerializeField]
+        protected string entityTitle;
+
+        [Tooltip("Titles by language keys")]
+        [FormerlySerializedAs("characterTitles")]
+        [FormerlySerializedAs("itemTitles")]
+        [SerializeField]
+        protected LanguageData[] entityTitles;
+
+        public virtual string EntityTitle
+        {
+            get { return Language.GetText(entityTitles, entityTitle); }
         }
 
         [Header("Model and Transform Settings")]

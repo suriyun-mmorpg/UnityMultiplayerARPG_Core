@@ -11,12 +11,6 @@ namespace MultiplayerARPG
         public BaseNpcDialog CurrentNpcDialog { get; set; }
 
         [Header("Player Character Profile")]
-        [Tooltip("The title which will be shown in create scene")]
-        [SerializeField]
-        protected string characterTitle;
-        [Tooltip("Character titles by language keys")]
-        [SerializeField]
-        protected LanguageData[] characterTitles;
         [Tooltip("This is list which used as choice of character classes when create character")]
         [SerializeField]
         [FormerlySerializedAs("playerCharacters")]
@@ -24,11 +18,6 @@ namespace MultiplayerARPG
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected BasePlayerCharacterController controllerPrefab;
-
-        public string CharacterTitle
-        {
-            get { return Language.GetText(characterTitles, characterTitle); }
-        }
 
         public PlayerCharacter[] CharacterDatabases
         {

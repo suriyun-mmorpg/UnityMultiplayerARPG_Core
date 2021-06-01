@@ -13,12 +13,6 @@ namespace MultiplayerARPG
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
         [Header("Monster Character Profile")]
-        [Tooltip("The title which will override `Monster Character`'s title")]
-        [SerializeField]
-        protected string characterTitle;
-        [Tooltip("Character titles by language keys")]
-        [SerializeField]
-        protected LanguageData[] characterTitles;
         [SerializeField]
         [FormerlySerializedAs("monsterCharacter")]
         protected MonsterCharacter characterDatabase;
@@ -33,21 +27,13 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldByte summonType = new SyncFieldByte();
 
-        public string CharacterTitle
-        {
-            get { return Language.GetText(characterTitles, characterTitle); }
-        }
-
-        public override string Title
+        public override string EntityTitle
         {
             get
             {
-                // Return title (Can set in prefab) if it is not empty
-                if (!string.IsNullOrEmpty(CharacterTitle))
-                    return CharacterTitle;
-                return !CharacterDatabase || string.IsNullOrEmpty(CharacterDatabase.Title) ? LanguageManager.GetUnknowTitle() : CharacterDatabase.Title;
+                string title = base.EntityTitle;
+                return !string.IsNullOrEmpty(title) ? title : characterDatabase.Title;
             }
-            set { }
         }
 
         private BaseCharacterEntity summoner;
