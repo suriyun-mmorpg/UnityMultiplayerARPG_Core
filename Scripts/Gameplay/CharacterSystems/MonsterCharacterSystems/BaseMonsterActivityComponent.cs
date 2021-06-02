@@ -2,7 +2,7 @@
 {
     public abstract class BaseMonsterActivityComponent : BaseGameEntityComponent<BaseMonsterCharacterEntity>
     {
-        public MonsterCharacter MonsterDatabase
+        public MonsterCharacter CharacterDatabase
         {
             get { return Entity.CharacterDatabase; }
         }

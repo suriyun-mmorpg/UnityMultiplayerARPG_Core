@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         Normal,
         Aggressive,
         Assist,
+        NoHarm,
     }
 
     [System.Serializable]
@@ -27,7 +28,7 @@ namespace MultiplayerARPG
         private short defaultLevel = 1;
         public short DefaultLevel { get { return defaultLevel; } }
         [SerializeField]
-        [Tooltip("`Normal` will attack when being attacked, `Aggressive` will attack when enemy nearby, `Assist` will attack when other with same `Ally Id` being attacked.")]
+        [Tooltip("`Normal` will attack when being attacked, `Aggressive` will attack when enemy nearby, `Assist` will attack when other with same `Ally Id` being attacked, `NoHarm` won't attack.")]
         private MonsterCharacteristic characteristic;
         public MonsterCharacteristic Characteristic { get { return characteristic; } }
         [SerializeField]

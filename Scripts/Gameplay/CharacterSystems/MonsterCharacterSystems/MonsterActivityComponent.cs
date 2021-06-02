@@ -38,7 +38,7 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            if (!Entity.IsServer || Entity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
+            if (!Entity.IsServer || Entity.Identity.CountSubscribers() == 0 || CharacterDatabase == null)
                 return;
 
             if (Entity.IsDead())
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         private bool UpdateAttackEnemy(float deltaTime, Vector3 currentPosition)
         {
-            if (!Entity.TryGetTargetEntity(out tempTargetEnemy))
+            if (!Entity.TryGetTargetEntity(out tempTargetEnemy) || CharacterDatabase.Characteristic == MonsterCharacteristic.NoHarm)
             {
                 // No target, stop attacking
                 ClearActionState();
@@ -151,7 +151,7 @@ namespace MultiplayerARPG
             if (tempTargetEnemy != null && !Entity.IsPlayingActionAnimation() && !alreadySetActionState)
             {
                 // Random action state to do next time
-                if (MonsterDatabase.RandomSkill(Entity, out queueSkill, out queueSkillLevel) && queueSkill != null)
+                if (CharacterDatabase.RandomSkill(Entity, out queueSkill, out queueSkillLevel) && queueSkill != null)
                 {
                     // Cooling down
                     if (Entity.IndexOfSkillUsage(queueSkill.DataId, SkillUsageType.Skill) >= 0)
@@ -297,7 +297,7 @@ namespace MultiplayerARPG
         public virtual bool FindEnemy(Vector3 currentPosition)
         {
             // Aggressive monster or summoned monster will find target to attack
-            if (MonsterDatabase.Characteristic != MonsterCharacteristic.Aggressive &&
+            if (CharacterDatabase.Characteristic != MonsterCharacteristic.Aggressive &&
                 Entity.Summoner == null)
                 return false;
 
@@ -307,7 +307,7 @@ namespace MultiplayerARPG
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
                 List<BaseCharacterEntity> characterEntities = Entity.FindAliveCharacters<BaseCharacterEntity>(
-                    MonsterDatabase.VisualRange,
+                    CharacterDatabase.VisualRange,
                     false, /* Don't find an allies */
                     true,  /* Always find an enemies */
                     Entity.IsSummoned && isAggressiveWhileSummonerIdle /* Find enemy while summoned and aggresively */);
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
                 if (!isAttackBuilding)
                     return false;
                 // Find building to attack
-                List<BuildingEntity> buildingEntities = Entity.FindAliveDamageableEntities<BuildingEntity>(MonsterDatabase.VisualRange, CurrentGameInstance.buildingLayer.Mask);
+                List<BuildingEntity> buildingEntities = Entity.FindAliveDamageableEntities<BuildingEntity>(CharacterDatabase.VisualRange, CurrentGameInstance.buildingLayer.Mask);
                 foreach (BuildingEntity buildingEntity in buildingEntities)
                 {
                     // Attack target settings
