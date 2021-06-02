@@ -240,7 +240,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (item.Requirement.character != null && item.Requirement.character != character.GetDatabase())
+            if (!item.Requirement.ClassIsAvailable(character.GetDatabase() as PlayerCharacter))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
                 return false;

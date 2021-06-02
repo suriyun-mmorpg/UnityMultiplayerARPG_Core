@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -8,11 +10,13 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Require Level}")]
         public UILocaleKeySetting formatKeyRequireLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL);
         [Tooltip("Format => {0} = {Require Class Title}")]
-        public UILocaleKeySetting formatKeyRequireClass = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_CLASS);
+        [FormerlySerializedAs("formatKeyRequireClasses")]
+        public UILocaleKeySetting formatKeyRequireClasses = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_CLASS);
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
-        public TextWrapper uiTextRequireClass;
+        [FormerlySerializedAs("uiTextRequireClass")]
+        public TextWrapper uiTextRequireClasses;
         public UIAttributeAmounts uiRequireAttributeAmounts;
 
         protected override void UpdateData()
@@ -33,19 +37,36 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiTextRequireClass != null)
+            if (uiTextRequireClasses != null)
             {
-                if (Data == null || Data.Requirement.character == null)
+                if (Data == null || !Data.Requirement.HasAvailableClasses())
                 {
                     // Hide require class label when require character is null
-                    uiTextRequireClass.SetGameObjectActive(false);
+                    uiTextRequireClasses.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextRequireClass.SetGameObjectActive(true);
-                    uiTextRequireClass.text = string.Format(
-                        LanguageManager.GetText(formatKeyRequireClass),
-                        Data.Requirement.character.Title);
+                    StringBuilder str = new StringBuilder();
+                    if (Data.Requirement.availableClass != null)
+                    {
+                        str.Append(Data.Requirement.availableClass.Title);
+                    }
+                    if (Data.Requirement.availableClasses != null &&
+                        Data.Requirement.availableClasses.Length > 0)
+                    {
+                        foreach (PlayerCharacter characterClass in Data.Requirement.availableClasses)
+                        {
+                            if (characterClass == null)
+                                continue;
+                            if (str.Length > 0)
+                                str.Append('/');
+                            str.Append(characterClass.Title);
+                        }
+                    }
+                    uiTextRequireClasses.SetGameObjectActive(true);
+                    uiTextRequireClasses.text = string.Format(
+                        LanguageManager.GetText(formatKeyRequireClasses),
+                        str.ToString());
                 }
             }
 
