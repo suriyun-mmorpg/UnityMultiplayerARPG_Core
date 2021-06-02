@@ -181,6 +181,8 @@ namespace MultiplayerARPG
                     StringBuilder str = new StringBuilder();
                     foreach (WeaponType availableWeapon in CacheAvailableWeapons)
                     {
+                        if (availableWeapon == null)
+                            continue;
                         if (str.Length > 0)
                             str.Append('/');
                         str.Append(availableWeapon.Title);
@@ -205,6 +207,8 @@ namespace MultiplayerARPG
                     StringBuilder str = new StringBuilder();
                     foreach (ArmorType requireArmor in availableArmors)
                     {
+                        if (requireArmor == null)
+                            continue;
                         if (str.Length > 0)
                             str.Append('/');
                         str.Append(requireArmor.Title);
@@ -229,6 +233,8 @@ namespace MultiplayerARPG
                     StringBuilder str = new StringBuilder();
                     foreach (VehicleType requireVehicle in availableVehicles)
                     {
+                        if (requireVehicle == null)
+                            continue;
                         if (str.Length > 0)
                             str.Append('/');
                         str.Append(requireVehicle.Title);
