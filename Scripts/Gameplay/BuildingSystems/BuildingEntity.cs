@@ -18,10 +18,11 @@ namespace MultiplayerARPG
         protected bool canBuildOnAnySurface;
 
         [SerializeField]
-        [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
+        [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish. This is a part of `buildingTypes`, just keep it for backward compatibility.")]
         protected string buildingType;
 
         [SerializeField]
+        [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish.")]
         protected List<string> buildingTypes;
 
         [SerializeField]
