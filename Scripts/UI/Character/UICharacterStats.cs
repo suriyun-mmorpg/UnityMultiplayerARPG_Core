@@ -211,6 +211,8 @@ namespace MultiplayerARPG
                         uiTextStamina,
                         uiTextStaminaRecovery,
                         uiTextStaminaLeechRate,
+                        uiTextFood,
+                        uiTextWater,
                         uiTextAccuracy,
                         uiTextEvasion,
                         uiTextCriRate,
