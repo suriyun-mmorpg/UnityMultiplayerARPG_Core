@@ -132,7 +132,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         private bool UpdateAttackEnemy(float deltaTime, Vector3 currentPosition)
         {
-            if (!Entity.TryGetTargetEntity(out tempTargetEnemy) || CharacterDatabase.Characteristic == MonsterCharacteristic.NoHarm)
+            if (!Entity.TryGetTargetEntity(out tempTargetEnemy) || Entity.Characteristic == MonsterCharacteristic.NoHarm)
             {
                 // No target, stop attacking
                 ClearActionState();
@@ -297,7 +297,7 @@ namespace MultiplayerARPG
         public virtual bool FindEnemy(Vector3 currentPosition)
         {
             // Aggressive monster or summoned monster will find target to attack
-            if (CharacterDatabase.Characteristic != MonsterCharacteristic.Aggressive &&
+            if (Entity.Characteristic != MonsterCharacteristic.Aggressive &&
                 Entity.Summoner == null)
                 return false;
 

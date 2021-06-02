@@ -16,6 +16,11 @@ namespace MultiplayerARPG
         [SerializeField]
         [FormerlySerializedAs("monsterCharacter")]
         protected MonsterCharacter characterDatabase;
+        [Tooltip("If this is `TRUE` it will use `overrideCharacteristic` as its characteristic instead of `characterDatabase.Characteristic`")]
+        [SerializeField]
+        protected bool isOverrideCharacteristic;
+        [SerializeField]
+        protected MonsterCharacteristic overrideCharacteristic;
         [SerializeField]
         protected float destroyDelay = 2f;
         [SerializeField]
@@ -80,6 +85,23 @@ namespace MultiplayerARPG
         {
             get { return characterDatabase; }
             set { characterDatabase = value; }
+        }
+
+        public bool IsOverrideCharacteristic
+        {
+            get { return isOverrideCharacteristic; }
+            set { isOverrideCharacteristic = value; }
+        }
+
+        public MonsterCharacteristic OverrideCharacteristic
+        {
+            get { return overrideCharacteristic; }
+            set { overrideCharacteristic = value; }
+        }
+
+        public MonsterCharacteristic Characteristic
+        {
+            get { return IsOverrideCharacteristic ? OverrideCharacteristic : CharacterDatabase.Characteristic; }
         }
 
         public override int DataId
@@ -614,7 +636,7 @@ namespace MultiplayerARPG
 
         protected override void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
-            if (CharacterDatabase.Characteristic != MonsterCharacteristic.Assist)
+            if (Characteristic != MonsterCharacteristic.Assist)
                 return;
             // Warn that this character received damage to nearby characters
             List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(CharacterDatabase.VisualRange, true, false, false);
@@ -628,7 +650,7 @@ namespace MultiplayerARPG
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
         {
             if ((Summoner && Summoner == ally) ||
-                CharacterDatabase.Characteristic == MonsterCharacteristic.Assist)
+                Characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
     }
