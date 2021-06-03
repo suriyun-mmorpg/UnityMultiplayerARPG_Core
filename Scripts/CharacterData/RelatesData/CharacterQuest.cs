@@ -133,10 +133,11 @@ namespace MultiplayerARPG
 
         public static CharacterQuest Create(Quest quest)
         {
-            CharacterQuest newQuest = new CharacterQuest();
-            newQuest.dataId = quest.DataId;
-            newQuest.isComplete = false;
-            return newQuest;
+            return new CharacterQuest()
+            {
+                dataId = quest.DataId,
+                isComplete = false,
+            };
         }
 
         public Dictionary<int, int> ReadKilledMonsters(string killMonsters)

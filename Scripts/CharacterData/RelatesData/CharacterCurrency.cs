@@ -38,10 +38,11 @@ namespace MultiplayerARPG
 
         public static CharacterCurrency Create(int dataId, int amount = 0)
         {
-            CharacterCurrency newCurrency = new CharacterCurrency();
-            newCurrency.dataId = dataId;
-            newCurrency.amount = amount;
-            return newCurrency;
+            return new CharacterCurrency()
+            {
+                dataId = dataId,
+                amount = amount,
+            };
         }
 
         public void Serialize(NetDataWriter writer)

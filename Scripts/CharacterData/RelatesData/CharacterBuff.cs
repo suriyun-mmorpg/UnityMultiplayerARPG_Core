@@ -257,12 +257,13 @@ namespace MultiplayerARPG
 
         public static CharacterBuff Create(BuffType type, int dataId, short level = 1)
         {
-            CharacterBuff newBuff = new CharacterBuff();
-            newBuff.type = type;
-            newBuff.dataId = dataId;
-            newBuff.level = level;
-            newBuff.buffRemainsDuration = 0f;
-            return newBuff;
+            return new CharacterBuff()
+            {
+                type = type,
+                dataId = dataId,
+                level = level,
+                buffRemainsDuration = 0f,
+            };
         }
 
         public void Serialize(NetDataWriter writer)

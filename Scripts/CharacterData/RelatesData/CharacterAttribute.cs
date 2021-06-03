@@ -38,10 +38,11 @@ namespace MultiplayerARPG
 
         public static CharacterAttribute Create(int dataId, short amount = 0)
         {
-            CharacterAttribute newAttribute = new CharacterAttribute();
-            newAttribute.dataId = dataId;
-            newAttribute.amount = amount;
-            return newAttribute;
+            return new CharacterAttribute()
+            {
+                dataId = dataId,
+                amount = amount,
+            };
         }
 
         public void Serialize(NetDataWriter writer)

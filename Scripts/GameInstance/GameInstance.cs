@@ -236,11 +236,17 @@ namespace MultiplayerARPG
         [Tooltip("Max distance to follow summoner, if distance between characters more than this it will teleport to summoner")]
         public float maxFollowSummonerDistance = 10f;
 
-        [Header("Gameplay Configs - Summon Pet")]
-        [Tooltip("This is duration to lock item before it is able to spawn later after character dead")]
+        [Header("Gameplay Configs - Summon Pet Item")]
+        [Tooltip("This is duration to lock item before it is able to summon later after character dead")]
         public float petDeadLockDuration = 60f;
-        [Tooltip("This is duration to lock item before it is able to spawn later after unsummon")]
+        [Tooltip("This is duration to lock item before it is able to summon later after unsummon")]
         public float petUnSummonLockDuration = 30f;
+
+        [Header("Gameplay Configs - Summon Companion")]
+        [Tooltip("This is duration to lock companion summoning before it is able to summon later after character dead")]
+        public float companionDeadLockDuration = 60f;
+        [Tooltip("This is duration to lock companion summoning before it is able to summon later after unsummon")]
+        public float companionUnSummonLockDuration = 30f;
 
         [Header("Gameplay Configs - Instance Dungeon")]
         [Tooltip("Distance from party leader character to join instance map")]

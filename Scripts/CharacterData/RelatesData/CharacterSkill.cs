@@ -42,10 +42,11 @@ namespace MultiplayerARPG
 
         public static CharacterSkill Create(int dataId, short level = 1)
         {
-            CharacterSkill newSkill = new CharacterSkill();
-            newSkill.dataId = dataId;
-            newSkill.level = level;
-            return newSkill;
+            return new CharacterSkill()
+            {
+                dataId = dataId,
+                level = level,
+            };
         }
 
         public void Serialize(NetDataWriter writer)

@@ -148,15 +148,25 @@ namespace MultiplayerARPG
 
         public void UnSummon(BaseCharacterEntity summoner)
         {
-            if (type == SummonType.PetItem)
+            switch (type)
             {
-                CharacterItem newItem = CharacterItem.Create(dataId, Level, 1);
-                newItem.exp = Exp;
-                if (CacheEntity && CacheEntity.CurrentHp <= 0)
-                    newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
-                else
-                    newItem.Lock(GameInstance.Singleton.petUnSummonLockDuration);
-                summoner.AddOrSetNonEquipItems(newItem);
+                case SummonType.PetItem:
+                    // Return to character as a pet item
+                    CharacterItem newItem = CharacterItem.Create(dataId, Level, 1);
+                    newItem.exp = Exp;
+                    if (CacheEntity && CacheEntity.CurrentHp <= 0)
+                        newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
+                    else
+                        newItem.Lock(GameInstance.Singleton.petUnSummonLockDuration);
+                    summoner.AddOrSetNonEquipItems(newItem);
+                    break;
+                case SummonType.Companion:
+                    // Save companion data
+                    if (summoner is BasePlayerCharacterEntity)
+                    {
+                        
+                    }
+                    break;
             }
 
             if (CacheEntity)
@@ -247,10 +257,11 @@ namespace MultiplayerARPG
 
         public static CharacterSummon Create(SummonType type, int dataId)
         {
-            CharacterSummon newSummon = new CharacterSummon();
-            newSummon.type = type;
-            newSummon.dataId = dataId;
-            return newSummon;
+            return new CharacterSummon()
+            {
+                type = type,
+                dataId = dataId,
+            };
         }
 
         public void Serialize(NetDataWriter writer)

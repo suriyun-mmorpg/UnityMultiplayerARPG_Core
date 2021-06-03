@@ -90,11 +90,12 @@ namespace MultiplayerARPG
 
         public static CharacterSkillUsage Create(SkillUsageType type, int dataId)
         {
-            CharacterSkillUsage newSkillUsage = new CharacterSkillUsage();
-            newSkillUsage.type = type;
-            newSkillUsage.dataId = dataId;
-            newSkillUsage.coolDownRemainsDuration = 0f;
-            return newSkillUsage;
+            return new CharacterSkillUsage()
+            {
+                type = type,
+                dataId = dataId,
+                coolDownRemainsDuration = 0f,
+            };
         }
 
         public void Serialize(NetDataWriter writer)
